@@ -447,13 +447,24 @@ def modify_registration(registration, data, management=False, notify_user=True):
     billable_items_locked = not management and registration.is_paid
     active_fields = regform.active_fields
 
-    def _set_data(form_item, value):
-        attrs = form_item.field_impl.process_form_data(registration, value, data_by_field[form_item.id],
+    def _void_field_if_needed(field):
+        show_if_field_id = field.data.get('show_if_field_id')
+        if show_if_field_id is not None:
+            show_if_data = registration.data_by_field.get(show_if_field_id)
+            if show_if_data is not None:
+                show_if_field = show_if_data.field_data.field
+                # recursively attempt to void fields it depends on
+                _void_field_if_needed(show_if_field)
+        if not registration.is_field_shown(field):
+            _set_data(field, field.field_impl.empty_value)
+
+    def _set_data(field, value):
+        attrs = field.field_impl.process_form_data(registration, value, data_by_field[field.id],
                                              billable_items_locked=billable_items_locked)
         for key, val in attrs.items():
-            setattr(data_by_field[form_item.id], key, val)
-        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-            key = form_item.personal_data_type.column
+            setattr(data_by_field[field.id], key, val)
+        if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.column:
+            key = field.personal_data_type.column
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
@@ -492,8 +503,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     # Second loop to remove fields that are hidden after the changes are applied.
     for form_item in active_fields:
-        if not registration.is_field_shown(form_item):
-            _set_data(form_item, form_item.field_impl.empty_value)
+        _void_field_if_needed(form_item)
 
     if not management and regform.needs_publish_consent:
         consent_to_publish = data.get('consent_to_publish')
