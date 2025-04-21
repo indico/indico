@@ -19,6 +19,7 @@ Improvements
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
+- Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^
