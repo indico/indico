@@ -199,9 +199,13 @@ class RHMenuEntryToggleDefault(RHMenuEntryEditBase):
         if self.event.default_page == self.entry.page:
             is_default = False
             self.event.default_page = None
+            self.entry.log(EventLogRealm.management, LogKind.change, 'Menu',
+                            f'Event homepage unset: {self.entry.log_title}', session.user)
         else:
             is_default = True
             self.event.default_page = self.entry.page
+            self.entry.log(EventLogRealm.management, LogKind.change, 'Menu',
+                            f'Event homepage set: {self.entry.log_title}', session.user)
         return jsonify(is_default=is_default)
 
 
