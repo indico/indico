@@ -29,6 +29,17 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
 
+entry_log_fields = {
+    'title': {'title': 'Title', 'type': 'string'},
+    'is_enabled': 'Show',
+    'new_tab': 'New Tab',
+    'protection_mode': 'Protection mode',
+    'speakers_can_access': 'Grant speakers access',
+    'link_url': {'title': 'URL', 'type': 'string'},
+    'html': 'Content',
+}
+
+
 def _render_menu_entry(entry):
     tpl = get_template_module('events/layout/_menu.html')
     return tpl.menu_entry(entry=entry)
@@ -71,8 +82,10 @@ class RHMenuToggleCustom(RHMenuBase):
         layout_settings.set(self.event, 'use_custom_menu', enabled)
         logger.info('Menu customization for %s %s by %s', self.event, 'enabled' if enabled else 'disabled',
                     session.user)
-        self.event.log(EventLogRealm.management, LogKind.change, 'Menu',
-                       f'Menu customization has been {'enabled' if enabled else 'disabled'}', session.user)
+        if enabled:
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Menu', 'Custom menu enabled', session.user)
+        else:
+            self.event.log(EventLogRealm.management, LogKind.negative, 'Menu', 'Custom menu disabled', session.user)
         return jsonify(enabled=enabled)
 
 
@@ -109,26 +122,15 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
                                     custom_title=self.entry.title is not None)
         form = form_cls(entry=self.entry, obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
-            log_fields = {'title': 'Title',
-                          'is_enabled': 'Show',
-                          'new_tab': 'New Tab',
-                          'protection_mode': 'Protection mode',
-                          'speakers_can_access': 'Grant speakers access'}
+            changes = self.entry.populate_from_dict(form.data, skip={'html', 'custom_title'})
 
-            if self.entry.is_link:
-                log_fields['link_url'] = 'URL'
-
-            form_data = {key: getattr(form, key).data for key in log_fields}
-            changes = self.entry.populate_from_dict(form_data, skip={'acl'})
-
-            if self.entry.is_page:
-                log_fields['html'] = 'Content'
+            if self.entry.is_page and self.entry.page.html != form.html.data:
                 changes['html'] = (self.entry.page.html, form.html.data)
                 self.entry.page.html = form.html.data
 
-            self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
-                      f'{self.entry.type.title} Entry "{form.data['title']}" modified', session.user,
-                      data={'Changes': make_diff_log(changes, log_fields)})
+            self.entry.log(EventLogRealm.management, LogKind.change, 'Menu',
+                           f'Menu entry changed: {self.entry.log_title}', session.user,
+                           data={'Changes': make_diff_log(changes, entry_log_fields)})
 
             return jsonify_data(entry=_render_menu_entry(self.entry))
         return jsonify_form(form)
@@ -172,22 +174,21 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
         else:
             self.entry.move(position)
 
-        log_msg = ('Separator Entry' if self.entry.is_separator else
-                   f'{self.entry.type.title} Entry "{self.entry.title}"')
-        self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
-                       f"{log_msg} has been {'inserted' if parent_id != self.entry.parent_id else 'moved'} in "
-                       f"position {self.entry.position}", session.user)
+        self.entry.log(EventLogRealm.management, LogKind.change, 'Menu', f'Menu entry moved: {self.entry.log_title}',
+                       session.user, data={'Parent': self.entry.parent.log_title if self.entry.parent else None,
+                                           'Position': self.entry.position + 1})
         return jsonify_data(flash=False)
 
 
 class RHMenuEntryToggleEnabled(RHMenuEntryEditBase):
     def _process(self):
         self.entry.is_enabled = not self.entry.is_enabled
-        log_msg = 'Separator Entry' if self.entry.is_separator else \
-            f'{self.entry.type.title} Entry "{self.entry.title}"'
-        self.entry.log(EventLogRealm.management, LogKind.positive if self.entry.is_enabled else LogKind.negative,
-                       'Menu Entry', f"{log_msg} visibility has been "
-                                     f"{'enabled' if self.entry.is_enabled else 'disabled'}", session.user)
+        if self.entry.is_enabled:
+            self.entry.log(EventLogRealm.management, LogKind.positive, 'Menu',
+                           f'Menu entry enabled: {self.entry.log_title}', session.user)
+        else:
+            self.entry.log(EventLogRealm.management, LogKind.negative, 'Menu',
+                           f'Menu entry disabled: {self.entry.log_title}', session.user)
         return jsonify(is_enabled=self.entry.is_enabled)
 
 
@@ -218,7 +219,7 @@ class RHMenuAddEntry(RHMenuBase):
             entry = MenuEntry(event=self.event, type=MenuEntryType.separator)
             db.session.add(entry)
             db.session.flush()
-            entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry', 'Separator Entry has been added',
+            entry.log(EventLogRealm.management, LogKind.positive, 'Menu', f'Menu entry added: {entry.log_title}',
                       session.user)
             return jsonify_data(flash=False, entry=_render_menu_entry(entry))
 
@@ -233,28 +234,18 @@ class RHMenuAddEntry(RHMenuBase):
         form = form_cls(obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
             entry = MenuEntry(event=self.event, type=MenuEntryType[entry_type])
-            form.populate_obj(entry, skip={'html'})
-            log_fields = {'title': 'Title', 'is_enabled': 'Show', 'new_tab': 'New Tab'}
-            changes = {'title': ('', form.data['title']),
-                       'is_enabled': (None, form.data['is_enabled']),
-                       'new_tab': (None, form.data['new_tab'])}
-
+            changes = entry.populate_from_dict(form.data, skip={'html'})
             if entry.is_page:
                 page = EventPage(html=form.html.data)
                 self.event.custom_pages.append(page)
                 entry.page = page
-                log_fields['html'] = 'Content'
-                changes['html'] = ('', form.html.data)
-
-            if entry.is_link:
-                log_fields['link_url'] = 'URL'
-                changes['link_url'] = ('', form.data['link_url'])
+                changes['html'] = ('', page.html)
 
             db.session.add(entry)
             db.session.flush()
-            entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
-                      f'{entry.type.title} Entry "{form.data['title']}" has been added', session.user,
-                      data={'Changes': make_diff_log(changes, log_fields)})
+
+            entry.log(EventLogRealm.management, LogKind.positive, 'Menu', f'Menu entry added: {entry.log_title}',
+                      session.user, data={'Changes': make_diff_log(changes, entry_log_fields)})
             return jsonify_data(entry=_render_menu_entry(entry))
         return jsonify_form(form)
 
@@ -280,12 +271,10 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         for entry in entries:
             entry.position = next(position_gen)
 
+        self.entry.log(EventLogRealm.management, LogKind.negative, 'Menu',
+                       f'Menu entry deleted: {self.entry.log_title}', session.user)
         db.session.delete(self.entry)
         db.session.flush()
-        log_msg = 'Separator Entry' if self.entry.is_separator else \
-            f'{self.entry.type.title} Entry "{self.entry.title}"'
-        self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry', f'{log_msg} has been deleted',
-                       session.user)
 
         return jsonify_data(flash=False, menu=_render_menu_entries(self.event, connect_menu=True))
 
