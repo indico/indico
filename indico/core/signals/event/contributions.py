@@ -10,6 +10,9 @@ from indico.core.signals.event import _signals
 
 contribution_created = _signals.signal('contribution-created', '''
 Called when a new contribution is created. The `sender` is the new contribution.
+If a contribution is being cloned, the original one is passed in the `cloned_from`
+kwarg. In this case, a `person_link_map` kwarg with the mapping between old and new
+contribution person links is also passed .
 ''')
 
 contribution_deleted = _signals.signal('contribution-deleted', '''
