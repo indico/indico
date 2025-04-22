@@ -150,9 +150,7 @@ class PersonalDataType(IndicoIntEnum):
     @property
     @make_interceptable
     def is_content_validation_protected(self):
-        """
-        The setting for the content validation of the field can't be modified.
-        """
+        """The setting for the content validation of the field can't be modified."""
         return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
 
     @property
