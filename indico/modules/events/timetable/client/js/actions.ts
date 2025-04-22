@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TopLevelEntry, BlockEntry, BreakEntry, ChildBreakEntry} from './types';
+import {TopLevelEntry, BlockEntry, BreakEntry, ChildBreakEntry, ContribEntry, ChildContribEntry} from './types';
 
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
@@ -20,6 +20,7 @@ export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
 export const DROP_UNSCHEDULED_CONTRIBS = 'Drop unscheduled contributions';
 export const SCHEDULE_CONTRIBS = 'Schedule contributions';
 export const SCHEDULE_ENTRY = 'Schedule entry';
+export const UNSCHEDULE_ENTRY = 'Unschedule entry';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
@@ -65,6 +66,11 @@ interface ScheduleEntryAction {
   unscheduled: any[];
 }
 
+interface UnscheduleEntryAction {
+  type: typeof UNSCHEDULE_ENTRY;
+  entry: ContribEntry | ChildContribEntry;
+}
+
 interface CreateEntryAction {
   type: typeof CREATE_ENTRY;
   entryType: string;
@@ -87,6 +93,7 @@ export type Action =
   | SelectEntryAction
   | DeselectEntryAction
   | ScheduleEntryAction
+  | UnscheduleEntryAction
   | CreateEntryAction
   | DeleteBreakAction
   | DeleteBlockAction;
@@ -150,6 +157,10 @@ export function scheduleEntry(
   unscheduled: any[]
 ): ScheduleEntryAction {
   return {type: SCHEDULE_ENTRY, date, entries, unscheduled};
+}
+
+export function unscheduleEntry(entry: ContribEntry | ChildContribEntry): UnscheduleEntryAction {
+  return {type: UNSCHEDULE_ENTRY, entry};
 }
 
 export function changeColor(sessionId, color) {
