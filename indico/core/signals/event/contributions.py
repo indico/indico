@@ -28,6 +28,9 @@ in the ``changes`` kwarg.
 
 subcontribution_created = _signals.signal('subcontribution-created', '''
 Called when a new subcontribution is created. The `sender` is the new subcontribution.
+If a subcontribution is being cloned, the original one is passed in the `cloned_from`
+kwarg. In this case, a `person_link_map` kwarg with the mapping between old and new
+subcontribution person links is also passed .
 ''')
 
 subcontribution_deleted = _signals.signal('subcontribution-deleted', '''

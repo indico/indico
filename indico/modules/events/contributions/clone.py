@@ -159,8 +159,9 @@ class ContributionCloner(EventCloner):
             for orig_contrib, contrib in self._contrib_map.items():
                 signals.event.contribution_created.send(contrib, cloned_from=orig_contrib,
                                                         person_link_map=self._person_link_map)
-            for subcontrib in self._subcontrib_map.values():
-                signals.event.subcontribution_created.send(subcontrib)
+            for orig_subcontrib, subcontrib in self._subcontrib_map.items():
+                signals.event.subcontribution_created.send(subcontrib, cloned_from=orig_subcontrib,
+                                                           person_link_map=self._person_link_map)
         db.session.flush()
         return {
             'person_link_map': self._person_link_map,

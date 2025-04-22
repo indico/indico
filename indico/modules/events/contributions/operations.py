@@ -133,7 +133,7 @@ def create_subcontribution(contrib, data):
     subcontrib.populate_from_dict(data)
     contrib.subcontributions.append(subcontrib)
     db.session.flush()
-    signals.event.subcontribution_created.send(subcontrib)
+    signals.event.subcontribution_created.send(subcontrib, cloned_from=None)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, LogKind.positive, 'Subcontributions',
                          f'Subcontribution "{subcontrib.title}" has been created', session.user,
