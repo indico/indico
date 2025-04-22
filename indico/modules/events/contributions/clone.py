@@ -114,13 +114,15 @@ class ContributionCloner(EventCloner):
         cloner._session_block_map = {contribution.session_block: contribution.session_block}
         cloner._contrib_type_map = {contribution.type: contribution.type}
         cloner._contrib_field_map = dict(zip(event.contribution_fields, event.contribution_fields, strict=True))
+        cloner._person_link_map = {}
         cloner._contrib_map = {}
         cloner._subcontrib_map = {}
         new_contribution = cloner._create_new_contribution(event, contribution,
                                                            preserve_session=preserve_session,
                                                            excluded_attrs={'friendly_id'})
         db.session.flush()
-        signals.event.contribution_created.send(new_contribution)
+        signals.event.contribution_created.send(new_contribution, cloned_from=contribution,
+                                                person_link_map=cloner._person_link_map)
         contributions_logger.info('Contribution %s created by %s (from %s)', new_contribution, session.user,
                                   contribution)
         new_contribution.log(
@@ -147,18 +149,25 @@ class ContributionCloner(EventCloner):
         if event_exists:
             self._new_event_persons = {person.user_id: person for person in new_event.persons
                                        if person.user_id is not None}
+        self._person_link_map = {}
         self._contrib_map = {}
         self._subcontrib_map = {}
         with db.session.no_autoflush:
             self._clone_contribs(new_event, event_exists=event_exists)
         self._synchronize_friendly_id(new_event)
         if event_exists:
-            for contrib in self._contrib_map.values():
-                signals.event.contribution_created.send(contrib)
-            for subcontrib in self._subcontrib_map.values():
-                signals.event.subcontribution_created.send(subcontrib)
+            for orig_contrib, contrib in self._contrib_map.items():
+                signals.event.contribution_created.send(contrib, cloned_from=orig_contrib,
+                                                        person_link_map=self._person_link_map)
+            for orig_subcontrib, subcontrib in self._subcontrib_map.items():
+                signals.event.subcontribution_created.send(subcontrib, cloned_from=orig_subcontrib,
+                                                           person_link_map=self._person_link_map)
         db.session.flush()
-        return {'contrib_map': self._contrib_map, 'subcontrib_map': self._subcontrib_map}
+        return {
+            'person_link_map': self._person_link_map,
+            'contrib_map': self._contrib_map,
+            'subcontrib_map': self._subcontrib_map,
+        }
 
     def _create_new_contribution(self, event, old_contrib, preserve_session=True, excluded_attrs=None,
                                  event_exists=False):
@@ -230,6 +239,7 @@ class ContributionCloner(EventCloner):
                 link.person = self._new_event_persons[current_person.user_id]
             else:
                 link.person = current_person
+            self._person_link_map[old_link] = link
             yield link
 
     def _clone_fields(self, fields):

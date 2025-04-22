@@ -192,10 +192,10 @@ def clone_event(event, n_occurrence, start_dt, cloners, category=None, refresh_u
                              add_creator_as_manager=False, cloning=True)
 
     # Run the modular cloning system
-    EventCloner.run_cloners(event, new_event, cloners, n_occurrence)
+    used_cloners, shared_data = EventCloner.run_cloners(event, new_event, cloners, n_occurrence)
     if refresh_users:
         new_event.refresh_event_persons(notify=False)
-    signals.event.cloned.send(event, new_event=new_event)
+    signals.event.cloned.send(event, new_event=new_event, used_cloners=used_cloners, shared_data=shared_data)
 
     # Grant access to the event creator -- must be done after modular cloners
     # since cloning the event ACL would result in a duplicate entry
@@ -216,9 +216,10 @@ def clone_into_event(source_event, target_event, cloners):
     """
     # Run the modular cloning system
     g.importing_event = True
-    used_cloners = EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
+    used_cloners, shared_data = EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
     del g.importing_event
-    signals.event.imported.send(target_event, source_event=source_event)
+    signals.event.imported.send(target_event, source_event=source_event, used_cloners=used_cloners,
+                                shared_data=shared_data)
     cloner_classes = {c.name: c for c in get_event_cloners().values()}
     target_event.log(EventLogRealm.event, LogKind.change, 'Event', 'Data imported', session.user,
                      data={'Modules': ', '.join(orig_string(used_cloners[c].friendly_name)

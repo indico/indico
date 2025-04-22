@@ -41,7 +41,9 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Expose cloning details such as object mappings in the ``event.cloned`` signal (:pr:`6858`)
+- Expose cloning details in the ``contribution.created`` and ``subcontribution.created``
+  signals (:pr:`6858`)
 
 
 Version 3.3.6
