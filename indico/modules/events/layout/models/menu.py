@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.modules.events.layout.models.principals import MenuEntryPrincipal
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, orig_string
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify, text_to_repr
 from indico.web.flask.util import url_for
@@ -113,6 +113,19 @@ class MenuEntryMixin:
     @property
     def is_separator(self):
         return self.type == MenuEntryType.separator
+
+    @property
+    def log_title(self):
+        if self.is_separator:
+            return '<Spacer>'
+        elif self.title:
+            return self.title
+        elif defaults := self.default_data:
+            return orig_string(defaults.title)
+        # this is very unlikely to ever happen, since typically we hide orphaned entries (ie internal/plugin
+        # menu items which are no longer being defined via the signal) and thus managers cannot do loggable
+        # operations on them
+        return '<Orphaned>'
 
     @cached_property
     def default_data(self):
@@ -413,6 +426,10 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
     @property
     def protection_parent(self):
         return self.parent or self.event_ref
+
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the entry."""
+        return self.event.log(*args, meta={'menu_entry_id': self.id}, **kwargs)
 
 
 class EventPage(db.Model):
