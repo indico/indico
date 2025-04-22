@@ -109,10 +109,25 @@ function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
 }
 
 function Contribution({entry, onClose}: {entry: ContribEntry; onClose: () => void}) {
+  const dispatch = useDispatch();
+  const {id} = entry;
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+  const eventId = useSelector(selectors.getEventId);
+
+  async function unscheduleContrib(e) {
+    e.stopPropagation();
+    const url = entryActionsURL({event_id: eventId, entry_id: id});
+    try {
+      await indicoAxios.delete(url);
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    dispatch(actions.unscheduleEntry(entry));
+  }
 
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
@@ -121,8 +136,8 @@ function Contribution({entry, onClose}: {entry: ContribEntry; onClose: () => voi
           <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
             <ButtonGroup>
               <Button icon="edit" />
-              <Button icon="paint brush" />
-              <Button icon="trash" />
+              <Button icon="paint brush" disabled />
+              <Button icon="minus" onClick={unscheduleContrib} />
             </ButtonGroup>
             <ButtonGroup>
               <Button
