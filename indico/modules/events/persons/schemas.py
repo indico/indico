@@ -115,7 +115,7 @@ class EventPersonUpdateSchema(EventPersonSchema):
     class Meta(EventPersonSchema.Meta):
         fields = ('title', 'first_name', 'last_name', 'address', 'phone', 'affiliation', 'affiliation_link')
 
-    title = fields.Enum(UserTitle)
+    title = NoneValueEnumField(UserTitle, none_value=UserTitle.none)
 
     @validates_schema(skip_on_field_errors=True)
     def check_restricted_affiliation(self, data, **kwargs):
