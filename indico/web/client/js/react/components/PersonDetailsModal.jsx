@@ -158,6 +158,7 @@ export default function PersonDetailsModal({
           options={titles}
           placeholder={Translate.string('None', 'Title (salutation)')}
           required={requiredPersonFields?.includes('title')}
+          nullIfEmpty
         />
         {!extraParams?.disableAffiliations && (
           <FinalAffiliationField

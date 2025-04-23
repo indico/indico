@@ -32,6 +32,7 @@ Bugfixes
 - Fix scheduling existing contributions not working in rare cirucmstances (:pr:`6853`)
 - Convert author/speaker email addresses to lowercase during input and use the lowercase
   version for deduplication (:pr:`6855`)
+- Fix error when removing the title of an event person (:pr:`6859`)
 
 Accessibility
 ^^^^^^^^^^^^^
