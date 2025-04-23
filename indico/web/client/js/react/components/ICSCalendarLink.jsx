@@ -223,15 +223,14 @@ export default function ICSCalendarLink({
           </>
         )}
         <strong styleName="export-option">
-          <Translate>Reminder Alerts</Translate>
+          <Translate>Reminders</Translate>
         </strong>
-        <Translate as="p">Add alerts to each event in your calendar.</Translate>
+        <Translate as="p">Add reminder to each event in your calendar.</Translate>
         <div styleName="reminder-options">
           <Dropdown
             selection
-            placeholder={Translate.string('Select alert time')}
             options={[
-              {key: 'None', text: Translate.string('None', 'alert'), value: 0},
+              {key: '0', text: Translate.string('No reminder', 'alert'), value: 0},
               {key: '5', text: Translate.string('5 minutes before'), value: 5},
               {key: '15', text: Translate.string('15 minutes before'), value: 15},
               {key: '30', text: Translate.string('30 minutes before'), value: 30},
