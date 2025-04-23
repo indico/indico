@@ -20,6 +20,8 @@ Improvements
   moderators (:pr:`6823`)
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
 - Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
+- Add duration and date/time placeholders when sending emails for contributions
+  (:pr:`6860`)
 
 Bugfixes
 ^^^^^^^^
