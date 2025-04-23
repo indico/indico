@@ -166,7 +166,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 validate={v.optional(v.range(dataRetentionRange.min, dataRetentionRange.max))}
                 label={Translate.string('Retention period (weeks)')}
                 description={Translate.string(
-                  'Specify how long user-provided data for this field will be preserved in the database.'
+                  'Customized fields data are retained for a period that aligns with the data retention ' +
+                    'policy of the overall registration form. However, shorter retention periods can be ' +
+                    'configured by adjusting the field settings above.'
                 )}
               />
               <FormSpy subscription={{values: true}}>
