@@ -640,9 +640,10 @@ def test_modify_registration_update_consent(dummy_reg):
 
     # 'consent_to_publish' is not in the changes and thus should not be modified
     changes = {}
-    prev_consent_to_publish = dummy_reg.consent_to_publish
+    # Set consent_to_publish to a non-default value
+    dummy_reg.consent_to_publish = RegistrationVisibility.all
     modify_registration(dummy_reg, changes, management=False, notify_user=False)
-    assert dummy_reg.consent_to_publish == prev_consent_to_publish
+    assert dummy_reg.consent_to_publish == RegistrationVisibility.all
 
 
 @pytest.mark.usefixtures('request_context')
