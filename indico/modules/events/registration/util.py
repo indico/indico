@@ -1024,7 +1024,10 @@ def process_registration_picture(source, *, thumbnail=False):
         picture = Image.open(source)
     except (OSError, Image.DecompressionBombError):
         return None
-    picture = ImageOps.exif_transpose(picture)
+    try:
+        picture = ImageOps.exif_transpose(picture)
+    except ZeroDivisionError:
+        return None
     if picture.mode != 'RGB':
         picture = picture.convert('RGB')
     size_x, size_y = picture.size
