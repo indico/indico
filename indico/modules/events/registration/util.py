@@ -486,8 +486,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
             setattr(registration, key, value)
 
     if not management and regform.needs_publish_consent:
-        consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
-        update_registration_consent_to_publish(registration, consent_to_publish)
+        consent_to_publish = data.get('consent_to_publish')
+        if consent_to_publish is not None:
+            update_registration_consent_to_publish(registration, consent_to_publish)
 
     registration.sync_state()
     db.session.flush()
