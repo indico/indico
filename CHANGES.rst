@@ -36,7 +36,7 @@ Bugfixes
   version for deduplication (:pr:`6855`)
 - Fix error when removing the title of an event person (:pr:`6859`)
 - Fix participant visibility being set to "nobody" when a registration was modifified
-  (:pr:`6862`)
+  (:pr:`6863`)
 
 Accessibility
 ^^^^^^^^^^^^^
