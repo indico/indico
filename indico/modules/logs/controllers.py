@@ -13,12 +13,13 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.core.notifications import make_email, send_email
+from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.logs.models.entries import (CategoryLogEntry, CategoryLogRealm, EventLogEntry, EventLogRealm,
-                                                UserLogEntry, UserLogRealm)
+from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
+                                                EventLogEntry, EventLogRealm, UserLogEntry, UserLogRealm)
 from indico.modules.logs.util import serialize_log_entry
-from indico.modules.logs.views import WPCategoryLogs, WPEventLogs, WPUserLogs
+from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -38,14 +39,15 @@ def _get_metadata_query():
             if k.startswith('meta.')}
 
 
-class RHEventLogs(RHManageEventBase):
-    """Show the modification/action log for the event."""
+class RHAppLogs(RHAdminBase):
+    """Show app logs."""
 
     def _process(self):
         metadata_query = _get_metadata_query()
-        realms = {realm.name: realm.title for realm in EventLogRealm}
-        return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
-                                           logs_api_url=url_for('.api_event_logs', self.event))
+        realms = {realm.name: realm.title for realm in AppLogRealm}
+        return WPAppLogs.render_template('logs.html', 'logs',
+                                         realms=realms, metadata_query=metadata_query,
+                                         logs_api_url=url_for('.api_app_logs'))
 
 
 class RHCategoryLogs(RHManageCategoryBase):
@@ -57,6 +59,16 @@ class RHCategoryLogs(RHManageCategoryBase):
         return WPCategoryLogs.render_template('logs.html', self.category, 'logs',
                                               realms=realms, metadata_query=metadata_query,
                                               logs_api_url=url_for('.api_category_logs', self.category))
+
+
+class RHEventLogs(RHManageEventBase):
+    """Show the modification/action log for the event."""
+
+    def _process(self):
+        metadata_query = _get_metadata_query()
+        realms = {realm.name: realm.title for realm in EventLogRealm}
+        return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
+                                           logs_api_url=url_for('.api_event_logs', self.event))
 
 
 class RHUserLogs(RHUserBase):
@@ -96,7 +108,8 @@ class LogsAPIMixin:
         if not filters and not metadata_query:
             return jsonify(current_page=1, pages=[], entries=[], total_page_count=0)
 
-        query = self.object.log_entries.order_by(self.model.logged_dt.desc())
+        query = self.object.log_entries if self.object else self.model.query
+        query = query.order_by(self.model.logged_dt.desc())
         realms = {self.realm_enum.get(f) for f in filters if self.realm_enum.get(f)}
         if realms:
             query = query.filter(self.model.realm.in_(realms))
@@ -124,17 +137,17 @@ class LogsAPIMixin:
         return jsonify(current_page=page, pages=list(query.iter_pages()), total_page_count=query.pages, entries=entries)
 
 
-class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
-    model = EventLogEntry
-    realm_enum = EventLogRealm
+class RHAppLogsJSON(LogsAPIMixin, RHAdminBase):
+    model = AppLogEntry
+    realm_enum = AppLogRealm
 
     @property
     def object(self):
-        return self.event
+        return None
 
     @property
     def object_tzinfo(self):
-        return self.event.tzinfo
+        return get_timezone(config.DEFAULT_TIMEZONE)
 
 
 class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
@@ -148,6 +161,19 @@ class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
     @property
     def object_tzinfo(self):
         return self.category.tzinfo
+
+
+class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
+    model = EventLogEntry
+    realm_enum = EventLogRealm
+
+    @property
+    def object(self):
+        return self.event
+
+    @property
+    def object_tzinfo(self):
+        return self.event.tzinfo
 
 
 class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
