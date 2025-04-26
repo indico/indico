@@ -55,6 +55,7 @@ body {
 export const getConfig = (
   field,
   {
+    disabled = false,
     images = true,
     imageUploadURL = null,
     fullScreen = true,
@@ -65,6 +66,7 @@ export const getConfig = (
   } = {},
   {onChange = null} = {}
 ) => ({
+  readonly: disabled,
   target: field,
   promotion: false,
   branding: false,
