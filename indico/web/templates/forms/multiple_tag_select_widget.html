@@ -9,6 +9,10 @@
         setupMultipleTagSelectWidget({
             fieldId: {{ field.id | tojson }},
             choices: {{ field.choices | tojson }},
+            inputArgs: {{ input_args | tojson }},
+            initialSelection: {{ field.data | default([]) | tojson }},
         });
+        {# Call `initForms()` again because `WTFMultipleTagSelectField` has been rendered only after its first call. #}
+        initForms($('form'));
     </script>
 {% endblock %}
