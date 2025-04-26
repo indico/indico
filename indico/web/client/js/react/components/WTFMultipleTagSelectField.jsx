@@ -11,9 +11,15 @@ import {Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from '../i18n';
 
-export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices}) {
+export default function WTFMultipleTagSelectField({
+  fieldId,
+  wrapperId,
+  choices,
+  inputArgs,
+  initialSelection,
+}) {
   const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState(initialSelection);
 
   // Trigger change only after the DOM has changed
   useEffect(() => {
@@ -52,6 +58,7 @@ export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices})
         selection
         value={selectedOptions}
         renderLabel={renderLabel}
+        disabled={inputArgs.disabled ?? false}
       />
       {/* Since Dropdown does not render as a <select> element, we use a dummy <select>
        * with the correct name attribute and options selected which are used when the form is submitted.
@@ -63,6 +70,7 @@ export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices})
         readOnly
         value={selectedOptions}
         style={{display: 'none'}}
+        {...inputArgs}
       >
         {options.map(({key, text, value}) => (
           <option key={key} value={value}>
@@ -78,4 +86,6 @@ WTFMultipleTagSelectField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   wrapperId: PropTypes.string.isRequired,
   choices: PropTypes.array.isRequired,
+  inputArgs: PropTypes.object.isRequired,
+  initialSelection: PropTypes.array.isRequired,
 };

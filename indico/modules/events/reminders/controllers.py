@@ -9,6 +9,7 @@ from flask import flash, jsonify, redirect, render_template, request, session
 
 from indico.core.db import db
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
 from indico.modules.events.reminders.models.reminders import EventReminder
@@ -79,7 +80,8 @@ class RHEditReminder(RHSpecificReminderBase):
         else:
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_dt': reminder.scheduled_dt}
-        return FormDefaults(reminder, **defaults_kwargs)
+        defaults_kwargs['tags'] = [str(tag.id) for tag in reminder.tags]
+        return FormDefaults(reminder, skip_attrs=['tags'], **defaults_kwargs)
 
     def _process(self):
         reminder = self.reminder
@@ -88,7 +90,15 @@ class RHEditReminder(RHSpecificReminderBase):
             if reminder.is_sent:
                 flash(_('This reminder has already been sent and cannot be modified anymore.'), 'error')
                 return redirect(url_for('.edit', reminder))
-            form.populate_obj(reminder, existing_only=True)
+            form.populate_obj(reminder, skip=['tags'], existing_only=True)
+
+            if form.send_to_participants.data and form.tags:
+                tag_ids = [int(id) for id in form.tags.data]
+                tags = set(RegistrationTag.query.with_parent(self.event).filter(RegistrationTag.id.in_(tag_ids)).all())
+            else:
+                tags = set()
+            reminder.tags = tags
+
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
@@ -108,7 +118,15 @@ class RHAddReminder(RHRemindersBase):
         form = ReminderForm(event=self.event, schedule_type='relative', attach_ical=True)
         if form.validate_on_submit():
             reminder = EventReminder(creator=session.user, event=self.event)
-            form.populate_obj(reminder, existing_only=True)
+            form.populate_obj(reminder, skip=['tags'], existing_only=True)
+
+            if form.send_to_participants.data and form.tags:
+                tag_ids = [int(id) for id in form.tags.data]
+                tags = set(RegistrationTag.query.with_parent(self.event).filter(RegistrationTag.id.in_(tag_ids)).all())
+            else:
+                tags = set()
+            reminder.tags = tags
+
             db.session.add(reminder)
             db.session.flush()
             if form.schedule_type.data == 'now':

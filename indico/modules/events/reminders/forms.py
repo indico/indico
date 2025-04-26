@@ -11,13 +11,18 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.modules.events.models.events import EventType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import EmailListField, IndicoDateTimeField, IndicoRadioField, TimeDeltaField
+from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoRadioField,
+                                     IndicoSelectMultipleCheckboxField, TimeDeltaField)
+from indico.web.forms.fields.simple import IndicoMultipleTagSelectField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless
+from indico.web.forms.widgets import TinyMCEWidget
 
 
 class ReminderForm(IndicoForm):
-    recipient_fields = ['recipients', 'send_to_participants', 'send_to_speakers']
+    recipient_fields = ['recipients', 'send_to_participants', 'registration_form_ids',
+                        'tags', 'all_tags', 'send_to_speakers']
     schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
     schedule_recipient_fields = recipient_fields + schedule_fields
 
@@ -33,14 +38,23 @@ class ReminderForm(IndicoForm):
     # Recipients
     recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
     send_to_participants = BooleanField(_('Participants'),
-                                        description=_('Send the reminder to all participants/registrants '
-                                                      'of the event.'))
+                                        description=_('Send the reminder to participants/registrants of the event.'))
+    registration_form_ids = IndicoSelectMultipleCheckboxField(_('Filter by registration forms'),
+                                                              [HiddenUnless('send_to_participants')],
+                                                              description=_('Limit reminders to participants of '
+                                                                            'these registration forms.'))
+    tags = IndicoMultipleTagSelectField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
+                                        description=_('Limit reminders to participants with these tags.'))
+    all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
+                            description=_('Participants must have all of the selected tags. '
+                                          'Otherwise at least one of them.'))
     send_to_speakers = BooleanField(_('Speakers'),
                                     description=_('Send the reminder to all speakers/chairpersons of the event.'))
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
-    message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
+    message = TextAreaField(_('Note'), widget=TinyMCEWidget(),
+                            description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
     include_description = BooleanField(_('Include description'),
@@ -57,6 +71,19 @@ class ReminderForm(IndicoForm):
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary
+        regforms = sorted([rf for rf in self.event.registration_forms if not rf.is_deleted], key=lambda rf: rf.title)
+        if len(regforms) > 1:
+            regform_choices = [(str(rf.id), rf.title) for rf in regforms]
+            self.registration_form_ids.choices = regform_choices
+        else:
+            del self.registration_form_ids
+        tags = sorted(self.event.registration_tags, key=lambda tag: natural_sort_key(tag.title))
+        if tags:
+            tag_choices = [(str(tag.id), (tag.title, tag.color)) for tag in tags]
+            self.tags.choices = tag_choices
+        else:
+            del self.tags
+            del self.all_tags
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:
