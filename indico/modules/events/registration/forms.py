@@ -24,6 +24,7 @@ from indico.modules.designer import PageLayout, PageOrientation, PageSize, Templ
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
+from indico.modules.events.registration.models.checks import RegistrationCheckRule, RegistrationCheckType
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItem
@@ -749,3 +750,51 @@ class PublishReceiptForm(IndicoForm):
 
     notify_user = BooleanField(_('Notify users'), widget=SwitchWidget(),
                                description=_('Whether users should be notified about the published receipt'))
+
+
+class RegistrationCheckTypeForm(IndicoForm):
+    """Form to define a new registration check type."""
+
+    title = StringField(_('Title'), [DataRequired(), Length(min=3, max=200)])
+    rule = IndicoEnumSelectField(_('Rule'), enum=RegistrationCheckRule, sorted=True)
+    check_out_allowed = BooleanField(_('Can check out'), widget=SwitchWidget(),
+                                  description=_('If enabled, check-out actions can be performed on this check type.'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event', None)
+        self.check_type = kwargs.pop('check_type', None)
+        super().__init__(*args, **kwargs)
+
+    def validate_title(self, field):
+        if self.event:
+            query = (RegistrationCheckType.query.filter(
+                db.or_(db.and_(RegistrationCheckType.event_id == self.event.id,
+                               db.func.lower(RegistrationCheckType.title) == field.data.lower()),
+                       db.and_(RegistrationCheckType.is_system_defined,
+                               db.func.lower(RegistrationCheckType.title) == field.data.lower())))
+            )
+        else:
+            query = (RegistrationCheckType.query
+                     .filter(RegistrationCheckType.is_system_defined,
+                             db.func.lower(RegistrationCheckType.title) == field.data.lower()))
+        if self.check_type:
+            query = query.filter(RegistrationCheckType.id != self.check_type.id)
+        if query.has_rows():
+            raise ValidationError(_('This title is already in use.'))
+
+
+class RegistrationChecksAssignForm(IndicoForm):
+    """Form to perform bulk check on registrations."""
+
+    check_type_id = SelectField(_('Check'), [DataRequired()])
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def __init__(self, event, **kwargs):
+        super().__init__(**kwargs)
+        check_types = (event.check_types +
+                       RegistrationCheckType.query.filter(RegistrationCheckType.is_system_defined).all())
+        self.check_type_id.choices = [(str(check_type.id), check_type.title) for check_type in check_types]
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form

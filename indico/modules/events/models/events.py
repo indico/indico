@@ -276,6 +276,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         nullable=False,
         default=True
     )
+    #: Default `RegistrationCheckType` for the event
+    default_check_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.check_types.id'),
+        index=True,
+        nullable=False
+    )
 
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
@@ -386,6 +393,17 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             lazy=True
         )
     )
+    #: The default check to be performed on registrations of this event
+    default_check_type = db.relationship(
+        'RegistrationCheckType',
+        foreign_keys=default_check_type_id,
+        post_update=True,
+        lazy=True,
+        backref=db.backref(
+            'default_check_type_of',
+            lazy=True
+        )
+    )
     #: The current pending move request
     pending_move_request = db.relationship(
         'EventMoveRequest',
@@ -408,6 +426,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - all_room_reservation_occurrence_links (ReservationOccurrenceLink.event)
     # - all_vc_room_associations (VCRoomEventAssociation.event)
     # - attachment_folders (AttachmentFolder.linked_event)
+    # - check_types (RegistrationCheckType.event)
     # - clones (Event.cloned_from)
     # - contribution_fields (ContributionField.event)
     # - contribution_types (ContributionType.event)

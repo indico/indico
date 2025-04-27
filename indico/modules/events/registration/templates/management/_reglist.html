@@ -75,6 +75,19 @@
                                                 {{- registration.checked_in_dt | format_datetime(timezone=registration.event.tzinfo) -}}
                                             {%- endif %}
                                         </td>
+                                    {% elif item.id == 'checked_out' %}
+                                        <td class="i-table">
+                                            {% if registration.checked_out %}
+                                                {%- trans %}Yes{% endtrans -%}
+                                            {% else %}
+                                                {%- trans %}No{% endtrans -%}
+                                            {% endif %}
+                                    {% elif item.id == 'checked_out_date' %}
+                                        <td class="i-table" data-text="{{ registration.checked_out_dt }}">
+                                            {%- if registration.checked_out_dt %}
+                                                {{- registration.checked_out_dt | format_datetime(timezone=registration.event.tzinfo) -}}
+                                            {%- endif %}
+                                        </td>
                                     {% elif item.id == 'payment_date' %}
                                         <td class="i-table" data-text="{{ registration.payment_dt }}">
                                             {%- if registration.payment_dt %}
