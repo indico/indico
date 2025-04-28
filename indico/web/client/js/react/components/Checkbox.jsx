@@ -10,15 +10,7 @@ import React, {useEffect, useRef} from 'react';
 
 import './Checkbox.module.scss';
 
-export default function Checkbox({
-  label,
-  onChange,
-  indeterminate,
-  showAsToggle,
-  className,
-  style,
-  ...inputProps
-}) {
+export default function Checkbox({label, onChange, indeterminate, showAsToggle, ...inputProps}) {
   const checkbox = useRef();
 
   useEffect(() => {
@@ -37,25 +29,29 @@ export default function Checkbox({
     }
   };
 
-  return (
-    <label className={className} style={style} styleName="checkbox-field">
-      <span styleName="checkbox-label">
-        <input ref={checkbox} styleName="checkbox" onChange={handleChange} {...inputProps} />
-        <span>
-          {label}
-          {inputProps.required && (
-            <span styleName="required-checkbox-asterisk" aria-hidden="true">
-              *
-            </span>
-          )}
+  if (label) {
+    return (
+      <label styleName="checkbox-field">
+        <span styleName="checkbox-label">
+          <input ref={checkbox} styleName="checkbox" onChange={handleChange} {...inputProps} />
+          <span>
+            {label}
+            {inputProps.required && (
+              <span styleName="required-checkbox-asterisk" aria-hidden="true">
+                *
+              </span>
+            )}
+          </span>
         </span>
-      </span>
-    </label>
-  );
+      </label>
+    );
+  } else {
+    return <input ref={checkbox} styleName="checkbox" onChange={handleChange} {...inputProps} />;
+  }
 }
 
 Checkbox.propTypes = {
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   onChange: PropTypes.func,
   indeterminate: PropTypes.bool,
   showAsToggle: PropTypes.bool,
@@ -64,6 +60,7 @@ Checkbox.propTypes = {
 };
 
 Checkbox.defaultProps = {
+  label: undefined,
   indeterminate: false,
   showAsToggle: false,
   className: '',

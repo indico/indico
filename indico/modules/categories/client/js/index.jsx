@@ -16,6 +16,7 @@ import './base';
 import './favorite';
 
 import SearchBox from 'indico/modules/search/components/SearchBox';
+import {Translate} from 'indico/react/i18n';
 
 import CategoryModeration from './components/CategoryModeration';
 import CategoryStatistics from './components/CategoryStatistics';
@@ -28,24 +29,38 @@ import {LocaleContext} from './context.js';
     if (domContainer) {
       const category = JSON.parse(domContainer.dataset.category);
       const isAdmin = domContainer.dataset.isAdmin !== undefined;
+      const isRootCategory = !category.id;
+      let defaultURL, searchOptions;
+
+      if (isRootCategory) {
+        defaultURL = searchURL();
+        searchOptions = [
+          {
+            scopeLabel: Translate.string('all of Indico'),
+            requestURL: null,
+          },
+        ];
+      } else {
+        defaultURL = categorySearchURL({category_id: category.id});
+        searchOptions = [
+          {
+            scopeLabel: Translate.string('in this category'),
+            formAction: null,
+          },
+          {
+            scopeLabel: Translate.string('all of Indico'),
+            formAction: searchURL(),
+          },
+        ];
+      }
 
       ReactDOM.render(
-        React.createElement(SearchBox, {
-          onSearch: (keyword, isGlobal, adminOverrideEnabled) => {
-            const params = {q: keyword};
-            if (isAdmin && adminOverrideEnabled) {
-              params.admin_override_enabled = true;
-            }
-            if (isGlobal) {
-              window.location = searchURL(params);
-            } else {
-              params.category_id = category.id;
-              window.location = categorySearchURL(params);
-            }
-          },
-          category,
-          isAdmin,
-        }),
+        <SearchBox
+          defaultUrl={defaultURL}
+          options={searchOptions}
+          category={category}
+          isAdmin={isAdmin}
+        />,
         domContainer
       );
     }
