@@ -97,7 +97,7 @@ def _make_image_preview(img):
             if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
                 return ''
             return _process_img(preview)
-    except OSError:
+    except (OSError, Image.DecompressionBombError):
         return ''
 
 
