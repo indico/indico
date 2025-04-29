@@ -15,8 +15,6 @@ import {Param, Translate} from 'indico/react/i18n';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
-import 'indico/custom_elements/ind_date_picker';
-
 export const INVALID = '__invalid__';
 
 export default function DatePicker({

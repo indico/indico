@@ -16,8 +16,6 @@ import {DateRange} from 'indico/utils/date';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
-import 'indico/custom_elements/ind_date_picker';
-
 const INVALID = '__invalid__';
 
 export default function DateRangePicker({

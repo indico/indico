@@ -17,6 +17,7 @@ import * as ReactRouterDom from 'react-router-dom';
 import * as Redux from 'redux';
 import * as SUIR from 'semantic-ui-react';
 
+import * as IndicoCustomElements from 'indico/custom_elements';
 import * as IndicoReactComponents from 'indico/react/components';
 import * as IndicoPrincipalsImperative from 'indico/react/components/principals/imperative';
 import * as IndicoSyncedInputs from 'indico/react/components/syncedInputs';
@@ -52,3 +53,4 @@ window._IndicoUtilsDate = IndicoUtilsDate;
 window._IndicoUtilsCase = IndicoUtilsCase;
 window._IndicoUtilsPlugins = IndicoUtilsPlugins;
 window._IndicoPrincipalsImperative = IndicoPrincipalsImperative;
+window._IndicoCustomElements = IndicoCustomElements;
