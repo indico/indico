@@ -11,8 +11,6 @@ import React, {useRef} from 'react';
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-import 'indico/custom_elements/ind_select';
-
 export default function Select({
   options,
   value,
