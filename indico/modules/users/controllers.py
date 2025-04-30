@@ -903,8 +903,8 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
 
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
-    affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
-    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation_link')
+    affiliation_id = fields.Integer(attribute='affiliation_link.id')
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link')
     title = fields.Enum(UserTitle, attribute='_title')
 
     class Meta:
