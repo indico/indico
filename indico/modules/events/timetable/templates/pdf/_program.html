@@ -215,7 +215,7 @@
     {% set sess = object.session %}
     {% set type = entry.type.name %}
 
-    <h3>{{ object.full_title or object.title }}</h3>
+    <h3>{{%- if object.board_number -%}{{ object.board_number }}: {% endif -%}{ object.full_title or object.title }}</h3>
     <div class="session-block-title-info">
         <p>
             <b>
