@@ -10,5 +10,6 @@ import setup from './setup';
 import 'indico/modules/core/impersonation';
 import 'indico/modules/core/top_bars';
 import 'indico/modules/core/session_expiry';
+import 'indico/custom_elements';
 
 setup();
