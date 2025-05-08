@@ -146,7 +146,7 @@ def test_multi_choice_field_process_form_data_mixed_price_change(multi_choice_fi
     assert rv['data'] == form_data
     old_choices = old_version.versioned_data['choices']
     new_choices = multi_choice_field.versioned_data['choices']
-    combined = new_choices[:2] + [old_choices[2]] + [new_choices[-1]]
+    combined = [*new_choices[:2], old_choices[2], new_choices[-1]]
     _assert_same_choices(rv['field_data'].versioned_data['choices'], combined)
 
 
@@ -170,7 +170,7 @@ def test_multi_choice_field_process_form_data_price_change_deselected(multi_choi
     assert new_data.price == 500
     old_choices = old_version.versioned_data['choices']
     new_choices = multi_choice_field.versioned_data['choices']
-    combined = [old_choices[-1]] + new_choices[:-1]
+    combined = [old_choices[-1], *new_choices[:-1]]
     _assert_same_choices(rv['field_data'].versioned_data['choices'], combined)
     # now we re-check the previously deselected option and should get the NEW price
     form_data = {_id(2): 1, _id(3): 1}

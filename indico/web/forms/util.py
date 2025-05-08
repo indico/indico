@@ -57,7 +57,7 @@ def inject_validators(form, field_name, validators, early=False):
             validators_arg = validators + unbound.args[1]
         else:
             validators_arg = unbound.args[1] + validators
-        unbound.args = unbound.args[:1] + (validators_arg,) + unbound.args[2:]
+        unbound.args = (*unbound.args[:1], validators_arg, *unbound.args[2:])
     else:
         unbound.kwargs['validators'] = validators
     setattr(form, field_name, unbound)

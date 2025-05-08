@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-# ruff: noqa: N802, N803, N806, E741, PLR1702
+# ruff: noqa: N802, N803, N806, E741
 
 import re
 

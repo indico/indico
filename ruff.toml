@@ -100,7 +100,7 @@ ignore = [
 ]
 
 extend-safe-fixes = [
-    'RUF005',  # we typically don't deal with objects overriding `__add__` ir `__radd__`
+    'RUF005',  # we typically don't deal with objects overriding `__add__` or `__radd__`
     'C4',      # they seem pretty safe
     'UP008',   # ^ likewise
     'D200',    # ^ likewise

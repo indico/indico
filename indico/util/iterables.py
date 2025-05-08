@@ -65,5 +65,5 @@ def window(seq, n=2):
     if len(result) == n:
         yield result
     for elem in it:
-        result = result[1:] + (elem,)
+        result = (*result[1:], elem)
         yield result
