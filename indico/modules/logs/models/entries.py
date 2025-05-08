@@ -34,9 +34,10 @@ class CategoryLogRealm(RichIntEnum):
 
 
 class UserLogRealm(RichIntEnum):
-    __titles__ = (None, _('User'), _('Management'))
+    __titles__ = (None, _('User'), _('Management'), _('Permissions'))
     user = 1
     management = 2
+    permissions = 3
 
 
 class LogKind(IndicoIntEnum):
