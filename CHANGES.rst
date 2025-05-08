@@ -41,6 +41,8 @@ Bugfixes
 - Allow the browser to perform spellchecking in the HTML/WYSIWYG minutes editor (:pr:`6890`)
 - Fix downdown/combobox issues on iOS Safari devices (:issue:`6830`, :pr:`6839`, thanks
   :user:`foxbunny`)
+- Fix font rendering issue in event titles with some cyrillic characters (:issue:`6673`,
+  :pr:`6881`, thanks :user:`Fedor204`)
 
 Accessibility
 ^^^^^^^^^^^^^
