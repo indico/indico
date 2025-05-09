@@ -7,37 +7,154 @@
 
 @use 'base/palette' as *;
 @use 'base/utilities' as *;
+@use 'partials/icons';
 @use 'design_system';
 
-.search-type-option {
-  @extend %flex-row;
+.search-box {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
 
-  span {
-    @include ellipsis();
-    font-size: 0.95em;
-    color: $dark-gray;
-    width: 50%;
+  .field {
+    @extend %text-input;
+
+    flex: 1;
+    display: flex;
+    gap: 0.5em;
+
+    &::after {
+      @extend %icon;
+      @extend %icon-search;
+
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2em;
+    }
+
+    span {
+      @extend %visually-hidden;
+    }
+
+    input {
+      flex: 1;
+    }
   }
-}
 
-.checkbox-admin-search:global(.ui.checkbox) {
-  display: flex;
-  justify-content: space-between;
+  .options {
+    position: absolute;
+    top: calc(100% + 0.5em);
 
-  label {
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: $dark-gray;
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+
+    transition-property: opacity, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+
+    &:not(:empty) {
+      border: var(--control-border);
+      border-radius: var(--control-border-radius);
+      background: var(--background-primary);
+      box-shadow: var(--control-raised-shadow);
+    }
   }
-}
 
-:global(.ui.search > .results > .result.cursor-default) {
-  cursor: default;
-}
+  .options:empty,
+  &:not(:focus-within) .options {
+    opacity: 0;
+    transform: translateY(0.5em);
+    pointer-events: none;
+  }
 
-.search-field > span {
-  @extend %visually-hidden;
+  .options li {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
+    min-width: 10em;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    &:not(:last-child) {
+      border-bottom: var(--control-border);
+    }
+
+    & > * {
+      padding: 1em;
+    }
+
+    &:focus-within {
+      background: var(--control-clickable-surface-focus-color);
+    }
+  }
+
+  .search-type-option > button,
+  .admin-check > label {
+    @extend %flex-row;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-type-option > button {
+    @extend %button-clear;
+  }
+
+  .search-scope {
+    @extend %label;
+
+    display: inline-flex;
+    gap: 0.5em;
+    align-items: center;
+
+    &::after {
+      @extend %icon;
+      @extend %icon-arrow-right-sparse;
+    }
+  }
+
+  .checkbox-admin-search:global(.ui.checkbox) {
+    display: flex;
+    justify-content: space-between;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: $dark-gray;
+    }
+  }
+
+  .search-field > span {
+    @extend %visually-hidden;
+  }
+
+  .admin-label {
+    @extend %label;
+    --label-color: var(--label-red-bg-color);
+    --label-text-color: var(--label-red-text-color);
+  }
+
+  .admin-check {
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+  }
+
+  // States
+
+  &:focus-within {
+    .field {
+      border-color: var(--control-text-box-border-focus-color);
+      @extend %default-focus-ring;
+    }
+  }
+
+  .navigation-notes,
+  .navigation-notes-separator {
+    @extend %visually-hidden;
+  }
 }

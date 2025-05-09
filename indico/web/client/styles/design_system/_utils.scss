@@ -11,8 +11,8 @@
 }
 
 %default-focus-ring {
-  outline: medium solid Highlight;
-  outline: medium solid -webkit-focus-ring-color;
+  outline: thin solid Highlight;
+  outline: thin solid -webkit-focus-ring-color;
 }
 
 %text-size-reset {
