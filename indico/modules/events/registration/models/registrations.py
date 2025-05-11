@@ -300,6 +300,7 @@ class Registration(db.Model):
         secondary=registrations_tags_table,
         passive_deletes=True,
         collection_class=set,
+        order_by='RegistrationTag.title',
         backref=db.backref(
             'registrations',
             lazy=False
