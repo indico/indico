@@ -50,6 +50,8 @@ Internal Changes
 - Expose cloning details such as object mappings in the ``event.cloned`` signal (:pr:`6858`)
 - Expose cloning details in the ``contribution.created`` and ``subcontribution.created``
   signals (:pr:`6858`)
+- Add the id and color of registration tags on the Checkin API endpoint for registation
+  data (:pr:`6874`, thanks :user:`duartegalvao`)
 
 
 Version 3.3.6
