@@ -17,6 +17,7 @@ from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
 from indico.core.errors import UserValueError
+from indico.util.date_time import format_datetime
 from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
@@ -127,7 +128,7 @@ def _prepare_excel_data(data, tz=None):
     elif is_lazy_string(data) or isinstance(data, Markup):
         data = str(data)
     elif isinstance(data, datetime):
-        data = data.astimezone(tz=tz)
+        data = format_datetime(data, format='yyyy/MM/dd HH:mm', timezone=tz)
     return data
 
 
@@ -139,7 +140,7 @@ def generate_xlsx(headers, rows, tz=None):
     :return: an `io.BytesIO` containing the XLSX data
     """
     workbook_options = {'in_memory': True, 'strings_to_formulas': False, 'strings_to_numbers': False,
-                        'strings_to_urls': False, 'default_date_format': 'yyyy/mm/dd hh:mm:ss', 'remove_timezone': True}
+                        'strings_to_urls': False}
     buf = BytesIO()
     header_positions = {name: i for i, name in enumerate(headers)}
     # convert row dicts to lists
