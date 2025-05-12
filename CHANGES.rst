@@ -46,6 +46,8 @@ Bugfixes
 - Fix font rendering issue in event titles with some cyrillic characters (:issue:`6673`,
   :pr:`6881`, thanks :user:`Fedor204`)
 - Include registration tags in event export (:pr:`6896`)
+- Fix datetime handling in excel exports (:issue:`6806`, :pr:`6887`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
