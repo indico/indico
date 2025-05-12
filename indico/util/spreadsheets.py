@@ -8,7 +8,7 @@
 import csv
 import re
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import date, datetime
 from enum import auto
 from io import BytesIO, TextIOWrapper
 
@@ -17,7 +17,7 @@ from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
 from indico.core.errors import UserValueError
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_date, format_datetime
 from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
@@ -129,6 +129,8 @@ def _prepare_excel_data(data, tz=None):
         data = str(data)
     elif isinstance(data, datetime):
         data = format_datetime(data, format='yyyy/MM/dd HH:mm', timezone=tz)
+    elif isinstance(data, date):
+        data = format_date(data, format='yyyy/MM/dd', timezone=tz)
     return data
 
 
