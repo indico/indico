@@ -129,12 +129,8 @@ body {
 }
 
 /* Main content */
-.session-block.contribution .inherited-bg-color {
-  background-color: rgb(146, 182, 219);
-}
-
-.session-block.contribution .inherited-bg-color-trans {
-  background-color: rgb(146, 182, 219, 66);
+.session-block.contribution :is(.inherited-bg-color, .inherited-bg-color-trans) {
+  background-color: var(--primary-color-trans);
 }
 
 .session-block.contribution .inherited-txt-color {
