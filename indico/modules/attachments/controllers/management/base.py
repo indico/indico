@@ -13,6 +13,7 @@ from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.permissions import update_read_permissions
 from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AddAttachmentLinkForm, AttachmentFolderForm,
@@ -115,13 +116,14 @@ class AddAttachmentFilesMixin:
                 filename = secure_client_filename(f.filename)
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename,
                                         type=AttachmentType.file, protection_mode=form.protection_mode.data)
-                if attachment.is_self_protected and form.acl:
-                    attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
                 attachment.file.save(f.stream)
                 db.session.add(attachment)
                 db.session.flush()
+                # To be able to log attachment ID these steps must be done after flushing
+                if attachment.is_self_protected and form.acl:
+                    update_read_permissions(attachment, form)
                 logger.info('Attachment %s uploaded by %s', attachment, session.user)
                 signals.attachments.attachment_created.send(attachment, user=session.user)
             flash(ngettext('The attachment has been uploaded', '{count} attachments have been uploaded', len(files))
@@ -139,7 +141,7 @@ class AddAttachmentLinkMixin:
     def _process(self):
         form = AddAttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
-            add_attachment_link(form.data, self.object)
+            add_attachment_link(form, self.object)
             flash(_('The link has been added'), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form,
@@ -163,9 +165,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             self.attachment.folder = folder
             form.populate_obj(self.attachment, skip={'acl', 'file', 'folder'})
             if self.attachment.is_self_protected and form.acl:
-                # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
-                self.attachment.acl |= form.acl.data
-                self.attachment.acl &= form.acl.data
+                update_read_permissions(self.attachment, form)
             # files need special handling; links are already updated in `populate_obj`
             if self.attachment.type == AttachmentType.file:
                 file = form.file.data['added']
@@ -194,9 +194,11 @@ class CreateFolderMixin:
         if form.validate_on_submit():
             folder = AttachmentFolder(object=self.object)
             form.populate_obj(folder, skip={'acl'})
-            if folder.is_self_protected and form.acl:
-                folder.acl = form.acl.data
             db.session.add(folder)
+            db.session.flush()
+            # To be able to log attachment ID these steps must be done after flushing
+            if folder.is_self_protected and form.acl:
+                update_read_permissions(folder, form)
             logger.info('Folder %s created by %s', folder, session.user)
             signals.attachments.folder_created.send(folder, user=session.user)
             flash(_('Folder "{name}" created').format(name=folder.title), 'success')
@@ -214,9 +216,7 @@ class EditFolderMixin(SpecificFolderMixin):
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
             if self.folder.is_self_protected and form.acl:
-                # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
-                self.folder.acl |= form.acl.data
-                self.folder.acl &= form.acl.data
+                update_read_permissions(self.folder, form)
             logger.info('Folder %s edited by %s', self.folder, session.user)
             signals.attachments.folder_updated.send(self.folder, user=session.user)
             flash(_('Folder "{name}" updated').format(name=self.folder.title), 'success')

@@ -12,6 +12,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
+from indico.core.permissions import update_read_permissions
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger
 from indico.modules.events.layout.forms import MenuBuiltinEntryForm, MenuLinkForm, MenuPageForm
@@ -122,11 +123,12 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
                                     custom_title=self.entry.title is not None)
         form = form_cls(entry=self.entry, obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
-            changes = self.entry.populate_from_dict(form.data, skip={'html', 'custom_title'})
+            changes = self.entry.populate_from_dict(form.data, skip={'acl', 'html', 'custom_title'})
 
             if self.entry.is_page and self.entry.page.html != form.html.data:
                 changes['html'] = (self.entry.page.html, form.html.data)
                 self.entry.page.html = form.html.data
+            update_read_permissions(self.entry, form)
 
             self.entry.log(EventLogRealm.management, LogKind.change, 'Menu',
                            f'Menu entry changed: {self.entry.log_title}', session.user,
@@ -238,16 +240,16 @@ class RHMenuAddEntry(RHMenuBase):
         form = form_cls(obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
             entry = MenuEntry(event=self.event, type=MenuEntryType[entry_type])
-            changes = entry.populate_from_dict(form.data, skip={'html'})
+            changes = entry.populate_from_dict(form.data, skip={'acl', 'html'})
             if entry.is_page:
                 page = EventPage(html=form.html.data)
                 self.event.custom_pages.append(page)
                 entry.page = page
                 changes['html'] = ('', page.html)
-
             db.session.add(entry)
             db.session.flush()
-
+            # To be able to log menu entry ID these steps must be done after flushing
+            update_read_permissions(entry, form)
             entry.log(EventLogRealm.management, LogKind.positive, 'Menu', f'Menu entry added: {entry.log_title}',
                       session.user, data={'Changes': make_diff_log(changes, entry_log_fields)})
             return jsonify_data(entry=_render_menu_entry(entry))
