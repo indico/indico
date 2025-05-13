@@ -8,6 +8,7 @@
 from flask import session
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.modules.attachments.logging import connect_log_signals
 from indico.modules.attachments.models.attachments import Attachment
@@ -22,6 +23,10 @@ __all__ = ('logger', 'Attachment', 'AttachmentFolder')
 
 logger = Logger.get('attachments')
 connect_log_signals()
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Attachment), sender=Attachment, weak=False)
+signals.acl.entry_changed.connect(make_acl_log_fn(AttachmentFolder), sender=AttachmentFolder, weak=False)
 
 
 @signals.users.merged.connect
