@@ -61,6 +61,8 @@ body {
   --control-padding: 0.5em 1em;
   --control-internal-gap: 0.2em;
   --control-raised-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
+  --control-text-box-border-focus-color: var(--accent-border-color);
+  --control-text-box-bg-color: var(--background-primary);
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);
@@ -131,4 +133,8 @@ body {
 
   // Modal controls
   --modal-control-box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.3);
+
+  // Labels
+  --label-red-bg-color: #c00;
+  --label-red-text-color: #fff;
 }

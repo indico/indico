@@ -68,3 +68,36 @@
     @extend %icon-checkmark;
   }
 }
+
+%text-input {
+  background: var(--control-text-box-bg-color);
+  border: var(--control-border);
+  border-radius: var(--control-border-radius);
+
+  &:is(input, textarea) {
+    padding: 0.3em 0.5em;
+  }
+
+  &:focus-visible,
+  &:focus-within,
+  &:hover {
+    border-color: var(--control-text-box-border-focus-color);
+  }
+
+  &:focus-visible,
+  &:focus-within {
+    @extend %default-focus-ring;
+  }
+
+  // This covers cases where we want the container to look like
+  // an input, while hosting the input itself and additional
+  // controls and/or decoration (e.g., clear button, icon).
+  input {
+    background: transparent;
+    border: 0 !important; // FIXME: conflict with _input.scss which should be phased out
+    border-radius: 0;
+    color: inherit;
+    font: inherit;
+    padding: 0.3em 0.5em;
+  }
+}

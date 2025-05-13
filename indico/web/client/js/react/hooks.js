@@ -367,3 +367,68 @@ export function useNativeEvent(ref, eventType, callback, options = {}) {
     return () => node.removeEventListener(eventType, callback);
   }, [ref, eventType, callback, options]);
 }
+
+// Keys not intended for the key sink in the
+// useVerticalArrowNavigation() hook.
+const NOT_FOR_KEY_SINK = new Set([
+  'Space',
+  'Tab',
+  'Enter',
+  'ShiftLeft',
+  'ShiftRight',
+  'AltLeft',
+  'AltRight',
+  'ControlLeft',
+  'ControlRight',
+]);
+
+/**
+ * Instrument the container to allow vertical navigation
+ * using arrow keys.
+ *
+ * This hook deals with two kinds of elements within the
+ * subtree:
+ *
+ * - stops - elements where focus should go when the
+ *   up/down arrows are pressed
+ * - key sink - an element that will receive *all other*
+ *   key events, except Tab, Space and Enter
+ *
+ * The key sink is usually a text input. If absent, the
+ * key events are treated as usual.
+ *
+ * To mark an element as a stop, simply give it a
+ * `data-stop` attribute with no value or any value.
+ */
+export function useVerticalArrowNavigation(containerRef, keySinkRef) {
+  useEffect(() => {
+    const abortCtrl = new AbortController();
+
+    containerRef.current.addEventListener(
+      'keydown',
+      evt => {
+        if (evt.code === 'ArrowUp' || evt.code === 'ArrowDown') {
+          evt.preventDefault();
+
+          const stops = [...evt.currentTarget.querySelectorAll('[data-stop]')];
+          const currentStopIndex = stops.indexOf(document.activeElement);
+          const isDownward = evt.code === 'ArrowDown';
+          let nextStop;
+
+          if (isDownward) {
+            nextStop = stops[currentStopIndex + 1] ?? stops[0];
+          } else {
+            nextStop = stops[currentStopIndex - 1] ?? stops.at(-1);
+          }
+
+          nextStop.focus();
+        } else if (!NOT_FOR_KEY_SINK.has(evt.code)) {
+          keySinkRef?.current?.focus();
+        }
+      },
+      {signal: abortCtrl.signal}
+    );
+
+    return () => abortCtrl.abort();
+  }, [containerRef, keySinkRef]);
+}
