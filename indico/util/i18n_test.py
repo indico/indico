@@ -19,7 +19,7 @@ from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
 from indico.util.date_time import format_datetime
-from indico.util.i18n import _, force_locale, gettext_context, make_bound_gettext, ngettext, pgettext
+from indico.util.i18n import _, force_locale, gettext_context, make_bound_gettext, ngettext, orig_string, pgettext
 
 
 def _to_msgid(context, message):
@@ -232,3 +232,12 @@ def test_force_user_locale(dummy_user):
     assert _('I need a drink.') == "I be needin' a bottle of rhum!"
 
     assert session.lang == 'en_AU'
+
+
+@pytest.mark.parametrize(('string', 'expected_orig_string'), (
+    ('The wheels', 'The wheels'),
+    (_('The wheels'), 'The wheels'),
+    (pgettext('Monty Python', 'The wheels'), 'The wheels'),
+), ids=('not-lazy-string', 'gettext', 'pgettext'))
+def test_orig_string(string, expected_orig_string):
+    assert orig_string(string) == expected_orig_string
