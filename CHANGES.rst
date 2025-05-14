@@ -38,6 +38,7 @@ Bugfixes
 - Fix participant visibility being set to "nobody" when a registration was modifified
   (:pr:`6863`)
 - Fix error when editing a room while no custom attributes have been defined (:pr:`6840`)
+- Allow the browser to perform spellchecking in the HTML/WYSIWYG minutes editor (:pr:`6890`)
 
 Accessibility
 ^^^^^^^^^^^^^
