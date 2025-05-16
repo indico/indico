@@ -41,6 +41,8 @@ Bugfixes
 - Allow the browser to perform spellchecking in the HTML/WYSIWYG minutes editor (:pr:`6890`)
 - Fix downdown/combobox issues on iOS Safari devices (:issue:`6830`, :pr:`6839`, thanks
   :user:`foxbunny`)
+- Fix datetime handling in excel exports (:issue:`6806`, :pr:`6887`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
