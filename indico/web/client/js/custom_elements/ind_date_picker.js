@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
+import {focusLost} from 'indico/utils/composite-events';
 import {
   DateRange,
   OpenDateRange,
@@ -422,40 +423,16 @@ class DialogModeController {
   }
 
   setUpEvents() {
-    this.dialog.addEventListener('pointerdown', () => {
-      // Because Safari does not focus buttons (and other elements) when they
-      // are clicked, we need to mark the dialog as having received such clicks
-      // and test for it in the close handler.
-      this.dialog.noImmediateClose = true;
-      setTimeout(() => {
-        // Unset with a delay to allow focusout handler to see this flag.
-        // It must still be unset so it doesn't linger on forever. The delay
-        // was chosen based on trial and error. In general, you don't want
-        // to make it shorter, but you may increase it if some browser/OS
-        // combination unsets the flag too quickly.
-        delete this.dialog.noImmediateClose;
-      }, 100);
+    focusLost(this.dialog, () => {
+      this.calendar.open = false;
     });
-    this.dialog.addEventListener('focusout', () => {
-      // The focusout event is triggered on the dialog or somewhere in it.
-      // We use requestAnimationFrame to allow the target element to get
-      // focused so we know where the focus is going.
-      requestAnimationFrame(() => {
-        // When a button in the dialog is clicked, `noImmediateClose` is set on
-        // the dialog element. We test for the absence of this flag as well as
-        // focus escaping from the dialog as two cues to close it.
-        if (!this.dialog.noImmediateClose && !this.dialog.contains(document.activeElement)) {
-          this.calendar.open = false;
-        }
-      });
-      // Handle closing/opening the dialog by clicking outside
-      this.dialog.addEventListener('keydown', evt => {
-        if (evt.code !== 'Escape') {
-          return;
-        }
-        this.calendar.open = false;
-        this.calendar.dispatchEvent(new Event('x-keyclose'));
-      });
+    // Handle closing/opening the dialog by clicking outside
+    this.dialog.addEventListener('keydown', evt => {
+      if (evt.code !== 'Escape') {
+        return;
+      }
+      this.calendar.open = false;
+      this.calendar.dispatchEvent(new Event('x-keyclose'));
     });
     // Handle dialog open/close initialized through the ind-calendar `open` attribute
     this.calendar.addEventListener('x-attrchange.open', () => {
