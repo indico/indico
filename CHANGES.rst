@@ -39,6 +39,8 @@ Bugfixes
   (:pr:`6863`)
 - Fix error when editing a room while no custom attributes have been defined (:pr:`6840`)
 - Allow the browser to perform spellchecking in the HTML/WYSIWYG minutes editor (:pr:`6890`)
+- Fix downdown/combobox issues on iOS Safari devices (:issue:`6830`, :pr:`6839`, thanks
+  :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

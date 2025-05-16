@@ -18,6 +18,37 @@ function updateClientGeometry() {
   viewportHeight = document.documentElement.clientHeight;
 }
 
+// XXX: On Safari (and generally browsers that support visual viewports)
+// we use calculations based around the visual viewport offsets to account
+// for the UI overlays such as virtual keyboards. For efficiency, the following
+// functions have dual definitions based on whether the visual viewport is
+// supported, so that we don't test for it on every call.
+//
+// Visual viewport offsets determine how much the viewport is pushed uo (or
+// left) compared to its original location when the UI overlay is not shown.
+// Therefore we must *add* these offsets to compensate.
+//
+// Note that currently these calculations do not account for elastic scroll.
+// You should expect that the calculations are going to be off by some margin
+// while the elastic scroll is in effect. There is no known (to me) method that
+// accounts for these. If you find it, you should apply it to these functions,
+// as they represent the single source of truth for any kind of coordinate
+// adjustment.
+
+const hasVisualViewport = window.visualViewport !== undefined;
+
+const getScrollTop = hasVisualViewport
+  ? () => window.scrollY + visualViewport.offsetTop
+  : () => window.scrollY;
+
+const getScrollLeft = hasVisualViewport
+  ? () => window.scrollX + visualViewport.offsetLeft
+  : () => window.scrollX;
+
+const getVisualY = hasVisualViewport ? y => y + visualViewport.offsetTop : y => y;
+
+const getVisualX = hasVisualViewport ? x => x + visualViewport.offsetLeft : x => x;
+
 // Positioning strategies
 //
 // The mixins represent the generic positioning methods, while the
@@ -47,15 +78,21 @@ const geometry = {
     // Vertical geometry
     this.targetHeight ??= this.targetRect.height;
     this.anchorHeight ??= this.anchorRect.height;
-    this.anchorTop ??= this.anchorRect.top;
-    this.anchorBottom ??= this.anchorRect.bottom;
-    this.initialPageYOffset = window.pageYOffset;
+    this.anchorTop ??= getVisualY(this.anchorRect.top);
+    this.anchorBottom ??= getVisualY(this.anchorRect.bottom);
     // Horizontal geometry
     this.targetWidth ??= this.targetRect.width;
     this.anchorWidth ??= this.anchorRect.width;
-    this.anchorLeft ??= this.anchorRect.left;
-    this.anchorRight ??= this.anchorRect.right;
-    this.initialPageXOffset = window.pageXOffset;
+    this.anchorLeft ??= getVisualX(this.anchorRect.left);
+    this.anchorRight ??= getVisualX(this.anchorRect.right);
+    // Initial scroll positions
+    // XXX: These are remembered because, instead of calculating the
+    // positions of each element over and over for each scroll event,
+    // we simply adjust the position based on scroll distance. This
+    // prevents layout thrashing because scroll positions can be read
+    // without forced reflow.
+    this.initialScrollTop = getScrollTop();
+    this.initialScrollLeft = getScrollLeft();
   },
   resetGeometry(callback) {
     delete this.anchorRect;
@@ -68,7 +105,8 @@ const geometry = {
     delete this.targetRect;
     delete this.targetWidth;
     delete this.targetHeight;
-    delete this.initialPageYOffset;
+    delete this.initialScrollTop;
+    delete this.initialScrollLeft;
 
     this.setAnchorGeometry();
     requestAnimationFrame(() => {
@@ -77,14 +115,14 @@ const geometry = {
     });
   },
   setTop(top) {
-    const scrollOffset = window.pageYOffset - this.initialPageYOffset;
+    const scrollOffset = getScrollTop() - this.initialScrollTop;
     this.target.style.setProperty(
       '--target-top',
       `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
     );
   },
   setLeft(left) {
-    const scrollOffset = window.pageXOffset - this.initialPageXOffset;
+    const scrollOffset = getScrollLeft() - this.initialScrollLeft;
     this.target.style.setProperty(
       '--target-left',
       `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
@@ -252,19 +290,22 @@ export function position(target, anchor, strategy, callback) {
     strategy.setAlignment();
     strategy.setArrowDirection();
   };
+  const adjustWithFullGeometryReset = () => strategy.resetGeometry(adjustPosition);
 
-  window.addEventListener(
-    'resize',
-    () => {
-      strategy.resetGeometry(adjustPosition);
-    },
-    {
-      signal: positioningAbortController.signal,
-    }
-  );
+  window.addEventListener('resize', adjustWithFullGeometryReset, {
+    signal: positioningAbortController.signal,
+  });
   window.addEventListener('scroll', adjustPosition, {
     signal: positioningAbortController.signal,
     passive: true,
+  });
+  window.visualViewport?.addEventListener('resize', adjustWithFullGeometryReset, {
+    signal: positioningAbortController.signal,
+  });
+  // XXX: This is not a standard scroll event. It only fires *once* after the
+  // scroll is finished.
+  window.visualViewport?.addEventListener('scroll', adjustWithFullGeometryReset, {
+    signal: positioningAbortController.signal,
   });
 
   // Since hidden elements will not have a client rect, we need to first simulate
