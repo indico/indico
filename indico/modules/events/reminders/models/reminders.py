@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from enum import Enum
+
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,7 +14,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.notifications import make_email, send_email
 from indico.modules.core.settings import core_settings
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
@@ -22,10 +24,16 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, registrations_tags_table
 from indico.modules.events.reminders import logger
-from indico.modules.events.reminders.util import make_reminder_email
+from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.util.date_time import now_utc
 from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
+from indico.web.flask.templating import get_template_module
+
+
+class ReminderType(int, Enum):
+    classic = 1
+    custom = 2
 
 
 reminders_forms_table = db.Table(
@@ -171,11 +179,22 @@ class EventReminder(db.Model):
         db.String,
         nullable=False
     )
-    #: Custom message to include in the email
+    #: Subject of reminder email for customized reminder.
+    subject = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    #: Custom message to include in the email (ReminderType.classic) or the complete message (ReminderType.custom).
     message = db.Column(
         db.String,
         nullable=False,
         default=''
+    )
+    #: It is a classic reminder or a customized one.
+    reminder_type = db.Column(
+        PyIntEnum(ReminderType),
+        nullable=False
     )
 
     #: The user who created the reminder
@@ -316,6 +335,15 @@ class EventReminder(db.Model):
             email_params.update(param)
         return make_email(**email_params)
 
+    def _get_reminder_email_tpl(self):
+        with_agenda = self.include_summary
+        if self.event.type_ == EventType.lecture:
+            with_agenda = False
+        agenda = self.event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
+        return get_template_module('events/reminders/emails/event_reminder.txt', event=self.event,
+                                   url=self.event.short_external_url, note=self.note, with_agenda=with_agenda,
+                                   with_description=self.with_description, agenda=agenda)
+
     def send(self):
         """Send the reminder to its recipients."""
         self.is_sent = True
@@ -324,8 +352,9 @@ class EventReminder(db.Model):
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
         with self.event.force_event_locale():
-            text_email_tpl, html_email_tpl = make_reminder_email(self.event, self.include_summary,
-                                                                 self.include_description, self.message)
+            text_email_tpl, html_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type,
+                                                                    self.include_summary, self.include_description,
+                                                                    self.subject, self.message)
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
@@ -333,10 +362,11 @@ class EventReminder(db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         sender = self.event.get_verbose_email_sender(self.reply_to_address)
+        alternatives = [(text_email_tpl.get_body(), 'text/plain')] if text_email_tpl else None
         for recipient in recipients:
             with self.event.force_event_locale():
                 email = self._make_email(sender, recipient, html_email_tpl, attachments, html=True,
-                                         alternatives=[(text_email_tpl.get_body(), 'text/plain')])
+                                         alternatives=alternatives)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

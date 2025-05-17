@@ -5,15 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import BooleanField, SelectField, TextAreaField
+from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.events.models.events import EventType
+from indico.modules.events.reminders.models.reminders import ReminderType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoRadioField,
+from indico.web.forms.fields import (EmailListField, HiddenEnumField, IndicoDateTimeField, IndicoRadioField,
                                      IndicoSelectMultipleCheckboxField, TimeDeltaField)
 from indico.web.forms.fields.simple import IndicoMultipleTagSelectField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless
@@ -25,6 +26,7 @@ class ReminderForm(IndicoForm):
     schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
     schedule_recipient_fields = recipient_fields + schedule_fields
 
+    reminder_type = HiddenEnumField(enum=ReminderType)
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
                                      choices=[('relative', _('Relative to the event start time')),
@@ -53,6 +55,7 @@ class ReminderForm(IndicoForm):
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
+    subject = StringField(_('Subject'), [DataRequired()])
     message = TextAreaField(_('Note'), widget=TinyMCEWidget(),
                             description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
@@ -82,6 +85,14 @@ class ReminderForm(IndicoForm):
         else:
             del self.tags
             del self.all_tags
+        if self.reminder_type.data == ReminderType.classic:
+            del self.subject
+        else:
+            self.message.label.text = _('Email body')
+            self.message.validators = (DataRequired(),)
+            self.message.flags.required = True
+            del self.include_summary
+            del self.include_description
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:
