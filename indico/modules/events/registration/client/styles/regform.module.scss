@@ -317,7 +317,9 @@
   }
 
   > .actions {
-    visibility: hidden;
+    & > *:not(.conditional) {
+      visibility: hidden;
+    }
 
     a + a,
     a + i,
@@ -351,7 +353,7 @@
       cursor: grabbing;
     }
 
-    &:hover > .actions {
+    &:hover > .actions > * {
       visibility: visible;
     }
   }
