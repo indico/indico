@@ -145,6 +145,7 @@ export:
       - EventRole.event_id
       - EventPrincipal.event_id
       - EventNote.event_id
+      - RegistrationTag.event_id
       - RegistrationForm.event_id
       - Survey.event_id
       - DesignerTemplate.event_id
@@ -497,6 +498,7 @@ export:
       ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationData.registration_id
+      - Registration.tags.prop.secondary.c.registration_id
       - PaymentTransaction.registration_id
       - ReceiptFile.registration_id
 
@@ -511,6 +513,8 @@ export:
   RegistrationInvitation:
     cols:
       uuid: uuid = VALUE if KEEP_UUIDS else SKIP
+  RegistrationTag: {}
+  event_registration.registration_tags: {}
 
   PaymentTransaction: {}
 

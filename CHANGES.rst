@@ -43,6 +43,7 @@ Bugfixes
   :user:`foxbunny`)
 - Fix font rendering issue in event titles with some cyrillic characters (:issue:`6673`,
   :pr:`6881`, thanks :user:`Fedor204`)
+- Include registration tags in event export (:pr:`6896`)
 
 Accessibility
 ^^^^^^^^^^^^^
