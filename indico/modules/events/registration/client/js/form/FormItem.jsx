@@ -65,11 +65,11 @@ ItemLocked.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
-function ItemHidden({reason}) {
-  return <Popup trigger={<Icon name="hide" />}>{reason}</Popup>;
+function ItemConditional({reason}) {
+  return <Popup trigger={<Icon name="hide" styleName="conditional" />}>{reason}</Popup>;
 }
 
-ItemHidden.propTypes = {
+ItemConditional.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
@@ -240,7 +240,7 @@ export default function FormItem({
         {setupActions}
         {lockedReason && <ItemLocked reason={lockedReason} />}
         {!!showIfFieldId && setupMode && (
-          <ItemHidden reason={Translate.string('This field is conditionally shown')} />
+          <ItemConditional reason={Translate.string('This field is conditionally shown')} />
         )}
         {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
         {!lockedReason && !showPurged && paidItemLocked && (
