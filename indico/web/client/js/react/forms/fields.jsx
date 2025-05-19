@@ -562,7 +562,7 @@ export function FinalDropdown({
   ...rest
 }) {
   const extraProps = {};
-  if (multiple) {
+  if (multiple || singleValueAsList) {
     extraProps.isEqual = unsortedArraysEqual;
   }
   const parse = value =>
