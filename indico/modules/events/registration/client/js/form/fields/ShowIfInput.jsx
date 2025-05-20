@@ -33,6 +33,8 @@ export function ShowIfInput({hasValueSelected}) {
       throw new Error(`Input ${field.inputType} field has no options defined`);
     }
   }
+  // XXX maybe this is wrong, single choice inputs could be optional but enable some field
+  // for either its options are chosen...
   const isMultipleChoice = options.length > 2;
 
   return (
