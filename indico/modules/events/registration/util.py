@@ -448,9 +448,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
     active_fields = regform.active_fields
 
     def _void_field_if_needed(field):
-        show_if_field_id = field.data.get('show_if_field_id')
-        if show_if_field_id is not None:
-            show_if_data = registration.data_by_field.get(show_if_field_id)
+        if field.show_if_id is not None:
+            show_if_data = registration.data_by_field.get(field.show_if_id)
             if show_if_data is not None:
                 show_if_field = show_if_data.field_data.field
                 # recursively attempt to void fields it depends on
