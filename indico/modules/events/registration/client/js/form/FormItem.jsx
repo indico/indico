@@ -172,10 +172,10 @@ export default function FormItem({
     ) : null;
 
   useEffect(() => {
-    if (!show && !setupMode) {
+    if (!show && !setupMode && inputType !== 'label') {
       form.change(htmlName, defaultValue);
     }
-  }, [show, setupMode, form, htmlName, defaultValue]);
+  }, [show, setupMode, form, htmlName, inputType, defaultValue]);
 
   if (!show && !setupMode) {
     return null;
