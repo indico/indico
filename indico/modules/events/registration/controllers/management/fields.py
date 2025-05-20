@@ -88,7 +88,7 @@ class GeneralFieldDataSchema(mm.Schema):
         if field_id is None:
             return
         field = self.context['field']
-        if field.is_manager_only or (field.parent is not None and field.parent.is_manager_only):
+        if field.parent.is_manager_only:
             raise ValueError('Manager-only fields cannot be conditionally shown')
         used_field_ids = set()
         if field.id is not None:
@@ -106,7 +106,7 @@ class GeneralFieldDataSchema(mm.Schema):
             else:
                 used_field_ids.add(next_field_id)
             next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
-            if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
+            if next_field.parent.is_manager_only:
                 raise ValidationError('Field conditions may not depend on fields in manager-only sections')
             if not next_field.is_enabled:
                 raise ValidationError('Field conditions may not depend on disabled fields')
