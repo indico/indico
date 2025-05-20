@@ -22,6 +22,8 @@ Improvements
 - Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
 - Add duration and date/time placeholders when sending emails for contributions
   (:pr:`6860`)
+- Set the abstract type directly, if there is only 1 choice and type is required
+  (:pr:`6897`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^

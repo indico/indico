@@ -528,6 +528,9 @@ class AbstractForm(IndicoForm):
                                                  .order_by(db.func.lower(ContributionType.name)))
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
+        if (abstracts_settings.get(self.event, 'contrib_type_required')
+            and self.submitted_contrib_type.query.count() == 1):
+            self.submitted_contrib_type.allow_blank = False
         if not self.event.cfa.allow_attachments:
             del self.attachments
         if not description_settings['is_active']:
