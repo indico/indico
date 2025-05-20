@@ -128,7 +128,8 @@ class TextDataSchema(GeneralFieldDataSchema):
         exclude = ('is_required', 'retention_period', 'input_type')
 
 
-def _fill_form_field_with_data(field, field_data, is_static_text=False, context=None):
+def _fill_form_field_with_data(field, field_data, *, is_static_text=False):
+    context = {'regform': field.registration_form, 'field': field}
     schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
     schema = schema_cls(context=context)
     general_data, raw_field_specific_data = schema.load(field_data)
@@ -219,8 +220,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
-        changes = _fill_form_field_with_data(self.field, field_data,
-                                             context={'regform': self.regform, 'field': self.field})
+        changes = _fill_form_field_with_data(self.field, field_data)
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
@@ -267,7 +267,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
         form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data, context={'regform': self.regform, 'field': form_field})
+        _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
         form_field.log(
@@ -292,8 +292,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         field_data.pop('input_type', None)
-        changes = _fill_form_field_with_data(self.field, field_data, is_static_text=True,
-                                             context={'regform': self.regform, 'field': self.field})
+        changes = _fill_form_field_with_data(self.field, field_data, is_static_text=True)
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
@@ -319,8 +318,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
         form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data, is_static_text=True,
-                                   context={'regform': self.regform, 'field': form_field})
+        _fill_form_field_with_data(form_field, field_data, is_static_text=True)
         db.session.add(form_field)
         db.session.flush()
         form_field.log(
