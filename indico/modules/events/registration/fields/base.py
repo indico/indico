@@ -8,7 +8,7 @@
 from copy import deepcopy
 from decimal import Decimal
 
-from marshmallow import ValidationError, fields, validate, validates
+from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -17,51 +17,28 @@ from indico.util.marshmallow import not_empty
 
 
 class FieldSetupSchemaBase(mm.Schema):
-    show_if_field_id = fields.Integer(required=False, load_default=None)
-    show_if_field_values = fields.List(fields.String(), required=False)
+    """Base schema for configuring registration form fields.
 
-    @validates('show_if_field_id')
-    def _check_if_field_id(self, field_id, **kwargs):
-        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
-        if field_id is None:
-            return
-        field = self.context['field']
-        if field.is_manager_only or (field.parent is not None and field.parent.is_manager_only):
-            raise ValueError('Manager-only fields cannot be conditionally shown')
-        used_field_ids = set()
-        if field.id is not None:
-            if field.id == field_id:
-                raise ValueError('The field cannot conditionally depend on itself to be shown')
-            used_field_ids.add(field.id)
-        regform = self.context['regform']
-        if not RegistrationFormItem.query.filter_by(id=field_id, registration_form_id=regform.id).has_rows():
-            raise ValidationError('The field to show does not belong to the same registration form.')
-        # Avoid cycles
-        next_field_id = field_id
-        while next_field_id is not None:
-            if next_field_id in used_field_ids:
-                raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
-            else:
-                used_field_ids.add(next_field_id)
-            next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
-            if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
-                raise ValidationError('Field conditions may not depend on fields in manager-only sections')
-            if not next_field.is_enabled:
-                raise ValidationError('Field conditions may not depend on disabled fields')
-            next_field_id = next_field.data.get('show_if_field_id')
+    Any global options that go into every field's JSON config data can be
+    added here; if the options are stored in a dedicated column, they should
+    go to `GeneralFieldDataSchema` instead.
+    """
 
 
 class BillableFieldDataSchema(FieldSetupSchemaBase):
+    """Base config schema for fields that can have a price."""
+
     price = fields.Float(load_default=0)
 
 
 class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
+    """Base config schema for fields that can have a price and limited places."""
+
     places_limit = fields.Integer(load_default=0, validate=validate.Range(0))
 
 
 class LimitedPlacesBillableItemSchema(LimitedPlacesBillableFieldDataSchema):
-    class Meta:
-        exclude = ('show_if_field_id', 'show_if_field_values')
+    """Base config schema for field items that can have a price and limited places."""
 
 
 class RegistrationFormFieldBase:

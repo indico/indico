@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy.orm.attributes import flag_modified
-
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -45,16 +43,16 @@ class RegistrationFormCloner(EventCloner):
                                    skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
         self._field_data_map = {}
         self._form_map = {}
+        self._item_map = {}
         for old_form in self.old_event.registration_forms:
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
-            db.session.add(new_form)
-            new_event.registration_forms.append(new_form)
-            db.session.add(new_event)
             self._clone_form_items(old_form, new_form, clone_all_revisions)
+            new_event.registration_forms.append(new_form)
             signals.event.registration.after_registration_form_clone.send(old_form, new_form=new_form)
             db.session.flush()
             self._form_map[old_form] = new_form
         return {'form_map': self._form_map,
+                'item_map': self._item_map,
                 'field_data_map': self._field_data_map}
 
     def _has_content(self, event):
@@ -63,7 +61,6 @@ class RegistrationFormCloner(EventCloner):
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
-        item_map = {}
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
@@ -78,17 +75,13 @@ class RegistrationFormCloner(EventCloner):
                         new_item.current_data = field_data
                         self._field_data_map[old_item.current_data] = field_data
                 new_section.children.append(new_item)
-                item_map[old_item.id] = new_item
-                db.session.add(new_item)
+                self._item_map[old_item] = new_item
             new_form.form_items.append(new_section)
-            db.session.add(new_section)
             db.session.flush()
-        # adapt the show_if-related fields to the newly generated ids
-        for new_item in item_map.values():
-            show_if_field_id = new_item.data.get('show_if_field_id')
-            if show_if_field_id is not None:
-                new_item.data['show_if_field_id'] = item_map[show_if_field_id].id
-                flag_modified(new_item, 'data')
+        # link conditional fields to the new fields
+        for old_item, new_item in self._item_map.items():
+            if old_item.show_if_field:
+                new_item.show_if_field = self._item_map[old_item.show_if_field]
         db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):

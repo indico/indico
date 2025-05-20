@@ -419,10 +419,11 @@ class Registration(db.Model):
         return loc
 
     def is_field_shown(self, field):
-        show_if_field_id = field.data.get('show_if_field_id')
-        show_if_field_values = field.data.get('show_if_field_values')
-        if (not show_if_field_id or not show_if_field_values or
-            not (show_if_data := self.data_by_field.get(show_if_field_id))):
+        if (
+            not field.show_if_id
+            or not field.show_if_values
+            or not (show_if_data := self.data_by_field.get(field.show_if_id))
+        ):
             return True
         show_if_field = show_if_data.field_data.field
         data = show_if_data.data
@@ -432,7 +433,7 @@ class Registration(db.Model):
             values = ['1'] if data else ['0']
         else:
             values = data
-        return any(v in show_if_field_values for v in values) and self.is_field_shown(show_if_field)
+        return any(v in field.show_if_values for v in values) and self.is_field_shown(show_if_field)
 
     @locator.uuid
     def locator(self):

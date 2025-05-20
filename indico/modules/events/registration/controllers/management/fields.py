@@ -9,11 +9,11 @@ from datetime import timedelta
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
-from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
 from indico.modules.events.registration import logger
@@ -39,6 +39,8 @@ class GeneralFieldDataSchema(mm.Schema):
     is_required = fields.Bool(load_default=False)
     retention_period = fields.TimeDelta(load_default=None, precision=fields.TimeDelta.WEEKS)
     input_type = fields.String(required=True, validate=not_empty)
+    show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
+    show_if_values = fields.List(fields.String(), required=False, data_key='show_if_field_values')
 
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
@@ -79,8 +81,43 @@ class GeneralFieldDataSchema(mm.Schema):
                 raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty '
                                         'for indefinite.'))
 
+    @validates('show_if_id')
+    @no_autoflush
+    def _check_show_if_id(self, field_id, **kwargs):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
+        if field_id is None:
+            return
+        field = self.context['field']
+        if field.is_manager_only or (field.parent is not None and field.parent.is_manager_only):
+            raise ValueError('Manager-only fields cannot be conditionally shown')
+        used_field_ids = set()
+        if field.id is not None:
+            if field.id == field_id:
+                raise ValueError('The field cannot conditionally depend on itself to be shown')
+            used_field_ids.add(field.id)
+        regform = self.context['regform']
+        if not RegistrationFormItem.query.filter_by(id=field_id, registration_form_id=regform.id).has_rows():
+            raise ValidationError('The field to show does not belong to the same registration form.')
+        # Avoid cycles
+        next_field_id = field_id
+        while next_field_id is not None:
+            if next_field_id in used_field_ids:
+                raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
+            else:
+                used_field_ids.add(next_field_id)
+            next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
+            if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
+                raise ValidationError('Field conditions may not depend on fields in manager-only sections')
+            if not next_field.is_enabled:
+                raise ValidationError('Field conditions may not depend on disabled fields')
+            next_field_id = next_field.show_if_id
+
     @post_load(pass_original=True)
-    def _split_unknown(self, data, original_data, **kwargs):
+    def _postprocess(self, data, original_data, **kwargs):
+        # clear show_if_values if there's no show_if_id
+        if data['show_if_id'] is None:
+            data['show_if_values'] = None
+        # split result into parsed and unknown values
         parsed = {k: v for k, v in data.items() if k in self.load_fields}
         unknown = {k: v for k, v in original_data.items() if k not in self.load_fields}
         return parsed, unknown
@@ -93,7 +130,7 @@ class TextDataSchema(GeneralFieldDataSchema):
 
 def _fill_form_field_with_data(field, field_data, is_static_text=False, context=None):
     schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
-    schema = schema_cls(context={'field': field})
+    schema = schema_cls(context=context)
     general_data, raw_field_specific_data = schema.load(field_data)
     changes = {}
     for key, value in general_data.items():
@@ -135,7 +172,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
-        if not enabled and self.field.is_condition:
+        if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
@@ -160,14 +197,12 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
-        if self.field.is_condition:
+        if self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
-        if 'show_if_field_id' in (self.field.data or {}):
-            self.field.data.pop('show_if_field_id')
-            self.field.data.pop('show_if_field_values', None)
-            flag_modified(self.field, 'data')
+        self.field.show_if_id = None
+        self.field.show_if_values = None
         update_regform_item_positions(self.regform)
         db.session.flush()
         self.field.log(
@@ -257,7 +292,8 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         field_data.pop('input_type', None)
-        changes = _fill_form_field_with_data(self.field, field_data, is_static_text=True)
+        changes = _fill_form_field_with_data(self.field, field_data, is_static_text=True,
+                                             context={'regform': self.regform, 'field': self.field})
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
@@ -283,7 +319,8 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
         form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data, is_static_text=True)
+        _fill_form_field_with_data(form_field, field_data, is_static_text=True,
+                                   context={'regform': self.regform, 'field': form_field})
         db.session.add(form_field)
         db.session.flush()
         form_field.log(

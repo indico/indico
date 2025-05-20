@@ -82,8 +82,8 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             for section in self.regform.sections:
                 if section.is_deleted:
                     continue
-                fields_ids = {(field.data or {}).get('show_if_field_id')
-                              for field in section.children if not field.is_deleted} - {None}
+                fields_ids = {field.show_if_id for field in section.children
+                              if field.show_if_id is not None and not field.is_deleted}
                 if critical_fields_ids & fields_ids:
                     raise ValidationError('Cannot make section management-only due to conditional field relations')
         db.session.flush()
@@ -109,7 +109,7 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
         if not enabled:
             if self.section.type == RegistrationFormItemType.section_pd:
                 raise BadRequest
-            if any(f.is_condition for f in self.section.children):
+            if any(f.condition_for for f in self.section.children):
                 raise NoReportError.wrap_exc(
                     BadRequest(_('Sections with fields used as conditional cannot be disabled'))
                 )
