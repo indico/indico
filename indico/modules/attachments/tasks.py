@@ -8,6 +8,7 @@
 import os
 
 from indico.core.celery import celery
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.files.models.files import File
@@ -22,7 +23,7 @@ def generate_materials_package(attachment_ids, event):
     generated_zip = attachment_package_mixin._generate_zip_file(attachments, return_file=True)
     f = File(filename='material-package.zip', content_type='application/zip', meta={'event_id': event.id})
     context = ('event', event.id, 'attachment-package')
-    f.save(context, generated_zip)
+    f.save(context, generated_zip, backend=config.STATIC_SITE_STORAGE)
     db.session.add(f)
     db.session.commit()
     os.unlink(generated_zip.name)
