@@ -285,3 +285,7 @@ export function MultiChoiceSettings() {
     </>
   );
 }
+
+export function multiChoiceShowIfOptions(field) {
+  return field.choices.map(({caption, id}) => ({value: id, text: caption}));
+}

@@ -33,6 +33,7 @@ import LabelInput from './LabelInput';
 import MultiChoiceInput, {
   MultiChoiceSettings,
   multiChoiceSettingsInitialData,
+  multiChoiceShowIfOptions,
 } from './MultiChoiceInput';
 import NumberInput, {NumberSettings, numberSettingsFormValidator} from './NumberInput';
 import PhoneInput from './PhoneInput';
@@ -162,9 +163,9 @@ const fieldRegistry = {
     settingsModalSize: 'small',
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
+    showIfOptions: singleChoiceShowIfOptions,
     icon: 'dropmenu',
     renderAsFieldset: options => options.itemType === 'radiogroup',
-    showIfOptions: singleChoiceShowIfOptions,
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),
@@ -173,6 +174,7 @@ const fieldRegistry = {
     settingsModalSize: 'small',
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator],
     settingsFormInitialData: multiChoiceSettingsInitialData,
+    showIfOptions: multiChoiceShowIfOptions,
     icon: 'list',
     renderAsFieldset: true,
   },
