@@ -118,8 +118,9 @@ class GeneralFieldDataSchema(mm.Schema):
         if data['show_if_id'] is None:
             data['show_if_values'] = None
         # split result into parsed and unknown values
+        load_orig_keys = {f.data_key or k for k, f in self.load_fields.items()}
         parsed = {k: v for k, v in data.items() if k in self.load_fields}
-        unknown = {k: v for k, v in original_data.items() if k not in self.load_fields}
+        unknown = {k: v for k, v in original_data.items() if k not in load_orig_keys}
         return parsed, unknown
 
 
@@ -266,7 +267,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
-        form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
+        form_field = RegistrationFormField(parent=self.section, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
@@ -317,7 +318,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
-        form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
+        form_field = RegistrationFormText(parent=self.section, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data, is_static_text=True)
         db.session.add(form_field)
         db.session.flush()
