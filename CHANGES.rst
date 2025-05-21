@@ -22,6 +22,8 @@ Improvements
 - Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
 - Add duration and date/time placeholders when sending emails for contributions
   (:pr:`6860`)
+- Use :data:`STATIC_SITE_STORAGE` for the temporary file from a material package
+  (:pr:`6898`)
 
 Bugfixes
 ^^^^^^^^
