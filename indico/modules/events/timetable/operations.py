@@ -56,7 +56,7 @@ def create_contribution_entry(event, data, session_block=None, extend_parent=Tru
     contribution_ = Contribution(event=event)
     contribution_.populate_from_dict(data)
     entry_data = {'object': contribution_, 'start_dt': start_dt}
-    parent = session_block.timetable_entry if session_block else None
+    parent = session_block.timetable_entry if extend_parent and session_block else None
     return create_timetable_entry(event, entry_data, parent=parent, extend_parent=extend_parent)
 
 
@@ -81,7 +81,8 @@ def create_timetable_entry(event, data, parent=None, extend_parent=False):
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
-    signals.event.timetable_entry_created.send(entry)
+    # TODO: (Ajob) Uncomment to enable creation again
+    # signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, user)
     entry.event.log(EventLogRealm.management, LogKind.positive, 'Timetable',
                     f"Entry for {object_type} '{object_title}' created", user,

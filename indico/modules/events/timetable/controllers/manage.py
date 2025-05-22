@@ -161,6 +161,7 @@ class RHAPICreateContribution(RHManageTimetableBase):
 
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
         return TimetableEntrySchema().jsonify(contrib_entry)
 

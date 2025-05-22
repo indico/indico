@@ -149,7 +149,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       type: rawType,
       start_dt: startDt,
       id,
-      object: {title, duration, colors, session_id: sessionId},
+      duration,
+      object: {title, colors, session_id: sessionId, persons},
     } = data;
 
     const type = {
@@ -166,7 +167,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       id: id || -1,
       type,
       title,
-      duration,
+      duration: duration / 60,
       startDt: moment(startDt),
       x: 0,
       y: 0,
@@ -177,11 +178,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       backgroundColor: colors ? colors.background : '',
       sessionId: sessionId || null,
     };
-
     return mappedObj;
   };
 
   const _handleCreateContribution = async data => {
+    data.person_links = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
       'title',
       'duration',
@@ -192,24 +193,22 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'inheriting',
       'start_dt',
     ]);
-    data['person_link_data'] = data.person_links.map(mapPersonLinkToSchema);
-    delete data.person_links;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
   const _handleCreateSessionBlock = async data => {
     // data = _.omitBy(data, 'conveners'); // TODO person links
     // data.conveners = [];
+    data.conveners = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
       'title',
       'duration',
       'location_data',
       'inheriting',
       'start_dt',
-      'person_links',
+      'conveners',
       'session_id',
     ]);
-    data.person_links = data.person_links.map(mapPersonLinkToSchema);
     return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 
@@ -256,7 +255,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     const {data: resData} = await submitHandler(data);
     const newTopLevelEntry = _mapDataToEntry(resData);
 
-    dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
+    if (isEditing) {
+      // TODO: (Ajob) Implement editing existing entries
+      // dispatch(actions.updateEntry(newTopLevelEntry));
+    } else {
+      dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
+    }
     onSubmit();
     onClose();
   };

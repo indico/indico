@@ -49,7 +49,7 @@ function gcd(a: number, b: number) {
 // Data mapping functions
 export const mapPersonLinkToSchema = data => ({
   title: data.title,
-  name: data.name,
+  // name: data.name,
   first_name: data.firstName,
   last_name: data.lastName,
   affiliation: data.affiliation,
@@ -59,7 +59,7 @@ export const mapPersonLinkToSchema = data => ({
   phone: data.phone,
   roles: data.roles,
   type: data.type,
-  avatar_url: data.avatarURL,
+  // avatar_url: data.avatarURL,
 });
 
 const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
