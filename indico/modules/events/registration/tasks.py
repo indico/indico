@@ -108,7 +108,9 @@ def delete_registrations():
 
 @celery.task(name='delete_previous_registration_file')
 def delete_previous_registration_file(reg_data, storage_backend, storage_file_id):
-    if reg_data.storage_backend == storage_backend and reg_data.storage_file_id == storage_file_id:
+    if reg_data is None or (
+        reg_data.storage_backend == storage_backend and reg_data.storage_file_id == storage_file_id
+    ):
         return
     logger.debug('Deleting registration file: %s from %s storage', storage_file_id, storage_backend)
     storage = get_storage(storage_backend)

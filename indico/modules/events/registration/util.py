@@ -56,6 +56,7 @@ from indico.util.i18n import _
 from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
+from indico.web.args import parser
 
 
 @dataclasses.dataclass
@@ -395,8 +396,10 @@ def create_registration(regform, data, invitation=None, management=False, notify
                                 base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
     if skip_moderation is None:
         skip_moderation = management
+    all_data_by_id = {f.id: data.get(f.html_field_name) for f in regform.active_fields}
+    hidden_fields = get_hidden_conditional_fields(regform, all_data_by_id)
     for form_item in regform.active_fields:
-        if form_item.is_purged or form_item.get_locked_reason(None):
+        if form_item in hidden_fields or form_item.is_purged or form_item.get_locked_reason(None):
             # Leave the registration data empty
             continue
         default = form_item.field_impl.default_value
@@ -447,19 +450,15 @@ def modify_registration(registration, data, management=False, notify_user=True):
     billable_items_locked = not management and registration.is_paid
     active_fields = regform.active_fields
 
-    def _void_field_if_needed(field):
-        if field.show_if_id is not None:
-            show_if_data = registration.data_by_field.get(field.show_if_id)
-            if show_if_data is not None:
-                show_if_field = show_if_data.field_data.field
-                # recursively attempt to void fields it depends on
-                _void_field_if_needed(show_if_field)
-        if not registration.is_field_shown(field):
-            _set_data(field, field.field_impl.empty_value)
+    # Get both the existing data and the new data from the client as modifying registrations
+    # sends a PATCH with only updated fields in the payload.
+    all_data_by_id = {field_id: field_data.data for field_id, field_data in data_by_field.items()}
+    all_data_by_id.update({f.id: data[f.html_field_name] for f in regform.active_fields if f.html_field_name in data})
+    hidden_fields = get_hidden_conditional_fields(regform, all_data_by_id)
 
     def _set_data(field, value):
         attrs = field.field_impl.process_form_data(registration, value, data_by_field[field.id],
-                                             billable_items_locked=billable_items_locked)
+                                                   billable_items_locked=billable_items_locked)
         for key, val in attrs.items():
             setattr(data_by_field[field.id], key, val)
         if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.column:
@@ -475,6 +474,16 @@ def modify_registration(registration, data, management=False, notify_user=True):
         field_impl = form_item.field_impl
         has_data = form_item.html_field_name in data
         can_modify = management or not form_item.parent.is_manager_only
+        existing_data = data_by_field.get(form_item.id)
+
+        if form_item in hidden_fields:
+            if not existing_data:
+                continue
+            if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
+                delete_previous_registration_file.apply_async([None, existing_data.storage_backend,
+                                                               existing_data.storage_file_id], countdown=600)
+            registration.data.remove(existing_data)
+            continue
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
@@ -491,18 +500,13 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if value is NotImplemented:  # un-modifiable field w/ no existing nor default value
             continue
 
-        if (field_impl.is_file_field and (file_data := data_by_field.get(form_item.id))
-                and file_data.storage_file_id is not None):
-            delete_previous_registration_file.apply_async([file_data, file_data.storage_backend,
-                                                           file_data.storage_file_id], countdown=600)
+        if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
+            delete_previous_registration_file.apply_async([existing_data, existing_data.storage_backend,
+                                                           existing_data.storage_file_id], countdown=600)
         if form_item.id not in data_by_field:
             data_by_field[form_item.id] = RegistrationData(registration=registration,
                                                            field_data=form_item.current_data)
         _set_data(form_item, value)
-
-    # Second loop to remove fields that are hidden after the changes are applied.
-    for form_item in active_fields:
-        _void_field_if_needed(form_item)
 
     if not management and regform.needs_publish_consent:
         consent_to_publish = data.get('consent_to_publish')
@@ -1010,10 +1014,21 @@ def diff_registration_data(old_data, new_data):
              the old and new friendly data and the field price
     """
     diff = {}
-    for html_field_name in old_data:
-        old = old_data[html_field_name]
-        new = new_data[html_field_name]
-        if old['data'] != new['data'] or (old['is_file_field'] and old['storage_file_id'] != new['storage_file_id']):
+    for html_field_name in old_data.keys() | new_data.keys():
+        old = old_data.get(html_field_name)
+        new = new_data.get(html_field_name)
+        if old is None:
+            diff[html_field_name] = {
+                'old': {'price': 0, 'friendly_data': ''},
+                'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
+            }
+        elif new is None:
+            # XXX this doesn't actually get displayed in the emails
+            diff[html_field_name] = {
+                'old': {'price': old['price'], 'friendly_data': old['friendly_data']},
+                'new': {'price': 0, 'friendly_data': ''}
+            }
+        elif old['data'] != new['data'] or (old['is_file_field'] and old['storage_file_id'] != new['storage_file_id']):
             diff[html_field_name] = {
                 'old': {'price': old['price'], 'friendly_data': old['friendly_data']},
                 'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
@@ -1065,3 +1080,52 @@ def process_registration_picture(source, *, thumbnail=False):
     picture.save(image_bytes, 'JPEG')
     image_bytes.seek(0)
     return image_bytes
+
+
+def _is_field_shown(field, data):
+    # not conditional
+    if not field.show_if_field:
+        return True
+    # condition field has no data
+    if (show_if_data := data.get(field.show_if_id)) is None:
+        return False
+    if isinstance(show_if_data, dict):
+        values = show_if_data.keys()
+    elif isinstance(show_if_data, bool):
+        values = ['1'] if show_if_data else ['0']
+    else:
+        # XXX what do we have here?
+        values = show_if_data
+    return any(v in field.show_if_values for v in values) and _is_field_shown(field.show_if_field, data)
+
+
+def get_hidden_conditional_fields(regform, data_by_id):
+    return {f for f in regform.active_fields if not _is_field_shown(f, data_by_id)}
+
+
+# XXX rename optional_field since it may be True for all partial in management mode
+def load_registration_schema(regform, schema_cls, *, registration=None, partial_fields=frozenset()):
+    """Process data using the registration schema.
+
+    This takes conditional fields into account so required fields which
+    are disabled due to a condition do not cause a validation error, but
+    required fields that are active are actually enforced as required.
+    """
+    # During the first parse all fields may be omitted; we could limit this to conditional
+    # fields but it doesn't really matter as we just need to get field values.
+    schema = schema_cls(partial=True)
+    all_form_data = parser.parse(schema)
+    if registration:
+        # Use existing data from the registration, and then extend/overwrite it with new data
+        data_by_id = {field_id: field_data.data for field_id, field_data in registration.data_by_field.items()}
+        data_by_id.update({f.id: all_form_data[f.html_field_name] for f in regform.active_fields
+                           if f.html_field_name in all_form_data})
+    else:
+        data_by_id = {f.id: all_form_data.get(f.html_field_name) for f in regform.active_fields}
+    hidden_fields = get_hidden_conditional_fields(regform, data_by_id)
+    # Now that we know which fields are disabled due to unmet conditions, we can parse
+    # the form data again and properly fail if any required fields are missing/empty.
+    # XXX: The frontend is not supposed to send data for any field that is disabled,
+    #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
+    schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
+    return parser.parse(schema)

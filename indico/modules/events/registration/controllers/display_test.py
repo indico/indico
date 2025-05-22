@@ -126,6 +126,20 @@ def test_display_edit_override_required_rh(
     assert dummy_regform.active_registration_count == 1
 
     # We are not a manager, but are attempting to avoid setting the required field. We should get a 422
+    jsondata = {'first_name': 'hax0r'}
+    url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/edit?token={reg.uuid}'
+    with app_context.test_request_context(url, json=jsondata):
+        rh = RHRegistrationDisplayEdit()
+        rh._process_args()
+        rh._check_access()
+
+        with pytest.raises(UnprocessableEntity) as excinfo:
+            rh._process_POST()
+
+        messages = excinfo.value.data['messages']
+        assert messages == {boolean_field.html_field_name: ['Missing data for required field.']}
+
+    # Attempting to set override_required must also fail
     jsondata = {'first_name': 'hax0r', 'override_required': True}
     url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/edit?token={reg.uuid}'
     with app_context.test_request_context(url, json=jsondata):
@@ -137,9 +151,7 @@ def test_display_edit_override_required_rh(
             rh._process_POST()
 
         messages = excinfo.value.data['messages']
-        assert len(messages) == 2
-        assert messages['override_required'][0] == 'Unknown field.'
-        assert messages[boolean_field.html_field_name][0] == 'Missing data for required field.'
+        assert messages['override_required'] == ['Unknown field.']
 
     # Try again with the correct fields
     assert not smtp.outbox
