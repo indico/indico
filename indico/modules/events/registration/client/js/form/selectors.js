@@ -30,6 +30,13 @@ export const isItemHidden = createSelector(
   (hiddenIds, itemId) => !!itemId && hiddenIds.includes(itemId)
 );
 
+/** Check whether an item is hidden. */
+export const getHiddenItemHTMLNames = createSelector(
+  getItems,
+  getHiddenItemIds,
+  (fields, hiddenIds) => Object.values(_.pick(fields, hiddenIds)).map(f => f.htmlName)
+);
+
 /** Get the currency used by the registration form. */
 export const getCurrency = createSelector(
   getStaticData,
