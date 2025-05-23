@@ -437,7 +437,7 @@ def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
     assert registered_persons == {user_person, no_user_person}
 
 
-def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
+def test_create_registration(monkeypatch, dummy_user, dummy_regform):
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
     # Extend the dummy_regform with more sections and fields
@@ -520,7 +520,7 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
 
 
 @pytest.mark.usefixtures('request_context')
-def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
+def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     session.set_session_user(dummy_user)
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
