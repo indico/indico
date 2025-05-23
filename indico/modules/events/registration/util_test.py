@@ -573,11 +573,23 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 2}
     assert reg.data_by_field[checkbox_field.id].data
 
+    # Modify the registration without re-sending unchanged data
+    data = {
+        multi_choice_field.html_field_name: {choice_uuid: 1},
+        checkbox_field.html_field_name: False,  # manager-only --> value must be ignored
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 1}
+    # Assert that the manager field is not changed
+    assert reg.data_by_field[checkbox_field.id].data
+
     # Modify the registration
     data = {
-        boolean_field.html_field_name: True,
+        boolean_field.html_field_name: True,  # unmodified, but re-sending it is allowed
         multi_choice_field.html_field_name: {choice_uuid: 1},
-        checkbox_field.html_field_name: False,
+        checkbox_field.html_field_name: False,  # manager-only --> value must be ignored
     }
     modify_registration(reg, data, management=False, notify_user=False)
 
