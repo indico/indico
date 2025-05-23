@@ -171,3 +171,197 @@ def test_display_edit_override_required_rh(dummy_regform, dummy_user, app_contex
             subject=f'[Indico] Registration modified for {dummy_regform.event.title}',
             to=dummy_user.email,
         )
+
+
+def test_display_register_conditional(db, dummy_regform, dummy_user, app_context, mocker):
+    mocker.patch('indico.modules.events.registration.util.notify_registration_creation')
+    mocker.patch('indico.modules.events.registration.util.notify_registration_modification')
+
+    # Extend the dummy_regform with more sections and fields
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    })
+
+    db.session.flush()
+    text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field, {
+        'input_type': 'text', 'title': 'Cond Text',
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': ['1'],
+    })
+    text_field_req = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field_req, {
+        'input_type': 'text', 'title': 'Cond Text Required',
+        'is_required': True,
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': ['1'],
+    })
+
+    dummy_regform.start_dt = now_utc(False)
+    dummy_regform.modification_mode = ModificationMode.allowed_always
+    dummy_regform.require_captcha = False
+    db.session.flush()
+    assert dummy_regform.active_registration_count == 0
+    personal_data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    def _test_register(data, *, raises):
+        url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/'
+        with app_context.test_request_context(url, json={**personal_data, **data}):
+            rh = RHRegistrationForm()
+            rh._process_args()
+            rh._check_access()
+            if raises:
+                with pytest.raises(UnprocessableEntity) as excinfo:
+                    rh._process_POST()
+                return excinfo.value.data['messages']
+            else:
+                rh._process_POST()
+                assert dummy_regform.active_registration_count == 1
+                return dummy_regform.registrations[0]
+
+    # Registering fails because the required field is active but has no data
+    data = {boolean_field.html_field_name: True}
+    messages = _test_register(data, raises=True)
+    assert messages == {text_field_req.html_field_name: ['Missing data for required field.']}
+
+    # Registering fails because the conditional fields are hidden but have data
+    data = {
+        text_field.html_field_name: 'foo',
+        text_field_req.html_field_name: 'bar',
+    }
+    messages = _test_register(data, raises=True)
+    assert messages == {
+        text_field.html_field_name: ['Unknown field.'],
+        text_field_req.html_field_name: ['Unknown field.'],
+    }
+
+    # Registering succeeds, conditional field disabled (no value)
+    reg = _test_register({}, raises=False)
+    assert not reg.data_by_field[boolean_field.id].data
+    assert text_field.id not in reg.data_by_field
+    assert text_field_req.id not in reg.data_by_field
+
+    db.session.delete(reg)
+    db.session.flush()
+    db.session.expire(dummy_regform)
+    assert dummy_regform.active_registration_count == 0
+
+    # Registering succeeds, conditional field + required field have values
+    data = {
+        boolean_field.html_field_name: True,
+        text_field_req.html_field_name: 'foo',
+    }
+    reg = _test_register(data, raises=False)
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[text_field.id].data == ''
+    assert reg.data_by_field[text_field_req.id].data == 'foo'
+
+
+def test_display_modify_conditional(db, dummy_regform, dummy_user, app_context, mocker):
+    mocker.patch('indico.modules.events.registration.util.notify_registration_creation')
+    mocker.patch('indico.modules.events.registration.util.notify_registration_modification')
+
+    # Extend the dummy_regform with more sections and fields
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    })
+
+    db.session.flush()
+    text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field, {
+        'input_type': 'text', 'title': 'Cond Text',
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': ['1'],
+    })
+    text_field_req = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field_req, {
+        'input_type': 'text', 'title': 'Cond Text Required',
+        'is_required': True,
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': ['1'],
+    })
+
+    dummy_regform.start_dt = now_utc(False)
+    dummy_regform.modification_mode = ModificationMode.allowed_always
+    dummy_regform.require_captcha = False
+    db.session.flush()
+    assert dummy_regform.active_registration_count == 0
+    personal_data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    def _test_register(data, *, raises):
+        url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/'
+        with app_context.test_request_context(url, json={**personal_data, **data}):
+            rh = RHRegistrationForm()
+            rh._process_args()
+            rh._check_access()
+            if raises:
+                with pytest.raises(UnprocessableEntity) as excinfo:
+                    rh._process_POST()
+                return excinfo.value.data['messages']
+            else:
+                rh._process_POST()
+                assert dummy_regform.active_registration_count == 1
+                return dummy_regform.registrations[0]
+
+    def _test_modify(reg, data, *, raises):
+        url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/edit?token={reg.uuid}'
+        with app_context.test_request_context(url, json={**personal_data, **data}):
+            rh = RHRegistrationDisplayEdit()
+            rh._process_args()
+            rh._check_access()
+            if raises:
+                with pytest.raises(UnprocessableEntity) as excinfo:
+                    rh._process_POST()
+                return excinfo.value.data['messages']
+            else:
+                rh._process_POST()
+
+    # Register with value in conditional field
+    data = {
+        boolean_field.html_field_name: True,
+        text_field_req.html_field_name: 'foo',
+    }
+    reg = _test_register(data, raises=False)
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[text_field.id].data == ''
+    assert reg.data_by_field[text_field_req.id].data == 'foo'
+
+    # No-op should be fine, existing data kept
+    _test_modify(reg, {}, raises=False)
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[text_field.id].data == ''
+    assert reg.data_by_field[text_field_req.id].data == 'foo'
+
+    # Cannot clear required field
+    messages = _test_modify(reg, {text_field_req.html_field_name: ''}, raises=True)
+    assert messages == {text_field_req.html_field_name: ['This field cannot be empty.']}
+
+    # Condition no longer met -> cannot set data for them
+    messages = _test_modify(reg, {boolean_field.html_field_name: False, text_field.html_field_name: ''}, raises=True)
+    assert messages == {text_field.html_field_name: ['Unknown field.']}
+
+    # Condition no longer met -> data for fields removed
+    _test_modify(reg, {boolean_field.html_field_name: False}, raises=False)
+    assert not reg.data_by_field[boolean_field.id].data
+    assert text_field.id not in reg.data_by_field
+    assert text_field_req.id not in reg.data_by_field
+
+    # Cannot enable field w/o providing new value for required one
+    messages = _test_modify(reg, {boolean_field.html_field_name: True}, raises=True)
+    assert messages == {text_field_req.html_field_name: ['Missing data for required field.']}
+
+    # Cannot enable field with an empty new new value for required one
+    messages = _test_modify(reg, {boolean_field.html_field_name: True, text_field_req.html_field_name: ''}, raises=True)
+    assert messages == {text_field_req.html_field_name: ['This field cannot be empty.']}
+
+    # Success when providing required data
+    _test_modify(reg, {boolean_field.html_field_name: True, text_field_req.html_field_name: 'bar'}, raises=False)
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[text_field.id].data == ''
+    assert reg.data_by_field[text_field_req.id].data == 'bar'
