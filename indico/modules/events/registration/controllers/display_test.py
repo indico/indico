@@ -99,16 +99,14 @@ def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
     assert not smtp.outbox
 
 
-def test_display_edit_override_required_rh(
-    db, dummy_regform, dummy_user, app_context, smtp
-):
+def test_display_edit_override_required_rh(dummy_regform, dummy_user, app_context, smtp):
     # Add a section and a required field
     section = RegistrationFormSection(
         registration_form=dummy_regform, title='dummy_section', is_manager_only=False
     )
 
     assert dummy_regform.active_registration_count == 0
-    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(
         boolean_field, {'input_type': 'bool', 'is_required': True, 'title': 'Yes/No'}
     )
