@@ -43,6 +43,7 @@ class RegistrationFormCloner(EventCloner):
                                    skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
         self._field_data_map = {}
         self._form_map = {}
+        self._item_map = {}
         for old_form in self.old_event.registration_forms:
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
             self._clone_form_items(old_form, new_form, clone_all_revisions)
@@ -51,6 +52,7 @@ class RegistrationFormCloner(EventCloner):
             db.session.flush()
             self._form_map[old_form] = new_form
         return {'form_map': self._form_map,
+                'item_map': self._item_map,
                 'field_data_map': self._field_data_map}
 
     def _has_content(self, event):
@@ -73,8 +75,14 @@ class RegistrationFormCloner(EventCloner):
                         new_item.current_data = field_data
                         self._field_data_map[old_item.current_data] = field_data
                 new_section.children.append(new_item)
+                self._item_map[old_item] = new_item
             new_form.form_items.append(new_section)
             db.session.flush()
+        # link conditional fields to the new fields
+        for old_item, new_item in self._item_map.items():
+            if old_item.show_if_field:
+                new_item.show_if_field = self._item_map[old_item.show_if_field]
+        db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):
         for old_version in old_item.data_versions:

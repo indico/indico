@@ -26,9 +26,10 @@ import {indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
+import ConditionalFieldsController from '../form/ConditionalFieldsController';
 import FormErrorList from '../form/FormErrorList';
 import FormSection from '../form/FormSection';
-import {getNestedSections, getStaticData} from '../form/selectors';
+import {getHiddenItemHTMLNames, getNestedSections, getStaticData} from '../form/selectors';
 
 import {
   getUpdateMode,
@@ -145,11 +146,14 @@ export default function RegistrationFormSubmission() {
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
+  const hiddenItemHTMLNames = useSelector(getHiddenItemHTMLNames);
 
   const onSubmit = async (data, form) => {
     // There is no need to store whether the user accepted the privacy policy
     // as it is not possible to submit the form without accepting it.
     data = _.omit(data, 'agreed_to_privacy_policy');
+    // Do not send data for hidden fields; they are cleared server-side.
+    data = _.omit(data, hiddenItemHTMLNames);
     let resp;
     const formData = isUpdateMode ? getChangedValues(data, form, ['notify_user']) : data;
     try {
@@ -175,6 +179,7 @@ export default function RegistrationFormSubmission() {
     >
       {fprops => (
         <form onSubmit={fprops.handleSubmit}>
+          <ConditionalFieldsController />
           {renderPluginComponents('regformBeforeSections')}
           {sections.map(section => (
             <FormSection key={section.id} {...section} />

@@ -16,12 +16,29 @@ from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 
 
-class BillableFieldDataSchema(mm.Schema):
+class FieldSetupSchemaBase(mm.Schema):
+    """Base schema for configuring registration form fields.
+
+    Any global options that go into every field's JSON config data can be
+    added here; if the options are stored in a dedicated column, they should
+    go to `GeneralFieldDataSchema` instead.
+    """
+
+
+class BillableFieldDataSchema(FieldSetupSchemaBase):
+    """Base config schema for fields that can have a price."""
+
     price = fields.Float(load_default=0)
 
 
 class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
+    """Base config schema for fields that can have a price and limited places."""
+
     places_limit = fields.Integer(load_default=0, validate=validate.Range(0))
+
+
+class LimitedPlacesBillableItemSchema(LimitedPlacesBillableFieldDataSchema):
+    """Base config schema for field items that can have a price and limited places."""
 
 
 class RegistrationFormFieldBase:
@@ -38,7 +55,7 @@ class RegistrationFormFieldBase:
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
     #: whether this field is associated with a file instead of normal data
@@ -114,10 +131,10 @@ class RegistrationFormFieldBase:
         """
         return RegistrationData.data.op('#>>')('{}').in_(data_list)
 
-    def create_setup_schema(self):
+    def create_setup_schema(self, context=None):
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
-        return schema()
+        return schema(context=context)
 
     def create_mm_field(self, registration=None, override_required=False):
         """
@@ -245,7 +262,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
