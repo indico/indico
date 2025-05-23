@@ -439,6 +439,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 def modify_registration(registration, data, management=False, notify_user=True):
     from indico.modules.events.registration.tasks import delete_previous_registration_file
 
+    user = session.user if session else None
     old_data = snapshot_registration_data(registration)
     old_price = registration.price
     personal_data_changes = {}
@@ -527,11 +528,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
     diff = diff_registration_data(old_data, new_data)
     notify_registration_modification(registration, notify_user=notify_user, diff=diff, old_price=old_price,
                                      from_management=management)
-    logger.info('Registration %s modified by %s', registration, session.user)
+    logger.info('Registration %s modified by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      LogKind.change, 'Registration',
                      f'Registration modified: {registration.full_name}',
-                     session.user, data={'Email': registration.email})
+                     user, data={'Email': registration.email})
 
 
 def update_registration_consent_to_publish(registration, consent_to_publish):
