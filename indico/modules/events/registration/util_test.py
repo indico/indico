@@ -462,7 +462,8 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
     data = {
         boolean_field.html_field_name: True,
         multi_choice_field.html_field_name: {'test1': 2},
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
@@ -472,7 +473,8 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
 
     # Make sure that missing data gets default values:
     data = {
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -491,7 +493,8 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
 
     data = {
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -504,7 +507,8 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
     # Try again with management=True
     data = {
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -552,7 +556,8 @@ def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
         boolean_field.html_field_name: True,
         multi_choice_field.html_field_name: {choice_uuid: 2},
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
