@@ -16,6 +16,8 @@ import './custom_elements/ind_bypass_block_links.js';
 import './custom_elements/ind_menu.js';
 import './custom_elements/ind_share_widget.js';
 import './custom_elements/ind_vc_room_segment.js';
+import './custom_elements/ind_with_popup.js';
+import './custom_elements/ind_with_toggletip.js';
 import './widgets/tz_selector.js';
 import './widgets/dynamic-tips.js';
 
