@@ -33,7 +33,8 @@ from indico.testing.util import assert_json_snapshot
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
-def test_import_users(dummy_regform):
+@pytest.mark.usefixtures('dummy_regform')
+def test_import_users():
     csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.test',
                       b'Jane,Smith,ACME Inc.,CEO,,jane@example.test',
                       b'Billy Bob,Doe,,,,1337@EXAMPLE.test'])
@@ -442,16 +443,13 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
 
     # Extend the dummy_regform with more sections and fields
     section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
-    db.session.add(section)
-    db.session.flush()
 
-    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(boolean_field, {
         'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
     })
-    db.session.add(boolean_field)
 
-    multi_choice_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    multi_choice_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
@@ -459,7 +457,6 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
             {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
         ]
     })
-    db.session.add(multi_choice_field)
     db.session.flush()
 
     data = {
@@ -485,14 +482,11 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
 
     # Add a manager only section
     section = RegistrationFormSection(registration_form=dummy_regform, title='manager_section', is_manager_only=True)
-    db.session.add(section)
-    db.session.flush()
 
-    checkbox_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    checkbox_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(checkbox_field, {
         'input_type': 'checkbox', 'title': 'Checkbox'
     })
-    db.session.add(checkbox_field)
     db.session.flush()
 
     data = {
@@ -527,16 +521,13 @@ def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     # Extend the dummy_regform with more sections and fields
     user_section = RegistrationFormSection(registration_form=dummy_regform,
                                            title='dummy_section', is_manager_only=False)
-    db.session.add(user_section)
-    db.session.flush()
 
-    boolean_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(boolean_field, {
         'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
     })
-    db.session.add(boolean_field)
 
-    multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    multi_choice_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
@@ -545,20 +536,15 @@ def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
         ]
     })
     choice_uuid = next(k for k, v in multi_choice_field.data['captions'].items() if v == 'A')
-    db.session.add(multi_choice_field)
-    db.session.flush()
 
     # Add a manager-only section
     management_section = RegistrationFormSection(registration_form=dummy_regform,
                                                  title='manager_section', is_manager_only=True)
-    db.session.add(management_section)
-    db.session.flush()
 
-    checkbox_field = RegistrationFormField(parent_id=management_section.id, registration_form=dummy_regform)
+    checkbox_field = RegistrationFormField(parent=management_section, registration_form=dummy_regform)
     _fill_form_field_with_data(checkbox_field, {
         'input_type': 'checkbox', 'is_required': True, 'title': 'Checkbox'
     })
-    db.session.add(checkbox_field)
     db.session.flush()
 
     # Create a registration
@@ -610,14 +596,13 @@ def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     assert not reg.data_by_field[checkbox_field.id].data
 
     # Add a new field after registering
-    new_multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    new_multi_choice_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(new_multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
             {'caption': 'A', 'id': 'new:test3', 'is_enabled': True},
         ]
     })
-    db.session.add(new_multi_choice_field)
     db.session.flush()
 
     modify_registration(reg, {}, management=False, notify_user=False)
