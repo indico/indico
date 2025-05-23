@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import * as actions from './actions';
 import BlockEntry from './BlockEntry';
-import EntryContent from './ContributionEntry';
+import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
 import {TimetablePopup} from './EntryPopup';
 import {ReduxState} from './reducers';
