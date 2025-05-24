@@ -52,7 +52,7 @@
                 </span>
             </div>
         </a>
-        {%- for short_name, method in methods %}
+        {%- for short_name, method in methods|sort(attribute='1.title') %}
             {% set payment_enabled = method in enabled_methods %}
             <a href="#" id="plugin-{{ method.name }}"
                class="js-edit-method i-badge {%- if payment_enabled %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"

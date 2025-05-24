@@ -44,7 +44,9 @@ class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title', 'description', 'start_dt', 'end_dt')
+        fields = ('id', 'title', 'description', 'start_dt', 'end_dt', 'registration_tags')
+
+    registration_tags = fields.Nested(RegistrationTagSchema, many=True)
 
 
 class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
@@ -71,7 +73,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     checkin_secret = fields.UUID(attribute='ticket_uuid')
     payment_date = fields.Method('_get_payment_date')
     formatted_price = fields.Function(lambda reg: reg.render_price())
-    tags = fields.Function(lambda reg: sorted(t.title for t in reg.tags))
+    tags = fields.Nested(RegistrationTagSchema, many=True)
     registration_date = fields.DateTime(attribute='submitted_dt')
     registration_data = fields.Method('_get_registration_data')
 
