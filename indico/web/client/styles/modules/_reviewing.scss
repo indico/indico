@@ -33,6 +33,23 @@
     p:last-child {
       margin-bottom: 0;
     }
+
+    ul, ol {
+      margin: 0.25em 0 0.5em 1em;
+      padding: 0;
+    }
+
+    blockquote {
+      margin: 0 1em 1em 1em;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    hr {
+      border-bottom: 1px solid #dfdfdf;
+    }
   }
 
   textarea.grow {
