@@ -1104,7 +1104,6 @@ def get_hidden_conditional_fields(regform, data_by_id):
     return {f for f in regform.active_fields if not _is_field_shown(f, data_by_id)}
 
 
-# XXX rename optional_field since it may be True for all partial in management mode
 def load_registration_schema(regform, schema_cls, *, registration=None, partial_fields=frozenset()):
     """Process data using the registration schema.
 
