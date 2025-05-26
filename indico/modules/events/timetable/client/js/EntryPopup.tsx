@@ -69,8 +69,9 @@ function TimetablePopupContent({
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const draftEntry = {...entry, duration: entry.duration};
 
-  const onEdit = () => {
+  const onEdit = (e: MouseEvent) => {
     onClose();
+    e.stopPropagation();
     dispatch(actions.setDraftEntry(draftEntry));
   };
 

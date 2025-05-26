@@ -115,7 +115,9 @@ export function DraggableEntry({id, isChild=false, ...rest}) {
     return (
       <TimetablePopup
         trigger={entry}
-        onClose={() => dispatch(actions.deselectEntry())}
+        onClose={() => {
+          dispatch(actions.deselectEntry());
+        }}
         entry={{id, ...rest}}
       />
     );
