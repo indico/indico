@@ -86,9 +86,13 @@ export function DraggableEntry({id, isChild=false, ...rest}) {
   const listeners = {
     ..._listeners,
     onClick,
-    onMouseDown: e => {
+    onMouseDown: (event: MouseEvent) => {
+      if (event.button !== 0) {
+        return;
+      }
+
       onMouseDown();
-      _listeners.onMouseDown(e);
+      _listeners.onMouseDown(event);
     },
   };
 

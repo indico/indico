@@ -219,6 +219,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         return;
       }
 
+      if (event.button !== 0) {
+        // TODO: (Ajob) Investigate if we need to handle right-clicks
+        return;
+      }
+
       const rect = calendarRef.current.getBoundingClientRect();
       const y = minutesToPixels(
         Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
