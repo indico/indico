@@ -515,3 +515,9 @@ export function SingleChoiceSettings() {
 export function singleChoiceShowIfOptions(field) {
   return field.choices.map(({caption, id}) => ({value: id, text: caption}));
 }
+
+export function singleChoiceGetDataForCondition(value) {
+  return Object.entries(value)
+    .filter(([, slots]) => slots > 0)
+    .map(([key]) => key);
+}
