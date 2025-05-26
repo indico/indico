@@ -103,6 +103,16 @@ class RegistrationFormFieldBase:
         assert default is not NotImplemented
         return default
 
+    def get_data_for_condition(self, value) -> set:
+        """Convert field value to the format expected in a condition check.
+
+        If this field can be used for a condition, this method needs to return a
+        set of values (based on the `value` the field currently contains). If this
+        set intersects with the other field's configured condition, that field will
+        be visible.
+        """
+        raise NotImplementedError('Field cannot be used as a condition')
+
     def get_validators(self, existing_registration):
         """Return a list of marshmallow validators for this field.
 

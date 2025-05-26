@@ -137,6 +137,9 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
+    def get_data_for_condition(self, value) -> set:
+        return {id for id, slots in value.items() if slots > 0}
+
     def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
             if not new_data:
@@ -505,6 +508,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
     @property
     def empty_value(self):
         return {'choice': None}
+
+    def get_data_for_condition(self, value) -> set:
+        return {value['choice']}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):

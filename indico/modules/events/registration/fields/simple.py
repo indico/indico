@@ -152,6 +152,9 @@ class CheckboxField(RegistrationFormBillableField):
     def default_value(self):
         return False
 
+    def get_data_for_condition(self, value) -> set:
+        return {str(int(value))}  # XXX why not a normal boolean?!
+
 
 class DateFieldDataSchema(FieldSetupSchemaBase):
     date_format = fields.String(required=True, validate=validate.OneOf([
@@ -286,6 +289,9 @@ class BooleanField(RegistrationFormBillableField):
     @property
     def empty_value(self):
         return None
+
+    def get_data_for_condition(self, value) -> set:
+        return {str(int(value))}  # XXX why not a normal boolean?!
 
     def get_places_used(self):
         places_used = 0
