@@ -72,7 +72,6 @@ export default function BlockEntry({
     : {};
   renderChildren = renderChildren && _children.length > 0;
 
-  console.log('convene me', conveners);
   style = {
     ...style,
     position: 'absolute',

@@ -56,6 +56,7 @@ export default function ContributionEntry({
   isChild = false,
   children: _children = [],
   setChildDuration = () => {},
+  renderChildren = true,
 }: DraggableEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const dispatch = useDispatch();
@@ -73,6 +74,8 @@ export default function ContributionEntry({
         // zIndex: 70,
       }
     : {};
+  renderChildren = renderChildren && _children.length > 0;
+
   style = {
     ...style,
     position: 'absolute',
@@ -80,6 +83,7 @@ export default function ContributionEntry({
     left: offset,
     width: `calc(${width} - 6px)`,
     height: minutesToPixels(Math.max(duration, minutesToPixels(5)) - 1),
+    textAlign: 'left',
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
@@ -106,6 +110,15 @@ export default function ContributionEntry({
       .add(deltaMinutes, 'minutes')
       .format(),
   })) ?? [];
+
+  // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);
+  // const setChildDuration = useCallback(() => {}, [])
+
+  const latestChildEndDt = children.reduce((acc, child) => {
+    const endDt = moment(child.startDt).add(child.duration, 'minutes');
+    return endDt.isAfter(acc) ? endDt : acc;
+  }, moment(startDt));
+
 
   useEffect(() => {
     setDuration(_duration);
@@ -142,7 +155,7 @@ export default function ContributionEntry({
   return (
     <div
       role="button"
-      styleName={`entry ${type === 'break' ? 'break' : ''} ${children.length ? '' : 'simple'}`}
+      styleName={`entry ${type === 'break' ? 'break' : ''} ${renderChildren ? '' : 'simple'}`}
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
@@ -166,6 +179,12 @@ export default function ContributionEntry({
           dispatch(actions.selectEntry(id));
         }}
       >
+        {/* TODO: (Ajob) Check if necessary */}
+        {/* <BlockTitle
+          title={formatBlockTitle(sessionTitle, title)}
+          duration={duration}
+          timeRange={timeRange}
+        /> */}
         <EntryTitle
           title={title}
           duration={duration}
@@ -199,6 +218,7 @@ export default function ContributionEntry({
       </div>
       <ResizeHandle
         duration={duration}
+        minDuration={latestChildEndDt.diff(startDt, 'minutes')}
         maxDuration={parentEndDt ? moment(parentEndDt).diff(startDt, 'minutes') : undefined}
         resizeStartRef={resizeStartRef}
         setLocalDuration={setDuration}
@@ -309,7 +329,7 @@ function LongTitle({
         {icon}
         <span styleName="title">{title}</span>
       </div>
-      <div>{timeRange}</div>
+      <div styleName="time">{timeRange}</div>
     </div>
   );
 }

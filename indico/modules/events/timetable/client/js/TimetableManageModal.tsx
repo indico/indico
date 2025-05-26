@@ -197,8 +197,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleCreateSessionBlock = async data => {
-    // data = _.omitBy(data, 'conveners'); // TODO person links
-    // data.conveners = [];
     data.conveners = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
       'title',
