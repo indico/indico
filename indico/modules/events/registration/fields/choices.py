@@ -121,6 +121,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     has_default_item = False
     mm_field_class = fields.Dict
     mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer()}
+    allow_condition = True
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -483,6 +484,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     setup_schema_base_cls = AccommodationSetupSchema
     mm_field_class = fields.Nested
     mm_field_args = (AccommodationSchema,)
+    allow_condition = True
 
     def _get_default_value(self, *, ui):
         versioned_data = self.form_item.versioned_data

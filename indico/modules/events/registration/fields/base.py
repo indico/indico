@@ -64,6 +64,10 @@ class RegistrationFormFieldBase:
     is_invalid_field = False
     #: whether this field must not be "empty" (falsy value) if required
     not_empty_if_required = True
+    #: whether this field may be used as a condition; this is purely for validation,
+    #: on the frontend it depends solely on the config in the field registry whether
+    #: the field can be selected as a condition.
+    allow_condition = False
 
     def __init__(self, form_item):
         self.form_item = form_item
