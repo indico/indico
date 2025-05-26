@@ -15,6 +15,7 @@ import {setHiddenItemIds} from '../form_submission/actions';
 import {getHiddenItemIds, getItems} from './selectors';
 
 function parseConditionalValues(value) {
+  // TODO move this logic to the field implementations
   if (typeof value === 'boolean') {
     return value ? ['1'] : ['0'];
   } else if (value !== null && typeof value === 'object') {
@@ -22,7 +23,7 @@ function parseConditionalValues(value) {
       return [value.choice];
     }
     return Object.entries(value)
-      .filter(([, enabled]) => enabled === 1)
+      .filter(([, slots]) => slots > 0)
       .map(([key]) => key);
   }
   return value || undefined;
