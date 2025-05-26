@@ -56,7 +56,8 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
-                                                     import_registrations_from_csv, make_registration_schema)
+                                                     import_registrations_from_csv, load_registration_schema,
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -69,7 +70,7 @@ from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -379,10 +380,10 @@ class RHRegistrationCreate(RHManageRegFormBase):
         if self.regform.is_purged:
             raise Forbidden(_('Registration is disabled due to an expired retention period'))
         override_required = request.json.get('override_required', False)
-        schema = make_registration_schema(self.regform, management=True, override_required=override_required)()
-        form = parser.parse(schema)
-        session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
-        create_registration(self.regform, form, management=True, notify_user=notify_user)
+        schema_cls = make_registration_schema(self.regform, management=True, override_required=override_required)
+        form_data = load_registration_schema(self.regform, schema_cls)
+        session['registration_notify_user_default'] = notify_user = form_data.pop('notify_user', False)
+        create_registration(self.regform, form_data, management=True, notify_user=notify_user)
         flash(_('The registration was created.'), 'success')
         return jsonify({'redirect': url_for('event_registration.manage_reglist', self.regform)})
 
