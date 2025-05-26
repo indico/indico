@@ -750,7 +750,7 @@ def test_create_registration_conditional(monkeypatch, dummy_user, dummy_regform)
     _fill_form_field_with_data(text_field, {
         'input_type': 'text', 'title': 'Cond Text',
         'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_values': [True],
     })
 
     db.session.flush()
@@ -799,7 +799,7 @@ def test_modify_registration_conditional(monkeypatch, dummy_user, dummy_regform)
     _fill_form_field_with_data(text_field, {
         'input_type': 'text', 'title': 'Cond Text',
         'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_values': [True],
     })
 
     db.session.flush()

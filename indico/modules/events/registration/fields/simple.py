@@ -153,7 +153,7 @@ class CheckboxField(RegistrationFormBillableField):
         return False
 
     def get_data_for_condition(self, value) -> set:
-        return {str(int(value))}  # XXX why not a normal boolean?!
+        return {value}
 
 
 class DateFieldDataSchema(FieldSetupSchemaBase):
@@ -291,7 +291,7 @@ class BooleanField(RegistrationFormBillableField):
         return None
 
     def get_data_for_condition(self, value) -> set:
-        return {str(int(value))}  # XXX why not a normal boolean?!
+        return {value}
 
     def get_places_used(self):
         places_used = 0

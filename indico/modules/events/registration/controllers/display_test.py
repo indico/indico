@@ -178,8 +178,8 @@ def test_display_edit_override_required_rh(dummy_regform, dummy_user, app_contex
 
 condition_field_params = pytest.mark.parametrize(
     ('input_type', 'input_data', 'false_values', 'true_value', 'condition'), (
-    ('bool', {}, [False], True, '1'),
-    ('checkbox', {}, [False], True, '1'),
+    ('bool', {}, [False], True, True),
+    ('checkbox', {}, [False], True, True),
     ('single_choice', {'with_extra_slots': False, 'item_type': 'dropdown', 'choices': [
         {'caption': 'Yes', 'id': 'yes', 'is_enabled': True},
         {'caption': 'No', 'id': 'no', 'is_enabled': True},

@@ -282,7 +282,7 @@ FormItem.propTypes = {
   /** The ID of the field to use as condition for display */
   showIfFieldId: PropTypes.number,
   /** The value of the field to use as condition for display */
-  showIfFieldValues: PropTypes.node,
+  showIfFieldValues: PropTypes.array,
   /** The default value for a given field **/
   defaultValue: PropTypes.any,
   // ... and various other field-specific keys (billing, limited-places, other config)
