@@ -88,7 +88,8 @@ Available keys:
 - showIfOptions: optional; a function that returns the dropdown options when selecting the
   field as a condition
 - getDataForCondition: optional; a function that takes the current value of the field and
-  returns a list that can be compared with the stored condition of another field
+  returns a list that can be compared with the stored condition of another field. its logic
+  must match the corresponding ``get_data_for_condition`` method in the backend field class
 */
 
 const fieldRegistry = {
