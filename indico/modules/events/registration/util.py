@@ -1083,20 +1083,27 @@ def process_registration_picture(source, *, thumbnail=False):
     return image_bytes
 
 
-def _is_field_shown(field, data):
+def is_conditional_field_shown(field, data, *, is_db_data=False):
     # not conditional
     if not field.show_if_field:
         return True
     # condition field has no data
     if (show_if_data := data.get(field.show_if_id)) is None:
         return False
+    if is_db_data:
+        show_if_data = show_if_data.data
+        if show_if_data is None:
+            return False
     current_values = field.show_if_field.field_impl.get_data_for_condition(show_if_data)
     condition_values = set(field.show_if_values)
-    return (current_values & condition_values) and _is_field_shown(field.show_if_field, data)
+    if not (current_values & condition_values):
+        return False
+    # recurse to the condition field in case it's also conditional
+    return is_conditional_field_shown(field.show_if_field, data, is_db_data=is_db_data)
 
 
 def get_hidden_conditional_fields(regform, data_by_id):
-    return {f for f in regform.active_fields if not _is_field_shown(f, data_by_id)}
+    return {f for f in regform.active_fields if not is_conditional_field_shown(f, data_by_id)}
 
 
 def load_registration_schema(regform, schema_cls, *, registration=None, partial_fields=frozenset()):
