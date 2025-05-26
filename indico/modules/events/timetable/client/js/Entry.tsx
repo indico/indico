@@ -9,7 +9,6 @@ import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import * as actions from './actions';
-import BlockEntry from './BlockEntry';
 import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
 import {TimetablePopup} from './EntryPopup';
@@ -18,48 +17,13 @@ import * as selectors from './selectors';
 
 import './DayTimetable.module.scss';
 
-// export function DraggableBlockEntry({id, ...rest}) {
-//   const dispatch = useDispatch();
-//   const {listeners, setNodeRef, transform, isDragging} = useDraggable({
-//     id: `${id}`,
-//   });
-//   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
-//   const selectedId = useSelector(selectors.getSelectedId);
-//   const selected = useSelector(selectors.getSelectedEntry);
+interface DraggableEntryProps {
+  id: number;
+  isChild?: boolean;
+  [key: string]: any;
+}
 
-//   if (popupsEnabled && selected && id === selectedId) {
-//     const trigger = (
-//       <BlockEntry
-//         id={id}
-//         {...rest}
-//         listeners={listeners}
-//         setNodeRef={setNodeRef}
-//         transform={transform}
-//         isDragging={isDragging}
-//       />
-//     );
-//     return (
-//       <TimetablePopup
-//         trigger={trigger}
-//         onClose={() => dispatch(actions.selectEntry(null))}
-//         entry={selected}
-//       />
-//     );
-//   }
-
-//   return (
-//     <BlockEntry
-//       id={id}
-//       {...rest}
-//       listeners={listeners}
-//       setNodeRef={setNodeRef}
-//       transform={transform}
-//       isDragging={isDragging}
-//     />
-//   );
-// }
-
-export function DraggableEntry({id, isChild=false, ...rest}) {
+export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
