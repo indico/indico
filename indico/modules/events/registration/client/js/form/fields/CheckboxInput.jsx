@@ -104,3 +104,7 @@ export function CheckboxSettings() {
 export function checkboxShowIfOptions() {
   return [{value: '1', text: Translate.string('Yes')}, {value: '0', text: Translate.string('No')}];
 }
+
+export function checkboxGetDataForCondition(value) {
+  return [value ? '1' : '0']; // XXX why not a normal boolean?!
+}

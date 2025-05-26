@@ -13,13 +13,22 @@ import AccommodationInput, {
   accommodationSettingsFormValidator,
   accommodationSettingsInitialData,
   accommodationShowIfOptions,
+  accommodationGetDataForCondition,
 } from './AccommodationInput';
 import AccompanyingPersonsInput, {
   AccompanyingPersonsSettings,
   accompanyingPersonsSettingsInitialData,
 } from './AccompanyingPersonsInput';
-import BooleanInput, {BooleanSettings, booleanShowIfOptions} from './BooleanInput';
-import CheckboxInput, {CheckboxSettings, checkboxShowIfOptions} from './CheckboxInput';
+import BooleanInput, {
+  BooleanSettings,
+  booleanShowIfOptions,
+  booleanGetDataForCondition,
+} from './BooleanInput';
+import CheckboxInput, {
+  CheckboxSettings,
+  checkboxShowIfOptions,
+  checkboxGetDataForCondition,
+} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
 import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
@@ -34,6 +43,7 @@ import MultiChoiceInput, {
   MultiChoiceSettings,
   multiChoiceSettingsInitialData,
   multiChoiceShowIfOptions,
+  multiChoiceGetDataForCondition,
 } from './MultiChoiceInput';
 import NumberInput, {NumberSettings, numberSettingsFormValidator} from './NumberInput';
 import PhoneInput from './PhoneInput';
@@ -43,6 +53,7 @@ import SingleChoiceInput, {
   singleChoiceSettingsFormDecorator,
   singleChoiceSettingsInitialData,
   singleChoiceShowIfOptions,
+  singleChoiceGetDataForCondition,
 } from './SingleChoiceInput';
 import TextAreaInput, {TextAreaSettings} from './TextAreaInput';
 import TextInput, {TextSettings, textSettingsFormValidator} from './TextInput';
@@ -74,6 +85,10 @@ Available keys:
 - renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies
   to fields that use multiple controls, like radios, checkboxes, multi-button controls;
   can either be a Boolean or a function that takes field options and returns a Boolean
+- showIfOptions: optional; a function that returns the dropdown options when selecting the
+  field as a condition
+- getDataForCondition: optional; a function that takes the current value of the field and
+  returns a list that can be compared with the stored condition of another field
 */
 
 const fieldRegistry = {
@@ -116,6 +131,7 @@ const fieldRegistry = {
     icon: 'checkbox-checked',
     customFormItem: true,
     showIfOptions: checkboxShowIfOptions,
+    getDataForCondition: checkboxGetDataForCondition,
   },
   date: {
     title: Translate.string('Date'),
@@ -133,6 +149,7 @@ const fieldRegistry = {
     icon: 'switchon',
     renderAsFieldset: true,
     showIfOptions: booleanShowIfOptions,
+    getDataForCondition: booleanGetDataForCondition,
   },
   phone: {
     title: Translate.string('Phone'),
@@ -164,6 +181,7 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
     showIfOptions: singleChoiceShowIfOptions,
+    getDataForCondition: singleChoiceGetDataForCondition,
     icon: 'dropmenu',
     renderAsFieldset: options => options.itemType === 'radiogroup',
   },
@@ -175,6 +193,7 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator],
     settingsFormInitialData: multiChoiceSettingsInitialData,
     showIfOptions: multiChoiceShowIfOptions,
+    getDataForCondition: multiChoiceGetDataForCondition,
     icon: 'list',
     renderAsFieldset: true,
   },
@@ -191,6 +210,7 @@ const fieldRegistry = {
     icon: 'home',
     renderAsFieldset: true,
     showIfOptions: accommodationShowIfOptions,
+    getDataForCondition: accommodationGetDataForCondition,
   },
   accompanying_persons: {
     title: Translate.string('Accompanying Persons'),
