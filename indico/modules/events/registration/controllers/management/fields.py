@@ -96,8 +96,10 @@ class GeneralFieldDataSchema(mm.Schema):
                 raise ValueError('The field cannot conditionally depend on itself to be shown')
             used_field_ids.add(field.id)
         regform = self.context['regform']
-        if not RegistrationFormItem.query.filter_by(id=field_id, registration_form_id=regform.id).has_rows():
+        if not (condition_field := RegistrationFormItem.query.with_parent(regform).filter_by(id=field_id).first()):
             raise ValidationError('The field to show does not belong to the same registration form.')
+        if not condition_field.field_impl.allow_condition:
+            raise ValidationError('This field cannot be used as a condition.')
         # Avoid cycles
         next_field_id = field_id
         while next_field_id is not None:

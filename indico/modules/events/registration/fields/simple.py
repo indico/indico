@@ -105,6 +105,7 @@ class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
+    allow_condition = True
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -252,6 +253,7 @@ class BooleanField(RegistrationFormBillableField):
     mm_field_class = fields.Boolean
     setup_schema_base_cls = BooleanFieldSetupSchema
     not_empty_if_required = False
+    allow_condition = True
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
