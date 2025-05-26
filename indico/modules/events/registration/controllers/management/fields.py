@@ -40,7 +40,7 @@ class GeneralFieldDataSchema(mm.Schema):
     retention_period = fields.TimeDelta(load_default=None, precision=fields.TimeDelta.WEEKS)
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
-    show_if_values = fields.List(fields.String(), required=False, data_key='show_if_field_values')
+    show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
 
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):

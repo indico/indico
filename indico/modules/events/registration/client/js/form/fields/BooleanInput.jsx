@@ -202,9 +202,12 @@ export function BooleanSettings() {
 }
 
 export function booleanShowIfOptions() {
-  return [{value: '1', text: Translate.string('Yes')}, {value: '0', text: Translate.string('No')}];
+  return [
+    {value: true, text: Translate.string('Yes')},
+    {value: false, text: Translate.string('No')},
+  ];
 }
 
 export function booleanGetDataForCondition(value) {
-  return [value ? '1' : '0']; // XXX why not a normal boolean?!
+  return [value];
 }
