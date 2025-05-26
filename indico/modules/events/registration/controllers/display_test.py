@@ -7,6 +7,7 @@
 
 import pytest
 from flask import request, session
+from marshmallow import fields
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationForm,
@@ -20,6 +21,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import create_registration
 from indico.testing.util import extract_emails
 from indico.util.date_time import now_utc
+from indico.util.marshmallow import UUIDString
+from indico.util.string import snakify_keys
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -173,31 +176,74 @@ def test_display_edit_override_required_rh(dummy_regform, dummy_user, app_contex
         )
 
 
-def test_display_register_conditional(db, dummy_regform, dummy_user, app_context, mocker):
+condition_field_params = pytest.mark.parametrize(
+    ('input_type', 'input_data', 'false_values', 'true_value', 'condition'), (
+    ('bool', {}, [False], True, '1'),
+    ('checkbox', {}, [False], True, '1'),
+    ('single_choice', {'with_extra_slots': False, 'item_type': 'dropdown', 'choices': [
+        {'caption': 'Yes', 'id': 'yes', 'is_enabled': True},
+        {'caption': 'No', 'id': 'no', 'is_enabled': True},
+    ]}, [{}, {'no': 1}, {'yes': 0}], {'yes': 1}, 'yes'),
+    ('multi_choice', {'with_extra_slots': False, 'choices': [
+        {'caption': 'Yes', 'id': 'yes', 'is_enabled': True},
+        {'caption': 'No', 'id': 'no', 'is_enabled': True},
+    ]}, [{}, {'no': 1}, {'yes': 0}], {'yes': 1}, 'yes'),
+    (
+        'accommodation',
+        {
+            'arrival': {'start_date': '2025-05-01', 'end_date': '2025-05-03'},
+            'departure': {'start_date': '2025-05-02', 'end_date': '2025-05-05'},
+            'choices': [
+                {
+                    'caption': 'Nothing',
+                    'id': 'noacc',
+                    'is_enabled': True,
+                    'is_no_accommodation': True,
+                },
+                {'caption': 'Yes', 'id': 'yes', 'is_enabled': True},
+                {'caption': 'No', 'id': 'no', 'is_enabled': True},
+            ],
+        },
+        [
+            {'choice': 'noacc', 'isNoAccommodation': True},
+            {'choice': 'no', 'isNoAccommodation': False, 'arrivalDate': '2025-05-01', 'departureDate': '2025-05-02'},
+        ],
+        {'choice': 'yes', 'isNoAccommodation': False, 'arrivalDate': '2025-05-01', 'departureDate': '2025-05-02'},
+        'yes',
+    ),
+))
+
+
+@condition_field_params
+def test_display_register_conditional(db, dummy_regform, dummy_user, app_context, mocker, monkeypatch,
+                                      input_type, input_data, false_values, true_value, condition):
     mocker.patch('indico.modules.events.registration.util.notify_registration_creation')
     mocker.patch('indico.modules.events.registration.util.notify_registration_modification')
+    monkeypatch.setattr(UUIDString, '_deserialize', fields.String._deserialize)  # for accommodation field
+    monkeypatch.setattr(fields.UUID, '_deserialize', fields.String._deserialize)  # for choice fields
 
     # Extend the dummy_regform with more sections and fields
     section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
 
-    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
-    _fill_form_field_with_data(boolean_field, {
-        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(condition_field, {
+        'input_type': input_type, 'title': 'Condition trigger',
+        **input_data
     })
 
     db.session.flush()
     text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(text_field, {
         'input_type': 'text', 'title': 'Cond Text',
-        'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_id': condition_field.id,
+        'show_if_field_values': [condition],
     })
     text_field_req = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(text_field_req, {
         'input_type': 'text', 'title': 'Cond Text Required',
         'is_required': True,
-        'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_id': condition_field.id,
+        'show_if_field_values': [condition],
     })
 
     dummy_regform.start_dt = now_utc(False)
@@ -223,11 +269,11 @@ def test_display_register_conditional(db, dummy_regform, dummy_user, app_context
                 return dummy_regform.registrations[0]
 
     # Registering fails because the required field is active but has no data
-    data = {boolean_field.html_field_name: True}
+    data = {condition_field.html_field_name: true_value}
     messages = _test_register(data, raises=True)
     assert messages == {text_field_req.html_field_name: ['Missing data for required field.']}
 
-    # Registering fails because the conditional fields are hidden but have data
+    # Registering fails because the conditional fields are hidden (no value for condition) but have data
     data = {
         text_field.html_field_name: 'foo',
         text_field_req.html_field_name: 'bar',
@@ -238,9 +284,28 @@ def test_display_register_conditional(db, dummy_regform, dummy_user, app_context
         text_field_req.html_field_name: ['Unknown field.'],
     }
 
+    # Registering fails because the conditional fields are hidden (explicit "wrong" value for condition) but have data
+    for val in false_values:
+        data = {
+            condition_field.html_field_name: val,
+            text_field.html_field_name: 'foo',
+            text_field_req.html_field_name: 'bar',
+        }
+        messages = _test_register(data, raises=True)
+        assert messages == {
+            text_field.html_field_name: ['Unknown field.'],
+            text_field_req.html_field_name: ['Unknown field.'],
+        }
+
     # Registering succeeds, conditional field disabled (no value)
     reg = _test_register({}, raises=False)
-    assert not reg.data_by_field[boolean_field.id].data
+    default_value = (
+        # This is kind of ugly, but less obscure than going through `process_form_data` just for the accommodation field
+        {'choice': 'noacc', 'is_no_accommodation': True}
+        if input_type == 'accommodation'
+        else condition_field.field_impl.ui_default_value
+    )
+    assert reg.data_by_field[condition_field.id].data == default_value
     assert text_field.id not in reg.data_by_field
     assert text_field_req.id not in reg.data_by_field
 
@@ -251,40 +316,45 @@ def test_display_register_conditional(db, dummy_regform, dummy_user, app_context
 
     # Registering succeeds, conditional field + required field have values
     data = {
-        boolean_field.html_field_name: True,
+        condition_field.html_field_name: true_value,
         text_field_req.html_field_name: 'foo',
     }
     reg = _test_register(data, raises=False)
-    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[condition_field.id].data
     assert reg.data_by_field[text_field.id].data == ''
     assert reg.data_by_field[text_field_req.id].data == 'foo'
 
 
-def test_display_modify_conditional(db, dummy_regform, dummy_user, app_context, mocker):
+@condition_field_params
+def test_display_modify_conditional(db, dummy_regform, dummy_user, app_context, mocker, monkeypatch,
+                                    input_type, input_data, false_values, true_value, condition):
     mocker.patch('indico.modules.events.registration.util.notify_registration_creation')
     mocker.patch('indico.modules.events.registration.util.notify_registration_modification')
+    monkeypatch.setattr(UUIDString, '_deserialize', fields.String._deserialize)  # for accommodation field
+    monkeypatch.setattr(fields.UUID, '_deserialize', fields.String._deserialize)  # for choice fields
 
     # Extend the dummy_regform with more sections and fields
     section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
 
-    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
-    _fill_form_field_with_data(boolean_field, {
-        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(condition_field, {
+        'input_type': input_type, 'title': 'Condition trigger',
+        **input_data
     })
 
     db.session.flush()
     text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(text_field, {
         'input_type': 'text', 'title': 'Cond Text',
-        'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_id': condition_field.id,
+        'show_if_field_values': [condition],
     })
     text_field_req = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(text_field_req, {
         'input_type': 'text', 'title': 'Cond Text Required',
         'is_required': True,
-        'show_if_field_id': boolean_field.id,
-        'show_if_field_values': ['1'],
+        'show_if_field_id': condition_field.id,
+        'show_if_field_values': [condition],
     })
 
     dummy_regform.start_dt = now_utc(False)
@@ -324,17 +394,17 @@ def test_display_modify_conditional(db, dummy_regform, dummy_user, app_context, 
 
     # Register with value in conditional field
     data = {
-        boolean_field.html_field_name: True,
+        condition_field.html_field_name: true_value,
         text_field_req.html_field_name: 'foo',
     }
     reg = _test_register(data, raises=False)
-    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[condition_field.id].data
     assert reg.data_by_field[text_field.id].data == ''
     assert reg.data_by_field[text_field_req.id].data == 'foo'
 
     # No-op should be fine, existing data kept
     _test_modify(reg, {}, raises=False)
-    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[condition_field.id].data
     assert reg.data_by_field[text_field.id].data == ''
     assert reg.data_by_field[text_field_req.id].data == 'foo'
 
@@ -343,25 +413,29 @@ def test_display_modify_conditional(db, dummy_regform, dummy_user, app_context, 
     assert messages == {text_field_req.html_field_name: ['This field cannot be empty.']}
 
     # Condition no longer met -> cannot set data for them
-    messages = _test_modify(reg, {boolean_field.html_field_name: False, text_field.html_field_name: ''}, raises=True)
-    assert messages == {text_field.html_field_name: ['Unknown field.']}
+    for val in false_values:
+        messages = _test_modify(reg, {condition_field.html_field_name: val, text_field.html_field_name: ''},
+                                raises=True)
+        assert messages == {text_field.html_field_name: ['Unknown field.']}
 
     # Condition no longer met -> data for fields removed
-    _test_modify(reg, {boolean_field.html_field_name: False}, raises=False)
-    assert not reg.data_by_field[boolean_field.id].data
+    _test_modify(reg, {condition_field.html_field_name: false_values[0]}, raises=False)
+    assert reg.data_by_field[condition_field.id].data == snakify_keys(false_values[0])
     assert text_field.id not in reg.data_by_field
     assert text_field_req.id not in reg.data_by_field
 
     # Cannot enable field w/o providing new value for required one
-    messages = _test_modify(reg, {boolean_field.html_field_name: True}, raises=True)
+    messages = _test_modify(reg, {condition_field.html_field_name: true_value}, raises=True)
     assert messages == {text_field_req.html_field_name: ['Missing data for required field.']}
 
     # Cannot enable field with an empty new new value for required one
-    messages = _test_modify(reg, {boolean_field.html_field_name: True, text_field_req.html_field_name: ''}, raises=True)
+    messages = _test_modify(reg, {condition_field.html_field_name: true_value, text_field_req.html_field_name: ''},
+                            raises=True)
     assert messages == {text_field_req.html_field_name: ['This field cannot be empty.']}
 
     # Success when providing required data
-    _test_modify(reg, {boolean_field.html_field_name: True, text_field_req.html_field_name: 'bar'}, raises=False)
-    assert reg.data_by_field[boolean_field.id].data
+    _test_modify(reg, {condition_field.html_field_name: true_value, text_field_req.html_field_name: 'bar'},
+                 raises=False)
+    assert reg.data_by_field[condition_field.id].data
     assert reg.data_by_field[text_field.id].data == ''
     assert reg.data_by_field[text_field_req.id].data == 'bar'
