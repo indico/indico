@@ -114,6 +114,9 @@ class RegistrationFormFieldBase:
         set of values (based on the `value` the field currently contains). If this
         set intersects with the other field's configured condition, that field will
         be visible.
+
+        The logic in this method must match the corresponding ``getDataForCondition``
+        function in the frontend field registry.
         """
         raise NotImplementedError('Field cannot be used as a condition')
 
