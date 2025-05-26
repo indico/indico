@@ -1090,9 +1090,17 @@ def _is_field_shown(field, data):
     # condition field has no data
     if (show_if_data := data.get(field.show_if_id)) is None:
         return False
+    # TODO move this to the field implementations
     if isinstance(show_if_data, dict):
-        values = show_if_data.keys()
+        # choice + accommodation fields
+        if choice := show_if_data.get('choice'):
+            # accommodation field
+            values = [choice]
+        else:
+            # choice fields
+            values = {k for k, v in show_if_data.items() if v}
     elif isinstance(show_if_data, bool):
+        # checkbox + bool fields
         values = ['1'] if show_if_data else ['0']
     else:
         # XXX what do we have here?
