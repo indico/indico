@@ -1090,22 +1090,9 @@ def _is_field_shown(field, data):
     # condition field has no data
     if (show_if_data := data.get(field.show_if_id)) is None:
         return False
-    # TODO move this to the field implementations
-    if isinstance(show_if_data, dict):
-        # choice + accommodation fields
-        if choice := show_if_data.get('choice'):
-            # accommodation field
-            values = [choice]
-        else:
-            # choice fields
-            values = {k for k, v in show_if_data.items() if v}
-    elif isinstance(show_if_data, bool):
-        # checkbox + bool fields
-        values = ['1'] if show_if_data else ['0']
-    else:
-        # XXX what do we have here?
-        values = show_if_data
-    return any(v in field.show_if_values for v in values) and _is_field_shown(field.show_if_field, data)
+    current_values = field.show_if_field.field_impl.get_data_for_condition(show_if_data)
+    condition_values = set(field.show_if_values)
+    return (current_values & condition_values) and _is_field_shown(field.show_if_field, data)
 
 
 def get_hidden_conditional_fields(regform, data_by_id):
