@@ -240,7 +240,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   // TODO: Implement logic for breaks
   const _handleCreateBreak = async data => {
-    data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt', 'colors']);
+    data = _.pick(data, [
+      'title',
+      'break',
+      'duration',
+      'location_data',
+      'inheriting',
+      'start_dt',
+      'colors',
+    ]);
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
