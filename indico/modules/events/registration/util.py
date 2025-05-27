@@ -481,7 +481,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if not existing_data:
                 continue
             if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
-                delete_previous_registration_file.apply_async([None, existing_data.storage_backend,
+                delete_previous_registration_file.apply_async([existing_data.registration_id,
+                                                               existing_data.field_data_id,
+                                                               existing_data.storage_backend,
                                                                existing_data.storage_file_id], countdown=600)
             registration.data.remove(existing_data)
             continue
@@ -502,7 +504,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
             continue
 
         if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
-            delete_previous_registration_file.apply_async([existing_data, existing_data.storage_backend,
+            delete_previous_registration_file.apply_async([existing_data.registration_id,
+                                                           existing_data.field_data_id,
+                                                           existing_data.storage_backend,
                                                            existing_data.storage_file_id], countdown=600)
         if form_item.id not in data_by_field:
             data_by_field[form_item.id] = RegistrationData(registration=registration,
