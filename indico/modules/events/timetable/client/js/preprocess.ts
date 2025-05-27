@@ -66,26 +66,58 @@ export function preprocessTimetableEntries(
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   const dayEntries = {};
+  console.log('preproccessed entries', data);
   for (const day in data) {
     dayEntries[day] = [];
     for (const _id in data[day]) {
       const id = parseInt(_id.slice(1), 10);
       const type = entryTypeMapping[_id[0]];
       const entry = data[day][_id];
+      const {
+        duration,
+        description = '',
+        address = '',
+        room = '',
+        location: venueName = '',
+        presenters = [],
+        conveners = [],
+        board_number: boardNumber = '',
+        code,
+      } = entry as any;
+
+      // TODO: (Ajob) Currently not passing roles as they do not exist
+      //              here. Update the schema to include roles.
+      const personLinks = [...presenters, ...conveners].map(
+        ({affiliation, familyName: lastName, firstName, email, name}) => ({
+          affiliation,
+          email,
+          lastName,
+          firstName,
+          name,
+        })
+      );
 
       dayEntries[day].push({
         type,
         id,
         title: entry.slotTitle ? entry.slotTitle : entry.title,
+        description,
         startDt: dateToMoment(entry.startDate),
-        duration: entry.duration,
+        duration,
         x: 0,
         y: 0,
         width: 0,
         column: 0,
         maxColumn: 0,
-        person_links: entry.conveners,
         // TODO: (Ajob) Get other attributes such as person_links
+        personLinks,
+        boardNumber,
+        code,
+        location: {
+          address,
+          room,
+          venueName,
+        },
       });
 
       if (entry.sessionId) {

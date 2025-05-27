@@ -62,6 +62,8 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     return obj;
   }, [entries, dispatch, dt]);
 
+  console.log('seriesss!', entries);
+
   return (
     <>
       {entries.map(entry =>

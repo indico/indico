@@ -27,7 +27,7 @@ import * as actions from './actions';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
-import {formatBlockTitle, getEntryColor} from './utils';
+import {getEntryColor} from './utils';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -68,6 +68,8 @@ function TimetablePopupContent({
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const draftEntry = {...entry, duration: entry.duration};
+
+  console.log('The draft entry is ', draftEntry);
 
   const onEdit = (e: MouseEvent) => {
     onClose();

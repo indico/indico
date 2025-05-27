@@ -73,6 +73,7 @@ interface DraftEntry {
   colors?: EntryColors;
   session_id?: number;
   code?: string;
+  board_number?: string;
   id?: number;
 }
 
@@ -93,6 +94,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 }) => {
   const dispatch = useDispatch();
 
+  console.log('indeed, i am ', entry);
+
   const isEditing = !!entry.id;
   const personLinkFieldParams = {
     allowAuthors: true,
@@ -106,13 +109,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const initialValues: DraftEntry = {
     title: entry.title || '',
     description: entry.description || '',
-    person_links: entry.person_links || [],
+    person_links: entry.personLinks || [],
     keywords: entry.keywords || [],
     references: entry.references || [],
-    location_data: {inheriting: false},
+    // TODO: (Ajob) Clean up the location data
+    location_data: {inheriting: false, ...(entry.location || {})},
     start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     duration: entry.duration * 60, // Minutes to seconds
-    session_id: entry.session_id || null,
+    session_id: entry.sessionId || null,
+    board_number: entry.boardNumber || null,
     code: entry.code || null,
   };
 
