@@ -11,8 +11,6 @@ import React, {useRef} from 'react';
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-import 'indico/custom_elements/ind_combobox';
-
 export default function ComboBox({options, value, onChange, ...inputProps}) {
   const uncontrolledInputProps = {...inputProps, defaultValue: value};
   const inputRef = useRef();

@@ -72,6 +72,7 @@ export default env => {
       'indico/utils/case': '_IndicoUtilsCase',
       'indico/utils/plugins': '_IndicoUtilsPlugins',
       'indico/react/components/principals/imperative': '_IndicoPrincipalsImperative',
+      'indico/custom_elements': '_IndicoCustomElements',
     },
     module: {
       rules: [
