@@ -37,16 +37,38 @@ interface EntryColors {
   text: string;
 }
 
-// TOOD: (Ajob) Make an interface for each entry and then make
+interface LocationData {
+  inheriting: boolean;
+  address?: string;
+  room_id?: string;
+  room_name?: string;
+  venue_id?: string;
+  venue_name?: string;
+}
+
+interface PersonLink {
+  email: string;
+  first_name: string;
+  last_name: string;
+  roles: string[];
+  title: string;
+  type: string;
+  phone?: string;
+  address?: string;
+  affiliation?: string;
+  affiliation_id?: number;
+}
+
+// TODO: (Ajob) Make an interface for each entry and then make
 //              the draftentry the union of it.
 interface DraftEntry {
   title: string;
   duration: number;
   keywords: string[];
   references: string[];
-  location_data: object;
+  location_data: LocationData;
   start_dt: Date;
-  person_links?: any[];
+  person_links?: PersonLink[];
   description?: string;
   colors?: EntryColors;
   session_id?: number;
@@ -150,7 +172,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       start_dt: startDt,
       id,
       duration,
-      object: {title, colors, session_id: sessionId, persons},
+      object: {title, colors, session_id: sessionId},
     } = data;
 
     const type = {
@@ -185,6 +207,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     data.person_links = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
       'title',
+      'description',
       'duration',
       'person_links',
       'keywords',
@@ -192,6 +215,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'location_data',
       'inheriting',
       'start_dt',
+      'keywords',
+      'board_number',
+      'code',
     ]);
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
