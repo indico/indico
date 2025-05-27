@@ -225,13 +225,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const _handleCreateSessionBlock = async data => {
     data.conveners = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
+      'session_id',
       'title',
+      'description',
       'duration',
       'location_data',
       'inheriting',
       'start_dt',
       'conveners',
-      'session_id',
+      'code',
     ]);
     return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
