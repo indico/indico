@@ -1003,7 +1003,7 @@ def serialize_registration_form(regform):
 
 def snapshot_registration_data(registration):
     data = {}
-    for regfields in registration.summary_data.values():
+    for regfields in registration.get_summary_data().values():
         for field, regdata in regfields.items():
             data[field.html_field_name] = {'price': regdata.price, 'data': regdata.data,
                                            'storage_file_id': regdata.storage_file_id,
