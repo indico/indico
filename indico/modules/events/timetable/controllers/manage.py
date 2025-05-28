@@ -26,6 +26,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         create_session_block_entry, create_timetable_entry,
                                                         delete_timetable_entry, update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
+from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_time_changes
@@ -41,7 +42,7 @@ class RHManageTimetable(RHManageTimetableBase):
 
     def _process(self):
         event_info = serialize_event_info(self.event)
-        timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
+        timetable_data = TimetableSerializerNew(self.event, management=True).serialize_timetable()
         return WPManageTimetable.render_template('management_new.html', self.event, event_info=event_info,
                                                  show_draft_warning=should_show_draft_warning(self.event),
                                                  timetable_data=timetable_data)
