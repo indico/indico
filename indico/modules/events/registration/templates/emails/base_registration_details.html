@@ -3,7 +3,7 @@
 {% block registration_body %}
     {%- set diff = diff if diff is not none else {} -%}
     {%- set old_price = old_price if old_price is not none else registration.price -%}
-    {% for section, fields in registration.summary_data.items() if not section.is_manager_only %}
+    {% for section, fields in registration.get_summary_data(hide_empty=true).items() if not section.is_manager_only %}
         <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
             <h2>{{ section.title }}</h2>
             <dl>
