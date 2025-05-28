@@ -11,7 +11,7 @@ import {useForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 
 import {FinalDropdown} from 'indico/react/forms';
-import {Fieldset} from 'indico/react/forms/fields';
+import {Fieldset, unsortedArraysEqual} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
 import {getItems} from '../selectors';
@@ -54,6 +54,7 @@ export function ShowIfInput({hasValueSelected}) {
           }))}
         closeOnChange
         selection
+        allowNull
         onChange={value => {
           form.change('showIfFieldValues', null);
           if (!value) {
@@ -72,11 +73,19 @@ export function ShowIfInput({hasValueSelected}) {
           label={Translate.string('Has values')}
           placeholder={Translate.string('Select values...')}
           options={options}
-          format={value => (isMultipleChoice || value === null ? value : value[0])}
-          singleValueAsList={!isMultipleChoice}
+          multiple={isMultipleChoice}
+          parse={value => (isMultipleChoice ? value : [value])}
+          format={value => {
+            if (isMultipleChoice) {
+              return value ?? [];
+            } else {
+              return value ? value[0] : null;
+            }
+          }}
+          isEqual={unsortedArraysEqual}
           closeOnChange
           selection
-          multiple={isMultipleChoice}
+          allowNull
         />
       )}
     </Fieldset>
