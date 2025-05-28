@@ -69,8 +69,6 @@ function TimetablePopupContent({
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const draftEntry = {...entry, duration: entry.duration};
 
-  console.log('The draft entry is ', draftEntry);
-
   const onEdit = (e: MouseEvent) => {
     onClose();
     e.stopPropagation();

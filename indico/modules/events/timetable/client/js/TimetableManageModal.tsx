@@ -94,8 +94,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  console.log('indeed, i am ', entry);
-
   const isEditing = !!entry.id;
   const personLinkFieldParams = {
     allowAuthors: true,

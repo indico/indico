@@ -66,7 +66,6 @@ export function preprocessTimetableEntries(
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   const dayEntries = {};
-  console.log('preproccessed entries', data);
   for (const day in data) {
     dayEntries[day] = [];
     for (const _id in data[day]) {
@@ -88,12 +87,14 @@ export function preprocessTimetableEntries(
       // TODO: (Ajob) Currently not passing roles as they do not exist
       //              here. Update the schema to include roles.
       const personLinks = [...presenters, ...conveners].map(
-        ({affiliation, familyName: lastName, firstName, email, name}) => ({
+        ({affiliation, familyName: lastName, firstName, email, name, roles, avatarURL}) => ({
           affiliation,
           email,
           lastName,
           firstName,
           name,
+          roles,
+          avatarURL,
         })
       );
 

@@ -151,18 +151,6 @@ class TimetableSerializer:
         if contribution.session:
             data.update(self._get_color_data(contribution.session))
         data.update(self._get_location_data(contribution))
-        from pprint import pprint
-        pprint(contribution.person_links)
-        for p in contribution.person_links:
-            roles_arr = []
-            if p.author_type:
-                roles_arr.append('primary' if p.author_type == 1 else 'secondary')
-            if p.is_speaker:
-                roles_arr.append('speaker')
-            if p.is_submitter:
-                roles_arr.append('submitter')
-            print('\t', roles_arr)
-
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
@@ -212,6 +200,17 @@ class TimetableSerializer:
                      'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': break_.title})
         return data
+
+    def _get_person_link_roles(self, person_link):
+        roles = []
+
+        if author_type := getattr(person_link, 'author_type', False):
+            roles.append('primary' if author_type == AuthorType.primary else 'secondary')
+        if getattr(person_link, 'is_speaker', False):
+            roles.append('speaker')
+        if getattr(person_link, 'is_submitter', False):
+            roles.append('submitter')
+        return roles
 
     def _get_attachment_data(self, obj):
         def serialize_attachment(attachment):
@@ -304,8 +303,16 @@ class TimetableSerializer:
                 'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
                                                   abbrev_first_name=False, show_title=person.event.show_titles),
                 'displayOrderKey': person_link.display_order_key}
+        if person.user:
+            data['avatarURL'] = person.user.avatar_url
+
         if self.can_manage_event:
             data['email'] = person.email
+
+        # TODO: (Ajob) Replace with proper schemas later
+        if roles := self._get_person_link_roles(person_link):
+            data['roles'] = roles
+
         return data
 
 
