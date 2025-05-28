@@ -12,6 +12,7 @@ from operator import attrgetter
 import dateutil.parser
 from flask import flash, jsonify, request, session
 from pytz import utc
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.errors import UserValueError
@@ -33,9 +34,9 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         delete_timetable_entry, fit_session_block_entry,
-                                                        move_timetable_entry, schedule_contribution,
-                                                        swap_timetable_entry, update_break_entry,
-                                                        update_timetable_entry, update_timetable_entry_object)
+                                                        modify_timetable_entry_time, move_timetable_entry,
+                                                        schedule_contribution, swap_timetable_entry, update_break_entry,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.reschedule import RescheduleMode, Rescheduler
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   get_time_changes_notifications, shift_following_entries)
@@ -43,6 +44,7 @@ from indico.modules.events.util import get_field_values, get_random_color, track
 from indico.util.date_time import as_utc, iterdays
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
+from indico.web.args import use_kwargs
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.simple import make_keywords_field
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -513,28 +515,17 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
         else:
             return SessionManagementLevel.coordinate
 
+    @use_kwargs({
+        'start_dt': fields.String(required=True, data_key='startDate'),
+        'end_dt': fields.String(required=True, data_key='endDate'),
+    })
+    def _process_args(self, start_dt, end_dt):
+        RHManageTimetableEntryBase._process_args(self)
+        self.start_dt = start_dt
+        self.end_dt = end_dt
+
     def _process(self):
-        new_start_dt = self.event.tzinfo.localize(
-            dateutil.parser.parse(request.form.get('startDate'))).astimezone(utc)
-        new_end_dt = self.event.tzinfo.localize(dateutil.parser.parse(request.form.get('endDate'))).astimezone(utc)
-        new_duration = new_end_dt - new_start_dt
-        is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
-        tzinfo = self.event.tzinfo
-        if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
-            raise UserValueError(_('Session block cannot span more than one day'))
-        with track_time_changes(auto_extend=True, user=session.user) as changes:
-            update_timetable_entry_object(self.entry, {'duration': new_duration})
-            if is_session_block:
-                self.entry.move(new_start_dt)
-            if not is_session_block:
-                update_timetable_entry(self.entry, {'start_dt': new_start_dt})
-        if is_session_block and self.entry.children:
-            if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
-                raise UserValueError(_('Session block cannot be shortened this much because contributions contained '
-                                       "wouldn't fit."))
-        notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
-        return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
-                            notifications=notifications)
+        return modify_timetable_entry_time(self)
 
 
 class RHLegacyTimetableEditSession(RHSessionREST):

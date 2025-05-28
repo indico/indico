@@ -8,7 +8,9 @@
 from datetime import datetime
 from operator import attrgetter
 
+import dateutil
 from flask import session
+from pytz import utc
 
 from indico.core import signals
 from indico.core.db import db
@@ -17,12 +19,15 @@ from indico.modules.events import EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.operations import create_session_block, update_session_block
 from indico.modules.events.timetable import logger
+from indico.modules.events.timetable.legacy import serialize_entry_update
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.events.timetable.util import find_latest_entry_end_dt
+from indico.modules.events.timetable.util import find_latest_entry_end_dt, get_time_changes_notifications
+from indico.modules.events.util import track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
+from indico.web.util import jsonify_data
 
 
 def _get_object_info(entry):
@@ -230,3 +235,26 @@ def get_sibling_entry(entry, direction, in_session=False):
     elif direction == 'up':
         siblings = [x for x in siblings if x.end_dt <= entry.start_dt]
         return max(siblings, key=attrgetter('end_dt')) if siblings else None
+
+def modify_timetable_entry_time(rh):
+    new_start_dt = rh.event.tzinfo.localize(
+            dateutil.parser.parse(rh.start_dt)).astimezone(utc)
+    new_end_dt = rh.event.tzinfo.localize(dateutil.parser.parse(rh.end_dt)).astimezone(utc)
+    new_duration = new_end_dt - new_start_dt
+    is_session_block = rh.entry.type == TimetableEntryType.SESSION_BLOCK
+    tzinfo = rh.event.tzinfo
+    if is_session_block and new_end_dt.astimezone(tzinfo).date() != rh.entry.start_dt.astimezone(tzinfo).date():
+        raise UserValueError(_('Session block cannot span more than one day'))
+    with track_time_changes(auto_extend=True, user=session.user) as changes:
+        update_timetable_entry_object(rh.entry, {'duration': new_duration})
+        if is_session_block:
+            rh.entry.move(new_start_dt)
+        if not is_session_block:
+            update_timetable_entry(rh.entry, {'start_dt': new_start_dt})
+    if is_session_block and rh.entry.children:
+        if new_end_dt < max(rh.entry.children, key=attrgetter('end_dt')).end_dt:
+            raise UserValueError(_('Session block cannot be shortened this much because contributions contained '
+                                   "wouldn't fit."))
+    notifications = get_time_changes_notifications(changes, tzinfo=rh.event.tzinfo, entry=rh.entry)
+    return jsonify_data(update=serialize_entry_update(rh.entry, session_=rh.session),
+                        notifications=notifications)

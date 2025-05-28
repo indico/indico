@@ -29,10 +29,10 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_contribution_entry,
                                                         create_session_block_entry, create_timetable_entry,
-                                                        delete_timetable_entry, update_timetable_entry,
-                                                        update_timetable_entry_object)
+                                                        delete_timetable_entry, modify_timetable_entry_time,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
-from indico.modules.events.timetable.util import get_time_changes_notifications, render_entry_info_balloon
+from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import should_show_draft_warning, track_time_changes
 from indico.util.i18n import _
@@ -188,36 +188,11 @@ class RHAPIEditEntryTime(RHManageTimetableEntryBase):
     })
     def _process_args(self, start_dt, end_dt):
         RHManageTimetableEntryBase._process_args(self)
-        self.start_dt = self.event.tzinfo.localize(
-            dateutil.parser.parse(start_dt)).astimezone(utc)
-        self.end_dt = self.event.tzinfo.localize(dateutil.parser.parse(end_dt)).astimezone(utc)
+        self.start_dt = start_dt
+        self.end_dt = end_dt
 
     def _process(self):
-        new_start_dt = self.start_dt
-        new_end_dt = self.end_dt
-        new_duration = new_end_dt - new_start_dt
-
-        is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
-        tzinfo = self.event.tzinfo
-
-        if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
-            raise UserValueError(_('Session block cannot span more than one day'))
-
-        with track_time_changes(auto_extend=True, user=session.user) as changes:
-            update_timetable_entry_object(self.entry, {'duration': new_duration})
-            if is_session_block:
-                self.entry.move(new_start_dt)
-            else:
-                update_timetable_entry(self.entry, {'start_dt': new_start_dt})
-
-        if is_session_block and self.entry.children:
-            if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
-                raise UserValueError(_('Session block cannot be shortened this much because contributions contained '
-                                       "wouldn't fit."))
-
-        notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
-        return jsonify_data(update=serialize_entry_update(self.entry),
-                            notifications=notifications)
+        return modify_timetable_entry_time(self)
 
 
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
