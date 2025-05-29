@@ -28,3 +28,11 @@
 .ui.info.message .header {
   color: var(--accent-highlight-color) !important;
 }
+
+// Fix popup positioning issues caused by unnecessary transforms
+.ui.visible.popup {
+  -webkit-transform: none !important;
+  transform: none !important;
+  -webkit-backface-visibility: visible !important;
+  backface-visibility: visible !important;
+}

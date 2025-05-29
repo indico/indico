@@ -289,7 +289,6 @@ export function FinalDateRangePicker({name, ...props}) {
       component={DateRangePicker}
       validate={val => {
         const res = v.chain(...validators)(val);
-        console.log('validating', val, res);
         return res;
       }}
     />

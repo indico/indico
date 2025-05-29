@@ -10,6 +10,86 @@ import {domReady} from 'indico/utils/domstate';
 let viewportWidth = document.documentElement.clientWidth;
 let viewportHeight = document.documentElement.clientHeight;
 
+function matrixMultiply(m1, m2) {
+  if (!m1) {
+    return m2;
+  }
+  if (!m2) {
+    return m1;
+  }
+
+  return {
+    a: m1.a * m2.a + m1.c * m2.b,
+    b: m1.b * m2.a + m1.d * m2.b,
+    c: m1.a * m2.c + m1.c * m2.d,
+    d: m1.b * m2.c + m1.d * m2.d,
+    e: m1.a * m2.e + m1.c * m2.f + m1.e,
+    f: m1.b * m2.e + m1.d * m2.f + m1.f,
+  };
+}
+
+function parseMatrix(transformString) {
+  if (!transformString || transformString === 'none') {
+    return null;
+  }
+
+  const match = transformString.match(/matrix\(([^)]+)\)/);
+  if (match) {
+    const values = match[1].split(',').map(v => parseFloat(v.trim()));
+    return {
+      a: values[0],
+      b: values[1],
+      c: values[2],
+      d: values[3],
+      e: values[4],
+      f: values[5],
+    };
+  }
+
+  const match3d = transformString.match(/matrix3d\(([^)]+)\)/);
+  if (match3d) {
+    const values = match3d[1].split(',').map(v => parseFloat(v.trim()));
+    return {
+      a: values[0],
+      b: values[1],
+      c: values[4],
+      d: values[5],
+      e: values[12],
+      f: values[13],
+    };
+  }
+
+  return null;
+}
+
+const transformCache = new WeakMap();
+
+function getCumulativeTransform(element) {
+  if (transformCache.has(element)) {
+    return transformCache.get(element);
+  }
+
+  const transforms = [];
+  let current = element;
+
+  while (current && current !== document.documentElement) {
+    const style = window.getComputedStyle(current);
+    const matrix = parseMatrix(style.transform);
+    if (matrix) {
+      transforms.push(matrix);
+    }
+    current = current.parentElement;
+  }
+
+  let cumulative = null;
+  for (let i = transforms.length - 1; i >= 0; i--) {
+    cumulative = matrixMultiply(cumulative, transforms[i]);
+  }
+
+  transformCache.set(element, cumulative);
+  return cumulative;
+}
+
 domReady.then(() => setTimeout(updateClientGeometry));
 window.addEventListener('resize', updateClientGeometry);
 
@@ -75,16 +155,24 @@ const geometry = {
   getGeometry() {
     this.targetRect ??= this.target.getBoundingClientRect();
     this.anchorRect ??= this.anchor.getBoundingClientRect();
+
     // Vertical geometry
     this.targetHeight ??= this.targetRect.height;
     this.anchorHeight ??= this.anchorRect.height;
-    this.anchorTop ??= getVisualY(this.anchorRect.top);
-    this.anchorBottom ??= getVisualY(this.anchorRect.bottom);
+
     // Horizontal geometry
     this.targetWidth ??= this.targetRect.width;
     this.anchorWidth ??= this.anchorRect.width;
-    this.anchorLeft ??= getVisualX(this.anchorRect.left);
-    this.anchorRight ??= getVisualX(this.anchorRect.right);
+
+    // Check for transformed ancestors and use appropriate strategy
+    const anchorTransform = getCumulativeTransform(this.anchor);
+
+    if (anchorTransform) {
+      this.getGeometryInTransformed();
+    } else {
+      this.getGeometryInViewport();
+    }
+
     // Initial scroll positions
     // XXX: These are remembered because, instead of calculating the
     // positions of each element over and over for each scroll event,
@@ -93,6 +181,81 @@ const geometry = {
     // without forced reflow.
     this.initialScrollTop = getScrollTop();
     this.initialScrollLeft = getScrollLeft();
+  },
+
+  getGeometryInViewport() {
+    // Original viewport-based positioning
+    this.anchorTop ??= getVisualY(this.anchorRect.top);
+    this.anchorBottom ??= getVisualY(this.anchorRect.bottom);
+    this.anchorLeft ??= getVisualX(this.anchorRect.left);
+    this.anchorRight ??= getVisualX(this.anchorRect.right);
+
+    // Calculate viewport bounds for clamping
+    this.clampTop = 0;
+    this.clampBottom = viewportHeight - this.targetHeight;
+    this.clampLeft = 0;
+    this.clampRight = viewportWidth - this.targetWidth;
+
+    // For fit calculations, use viewport dimensions
+    this.availableSpaceBelow = viewportHeight - this.anchorBottom;
+    this.availableSpaceAbove = this.anchorTop;
+    this.availableSpaceRight = viewportWidth - this.anchorRight;
+    this.availableSpaceLeft = this.anchorLeft;
+  },
+
+  getGeometryInTransformed() {
+    // Find the closest transformed ancestor
+    let transformedContainer = this.anchor.parentElement;
+    while (transformedContainer && transformedContainer !== document.documentElement) {
+      const style = window.getComputedStyle(transformedContainer);
+      if (style.transform && style.transform !== 'none') {
+        break;
+      }
+      transformedContainer = transformedContainer.parentElement;
+    }
+
+    if (transformedContainer) {
+      // Calculate actual offset between container and anchor
+      const containerRect = transformedContainer.getBoundingClientRect();
+
+      // This gives us the real offset including margins, padding, etc.
+      const actualOffsetTop = this.anchorRect.top - containerRect.top;
+      const actualOffsetBottom = this.anchorRect.bottom - containerRect.top;
+      const actualOffsetLeft = this.anchorRect.left - containerRect.left;
+      const actualOffsetRight = this.anchorRect.right - containerRect.left;
+
+      this.anchorTop ??= getVisualY(actualOffsetTop);
+      this.anchorBottom ??= getVisualY(actualOffsetBottom);
+      this.anchorLeft ??= getVisualX(actualOffsetLeft);
+      this.anchorRight ??= getVisualX(actualOffsetRight);
+
+      // Calculate viewport-relative bounds for clamping
+      // We need to keep the dropdown within the actual viewport, not the container
+      const containerViewportTop = containerRect.top;
+      const containerViewportLeft = containerRect.left;
+
+      // Calculate available space from current position to viewport edges
+      // For the top clamp: we can go negative (above container) if there's viewport space above
+      this.clampTop = -containerViewportTop;
+      this.clampBottom = viewportHeight - containerViewportTop - this.targetHeight;
+      this.clampLeft = -containerViewportLeft;
+      this.clampRight = viewportWidth - containerViewportLeft - this.targetWidth;
+
+      // For fit calculations, calculate actual available viewport space
+      // Convert container-relative positions back to viewport coordinates for fit calculations
+      const anchorViewportTop = containerViewportTop + actualOffsetTop;
+      const anchorViewportBottom = containerViewportTop + actualOffsetBottom;
+      const anchorViewportLeft = containerViewportLeft + actualOffsetLeft;
+      const anchorViewportRight = containerViewportLeft + actualOffsetRight;
+
+      this.availableSpaceBelow = viewportHeight - anchorViewportBottom;
+      this.availableSpaceAbove = anchorViewportTop;
+      this.availableSpaceRight = viewportWidth - anchorViewportRight;
+      this.availableSpaceLeft = anchorViewportLeft;
+    } else {
+      // Fallback to viewport strategy
+      this.getGeometryInViewport();
+    }
   },
   resetGeometry(callback) {
     delete this.anchorRect;
@@ -107,7 +270,17 @@ const geometry = {
     delete this.targetHeight;
     delete this.initialScrollTop;
     delete this.initialScrollLeft;
+    delete this.clampTop;
+    delete this.clampBottom;
+    delete this.clampLeft;
+    delete this.clampRight;
+    delete this.availableSpaceBelow;
+    delete this.availableSpaceAbove;
+    delete this.availableSpaceRight;
+    delete this.availableSpaceLeft;
 
+    transformCache.delete(this.anchor);
+    transformCache.delete(this.target);
     this.setAnchorGeometry();
     requestAnimationFrame(() => {
       this.getGeometry();
@@ -118,21 +291,21 @@ const geometry = {
     const scrollOffset = getScrollTop() - this.initialScrollTop;
     this.target.style.setProperty(
       '--target-top',
-      `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
+      `clamp(${this.clampTop}px, ${top - scrollOffset}px, ${this.clampBottom}px)`
     );
   },
   setLeft(left) {
     const scrollOffset = getScrollLeft() - this.initialScrollLeft;
     this.target.style.setProperty(
       '--target-left',
-      `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
+      `clamp(${this.clampLeft}px, ${left - scrollOffset}px, ${this.clampRight}px)`
     );
   },
 };
 
 const verticalPreferAbovePosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.targetHeight <= this.anchorTop;
+    this.fitsPreferredDirection = this.targetHeight <= this.availableSpaceAbove;
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
@@ -145,8 +318,8 @@ const verticalPreferAbovePosition = {
 
 const verticalPreferBelowPosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.anchorBottom + this.targetHeight <= viewportHeight;
-    this.firsOppositeDirection = this.anchorTop - this.targetHeight > 0;
+    this.fitsPreferredDirection = this.targetHeight <= this.availableSpaceBelow;
+    this.firsOppositeDirection = this.targetHeight <= this.availableSpaceAbove;
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
@@ -178,7 +351,7 @@ const horizontalCenter = {
 
 const horizontalFlush = {
   calculateAlignment() {
-    this.alignsPreferredSide = this.anchorLeft + this.targetWidth <= viewportWidth;
+    this.alignsPreferredSide = this.targetWidth <= this.availableSpaceRight + this.anchorLeft;
   },
   setAlignment() {
     if (this.alignsPreferredSide) {
@@ -191,7 +364,7 @@ const horizontalFlush = {
 
 const horizontalTargetPosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.targetWidth <= viewportWidth - this.anchorRight;
+    this.fitsPreferredDirection = this.targetWidth <= this.availableSpaceRight;
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
