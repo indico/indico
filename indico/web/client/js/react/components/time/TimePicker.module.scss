@@ -1,0 +1,24 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+.time-picker {
+  @extend %text-input;
+
+  :global(.ui.form) &:not(.bump-specificity)[type='text'] {
+    max-width: var(--time-picker-width, 8em);
+  }
+
+  &[data-time-format='12h'] {
+    --time-picker-width: 11em;
+  }
+}
+
+.notice {
+  @extend %visually-hidden;
+}
