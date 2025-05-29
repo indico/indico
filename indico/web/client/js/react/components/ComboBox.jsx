@@ -6,27 +6,50 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {optionPropType} from 'indico/react/util/propTypes';
 
-export default function ComboBox({options, value, onChange, ...inputProps}) {
-  const uncontrolledInputProps = {...inputProps, defaultValue: value};
+import 'indico/custom_elements/ind_combo_box';
+
+function DefaultLabel({option}) {
+  return option.label ?? option.value;
+}
+
+DefaultLabel.propTypes = {
+  option: optionPropType,
+};
+
+export default function ComboBox({
+  options,
+  onChange,
+  optionComponent: Option,
+  rankOption,
+  useAutocomplete,
+  value,
+  ...inputProps
+}) {
+  const comboBoxRef = useRef();
   const inputRef = useRef();
 
-  useNativeEvent(inputRef, 'input', onChange);
-  useNativeEvent(inputRef, 'change', onChange);
+  useNativeEvent(comboBoxRef, 'change', onChange);
+  useEffect(() => {
+    if (rankOption) {
+      comboBoxRef.current.rankOption = rankOption;
+    } else {
+      delete comboBoxRef.current.rankOption;
+    }
+  }, [rankOption]);
+
+  if (useAutocomplete) {
+    inputProps['aria-autocomplete'] = 'both';
+  }
 
   return (
-    <ind-combo-box>
-      <input
-        ref={inputRef}
-        {...uncontrolledInputProps}
-        type="text"
-        role="combobox"
-        autoComplete="off"
-      />
+    <ind-combo-box ref={comboBoxRef} value={value}>
+      <input ref={inputRef} type="text" role="combobox" autoComplete="off" {...inputProps} />
       <ul role="listbox">
         {options.map(option => {
           if (typeof option === 'string') {
@@ -48,7 +71,7 @@ export default function ComboBox({options, value, onChange, ...inputProps}) {
 
           return (
             <li role="option" data-value={option.value} key={option.value} {...optionProps}>
-              {option.label ?? option.value}
+              <Option option={option} />
             </li>
           );
         })}
@@ -79,10 +102,16 @@ ComboBox.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
+  useAutocomplete: PropTypes.bool,
+  optionComponent: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
+  rankOption: PropTypes.func,
 };
 
 ComboBox.defaultProps = {
   disabled: false,
   onFocus: undefined,
   onBlur: undefined,
+  useAutocomplete: false,
+  optionComponent: DefaultLabel,
+  rankOption: undefined,
 };

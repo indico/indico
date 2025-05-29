@@ -21,7 +21,7 @@ ind-combo-box {
 
   &[clearable] input[role='combobox'] {
     @include sui_debt.field_override() {
-      padding-right: 4.5em;
+      padding-right: 3.8em;
     }
   }
 
@@ -55,7 +55,7 @@ ind-combo-box {
   [role='listbox'][data-position-check] {
     @extend %popup-positioned-target;
     z-index: 10;
-    min-width: 100%;
+    min-width: var(--anchor-width);
     max-height: min(75vh, 16em);
     overflow-y: auto;
 

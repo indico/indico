@@ -13,3 +13,12 @@ import PropTypes from 'prop-types';
 export default {
   i18n: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
+
+/**
+ * Select list and ComboBox option prop type
+ */
+export const optionPropType = PropTypes.shape({
+  value: PropTypes.any,
+  label: PropTypes.any,
+  disabled: PropTypes.bool,
+}).isRequired;

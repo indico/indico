@@ -8,20 +8,28 @@
 import CustomElementBase from 'indico/custom_elements/_base';
 import * as positioning from 'indico/utils/positioning';
 
-import './ind_combobox.scss';
+import './ind_combo_box.scss';
 
-customElements.define(
+CustomElementBase.defineWhenDomReady(
   'ind-combo-box',
   class extends CustomElementBase {
     static lastId = 1;
 
-    get value() {
-      return this.querySelector('input').value;
-    }
+    static attributes = {
+      value: class InputValueProxy extends CustomElementBase.CustomAttribute {
+        setValue(newValue) {
+          CustomElementBase.setValue(this.elemenet.querySelector('input'), newValue);
+        }
+
+        getValue() {
+          return this.element.querySelector('input').value;
+        }
+      },
+    };
 
     setup() {
-      const indComboBox = this;
       const id = `combo-box-${this.constructor.lastId++}`;
+      const indComboBox = this;
       const listbox = this.querySelector('[role=listbox]');
       const input = this.querySelector('input');
       const clearButton = this.querySelector('button[value=clear]');
@@ -63,6 +71,10 @@ customElements.define(
 
       // Event handlers
 
+      indComboBox.addEventListener('x-attrchange.value', () => {
+        CustomElementBase.setValue(input, this.getAttribute('value'));
+      });
+
       input.addEventListener('click', () => {
         // When user clicks the input while no candidates are matching the value,
         // ensure that all options are visible
@@ -82,70 +94,54 @@ customElements.define(
         if (option) {
           selectOption(option);
           toggleClearButton(true);
-          dispatchInternalInputEvent();
         }
       });
 
       input.addEventListener('blur', closeListbox);
 
       // Perform the inline autocomplete/search
-      input.addEventListener('input', evt => {
-        deselectCurrentSelection();
+      input.addEventListener(
+        'input',
+        evt => {
+          evt.stopPropagation(); // Prevent React from messing up the standard input operation. Use native change event instead!
+          deselectCurrentSelection();
 
-        const useAutocomplete = input.getAttribute('aria-autocomplete') === 'both';
-        const charactersWereAdded = !evt.inputType?.startsWith('delete'); // Manually triggered events don't have `evt.inputType`.
-        const filterKeyword = input.value;
-        const filterKeywordLC = filterKeyword.toLowerCase();
-        let topRank = 0;
-        let topCandidate;
-        let candidateCount = 0;
+          const useAutocomplete = input.getAttribute('aria-autocomplete') === 'both';
+          const charactersWereAdded = !evt.inputType?.startsWith('delete'); // Manually triggered events don't have `evt.inputType`.
+          const filterKeyword = input.value;
+          let topRank = 0;
+          let topCandidate;
+          let candidateCount = 0;
 
-        for (const option of listbox.children) {
-          const optionValue = option.dataset.value;
-          const optionValueLC = optionValue.toLowerCase();
+          for (const option of listbox.children) {
+            const optionRank = this.rankOption(useAutocomplete, filterKeyword, option);
 
-          // We use the option rank to determine the most likely candidate.
-          // This is not used for sorting the candidates. Candidates retain
-          // their original sort order.
-          let optionRank = 0;
+            option.hidden = filterKeyword && !optionRank;
+            if (!option.hidden) {
+              candidateCount++;
+            }
 
-          // Skip if no filter keyword
-          if (filterKeyword && !option.hasAttribute('aria-disabled')) {
-            // Exact initial match
-            optionRank += optionValue.startsWith(filterKeyword) * 1000;
-            // Case-insensitive initial match
-            optionRank += optionValueLC.startsWith(filterKeywordLC) * 100;
-            if (!useAutocomplete) {
-              // Case-insensitive match anywhere in the string
-              optionRank += optionValueLC.includes(filterKeywordLC);
-              // Exact match anywhere in the string
-              optionRank += optionValue.includes(filterKeyword) * 10;
+            if (optionRank > topRank) {
+              topRank = optionRank;
+              topCandidate = option;
             }
           }
-
-          option.hidden = filterKeyword && !optionRank;
-          if (!option.hidden) {
-            candidateCount++;
+          const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
+          if (shouldAutocomplete) {
+            selectOption(topCandidate);
+            moveVirtualCursorToOption(topCandidate);
+            // Select the portion of the input text that is ahead of the user-inputted filter keyword
+            // (this presents the type-ahead autocomplete)
+            selectInputText(findIndexAfterKeyword(filterKeyword));
+          } else {
+            dispatchExternalChangeEvent();
           }
 
-          if (optionRank > topRank) {
-            topRank = optionRank;
-            topCandidate = option;
-          }
-        }
-
-        const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
-        if (shouldAutocomplete) {
-          selectOption(topCandidate);
-          moveVirtualCursorToOption();
-          // Select the portion of the input text that is ahead of the user-inputted filter keyword
-          // (this presents the type-ahead autocomplete)
-          selectInputText(filterKeyword.length);
-        }
-
-        toggleListbox(filterKeyword && candidateCount > 0);
-        toggleClearButton();
-      });
+          toggleListbox(filterKeyword && candidateCount > 0);
+          toggleClearButton();
+        },
+        {capture: true}
+      );
 
       // Keyboard actions
       input.addEventListener('keydown', ev => {
@@ -161,7 +157,6 @@ customElements.define(
             }
             selectOptionViaKeyboard(findNextSelectableOption());
             toggleClearButton(true);
-            dispatchInternalInputEvent();
             break;
           case 'ArrowUp':
             ev.preventDefault();
@@ -171,7 +166,6 @@ customElements.define(
             }
             selectOptionViaKeyboard(findPreviousSelectableOption());
             toggleClearButton(true);
-            dispatchInternalInputEvent();
             break;
 
           // Use Enter or Escape to close
@@ -193,7 +187,7 @@ customElements.define(
       });
 
       clearButton?.addEventListener('click', () => {
-        input.value = '';
+        CustomElementBase.setValue(input, '');
         input.dispatchEvent(new Event('input'));
       });
 
@@ -209,8 +203,8 @@ customElements.define(
         }
       }
 
-      function dispatchInternalInputEvent() {
-        input.dispatchEvent(new Event('change', {bubbles: true}));
+      function dispatchExternalChangeEvent() {
+        indComboBox.dispatchEvent(new Event('change', {bubbles: true}));
       }
 
       let abortPositioning;
@@ -259,12 +253,13 @@ customElements.define(
         deselectCurrentSelection();
         option?.setAttribute('aria-selected', true);
         CustomElementBase.setValue(input, option?.dataset.value);
+        dispatchExternalChangeEvent();
       }
 
       function moveVirtualCursorToOption(option) {
         // Omit the option to remove selection
         input.setAttribute('aria-activedescendant', option?.id || '');
-        option.scrollIntoView({block: 'nearest'});
+        option?.scrollIntoView({block: 'nearest'});
       }
 
       function selectInputText(startIndex = input.value.length) {
@@ -295,6 +290,44 @@ customElements.define(
           )
         );
       }
+
+      function findIndexAfterKeyword(filterKeyword) {
+        const matchStartIndex = input.value.indexOf(filterKeyword);
+
+        if (matchStartIndex === -1) {
+          return input.value.length;
+        }
+
+        return matchStartIndex + filterKeyword.length;
+      }
+    }
+
+    rankOption(useAutocomplete, filterKeyword, option) {
+      const optionDisabled = option.hasAttribute('aria-disabled');
+      const optionValue = option.dataset.value;
+      const optionValueLC = optionValue.toLowerCase();
+      const filterKeywordLC = filterKeyword.toLowerCase();
+
+      // We use the option rank to determine the most likely candidate.
+      // This is not used for sorting the candidates. Candidates retain
+      // their original sort order.
+      let optionRank = 0;
+
+      // Skip if no filter keyword
+      if (filterKeyword && !optionDisabled) {
+        // Exact initial match
+        optionRank += optionValue.startsWith(filterKeyword) * 1000;
+        // Case-insensitive initial match
+        optionRank += optionValueLC.startsWith(filterKeywordLC) * 100;
+        if (!useAutocomplete) {
+          // Case-insensitive match anywhere in the string
+          optionRank += optionValueLC.includes(filterKeywordLC);
+          // Exact match anywhere in the string
+          optionRank += optionValue.includes(filterKeyword) * 10;
+        }
+      }
+
+      return optionRank;
     }
   }
 );
