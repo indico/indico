@@ -20,6 +20,7 @@ export default function CalendarRangeDatePicker({
   endDate,
   minDate,
   maxDate,
+  filter,
   ...props
 }) {
   const calendarRef = useRef();
@@ -42,8 +43,8 @@ export default function CalendarRangeDatePicker({
         {...props}
       >
         <div className="calendars">
-          <DatePickerGrid includeMonthHeader />
-          <DatePickerGrid includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
         </div>
       </DatePickerInlineCalendar>
     </ind-inline-date-range-picker>
@@ -58,6 +59,7 @@ CalendarRangeDatePicker.propTypes = {
   maxDate: PropTypes.string,
   yearsBefore: PropTypes.number,
   yearsAfter: PropTypes.number,
+  filter: PropTypes.func,
 };
 
 CalendarRangeDatePicker.defaultProps = {
@@ -65,4 +67,5 @@ CalendarRangeDatePicker.defaultProps = {
   endDate: null,
   minDate: null,
   maxDate: null,
+  filter: undefined,
 };

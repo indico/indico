@@ -17,9 +17,23 @@ import {fromISOLocalDate} from 'indico/utils/date_parser';
 const NUM_DAYS_PER_WEEK = 7;
 const NUM_CALENDAR_CELLS = 42; // 6 weeks x 7 days
 
-export function DatePickerGrid({includeMonthHeader = false}) {
+// Example filter usage:
+//
+//   filter={(d, meta) => !meta.weekInfo.weekend.includes(d.getDay() || 7)}
+//
+// The `meta` object will include `weekInfo` (see mdn.io/getWeekInfo),
+// and `locale` (string, for instance you can pass it into `toLocaleString()`)
+// which the calendar is currently using.
+
+export function DatePickerGrid({includeMonthHeader = false, filter}) {
+  const gridRef = useRef();
+
+  useEffect(() => {
+    gridRef.current.filter = filter;
+  });
+
   return (
-    <ind-date-grid data-grid>
+    <ind-date-grid ref={gridRef} data-grid>
       {includeMonthHeader ? <div className="month-label" data-month-label /> : null}
       <div className="weekdays" data-weekday-labels>
         {_.range(NUM_DAYS_PER_WEEK).map(i => (
@@ -37,10 +51,12 @@ export function DatePickerGrid({includeMonthHeader = false}) {
 
 DatePickerGrid.propTypes = {
   includeMonthHeader: PropTypes.bool,
+  filter: PropTypes.func,
 };
 
 DatePickerGrid.defaultProps = {
   includeMonthHeader: false,
+  filter: undefined,
 };
 
 export const DatePickerCalendar = React.forwardRef(({inline = false, children, ...props}, ref) => {
