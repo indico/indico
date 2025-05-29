@@ -896,6 +896,18 @@ CustomElementBase.define(
         }
       });
 
+      let getDateValidity = () => true;
+
+      Object.defineProperty(indDateGrid, 'filter', {
+        set(fn = () => true) {
+          getDateValidity = fn;
+          updateGridDates();
+        },
+        get() {
+          return getDateValidity;
+        },
+      });
+
       let debounceTimer;
 
       function updateGridDates() {
@@ -924,7 +936,8 @@ CustomElementBase.define(
             const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
 
             calendarButton.dataset.currentMonth = belongsToCurrentMonth;
-            calendarButton.disabled = !isRenderable;
+            calendarButton.disabled =
+              !getDateValidity(date, {locale: indDateGrid.locale, weekInfo}) || !isRenderable;
 
             if (!isRenderable) {
               calendarButton.textContent = '';
@@ -956,7 +969,7 @@ CustomElementBase.define(
             calendarButton.tabIndex = -1;
             calendarButton.value = toDateString(date);
 
-            if (this.allowableSelectionRange.includes(date)) {
+            if (indDateGrid.allowableSelectionRange.includes(date)) {
               calendarButton.removeAttribute('aria-disabled');
             } else {
               calendarButton.setAttribute('aria-disabled', true);
