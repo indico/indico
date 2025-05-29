@@ -77,6 +77,20 @@
     </tr>
     <tr class="i-table content">
         <td class="i-table caption log-caption">
+            {% trans %}Attachments{% endtrans %}
+        </td>
+        <td class="i-table value">
+            {% if data.attachments %}
+                {{ data.attachments }}
+            {% else %}
+                <span class="text-muted">
+                    {% trans %}No attachments{% endtrans %}
+                </span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
             {% trans %}Body{% endtrans %}
         </td>
         <td class="i-table value email-body">
