@@ -100,3 +100,14 @@ export function CheckboxSettings() {
     />
   );
 }
+
+export function checkboxShowIfOptions() {
+  return [
+    {value: true, text: Translate.string('Checked')},
+    {value: false, text: Translate.string('Unchecked')},
+  ];
+}
+
+export function checkboxGetDataForCondition(value) {
+  return [value];
+}

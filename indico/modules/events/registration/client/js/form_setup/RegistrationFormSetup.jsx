@@ -16,6 +16,7 @@ import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
+import ConditionalFieldsController from '../form/ConditionalFieldsController';
 import {getNestedSections, getItems} from '../form/selectors';
 
 import DisabledSectionsModal from './DisabledSectionsModal';
@@ -69,11 +70,14 @@ export default function RegistrationFormSetup() {
             }));
 
             return (
-              <SortableWrapper accept="regform-section" className="regform-section-list">
-                {currentSections.map((section, index) => (
-                  <SetupFormSection key={section.id} index={index} {...section} setupMode />
-                ))}
-              </SortableWrapper>
+              <>
+                <ConditionalFieldsController />
+                <SortableWrapper accept="regform-section" className="regform-section-list">
+                  {currentSections.map((section, index) => (
+                    <SetupFormSection key={section.id} index={index} {...section} setupMode />
+                  ))}
+                </SortableWrapper>
+              </>
             );
           }}
         </FinalForm>
