@@ -10,6 +10,7 @@ import csv
 import dataclasses
 import itertools
 import uuid
+from datetime import datetime
 from io import BytesIO
 from operator import attrgetter
 
@@ -50,7 +51,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import format_date, now_utc
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
@@ -555,16 +556,26 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             'ID': registration.friendly_id,
             'Name': f'{registration.first_name} {registration.last_name}'
         }
+        tzinfo = registration.event.tzinfo
         for item in regform_items:
             key = unique_col(item.title, item.id)
             if item.input_type == 'accommodation':
                 registration_dict[key] = data[item.id].friendly_data.get('choice') if item.id in data else ''
                 key = unique_col('{} ({})'.format(item.title, 'Arrival'), item.id)
                 arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
-                registration_dict[key] = format_date(arrival_date) if arrival_date else ''
+                registration_dict[key] = arrival_date or ''
                 key = unique_col('{} ({})'.format(item.title, 'Departure'), item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
-                registration_dict[key] = format_date(departure_date) if departure_date else ''
+                registration_dict[key] = departure_date or ''
+            elif item.input_type == 'date':
+                if item.id not in data:
+                    registration_dict[key] = ''
+                    continue
+                dt = datetime.fromisoformat(data[item.id].data).replace(tzinfo=tzinfo)
+                if ':' in item.data.get('date_format'):
+                    registration_dict[key] = dt
+                else:
+                    registration_dict[key] = dt.date()
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
         for name, (title, fn) in special_item_mapping.items():
