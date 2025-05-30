@@ -922,11 +922,13 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         RHRegistrationsExportBase._process_args(self)
         self.flat = flat
 
+    def _get_registrant_name(self, registration):
+        return secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}', registration.friendly_id)
+
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
-        registrant_name = secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}',
-                                          registration.friendly_id)
+        registrant_name = self._get_registrant_name(registration)
         file_name = secure_filename(
             f'{attachment.field_data.field.title}_{attachment.field_data.field_id}_{attachment.filename}',
             attachment.filename
@@ -938,16 +940,24 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         for reg_attachments in attachments.values():
             yield from reg_attachments
 
+    def _get_registration_attachments(self, registration, file_fields):
+        data = registration.data_by_field
+        attachments_for_registration = [field_data for file_field in file_fields
+                                        if (field_data := data.get(file_field.id)) and field_data.storage_file_id]
+        return attachments_for_registration or None
+
+    def _get_file_fields_by_form(self):
+        return {self.regform.id: [item for item in self.regform.form_items if item.is_field and
+                                   item.is_enabled and item.field_impl.is_file_field]}
+
     def _process(self):
         attachments = {}
-        file_fields = [item for item in self.regform.form_items if item.is_field and item.field_impl.is_file_field]
+        file_fields_by_form = self._get_file_fields_by_form()
         for registration in self.registrations:
-            data = registration.data_by_field
-            attachments_for_registration = [data.get(file_field.id) for file_field in file_fields
-                                            if data.get(file_field.id) and data.get(file_field.id).storage_file_id]
-            if attachments_for_registration:
-                attachments[registration.id] = attachments_for_registration
-        return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.regform.id)
+            if attachment := self._get_registration_attachments(
+              registration, file_fields_by_form.get(registration.registration_form_id, [])):
+                attachments[registration.id] = attachment
+        return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.event.id)
 
 
 @dataclasses.dataclass
