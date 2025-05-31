@@ -6,12 +6,13 @@
 # LICENSE file for more details.
 
 from babel.dates import get_timezone
-from flask import jsonify, request, session
-from werkzeug.exceptions import Forbidden
+from flask import flash, jsonify, redirect, request, session
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
+from indico.core.notifications import make_email, send_email
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.logs.models.entries import (CategoryLogEntry, CategoryLogRealm, EventLogEntry, EventLogRealm,
@@ -19,6 +20,7 @@ from indico.modules.logs.models.entries import (CategoryLogEntry, CategoryLogRea
 from indico.modules.logs.util import serialize_log_entry
 from indico.modules.logs.views import WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
@@ -159,3 +161,31 @@ class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
     @property
     def object_tzinfo(self):
         return get_timezone(config.DEFAULT_TIMEZONE)
+
+
+class RHResendEmail(RHManageEventBase):
+    """Resend an email log entry."""
+
+    def _process_args(self):
+        self.entry = EventLogEntry.get(request.view_args['log_entry_id'])
+        if self.entry is None:
+            raise NotFound('Event log entry does not exist.')
+        return super()._process_args()
+
+    def _process(self):
+        if self.entry.type != 'email':
+            raise Forbidden('Log entry is not an email.')
+        email = make_email(
+            to_list=self.entry.data['to'],
+            cc_list=self.entry.data.get('cc', []),
+            bcc_list=self.entry.data.get('bcc', []),
+            sender_address=self.entry.data['from'],
+            reply_address=self.entry.data.get('reply_to', []),
+            subject=self.entry.data['subject'],
+            body=self.entry.data['body'],
+            html=self.entry.data.get('content_type') == 'text/html',
+        )
+        send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
+                   log_metadata=self.entry.meta)
+        flash(_('The email has been resent.'), 'success')
+        return redirect(url_for('.event', self.event))
