@@ -8,7 +8,7 @@
 from flask import request
 
 from indico.modules.logs.controllers import (RHCategoryLogs, RHCategoryLogsJSON, RHEventLogs, RHEventLogsJSON,
-                                             RHUserLogs, RHUserLogsJSON)
+                                             RHResendEmail, RHUserLogs, RHUserLogsJSON)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -26,6 +26,10 @@ _bp.add_url_rule('/category/<int:category_id>/manage/logs/api/logs', 'api_catego
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/logs/', 'user', RHUserLogs)
     _bp.add_url_rule('/logs/api/logs', 'api_user_logs', RHUserLogsJSON)
+
+# Actions
+_bp.add_url_rule('/event/<int:event_id>/manage/logs/api/resend-email/<int:log_entry_id>', 'resend_email',
+                 RHResendEmail, methods=('POST',))
 
 
 @_bp.url_defaults

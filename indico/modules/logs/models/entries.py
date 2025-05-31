@@ -160,6 +160,10 @@ class LogEntryBase(db.Model):
     def __repr__(self):
         return format_repr(self, 'id', type(self).link_fk_name, 'logged_dt', 'realm', 'module', _text=self.summary)
 
+    @property
+    def locator(self):
+        return {'log_entry_id': self.id}
+
 
 class EventLogEntry(LogEntryBase):
     """Log entries for events."""

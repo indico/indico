@@ -101,4 +101,52 @@
             {% endif %}
         </td>
     </tr>
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
+            {% trans %}Status{% endtrans %}
+        </td>
+        <td class="i-table value">
+            {% if data.state == 'pending' %}
+                {% trans %}Pending{% endtrans %}
+            {% elif data.state == 'sent' %}
+                {% trans %}Sent{% endtrans %}
+            {% elif data.state == 'failed' %}
+                {% trans %}Failed{% endtrans %}
+            {% endif %}
+        </td>
+    </tr>
+    {% if entry.event %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                {% trans %}Actions{% endtrans %}
+            </td>
+            <td class="i-table value">
+                <button type="button"
+                        class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
+                        data-href="{{ url_for('.resend_email', entry.event, entry) }}"
+                        data-method="post"
+                        data-title="{% trans %}Resend email{% endtrans %}"
+                        data-confirm="
+                            {%- trans count=data.to|length -%}
+                                Do you really want to resend this email to {{ count }} recipient?
+                            {%- pluralize -%}
+                                Do you really want to resend this email to {{ count }} recipients?
+                            {%- endtrans -%}"
+                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}>
+                    Resend email
+                </button>
+                {% if data.attachments %}
+                    <small>
+                        <i class="icon-info"
+                           title="{%- trans -%}Resending emails with attachments is not supported.{%- endtrans -%}"></i>
+                    </small>
+                {% elif data.state == 'pending' %}
+                    <small>
+                        <i class="icon-info"
+                           title="{%- trans -%}Please wait until the email is sent before resending.{%- endtrans -%}"></i>
+                    </small>
+                {% endif %}
+            </td>
+        </tr>
+    {% endif %}
 {% endblock %}
