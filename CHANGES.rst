@@ -46,6 +46,7 @@ Bugfixes
 - Fix font rendering issue in event titles with some cyrillic characters (:issue:`6673`,
   :pr:`6881`, thanks :user:`Fedor204`)
 - Include registration tags in event export (:pr:`6896`)
+- Fix some messages not being translated due to a missing context (:pr:`6910`)
 
 Accessibility
 ^^^^^^^^^^^^^
