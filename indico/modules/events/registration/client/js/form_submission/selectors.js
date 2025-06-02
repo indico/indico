@@ -65,22 +65,6 @@ export const getFieldValue = createSelector(
     updateMode ? registrationData[field.htmlName] : undefined
 );
 
-const getTransitiveConditionForFields = createSelector(
-  getItems,
-  (state, id) => getItemById(state, id),
-  (fields, field) => {
-    const todo = [...field.showIfConditionFor];
-    const deps = [...field.showIfConditionFor];
-    while (todo.length) {
-      const id = todo.pop();
-      const depField = fields[id];
-      todo.push(...depField.showIfConditionFor);
-      deps.push(...depField.showIfConditionFor);
-    }
-    return new Set(deps);
-  }
-);
-
 const getFieldsWithPrices = createSelector(
   getItems,
   fields => {
@@ -96,9 +80,8 @@ export const isPaidItemLocked = createSelector(
   getPaid,
   (state, id) => getItemById(state, id),
   (state, id) => getFieldValue(state, id),
-  (state, id) => getTransitiveConditionForFields(state, id),
   getFieldsWithPrices,
-  (paid, field, value, conditions, fieldsWithPrices) => {
+  (paid, field, value, fieldsWithPrices) => {
     if (!paid) {
       // nothing locked if the registration hasn't been paid yet
       return false;
@@ -127,6 +110,6 @@ export const isPaidItemLocked = createSelector(
     // enough that a registration form allows changes after payment and also wants to let
     // registrants change options (in a multi-choice field) that aren't conditions for a
     // field with a price.
-    return !!conditions.intersection(fieldsWithPrices).size;
+    return !!new Set(field.showIfConditionForTransitive).intersection(fieldsWithPrices).size;
   }
 );

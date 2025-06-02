@@ -372,6 +372,13 @@ class RegistrationFormItem(db.Model):
         return {'id': self.id, 'description': self.description, 'position': self.position}
 
     @property
+    def condition_for_transitive(self):
+        deps = set(self.condition_for)
+        for field in self.condition_for:
+            deps |= field.condition_for_transitive
+        return deps
+
+    @property
     def is_active(self):
         return self.is_enabled and not self.is_deleted and self.parent.is_enabled and not self.parent.is_deleted
 
@@ -505,6 +512,7 @@ class RegistrationFormText(RegistrationFormItem):
             show_if_field_id=self.show_if_id,
             show_if_field_values=self.show_if_values,
             show_if_condition_for=[f.id for f in self.condition_for],
+            show_if_condition_for_transitive=[f.id for f in self.condition_for_transitive],
         )
         return camelize_keys(field_data)
 
