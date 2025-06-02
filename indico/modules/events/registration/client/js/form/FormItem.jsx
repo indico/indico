@@ -94,7 +94,6 @@ export default function FormItem({
   setupMode,
   setupActions,
   showIfFieldId,
-  showIfFieldValues,
   htmlName,
   defaultValue,
   ...rest
@@ -111,9 +110,6 @@ export default function FormItem({
   const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
-  if (!!showIfFieldValues && showIfFieldValues.length && showIfFieldValues.length <= 2) {
-    showIfFieldValues = showIfFieldValues[0];
-  }
 
   const fieldOptions = {
     id,
@@ -129,7 +125,6 @@ export default function FormItem({
     setupMode,
     setupActions,
     showIfFieldId,
-    showIfFieldValues,
     ...rest,
     meta,
   };
@@ -281,8 +276,6 @@ FormItem.propTypes = {
   setupActions: PropTypes.node,
   /** The ID of the field to use as condition for display */
   showIfFieldId: PropTypes.number,
-  /** The value of the field to use as condition for display */
-  showIfFieldValues: PropTypes.array,
   /** The default value for a given field **/
   defaultValue: PropTypes.any,
   // ... and various other field-specific keys (billing, limited-places, other config)
@@ -299,6 +292,5 @@ FormItem.defaultProps = {
   setupMode: false,
   setupActions: null,
   showIfFieldId: null,
-  showIfFieldValues: null,
   defaultValue: null,
 };
