@@ -301,9 +301,5 @@ def _message_to_json(msg: Message) -> tuple[str, tuple[str, ...]]:
         singular = msg.id
         translation = (msg.string,)
 
-    if msg.context is None:
-        key = singular
-    else:
-        key = f'{msg.context}\x04{singular}'
-
-    return (key, translation)
+    key = singular if msg.context is None else f'{msg.context}\x04{singular}'
+    return key, translation
