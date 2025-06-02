@@ -10,6 +10,7 @@ from collections import Counter
 
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
+from babel.messages import Message
 from babel.messages.pofile import read_po
 from babel.support import NullTranslations
 from flask import current_app, g, has_app_context, has_request_context, request, session
@@ -279,8 +280,7 @@ def po_to_json(po_file, locale=None, domain=None):
     with open(po_file, 'rb') as f:
         po_data = read_po(f, locale=locale, domain=domain)
 
-    messages = dict((message.id[0], message.string) if message.pluralizable else (message.id, [message.string])
-                    for message in po_data)
+    messages = dict(_message_to_json(msg) for msg in po_data)
 
     messages[''] = {
         'domain': po_data.domain,
@@ -291,3 +291,19 @@ def po_to_json(po_file, locale=None, domain=None):
     return {
         (po_data.domain or ''): messages
     }
+
+
+def _message_to_json(msg: Message) -> tuple[str, tuple[str, ...]]:
+    if msg.pluralizable:
+        singular = msg.id[0]
+        translation = msg.string
+    else:
+        singular = msg.id
+        translation = (msg.string,)
+
+    if msg.context is None:
+        key = singular
+    else:
+        key = f'{msg.context}\x04{singular}'
+
+    return (key, translation)
