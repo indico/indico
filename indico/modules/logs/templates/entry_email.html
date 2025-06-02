@@ -80,8 +80,8 @@
             {% trans %}Attachments{% endtrans %}
         </td>
         <td class="i-table value">
-            {% if data.attachments %}
-                {{ data.attachments }}
+            {% if data.attachment_count %}
+                {{ data.attachment_count }}
             {% else %}
                 <span class="text-muted">
                     {% trans %}No attachments{% endtrans %}
@@ -132,10 +132,10 @@
                             {%- pluralize -%}
                                 Do you really want to resend this email to {{ count }} recipients?
                             {%- endtrans -%}"
-                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}>
+                        {% if data.state == 'pending' or data.attachment_count %}disabled{% endif %}>
                     Resend email
                 </button>
-                {% if data.attachments %}
+                {% if data.attachment_count %}
                     <small>
                         <i class="icon-info"
                            title="{%- trans -%}Resending emails with attachments is not supported.{%- endtrans -%}"></i>
