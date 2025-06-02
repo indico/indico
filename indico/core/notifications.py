@@ -77,7 +77,7 @@ def _log_email(email, event, module, user, meta=None):
         'body': email['body'].strip(),
         'state': 'pending',
         'sent_dt': None,
-        'attachments': len(email['attachments']),
+        'attachment_count': len(email['attachments']),
     }
     return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
