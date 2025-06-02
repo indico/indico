@@ -71,8 +71,6 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
       initialValues = {...(initialValues || {}), price: 0};
     }
   }
-  const showIfFieldValues = (initialValues ?? {}).showIfFieldValues;
-
   const handleChangeItemType = (dirty, value) => {
     if (
       newItemType &&
@@ -155,9 +153,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
-          {!fieldIsRequired && (
-            <ShowIfInput hasValueSelected={!!showIfFieldValues && !!showIfFieldValues.length} />
-          )}
+          {!fieldIsRequired && <ShowIfInput fieldId={id} />}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput

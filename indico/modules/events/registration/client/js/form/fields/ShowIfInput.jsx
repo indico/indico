@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
-import {useForm} from 'react-final-form';
+import React from 'react';
+import {Field, useForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 
 import {FinalDropdown} from 'indico/react/forms';
@@ -18,24 +18,10 @@ import {getItems} from '../selectors';
 
 import {getFieldRegistry} from './registry';
 
-export function ShowIfInput({hasValueSelected}) {
-  const items = Object.values(useSelector(getItems));
+export function ShowIfInput({fieldId: thisFieldId}) {
+  const fields = useSelector(getItems);
   const fieldRegistry = getFieldRegistry();
   const form = useForm();
-  const [showValue, setShowValue] = useState(hasValueSelected);
-  const [, setSelectedField] = useState(null);
-  let options = [];
-  const {showIfFieldId, id: thisFieldId} = form.getState().values;
-  if (showValue) {
-    const field = items.find(({id}) => id === showIfFieldId);
-    options = fieldRegistry[field.inputType].showIfOptions(field);
-    if (!options) {
-      throw new Error(`Input ${field.inputType} field has no options defined`);
-    }
-  }
-  // XXX maybe this is wrong, single choice inputs could be optional but enable some field
-  // for either its options are chosen...
-  const isMultipleChoice = options.length > 2;
 
   return (
     <Fieldset legend={Translate.string('Show if')}>
@@ -43,7 +29,7 @@ export function ShowIfInput({hasValueSelected}) {
         name="showIfFieldId"
         label={Translate.string('Field')}
         placeholder={Translate.string('Select field...')}
-        options={items
+        options={Object.values(fields)
           .filter(
             ({id, inputType}) => id !== thisFieldId && !!fieldRegistry[inputType].showIfOptions
           )
@@ -55,47 +41,56 @@ export function ShowIfInput({hasValueSelected}) {
         closeOnChange
         selection
         allowNull
-        onChange={value => {
+        onChange={() => {
           form.change('showIfFieldValues', null);
-          if (!value) {
-            form.change('showIfFieldId', null);
-            setSelectedField(null);
-          } else {
-            setSelectedField(value);
-          }
-          setShowValue(!!value);
         }}
       />
-      {showValue && (
-        <FinalDropdown
-          required
-          name="showIfFieldValues"
-          label={Translate.string('Has values')}
-          placeholder={Translate.string('Select values...')}
-          options={options}
-          multiple={isMultipleChoice}
-          parse={value => (isMultipleChoice ? value : [value])}
-          format={value => {
-            if (isMultipleChoice) {
-              return value ?? [];
-            } else {
-              return value ? value[0] : null;
-            }
-          }}
-          isEqual={unsortedArraysEqual}
-          closeOnChange
-          selection
-          allowNull
-        />
-      )}
+      <Field name="showIfFieldId" subscription={{value: true}}>
+        {({input: {value: selectedFieldId}}) => {
+          if (!selectedFieldId) {
+            return null;
+          }
+          const field = fields[selectedFieldId];
+          const options = fieldRegistry[field.inputType].showIfOptions(field);
+          if (!options) {
+            throw new Error(`Input ${field.inputType} field has no options defined`);
+          }
+
+          // XXX maybe this is wrong, single choice inputs could be optional but enable some field
+          // for either its options are chosen...
+          const isMultipleChoice = options.length > 2;
+          return (
+            <FinalDropdown
+              required
+              name="showIfFieldValues"
+              label={Translate.string('Has values')}
+              placeholder={Translate.string('Select values...')}
+              options={options}
+              multiple={isMultipleChoice}
+              parse={value => (isMultipleChoice ? value : [value])}
+              format={value => {
+                if (isMultipleChoice) {
+                  return value ?? [];
+                } else {
+                  return value ? value[0] : null;
+                }
+              }}
+              isEqual={unsortedArraysEqual}
+              closeOnChange
+              selection
+              allowNull
+            />
+          );
+        }}
+      </Field>
     </Fieldset>
   );
 }
 
 ShowIfInput.propTypes = {
-  hasValueSelected: PropTypes.bool,
+  fieldId: PropTypes.number,
 };
 
 ShowIfInput.defaultProps = {
-  hasValueSelected: false,
+  fieldId: null, // null when adding new field
 };
