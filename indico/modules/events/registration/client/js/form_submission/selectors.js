@@ -7,7 +7,7 @@
 
 import {createSelector} from 'reselect';
 
-import {getItemById, getStaticData} from '../form/selectors';
+import {getItemById, getItems, getStaticData} from '../form/selectors';
 
 export const getUserInfo = createSelector(
   getStaticData,
@@ -65,11 +65,40 @@ export const getFieldValue = createSelector(
     updateMode ? registrationData[field.htmlName] : undefined
 );
 
+const getTransitiveConditionForFields = createSelector(
+  getItems,
+  (state, id) => getItemById(state, id),
+  (fields, field) => {
+    const todo = [...field.showIfConditionFor];
+    const deps = [...field.showIfConditionFor];
+    while (todo.length) {
+      const id = todo.pop();
+      const depField = fields[id];
+      todo.push(...depField.showIfConditionFor);
+      deps.push(...depField.showIfConditionFor);
+    }
+    return new Set(deps);
+  }
+);
+
+const getFieldsWithPrices = createSelector(
+  getItems,
+  fields => {
+    return new Set(
+      Object.values(fields)
+        .filter(field => field.price > 0 || field.choices?.some(c => c.price > 0))
+        .map(field => field.id)
+    );
+  }
+);
+
 export const isPaidItemLocked = createSelector(
   getPaid,
   (state, id) => getItemById(state, id),
   (state, id) => getFieldValue(state, id),
-  (paid, field, value) => {
+  (state, id) => getTransitiveConditionForFields(state, id),
+  getFieldsWithPrices,
+  (paid, field, value, conditions, fieldsWithPrices) => {
     if (!paid) {
       // nothing locked if the registration hasn't been paid yet
       return false;
@@ -89,8 +118,15 @@ export const isPaidItemLocked = createSelector(
       } else {
         choiceIsSelected = c => value[c.id] > 0;
       }
-      return !!field.choices.find(c => c.price > 0 && choiceIsSelected(c));
+      if (field.choices.some(c => c.price > 0 && choiceIsSelected(c))) {
+        return true;
+      }
     }
-    return false;
+    // check if the field is a condition for any field with a price. we do not look at the
+    // actual condition to disable individual options here, since it's (hopefully) unlikely
+    // enough that a registration form allows changes after payment and also wants to let
+    // registrants change options (in a multi-choice field) that aren't conditions for a
+    // field with a price.
+    return !!conditions.intersection(fieldsWithPrices).size;
   }
 );
