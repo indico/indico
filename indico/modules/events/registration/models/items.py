@@ -16,6 +16,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
+from indico.util.caching import memoize_request
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
@@ -372,6 +373,7 @@ class RegistrationFormItem(db.Model):
         return {'id': self.id, 'description': self.description, 'position': self.position}
 
     @property
+    @memoize_request
     def condition_for_transitive(self):
         deps = set(self.condition_for)
         for field in self.condition_for:

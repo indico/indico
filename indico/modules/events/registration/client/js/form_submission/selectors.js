@@ -67,13 +67,12 @@ export const getFieldValue = createSelector(
 
 const getFieldsWithPrices = createSelector(
   getItems,
-  fields => {
-    return new Set(
+  fields =>
+    new Set(
       Object.values(fields)
         .filter(field => field.price > 0 || field.choices?.some(c => c.price > 0))
         .map(field => field.id)
-    );
-  }
+    )
 );
 
 export const isPaidItemLocked = createSelector(
