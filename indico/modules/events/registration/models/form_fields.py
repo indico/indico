@@ -95,6 +95,7 @@ class RegistrationFormField(RegistrationFormItem):
             html_name=self.html_field_name,
             show_if_field_id=self.show_if_id,
             show_if_field_values=self.show_if_values,
+            show_if_condition_for=[f.id for f in self.condition_for],
             **super().view_data,
         )
         base_dict.update(self.field_impl.view_data)

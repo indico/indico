@@ -504,6 +504,7 @@ class RegistrationFormText(RegistrationFormItem):
             is_purged=self.is_purged,
             show_if_field_id=self.show_if_id,
             show_if_field_values=self.show_if_values,
+            show_if_condition_for=[f.id for f in self.condition_for],
         )
         return camelize_keys(field_data)
 

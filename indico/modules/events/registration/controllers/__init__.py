@@ -32,9 +32,14 @@ class RegistrationFormMixin:
     }
 
     def _process_args(self):
+        form_items_strategy = defaultload('form_items')
+        form_items_strategy.selectinload('condition_for')
+        form_items_strategy.joinedload('show_if_field')
+        children_strategy = form_items_strategy.joinedload('children')
+        children_strategy.joinedload('current_data')
         self.regform = (RegistrationForm.query
                         .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
-                        .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
+                        .options(form_items_strategy)
                         .one())
 
 
