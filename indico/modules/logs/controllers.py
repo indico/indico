@@ -183,7 +183,7 @@ class RHResendEmail(RHManageEventBase):
             reply_address=self.entry.data.get('reply_to', []),
             subject=self.entry.data['subject'],
             body=self.entry.data['body'],
-            html=self.entry.data.get('content_type') == 'text/html',
+            html=self.entry.data['content_type'] == 'text/html',
         )
         send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
                    log_metadata=self.entry.meta)
