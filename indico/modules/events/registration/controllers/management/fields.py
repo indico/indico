@@ -8,7 +8,7 @@
 from datetime import timedelta
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates, validates_schema
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -25,6 +25,7 @@ from indico.modules.events.registration.util import get_flat_section_positions_s
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
+from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
@@ -113,6 +114,47 @@ class GeneralFieldDataSchema(mm.Schema):
             if not next_field.is_enabled:
                 raise ValidationError('Field conditions may not depend on disabled fields')
             next_field_id = next_field.show_if_id
+
+    @validates_schema(skip_on_field_errors=True)
+    @no_autoflush
+    def _validate_conditions_retention_period(self, data, **kwargs):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
+        if isinstance(self, TextDataSchema):
+            # for static text we have no retention period
+            return
+        regform = self.context['regform']
+        show_if_id = data['show_if_id']
+        retention_period = data['retention_period']
+        # check upstream fields
+        if show_if_id is not None:
+            condition_field = RegistrationFormItem.query.with_parent(regform).filter_by(id=show_if_id).one()
+            for field in {condition_field, *condition_field.show_if_field_transitive}:
+                if field.retention_period and (not retention_period or field.retention_period < retention_period):
+                    raise ValidationError(
+                        _('This field depends on "{field}", which has a shorter retention period ({period}).')
+                        .format(field=field.title, period=format_human_timedelta(field.retention_period, 'weeks',
+                                                                                 weeks=True)),
+                        'retention_period',
+                    )
+        # check downstream fields
+        for field in self.context['field'].condition_for_transitive:
+            if isinstance(field, RegistrationFormText):
+                continue
+            # this field has a retention period, and the downstream field doesn't
+            if retention_period and not field.retention_period:
+                raise ValidationError(
+                    _('This field is a condition for "{field}", which has a longer retention period (indefinite).')
+                    .format(field=field.title),
+                    'retention_period',
+                )
+            # this field has a retention period that's lower than that of the downstream field
+            if field.retention_period and retention_period and field.retention_period > retention_period:
+                raise ValidationError(
+                    _('This field is a condition for "{field}", which has a longer retention period ({period}).')
+                    .format(field=field.title, period=format_human_timedelta(field.retention_period, 'weeks',
+                                                                             weeks=True)),
+                    'retention_period',
+                )
 
     @post_load(pass_original=True)
     def _postprocess(self, data, original_data, **kwargs):

@@ -374,6 +374,16 @@ class RegistrationFormItem(db.Model):
 
     @property
     @memoize_request
+    def show_if_field_transitive(self):
+        deps = set()
+        field = self
+        while field.show_if_field:
+            deps.add(field.show_if_field)
+            field = field.show_if_field
+        return deps
+
+    @property
+    @memoize_request
     def condition_for_transitive(self):
         deps = set(self.condition_for)
         for field in self.condition_for:
