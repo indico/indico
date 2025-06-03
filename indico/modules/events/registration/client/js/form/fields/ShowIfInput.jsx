@@ -41,6 +41,7 @@ export function ShowIfInput({fieldId: thisFieldId}) {
         closeOnChange
         selection
         allowNull
+        nullIfEmpty
         onChange={() => {
           form.change('showIfFieldValues', null);
         }}
