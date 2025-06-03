@@ -32,10 +32,23 @@ from indico.util.date_time import (_adjust_skeleton, as_utc, format_human_timede
     (timedelta(days=1, hours=1,  minutes=0,  seconds=0), 'days',    '1 day'),
     (timedelta(days=1, hours=12, minutes=0,  seconds=0), 'days',    '1 day'),
     (timedelta(days=2, hours=0,  minutes=0,  seconds=0), 'days',    '2 days'),
-    (timedelta(days=7, hours=0,  minutes=0,  seconds=0), 'days',    '7 days')
+    (timedelta(days=7, hours=0,  minutes=0,  seconds=0), 'days',    '7 days'),
+    (timedelta(days=9, hours=0,  minutes=0,  seconds=0), 'days',    '9 days'),
 ))
 def test_format_human_timedelta(delta, granularity, expected):
     assert format_human_timedelta(delta, granularity) == expected
+
+
+@pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
+    (timedelta(days=2, hours=0,  minutes=0,  seconds=0),  'days',    '2 days'),
+    (timedelta(days=7, hours=0,  minutes=0,  seconds=0),  'days',    '1 week'),
+    (timedelta(days=9, hours=0,  minutes=0,  seconds=0),  'days',    '1w 2d'),
+    (timedelta(days=9, hours=0,  minutes=0,  seconds=0),  'weeks',   '1 week'),
+    (timedelta(days=14, hours=0,  minutes=0,  seconds=0), 'weeks',   '2 weeks'),
+    (timedelta(days=20, hours=0,  minutes=0,  seconds=0), 'weeks',   '2 weeks'),
+))
+def test_format_human_timedelta_weeks(delta, granularity, expected):
+    assert format_human_timedelta(delta, granularity, weeks=True) == expected
 
 
 @pytest.mark.parametrize(('dt', 'fmt', 'expected'), (
