@@ -79,9 +79,7 @@ function TimetablePopupContent({
     if (draftEntry.id) {
       // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
       const {data} = await indicoAxios.get(entryURL({event_id: eventId, entry_id: draftEntry.id}));
-      console.log('data', data);
       draftEntry = mapTTDataToEntry(data);
-      console.log('draftentry', draftEntry);
       dispatch(actions.setDraftEntry(draftEntry));
     }
   };
