@@ -52,6 +52,8 @@
     @extend %button-base;
     flex: 1 0 auto;
 
+    white-space: nowrap;
+
     &::before {
       @extend %icon;
       @extend %icon-checkmark;
@@ -62,7 +64,7 @@
       // NB: fake icon to balance the layout
       @extend %icon;
       content: ' ';
-      width: 1ch;
+      width: 1em;
     }
   }
 
