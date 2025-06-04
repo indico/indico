@@ -8,10 +8,10 @@
 from marshmallow import fields
 
 from indico.core.marshmallow import mm
+from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionBlockSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.search.schemas import ContributionSchema
 
 
 class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):

@@ -105,8 +105,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
-    title: entry.title || '',
-    description: entry.description || '',
+    title: entry.title,
+    description: entry.description,
     person_links: entry.personLinks || [],
     keywords: entry.keywords || [],
     references: entry.references || [],
@@ -114,9 +114,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     location_data: {inheriting: false, ...(entry.location || {})},
     start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     duration: entry.duration * 60, // Minutes to seconds
-    session_id: entry.sessionId || null,
-    board_number: entry.boardNumber || null,
-    code: entry.code || null,
+    session_id: entry.sessionId,
+    board_number: entry.boardNumber,
+    code: entry.code,
   };
 
   const typeLongNames = {
@@ -175,7 +175,16 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       start_dt: startDt,
       id,
       duration,
-      object: {title, colors, session_id: sessionId},
+      object: {
+        title,
+        description,
+        persons: personLinks,
+        colors,
+        boardNumber,
+        code,
+        keywords,
+        session_id: sessionId,
+      },
     } = data;
 
     const type = {
@@ -192,10 +201,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       id: id || -1,
       type,
       title,
+      description,
       duration: duration / 60,
       startDt: moment(startDt),
       x: 0,
       y: 0,
+      personLinks,
+      boardNumber,
+      code,
+      keywords,
       column: 0,
       maxColumn: 0,
       children: [],
