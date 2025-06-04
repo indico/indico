@@ -27,6 +27,7 @@ export function ShowIfInput({fieldId: thisFieldId}) {
     <Fieldset legend={Translate.string('Show if')}>
       <FinalDropdown
         name="showIfFieldId"
+        /* i18n: Form field */
         label={Translate.string('Field')}
         placeholder={Translate.string('Select field...')}
         options={Object.values(fields)
@@ -64,7 +65,9 @@ export function ShowIfInput({fieldId: thisFieldId}) {
             <FinalDropdown
               required
               name="showIfFieldValues"
-              label={Translate.string('Has values')}
+              label={
+                isMultipleChoice ? Translate.string('Has values') : Translate.string('Has value')
+              }
               placeholder={Translate.string('Select values...')}
               options={options}
               multiple={isMultipleChoice}
