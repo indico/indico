@@ -49,6 +49,7 @@ function gcd(a: number, b: number) {
 }
 
 // Data mapping functions
+// TODO: (Ajob) Evaluate if necessary now that we can just do camelizeKeys
 export const mapPersonLinkToSchema = data => ({
   title: data.title,
   // name: data.name,

@@ -53,7 +53,7 @@ def create_break_entry(event, data, session_block=None, extend_parent=True):
 
 def create_contribution_entry(event, data, session_block=None, extend_parent=True):
     start_dt = data.pop('start_dt')
-    contribution_ = Contribution(event=event)
+    contribution_ = Contribution(event_id=event)
     contribution_.populate_from_dict(data)
     entry_data = {'object': contribution_, 'start_dt': start_dt}
     parent = session_block.timetable_entry if extend_parent and session_block else None

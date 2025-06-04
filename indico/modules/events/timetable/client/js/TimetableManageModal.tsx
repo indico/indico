@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import entryURL from 'indico-url:timetable.tt_entry';
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
 import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
@@ -103,6 +104,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
+    id: entry.id,
     title: entry.title,
     description: entry.description,
     person_links: entry.personLinks || [],
@@ -220,17 +222,23 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const _handleEditContribution = async data => {
     // TODO: (Ajob) Implement edit contribution
-    return data;
+    console.log(`edited contri ${entry.id}`, data);
+    console.log(await indicoAxios.patch(entryURL({event_id: eventId, entry_id: entry.id}), data));
+    return {data, object: {}};
   };
 
   const _handleEditSessionBlock = async data => {
     // TODO: (Ajob) Implement edit session block
-    return data;
+    console.log(`edited session block ${entry.id}`, data);
+    // return await indicoAxios.patch(entryURL({event_id: eventId, data.id}), data);
+    return {data, object: {}};
   };
 
   const _handleEditBreak = async data => {
     // TODO: (Ajob) Implement edit break
-    return data;
+    console.log(`edited break ${entry.id}`, data);
+    // return await indicoAxios.patch(entryURL({event_id: eventId, data.id}), data);
+    return {data, object: {}};
   };
 
   const handleSubmit = async data => {

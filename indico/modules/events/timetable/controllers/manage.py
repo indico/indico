@@ -189,6 +189,17 @@ class RHTimetableEntry(RHManageTimetableBase):
             id=request.view_args['entry_id']
         ).first_or_404()
 
+    # TODO: (Ajob) Clean this up and use marshmallow schemas (copy of legacy)
+    @use_args_schema_context(TimetableEntrySchema, lambda self: {'event': self.event})
+    def _process_PATCH(self, data):
+        """Update a timetable entry."""
+        from pprint import pprint
+        print('dataaaaaaaaaaaaa')
+        pprint(data)
+        with track_time_changes():
+            update_timetable_entry(self.entry, data)
+        return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
+
     def _process_GET(self):
         return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
 
