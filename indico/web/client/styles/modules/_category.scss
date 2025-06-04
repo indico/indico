@@ -251,7 +251,7 @@
 
       font-size: 1em;
       display: block;
-      max-width: 100%;
+      max-width: 36em; // Adjusted to prevent long titles from overflowing
     }
 
     .timing {
