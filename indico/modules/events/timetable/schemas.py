@@ -23,6 +23,7 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
 
     type = fields.Method('get_type')
     object = fields.Method('get_object')
+    duration = fields.TimeDelta(precision=fields.TimeDelta.SECONDS)
 
     def get_type(self, obj):
         return obj.type.name
@@ -30,11 +31,11 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
     def get_object(self, obj):
         match obj.type:
             case TimetableEntryType.SESSION_BLOCK:
-                return SessionBlockSchema().dump(obj.session_block)
+                return SessionBlockSchema(context=self.context).dump(obj.session_block)
             case TimetableEntryType.CONTRIBUTION:
-                return ContributionSchema().dump(obj.contribution)
+                return ContributionSchema(context=self.context).dump(obj.contribution)
             case TimetableEntryType.BREAK:
-                return BreakSchema().dump(obj.break_)
+                return BreakSchema(context=self.context).dump(obj.break_)
             case _:
                 return None
 

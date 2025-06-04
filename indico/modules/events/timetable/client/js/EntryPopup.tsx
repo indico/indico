@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import entryURL from 'indico-url:timetable.tt_entry';
+
 import moment from 'moment';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
@@ -22,12 +24,13 @@ import {
 
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
-import {getEntryColor} from './utils';
+import {getEntryColor, mapTTDataToEntry} from './utils';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -67,12 +70,20 @@ function TimetablePopupContent({
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
-  const draftEntry = {...entry, duration: entry.duration};
+  let draftEntry = {...entry, duration: entry.duration};
+  const eventId = useSelector(selectors.getEventId);
 
-  const onEdit = (e: MouseEvent) => {
+  const onEdit = async (e: MouseEvent) => {
     onClose();
     e.stopPropagation();
-    dispatch(actions.setDraftEntry(draftEntry));
+    if (draftEntry.id) {
+      // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
+      let {data} = await indicoAxios.get(entryURL({event_id: eventId, entry_id: draftEntry.id}));
+      console.log('data', data);
+      draftEntry = mapTTDataToEntry(data);
+      console.log('The draft entry I got is', data);
+      dispatch(actions.setDraftEntry(draftEntry));
+    }
   };
 
   return (

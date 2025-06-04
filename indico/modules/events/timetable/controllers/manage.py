@@ -42,6 +42,7 @@ class RHManageTimetable(RHManageTimetableBase):
 
     def _process(self):
         event_info = serialize_event_info(self.event)
+        # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event, management=True).serialize_timetable()
         return WPManageTimetable.render_template('management_new.html', self.event, event_info=event_info,
                                                  show_draft_warning=should_show_draft_warning(self.event),
@@ -149,25 +150,26 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-# TODO: (Ajob) Evaluate need for these three classes below
-class RHAPICreateBreak(RHManageTimetableBase):
+# TODO: (Ajob) Full rest API endpoint
+
+class RHTimetableBreakCreate(RHManageTimetableBase):
 
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
         break_entry = create_break_entry(self.event, data, extend_parent=False)
-        return TimetableEntrySchema().jsonify(break_entry)
+        return TimetableEntrySchema(context={'event': self.event}).jsonify(break_entry)
 
 
-class RHAPICreateContribution(RHManageTimetableBase):
+class RHTimetableContributionCreate(RHManageTimetableBase):
 
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
-        return TimetableEntrySchema().jsonify(contrib_entry)
+        return TimetableEntrySchema(context={'event': self.event}).jsonify(contrib_entry)
 
 
-class RHAPICreateSessionBlock(RHManageTimetableBase):
+class RHTimetableSessionBlockCreate(RHManageTimetableBase):
 
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: SessionBlockSchema):
@@ -177,8 +179,33 @@ class RHAPICreateSessionBlock(RHManageTimetableBase):
             raise NotFound
 
         block_entry = create_session_block_entry(session, data, extend_parent=False)
-        return TimetableEntrySchema().jsonify(block_entry)
+        return TimetableEntrySchema(context={'event': self.event}).jsonify(block_entry)
 
+
+class RHTimetableEntry(RHManageTimetableBase):
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
+        self.entry = self.event.timetable_entries.filter_by(
+            id=request.view_args['entry_id']
+        ).first_or_404()
+
+    def _process_GET(self):
+        return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
+
+
+class RHTimetableContribution(RHManageTimetableBase):
+    pass  # TODO: Evaluate if needed
+
+
+class RHTimetableBreak(RHManageTimetableBase):
+    pass  # TODO: Evaluate if needed
+
+
+class RHTimetableSessionBlock(RHManageTimetableBase):
+    pass  # TODO: Evaluate if needed
+
+
+# END OF REST API
 
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""

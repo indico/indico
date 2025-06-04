@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Entry, Session} from './types';
 import moment, {Moment} from 'moment';
+
+import {Entry, EntryType, Session, TopLevelEntry} from './types';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
@@ -61,6 +62,57 @@ export const mapPersonLinkToSchema = data => ({
   type: data.type,
   // avatar_url: data.avatarURL,
 });
+
+export const mapTTDataToEntry = (data): TopLevelEntry => {
+  const {
+    type: rawType,
+    start_dt: startDt,
+    id,
+    duration,
+    object: {
+      title,
+      description,
+      persons: personLinks,
+      colors,
+      boardNumber,
+      code,
+      keywords,
+      session_id: sessionId,
+    },
+  } = data;
+
+  const type = {
+    BREAK: EntryType.Break,
+    CONTRIBUTION: EntryType.Contribution,
+    SESSION_BLOCK: EntryType.SessionBlock,
+  }[rawType];
+
+  if (!type) {
+    throw new Error('Invalid entry type', rawType);
+  }
+
+  const mappedObj = {
+    id: id || -1,
+    type,
+    title,
+    description,
+    duration: duration / 60,
+    startDt: moment(startDt),
+    x: 0,
+    y: 0,
+    personLinks,
+    boardNumber,
+    code,
+    keywords,
+    column: 0,
+    maxColumn: 0,
+    children: [],
+    textColor: colors ? colors.text : '',
+    backgroundColor: colors ? colors.background : '',
+    sessionId: sessionId || null,
+  };
+  return mappedObj;
+};
 
 const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
 const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';

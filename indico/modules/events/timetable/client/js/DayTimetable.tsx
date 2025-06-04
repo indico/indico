@@ -25,14 +25,6 @@ import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from '
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
 
-// TODO: (Ajob) Start using interface below
-interface DraftEntry {
-  startDt: Moment;
-  duration: number;
-  height?: number;
-  y?: number;
-}
-
 interface DayTimetableProps {
   dt: Moment;
   eventId: number;

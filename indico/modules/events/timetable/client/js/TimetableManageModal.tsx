@@ -5,12 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import breakCreateURL from 'indico-url:timetable.api_create_break';
-import contributionCreateURL from 'indico-url:timetable.api_create_contrib';
-import sessionBlockCreateURL from 'indico-url:timetable.api_create_session_block';
+import breakCreateURL from 'indico-url:timetable.tt_break_create';
+import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
+import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
 
 import _ from 'lodash';
-import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
@@ -27,8 +26,8 @@ import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {EntryType, Session, TopLevelEntry} from './types';
-import {mapPersonLinkToSchema} from './utils';
+import {EntryType, Session} from './types';
+import {mapPersonLinkToSchema, mapTTDataToEntry} from './utils';
 
 // Generic models
 
@@ -93,7 +92,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch = useDispatch();
-
   const isEditing = !!entry.id;
   const personLinkFieldParams = {
     allowAuthors: true,
@@ -168,57 +166,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeForm, setActiveForm] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
-
-  const _mapDataToEntry = (data): TopLevelEntry => {
-    const {
-      type: rawType,
-      start_dt: startDt,
-      id,
-      duration,
-      object: {
-        title,
-        description,
-        persons: personLinks,
-        colors,
-        boardNumber,
-        code,
-        keywords,
-        session_id: sessionId,
-      },
-    } = data;
-
-    const type = {
-      BREAK: EntryType.Break,
-      CONTRIBUTION: EntryType.Contribution,
-      SESSION_BLOCK: EntryType.SessionBlock,
-    }[rawType];
-
-    if (!type) {
-      throw new Error('Invalid entry type', rawType);
-    }
-
-    const mappedObj = {
-      id: id || -1,
-      type,
-      title,
-      description,
-      duration: duration / 60,
-      startDt: moment(startDt),
-      x: 0,
-      y: 0,
-      personLinks,
-      boardNumber,
-      code,
-      keywords,
-      column: 0,
-      maxColumn: 0,
-      children: [],
-      textColor: colors ? colors.text : '',
-      backgroundColor: colors ? colors.background : '',
-      sessionId: sessionId || null,
-    };
-    return mappedObj;
-  };
 
   const _handleCreateContribution = async data => {
     data.person_links = data.person_links.map(mapPersonLinkToSchema);
@@ -304,7 +251,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     const {data: resData} = await submitHandler(data);
-    const newTopLevelEntry = _mapDataToEntry(resData);
+    const newTopLevelEntry = mapTTDataToEntry(resData);
 
     if (isEditing) {
       // TODO: (Ajob) Implement editing existing entries
