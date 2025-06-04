@@ -117,6 +117,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     code: entry.code,
   };
 
+  console.log('initialvalueesss', initialValues);
+
   const typeLongNames = {
     [EntryType.Contribution]: Translate.string('Contribution'),
     [EntryType.SessionBlock]: Translate.string('Session Block'),

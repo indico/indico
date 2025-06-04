@@ -8,6 +8,7 @@
 import moment, {Moment} from 'moment';
 
 import {Entry, EntryType, Session, TopLevelEntry} from './types';
+import { camelizeKeys } from 'indico/utils/case';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
@@ -72,9 +73,10 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     object: {
       title,
       description,
-      persons: personLinks,
+      person_links: personLinks,
       colors,
-      boardNumber,
+      board_number: boardNumber,
+      location_data: location,
       code,
       keywords,
       session_id: sessionId,
@@ -100,8 +102,9 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     startDt: moment(startDt),
     x: 0,
     y: 0,
-    personLinks,
+    personLinks: (personLinks || []).map(camelizeKeys),
     boardNumber,
+    location,
     code,
     keywords,
     column: 0,

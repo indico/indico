@@ -78,10 +78,10 @@ function TimetablePopupContent({
     e.stopPropagation();
     if (draftEntry.id) {
       // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
-      let {data} = await indicoAxios.get(entryURL({event_id: eventId, entry_id: draftEntry.id}));
+      const {data} = await indicoAxios.get(entryURL({event_id: eventId, entry_id: draftEntry.id}));
       console.log('data', data);
       draftEntry = mapTTDataToEntry(data);
-      console.log('The draft entry I got is', data);
+      console.log('draftentry', draftEntry);
       dispatch(actions.setDraftEntry(draftEntry));
     }
   };
