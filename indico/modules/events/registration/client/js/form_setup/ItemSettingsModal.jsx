@@ -159,7 +159,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               <FinalInput
                 name="retentionPeriod"
                 type="number"
-                placeholder={Translate.string('Permanent')}
+                placeholder={Translate.string('Indefinite')}
                 step="1"
                 min={dataRetentionRange.min}
                 max={dataRetentionRange.max}
