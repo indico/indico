@@ -350,7 +350,7 @@ class RegistrationFormItem(db.Model):
         )
     )
 
-    # The field on which this one depends
+    # The fields that depend on this one
     condition_for = db.relationship(
         'RegistrationFormItem',
         lazy=True,

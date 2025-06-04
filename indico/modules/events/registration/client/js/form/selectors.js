@@ -30,7 +30,7 @@ export const isItemHidden = createSelector(
   (hiddenIds, itemId) => !!itemId && hiddenIds.includes(itemId)
 );
 
-/** Check whether an item is hidden. */
+/** Get the HTML names of hidden items. */
 export const getHiddenItemHTMLNames = createSelector(
   getItems,
   getHiddenItemIds,
