@@ -5,9 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import editEntryTimeURL from 'indico-url:timetable.api_edit_entry_time';
+
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
@@ -39,18 +43,42 @@ interface DayTimetableProps {
   entries: TopLevelEntry[];
 }
 
+const updateEntryTime = async (
+  id: number,
+  eventId: number,
+  startDt: moment.Moment,
+  duration: number
+) => {
+  const url = editEntryTimeURL({entry_id: id, event_id: eventId});
+  const data = {
+    start_dt: startDt.format('YYYY-MM-DD HH:mm:ss'),
+    end_dt: startDt
+      .clone()
+      .add(duration, 'minutes')
+      .format('YYYY-MM-DD HH:mm:ss'),
+  };
+  try {
+    await indicoAxios.post(url, data);
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch = useDispatch();
   const selectedId = useSelector(selectors.getSelectedId);
+  const eventId = useSelector(selectors.getEventId);
 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+      obj[e.id] = (duration: number) => {
+        updateEntryTime(e.id, eventId, e.startDt, duration);
+        return dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+      };
     }
     return obj;
-  }, [entries, dispatch, dt]);
+  }, [entries, eventId, dispatch, dt]);
 
   const setChildDurations = useMemo(() => {
     const obj = {};
