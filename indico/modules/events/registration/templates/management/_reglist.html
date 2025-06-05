@@ -162,11 +162,20 @@
                                             {%- endif %}
                                         </td>
                                     {% else %}
-                                        <td class="i-table" data-text="{{ search_value }}">
-                                            {%- if item.id in data and data[item.id].friendly_data %}
-                                                {{- data[item.id].friendly_data }}
-                                            {%- endif %}
-                                        </td>
+                                        {% set custom_column = (
+                                            template_hook('registration-list-render-data', type=data[item.id].field_data.field.input_type, friendly_data=data[item.id].friendly_data)
+                                            if item.id in data
+                                            else none
+                                        ) %}
+                                        {% if custom_column %}
+                                            {{ custom_column }}
+                                        {% else %}
+                                            <td class="i-table" data-text="{{ search_value }}">
+                                                {%- if item.id in data and data[item.id].friendly_data %}
+                                                    {{- data[item.id].friendly_data }}
+                                                {%- endif %}
+                                            </td>
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             </tr>

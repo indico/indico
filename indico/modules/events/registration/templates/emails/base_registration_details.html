@@ -99,7 +99,8 @@
     {%- elif type == 'picture' and friendly_data -%}
         {{- render_picture(friendly_data, raw_data) -}}
     {%- else -%}
-        {{- friendly_data -}}
+        {{- template_hook('registration-email-render-data', type=type, friendly_data=friendly_data, raw_data=raw_data)
+            or friendly_data -}}
     {%- endif -%}
 {% endmacro %}
 
