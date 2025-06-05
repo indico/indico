@@ -13,12 +13,13 @@ from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
-                                                     get_form_registration_data, make_registration_schema,
-                                                     modify_registration, process_registration_picture)
+                                                     get_form_registration_data, load_registration_schema,
+                                                     make_registration_schema, modify_registration,
+                                                     process_registration_picture)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
 from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs
 
 
 class RegistrationFormMixin:
@@ -31,9 +32,14 @@ class RegistrationFormMixin:
     }
 
     def _process_args(self):
+        form_items_strategy = defaultload('form_items')
+        form_items_strategy.selectinload('condition_for')
+        form_items_strategy.joinedload('show_if_field')
+        children_strategy = form_items_strategy.joinedload('children')
+        children_strategy.joinedload('current_data')
         self.regform = (RegistrationForm.query
                         .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
-                        .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
+                        .options(form_items_strategy)
                         .one())
 
 
@@ -58,13 +64,14 @@ class RegistrationEditMixin:
 
     def _process_POST(self):
         optional_fields = self._get_optional_fields()
-        schema = make_registration_schema(
+        schema_cls = make_registration_schema(
             self.regform,
             management=self.management,
             registration=self.registration,
             override_required=self.management
-        )(partial=optional_fields)
-        form_data = parser.parse(schema)
+        )
+        form_data = load_registration_schema(self.regform, schema_cls, registration=self.registration,
+                                             partial_fields=optional_fields)
 
         notify_user = not self.management or form_data.pop('notify_user', False)
         if self.management:

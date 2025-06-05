@@ -418,6 +418,10 @@ class Registration(db.Model):
             loc['token'] = self.uuid
         return loc
 
+    def is_field_shown(self, field):
+        from indico.modules.events.registration.util import is_conditional_field_shown
+        return is_conditional_field_shown(field, self.data_by_field, is_db_data=True)
+
     @locator.uuid
     def locator(self):
         """A locator that uses uuid instead of id."""
@@ -519,12 +523,12 @@ class Registration(db.Model):
         price_adjustment = self.price_adjustment or Decimal(0)
         return (base_price + price_adjustment + calc_price).max(0)
 
-    @property
-    def summary_data(self):
+    def get_summary_data(self, *, hide_empty=False):
         """Export registration data nested in sections and fields."""
 
         def _fill_from_regform():
-            for section in self.registration_form.sections:
+            sections = self.sections_with_answered_fields if hide_empty else self.registration_form.sections
+            for section in sections:
                 if not section.is_visible:
                     continue
                 summary[section] = {}

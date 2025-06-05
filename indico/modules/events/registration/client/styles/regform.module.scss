@@ -72,6 +72,16 @@
     );
   }
 
+  &.management-hidden {
+    background: repeating-linear-gradient(
+      45deg,
+      $pastel-blue,
+      $pastel-blue 10px,
+      $light-blue 10px,
+      $light-blue 20px
+    );
+  }
+
   legend {
     // XXX: Copy styles from Semantic UI
     margin: 0 0 0.28571429rem 0;
@@ -307,9 +317,13 @@
   }
 
   > .actions {
-    visibility: hidden;
+    & > *:not(.conditional) {
+      visibility: hidden;
+    }
 
-    a + a {
+    a + a,
+    a + i,
+    i + i {
       margin-left: 3px;
     }
   }
@@ -339,7 +353,7 @@
       cursor: grabbing;
     }
 
-    &:hover > .actions {
+    &:hover > .actions > * {
       visibility: visible;
     }
   }

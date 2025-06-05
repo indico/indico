@@ -552,18 +552,20 @@ FinalRadio.propTypes = {
 /**
  * Like `FinalField` but for a dropdown.
  */
-export function FinalDropdown({name, label, multiple, nullIfEmpty, ...rest}) {
+export function FinalDropdown({name, label, multiple, nullIfEmpty, parse, format, ...rest}) {
   const extraProps = {};
   if (multiple) {
     extraProps.isEqual = unsortedArraysEqual;
   }
-  const parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+  if (parse === undefined) {
+    parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+  }
   return (
     <FinalField
       name={name}
       adapter={DropdownAdapter}
       label={label}
-      format={identity}
+      format={format}
       parse={parse}
       search
       deburr
@@ -580,12 +582,16 @@ FinalDropdown.propTypes = {
   label: PropTypes.string,
   multiple: PropTypes.bool,
   nullIfEmpty: PropTypes.bool,
+  parse: PropTypes.func,
+  format: PropTypes.func,
 };
 
 FinalDropdown.defaultProps = {
   label: null,
   multiple: false,
   nullIfEmpty: false,
+  parse: undefined,
+  format: identity,
 };
 
 /**

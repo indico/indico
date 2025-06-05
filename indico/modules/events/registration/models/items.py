@@ -16,6 +16,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
+from indico.util.caching import memoize_request
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
@@ -181,6 +182,10 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'  # noqa: UP032
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
+        db.CheckConstraint('show_if_id IS NULL OR type IN ({t.field}, {t.field_pd}, {t.text})'  # noqa: UP032
+                           .format(t=RegistrationFormItemType),
+                           name='no_conditional_sections'),
+        db.CheckConstraint('(show_if_id IS NULL) = (show_if_values IS NULL)', name='conditional_has_values'),
         db.CheckConstraint('retention_period IS NULL OR '
                            'type = {t.field} OR (type = {t.field_pd} AND personal_data_type NOT IN '
                            '({required_fields}))'
@@ -231,6 +236,18 @@ class RegistrationFormItem(db.Model):
         db.Integer,
         nullable=False,
         default=_get_next_position
+    )
+    #: The ID of the form field on which this one depends
+    show_if_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.form_items.id'),
+        index=True,
+        nullable=True,
+    )
+    #: The values of the referenced form field for which to show this one
+    show_if_values = db.Column(
+        JSONB(none_as_null=True),
+        nullable=True,
     )
     #: The title of this field
     title = db.Column(
@@ -324,6 +341,7 @@ class RegistrationFormItem(db.Model):
     children = db.relationship(
         'RegistrationFormItem',
         lazy=True,
+        foreign_keys=[parent_id],
         order_by='RegistrationFormItem.position',
         backref=db.backref(
             'parent',
@@ -332,14 +350,45 @@ class RegistrationFormItem(db.Model):
         )
     )
 
+    # The fields that depend on this one
+    condition_for = db.relationship(
+        'RegistrationFormItem',
+        lazy=True,
+        foreign_keys=[show_if_id],
+        backref=db.backref(
+            'show_if_field',
+            lazy=True,
+            remote_side=[id]
+        )
+    )
+
     # relationship backrefs:
     # - parent (RegistrationFormItem.children)
     # - registration_form (RegistrationForm.form_items)
+    # - show_if_field (RegistrationFormItem.condition_for)
 
     @property
     def view_data(self):
         """Return object with data that the frontend can understand."""
         return {'id': self.id, 'description': self.description, 'position': self.position}
+
+    @property
+    @memoize_request
+    def show_if_field_transitive(self):
+        deps = set()
+        field = self
+        while field.show_if_field:
+            deps.add(field.show_if_field)
+            field = field.show_if_field
+        return deps
+
+    @property
+    @memoize_request
+    def condition_for_transitive(self):
+        deps = set(self.condition_for)
+        for field in self.condition_for:
+            deps |= field.condition_for_transitive
+        return deps
 
     @property
     def is_active(self):
@@ -465,8 +514,18 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super().view_data, section_id=self.parent_id, is_enabled=self.is_enabled, input_type='label',
-                          title=self.title, is_purged=self.is_purged)
+        field_data = dict(
+            super().view_data,
+            section_id=self.parent_id,
+            is_enabled=self.is_enabled,
+            input_type='label',
+            title=self.title,
+            is_purged=self.is_purged,
+            show_if_field_id=self.show_if_id,
+            show_if_field_values=self.show_if_values,
+            show_if_condition_for=[f.id for f in self.condition_for],
+            show_if_condition_for_transitive=[f.id for f in self.condition_for_transitive],
+        )
         return camelize_keys(field_data)
 
     def _get_default_log_data(self):

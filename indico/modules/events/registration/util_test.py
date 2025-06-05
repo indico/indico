@@ -33,7 +33,8 @@ from indico.testing.util import assert_json_snapshot
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
-def test_import_users(dummy_regform):
+@pytest.mark.usefixtures('dummy_regform')
+def test_import_users():
     csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.test',
                       b'Jane,Smith,ACME Inc.,CEO,,jane@example.test',
                       b'Billy Bob,Doe,,,,1337@EXAMPLE.test'])
@@ -437,21 +438,18 @@ def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
     assert registered_persons == {user_person, no_user_person}
 
 
-def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
+def test_create_registration(monkeypatch, dummy_user, dummy_regform):
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
     # Extend the dummy_regform with more sections and fields
     section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
-    db.session.add(section)
-    db.session.flush()
 
-    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(boolean_field, {
         'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
     })
-    db.session.add(boolean_field)
 
-    multi_choice_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    multi_choice_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
@@ -459,13 +457,13 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
             {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
         ]
     })
-    db.session.add(multi_choice_field)
     db.session.flush()
 
     data = {
         boolean_field.html_field_name: True,
         multi_choice_field.html_field_name: {'test1': 2},
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
@@ -475,7 +473,8 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
 
     # Make sure that missing data gets default values:
     data = {
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -485,19 +484,17 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
 
     # Add a manager only section
     section = RegistrationFormSection(registration_form=dummy_regform, title='manager_section', is_manager_only=True)
-    db.session.add(section)
-    db.session.flush()
 
-    checkbox_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    checkbox_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
     _fill_form_field_with_data(checkbox_field, {
         'input_type': 'checkbox', 'title': 'Checkbox'
     })
-    db.session.add(checkbox_field)
     db.session.flush()
 
     data = {
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -510,7 +507,8 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     # Try again with management=True
     data = {
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert not reg.data_by_field[boolean_field.id].data
@@ -520,23 +518,19 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
 
 
 @pytest.mark.usefixtures('request_context')
-def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
-    session.set_session_user(dummy_user)
+def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
     # Extend the dummy_regform with more sections and fields
     user_section = RegistrationFormSection(registration_form=dummy_regform,
                                            title='dummy_section', is_manager_only=False)
-    db.session.add(user_section)
-    db.session.flush()
 
-    boolean_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(boolean_field, {
         'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
     })
-    db.session.add(boolean_field)
 
-    multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    multi_choice_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
@@ -545,20 +539,15 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
         ]
     })
     choice_uuid = next(k for k, v in multi_choice_field.data['captions'].items() if v == 'A')
-    db.session.add(multi_choice_field)
-    db.session.flush()
 
     # Add a manager-only section
     management_section = RegistrationFormSection(registration_form=dummy_regform,
                                                  title='manager_section', is_manager_only=True)
-    db.session.add(management_section)
-    db.session.flush()
 
-    checkbox_field = RegistrationFormField(parent_id=management_section.id, registration_form=dummy_regform)
+    checkbox_field = RegistrationFormField(parent=management_section, registration_form=dummy_regform)
     _fill_form_field_with_data(checkbox_field, {
         'input_type': 'checkbox', 'is_required': True, 'title': 'Checkbox'
     })
-    db.session.add(checkbox_field)
     db.session.flush()
 
     # Create a registration
@@ -566,18 +555,31 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
         boolean_field.html_field_name: True,
         multi_choice_field.html_field_name: {choice_uuid: 2},
         checkbox_field.html_field_name: True,
-        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
     assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 2}
     assert reg.data_by_field[checkbox_field.id].data
 
+    # Modify the registration without re-sending unchanged data
+    data = {
+        multi_choice_field.html_field_name: {choice_uuid: 1},
+        checkbox_field.html_field_name: False,  # manager-only --> value must be ignored
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 1}
+    # Assert that the manager field is not changed
+    assert reg.data_by_field[checkbox_field.id].data
+
     # Modify the registration
     data = {
-        boolean_field.html_field_name: True,
+        boolean_field.html_field_name: True,  # unmodified, but re-sending it is allowed
         multi_choice_field.html_field_name: {choice_uuid: 1},
-        checkbox_field.html_field_name: False,
+        checkbox_field.html_field_name: False,  # manager-only --> value must be ignored
     }
     modify_registration(reg, data, management=False, notify_user=False)
 
@@ -598,14 +600,13 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     assert not reg.data_by_field[checkbox_field.id].data
 
     # Add a new field after registering
-    new_multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    new_multi_choice_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(new_multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
             {'caption': 'A', 'id': 'new:test3', 'is_enabled': True},
         ]
     })
-    db.session.add(new_multi_choice_field)
     db.session.flush()
 
     modify_registration(reg, {}, management=False, notify_user=False)
@@ -731,3 +732,169 @@ def test_get_ticket_qr_code_data(request, mocker, snapshot, dummy_reg, url, tick
     data = get_ticket_qr_code_data(person)
     snapshot.snapshot_dir = Path(__file__).parent / 'tests'
     assert_json_snapshot(snapshot, data, f'ticket_qr_code_data-{request.node.callspec.id}.json')
+
+
+def test_create_registration_conditional(monkeypatch, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+
+    # Extend the dummy_regform with more sections and fields
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Bool 1'
+    })
+    db.session.flush()
+
+    boolean_field_2 = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field_2, {
+        'input_type': 'bool', 'title': 'Bool 2',
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': [True],
+    })
+    db.session.flush()
+
+    text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field, {
+        'input_type': 'text', 'title': 'Cond Text',
+        'show_if_field_id': boolean_field_2.id,
+        'show_if_field_values': [False],
+    })
+    db.session.flush()
+
+    personal_data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    # Register with the conditional field disabled, but data present. This is ignored here because it's only
+    # actively rejected on the schema level, while being silently ignored in create_registration
+    data = {
+        **personal_data,
+        boolean_field.html_field_name: False,
+        text_field.html_field_name: 'meow',
+    }
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert text_field.id not in reg.data_by_field  # disabled conditional field cannot have data
+    db.session.delete(reg)
+    db.session.flush()
+
+    # Register with the conditional field disabled, but data present. This is ignored here because it's only
+    # actively rejected on the schema level, while being silently ignored in create_registration
+    data = {
+        **personal_data,
+        boolean_field.html_field_name: True,
+        boolean_field_2.html_field_name: True,
+        text_field.html_field_name: 'meow',
+    }
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[boolean_field_2.id].data
+    assert text_field.id not in reg.data_by_field  # disabled conditional field cannot have data
+    db.session.delete(reg)
+    db.session.flush()
+
+    # Same as above, but omitting the data. This should also not satisfy the text field condition since it
+    # expects `False` ("No") for the boolean field, but no value is present.
+    data = {
+        **personal_data,
+        boolean_field.html_field_name: True,
+        text_field.html_field_name: 'meow',
+    }
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[boolean_field_2.id].data is None
+    assert text_field.id not in reg.data_by_field  # disabled conditional field cannot have data
+    db.session.delete(reg)
+    db.session.flush()
+
+    # With both fields having the correct value, the text field should be stored now
+    data = {
+        **personal_data,
+        boolean_field.html_field_name: True,
+        boolean_field_2.html_field_name: False,
+        text_field.html_field_name: 'meow',
+    }
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert not reg.data_by_field[boolean_field_2.id].data
+    assert reg.data_by_field[text_field.id].data == 'meow'
+
+
+@pytest.mark.usefixtures('request_context')
+def test_modify_registration_conditional(monkeypatch, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+
+    # Extend the dummy_regform with more sections and fields
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Bool 1'
+    })
+    db.session.flush()
+
+    boolean_field_2 = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field_2, {
+        'input_type': 'bool', 'title': 'Bool 2',
+        'show_if_field_id': boolean_field.id,
+        'show_if_field_values': [True],
+    })
+    db.session.flush()
+
+    text_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(text_field, {
+        'input_type': 'text', 'title': 'Cond Text',
+        'show_if_field_id': boolean_field_2.id,
+        'show_if_field_values': [False],
+    })
+    db.session.flush()
+
+    personal_data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    # Register with the field having data
+    data = {
+        **personal_data,
+        boolean_field.html_field_name: True,
+        boolean_field_2.html_field_name: False,
+        text_field.html_field_name: 'meow',
+    }
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert not reg.data_by_field[boolean_field_2.id].data
+    assert reg.data_by_field[text_field.id].data == 'meow'
+
+    # Modify the registration for the text field to become hidden
+    data = {
+        boolean_field.html_field_name: False,
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert boolean_field_2.id not in reg.data_by_field  # data is deleted for hidden field
+    assert text_field.id not in reg.data_by_field  # data is deleted for hidden field
+
+    # Modify the registration and try setting value for hidden field
+    data = {
+        text_field.html_field_name: 'meow',
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert boolean_field_2.id not in reg.data_by_field
+    assert text_field.id not in reg.data_by_field
+
+    # Modify the registration and try setting value for hidden field while still failing the conditions
+    data = {
+        boolean_field.html_field_name: False,
+        boolean_field_2.html_field_name: True,  # should not be set
+        text_field.html_field_name: 'meow',
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert boolean_field_2.id not in reg.data_by_field
+    assert text_field.id not in reg.data_by_field
