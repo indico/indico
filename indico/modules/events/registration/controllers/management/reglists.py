@@ -942,21 +942,32 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
 
     def _get_registration_attachments(self, registration, file_fields):
         data = registration.data_by_field
-        attachments_for_registration = [field_data for file_field in file_fields
-                                        if (field_data := data.get(file_field.id)) and field_data.storage_file_id]
-        return attachments_for_registration or None
+        return [
+            field_data
+            for file_field in file_fields
+            if (field_data := data.get(file_field.id)) and field_data.storage_file_id
+        ]
 
     def _get_file_fields_by_form(self):
-        return {self.regform.id: [item for item in self.regform.form_items if item.is_field and
-                                   item.is_enabled and item.field_impl.is_file_field]}
+        return {
+            self.regform.id: [
+                item
+                for item in self.regform.form_items
+                if item.is_field and item.is_enabled and item.field_impl.is_file_field
+            ]
+        }
 
     def _process(self):
-        attachments = {}
         file_fields_by_form = self._get_file_fields_by_form()
-        for registration in self.registrations:
-            if attachment := self._get_registration_attachments(
-              registration, file_fields_by_form.get(registration.registration_form_id, [])):
-                attachments[registration.id] = attachment
+        attachments = {
+            reg.id: reg_attachments
+            for reg in self.registrations
+            if (
+                reg_attachments := self._get_registration_attachments(
+                    reg, file_fields_by_form.get(reg.registration_form_id, [])
+                )
+            )
+        }
         return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.event.id)
 
 
