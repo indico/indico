@@ -8,7 +8,7 @@
 import csv
 import re
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import date, datetime
 from enum import auto
 from io import BytesIO, TextIOWrapper
 
@@ -17,7 +17,6 @@ from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
 from indico.core.errors import UserValueError
-from indico.util.date_time import format_datetime
 from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
@@ -120,15 +119,13 @@ def generate_csv(headers, rows, *, include_header=True):
     return buf
 
 
-def _prepare_excel_data(data, tz=None):
+def _prepare_excel_data(data):
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
         data = '; '.join(sorted(data, key=str.lower))
     elif is_lazy_string(data) or isinstance(data, Markup):
         data = str(data)
-    elif isinstance(data, datetime):
-        data = format_datetime(data, timezone=tz)
     return data
 
 
@@ -148,11 +145,19 @@ def generate_xlsx(headers, rows, tz=None):
     assert all(len(row) == len(headers) for row in rows)
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+        datetime_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm'})
         sheet = workbook.add_worksheet()
         for col, name in enumerate(map(_prepare_header, headers)):
             sheet.write(0, col, name, bold)
         for row, values in enumerate(rows, 1):
-            sheet.write_row(row, 0, [_prepare_excel_data(data, tz) for data in values])
+            for col, data in enumerate(values):
+                if isinstance(data, datetime):
+                    sheet.write_datetime(row, col, data.astimezone(tz).replace(tzinfo=None), datetime_format)
+                elif isinstance(data, date):
+                    sheet.write_datetime(row, col, data, date_format)
+                else:
+                    sheet.write(row, col, _prepare_excel_data(data))
     buf.seek(0)
     return buf
 
