@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import 'core-js/es';
+import 'indico/custom_elements';
 import setup from './setup';
 import 'indico/modules/core/impersonation';
 import 'indico/modules/core/top_bars';
