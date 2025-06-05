@@ -2,8 +2,10 @@
     {% extends 'categories/management/base.html' %}
 {% elif event|default(none) %}
     {% extends 'events/management/base.html' %}
-{% else %}
+{% elif user|default(none) %}
     {% extends 'users/base.html' %}
+{% else %}
+    {% extends 'layout/admin_page.html' %}
 {% endif %}
 
 {% block title %}
