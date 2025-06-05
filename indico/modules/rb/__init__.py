@@ -12,6 +12,7 @@ from flask import session
 from indico.core import signals
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
@@ -27,7 +28,12 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 
 
 logger = Logger.get('rb')
+
 rb_cache = make_scoped_cache('roombooking')
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Location), sender=Location, weak=False)
+signals.acl.entry_changed.connect(make_acl_log_fn(Room), sender=Room, weak=False)
 
 
 class BookingReasonRequiredOptions(RichIntEnum):
