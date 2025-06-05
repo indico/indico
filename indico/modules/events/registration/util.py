@@ -568,7 +568,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
                 registration_dict[key] = departure_date or ''
             elif item.input_type == 'date':
-                if item.id not in data:
+                if item.id not in data or not data[item.id].data:  # missing or empty data for the field
                     registration_dict[key] = ''
                     continue
                 dt = datetime.fromisoformat(data[item.id].data).replace(tzinfo=tzinfo)
