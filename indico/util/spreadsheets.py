@@ -145,8 +145,8 @@ def generate_xlsx(headers, rows, tz=None):
     assert all(len(row) == len(headers) for row in rows)
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})
-        date_format = workbook.add_format({'num_format': 'yyyy/mm/dd'})
-        datetime_format = workbook.add_format({'num_format': 'yyyy/mm/dd hh:mm'})
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+        datetime_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm'})
         sheet = workbook.add_worksheet()
         for col, name in enumerate(map(_prepare_header, headers)):
             sheet.write(0, col, name, bold)
