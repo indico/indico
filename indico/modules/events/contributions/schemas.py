@@ -160,6 +160,7 @@ class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
     end_dt = EventTimezoneDateTimeField()
 
 
+# TODO: (Ajob) Evaluate this schema vs timetable one
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution

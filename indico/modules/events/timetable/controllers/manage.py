@@ -44,9 +44,13 @@ class RHManageTimetable(RHManageTimetableBase):
         event_info = serialize_event_info(self.event)
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event, management=True).serialize_timetable()
-        return WPManageTimetable.render_template('management_new.html', self.event, event_info=event_info,
-                                                 show_draft_warning=should_show_draft_warning(self.event),
-                                                 timetable_data=timetable_data)
+        return WPManageTimetable.render_template(
+            'management_new.html',
+            self.event,
+            event_info=event_info,
+            show_draft_warning=should_show_draft_warning(self.event),
+            timetable_data=timetable_data,
+        )
 
 
 class RHManageTimetableOld(RHManageTimetableBase):
@@ -57,9 +61,13 @@ class RHManageTimetableOld(RHManageTimetableBase):
     def _process(self):
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
-        return WPManageTimetableOld.render_template('management.html', self.event, event_info=event_info,
-                                                 show_draft_warning=should_show_draft_warning(self.event),
-                                                 timetable_data=timetable_data)
+        return WPManageTimetableOld.render_template(
+            'management.html',
+            self.event,
+            event_info=event_info,
+            show_draft_warning=should_show_draft_warning(self.event),
+            timetable_data=timetable_data,
+        )
 
 
 class RHManageSessionTimetable(RHManageTimetableBase):
@@ -75,11 +83,16 @@ class RHManageSessionTimetable(RHManageTimetableBase):
             'can_manage_event': self.event.can_manage(session.user),
             'can_manage_session': self.session.can_manage(session.user),
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
-            'can_manage_contributions': self.session.can_manage_contributions(session.user)
+            'can_manage_contributions': self.session.can_manage_contributions(session.user),
         }
-        return WPManageTimetable.render_template('session_management.html', self.event, event_info=event_info,
-                                                 timetable_data=timetable_data, session_=self.session,
-                                                 **management_rights)
+        return WPManageTimetable.render_template(
+            'session_management.html',
+            self.event,
+            event_info=event_info,
+            timetable_data=timetable_data,
+            session_=self.session,
+            **management_rights,
+        )
 
 
 class RHTimetableREST(RHManageTimetableEntryBase):
@@ -152,8 +165,8 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 
 # TODO: (Ajob) Full rest API endpoint
 
-class RHTimetableBreakCreate(RHManageTimetableBase):
 
+class RHTimetableBreakCreate(RHManageTimetableBase):
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
         break_entry = create_break_entry(self.event, data, extend_parent=False)
@@ -161,7 +174,6 @@ class RHTimetableBreakCreate(RHManageTimetableBase):
 
 
 class RHTimetableContributionCreate(RHManageTimetableBase):
-
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
@@ -170,7 +182,6 @@ class RHTimetableContributionCreate(RHManageTimetableBase):
 
 
 class RHTimetableSessionBlockCreate(RHManageTimetableBase):
-
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
@@ -185,20 +196,30 @@ class RHTimetableSessionBlockCreate(RHManageTimetableBase):
 class RHTimetableEntry(RHManageTimetableBase):
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
-        self.entry = self.event.timetable_entries.filter_by(
-            id=request.view_args['entry_id']
-        ).first_or_404()
+        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     # TODO: (Ajob) Clean this up and use marshmallow schemas (copy of legacy)
     @use_args_schema_context(TimetableEntrySchema, lambda self: {'event': self.event})
     def _process_PATCH(self, data):
         """Update a timetable entry."""
         from pprint import pprint
+
         print('dataaaaaaaaaaaaa')
         pprint(data)
+        print('data')
+        print(data)
+        print('entryyyyyy')
+        pprint(self.entry)
+        
         with track_time_changes():
+            print('before updatee')
             update_timetable_entry(self.entry, data)
-        return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
+            print('after updateee')
+
+        print('self entryyy')
+        pprint(self.entry)
+        print('tt_entry before')
+        return jsonify()
 
     def _process_GET(self):
         return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
@@ -218,6 +239,7 @@ class RHTimetableSessionBlock(RHManageTimetableBase):
 
 # END OF REST API
 
+
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""
 
@@ -230,8 +252,9 @@ class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
             raise NotFound
 
     def _process(self):
-        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session,
-                                         is_session_timetable=self.is_session_timetable)
+        html = render_entry_info_balloon(
+            self.entry, editable=True, sess=self.session, is_session_timetable=self.is_session_timetable
+        )
         return jsonify(html=html)
 
 
@@ -265,9 +288,7 @@ class RHCloneContribution(RHManageTimetableBase):
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
-        self.contrib = (Contribution.query.with_parent(self.event)
-                        .filter_by(id=request.args['contrib_id'])
-                        .one())
+        self.contrib = Contribution.query.with_parent(self.event).filter_by(id=request.args['contrib_id']).one()
 
     def _process(self):
         contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)

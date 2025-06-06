@@ -201,6 +201,7 @@ class IndicoModel(Model):
         """
         cls = type(self)
         changed = {}
+        print('THE CLS IS [', cls, ']')
         for key, value in data.items():
             if keys and key not in keys:
                 continue
@@ -214,6 +215,8 @@ class IndicoModel(Model):
 
             # Track the old and new value so we can log the change
             old_value = getattr(self, key, None)
+            print('the key is ', key)
+            print('the value is ', value)
             setattr(self, key, value)
             new_value = getattr(self, key)
             if old_value != new_value:
