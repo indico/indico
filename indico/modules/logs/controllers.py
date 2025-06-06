@@ -166,11 +166,18 @@ class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
 class RHResendEmail(RHManageEventBase):
     """Resend an email log entry."""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.entry
+        }
+    }
+
     def _process_args(self):
-        self.entry = EventLogEntry.get(request.view_args['log_entry_id'])
+        RHManageEventBase._process_args(self)
+        self.entry = (EventLogEntry.query.with_parent(self.event)
+                      .filter_by(id=request.view_args['log_entry_id']).first_or_404())
         if self.entry is None:
             raise NotFound('Event log entry does not exist.')
-        return super()._process_args()
 
     def _process(self):
         if self.entry.type != 'email':
@@ -186,6 +193,6 @@ class RHResendEmail(RHManageEventBase):
             html=self.entry.data['content_type'] == 'text/html',
         )
         send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
-                   log_metadata=self.entry.meta)
+                   log_metadata=self.entry.meta, log_summary=f'Resent email: {self.entry.data["subject"]}')
         flash(_('The email has been resent.'), 'success')
         return redirect(url_for('.event', self.event))
