@@ -39,7 +39,7 @@ def email_sender(fn):
     return wrapper
 
 
-def send_email(email, event=None, module=None, user=None, log_metadata=None):
+def send_email(email, event=None, module=None, user=None, log_metadata=None, log_summary=None):
     """Send an email created by :func:`make_email`.
 
     When called while inside a RH, the email will be queued and only
@@ -56,14 +56,14 @@ def send_email(email, event=None, module=None, user=None, log_metadata=None):
     fn = send_email_task.delay if config.SMTP_USE_CELERY else do_send_email
     # we log the email immediately (as pending).  if we don't commit,
     # the log message will simply be thrown away later
-    log_entry = _log_email(email, event, module, user, log_metadata)
+    log_entry = _log_email(email, event, module, user, log_metadata, log_summary)
     if 'email_queue' in g:
         g.email_queue.append((fn, email, log_entry))
     else:
         fn(email, log_entry)
 
 
-def _log_email(email, event, module, user, meta=None):
+def _log_email(email, event, module, user, meta=None, summary=None):
     from indico.modules.logs import EventLogRealm, LogKind
     if not event:
         return None
@@ -83,7 +83,7 @@ def _log_email(email, event, module, user, meta=None):
             for a in email['attachments']
         ),
     }
-    return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', log_data['subject'],
+    return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
 

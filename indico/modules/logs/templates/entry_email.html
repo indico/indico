@@ -107,11 +107,14 @@
         </td>
         <td class="i-table value">
             {% if data.state == 'pending' %}
-                {% trans %}Pending{% endtrans %}
+                {# i18n: Status #}
+                {% trans 'status' %}Pending{% endtrans %}
             {% elif data.state == 'sent' %}
-                {% trans %}Sent{% endtrans %}
+                {# i18n: Status #}
+                {% trans 'status' %}Sent{% endtrans %}
             {% elif data.state == 'failed' %}
-                {% trans %}Failed{% endtrans %}
+                {# i18n: Status #}
+                {% trans 'status' %}Failed{% endtrans %}
             {% endif %}
         </td>
     </tr>
