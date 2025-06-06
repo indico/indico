@@ -24,6 +24,8 @@ Improvements
   (:pr:`6860`)
 - Use :data:`STATIC_SITE_STORAGE` for the temporary file from a material package
   (:pr:`6898`)
+- Allow resending emails from their log entries (:issue:`6905`, :pr:`6909`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
