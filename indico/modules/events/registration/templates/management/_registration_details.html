@@ -22,10 +22,14 @@
             {% endif %}
             {{ template_hook('extra-registration-actions', registration=registration) }}
         </div>
-        {% if registration.state.name not in ('rejected', 'withdrawn') %}
-            {{ _render_withdraw_actions(registration) }}
-        {% endif %}
-        {{ _render_allow_modification(registration) if registration.is_active }}
+        {% block render_withdraw_actions scoped %}
+            {% if registration.state.name not in ('rejected', 'withdrawn') %}
+                {{ _render_withdraw_actions(registration) }}
+            {% endif %}
+        {% endblock %}
+        {% block render_allow_modification scoped %}
+            {{ _render_allow_modification(registration) if registration.is_active }}
+        {% endblock %}
         {% if all_tags %}
             <div class="action-box">
                 {{ _render_registration_tags(registration, assigned_tags, all_tags) }}

@@ -104,7 +104,7 @@
                                         {%- endif %}
                                     </span>
                                 </td>
-                                <td class="i-table duration-column">
+                                <td class="i-table duration-column" data-text="{{ contrib.duration.total_seconds()|int }}">
                                     <span class="vertical-aligner">
                                         {% if not contrib.session_block %}
                                             <a href="#" class="icon-time js-contrib-duration hide-if-locked"
@@ -115,7 +115,7 @@
                                                title="{% trans %}This contribution is scheduled within a session block and duration can't be modified.{% endtrans %}"></i>
                                         {% endif %}
                                         <span class="label">
-                                            {{ contrib.duration|format_human_timedelta(narrow=true) if contrib.duration else 'n/a' }}
+                                            {{ contrib.duration|format_human_timedelta(narrow=true) }}
                                         </span>
                                     </span>
                                 </td>

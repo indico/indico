@@ -629,7 +629,8 @@ def search_affiliations(q):
     )
 
 
-def log_user_update(user, changes, *, from_sync=False):
+@make_interceptable
+def log_user_update(user, changes, *, from_sync=False, _extra_log_fields=None):
     log_fields = {
         '_title': 'Title',
         'synced_fields': 'Synced fields',
@@ -643,6 +644,7 @@ def log_user_update(user, changes, *, from_sync=False):
             'type': 'number',
             'convert': lambda changes: [x.id if x else None for x in changes]
         },
+        **(_extra_log_fields or {})
     }
     if len(changes) == 1:
         what = log_fields[list(changes)[0]]

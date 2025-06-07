@@ -20,6 +20,7 @@ from indico.modules.events.registration.controllers.management.fields import _fi
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
                                                      get_registered_event_persons, get_ticket_qr_code_data,
                                                      get_user_data, import_invitations_from_csv,
@@ -628,6 +629,21 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 3}
     assert not reg.data_by_field[checkbox_field.id].data
     assert reg.data_by_field[new_multi_choice_field.id].data == {}
+
+
+@pytest.mark.usefixtures('request_context')
+def test_modify_registration_update_consent(dummy_reg):
+    # Ensure that consent_to_publish is updated appropriately
+    changes = {'consent_to_publish': RegistrationVisibility.all}
+    modify_registration(dummy_reg, changes, management=False, notify_user=False)
+    assert dummy_reg.consent_to_publish == RegistrationVisibility.all
+
+    # 'consent_to_publish' is not in the changes and thus should not be modified
+    changes = {}
+    # Set consent_to_publish to a non-default value
+    dummy_reg.consent_to_publish = RegistrationVisibility.all
+    modify_registration(dummy_reg, changes, management=False, notify_user=False)
+    assert dummy_reg.consent_to_publish == RegistrationVisibility.all
 
 
 @pytest.mark.usefixtures('request_context')

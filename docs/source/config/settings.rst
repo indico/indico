@@ -806,8 +806,10 @@ Storage
 .. data:: STATIC_SITE_STORAGE
 
     The name of the storage backend used to store "offline copies" of
-    events.  Files are written to this backend when generating an offline
-    copy and deleted after a certain amount of time.
+    events and material packages.  Files are written to this backend when generating
+    an offline copy and deleted after a certain amount of time.  When someone requests
+    a material package for an event, it is also written to this backend, and deleted
+    about a day later.
 
     If not set, the :data:`ATTACHMENT_STORAGE` backend is used.
 

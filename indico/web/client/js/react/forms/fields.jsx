@@ -425,7 +425,12 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
   } else if (type === 'text' || type === 'email' || type === 'tel') {
     extraProps.format = formatters.trim;
     extraProps.formatOnBlur = true;
-    extraProps.parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+    const parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+    if (type === 'email') {
+      extraProps.parse = v => parse(v.toLowerCase());
+    } else {
+      extraProps.parse = parse;
+    }
   }
 
   if (noAutoComplete) {
@@ -547,18 +552,19 @@ FinalRadio.propTypes = {
 /**
  * Like `FinalField` but for a dropdown.
  */
-export function FinalDropdown({name, label, multiple, ...rest}) {
+export function FinalDropdown({name, label, multiple, nullIfEmpty, ...rest}) {
   const extraProps = {};
   if (multiple) {
     extraProps.isEqual = unsortedArraysEqual;
   }
+  const parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
   return (
     <FinalField
       name={name}
       adapter={DropdownAdapter}
       label={label}
       format={identity}
-      parse={identity}
+      parse={parse}
       search
       deburr
       // https://github.com/final-form/react-final-form/issues/544
@@ -573,11 +579,13 @@ FinalDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   multiple: PropTypes.bool,
+  nullIfEmpty: PropTypes.bool,
 };
 
 FinalDropdown.defaultProps = {
   label: null,
   multiple: false,
+  nullIfEmpty: false,
 };
 
 /**

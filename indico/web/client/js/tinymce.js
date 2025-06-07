@@ -225,6 +225,7 @@ export const getConfig = (
         .filter(x => x)
         .join(' '),
   entity_encoding: 'raw',
+  browser_spellcheck: true,
   convert_unsafe_embeds: true,
   sandbox_iframes: true,
   relative_urls: false, // kind of misleading: this just ensures domain-relative URLs

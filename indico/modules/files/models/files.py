@@ -82,12 +82,15 @@ class File(StoredFileMixin, db.Model):
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
         path = posixpath.join(*path_segments, filename)
-        return config.ATTACHMENT_STORAGE, path
+        backend = self.__backend or config.ATTACHMENT_STORAGE
+        return backend, path
 
-    def save(self, context, data):
+    def save(self, context, data, *, backend=None):
         self.__context = context
+        self.__backend = backend
         super().save(data)
         del self.__context
+        del self.__backend
 
     @property
     def signed_download_url(self):

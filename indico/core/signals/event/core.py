@@ -35,12 +35,16 @@ the order or some data on the person link).
 
 cloned = _signals.signal('cloned', '''
 Called when an event is cloned. The *sender* is the `Event` object of
-the old event, the new event is passed in the `new_event` kwarg.
+the old event, the new event is passed in the `new_event` kwarg. The cloners
+that were used are passed in the `used_cloners` kwarg and the shared data
+of these cloners is passed in the `shared_data` kwarg.
 ''')
 
 imported = _signals.signal('imported', '''
 Called when data is imported to an event. The *sender* is the `Event`
 data was imported into, the source event is passed in the `source_event` kwarg.
+The cloners that were used are passed in the `used_cloners` kwarg and the shared
+data of these cloners is passed in the `shared_data` kwarg.
 ''')
 
 type_changed = _signals.signal('type-changed', '''

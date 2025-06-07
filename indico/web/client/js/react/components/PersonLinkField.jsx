@@ -292,14 +292,14 @@ function PersonLinkField({
   };
 
   const onAdd = values => {
-    const existing = persons.filter(p => !!p.email).map(p => p.email);
+    const existing = persons.filter(p => !!p.email).map(p => p.email.toLowerCase());
     const hooks = getPluginObjects('onAddPersonLink');
     values.forEach(p => {
       p.name = formatName(p);
       p.roles = roles.filter(x => x.default).map(x => x.name);
       hooks.forEach(f => f(p));
     });
-    onChange([...persons, ...values.filter(v => !existing.includes(v.email))]);
+    onChange([...persons, ...values.filter(v => !existing.includes(v.email.toLowerCase()))]);
   };
 
   const onSubmit = value => {

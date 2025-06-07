@@ -76,7 +76,7 @@ export const isPaidItemLocked = createSelector(
     } else if (field.price > 0) {
       // easy for fields that have a price themselves
       return true;
-    } else if (value !== undefined && field.choices) {
+    } else if (value !== undefined && value !== null && field.choices) {
       // we assume that all fields with more complex options have them in `choices`,
       // and that a billable choice will have a `price`. if the old value is undefined,
       // we never disable the field altogether since some choices could in fact be free,

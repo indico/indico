@@ -50,7 +50,7 @@ function EventImageOption({identifier, filename, preview}) {
         {!preview && (
           <Popup
             content={Translate.string(
-              'This field only accepts jpg, png, gif and webp picture formats.'
+              'This field only accepts jpg, png, gif and webp picture formats, and extremely large images cannot be used.'
             )}
             trigger={<Icon name="warning sign" />}
           />

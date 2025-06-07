@@ -52,7 +52,7 @@ docutils==0.21.2
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-flask==3.1.0
+flask==3.1.1
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -64,7 +64,7 @@ greenlet==3.1.1
     # via
     #   -c requirements.txt
     #   sqlalchemy
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 hatch-requirements-txt==0.4.1
     # via -r requirements.dev.in
@@ -95,6 +95,7 @@ jinja2==3.1.6
 markupsafe==3.0.2
     # via
     #   -c requirements.txt
+    #   flask
     #   jinja2
     #   werkzeug
 migra==3.0.1663481299
@@ -168,7 +169,7 @@ requests==2.32.3
     #   sphinx
 responses==0.25.3
     # via -r requirements.dev.in
-ruff==0.11.2
+ruff==0.11.8
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -242,7 +243,7 @@ urllib3==1.26.20
     #   -c requirements.txt
     #   requests
     #   responses
-uv==0.6.9
+uv==0.7.3
     # via -r requirements.dev.in
 uvicorn==0.32.1
     # via sphinx-autobuild

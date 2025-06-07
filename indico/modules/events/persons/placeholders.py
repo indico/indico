@@ -11,6 +11,7 @@ from indico.modules.auth.util import url_for_register
 from indico.modules.events.contributions.util import get_contributions_for_person
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users.models.users import User
+from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 from indico.web.flask.templating import get_template_module
@@ -106,6 +107,28 @@ class ContributionCodePlaceholder(Placeholder):
     @classmethod
     def render(cls, contribution, **kwargs):
         return str(contribution.code)
+
+
+class ContributionDurationPlaceholder(Placeholder):
+    name = 'contribution_duration'
+    description = _('The duration of the contribution (e.g. "20 minutes")')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        with contribution.event.force_event_locale():
+            return format_human_timedelta(contribution.duration, 'minutes')
+
+
+class ContributionSchedulePlaceholder(Placeholder):
+    name = 'contribution_schedule'
+    description = _('The scheduled date/time of the contribution, or "n/a" if unscheduled')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        with contribution.event.force_event_locale():
+            if not contribution.start_dt:
+                return _('n/a')
+            return format_datetime(contribution.start_dt, timezone=contribution.event.tzinfo)
 
 
 class AbstractIDPlaceholder(Placeholder):

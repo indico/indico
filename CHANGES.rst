@@ -21,6 +21,11 @@ Improvements
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
 - Improve the booking linking feature (:issue:`6568`, :issue:`6811`, :pr:`6846`,
   thanks :user:`Moliholy, unconventionaldotdev`).
+- Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
+- Add duration and date/time placeholders when sending emails for contributions
+  (:pr:`6860`)
+- Use :data:`STATIC_SITE_STORAGE` for the temporary file from a material package
+  (:pr:`6898`)
 
 Bugfixes
 ^^^^^^^^
@@ -30,6 +35,22 @@ Bugfixes
 - Do not trigger notifications for withdrawn service requests when deleting past events
   (:issue:`6700`, :pr:`6754`, thanks :user:`bhngupta`)
 - Fix date picker on category calendar view (:issue:`6849`, :pr:`6850`)
+- Fix scheduling existing contributions not working in rare cirucmstances (:pr:`6853`)
+- Convert author/speaker email addresses to lowercase during input and use the lowercase
+  version for deduplication (:pr:`6855`)
+- Fix error when removing the title of an event person (:pr:`6859`)
+- Fix participant visibility being set to "nobody" when a registration was modifified
+  (:pr:`6863`)
+- Fix error when editing a room while no custom attributes have been defined (:pr:`6840`)
+- Allow the browser to perform spellchecking in the HTML/WYSIWYG minutes editor (:pr:`6890`)
+- Fix downdown/combobox issues on iOS Safari devices (:issue:`6830`, :pr:`6839`, thanks
+  :user:`foxbunny`)
+- Fix font rendering issue in event titles with some cyrillic characters (:issue:`6673`,
+  :pr:`6881`, thanks :user:`Fedor204`)
+- Include registration tags in event export (:pr:`6896`)
+- Fix some messages not being translated due to a missing context (:pr:`6910`)
+- Fix datetime handling in excel exports (:issue:`6806`, :pr:`6887`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -39,7 +60,11 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Expose cloning details such as object mappings in the ``event.cloned`` signal (:pr:`6858`)
+- Expose cloning details in the ``contribution.created`` and ``subcontribution.created``
+  signals (:pr:`6858`)
+- Add the id and color of registration tags on the Checkin API endpoint for registation
+  data (:pr:`6874`, thanks :user:`duartegalvao`)
 
 
 Version 3.3.6

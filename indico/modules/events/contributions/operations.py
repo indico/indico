@@ -64,7 +64,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     db.session.flush()
     if start_dt is not None:
         schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
-    signals.event.contribution_created.send(contrib)
+    signals.event.contribution_created.send(contrib, cloned_from=None)
     logger.info('Contribution %s created by %s', contrib, user)
     contrib.log(EventLogRealm.management, LogKind.positive, 'Contributions',
                 f'Contribution {contrib.verbose_title} has been created', user)
@@ -133,7 +133,7 @@ def create_subcontribution(contrib, data):
     subcontrib.populate_from_dict(data)
     contrib.subcontributions.append(subcontrib)
     db.session.flush()
-    signals.event.subcontribution_created.send(subcontrib)
+    signals.event.subcontribution_created.send(subcontrib, cloned_from=None)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
     subcontrib.event.log(EventLogRealm.management, LogKind.positive, 'Subcontributions',
                          f'Subcontribution "{subcontrib.title}" has been created', session.user,

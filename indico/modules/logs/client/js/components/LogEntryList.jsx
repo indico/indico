@@ -114,7 +114,11 @@ export default class LogEntryList extends React.PureComponent {
   };
 
   renderEmpty() {
-    return <MessageBox type="info">No logs to show</MessageBox>;
+    return (
+      <MessageBox type="info">
+        <Translate>No logs to show</Translate>
+      </MessageBox>
+    );
   }
 
   renderSpinner() {

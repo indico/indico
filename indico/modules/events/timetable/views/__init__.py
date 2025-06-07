@@ -18,6 +18,7 @@ from indico.modules.events.timetable.util import get_nested_timetable, get_neste
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplayBase
+from indico.util.mathjax import MathjaxMixin
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import register_template_hook, template_hook
 
@@ -25,10 +26,10 @@ from indico.web.flask.templating import register_template_hook, template_hook
 register_template_hook('week-meeting-body', inject_week_timetable)
 
 
-class WPManageTimetable(WPEventManagement):
+class WPManageTimetable(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/timetable/'
     sidemenu_option = 'timetable'
-    bundles = ('module_events.contributions.js',)
+    bundles = ('markdown.js', 'module_events.contributions.js')
 
     def __init__(self, rh, event_, **kwargs):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))

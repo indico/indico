@@ -265,7 +265,7 @@ def reset_editable(revision):
     _ensure_revision_can_be_updated(revision)
     editable = revision.editable
     old_state = editable.state
-    if old_state != EditableState.accepted:
+    if old_state not in (EditableState.accepted, EditableState.accepted_submitter):
         return
     was_published = editable.published_revision is not None
     editable.published_revision = None
