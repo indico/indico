@@ -223,10 +223,14 @@ class CalendarListView extends React.Component {
       actions: {openBookingDetails},
     } = this.props;
     const {reservation} = booking;
-    const {room, isAccepted} = reservation;
+    const {room, isAccepted, bookedBySelf, bookedForSelf} = reservation;
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
     let datesMatch = false;
     if (linkData) {
+      // Do not render the booking if it cannot be linked.
+      if (!bookedBySelf && !bookedForSelf) {
+        return null;
+      }
       const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
       datesMatch =
         moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
