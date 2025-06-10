@@ -13,13 +13,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setHiddenItemIds} from '../form_submission/actions';
 
 import {getFieldRegistry} from './fields/registry';
-import {getHiddenItemIds, getItems} from './selectors';
+import {getHiddenItemIds, getHiddenItemsInitialized, getItems} from './selectors';
 
 export default function ConditionalFieldsController() {
   const {values} = useFormState({subscription: {values: true}});
   const dispatch = useDispatch();
   const fields = useSelector(getItems);
   const currentlyHiddenItemIds = useSelector(getHiddenItemIds);
+  const hiddenItemsInitialized = useSelector(getHiddenItemsInitialized);
   const fieldRegistry = getFieldRegistry();
 
   const hiddenItemIds = Object.values(fields)
@@ -37,9 +38,9 @@ export default function ConditionalFieldsController() {
     .filter(id => id !== null);
 
   useEffect(() => {
-    if (!_.isEqual(currentlyHiddenItemIds, hiddenItemIds)) {
+    if (!hiddenItemsInitialized || !_.isEqual(currentlyHiddenItemIds, hiddenItemIds)) {
       dispatch(setHiddenItemIds(hiddenItemIds));
     }
-  }, [dispatch, currentlyHiddenItemIds, hiddenItemIds]);
+  }, [dispatch, hiddenItemsInitialized, currentlyHiddenItemIds, hiddenItemIds]);
   return null;
 }
