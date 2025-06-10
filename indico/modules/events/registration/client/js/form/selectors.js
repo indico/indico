@@ -14,7 +14,8 @@ export const getStaticData = state => state.staticData;
 
 export const getFlatSections = state => state.sections;
 export const getItems = state => state.items;
-export const getHiddenItemIds = state => state.hiddenItemIds;
+export const getHiddenItemsInitialized = state => state.hiddenItems.ready;
+export const getHiddenItemIds = state => state.hiddenItems.ids;
 
 /** Get an item by its ID. */
 export const getItemById = createSelector(

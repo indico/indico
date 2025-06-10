@@ -136,10 +136,10 @@ export default {
         return state;
     }
   },
-  hiddenItemIds: (state = [], action) => {
+  hiddenItems: (state = {ids: [], ready: false}, action) => {
     switch (action.type) {
       case SET_HIDDEN_ITEM_IDS:
-        return action.hiddenItemIds;
+        return {ids: action.hiddenItemIds, ready: true};
       default:
         return state;
     }
