@@ -53,7 +53,7 @@ pytz==2024.2
     # via flask-babel
 pyyaml==6.0.2
     # via sphinxcontrib-mermaid
-requests==2.32.3
+requests==2.32.4
     # via
     #   plantweb
     #   sphinx
