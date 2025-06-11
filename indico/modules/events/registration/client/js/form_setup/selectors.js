@@ -73,3 +73,9 @@ export const getDataRetentionRange = createSelector(
   getStaticData,
   staticData => staticData.dataRetentionRange
 );
+
+/** Return whether the field is a condition for another field */
+export const isFieldConditionFor = createSelector(
+  getItemById,
+  item => !!item.showIfConditionForTransitive.length
+);

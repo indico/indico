@@ -326,6 +326,11 @@
     i + i {
       margin-left: 3px;
     }
+
+    a:global(.disabled) {
+      color: $gray;
+      cursor: not-allowed;
+    }
   }
 
   &.editable {

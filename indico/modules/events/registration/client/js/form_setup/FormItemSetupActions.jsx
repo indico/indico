@@ -7,13 +7,14 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {RequestConfirmDelete} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import ItemSettingsModal from './ItemSettingsModal';
+import {isFieldConditionFor} from './selectors';
 
 export default function FormItemSetupActions({
   id,
@@ -25,6 +26,7 @@ export default function FormItemSetupActions({
   const dispatch = useDispatch();
   const [settingsModalActive, setSettingsModalActive] = useState(false);
   const [confirmDeleteActive, setConfirmDeleteActive] = useState(false);
+  const isCondition = useSelector(state => isFieldConditionFor(state, id));
 
   const handleEnableClick = () => {
     dispatch(actions.enableItem(id));
@@ -46,8 +48,12 @@ export default function FormItemSetupActions({
     <>
       {!fieldIsPersonalData && (
         <a
-          className="icon-remove hide-if-locked"
-          title={Translate.string('Remove field')}
+          className={`icon-remove hide-if-locked ${isCondition ? 'disabled' : ''}`}
+          title={
+            isCondition
+              ? Translate.string('Fields that are a condition for other fields cannot be deleted.')
+              : Translate.string('Delete field')
+          }
           onClick={handleRemoveClick}
         />
       )}
@@ -60,8 +66,12 @@ export default function FormItemSetupActions({
       )}
       {!fieldIsRequired && isEnabled && (
         <a
-          className="icon-disable hide-if-locked"
-          title={Translate.string('Disable field')}
+          className={`icon-disable hide-if-locked ${isCondition ? 'disabled' : ''}`}
+          title={
+            isCondition
+              ? Translate.string('Fields that are a condition for other fields cannot be disabled.')
+              : Translate.string('Disable field')
+          }
           onClick={handleDisableClick}
         />
       )}
