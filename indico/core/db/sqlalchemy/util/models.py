@@ -201,7 +201,6 @@ class IndicoModel(Model):
         """
         cls = type(self)
         changed = {}
-        print('THE CLS IS [', cls, ']')
         for key, value in data.items():
             if keys and key not in keys:
                 continue

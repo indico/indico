@@ -12,8 +12,8 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
-from indico.modules.events.contributions.operations import delete_contribution
-from indico.modules.events.contributions.schemas import ContributionSchema
+from indico.modules.events.contributions.controllers.management import RHManageContributionBase
+from indico.modules.events.contributions.operations import delete_contribution, update_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
@@ -25,12 +25,12 @@ from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_contribution_entry,
                                                         create_session_block_entry, create_timetable_entry,
                                                         delete_timetable_entry, update_timetable_entry)
-from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
+from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, TimetableEntrySchema
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
-from indico.modules.events.util import should_show_draft_warning, track_time_changes
-from indico.web.args import use_args_schema_context
+from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
+from indico.web.args import use_args, use_args_schema_context
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -166,22 +166,43 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 # TODO: (Ajob) Full rest API endpoint
 
 
-class RHTimetableBreakCreate(RHManageTimetableBase):
+class RHTimetableBreak(RHManageTimetableBase):
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
         break_entry = create_break_entry(self.event, data, extend_parent=False)
         return TimetableEntrySchema(context={'event': self.event}).jsonify(break_entry)
 
 
-class RHTimetableContributionCreate(RHManageTimetableBase):
+class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
         return TimetableEntrySchema(context={'event': self.event}).jsonify(contrib_entry)
 
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
+    def _process_PATCH(self, data):
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
 
-class RHTimetableSessionBlockCreate(RHManageTimetableBase):
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        
+        # TODO: (Ajob)  Find cleaner solution for marshmallow alias. I think there's already something there
+        #               in the schema itself called marshmallow_alias which makes _description into description
+        #               but it doesn't work for dumping, only for loading.
+        data['description'] = data['_description']
+        del data['_description']
+        
+        with (track_time_changes(), track_location_changes()):
+            update_contribution(self.contrib, data)
+        
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+
+    def _process_GET(self):
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+
+
+class RHTimetableSessionBlock(RHManageTimetableBase):
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
@@ -193,48 +214,21 @@ class RHTimetableSessionBlockCreate(RHManageTimetableBase):
         return TimetableEntrySchema(context={'event': self.event}).jsonify(block_entry)
 
 
+
 class RHTimetableEntry(RHManageTimetableBase):
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     # TODO: (Ajob) Clean this up and use marshmallow schemas (copy of legacy)
-    @use_args_schema_context(TimetableEntrySchema, lambda self: {'event': self.event})
+    # @use_args_schema_context(TimetableEntrySchema, lambda self: {'event': self.event})
     def _process_PATCH(self, data):
         """Update a timetable entry."""
-        from pprint import pprint
-
-        print('dataaaaaaaaaaaaa')
-        pprint(data)
-        print('data')
-        print(data)
-        print('entryyyyyy')
-        pprint(self.entry)
-        
-        with track_time_changes():
-            print('before updatee')
-            update_timetable_entry(self.entry, data)
-            print('after updateee')
-
-        print('self entryyy')
-        pprint(self.entry)
-        print('tt_entry before')
-        return jsonify()
+        return data
 
     def _process_GET(self):
         return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
-
-
-class RHTimetableContribution(RHManageTimetableBase):
-    pass  # TODO: Evaluate if needed
-
-
-class RHTimetableBreak(RHManageTimetableBase):
-    pass  # TODO: Evaluate if needed
-
-
-class RHTimetableSessionBlock(RHManageTimetableBase):
-    pass  # TODO: Evaluate if needed
+        
 
 
 # END OF REST API

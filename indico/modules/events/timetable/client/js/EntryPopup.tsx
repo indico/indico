@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import entryURL from 'indico-url:timetable.tt_entry';
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment from 'moment';
 import React from 'react';
@@ -76,9 +78,18 @@ function TimetablePopupContent({
   const onEdit = async (e: MouseEvent) => {
     onClose();
     e.stopPropagation();
+    console.group(draftEntry);
     if (draftEntry.id) {
       // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
-      const {data} = await indicoAxios.get(entryURL({event_id: eventId, entry_id: draftEntry.id}));
+      const editURL = {
+        [EntryType.Contribution]: contributionURL,
+        [EntryType.SessionBlock]: sessionBlockURL,
+        [EntryType.Break]: breakURL,
+      }[type];
+
+      const {data} = await indicoAxios.get(
+        editURL({event_id: eventId, [`${type}_id`]: draftEntry.id})
+      );
       draftEntry = mapTTDataToEntry(data);
       dispatch(actions.setDraftEntry(draftEntry));
     }

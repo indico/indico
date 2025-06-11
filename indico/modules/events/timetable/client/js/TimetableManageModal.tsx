@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import entryURL from 'indico-url:timetable.tt_entry';
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
+import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
@@ -119,8 +121,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     code: entry.code,
   };
 
-  console.log('initialvalueesss', initialValues);
-
   const typeLongNames = {
     [EntryType.Contribution]: Translate.string('Contribution'),
     [EntryType.SessionBlock]: Translate.string('Session Block'),
@@ -148,7 +148,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     [EntryType.SessionBlock]: sessionValues.length ? (
       <>
         {!isEditing && <SessionSelect sessions={sessionValues} required />}
-        <SessionBlockFormFields eventId={eventId} extraOptions={extraOptions} />
+        <SessionBlockFormFields
+          eventId={eventId}
+          extraOptions={extraOptions}
+          locationParent={null}
+        />
       </>
     ) : (
       <Message
@@ -223,21 +227,25 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const _handleEditContribution = async data => {
     // TODO: (Ajob) Implement edit contribution
     console.log(`edited contri ${entry.id}`, data);
-    console.log(await indicoAxios.patch(entryURL({event_id: eventId, entry_id: entry.id}), data));
+    console.log(
+      await indicoAxios.patch(contributionURL({event_id: eventId, contrib: entry.id}), data)
+    );
     return {data, object: {}};
   };
 
   const _handleEditSessionBlock = async data => {
     // TODO: (Ajob) Implement edit session block
     console.log(`edited session block ${entry.id}`, data);
-    // return await indicoAxios.patch(entryURL({event_id: eventId, data.id}), data);
+    console.log(
+      await indicoAxios.patch(sessionBlockURL({event_id: eventId, entry_id: entry.id}), data)
+    );
     return {data, object: {}};
   };
 
   const _handleEditBreak = async data => {
     // TODO: (Ajob) Implement edit break
     console.log(`edited break ${entry.id}`, data);
-    // return await indicoAxios.patch(entryURL({event_id: eventId, data.id}), data);
+    console.log(await indicoAxios.patch(breakURL({event_id: eventId, entry_id: entry.id}), data));
     return {data, object: {}};
   };
 
