@@ -14,12 +14,13 @@ import {FinalDropdown} from 'indico/react/forms';
 import {Fieldset, unsortedArraysEqual} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {getItems} from '../selectors';
+import {getItems, getFlatSections} from '../selectors';
 
 import {getFieldRegistry} from './registry';
 
 export function ShowIfInput({fieldId: thisFieldId}) {
   const fields = useSelector(getItems);
+  const sections = useSelector(getFlatSections);
   const fieldRegistry = getFieldRegistry();
   const form = useForm();
 
@@ -34,9 +35,9 @@ export function ShowIfInput({fieldId: thisFieldId}) {
           .filter(
             ({id, inputType}) => id !== thisFieldId && !!fieldRegistry[inputType].showIfOptions
           )
-          .map(({title, id: fieldId, isEnabled}) => ({
+          .map(({title, id: fieldId, sectionId, isEnabled}) => ({
             value: fieldId,
-            text: title,
+            text: `${sections[sectionId].title} » ${title}`,
             disabled: !isEnabled,
           }))}
         closeOnChange
