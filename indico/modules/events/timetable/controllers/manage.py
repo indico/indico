@@ -10,10 +10,13 @@ from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import RHManageContributionBase
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import delete_contribution, update_contribution
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
@@ -200,6 +203,18 @@ class RHTimetableContribution(RHManageContributionBase):
 
     def _process_GET(self):
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+    
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
 
 
 class RHTimetableSessionBlock(RHManageTimetableBase):

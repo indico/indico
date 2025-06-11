@@ -228,7 +228,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // TODO: (Ajob) Implement edit contribution
     console.log(`edited contri ${entry.id}`, data);
     console.log(
-      await indicoAxios.patch(contributionURL({event_id: eventId, contrib: entry.id}), data)
+      await indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data)
     );
     return {data, object: {}};
   };
@@ -237,7 +237,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // TODO: (Ajob) Implement edit session block
     console.log(`edited session block ${entry.id}`, data);
     console.log(
-      await indicoAxios.patch(sessionBlockURL({event_id: eventId, entry_id: entry.id}), data)
+      await indicoAxios.patch(
+        sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
+        data
+      )
     );
     return {data, object: {}};
   };
@@ -245,7 +248,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const _handleEditBreak = async data => {
     // TODO: (Ajob) Implement edit break
     console.log(`edited break ${entry.id}`, data);
-    console.log(await indicoAxios.patch(breakURL({event_id: eventId, entry_id: entry.id}), data));
+    console.log(await indicoAxios.patch(breakURL({event_id: eventId, break_id: entry.id}), data));
     return {data, object: {}};
   };
 
