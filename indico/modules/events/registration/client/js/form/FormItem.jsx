@@ -66,7 +66,7 @@ ItemLocked.propTypes = {
 };
 
 function ItemConditional({reason}) {
-  return <Popup trigger={<Icon name="hide" styleName="conditional" />}>{reason}</Popup>;
+  return <Popup trigger={<Icon name="code branch" styleName="conditional" />}>{reason}</Popup>;
 }
 
 ItemConditional.propTypes = {
