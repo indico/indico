@@ -37,6 +37,7 @@ export default function DateRangePicker({
   onChange,
   onFocus,
   onBlur,
+  filter,
 }) {
   format ??= moment.localeData().longDateFormat('L');
 
@@ -143,8 +144,8 @@ export default function DateRangePicker({
 
       <DatePickerCalendar>
         <div className="calendars">
-          <DatePickerGrid includeMonthHeader />
-          <DatePickerGrid includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
         </div>
       </DatePickerCalendar>
     </ind-date-range-picker>
@@ -173,6 +174,7 @@ DateRangePicker.propTypes = {
   rangeEndMax: PropTypes.string,
   min: PropTypes.string,
   max: PropTypes.string,
+  filter: PropTypes.func,
 };
 
 DateRangePicker.defaultProps = {
@@ -191,6 +193,7 @@ DateRangePicker.defaultProps = {
   rangeEndMax: '',
   min: '',
   max: '',
+  filter: undefined,
 };
 
 function validDate(key, required, invalidMessage, missingMessage) {

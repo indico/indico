@@ -24,6 +24,7 @@ export default function DatePicker({
   invalidValue = INVALID,
   min,
   max,
+  filter,
   ...inputProps
 }) {
   function handleDateChange(evt) {
@@ -57,7 +58,7 @@ export default function DatePicker({
       </button>
 
       <DatePickerCalendar>
-        <DatePickerGrid />
+        <DatePickerGrid filter={filter} />
       </DatePickerCalendar>
 
       <span className="date-format" data-format>
@@ -76,6 +77,7 @@ DatePicker.propTypes = {
   invalidValue: PropTypes.any,
   min: PropTypes.string,
   max: PropTypes.string,
+  filter: PropTypes.func,
 };
 
 DatePicker.defaultProps = {
@@ -83,6 +85,7 @@ DatePicker.defaultProps = {
   format: undefined,
   min: undefined,
   max: undefined,
+  filter: undefined,
 };
 
 /** Like DatePicker, but using a range-like value */
