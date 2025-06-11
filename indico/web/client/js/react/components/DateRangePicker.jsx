@@ -88,6 +88,7 @@ export default function DateRangePicker({
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
       range-end-max={rangeEndMax}
+      format={format}
       onChange={handleChange}
     >
       <fieldset>

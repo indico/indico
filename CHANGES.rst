@@ -49,6 +49,8 @@ Bugfixes
 - Fix some messages not being translated due to a missing context (:pr:`6910`)
 - Fix datetime handling in excel exports (:issue:`6806`, :pr:`6887`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Fix date range picker not working in some languages (e.g. Japanese) (:issue:`6921`,
+  :pr:`6922`)
 
 Accessibility
 ^^^^^^^^^^^^^
