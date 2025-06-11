@@ -67,32 +67,20 @@ export const mapPersonLinkToSchema = data => ({
 
 export const mapTTDataToEntry = (data): TopLevelEntry => {
   const {
-    type: rawType,
+    type,
     start_dt: startDt,
     id,
     duration,
-    object: {
-      title,
-      description,
-      person_links: personLinks,
-      colors,
-      board_number: boardNumber,
-      location_data: location,
-      code,
-      keywords,
-      session_id: sessionId,
-    },
+    title,
+    description,
+    person_links: personLinks,
+    colors,
+    board_number: boardNumber,
+    location_data: location,
+    code,
+    keywords,
+    session_id: sessionId,
   } = data;
-
-  const type = {
-    BREAK: EntryType.Break,
-    CONTRIBUTION: EntryType.Contribution,
-    SESSION_BLOCK: EntryType.SessionBlock,
-  }[rawType];
-
-  if (!type) {
-    throw new Error('Invalid entry type', rawType);
-  }
 
   const mappedObj = {
     id: id || -1,

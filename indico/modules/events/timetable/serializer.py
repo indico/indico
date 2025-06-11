@@ -123,11 +123,11 @@ class TimetableSerializer:
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
-                     'sessionSlotId': block.id,
+                     'sessionBlockId': block.id,
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
                      'title': block.session.title,
-                     'slotTitle': block.title,
+                     'blockTitle': block.title,
                      'attachments': self._get_attachment_data(block.session),
                      'code': block.session.code,
                      'contribDuration': block.session.default_contribution_duration.seconds / 60,
@@ -167,8 +167,8 @@ class TimetableSerializer:
                      'code': contribution.code,
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
-                     'sessionSlotId': block.id if block else None,
-                     'sessionSlotEntryId': entry.parent.id if entry.parent else None,
+                    #  'sessionSlotId': block.id if block else None,
+                    #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
@@ -192,12 +192,13 @@ class TimetableSerializer:
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
+                     'breakId': break_.id,
                      'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
                      'sessionCode': block.session.code if block else None,
-                     'sessionSlotId': block.id if block else None,
-                     'sessionSlotEntryId': entry.parent.id if entry.parent else None,
+                    #  'sessionSlotId': block.id if block else None,
+                    #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': break_.title})
         return data
 
@@ -254,7 +255,6 @@ class TimetableSerializer:
                 'endDate': self._get_entry_date_dt(end_dt, tzinfo)}
 
     def _get_entry_data(self, entry):
-        from indico.modules.events.timetable.operations import can_swap_entry
         data = {}
         data.update(self._get_date_data(entry))
         data['id'] = self._get_entry_key(entry)
@@ -264,8 +264,6 @@ class TimetableSerializer:
             data['isParallel'] = entry.is_parallel()
             data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
-            data['canSwapUp'] = can_swap_entry(entry, direction='up')
-            data['canSwapDown'] = can_swap_entry(entry, direction='down')
         return data
 
     def _get_entry_key(self, entry):
@@ -344,36 +342,14 @@ def _serialize_contribution(contribution):
                  'code': contribution.code,
                  'sessionCode': None,
                  'sessionId': contribution.session.id if contribution.session else None,
-                 'sessionSlotId': None,
-                 'sessionSlotEntryId': None,
+                #  'sessionSlotId': None,
+                #  'sessionSlotEntryId': None,
                  'title': contribution.title,
                  'url': url_for('contributions.display_contribution', contribution),
                  'friendlyId': contribution.friendly_id,
                  'references': [],
                  'board_number': contribution.board_number})
     return data
-
-
-def serialize_day_update(event, day, block=None, session_=None):
-    serializer = TimetableSerializer(event, management=True)
-    timetable = serializer.serialize_session_timetable(session_) if session_ else serializer.serialize_timetable()
-    block_id = serializer._get_entry_key(block) if block else None
-    day = day.strftime('%Y%m%d')
-    return {'day': day,
-            'entries': timetable[day] if not block else timetable[day][block_id]['entries'],
-            'slotEntry': serializer.serialize_session_block_entry(block) if block else None}
-
-
-def serialize_entry_update(entry, session_=None):
-    serializer = TimetableSerializer(entry.event, management=True)
-    day = entry.start_dt.astimezone(entry.event.tzinfo)
-    day_update = serialize_day_update(entry.event, day, block=entry.parent, session_=session_)
-    return {
-        'id': serializer._get_entry_key(entry),
-        'entry': serializer.serialize_timetable_entry(entry),
-        'autoOps': None,
-        **day_update
-    }
 
 
 def serialize_event_info(event):

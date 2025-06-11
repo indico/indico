@@ -79,6 +79,8 @@ function TimetablePopupContent({
     onClose();
     e.stopPropagation();
     console.group(draftEntry);
+    console.log('drat entry entry');
+    console.log(draftEntry);
     if (draftEntry.id) {
       // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
       const editURL = {
@@ -86,10 +88,14 @@ function TimetablePopupContent({
         [EntryType.SessionBlock]: sessionBlockURL,
         [EntryType.Break]: breakURL,
       }[type];
+      const editId = {
+        [EntryType.Contribution]: entry.contributionId,
+        [EntryType.SessionBlock]: entry.sessionBlockId,
+        [EntryType.Break]: entry.breakId,
+      }[type];
 
-      const {data} = await indicoAxios.get(
-        editURL({event_id: eventId, [`${type}_id`]: draftEntry.id})
-      );
+      const {data} = await indicoAxios.get(editURL({event_id: eventId, [`${type}_id`]: editId}));
+      data['type'] = type;
       draftEntry = mapTTDataToEntry(data);
       dispatch(actions.setDraftEntry(draftEntry));
     }

@@ -37,6 +37,8 @@ import Timetable from './Timetable';
         },
       };
       const store = createReduxStore('regform-submission', reducers, initialData);
+      console.log('all timetable data');
+      console.log(timetableData);
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
