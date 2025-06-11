@@ -24,7 +24,7 @@ Improvements
   (:pr:`6860`)
 - Use :data:`STATIC_SITE_STORAGE` for the temporary file from a material package
   (:pr:`6898`)
-- Implement conditional fields in registration forms (:issue:`1228`, :pr:`6678`,
+- Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
 
 Bugfixes
