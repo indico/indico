@@ -85,7 +85,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
                 fields_ids = {field.show_if_id for field in section.children
                               if field.show_if_id is not None and not field.is_deleted}
                 if critical_fields_ids & fields_ids:
-                    raise ValidationError('Cannot make section management-only due to conditional field relations')
+                    raise ValidationError('Cannot make section manager-only due to conditional field relations')
         db.session.flush()
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
