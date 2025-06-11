@@ -7,6 +7,8 @@
 
 import _ from 'lodash';
 
+import {SET_HIDDEN_ITEM_IDS} from '../form_submission/actions';
+
 import {
   CREATE_ITEM,
   CREATE_SECTION,
@@ -130,6 +132,14 @@ export default {
         });
         return newState;
       }
+      default:
+        return state;
+    }
+  },
+  hiddenItems: (state = {ids: [], ready: false}, action) => {
+    switch (action.type) {
+      case SET_HIDDEN_ITEM_IDS:
+        return {ids: action.hiddenItemIds, ready: true};
       default:
         return state;
     }

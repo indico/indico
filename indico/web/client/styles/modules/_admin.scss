@@ -7,7 +7,7 @@
 
 @use 'base' as *;
 
-.code {
+.code:not(.icon) {
   @include default-border-radius();
   border: 1px solid $gray;
   background: $light-gray;

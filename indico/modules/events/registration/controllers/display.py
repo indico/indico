@@ -30,7 +30,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_user_data, make_registration_schema)
+                                                     get_initial_form_values, get_user_data, load_registration_schema,
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -39,7 +40,7 @@ from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
 
@@ -399,8 +400,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if not self._can_register():
             raise ExpectedError(_('You cannot register for this event'))
 
-        schema = make_registration_schema(self.regform, captcha_required=self._captcha_required)()
-        form_data = parser.parse(schema)
+        schema_cls = make_registration_schema(self.regform, captcha_required=self._captcha_required)
+        form_data = load_registration_schema(self.regform, schema_cls)
         registration = create_registration(self.regform, form_data, self.invitation)
         invalidate_captcha()
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})

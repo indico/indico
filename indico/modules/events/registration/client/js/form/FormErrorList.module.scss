@@ -15,6 +15,7 @@
   --msgbox-sub-color: var(--msgbox-alert-sub-color);
 
   font-family: 'Muli', sans-serif;
+  margin-top: 25px;
 
   h4 {
     @extend %message-box-heading;

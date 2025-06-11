@@ -304,3 +304,11 @@ export function AccommodationSettings() {
     </>
   );
 }
+
+export function accommodationShowIfOptions(field) {
+  return field.choices.map(({caption, id}) => ({value: id, text: caption}));
+}
+
+export function accommodationGetDataForCondition(value) {
+  return [value.choice];
+}

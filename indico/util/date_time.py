@@ -206,7 +206,7 @@ def format_skeleton(dt, skeleton, locale=None, timezone=None):
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
 
 
-def format_human_timedelta(delta, granularity='seconds', narrow=False):
+def format_human_timedelta(delta, granularity='seconds', narrow=False, *, weeks=False):
     """Format a timedelta in a human-readable way.
 
     :param delta: the timedelta to format
@@ -215,26 +215,31 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
                         the output will never contain seconds unless
                         the whole timedelta spans less than a minute.
                         Accepted values are 'seconds', 'minutes',
-                        'hours' and 'days'.
+                        'hours', 'days' and 'weeks'.
     :param narrow: if true, only the short unit names will be used
+    :param weeks: if true, weeks are used
     """
-    field_order = ('days', 'hours', 'minutes', 'seconds')
+    field_order = ('weeks', 'days', 'hours', 'minutes', 'seconds') if weeks else ('days', 'hours', 'minutes', 'seconds')
     long_names = {
         'seconds': lambda n: ngettext('{0} second', '{0} seconds', n).format(n),
         'minutes': lambda n: ngettext('{0} minute', '{0} minutes', n).format(n),
         'hours': lambda n: ngettext('{0} hour', '{0} hours', n).format(n),
         'days': lambda n: ngettext('{0} day', '{0} days', n).format(n),
+        'weeks': lambda n: ngettext('{0} week', '{0} weeks', n).format(n),
     }
     short_names = {
         'seconds': lambda n: ngettext('{0}s', '{0}s', n).format(n),
         'minutes': lambda n: ngettext('{0}m', '{0}m', n).format(n),
         'hours': lambda n: ngettext('{0}h', '{0}h', n).format(n),
         'days': lambda n: ngettext('{0}d', '{0}d', n).format(n),
+        'weeks': lambda n: ngettext('{0}w', '{0}w', n).format(n),
     }
     if narrow:
         long_names = short_names
     values = dict.fromkeys(field_order, 0)
     values['seconds'] = delta.total_seconds()
+    if weeks:
+        values['weeks'], values['seconds'] = divmod(values['seconds'], 7*86400)
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
     values['hours'], values['seconds'] = divmod(values['seconds'], 3600)
     values['minutes'], values['seconds'] = divmod(values['seconds'], 60)

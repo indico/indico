@@ -26,6 +26,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {getFieldRegistry} from '../form/fields/registry';
+import {ShowIfInput} from '../form/fields/ShowIfInput';
 import {getStaticData, getItemById} from '../form/selectors';
 
 import * as actions from './actions';
@@ -70,7 +71,6 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
       initialValues = {...(initialValues || {}), price: 0};
     }
   }
-
   const handleChangeItemType = (dirty, value) => {
     if (
       newItemType &&
@@ -153,12 +153,13 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
+          {!fieldIsRequired && <ShowIfInput fieldId={id} />}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput
                 name="retentionPeriod"
                 type="number"
-                placeholder={Translate.string('Permanent')}
+                placeholder={Translate.string('Indefinite')}
                 step="1"
                 min={dataRetentionRange.min}
                 max={dataRetentionRange.max}

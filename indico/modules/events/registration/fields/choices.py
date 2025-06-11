@@ -17,7 +17,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableItemSchema,
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -59,7 +59,7 @@ def _get_choice_by_id(choice_id, choices):
             return choice
 
 
-class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
+class ChoiceItemSchema(LimitedPlacesBillableItemSchema):
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     max_extra_slots = fields.Integer(load_default=0, validate=validate.Range(0, 99))
@@ -73,7 +73,7 @@ class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
         return data
 
 
-class ChoiceSetupSchema(mm.Schema):
+class ChoiceSetupSchema(FieldSetupSchemaBase):
     with_extra_slots = fields.Bool(load_default=False)
     choices = fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
 
@@ -121,6 +121,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     has_default_item = False
     mm_field_class = fields.Dict
     mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer()}
+    allow_condition = True
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -136,6 +137,9 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     @property
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
+
+    def get_data_for_condition(self, value) -> set:
+        return {id for id, slots in value.items() if slots > 0}
 
     def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
@@ -394,7 +398,7 @@ def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
-class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
+class AccommodationItemSchema(LimitedPlacesBillableItemSchema):
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     is_no_accommodation = fields.Bool(load_default=False)
@@ -423,7 +427,7 @@ class AccommodationDateRangeSchema(mm.Schema):
             raise ValidationError('The end date cannot be before the start date', 'end_date')
 
 
-class AccommodationSetupSchema(mm.Schema):
+class AccommodationSetupSchema(FieldSetupSchemaBase):
     choices = fields.List(fields.Nested(AccommodationItemSchema), required=True, validate=not_empty)
     arrival = fields.Nested(AccommodationDateRangeSchema, required=True)
     departure = fields.Nested(AccommodationDateRangeSchema, required=True)
@@ -480,6 +484,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     setup_schema_base_cls = AccommodationSetupSchema
     mm_field_class = fields.Nested
     mm_field_args = (AccommodationSchema,)
+    allow_condition = True
 
     def _get_default_value(self, *, ui):
         versioned_data = self.form_item.versioned_data
@@ -505,6 +510,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
     @property
     def empty_value(self):
         return {'choice': None}
+
+    def get_data_for_condition(self, value) -> set:
+        return {value['choice']}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
