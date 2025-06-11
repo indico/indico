@@ -26,6 +26,8 @@ Improvements
   (:pr:`6898`)
 - Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
+- Log a new entry on the user log when two users are merged, both on the source and target users 
+  (:issue:`6882`, :pr:`6920`)
 
 Bugfixes
 ^^^^^^^^
