@@ -228,10 +228,15 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False, *, weeks=
         'weeks': lambda n: ngettext('{0} week', '{0} weeks', n).format(n),
     }
     short_names = {
+        # i18n: Shorthand form for the number of seconds
         'seconds': lambda n: ngettext('{0}s', '{0}s', n).format(n),
+        # i18n: Shorthand form for the number of minutes
         'minutes': lambda n: ngettext('{0}m', '{0}m', n).format(n),
+        # i18n: Shorthand form for the number of hours
         'hours': lambda n: ngettext('{0}h', '{0}h', n).format(n),
+        # i18n: Shorthand form for the number of days
         'days': lambda n: ngettext('{0}d', '{0}d', n).format(n),
+        # i18n: Shorthand form for the number of weeks
         'weeks': lambda n: ngettext('{0}w', '{0}w', n).format(n),
     }
     if narrow:
