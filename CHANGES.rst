@@ -19,6 +19,8 @@ Improvements
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
+- Improve the booking linking feature (:issue:`6568`, :issue:`6811`, :pr:`6846`,
+  thanks :user:`Moliholy, unconventionaldotdev`).
 - Log conference menu changes (:pr:`6851`, thanks :user:`openprojects`)
 - Add duration and date/time placeholders when sending emails for contributions
   (:pr:`6860`)

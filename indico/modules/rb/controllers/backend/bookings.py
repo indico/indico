@@ -40,7 +40,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
-from indico.util.date_time import now_utc, overlaps, server_to_utc, utc_to_server
+from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -117,6 +117,7 @@ class RHCalendar(RHRoomBookingBase):
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(load_default=None),
+        'end_dt': fields.DateTime(load_default=None),
         'last_reservation_id': fields.Int(load_default=None),
         'my_bookings': fields.Bool(load_default=False),
         'limit': fields.Int(load_default=40),
@@ -125,11 +126,12 @@ class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'room_ids': fields.List(fields.Int(), load_default=None),
     })
-    def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit, text):
+    def _process(self, room_ids, start_dt, end_dt, last_reservation_id, my_bookings, limit, text):
         start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
         booked_for_user = session.user if my_bookings else None
         bookings, rows_left = get_active_bookings(limit=limit,
                                                   start_dt=start_dt,
+                                                  end_dt=end_dt,
                                                   last_reservation_id=last_reservation_id,
                                                   room_ids=room_ids,
                                                   booked_for_user=booked_for_user,
@@ -450,10 +452,6 @@ class RHBookingOccurrenceLink(RHBookingBase):
         self.admin_override_enabled = admin_override_enabled
         if self.occurrence.link is not None:
             raise BadRequest('This booking occurrence is already linked')
-        if not overlaps((self.event.start_dt, self.event.end_dt),
-                        (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
-                        inclusive=True):
-            raise BadRequest('The event and booking occurrence times do not overlap')
 
     def _check_access(self):
         RHBookingBase._check_access(self)
