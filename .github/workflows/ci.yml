@@ -294,6 +294,59 @@ jobs:
           export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${{ job.services.postgres.ports[5432] }}/indicotest"
           pytest --color=yes
 
+  test-python-nodb:
+    name: test-python-${{ matrix.name }}-nodb
+    needs: setup
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: '3.12', python: '3.12', python_version_var: 'PYTHON_VERSION_312' }
+
+    steps:
+      # BEGIN common steps - edit all occurrences if needed!
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env[matrix.python_version_var] }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Download environment
+        uses: actions/download-artifact@v4
+        with:
+          name: environment-${{ matrix.name }}
+          path: /tmp
+
+      - name: Restore environment
+        run: tar xf /tmp/env.tar
+
+      - name: Activate virtualenv for later steps
+        run: |
+          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
+          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install Indico
+        run: uv pip install -e .
+      # END common steps
+
+      - name: Install redis
+        run: sudo apt-get install redis-server
+
+      - name: Run pytest tests
+        run: |
+          export INDICO_TEST_DATABASE_URI=''
+          pytest --color=yes
 
   test-js:
     needs: setup

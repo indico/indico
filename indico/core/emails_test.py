@@ -42,6 +42,7 @@ def test_get_actual_sender_address(mocker, sender_email, result):
     assert get_actual_sender_address(sender_email, {'reply@whatever.com'}) == (result[0], {'reply@whatever.com'})
 
 
+@pytest.mark.usefixtures('db')
 def test_get_actual_sender_address_weird_site_name(mocker):
     mocker.patch('indico.core.emails.config', MockConfig())
     core_settings.set('site_title', 'Indico @ Test')
