@@ -32,10 +32,12 @@ def _has_pending_invitations(invitations):
     return any(invitation.state == InvitationState.pending for invitation in invitations)
 
 
-def _query_pending_invitations(regform):
-    return (RegistrationInvitation.query.with_parent(regform)
-            .filter(RegistrationInvitation.state == InvitationState.pending)
-            .all())
+def _query_pending_invitations(regform, ids=None):
+    query = (RegistrationInvitation.query.with_parent(regform)
+             .filter(RegistrationInvitation.state == InvitationState.pending))
+    if ids:
+        query = query.filter(RegistrationInvitation.id.in_(ids))
+    return query.all()
 
 
 def _query_invitation_list(regform):
@@ -48,16 +50,17 @@ def _query_invitation_list(regform):
             .all())
 
 
-def _render_invitation_list(invitations):
+def _render_invitation_list(invitations, has_pending_invitations):
     tpl = get_template_module('events/registration/management/_invitation_list.html')
-    return tpl.render_invitation_list(invitations)
+    return tpl.render_invitation_list(invitations, has_pending_invitations)
 
 
 def _get_invitation_data(regform):
     invitations = _query_invitation_list(regform)
+    has_pending_invitations = _has_pending_invitations(invitations)
     return {
-        'invitation_list': _render_invitation_list(invitations),
-        'has_pending_invitations': _has_pending_invitations(invitations)
+        'invitation_list': _render_invitation_list(invitations, has_pending_invitations),
+        'has_pending_invitations': has_pending_invitations
     }
 
 
@@ -127,13 +130,16 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
 class RHRegistrationFormRemindersMetadata(RHManageRegFormBase):
     """Get the metadata for registration reminder emails."""
 
-    def _process(self):
+    @use_kwargs({
+        'invitation_ids': fields.List(fields.Int(), load_default=lambda: []),
+    })
+    def _process(self, invitation_ids):
         with self.event.force_event_locale():
             tpl = get_template_module('events/registration/emails/registration_reminder_default.html', event=self.event)
             body = tpl.get_html_body()
             subject = tpl.get_subject()
         placeholders = get_sorted_placeholders('registration-invitation-reminder-email')
-        invitations = _query_pending_invitations(self.regform)
+        invitations = _query_pending_invitations(self.regform, ids=invitation_ids)
         recipients = sorted(invitation.email for invitation in invitations)
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),

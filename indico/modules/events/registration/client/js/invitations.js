@@ -18,6 +18,7 @@ import EmailPendingInvitationsButton from './components/EmailPendingInvitationsB
     eventId,
     regformId,
     hasPendingInvitations,
+    checkboxSelector,
   }) {
     $('#invitation-list').on('indico:confirmed', '.js-invitation-action', function(evt) {
       evt.preventDefault();
@@ -52,15 +53,37 @@ import EmailPendingInvitationsButton from './components/EmailPendingInvitationsB
       },
     });
 
-    renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations});
+    renderEmailInvitationsBtn({
+      containerId: 'email-all-pending-invitations-container',
+      eventId,
+      regformId,
+      hasPendingInvitations,
+    });
+
+    if (hasPendingInvitations) {
+      renderEmailInvitationsBtn({
+        containerId: 'email-pending-invitations-container',
+        checkboxSelector,
+        eventId,
+        regformId,
+        hasPendingInvitations,
+      });
+    }
   };
 
-  function renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations}) {
-    const container = document.getElementById('email-pending-invitations-container');
+  function renderEmailInvitationsBtn({
+    containerId,
+    checkboxSelector,
+    eventId,
+    regformId,
+    hasPendingInvitations,
+  }) {
+    const container = document.getElementById(containerId);
     ReactDOM.render(
       <EmailPendingInvitationsButton
         eventId={eventId}
         regformId={regformId}
+        checkboxSelector={checkboxSelector}
         hasPendingInvitations={hasPendingInvitations}
       />,
       container
