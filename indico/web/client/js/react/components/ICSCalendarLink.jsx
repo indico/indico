@@ -9,7 +9,7 @@ import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
 import React, {useReducer, useState} from 'react';
-import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
+import {Button, Dropdown, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -94,6 +94,7 @@ export default function ICSCalendarLink({
 }) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [exportEventSeries, setExportEventSeries] = useState(false);
+  const [reminder, setReminder] = useState(0);
 
   const copyButton = (
     <Button
@@ -107,6 +108,8 @@ export default function ICSCalendarLink({
   );
 
   const fetchURL = async (extraParams, controller) => {
+    const {reminder: reminderValue, ...rest} = extraParams;
+    extraParams = reminderValue === 0 ? rest : extraParams;
     try {
       const {
         data: {url: signedURL},
@@ -146,7 +149,20 @@ export default function ICSCalendarLink({
       if (exportEventSeries) {
         extraParams = {...extraParams, series: true};
       }
-      _handleSetOption(key, extraParams);
+      _handleSetOption(key, {...extraParams, reminder});
+    }
+  };
+
+  const handleReminderChange = newValue => {
+    setReminder(newValue);
+
+    if (popupState.key) {
+      const option = options.find(opt => opt.key === popupState.key);
+
+      _handleSetOption(popupState.key, {
+        reminder: newValue,
+        ...option?.extraParams,
+      });
     }
   };
 
@@ -198,7 +214,7 @@ export default function ICSCalendarLink({
                   extraParams = {...extraParams, series: true};
                 }
                 setExportEventSeries(!exportEventSeries);
-                _handleSetOption(popupState.key, extraParams);
+                _handleSetOption(popupState.key, {...extraParams, reminder});
               }}
             >
               <Translate>Export all events in this event series</Translate>
@@ -206,6 +222,23 @@ export default function ICSCalendarLink({
             </div>
           </>
         )}
+        <strong styleName="export-option">
+          <Translate>Reminders</Translate>
+        </strong>
+        <Translate as="p">Add reminder to each event in your calendar.</Translate>
+        <div styleName="reminder-options">
+          <Dropdown
+            selection
+            options={[
+              {key: '0', text: Translate.string('No reminder', 'alert'), value: 0},
+              {key: '5', text: Translate.string('5 minutes before'), value: 5},
+              {key: '15', text: Translate.string('15 minutes before'), value: 15},
+              {key: '30', text: Translate.string('30 minutes before'), value: 30},
+            ]}
+            value={reminder}
+            onChange={(_, {value}) => handleReminderChange(value)}
+          />
+        </div>
         <strong styleName="export-option">
           <Translate>Synchronize with your calendar</Translate>
         </strong>
@@ -269,7 +302,7 @@ ICSCalendarLink.propTypes = {
 ICSCalendarLink.defaultProps = {
   params: {},
   renderButton: null,
-  popupPosition: 'left center',
+  popupPosition: 'bottom left',
   options: ICSExportOptions.defaultProps.options,
   eventInSeries: false,
 };
