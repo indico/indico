@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import * as FinalForm from 'final-form';
+import * as FlaskUrls from 'flask-urls';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
@@ -42,6 +43,7 @@ window._IndicoCoreRedux = Redux;
 window._IndicoCoreSUIR = SUIR;
 window._IndicoCoreReactFinalForm = ReactFinalForm;
 window._IndicoCoreFinalForm = FinalForm;
+window._IndicoCoreFlaskUrls = FlaskUrls;
 window._IndicoSyncedInputs = IndicoSyncedInputs;
 window._IndicoReactComponents = IndicoReactComponents;
 window._IndicoReactForm = IndicoReactForm;

@@ -51,6 +51,7 @@ export default env => {
     externals: {
       'jquery': 'jQuery',
       'moment': 'moment',
+      'flask-urls': '_IndicoCoreFlaskUrls',
       'react': '_IndicoCoreReact',
       'react-dnd': '_IndicoCoreReactDnd',
       'react-dom': '_IndicoCoreReactDom',
