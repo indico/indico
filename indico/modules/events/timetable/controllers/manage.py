@@ -16,6 +16,7 @@ from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import RHManageContributionBase
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import delete_contribution, update_contribution
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.sessions.schemas import SessionBlockSchema
@@ -27,7 +28,8 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_contribution_entry,
                                                         create_session_block_entry, create_timetable_entry,
-                                                        delete_timetable_entry, update_timetable_entry)
+                                                        delete_timetable_entry, update_break_entry,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, TimetableEntrySchema
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
@@ -169,12 +171,25 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 # TODO: (Ajob) Full rest API endpoint
 
 
-class RHTimetableBreak(RHManageTimetableBase):
+class RHTimetableBreak(RHManageEventBase):
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.break_ = Break.query.filter_by(id=request.view_args['break_id']).one()
+
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
         break_entry = create_break_entry(self.event, data, extend_parent=False)
         return TimetableEntrySchema(context={'event': self.event}).jsonify(break_entry)
 
+    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event}, partial=True)
+    def _process_PATCH(self, data):
+        with (track_time_changes(), track_location_changes()):
+            update_break_entry(self.break_, data)
+        
+        return BreakSchema(context={'event': self.event}).jsonify(self.break_)
+    
+    def _process_GET(self):
+        return BreakSchema(context={'event': self.event}).jsonify(self.break_)
 
 class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
@@ -227,23 +242,6 @@ class RHTimetableSessionBlock(RHManageTimetableBase):
 
         block_entry = create_session_block_entry(session, data, extend_parent=False)
         return TimetableEntrySchema(context={'event': self.event}).jsonify(block_entry)
-
-
-
-class RHTimetableEntry(RHManageTimetableBase):
-    def _process_args(self):
-        RHManageTimetableBase._process_args(self)
-        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
-
-    # TODO: (Ajob) Clean this up and use marshmallow schemas (copy of legacy)
-    # @use_args_schema_context(TimetableEntrySchema, lambda self: {'event': self.event})
-    def _process_PATCH(self, data):
-        """Update a timetable entry."""
-        return data
-
-    def _process_GET(self):
-        return TimetableEntrySchema(context={'event': self.event}).jsonify(self.entry)
-        
 
 
 # END OF REST API
