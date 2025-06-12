@@ -40,6 +40,7 @@ export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
 export const ADD_ENTRY = 'Add entry';
 export const CREATE_ENTRY = 'Create entry';
+export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
 export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
@@ -90,6 +91,12 @@ interface CreateEntryAction {
   entry: TopLevelEntry;
 }
 
+interface UpdateEntryAction {
+  type: typeof UPDATE_ENTRY;
+  entryType: string;
+  entry: TopLevelEntry;
+}
+
 interface DeleteBreakAction {
   type: typeof DELETE_BREAK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
@@ -108,6 +115,7 @@ export type Action =
   | ScheduleEntryAction
   | UnscheduleEntryAction
   | CreateEntryAction
+  | UpdateEntryAction
   | DeleteBreakAction
   | DeleteBlockAction
   | SetDraftEntryAction;
@@ -217,6 +225,9 @@ export function toggleShowAllTimeslots() {
   return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
 }
 
+// TODO: (Ajob) Evaluate addEntry and editEntry vs createEntry and updateEntry,
+//              the latter two were implemented later and might be duplicate
+
 export function addEntry(entryType) {
   return {type: ADD_ENTRY, entryType};
 }
@@ -227,6 +238,10 @@ export function createEntry(entryType, entry) {
 
 export function editEntry(entryType, entry) {
   return {type: EDIT_ENTRY, entryType, entry};
+}
+
+export function updateEntry(entryType, entry) {
+  return {type: UPDATE_ENTRY, entryType, entry};
 }
 
 export function closeModal() {

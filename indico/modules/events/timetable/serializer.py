@@ -13,7 +13,6 @@ from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
@@ -123,7 +122,7 @@ class TimetableSerializer:
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
-                     'sessionBlockId': block.id,
+                     'id': block.id,
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
                      'title': block.session.title,
@@ -146,6 +145,8 @@ class TimetableSerializer:
 
         block = entry.parent.session_block if entry.parent else None
         contribution = entry.contribution
+        print('THE CONTRIII')
+        print(contribution.id)
         data = {}
         data.update(self._get_entry_data(entry))
         if contribution.session:
@@ -154,7 +155,7 @@ class TimetableSerializer:
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
-                     'contributionId': contribution.id,
+                     'id': contribution.id,
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds / 60,
@@ -192,7 +193,7 @@ class TimetableSerializer:
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
-                     'breakId': break_.id,
+                     'id': break_.id,
                      'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
@@ -318,66 +319,3 @@ def serialize_contribution(contribution):
     return {'id': contribution.id,
             'friendly_id': contribution.friendly_id,
             'title': contribution.title}
-
-
-# TODO: This is only temporary to get unscheduled contributions working
-# before we rewrite the timetable serializer
-def _serialize_contribution(contribution):
-    data = {
-        'id': f'c{contribution.id}',
-        'uniqueId': contribution.id
-    }
-    if contribution.session:
-        data.update({'color': '#' + contribution.session.background_color,
-                     'textColor': '#' + contribution.session.text_color})
-    data.update({'entryType': 'Contribution',
-                 '_type': 'ContribSchEntry',
-                 '_fossil': 'contribSchEntryDisplay',
-                 'contributionId': contribution.id,
-                 'attachments': [],
-                 'description': contribution.description,
-                 'duration': contribution.duration_display.seconds / 60,
-                 'pdf': url_for('contributions.export_pdf', contribution),
-                 'presenters': [],
-                 'code': contribution.code,
-                 'sessionCode': None,
-                 'sessionId': contribution.session.id if contribution.session else None,
-                #  'sessionSlotId': None,
-                #  'sessionSlotEntryId': None,
-                 'title': contribution.title,
-                 'url': url_for('contributions.display_contribution', contribution),
-                 'friendlyId': contribution.friendly_id,
-                 'references': [],
-                 'board_number': contribution.board_number})
-    return data
-
-
-def serialize_event_info(event):
-    from indico.modules.events.contributions import Contribution
-    return {'_type': 'Conference',
-            'id': str(event.id),
-            'title': event.title,
-            'startDate': event.start_dt_local,
-            'endDate': event.end_dt_local,
-            'isConference': event.type_ == EventType.conference,
-            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
-            'contributions': [_serialize_contribution(c)
-                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
-
-
-def serialize_session(sess):
-    """Return data for a single session."""
-    return {
-        '_type': 'Session',
-        'address': sess.address,
-        'color': '#' + sess.colors.background,
-        'description': sess.description,
-        'id': sess.id,
-        'isPoster': sess.is_poster,
-        'location': sess.venue_name,
-        'room': sess.room_name,
-        'roomFullname': sess.room_name,
-        'textColor': '#' + sess.colors.text,
-        'title': sess.title,
-        'url': url_for('sessions.display_session', sess)
-    }

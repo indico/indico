@@ -225,12 +225,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleEditContribution = async data => {
-    // TODO: (Ajob) Implement edit contribution
-    console.log(`edited contri ${entry.id}`, data);
-    console.log(
-      await indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data)
-    );
-    return {data, object: {}};
+    return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data);
   };
 
   const _handleEditSessionBlock = async data => {
@@ -272,13 +267,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     const {data: resData} = await submitHandler(data);
-    const newTopLevelEntry = mapTTDataToEntry(resData);
+    // TODO: (Ajob) Cleanup, activeform is a bit 'weird' to pass
+    const resEntry = mapTTDataToEntry(resData);
 
     if (isEditing) {
       // TODO: (Ajob) Implement editing existing entries
-      // dispatch(actions.updateEntry(newTopLevelEntry));
+      resEntry['type'] = activeForm;
+      dispatch(actions.updateEntry(activeForm, resEntry));
     } else {
-      dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
+      dispatch(actions.createEntry(activeForm, resEntry));
     }
     onSubmit();
     onClose();

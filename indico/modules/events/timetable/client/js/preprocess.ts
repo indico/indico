@@ -34,10 +34,7 @@ interface SchemaBlock extends SchemaEntry {
   duration: number;
   sessionId?: number;
   entries?: Record<string, SchemaEntry>;
-  // TODO: (Ajob) Clean up the schema or separate the attrs below
-  contributionId?: number;
-  breakId?: number;
-  sessionBlockId?: number;
+  id: number; // ID of contribution, session_block or break
 }
 
 const entryTypeMapping = {
@@ -104,7 +101,7 @@ export function preprocessTimetableEntries(
 
       dayEntries[day].push({
         type,
-        id,
+        id: entry.id,
         title: entry.slotTitle ? entry.slotTitle : entry.title,
         description,
         startDt: dateToMoment(entry.startDate),
@@ -127,18 +124,6 @@ export function preprocessTimetableEntries(
 
       if (entry.sessionId) {
         dayEntries[day].at(-1).sessionId = entry.sessionId;
-      }
-
-      if (entry.contributionId) {
-        dayEntries[day].at(-1).contributionId = entry.contributionId;
-      }
-
-      if (entry.sessionBlockId) {
-        dayEntries[day].at(-1).sessionBlockId = entry.sessionBlockId;
-      }
-
-      if (entry.breakId) {
-        dayEntries[day].at(-1).breakId = entry.breakId;
       }
 
       if (type === EntryType.Break) {

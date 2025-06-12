@@ -297,7 +297,7 @@ class RHCloneContribution(RHManageTimetableBase):
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
-        self.contrib = Contribution.query.with_parent(self.event).filter_by(id=request.args['contrib_id']).one()
+        self.contrib = Contribution.query.with_parent(self.event).filter_by(id=request.args['id']).one()
 
     def _process(self):
         contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)

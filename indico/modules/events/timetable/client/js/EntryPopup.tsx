@@ -78,7 +78,6 @@ function TimetablePopupContent({
   const onEdit = async (e: MouseEvent) => {
     onClose();
     e.stopPropagation();
-    console.group(draftEntry);
     console.log('drat entry entry');
     console.log(draftEntry);
     if (draftEntry.id) {
@@ -88,13 +87,8 @@ function TimetablePopupContent({
         [EntryType.SessionBlock]: sessionBlockURL,
         [EntryType.Break]: breakURL,
       }[type];
-      const editId = {
-        [EntryType.Contribution]: entry.contributionId,
-        [EntryType.SessionBlock]: entry.sessionBlockId,
-        [EntryType.Break]: entry.breakId,
-      }[type];
 
-      const {data} = await indicoAxios.get(editURL({event_id: eventId, [`${type}_id`]: editId}));
+      const {data} = await indicoAxios.get(editURL({event_id: eventId, [`${type}_id`]: entry.id}));
       data['type'] = type;
       draftEntry = mapTTDataToEntry(data);
       dispatch(actions.setDraftEntry(draftEntry));

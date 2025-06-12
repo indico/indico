@@ -165,7 +165,8 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block')
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
+                  'timetable_entry')
 
     start_dt = EventTimezoneDateTimeField()
     # TODO: filter inactive and resitricted contrib fields

@@ -109,6 +109,39 @@ export default {
           ],
         };
       }
+      case actions.UPDATE_ENTRY: {
+        const {
+          entry,
+          entryType,
+          entry: {startDt},
+        } = action;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+
+        const dayKey = moment(startDt).format('YYYYMMDD');
+        const dayEntries = newEntries[dayKey];
+
+        const editedIndex = dayEntries.findIndex(e => {
+          return e.id === entry.id && e.type === entryType;
+        });
+
+        newEntries[dayKey][editedIndex] = entry;
+
+        // TODO: (Ajob) make sure to edit entry first
+        newEntries[dayKey] = layout([...dayEntries]);
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'update',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
       case actions.RESIZE_ENTRY: {
         const {date, id, parentId, duration} = action;
         let newDayEntries;
