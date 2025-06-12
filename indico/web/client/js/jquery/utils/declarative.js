@@ -374,12 +374,10 @@ import {$T} from '../../utils/i18n';
       const url = window.location.pathname + (newQueryString ? `?${newQueryString}` : '');
 
       $('<a>', {
-        class: 'anchor-link',
+        class: 'anchor-link icon-link',
         href: permalink || `${url}#${fragment}`,
         title: $elem.data('anchor-text') || $T.gettext('Direct link to this item'),
-      })
-        .html('&para;')
-        .appendTo($elem);
+      }).appendTo($elem);
     });
   }
 
