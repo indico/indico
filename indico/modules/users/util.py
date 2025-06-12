@@ -423,6 +423,27 @@ def merge_users(source, target, force=False):
     source.email = primary_source_email
     db.session.flush()
 
+    data_target = {'Source ID': source.id, 'First Name': source.first_name, 'Last Name': source.last_name}
+    data_source = {'Target ID': target.id, 'First Name': target.first_name, 'Last Name': target.last_name}
+    
+    target.log(
+        UserLogRealm.user,
+        LogKind.other,
+        'User',
+        'User merged',
+        session.user if session else None,
+        data=data_target
+    )
+    
+    source.log(
+        UserLogRealm.user,
+        LogKind.other,
+        'User',
+        'User merged',
+        session.user if session else None,
+        data=data_source
+    )
+    
     logger.info('Successfully merged %s into %s', source, target)
 
 
