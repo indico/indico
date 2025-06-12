@@ -53,6 +53,7 @@ Bugfixes
   :user:`duartegalvao, unconventionaldotdev`)
 - Fix date range picker not working in some languages (e.g. Japanese) (:issue:`6921`,
   :pr:`6922`)
+- Fix checkbox styling when label is too long (:issue:`6884`, :pr:`6926`)
 
 Accessibility
 ^^^^^^^^^^^^^
