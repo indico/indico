@@ -26,6 +26,7 @@ Improvements
   (:pr:`6898`)
 - Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
+- Include language settings when cloning an event (:issue:`6871`, :pr:`6929`)
 
 Bugfixes
 ^^^^^^^^
