@@ -21,6 +21,7 @@ from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
+from indico.modules.events.registration.controllers.management.description import event_settings
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
                                                                    RegistrationFormItem)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -151,7 +152,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         return self.view_class.render_template('display/regform_list.html', self.event,
                                                regforms=displayed_regforms,
                                                user_registrations=user_registrations,
-                                               is_restricted_access=self.is_restricted_access)
+                                               is_restricted_access=self.is_restricted_access,
+                                               event_settings=event_settings)
 
 
 class ParticipantListMixin:
