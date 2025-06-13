@@ -125,7 +125,11 @@ class PaymentPluginMixin:
                 'amount': registration.price,
                 'currency': registration.currency,
                 'settings': settings,
-                'event_settings': event_settings}
+                'event_settings': event_settings,
+                'event_id':registration.event_id,
+                'registration_id': registration.id, 
+                'registration_form_id': registration.registration_form_id
+               }
         self.adjust_payment_form_data(data)
         return render_plugin_template('event_payment_form.html', **data)
 
