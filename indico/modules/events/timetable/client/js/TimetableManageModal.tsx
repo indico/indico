@@ -173,7 +173,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
-  const [activeForm, setActiveForm] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
+  const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
     data.person_links = data.person_links.map(mapPersonLinkToSchema);
@@ -214,6 +214,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const _handleCreateBreak = async data => {
     data = _.pick(data, [
       'title',
+      'description',
       'break',
       'duration',
       'location_data',
@@ -252,31 +253,31 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           [EntryType.Break]: _handleCreateBreak,
         };
 
-    const submitHandler = submitHandlers[activeForm];
+    const submitHandler = submitHandlers[activeType];
 
     if (!submitHandler) {
       throw new Error('Invalid form or no submit function found');
     }
 
     const {data: resData} = await submitHandler(data);
-    // TODO: (Ajob) Cleanup, activeform is a bit 'weird' to pass
     const resEntry = mapTTDataToEntry(resData);
 
+    resEntry['type'] = activeType;
+
     if (isEditing) {
-      // TODO: (Ajob) Implement editing existing entries
-      resEntry['type'] = activeForm;
-      dispatch(actions.updateEntry(activeForm, resEntry));
+      dispatch(actions.updateEntry(activeType, resEntry));
     } else {
-      dispatch(actions.createEntry(activeForm, resEntry));
+      dispatch(actions.createEntry(activeType, resEntry));
     }
+
     onSubmit();
     onClose();
   };
 
   const changeForm = (key: EntryType) => {
-    setActiveForm(key);
+    setActiveType(key);
     if (key === EntryType.SessionBlock && !sessionValues.length) {
-      forms[activeForm];
+      forms[activeType];
     }
   };
 
@@ -284,7 +285,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // Allows to prevent submitting with pre-conditions, such as
     // not having any sessions available for session blocks. Can
     // be extended for other conditions and forms.
-    if (activeForm === EntryType.SessionBlock) {
+    if (activeType === EntryType.SessionBlock) {
       return !!sessionValues.length;
     }
     return true;
@@ -329,7 +330,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
                   onClick={() => {
                     changeForm(key);
                   }}
-                  color={activeForm === key ? 'blue' : undefined}
+                  color={activeType === key ? 'blue' : undefined}
                 >
                   {typeLongNames[key]}
                 </Button>
@@ -339,7 +340,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           <Divider />
         </>
       )}
-      {forms[activeForm]}
+      {forms[activeType]}
     </FinalModalForm>
   );
 };

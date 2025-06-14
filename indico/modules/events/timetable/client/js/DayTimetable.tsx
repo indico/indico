@@ -83,9 +83,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   const [isDragging, setIsDragging] = useState(false);
 
-  console.log('early entries are')
-  console.log(entries)
-
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
   function handleDragEnd(
