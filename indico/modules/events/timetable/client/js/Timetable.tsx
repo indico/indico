@@ -31,6 +31,9 @@ export default function Timetable() {
   const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
 
+  console.log('current date entries?')
+  console.log(currentDateEntries)
+
   const useWeekView = false;
 
   const minHour = showAllTimeslots

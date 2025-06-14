@@ -240,7 +240,6 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-
   const iconName = {
     [EntryType.Break]: 'coffee',
     [EntryType.Contribution]: 'file alternate outline',

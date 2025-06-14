@@ -18,7 +18,8 @@ from indico.modules.events.contributions.models.references import ContributionRe
 from indico.modules.events.contributions.operations import delete_contribution, update_contribution
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.sessions.operations import delete_session_block
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.operations import delete_session_block, update_session_block
 from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
@@ -232,7 +233,12 @@ class RHTimetableContribution(RHManageContributionBase):
         return references
 
 
-class RHTimetableSessionBlock(RHManageTimetableBase):
+class RHTimetableSessionBlock(RHManageEventBase):
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.session_block = SessionBlock.query.filter_by(id=request.view_args['session_block_id']).one()
+
+    
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
@@ -242,6 +248,16 @@ class RHTimetableSessionBlock(RHManageTimetableBase):
 
         block_entry = create_session_block_entry(session, data, extend_parent=False)
         return TimetableEntrySchema(context={'event': self.event}).jsonify(block_entry)
+
+    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event}, partial=True)
+    def _process_PATCH(self, data):
+        with (track_time_changes(), track_location_changes()):
+            update_session_block(self.session_block, data)
+        
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
+    
+    def _process_GET(self):
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
 
 
 # END OF REST API

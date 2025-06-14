@@ -33,6 +33,7 @@ interface SchemaBlock extends SchemaEntry {
   startDate: SchemaDate;
   duration: number;
   sessionId?: number;
+  sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   id: number; // ID of contribution, session_block or break
 }
@@ -70,7 +71,7 @@ export function preprocessTimetableEntries(
   for (const day in data) {
     dayEntries[day] = [];
     for (const _id in data[day]) {
-      const id = parseInt(_id.slice(1), 10);
+      // const id = parseInt(_id.slice(1), 10);
       const type = entryTypeMapping[_id[0]];
       const entry = data[day][_id];
       const {
@@ -83,6 +84,8 @@ export function preprocessTimetableEntries(
         conveners = [],
         board_number: boardNumber = '',
         code,
+        title,
+        id,
       } = entry as any;
 
       // TODO: (Ajob) Currently not passing roles as they do not exist
@@ -101,8 +104,8 @@ export function preprocessTimetableEntries(
 
       dayEntries[day].push({
         type,
-        id: entry.id,
-        title: entry.slotTitle ? entry.slotTitle : entry.title,
+        id,
+        title,
         description,
         startDt: dateToMoment(entry.startDate),
         duration,
@@ -130,8 +133,7 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).backgroundColor = entry.color;
         dayEntries[day].at(-1).textColor = entry.textColor;
       } else if (type === EntryType.SessionBlock) {
-        dayEntries[day].at(-1).sessionTitle = entry.title;
-        dayEntries[day].at(-1).title = entry.slotTitle;
+        dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.entries(entry.entries).map(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {

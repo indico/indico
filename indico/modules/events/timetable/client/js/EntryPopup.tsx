@@ -66,8 +66,7 @@ function TimetablePopupContent({
 }) {
   const dispatch = useDispatch();
 
-  const {type} = entry;
-  const title = 'sessionTitle' in entry ? entry.sessionTitle : entry.title;
+  const {type, title} = entry;
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
@@ -76,23 +75,23 @@ function TimetablePopupContent({
   const eventId = useSelector(selectors.getEventId);
 
   const onEdit = async (e: MouseEvent) => {
+    if (!draftEntry.id) {
+      return;
+    }
+
     onClose();
     e.stopPropagation();
-    console.log('drat entry entry');
-    console.log(draftEntry);
-    if (draftEntry.id) {
-      // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
-      const editURL = {
-        [EntryType.Contribution]: contributionURL,
-        [EntryType.SessionBlock]: sessionBlockURL,
-        [EntryType.Break]: breakURL,
-      }[type];
+    // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
+    const editURL = {
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.id}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.id}),
+    }[type];
 
-      const {data} = await indicoAxios.get(editURL({event_id: eventId, [`${type}_id`]: entry.id}));
-      data['type'] = type;
-      draftEntry = mapTTDataToEntry(data);
-      dispatch(actions.setDraftEntry(draftEntry));
-    }
+    const {data} = await indicoAxios.get(editURL);
+    data['type'] = type;
+    draftEntry = mapTTDataToEntry(data);
+    dispatch(actions.setDraftEntry(draftEntry));
   };
 
   return (
