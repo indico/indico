@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
-from indico.modules.events.contributions.controllers.management import RHManageContributionBase
+from indico.modules.events.contributions.controllers.management import RHManageContributionBase, RHManageContributionsBase
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import delete_contribution, update_contribution
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -31,7 +31,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         create_session_block_entry, create_timetable_entry,
                                                         delete_timetable_entry, update_break_entry,
                                                         update_timetable_entry)
-from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, TimetableEntrySchema
+from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
@@ -172,15 +172,17 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 # TODO: (Ajob) Full rest API endpoint
 
 
+class RHTimetableBreakCreate(RHManageEventBase):
+    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
+    def _process_POST(self, data: Break):
+        break_entry = create_break_entry(self.event, data, extend_parent=False)
+        return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
+
+
 class RHTimetableBreak(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.break_ = Break.query.filter_by(id=request.view_args['break_id']).one()
-
-    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
-    def _process_POST(self, data: Break):
-        break_entry = create_break_entry(self.event, data, extend_parent=False)
-        return TimetableEntrySchema(context={'event': self.event}).jsonify(break_entry)
 
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):
@@ -192,13 +194,14 @@ class RHTimetableBreak(RHManageEventBase):
     def _process_GET(self):
         return BreakSchema(context={'event': self.event}).jsonify(self.break_)
 
-class RHTimetableContribution(RHManageContributionBase):
+class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
-        return TimetableEntrySchema(context={'event': self.event}).jsonify(contrib_entry)
+        return ContributionSchema(context={'event': self.event}).jsonify(contrib_entry.contribution)
 
+class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):
         if (references := data.get('references')) is not None:
@@ -233,12 +236,7 @@ class RHTimetableContribution(RHManageContributionBase):
         return references
 
 
-class RHTimetableSessionBlock(RHManageEventBase):
-    def _process_args(self):
-        RHManageEventBase._process_args(self)
-        self.session_block = SessionBlock.query.filter_by(id=request.view_args['session_block_id']).one()
-
-    
+class RHTimetableSessionBlockCreate(RHManageEventBase):
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
@@ -247,7 +245,13 @@ class RHTimetableSessionBlock(RHManageEventBase):
             raise NotFound
 
         block_entry = create_session_block_entry(session, data, extend_parent=False)
-        return TimetableEntrySchema(context={'event': self.event}).jsonify(block_entry)
+        return SessionBlockSchema(context={'event': self.event}).jsonify(block_entry.session_block)
+
+
+class RHTimetableSessionBlock(RHManageEventBase):
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.session_block = SessionBlock.query.filter_by(id=request.view_args['session_block_id']).one()
 
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):

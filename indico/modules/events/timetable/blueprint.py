@@ -24,9 +24,9 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableSwapEntries)
 from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
-                                                                RHManageTimetableOld, RHTimetableBreak,
-                                                                RHTimetableContribution, RHTimetableREST,
-                                                                RHTimetableSessionBlock)
+                                                                RHManageTimetableOld, RHTimetableBreak, RHTimetableBreakCreate,
+                                                                RHTimetableContribution, RHTimetableContributionCreate, RHTimetableREST,
+                                                                RHTimetableSessionBlock, RHTimetableSessionBlockCreate)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -71,13 +71,13 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
     _bp.add_url_rule('/clone-contribution', 'clone_contribution', RHCloneContribution, methods=('POST',))
 
 # TODO: (Ajob) Replace API routes below with generic
-_bp.add_url_rule('/timetable/break', 'tt_break_create', RHTimetableBreak, methods=('POST',))
+_bp.add_url_rule('/timetable/break', 'tt_break_create', RHTimetableBreakCreate, methods=('POST',))
 _bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetableBreak, methods=('GET', 'PATCH','DELETE'))
 
-_bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContribution, methods=('POST',))
+_bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContributionCreate, methods=('POST',))
 _bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution, methods=('GET', 'PATCH','DELETE'))
 
-_bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlock,
+_bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
                  methods=('POST',))
 _bp.add_url_rule('/timetable/session-block/<int:session_block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
                  methods=('GET', 'PATCH','DELETE'))
