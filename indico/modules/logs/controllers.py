@@ -110,7 +110,7 @@ class LogsAPIMixin:
                        _contains(self.model.data['from'].astext, text),
                        _contains(self.model.data['to'].astext, text),
                        _contains(self.model.data['cc'].astext, text))
-            ).outerjoin(db.m.User)
+            ).outerjoin(db.m.User, db.m.User.id == self.model.user_id)
 
         if metadata_query:
             query = query.filter(self.model.meta.contains(metadata_query))

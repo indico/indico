@@ -53,6 +53,7 @@ Bugfixes
   :user:`duartegalvao, unconventionaldotdev`)
 - Fix date range picker not working in some languages (e.g. Japanese) (:issue:`6921`,
   :pr:`6922`)
+- Fix error when searching in user logs (:issue:`6933`, :pr:`6936`)
 
 Accessibility
 ^^^^^^^^^^^^^
