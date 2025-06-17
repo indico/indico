@@ -894,7 +894,7 @@ def update_regform_item_positions(regform):
 
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
-                      allow_different_email):
+                      allow_different_email=True):
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
