@@ -259,7 +259,7 @@ def test_po_to_json(tmp_path):
         msgid "baz"
         msgid_plural "bazs"
         msgstr[0] "qux with context"
-        msgstr[1] "quxs with context"    
+        msgstr[1] "quxs with context"
     ''')
     po_file.write_text(po_content, encoding='utf-8')
 

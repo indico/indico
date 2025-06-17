@@ -7,7 +7,8 @@ preview = true
 dummy-variable-rgx = '^(_{2,}|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$' # a single `_` is already used for i18n
 
 select = [
-    'E',      # pycodestyle
+    'E',      # pycodestyle (errors)
+    'W',      # pycodestyle (warnings)
     'F',      # pyflakes
     'N',      # pep8-naming
     'Q',      # flake8-quotes
