@@ -893,7 +893,8 @@ def update_regform_item_positions(regform):
             child.position = next(positions if child_active else disabled_positions)
 
 
-def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check):
+def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
+                      allow_different_email):
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
@@ -901,6 +902,7 @@ def create_invitation(regform, user, email_sender, email_subject, email_body, *,
         affiliation=user['affiliation'],
         skip_moderation=skip_moderation,
         skip_access_check=skip_access_check,
+        allow_different_email=allow_different_email,
     )
     regform.invitations.append(invitation)
     db.session.flush()

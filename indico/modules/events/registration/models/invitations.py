@@ -80,6 +80,12 @@ class RegistrationInvitation(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether registration email should match invitation email
+    allow_different_email = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The email of the invited person
     email = db.Column(
         db.String,

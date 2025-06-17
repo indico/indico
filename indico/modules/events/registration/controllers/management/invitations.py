@@ -82,11 +82,13 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         form = form_cls(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_access_check = form.skip_access_check.data
+        allow_different_email = form.allow_different_email.data
         if form.validate_on_submit():
             email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             for user in form.users.data:
                 create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
-                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check)
+                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check,
+                                  allow_different_email=allow_different_email)
             num = len(form.users.data)
             flash(ngettext('The invitation has been sent.',
                            '{n} invitations have been sent.',

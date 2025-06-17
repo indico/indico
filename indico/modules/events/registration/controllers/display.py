@@ -325,6 +325,16 @@ class InvitationMixin:
         if self.invitation is None:
             flash(_('This invitation does not exist or has been withdrawn.'), 'warning')
 
+    def _check_access(self):
+        if self.invitation:
+            self.check_invitation_email(session.user)
+
+    def check_invitation_email(self, user):
+        if not user:
+            return
+        if not self.invitation.allow_different_email and user.email != self.invitation.email:
+            raise Forbidden(_('You are not allow to use this invitation.'))
+
 
 class RHRegistrationFormCheckEmail(CheckEmailMixin, InvitationMixin, RHRegistrationFormBase):
     """Check how an email will affect the registration."""
@@ -363,12 +373,16 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _check_access(self):
         try:
             RHRegistrationFormRegistrationBase._check_access(self)
+            InvitationMixin._check_access(self)
         except ForbiddenPrivateRegistrationForm:
             if not self.invitation:
                 raise
+            else:
+                self.check_invitation_email(session.user)
         except Forbidden:
             if not self.invitation or not self.invitation.skip_access_check:
                 raise
+            self.check_invitation_email(session.user)
             self.is_restricted_access = True
         if self.regform.require_login and not session.user and request.method != 'GET':
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
@@ -378,6 +392,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         RHRegistrationFormRegistrationBase._process_args(self)
         InvitationMixin._process_args(self)
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
+            self.check_invitation_email(session.user)
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
     @property

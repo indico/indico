@@ -144,6 +144,7 @@ export default function RegistrationFormSubmission() {
     captchaRequired,
     captchaSettings,
     policyAgreementRequired,
+    allowDifferentEmail,
   } = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
@@ -192,7 +193,11 @@ export default function RegistrationFormSubmission() {
             <>
               {renderPluginComponents('regformBeforeSections')}
               {sections.map(section => (
-                <FormSection key={section.id} {...section} />
+                <FormSection
+                  key={section.id}
+                  {...section}
+                  readonlyEmail={!allowDifferentEmail && section.isPersonalData}
+                />
               ))}
               {renderPluginComponents('regformAfterSections')}
             </>

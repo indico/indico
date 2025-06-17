@@ -31,6 +31,9 @@
                     </td>
                     <td class="email">
                         {{ invitation.email }}
+                        {% if invitation.state.name == 'pending' and invitation.allow_different_email %}
+                            <i class="icon-warning warningText" title="{% trans %}Allow registration with a different email.{% endtrans %}"></i>
+                        {% endif %}
                     </td>
                     <td class="affiliation">
                         {{ invitation.affiliation }}
