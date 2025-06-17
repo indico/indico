@@ -22,6 +22,7 @@ from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.settings import event_language_settings
 from indico.modules.events.util import format_log_person, format_log_ref, split_log_location_changes
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
@@ -190,6 +191,12 @@ def clone_event(event, n_occurrence, start_dt, cloners, category=None, refresh_u
     new_event = create_event(category or event.category, event.type_, data,
                              features=features_event_settings.get(event, 'enabled'),
                              add_creator_as_manager=False, cloning=True)
+
+    event_language_settings.set_multi(new_event, {
+        'default_locale': event_language_settings.get(event, 'default_locale'),
+        'enforce_locale': event_language_settings.get(event, 'enforce_locale'),
+        'supported_locales': event_language_settings.get(event, 'supported_locales')
+    })
 
     # Run the modular cloning system
     used_cloners, shared_data = EventCloner.run_cloners(event, new_event, cloners, n_occurrence)
