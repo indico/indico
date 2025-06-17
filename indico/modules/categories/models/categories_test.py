@@ -105,10 +105,14 @@ def test_nth_parent(category_family):
     assert sibling.nth_parent(1) == son.nth_parent(1)
     assert sibling.nth_parent(2) == son.nth_parent(2)
 
-    pytest.raises(IndexError, grandpa.nth_parent, 1)
-    pytest.raises(IndexError, dad.nth_parent, 2)
-    pytest.raises(IndexError, son.nth_parent, 3)
-    pytest.raises(IndexError, grandpa.nth_parent, 100)
+    with pytest.raises(IndexError):
+        grandpa.nth_parent(1)
+    with pytest.raises(IndexError):
+        dad.nth_parent(2)
+    with pytest.raises(IndexError):
+        son.nth_parent(3)
+    with pytest.raises(IndexError):
+        grandpa.nth_parent(100)
 
 
 def test_is_descendant_of(category_family):

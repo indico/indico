@@ -169,7 +169,7 @@ requests==2.32.4
     #   sphinx
 responses==0.25.3
     # via -r requirements.dev.in
-ruff==0.11.8
+ruff==0.12.0
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -243,7 +243,7 @@ urllib3==1.26.20
     #   -c requirements.txt
     #   requests
     #   responses
-uv==0.7.3
+uv==0.7.13
     # via -r requirements.dev.in
 uvicorn==0.32.1
     # via sphinx-autobuild
