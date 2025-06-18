@@ -38,10 +38,17 @@ export default function Checkbox({
   };
 
   return (
-    <label className={className} style={style}>
+    <label className={className} style={style} styleName="checkbox-field">
       <span styleName="checkbox-label">
         <input ref={checkbox} styleName="checkbox" onChange={handleChange} {...inputProps} />
-        <span>{label}</span>
+        <span>
+          {label}
+          {inputProps.required && (
+            <span styleName="required-checkbox-asterisk" aria-hidden="true">
+              *
+            </span>
+          )}
+        </span>
       </span>
     </label>
   );
