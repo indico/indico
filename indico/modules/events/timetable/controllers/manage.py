@@ -13,7 +13,8 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
-from indico.modules.events.contributions.controllers.management import RHManageContributionBase, RHManageContributionsBase
+from indico.modules.events.contributions.controllers.management import (RHManageContributionBase,
+                                                                        RHManageContributionsBase)
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
 from indico.modules.events.contributions.schemas import ContributionSchema

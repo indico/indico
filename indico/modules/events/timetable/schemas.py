@@ -6,19 +6,19 @@
 # LICENSE file for more details.
 
 from typing import List
+
 from marshmallow import EXCLUDE, fields, pre_load
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.schemas import ContributionReferenceSchema
-from indico.modules.events.person_link_schemas import (
-    ContributionPersonLinkSchema as _ContributionPersonLinkSchema,
-    SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
-)
+from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
+from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+
 
 class SimplePersonLinkSchema(_ContributionPersonLinkSchema):
     class Meta:
