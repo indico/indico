@@ -656,14 +656,17 @@ def make_acl_log_fn(obj_type, log_realm=None):
             obj.log(log_realm, log_kind, 'Protection', summary, user, data=data)
 
         if principal.principal_type == PrincipalType.user:
+            sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
             user_log_data = data.copy()
             del user_log_data['User']
             user_log_data[f'{obj_type.__name__} ID'] = obj.id
+            if isinstance(obj, db.m.Category):
+                user_log_data['Category path'] = sep.join(obj.chain_titles)
             obj_title = getattr(obj, 'title', None) or getattr(obj, 'name', str(obj))
             if parent := obj.protection_parent:
-                user_log_data[f'{parent.__class__.__name__} ID'] = parent.id
+                user_log_data[f'{type(parent).__name__} ID'] = parent.id
                 parent_title = getattr(parent, 'title', None) or getattr(parent, 'name', str(parent))
-                obj_title = f'{parent_title} / {obj_title}'
+                obj_title = f'{parent_title} {sep} {obj_title}'
 
             if log_kind == LogKind.positive:
                 summary = f'{obj_type.__name__} permission granted ({obj_title})'
