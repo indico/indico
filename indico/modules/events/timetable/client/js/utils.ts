@@ -48,42 +48,26 @@ function gcd(a: number, b: number) {
   return a;
 }
 
-// Data mapping functions
-// TODO: (Ajob) Evaluate if necessary now that we can just do camelizeKeys
-export const mapPersonLinkToSchema = data => ({
-  title: data.title,
-  // name: data.name,
-  first_name: data.firstName,
-  last_name: data.lastName,
-  affiliation: data.affiliation,
-  affiliation_id: data.affiliationId,
-  email: data.email,
-  address: data.address,
-  phone: data.phone,
-  roles: data.roles,
-  type: data.type,
-  // avatar_url: data.avatarURL,
-});
-
 export const mapTTDataToEntry = (data): TopLevelEntry => {
   const {
     type,
-    start_dt: startDt,
+    startDt,
     id,
     duration,
     title,
     description,
-    person_links: personLinks,
+    conveners,
+    personLinks,
     colors,
-    board_number: boardNumber,
-    location_data: location,
+    boardNumber,
+    location,
     code,
     keywords,
-    session_id: sessionId,
-  } = data;
+    sessionId,
+  } = camelizeKeys(data);
 
   const mappedObj = {
-    id: id || -1,
+    id,
     type,
     title,
     description,
@@ -91,7 +75,7 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     startDt: moment(startDt),
     x: 0,
     y: 0,
-    personLinks: (personLinks || []).map(camelizeKeys),
+    personLinks: personLinks || conveners || [],
     boardNumber,
     location,
     code,
@@ -103,6 +87,7 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
   };
+
   return mappedObj;
 };
 

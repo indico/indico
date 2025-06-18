@@ -31,6 +31,7 @@ import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session} from './types';
 import {mapPersonLinkToSchema, mapTTDataToEntry} from './utils';
+import {snakifyKeys} from 'indico/utils/case';
 
 // Generic models
 
@@ -114,7 +115,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     references: entry.references || [],
     // TODO: (Ajob) Clean up the location data
     location_data: {inheriting: false, ...(entry.location || {})},
-    start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
+    // TODO: (Ajob) Check how we can clean up the required format
+    //       as it seems like Contributions need it to be without tzinfo
+    start_dt:
+      entry.type === EntryType.Contribution
+        ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
+        : entry.startDt.format(),
     duration: entry.duration * 60, // Minutes to seconds
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
@@ -176,7 +182,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
-    data.person_links = data.person_links.map(mapPersonLinkToSchema);
     data = _.pick(data, [
       'title',
       'description',
@@ -195,7 +200,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleCreateSessionBlock = async data => {
-    data.conveners = data.person_links.map(mapPersonLinkToSchema);
+    data.conveners = data.person_links;
     data = _.pick(data, [
       'session_id',
       'title',
@@ -207,7 +212,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'conveners',
       'code',
     ]);
-    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
+    const resData = await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
+    resData['person_links'] = resData['conveners'];
+    delete resData['conveners'];
+    return resData;
   };
 
   // TODO: Implement logic for breaks
@@ -226,6 +234,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleEditContribution = async data => {
+    console.log('IS THERE AN ISSUE HERE OR NAH');
     return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data);
   };
 
@@ -259,8 +268,18 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       throw new Error('Invalid form or no submit function found');
     }
 
-    const {data: resData} = await submitHandler(data);
+    const submitData = snakifyKeys(data);
+    // TODO: (Ajob) Remove once personlinks is fixed
+    if (isEditing) {
+      delete submitData['person_links'];
+    }
+
+    console.log('avant submit');
+    const {data: resData} = await submitHandler(submitData);
+    console.log('apres submit');
+
     const resEntry = mapTTDataToEntry(resData);
+    console.log('resentry', resEntry);
 
     resEntry['type'] = activeType;
 
@@ -270,7 +289,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       dispatch(actions.createEntry(activeType, resEntry));
     }
 
-    onSubmit();
     onClose();
   };
 

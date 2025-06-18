@@ -145,8 +145,6 @@ class TimetableSerializer:
 
         block = entry.parent.session_block if entry.parent else None
         contribution = entry.contribution
-        print('THE CONTRIII')
-        print(contribution.id)
         data = {}
         data.update(self._get_entry_data(entry))
         if contribution.session:

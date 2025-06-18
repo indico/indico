@@ -55,6 +55,7 @@ def create_contribution_entry(event, data, session_block=None, extend_parent=Tru
     start_dt = data.pop('start_dt')
     contribution_ = Contribution(event=event)
     contribution_.populate_from_dict(data)
+    print('Im done with populating')
     entry_data = {'object': contribution_, 'start_dt': start_dt}
     parent = session_block.timetable_entry if extend_parent and session_block else None
     entry = create_timetable_entry(event, entry_data, parent=parent, extend_parent=extend_parent)

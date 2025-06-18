@@ -15,28 +15,27 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import RHManageContributionBase, RHManageContributionsBase
 from indico.modules.events.contributions.models.references import ContributionReference
-from indico.modules.events.contributions.operations import delete_contribution, update_contribution
+from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
+from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import delete_session_block, update_session_block
-from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_entry_update, serialize_event_info,
                                                     serialize_session)
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import (create_break_entry, create_contribution_entry,
-                                                        create_session_block_entry, create_timetable_entry,
-                                                        delete_timetable_entry, update_break_entry,
-                                                        update_timetable_entry)
-from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema
+from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
+                                                        create_timetable_entry, delete_timetable_entry,
+                                                        update_break_entry, update_timetable_entry)
+from indico.modules.events.timetable.schemas import BreakSchema, SessionBlockSchema
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
-from indico.web.args import use_args, use_args_schema_context
+from indico.web.args import use_args_schema_context
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -196,24 +195,41 @@ class RHTimetableBreak(RHManageEventBase):
 
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
-    def _process_POST(self, data: Contribution):
+    def _process_POST(self, data):
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
+        # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-        contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
-        return ContributionSchema(context={'event': self.event}).jsonify(contrib_entry.contribution)
+
+        contrib = create_contribution(self.event, data)
+        return ContributionSchema(context={'event': self.event}).jsonify(contrib)
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
 
 class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):
+        print('its doing some patch oppp')
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
 
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-        
+
+        print('patchy patch')
         # TODO: (Ajob)  Find cleaner solution for marshmallow alias. I think there's already something there
         #               in the schema itself called marshmallow_alias which makes _description into description
         #               but it doesn't work for dumping, only for loading.
-        data['description'] = data['_description']
-        del data['_description']
+        if '_description' in data:
+            data['description'] = data.pop('_description')
         
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)

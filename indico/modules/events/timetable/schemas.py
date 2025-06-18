@@ -5,15 +5,37 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields, pre_load
+from typing import List
+from marshmallow import EXCLUDE, fields, pre_load
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import ContributionReferenceSchema, TimezoneAwareSessionBlockSchema
-from indico.modules.events.person_link_schemas import EventPersonLinkSchema
-from indico.modules.events.sessions.schemas import LocationDataSchema, SessionBlockSchema, SessionColorSchema
+from indico.modules.events.contributions.schemas import ContributionReferenceSchema
+from indico.modules.events.person_link_schemas import (
+    ContributionPersonLinkSchema as _ContributionPersonLinkSchema,
+    SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
+)
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+
+class SimplePersonLinkSchema(_ContributionPersonLinkSchema):
+    class Meta:
+        model = _ContributionPersonLinkSchema
+        fields = ('id', 'roles')
+
+
+class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = SessionBlock
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
+
+    start_dt = fields.DateTime(required=True)
+    location_data = fields.Nested(LocationDataSchema)
+    # TODO: Make it so that passing explicit `many=True` is not required
+    conveners = fields.Nested(_SessionBlockPersonLinkSchema(many=True, partial=False, unknown=EXCLUDE), attribute='person_links', partial=False, unknown=EXCLUDE)
+    duration = fields.TimeDelta(required=True)
 
 
 class BreakSchema(mm.SQLAlchemyAutoSchema):
@@ -33,15 +55,14 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'event_id', 'references', 'person_links', 'session_block', 'duration', 'start_dt')
+                  'event_id', 'references', 'person_links', 'session_block', 'duration', 'start_dt',
+                  'avatar_url', 'name')
 
     start_dt = fields.DateTime(required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.SECONDS)
-    person_links = fields.Nested(EventPersonLinkSchema, many=True, dump_only=True)
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
-    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
-
 
 class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
@@ -50,10 +71,7 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
                   'contribution_id', 'break_id', 'type', 'start_dt',
                   'end_dt', 'duration', 'object', 'contribution', 'break_',
                   'session_block')
-        # include_relationships = True
-        # load_instance = True
 
-    type_number = None
     type = fields.Method('get_type', 'load_type')
     object = fields.Method('get_object', 'load_object')
     session_block_id = fields.Nested(SessionBlockSchema, only=('id',), dump_only=True)

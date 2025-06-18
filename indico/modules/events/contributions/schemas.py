@@ -8,7 +8,7 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import ValidationError, fields, post_dump, post_load, validates
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump, post_load, validates
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -171,7 +171,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     start_dt = EventTimezoneDateTimeField()
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
-    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False, unknown=EXCLUDE)
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
