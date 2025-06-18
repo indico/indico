@@ -61,7 +61,7 @@ sqlalchemy<2  # major upgrade
 terminaltables
 translitcodec
 ua-parser
-urllib3<2  # not yet compatible with botocore (s3 plugin)
+urllib3<3  # not yet compatible with botocore (s3 plugin)
 wallet-py3k
 weasyprint
 webargs
