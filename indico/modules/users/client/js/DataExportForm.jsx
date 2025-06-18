@@ -124,7 +124,7 @@ function AdditionalOptions() {
 function Toggle({name, title, description}) {
   return (
     <div styleName="toggle">
-      <FinalCheckbox name={name} label={<b>{title}</b>} />
+      <FinalCheckbox name={name} label={title} />
       <div styleName="description">{description}</div>
     </div>
   );
