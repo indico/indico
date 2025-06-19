@@ -205,6 +205,53 @@ describe('Time', () => {
   });
 
   it.each([
+    // 12-hour format with meridiem (should parse as 12-hour)
+    ['12:00 AM', 0, 0],
+    ['12:01 AM', 0, 1],
+    ['12:00 PM', 12, 0],
+    ['12:01 PM', 12, 1],
+    ['01:00 PM', 13, 0],
+    ['11:59 PM', 23, 59],
+    ['7:00 am', 7, 0],
+    ['7:00 p.m.', 19, 0],
+    ['7:00 P', 19, 0],
+    ['7a', 7, 0],
+    ['2p', 14, 0],
+    ['740a', 7, 40],
+    ['240p', 14, 40],
+    ['12p', 12, 0],
+    ['13 PM', 13, 3],
+    ['56p', 17, 6],
+    [' 7:00 a m', 7, 0],
+    ['07 : 00AM', 7, 0],
+
+    // 24-hour format (no meridiem, should parse as 24-hour)
+    ['00:00', 0, 0],
+    ['00:01', 0, 1],
+    ['03:10', 3, 10],
+    ['12:00', 12, 0],
+    ['12:01', 12, 1],
+    ['19:10', 19, 10],
+    ['23:59', 23, 59],
+    ['19h10', 19, 10],
+    ['19H 10', 19, 10],
+    ['19.10', 19, 10],
+    ['7', 7, 0],
+    ['07', 7, 0],
+    ['700', 7, 0],
+    ['0730', 7, 30],
+    ['1234', 12, 34],
+    ['56', 5, 6],
+    [' 7:00 ', 7, 0],
+    ['07 : 00', 7, 0],
+  ])(
+    'should parse valid time formats with automatic format detection, like "%s"',
+    (input, hour, minute) => {
+      expect(Time.fromString(input, 'any')).toEqual(Time.fromHour(hour, minute));
+    }
+  );
+
+  it.each([
     '2400',
     '24:00',
     '1260',
@@ -259,6 +306,49 @@ describe('Time', () => {
     expect(Time.fromString(input, '12h').value).toBe(NaN);
   });
 
+  it.each([
+    // Invalid formats that should fail for both 12h and 24h
+    '2400',
+    '24:00',
+    '1260',
+    '12:60',
+    '-1:00',
+    '25:00',
+    '07-00',
+    '07::00',
+    '::',
+    'NaN',
+    'null',
+    'undefined',
+    '',
+    'true',
+    'false',
+    '{}',
+    '[]',
+    'lunch time',
+    'midnightish',
+    '12:345',
+    '9:9999',
+    '7:00🕖',
+
+    // Invalid 12-hour formats (has meridiem but invalid structure)
+    '0:00 PM', // Hour 0 is invalid in 12-hour
+    '0:30 PM', // Hour 0 is invalid in 12-hour
+    '0h30 PM', // Hour 0 is invalid in 12-hour
+    'am', // No time component
+    'AM', // No time component
+    'AM 07:00', // Meridiem before time
+    '7 AM PM', // Double meridiem
+    'PM:07 00', // Meridiem in wrong position
+
+    // These have meridiem indicators but invalid for 12-hour format
+    '11:12am', // Would be 11:12 in 24h but invalid separator before meridiem
+    '08:00 PM', // Leading zero typically not used in 12-hour format
+    '9:30 a.m.', // Would be 9:30 in 24h but invalid separator before meridiem
+  ])('should fail to parse invalid formats with automatic format selection, like "%s"', input => {
+    expect(Time.fromString(input, 'any').value).toBe(NaN);
+  });
+
   it('should format to locale string', () => {
     const t = Time.fromString('14:00');
 
@@ -278,6 +368,22 @@ describe('Time', () => {
     const t = Time.fromString(timeString);
 
     expect(t.toDurationString()).toBe(durationString);
+  });
+
+  it('should use automatic selection of time format by default', () => {
+    const sample12hA = Time.fromString('12:01', '12h');
+    const sampleAnyA = Time.fromString('12:01', 'any');
+    const sampleDefA = Time.fromString('12:01');
+
+    expect(sample12hA.value).not.toBe(sampleAnyA.value);
+    expect(sampleAnyA.value).toBe(sampleDefA.value);
+
+    const sample24hB = Time.fromString('7:00 PM', '24h');
+    const sampleAnyB = Time.fromString('7:00 PM', 'any');
+    const sampleDefB = Time.fromString('7:00 PM');
+
+    expect(sample24hB.value).not.toBe(sampleAnyB.value);
+    expect(sampleAnyB.value).toBe(sampleDefB.value);
   });
 });
 
