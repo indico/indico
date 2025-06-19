@@ -28,6 +28,8 @@ Improvements
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
 - Log user-specific ACL changes to user log (:pr:`6841`, thanks :user:`tomako`)
 - Include language settings when cloning an event (:issue:`6871`, :pr:`6929`)
+- Improve the booking linking feature (:issue:`6568`, :issue:`6811`, :pr:`6846`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
