@@ -118,7 +118,7 @@ export function preprocessTimetableEntries(
         personLinks,
         boardNumber,
         code,
-        location: {
+        locationData: {
           address,
           room,
           venueName,

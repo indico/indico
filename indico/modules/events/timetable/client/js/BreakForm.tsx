@@ -50,6 +50,7 @@ export function BreakFormFields({
     extraOptions = {},
 }: BreakFormFieldsProps) {
     const {minStartDt, maxEndDt} = extraOptions;
+
     return (
         <>
             <FinalInput name="title" label={Translate.string('Title')} autoFocus required />

@@ -137,8 +137,6 @@ export function ContributionFormFields({
 
   const {minStartDt, maxEndDt} = extraOptions;
   
-  console.log('contrib form things')
-  console.log(initialValues);
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />

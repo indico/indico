@@ -21,6 +21,7 @@ import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
 import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
@@ -30,8 +31,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session} from './types';
-import {mapPersonLinkToSchema, mapTTDataToEntry} from './utils';
-import {snakifyKeys} from 'indico/utils/case';
+import {mapTTDataToEntry} from './utils';
 
 // Generic models
 
@@ -95,8 +95,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onClose = () => null,
   onSubmit = () => null,
 }) => {
-  console.log('entry type', entry.type);
-
   const dispatch = useDispatch();
   const isEditing = !!entry.id;
   const personLinkFieldParams = {
@@ -116,7 +114,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     keywords: entry.keywords || [],
     references: entry.references || [],
     // TODO: (Ajob) Clean up the location data
-    location_data: {inheriting: false, ...(entry.location || {})},
+    location_data: snakifyKeys(entry.location) || {inheriting: false},
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
     start_dt: entry.startDt.format(),
@@ -124,6 +122,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
     code: entry.code,
+    colors: entry.colors,
   };
 
   const typeLongNames = {
@@ -279,14 +278,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       delete submitData['person_links'];
     }
 
-    console.log('avant submit');
     const {data: resData} = await submitHandler(submitData);
-    console.log('apres submit');
+    resData['type'] = activeType;
 
     const resEntry = mapTTDataToEntry(resData);
-    console.log('resentry', resEntry);
-
-    resEntry['type'] = activeType;
 
     if (isEditing) {
       dispatch(actions.updateEntry(activeType, resEntry));
@@ -294,7 +289,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       dispatch(actions.createEntry(activeType, resEntry));
     }
 
-    onClose();
+    onSubmit();
+    // onClose();
   };
 
   const changeForm = (key: EntryType) => {
