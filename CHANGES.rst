@@ -26,6 +26,7 @@ Improvements
   (:pr:`6898`)
 - Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
+- Log user-specific ACL changes to user log (:pr:`6841`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^

@@ -586,11 +586,19 @@ def render_acl(obj):
     return jsonify_template('_access_list.html', acl=obj.get_inherited_acl())
 
 
-def make_acl_log_fn(obj_type, log_realm):
+def make_acl_log_fn(obj_type, log_realm=None):
+    """Create logger function for logging ACL changes in both the object's and user's log.
+
+    :param obj_type: Object type, permissions belong to
+    :param log_realm: Log realm for permission owner's log entry.
+                      If `None`, only principal log entry will be created (if it's a `User`).
+    """
     def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **kwargs):
-        from indico.modules.logs.models.entries import LogKind
+        from indico.modules.logs.models.entries import LogKind, UserLogRealm
 
         if quiet:
+            return
+        if isinstance(obj, db.m.Event) and obj._logging_disabled:
             return
 
         user = session.user if session else None  # allow acl changes outside request context
@@ -617,17 +625,21 @@ def make_acl_log_fn(obj_type, log_realm):
         elif principal.principal_type == PrincipalType.event_role:
             data['Event Role'] = principal.name
         if entry is None:
+            summary = 'ACL entry removed'
+            log_kind = LogKind.negative
             data['Read Access'] = old_data['read_access']
             data['Manager'] = old_data['full_access']
             data['Permissions'] = _format_permissions(old_data['permissions'])
-            obj.log(log_realm, LogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
         elif is_new:
+            summary = 'ACL entry added'
+            log_kind = LogKind.positive
             data['Read Access'] = entry.read_access
             data['Manager'] = entry.full_access
             if entry.permissions:
                 data['Permissions'] = _format_permissions(entry.permissions)
-            obj.log(log_realm, LogKind.positive, 'Protection', 'ACL entry added', user, data=data)
         elif entry.current_data != old_data:
+            summary = 'ACL entry changed'
+            log_kind = LogKind.change
             data['Read Access'] = entry.read_access
             data['Manager'] = entry.full_access
             current_permissions = set(entry.permissions)
@@ -639,6 +651,51 @@ def make_acl_log_fn(obj_type, log_realm):
                 data['Permissions (removed)'] = _format_permissions(removed_permissions)
             if current_permissions:
                 data['Permissions'] = _format_permissions(current_permissions)
-            obj.log(log_realm, LogKind.change, 'Protection', 'ACL entry changed', user, data=data)
+        else:
+            return
+
+        if log_realm:
+            obj.log(log_realm, log_kind, 'Protection', summary, user, data=data)
+
+        if principal.principal_type == PrincipalType.user:
+            user_log_data = data.copy()
+            del user_log_data['User']
+            extra_user_log_data, obj_title = _get_hierarchical_log_data(obj)
+            user_log_data.update(extra_user_log_data)
+
+            match log_kind:
+                case LogKind.positive:
+                    summary = f'{obj_type.__name__} ACL entry added ({obj_title})'
+                case LogKind.negative:
+                    summary = f'{obj_type.__name__} ACL entry removed ({obj_title})'
+                case LogKind.change:
+                    summary = f'{obj_type.__name__} ACL entry changed ({obj_title})'
+                case _:
+                    assert False  # cannot happen, but would log a wrong summary
+            principal.log(UserLogRealm.acl, log_kind, 'Permissions', summary, user, data=user_log_data)
 
     return _log_acl_changes
+
+
+def _get_obj_name(obj):
+    return getattr(obj, 'title', None) or getattr(obj, 'name', None) or str(obj)
+
+
+def _get_hierarchical_log_data(obj):
+    stop_types = (db.m.Event, db.m.Category, db.m.Location)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+    segments = []
+    data = {}
+    stop = False
+    while obj:
+        data[f'{type(obj).__name__} ID'] = obj.id
+        segments.append(_get_obj_name(obj))
+        if isinstance(obj, db.m.Category) and 'Category path' not in data:
+            data['Category path'] = sep.join(obj.chain_titles)
+        obj = obj.protection_parent
+        if obj is None or stop:
+            break
+        if isinstance(obj, stop_types):
+            stop = True  # include the parent, but don't climb further
+
+    return data, sep.join(reversed(segments))

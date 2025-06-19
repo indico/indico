@@ -74,6 +74,10 @@
     @include icon-before('icon-users');
   }
 
+  li.log-realm-acl span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-shield');
+  }
+
   li.log-realm-user span.log-module span.log-icon i.log-realm {
     @include icon-before('icon-user');
   }

@@ -34,9 +34,16 @@ class CategoryLogRealm(RichIntEnum):
 
 
 class UserLogRealm(RichIntEnum):
-    __titles__ = (None, _('User'), _('Management'))
+    __titles__ = (
+        None,
+        _('User'),
+        _('Management'),
+        # i18n: Access Control List
+        _('ACL')
+    )
     user = 1
     management = 2
+    acl = 3
 
 
 class LogKind(IndicoIntEnum):
