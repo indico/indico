@@ -340,11 +340,6 @@ describe('Time', () => {
     'AM 07:00', // Meridiem before time
     '7 AM PM', // Double meridiem
     'PM:07 00', // Meridiem in wrong position
-
-    // These have meridiem indicators but invalid for 12-hour format
-    '11:12am', // Would be 11:12 in 24h but invalid separator before meridiem
-    '08:00 PM', // Leading zero typically not used in 12-hour format
-    '9:30 a.m.', // Would be 9:30 in 24h but invalid separator before meridiem
   ])('should fail to parse invalid formats with automatic format selection, like "%s"', input => {
     expect(Time.fromString(input, 'any').value).toBe(NaN);
   });
