@@ -658,24 +658,44 @@ def make_acl_log_fn(obj_type, log_realm=None):
             obj.log(log_realm, log_kind, 'Protection', summary, user, data=data)
 
         if principal.principal_type == PrincipalType.user:
-            sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
             user_log_data = data.copy()
             del user_log_data['User']
-            user_log_data[f'{obj_type.__name__} ID'] = obj.id
-            if isinstance(obj, db.m.Category):
-                user_log_data['Category path'] = sep.join(obj.chain_titles)
-            obj_title = getattr(obj, 'title', None) or getattr(obj, 'name', str(obj))
-            if parent := obj.protection_parent:
-                user_log_data[f'{type(parent).__name__} ID'] = parent.id
-                parent_title = getattr(parent, 'title', None) or getattr(parent, 'name', str(parent))
-                obj_title = f'{parent_title} {sep} {obj_title}'
+            extra_user_log_data, obj_title = _get_hierarchical_log_data(obj)
+            user_log_data.update(extra_user_log_data)
 
-            if log_kind == LogKind.positive:
-                summary = f'{obj_type.__name__} permission granted ({obj_title})'
-            elif log_kind == LogKind.negative:
-                summary = f'{obj_type.__name__} permission revoked ({obj_title})'
-            elif log_kind == LogKind.change:
-                summary = f'{obj_type.__name__} permission changed ({obj_title})'
+            match log_kind:
+                case LogKind.positive:
+                    summary = f'{obj_type.__name__} permission granted ({obj_title})'
+                case LogKind.negative:
+                    summary = f'{obj_type.__name__} permission revoked ({obj_title})'
+                case LogKind.change:
+                    summary = f'{obj_type.__name__} permission changed ({obj_title})'
+                case _:
+                    assert False  # cannot happen, but would log a wrong summary
             principal.log(UserLogRealm.permissions, log_kind, 'ACL', summary, user, data=user_log_data)
 
     return _log_acl_changes
+
+
+def _get_obj_name(obj):
+    return getattr(obj, 'title', None) or getattr(obj, 'name', None) or str(obj)
+
+
+def _get_hierarchical_log_data(obj):
+    stop_types = (db.m.Event, db.m.Category, db.m.Location)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+    segments = []
+    data = {}
+    stop = False
+    while obj:
+        data[f'{type(obj).__name__} ID'] = obj.id
+        segments.append(_get_obj_name(obj))
+        if isinstance(obj, db.m.Category) and 'Category path' not in data:
+            data['Category path'] = sep.join(obj.chain_titles)
+        obj = obj.protection_parent
+        if obj is None or stop:
+            break
+        if isinstance(obj, stop_types):
+            stop = True  # include the parent, but don't climb further
+
+    return data, sep.join(reversed(segments))
