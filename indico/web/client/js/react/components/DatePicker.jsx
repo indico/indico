@@ -27,7 +27,6 @@ export default function DatePicker({
   filter,
   ...inputProps
 }) {
-  console.log('DatePicker', value);
   function handleDateChange(evt) {
     const {date} = evt.target.closest('ind-date-picker');
     const invalid = !!evt.target.value && !date;
