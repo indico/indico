@@ -18,6 +18,7 @@ from indico.modules.events.cloning import get_event_cloners
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.events.settings import event_language_settings
 from indico.modules.logs import EventLogRealm
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_legacy_id
@@ -210,3 +211,4 @@ def _event_cloned(old_event, new_event, **kwargs):
     new_event.contact_title = old_event.contact_title
     new_event.contact_emails = old_event.contact_emails
     new_event.contact_phones = old_event.contact_phones
+    event_language_settings.set_multi(new_event, event_language_settings.get_all(old_event, no_defaults=True))
