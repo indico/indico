@@ -109,7 +109,7 @@ export default function FormItem({
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
-  const isReadOnly = inputType === 'email' && rest.readonlyEmail;
+  const isReadOnly = inputType === 'email' && rest.readonlyEmail && rest.fieldIsPersonalData;
   const disabled =
     !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement) || isReadOnly;
 
