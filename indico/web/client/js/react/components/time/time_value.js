@@ -10,6 +10,10 @@
 // pattern to test *if* the time is in 12-hour format.
 const LAX_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)?$/i;
 
+// This is a strict 12h pattern that requires the meridiem part. It can be tested
+// to see whether the string is a 12h time of day string.
+const STRICT_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)$/i;
+
 // Matches zero-padded and non-zero-padded hours and minutes with or without ':'.
 const T24H_PATTERN = /^(?<hours>[01]\d|2[0-3]|\d)(?: *[:.h]? *(?<minutes>[0-5]?\d))?$/i;
 
@@ -23,38 +27,61 @@ function zeroPad(n) {
   return n.toString().padStart(2, '0');
 }
 
+function regexMatch12To24h(match) {
+  const hourString = match.groups.hours;
+  const minuteString = match.groups.minutes ?? '0';
+  const isPM = !!match.groups.meridiem?.toLowerCase().includes('p');
+  const hour = meridiemFixups[isPM](parseInt(hourString, 10));
+  const minute = parseInt(minuteString, 10);
+  return [hour, minute];
+}
+
+function regexMatch24To24h(match) {
+  const hourString = match.groups.hours;
+  const minuteString = match.groups.minutes ?? '0';
+  const hour = parseInt(hourString, 10);
+  const minute = parseInt(minuteString, 10);
+  return [hour, minute];
+}
+
 function parse12h(timeOfDayString) {
   let match;
 
   if ((match = LAX_T12H_PATTERN.exec(timeOfDayString))) {
-    const hourString = match.groups.hours;
-    const minuteString = match.groups.minutes ?? '0';
-    const isPM = !!match.groups.meridiem?.toLowerCase().includes('p');
-    const hour = meridiemFixups[isPM](parseInt(hourString, 10));
-    const minute = parseInt(minuteString, 10);
-    return [hour, minute];
-  } else {
-    return [NaN, NaN];
+    return regexMatch12To24h(match);
   }
+
+  return [NaN, NaN];
 }
 
 function parse24h(timeOfDayString) {
   let match;
 
   if ((match = T24H_PATTERN.exec(timeOfDayString))) {
-    const hourString = match.groups.hours;
-    const minuteString = match.groups.minutes ?? '0';
-    const hour = parseInt(hourString, 10);
-    const minute = parseInt(minuteString, 10);
-    return [hour, minute];
-  } else {
-    return [NaN, NaN];
+    return regexMatch24To24h(match);
   }
+
+  return [NaN, NaN];
+}
+
+function parseAny(timeOfDayString) {
+  let match;
+
+  if ((match = STRICT_T12H_PATTERN.exec(timeOfDayString))) {
+    return regexMatch12To24h(match);
+  }
+
+  if ((match = T24H_PATTERN.exec(timeOfDayString))) {
+    return regexMatch24To24h(match);
+  }
+
+  return [NaN, NaN];
 }
 
 const parsers = {
   '24h': parse24h,
   '12h': parse12h,
+  'any': parseAny,
 };
 
 /**
@@ -112,8 +139,8 @@ export class Time {
    *
    * See tests for a more complete list of examples.
    */
-  static fromString(timeOfDayString, format = '24h') {
-    const parser = parsers[format] || parse24h;
+  static fromString(timeOfDayString, format) {
+    const parser = parsers[format] || parseAny;
     const [hour, minute] = parser(timeOfDayString.trim());
     return this.fromHour(hour, minute);
   }

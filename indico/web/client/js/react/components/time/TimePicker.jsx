@@ -61,13 +61,14 @@ function getOptions(currentValue, startTime, step, min, max, timeFormat) {
   });
 }
 
-function formatTimeString(value, timeFormat, strict = false) {
+function formatTimeString(value, timeFormat) {
   if (!value) {
     return '';
   }
+
   const time = Time.fromString(value, timeFormat);
   if (isNaN(time.value)) {
-    return strict ? '' : value;
+    return '';
   }
 
   return time.toLocaleString(TIME_FORMAT_LOCALE[timeFormat]);
@@ -97,9 +98,9 @@ function rankTimeOption(timeFormat, _, keywordText, option) {
 }
 
 export default function TimePicker({value, startTime, step, min, max, timeFormat, onChange}) {
-  const [inputValue, setInputValue] = useState(formatTimeString(value, timeFormat));
+  const [inputValue, setInputValue] = useState(formatTimeString(value, '24h'));
   const [notice, setNotice] = useState('');
-  const valueAsTime = Time.fromString(value);
+  const valueAsTime = Time.fromString(value, '24h');
 
   const options = useMemo(() => getOptions(value, startTime, step, min, max, timeFormat), [
     value,
@@ -109,31 +110,6 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
     max,
     timeFormat,
   ]);
-
-  const fixValueIfNeeded = newValue => {
-    const maybeFixedValue = formatTimeString(newValue, timeFormat, true);
-
-    if (maybeFixedValue === newValue) {
-      // Value was already fixed
-      return;
-    }
-
-    if (!maybeFixedValue) {
-      setNotice(
-        Translate.string('The time value was invalid and was cleared', {
-          time: maybeFixedValue,
-        })
-      );
-    } else {
-      setNotice(
-        Translate.string('The time value was automatically corrected to {time}', {
-          time: maybeFixedValue,
-        })
-      );
-    }
-
-    setInputValue(maybeFixedValue);
-  };
 
   // Auto-clear notice
   useEffect(() => {
@@ -150,7 +126,7 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
 
   useEffect(
     () => {
-      const inputTime = Time.fromString(inputValue, timeFormat);
+      const inputTime = Time.fromString(inputValue, 'any');
       // Using Object.is() as value can also be NaN
       if (!Object.is(valueAsTime.value, inputTime.value)) {
         setInputValue(valueAsTime.toLocaleString(TIME_FORMAT_LOCALE[timeFormat]));
@@ -168,13 +144,38 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
 
   const handleChange = ev => {
     const newValue = ev.target.value;
-    const formattedNewValue = Time.fromString(newValue, timeFormat).toString();
-    setInputValue(newValue);
+    const formattedNewValue = Time.fromString(newValue).toString();
+    setInputValue('any');
     onChange(formattedNewValue === 'Invalid time' ? '' : formattedNewValue);
   };
 
   const handleBlur = ev => {
-    fixValueIfNeeded(ev.target.value);
+    // Reformat the value when user leaves the field
+
+    const maybeFixedValue = formatTimeString(ev.target.value, 'any');
+
+    // Value was already fixed
+    if (maybeFixedValue === ev.target.value) {
+      return;
+    }
+
+    setInputValue(maybeFixedValue);
+
+    // Announce any changes to screen readers
+
+    if (!maybeFixedValue) {
+      setNotice(
+        Translate.string('The time value was invalid and was cleared', {
+          time: maybeFixedValue,
+        })
+      );
+    } else {
+      setNotice(
+        Translate.string('The time value was automatically formatted as {time}', {
+          time: maybeFixedValue,
+        })
+      );
+    }
   };
 
   return (
