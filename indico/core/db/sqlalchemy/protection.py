@@ -598,6 +598,8 @@ def make_acl_log_fn(obj_type, log_realm=None):
 
         if quiet:
             return
+        if isinstance(obj, db.m.Event) and obj._logging_disabled:
+            return
 
         user = session.user if session else None  # allow acl changes outside request context
         available_permissions = get_available_permissions(obj_type)
