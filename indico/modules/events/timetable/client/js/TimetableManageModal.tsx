@@ -95,6 +95,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onClose = () => null,
   onSubmit = () => null,
 }) => {
+  console.log('entry type', entry.type);
+
   const dispatch = useDispatch();
   const isEditing = !!entry.id;
   const personLinkFieldParams = {
@@ -117,10 +119,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     location_data: {inheriting: false, ...(entry.location || {})},
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
-    start_dt:
-      entry.type === EntryType.Contribution
-        ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
-        : entry.startDt.format(),
+    start_dt: entry.startDt.format(),
     duration: entry.duration * 60, // Minutes to seconds
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
@@ -234,7 +233,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleEditContribution = async data => {
-    console.log('IS THERE AN ISSUE HERE OR NAH');
     return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data);
   };
 
@@ -266,6 +264,13 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     if (!submitHandler) {
       throw new Error('Invalid form or no submit function found');
+    }
+
+    if (data['start_dt']) {
+      data['start_dt'] =
+        activeType === EntryType.Contribution
+          ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
+          : entry.startDt.format();
     }
 
     const submitData = snakifyKeys(data);
