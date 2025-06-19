@@ -27,6 +27,7 @@ Improvements
 - Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
   thanks :user:`Moliholy, omegak, unconventionaldotdev`)
 - Log user-specific ACL changes to user log (:pr:`6841`, thanks :user:`tomako`)
+- Include language settings when cloning an event (:issue:`6871`, :pr:`6929`)
 
 Bugfixes
 ^^^^^^^^
