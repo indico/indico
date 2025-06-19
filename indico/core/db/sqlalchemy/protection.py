@@ -665,14 +665,14 @@ def make_acl_log_fn(obj_type, log_realm=None):
 
             match log_kind:
                 case LogKind.positive:
-                    summary = f'{obj_type.__name__} permission granted ({obj_title})'
+                    summary = f'{obj_type.__name__} ACL entry added ({obj_title})'
                 case LogKind.negative:
-                    summary = f'{obj_type.__name__} permission revoked ({obj_title})'
+                    summary = f'{obj_type.__name__} ACL entry removed ({obj_title})'
                 case LogKind.change:
-                    summary = f'{obj_type.__name__} permission changed ({obj_title})'
+                    summary = f'{obj_type.__name__} ACL entry changed ({obj_title})'
                 case _:
                     assert False  # cannot happen, but would log a wrong summary
-            principal.log(UserLogRealm.permissions, log_kind, 'ACL', summary, user, data=user_log_data)
+            principal.log(UserLogRealm.acl, log_kind, 'Permissions', summary, user, data=user_log_data)
 
     return _log_acl_changes
 
