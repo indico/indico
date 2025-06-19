@@ -238,7 +238,7 @@ typing-extensions==4.12.2
     #   anyio
 unbeheader==1.4.0
     # via -r requirements.dev.in
-urllib3==1.26.20
+urllib3==2.5.0
     # via
     #   -c requirements.txt
     #   requests
