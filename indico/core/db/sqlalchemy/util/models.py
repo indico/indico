@@ -214,17 +214,11 @@ class IndicoModel(Model):
 
             # Track the old and new value so we can log the change
             old_value = getattr(self, key, None)
-            print('the key is ', key)
-            print('the value is ', value)
-            print(self, key, value)
             setattr(self, key, value)
-            print('ive set it')
             new_value = getattr(self, key)
             if old_value != new_value:
                 # XXX: we copy because of https://github.com/sqlalchemy/sqlalchemy/issues/3913
                 changed[key] = (copy(old_value), copy(new_value))
-        
-        print('after the iterations')
         return changed if track_changes else None
 
     def populate_from_attrs(self, obj, attrs):

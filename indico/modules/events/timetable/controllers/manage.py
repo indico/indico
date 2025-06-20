@@ -219,13 +219,11 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
 class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):
-        print('its doing some patch oppp')
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
 
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
 
-        print('patchy patch')
         # TODO: (Ajob)  Find cleaner solution for marshmallow alias. I think there's already something there
         #               in the schema itself called marshmallow_alias which makes _description into description
         #               but it doesn't work for dumping, only for loading.
