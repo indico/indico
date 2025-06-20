@@ -381,6 +381,7 @@ def merge_users(source, target, force=False):
 
     # Move emails to the target user
     primary_source_email = source.email
+    source_extra_emails = sorted(source.secondary_emails)
     logger.info('Target %s initial emails: %s', target, ', '.join(target.all_emails))
     logger.info('Source %s emails to be linked to target %s: %s', source, target, ', '.join(source.all_emails))
     UserEmail.query.filter_by(user_id=source.id).update({
@@ -437,7 +438,8 @@ def merge_users(source, target, force=False):
 
     target.log(**log_args, summary=f'User merged from {source.full_name}', data={
         'Source ID': source.id, 'First Name': source.first_name, 'Last Name': source.last_name, 'Email': source.email,
-        'Identities': [f'{x.provider} - {x.identifier}' for x in source_identities]
+        'Extra emails': source_extra_emails,
+        'Identities': [f'{x.identifier} ({x.provider})' for x in source_identities],
     })
 
     logger.info('Successfully merged %s into %s', source, target)
