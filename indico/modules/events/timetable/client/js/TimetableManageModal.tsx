@@ -290,7 +290,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     onSubmit();
-    // onClose();
+    onClose();
   };
 
   const changeForm = (key: EntryType) => {

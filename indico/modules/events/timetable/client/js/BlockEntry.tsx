@@ -110,7 +110,7 @@ export default function BlockEntry({
     startDt: moment(child.startDt)
       .add(deltaMinutes, 'minutes')
       .format(),
-  })) ?? [];
+  }));
 
   // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);
   // const setChildDuration = useCallback(() => {}, [])

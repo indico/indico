@@ -32,12 +32,11 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     start_dt = fields.DateTime(required=True)
     location_data = fields.Nested(LocationDataSchema)
     # TODO: Make it so that passing explicit `many=True` is not required
-    conveners = fields.Nested(
-        _SessionBlockPersonLinkSchema(many=True, partial=False, unknown=EXCLUDE),
-        attribute='person_links',
+    conveners = fields.List(fields.Nested(
+        _SessionBlockPersonLinkSchema(partial=False, unknown=EXCLUDE),
         partial=False,
         unknown=EXCLUDE
-    )
+    ), attribute='person_links')
     duration = fields.TimeDelta(required=True)
 
 
