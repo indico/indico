@@ -145,7 +145,7 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
   const handleChange = ev => {
     const newValue = ev.target.value;
     const formattedNewValue = Time.fromString(newValue).toString();
-    setInputValue('any');
+    setInputValue(newValue);
     onChange(formattedNewValue === 'Invalid time' ? '' : formattedNewValue);
   };
 
