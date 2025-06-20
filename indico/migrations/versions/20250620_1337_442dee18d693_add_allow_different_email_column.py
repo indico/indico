@@ -1,7 +1,7 @@
 """Add allow_different_email column
 
 Revision ID: 442dee18d693
-Revises: 281d849bc4df
+Revises: a5b6d7237997
 Create Date: 2025-06-17 19:29:43.620509
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '442dee18d693'
-down_revision = '281d849bc4df'
+down_revision = 'a5b6d7237997'
 branch_labels = None
 depends_on = None
 
