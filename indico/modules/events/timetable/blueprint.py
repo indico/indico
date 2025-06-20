@@ -73,15 +73,16 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
 
 # TODO: (Ajob) Replace API routes below with generic
 _bp.add_url_rule('/timetable/break', 'tt_break_create', RHTimetableBreakCreate, methods=('POST',))
-_bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetableBreak, methods=('GET', 'PATCH','DELETE'))
+_bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetableBreak,
+                 methods=('GET', 'PATCH', 'DELETE'))
 
 _bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContributionCreate, methods=('POST',))
-_bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution, methods=('GET', 'PATCH','DELETE'))
-
+_bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution,
+                 methods=('GET', 'PATCH', 'DELETE'))
 _bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
                  methods=('POST',))
 _bp.add_url_rule('/timetable/session-block/<int:session_block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
-                 methods=('GET', 'PATCH','DELETE'))
+                 methods=('GET', 'PATCH', 'DELETE'))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
