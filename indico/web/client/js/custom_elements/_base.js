@@ -8,11 +8,32 @@
 import {toOptionalDate} from 'indico/utils/date';
 import {domReady} from 'indico/utils/domstate';
 
+const isPrototypeOf = Object.prototype.isPrototypeOf;
+
 function toKebabCase(propertyName) {
   return propertyName.replace(/[^A-Z][A-Z]/g, s => `${s[0]}-${s[1].toLowerCase()}`).toLowerCase();
 }
 
 export default class CustomElementBase extends HTMLElement {
+  static CustomAttribute = class {
+    static isSubclass(Other) {
+      return isPrototypeOf.call(this.prototype, Other.prototype);
+    }
+
+    constructor(element, attrName) {
+      this.element = element;
+      this.name = attrName;
+    }
+
+    getValue() {
+      return this.element.getAttribute(this.name);
+    }
+
+    setValue(value) {
+      this.element.setAttribute(this.name, value);
+    }
+  };
+
   static setValue = (element, value) => {
     // This is a hack to bypass the setter that React adds to the
     // value property. Apparently, modifying a value before firing
@@ -100,42 +121,50 @@ export default class CustomElementBase extends HTMLElement {
       const defaultValue = attributeSpec.default ?? null;
       const attributeName = toKebabCase(propertyName);
       let getter, setter;
-      switch (attributeSpec.type) {
-        case Boolean:
-          getter = function() {
-            return this.hasAttribute(attributeName);
-          };
-          setter = function(value) {
-            this.toggleAttribute(attributeName, value);
-          };
-          break;
-        case Number:
-          getter = function() {
-            return Number(this.getAttribute(attributeName));
-          };
-          setter = function(value) {
-            this.setAttribute(attributeName, value ?? '');
-          };
-          break;
-        case Date:
-          getter = function() {
-            return toOptionalDate(this.getAttribute(attributeName));
-          };
-          setter = function(value) {
-            if (typeof value === 'string') {
+
+      if (this.constructor.CustomAttribute.isSubclass(attributeSpec.type)) {
+        const Attr = attributeSpec.type;
+        const attr = new Attr(this, attributeName);
+        getter = attr.getValue.bind(attr);
+        setter = attr.getValue.bind(attr);
+      } else {
+        switch (attributeSpec.type) {
+          case Boolean:
+            getter = function() {
+              return this.hasAttribute(attributeName);
+            };
+            setter = function(value) {
+              this.toggleAttribute(attributeName, value);
+            };
+            break;
+          case Number:
+            getter = function() {
+              return Number(this.getAttribute(attributeName));
+            };
+            setter = function(value) {
+              this.setAttribute(attributeName, value ?? '');
+            };
+            break;
+          case Date:
+            getter = function() {
+              return toOptionalDate(this.getAttribute(attributeName));
+            };
+            setter = function(value) {
+              if (typeof value === 'string') {
+                this.setAttribute(attributeName, value);
+              } else {
+                this.setAttribute(attributeName, value?.toDateString?.() || '');
+              }
+            };
+            break;
+          default:
+            getter = function() {
+              return this.getAttribute(attributeName) ?? defaultValue;
+            };
+            setter = function(value) {
               this.setAttribute(attributeName, value);
-            } else {
-              this.setAttribute(attributeName, value?.toDateString?.() || '');
-            }
-          };
-          break;
-        default:
-          getter = function() {
-            return this.getAttribute(attributeName) ?? defaultValue;
-          };
-          setter = function(value) {
-            this.setAttribute(attributeName, value);
-          };
+            };
+        }
       }
       const descriptor = {
         get: getter,
