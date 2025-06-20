@@ -936,8 +936,6 @@ CustomElementBase.define(
             const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
 
             calendarButton.dataset.currentMonth = belongsToCurrentMonth;
-            calendarButton.disabled =
-              !getDateValidity(date, {locale: indDateGrid.locale, weekInfo}) || !isRenderable;
 
             if (!isRenderable) {
               calendarButton.textContent = '';
@@ -948,40 +946,43 @@ CustomElementBase.define(
               calendarButton.removeAttribute('data-range-end');
               calendarButton.value = '';
               calendarButton.tabIndex = -1;
-              calendarButton.disabled = true;
-              return;
-            }
-
-            // Update button attributes
-            calendarButton.textContent = date.getDate();
-            calendarButton.setAttribute(
-              'aria-label',
-              date.toLocaleDateString(indDateGrid.locale, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })
-            );
-            calendarButton.toggleAttribute(
-              'data-weekend',
-              weekInfo.weekend.includes(date.getDay() + 1)
-            );
-            calendarButton.tabIndex = -1;
-            calendarButton.value = toDateString(date);
-
-            if (indDateGrid.allowableSelectionRange.includes(date)) {
-              calendarButton.removeAttribute('aria-disabled');
             } else {
-              calendarButton.setAttribute('aria-disabled', true);
-            }
+              const isValid = getDateValidity(date, {
+                locale: indDateGrid.locale,
+                weekInfo,
+              });
+              const isSelectable = indDateGrid.allowableSelectionRange.includes(date) && isValid;
 
-            if (selectedRange.includes(date)) {
-              calendarButton.setAttribute('aria-selected', true);
-            } else {
-              calendarButton.removeAttribute('aria-selected');
+              calendarButton.textContent = date.getDate();
+              calendarButton.setAttribute(
+                'aria-label',
+                date.toLocaleDateString(indDateGrid.locale, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              );
+              calendarButton.toggleAttribute(
+                'data-weekend',
+                weekInfo.weekend.includes(date.getDay() + 1)
+              );
+              calendarButton.tabIndex = -1;
+              calendarButton.value = toDateString(date);
+
+              if (isSelectable) {
+                calendarButton.removeAttribute('aria-disabled');
+              } else {
+                calendarButton.setAttribute('aria-disabled', true);
+              }
+
+              if (selectedRange.includes(date)) {
+                calendarButton.setAttribute('aria-selected', true);
+              } else {
+                calendarButton.removeAttribute('aria-selected');
+              }
+              calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
+              calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
             }
-            calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
-            calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
           });
 
           const focusableButton = listbox.querySelector(
