@@ -72,6 +72,8 @@ Internal Changes
   signals (:pr:`6858`)
 - Add the id and color of registration tags on the Checkin API endpoint for registation
   data (:pr:`6874`, thanks :user:`duartegalvao`)
+- Allow disabling arbitrary dates in date picker / calendar controls (:pr:`6905`, thanks
+  :user:`foxbunny`)
 
 
 Version 3.3.6

@@ -13,7 +13,14 @@ import {useNativeEvent} from 'indico/react/hooks';
 
 import '../style/dates.scss';
 
-export default function CalendarSingleDatePicker({onChange, date, minDate, maxDate, ...props}) {
+export default function CalendarSingleDatePicker({
+  onChange,
+  date,
+  minDate,
+  maxDate,
+  filter,
+  ...props
+}) {
   const calendarRef = useRef();
 
   useNativeEvent(calendarRef, 'change', evt => {
@@ -23,7 +30,7 @@ export default function CalendarSingleDatePicker({onChange, date, minDate, maxDa
   return (
     <ind-inline-date-picker ref={calendarRef} value={date}>
       <DatePickerInlineCalendar minDate={minDate} maxDate={maxDate} {...props}>
-        <DatePickerGrid />
+        <DatePickerGrid filter={filter} />
       </DatePickerInlineCalendar>
     </ind-inline-date-picker>
   );
@@ -36,10 +43,12 @@ CalendarSingleDatePicker.propTypes = {
   maxDate: PropTypes.string,
   yearsBefore: PropTypes.number,
   yearsAfter: PropTypes.number,
+  filter: PropTypes.func,
 };
 
 CalendarSingleDatePicker.defaultProps = {
   date: null,
   minDate: null,
   maxDate: null,
+  filter: undefined,
 };
