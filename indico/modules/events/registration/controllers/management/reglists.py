@@ -960,9 +960,7 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         attachments = {
             reg.id: reg_attachments
             for reg in self.registrations
-            if (
-                reg_attachments := self._get_registration_attachments(reg, file_fields)
-            )
+            if (reg_attachments := self._get_registration_attachments(reg, file_fields))
         }
         return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.event.id)
 
