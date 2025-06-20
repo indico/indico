@@ -15,6 +15,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
@@ -190,6 +191,10 @@ class EventLogEntry(LogEntryBase):
             lazy='dynamic'
         )
     )
+
+    @locator_property
+    def locator(self):
+        return dict(self.event.locator, log_entry_id=self.id)
 
 
 class CategoryLogEntry(LogEntryBase):

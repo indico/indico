@@ -29,6 +29,8 @@ Improvements
 - Log user-specific ACL changes to user log (:pr:`6841`, thanks :user:`tomako`)
 - Include language settings when cloning an event (:issue:`6871`, :pr:`6929`)
 - Log user merges to user log (:issue:`6882`, :pr:`6920`)
+- Allow re-sending emails from their log entries (:issue:`6805`, :pr:`6909`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
