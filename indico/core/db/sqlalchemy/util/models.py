@@ -211,6 +211,7 @@ class IndicoModel(Model):
             if not track_changes:
                 setattr(self, key, value)
                 continue
+
             # Track the old and new value so we can log the change
             old_value = getattr(self, key, None)
             setattr(self, key, value)

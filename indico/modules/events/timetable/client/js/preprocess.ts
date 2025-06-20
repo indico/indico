@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import {ChildEntry, DayEntries, Session, UnscheduledContrib} from './types';
+import {ChildEntry, DayEntries, EntryType, Session, UnscheduledContrib} from './types';
 
 interface SchemaDate {
   date: string;
@@ -22,6 +22,7 @@ interface SchemaEntry {
   textColor?: string;
   color?: string;
   slotTitle?: string;
+  conveners?: any[];
 }
 
 interface SchemaSession extends SchemaEntry {
@@ -32,7 +33,9 @@ interface SchemaBlock extends SchemaEntry {
   startDate: SchemaDate;
   duration: number;
   sessionId?: number;
+  sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
+  id: number; // ID of contribution, session_block or break
 }
 
 const entryTypeMapping = {
@@ -64,41 +67,73 @@ export function preprocessTimetableEntries(
     contributions?: {uniqueId: number; title: string; duration: number; sessionId: number}[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
-  console.log('data', data);
-
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];
     for (const _id in data[day]) {
-      const id = parseInt(_id.slice(1), 10);
+      // const id = parseInt(_id.slice(1), 10);
       const type = entryTypeMapping[_id[0]];
       const entry = data[day][_id];
+      const {
+        duration,
+        description = '',
+        address = '',
+        room = '',
+        location: venueName = '',
+        presenters = [],
+        conveners = [],
+        board_number: boardNumber = '',
+        code,
+        title,
+        id,
+      } = entry as any;
+
+      // TODO: (Ajob) Currently not passing roles as they do not exist
+      //              here. Update the schema to include roles.
+      const personLinks = [...presenters, ...conveners].map(
+        ({affiliation, familyName: lastName, firstName, email, name, roles, avatarURL}) => ({
+          affiliation,
+          email,
+          lastName,
+          firstName,
+          name,
+          roles,
+          avatarURL,
+        })
+      );
 
       dayEntries[day].push({
         type,
         id,
-        title: entry.title,
+        title,
+        description,
         startDt: dateToMoment(entry.startDate),
-        duration: entry.duration,
+        duration,
         x: 0,
         y: 0,
         width: 0,
         column: 0,
         maxColumn: 0,
+        // TODO: (Ajob) Get other attributes such as person_links
+        personLinks,
+        boardNumber,
+        code,
+        locationData: {
+          address,
+          room,
+          venueName,
+        },
       });
 
       if (entry.sessionId) {
         dayEntries[day].at(-1).sessionId = entry.sessionId;
       }
 
-      if (type === 'break') {
+      if (type === EntryType.Break) {
         dayEntries[day].at(-1).backgroundColor = entry.color;
         dayEntries[day].at(-1).textColor = entry.textColor;
-      }
-
-      if (type === 'block') {
-        dayEntries[day].at(-1).title = entry.slotTitle;
-        dayEntries[day].at(-1).sessionTitle = entry.title;
+      } else if (type === EntryType.SessionBlock) {
+        dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.entries(entry.entries).map(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
@@ -127,8 +162,6 @@ export function preprocessTimetableEntries(
       }
     }
   }
-
-  console.log('dayEntries', dayEntries);
 
   return {
     dayEntries,
