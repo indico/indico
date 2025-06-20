@@ -126,29 +126,25 @@
             <td class="i-table value">
                 <button type="button"
                         class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
-                        data-href="{{ url_for('.resend_email', entry.event, entry) }}"
+                        data-href="{{ url_for('.resend_email', entry) }}"
                         data-method="post"
-                        data-title="{% trans %}Resend email{% endtrans %}"
+                        data-title="{% trans %}Re-send email{% endtrans %}"
                         data-confirm="
                             {%- trans count=data.to|length -%}
-                                Do you really want to resend this email to {{ count }} recipient?
+                                Do you really want to re-send this email to {{ count }} recipient?
                             {%- pluralize -%}
-                                Do you really want to resend this email to {{ count }} recipients?
+                                Do you really want to re-send this email to {{ count }} recipients?
                             {%- endtrans -%}"
-                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}>
-                    Resend email
+                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}
+                        {% if data.attachments %}
+                            title="{%- trans -%}Re-sending emails with attachments is not supported.{%- endtrans -%}"
+                        {% elif data.state == 'pending' %}
+                            title="{%- trans -%}This email has not been sent yet.{%- endtrans -%}"
+                        {% endif %}>
+                    {% trans %}
+                        Re-send email
+                    {% endtrans %}
                 </button>
-                {% if data.attachments %}
-                    <small>
-                        <i class="icon-info"
-                           title="{%- trans -%}Resending emails with attachments is not supported.{%- endtrans -%}"></i>
-                    </small>
-                {% elif data.state == 'pending' %}
-                    <small>
-                        <i class="icon-info"
-                           title="{%- trans -%}Please wait until the email is sent before resending.{%- endtrans -%}"></i>
-                    </small>
-                {% endif %}
             </td>
         </tr>
     {% endif %}
