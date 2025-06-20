@@ -923,7 +923,8 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         self.flat = flat
 
     def _get_registrant_name(self, registration):
-        return secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}', registration.friendly_id)
+        return secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}',
+                               str(registration.friendly_id))
 
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
