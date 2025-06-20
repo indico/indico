@@ -57,20 +57,21 @@
                     </div>
                     {% trans %}Send email reminders to users who have not yet registered.{% endtrans %}
                 </div>
-                <div class="toolbar" id="email-pending-invitations-container"></div>
+                <div class="toolbar" id="email-all-pending-invitations-container"></div>
             </div>
         </div>
     {% endif %}
 
     <div id="invitation-list">
-        {{ render_invitation_list(invitations) }}
+        {{ render_invitation_list(invitations, has_pending_invitations) }}
     </div>
 
     <script>
         setupInvitationPage({
             eventId: {{ event.id | tojson }},
             regformId: {{ regform.id | tojson }},
-            hasPendingInvitations: {{ has_pending_invitations | tojson }}
+            hasPendingInvitations: {{ has_pending_invitations | tojson }},
+            checkboxSelector: '#invitation-list input[name=invitation_ids][type=checkbox]',
         });
     </script>
 {% endblock %}

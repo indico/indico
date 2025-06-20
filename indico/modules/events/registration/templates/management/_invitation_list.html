@@ -1,8 +1,8 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_invitation_list(invitations) %}
+{% macro render_invitation_list(invitations, has_pending_invitations) %}
     {% if invitations %}
-        <div class="i-box invitation-list">
+        <div class="i-box invitation-list{% if not has_pending_invitations %} titled{% endif %}">
             {{ _render_invitations_block(invitations, 'pending', _('Pending invitations')) }}
             {{ _render_invitations_block(invitations, 'accepted', _('Accepted invitations')) }}
             {{ _render_invitations_block(invitations, 'declined', _('Declined invitations')) }}
@@ -18,22 +18,37 @@
 {% macro _render_invitations_block(invitations, state, title) %}
     {% set filtered_invitations = invitations | selectattr('state.name', 'equalto', state) | list %}
     {% if filtered_invitations %}
+        {% if state == 'pending' %}
+            <div class="toolbar hide-if-locked" id="email-pending-invitations-container"></div>
+        {% endif %}
         <div class="titled-rule">{{ title }}</div>
         <table class="invitation-table">
             {% for invitation in filtered_invitations %}
                 <tr>
+                    {% if state == 'pending' %}
+                        <td class="select">
+                            <input type="checkbox" name="invitation_ids" class="hide-if-locked" autocomplete="off"
+                                   id="invitation-{{ invitation.id }}" value="{{ invitation.id }}">
+                        </td>
+                    {% endif %}
                     <td class="name">
-                        {% if invitation.registration_id is not none %}
-                            <a href="{{ url_for('.registration_details', invitation.registration) }}">{{ invitation.first_name }} {{ invitation.last_name }}</a>
-                        {% else %}
-                            {{ invitation.first_name }} {{ invitation.last_name }}
-                        {% endif %}
+                        <label for="invitation-{{ invitation.id }}">
+                            {% if invitation.registration_id is not none %}
+                                <a href="{{ url_for('.registration_details', invitation.registration) }}">{{ invitation.first_name }} {{ invitation.last_name }}</a>
+                            {% else %}
+                                {{ invitation.first_name }} {{ invitation.last_name }}
+                            {% endif %}
+                        </label>
                     </td>
                     <td class="email">
-                        {{ invitation.email }}
+                        <label for="invitation-{{ invitation.id }}">
+                            {{ invitation.email }}
+                        </label>
                     </td>
                     <td class="affiliation">
-                        {{ invitation.affiliation }}
+                        <label for="invitation-{{ invitation.id }}">
+                            {{ invitation.affiliation }}
+                        </label>
                     </td>
                     <td class="actions hide-if-locked">
                         {% if invitation.state.name == 'pending' %}
