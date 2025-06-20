@@ -7,7 +7,7 @@
 
 from babel.dates import get_timezone
 from flask import flash, jsonify, redirect, request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.config import config
 from indico.core.db import db
@@ -174,12 +174,16 @@ class RHResendEmail(RHManageEventBase):
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
-        self.entry = (EventLogEntry.query.with_parent(self.event)
-                      .filter_by(id=request.view_args['log_entry_id']).first_or_404())
+        self.entry = (EventLogEntry.query
+                      .with_parent(self.event)
+                      .filter_by(id=request.view_args['log_entry_id'])
+                      .first_or_404())
 
     def _process(self):
         if self.entry.type != 'email':
-            raise Forbidden('Log entry is not an email.')
+            raise BadRequest('Invalid log entry type')
+        elif self.entry.data.get('attachments'):
+            raise BadRequest('Cannot re-send email with attachments')
         email = make_email(
             to_list=self.entry.data['to'],
             cc_list=self.entry.data.get('cc', []),
@@ -192,5 +196,5 @@ class RHResendEmail(RHManageEventBase):
         )
         send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
                    log_metadata=self.entry.meta, log_summary=f'Resent email: {self.entry.data['subject']}')
-        flash(_('The email has been resent.'), 'success')
+        flash(_('The email has been re-sent.'), 'success')
         return redirect(url_for('.event', self.event))
