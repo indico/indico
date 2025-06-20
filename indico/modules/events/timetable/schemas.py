@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from typing import List
-
 from marshmallow import EXCLUDE, fields, pre_load
 
 from indico.core.marshmallow import mm
@@ -34,7 +32,12 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     start_dt = fields.DateTime(required=True)
     location_data = fields.Nested(LocationDataSchema)
     # TODO: Make it so that passing explicit `many=True` is not required
-    conveners = fields.Nested(_SessionBlockPersonLinkSchema(many=True, partial=False, unknown=EXCLUDE), attribute='person_links', partial=False, unknown=EXCLUDE)
+    conveners = fields.Nested(
+        _SessionBlockPersonLinkSchema(many=True, partial=False, unknown=EXCLUDE),
+        attribute='person_links',
+        partial=False,
+        unknown=EXCLUDE
+    )
     duration = fields.TimeDelta(required=True)
 
 
@@ -63,6 +66,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
+
 
 class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
     class Meta:

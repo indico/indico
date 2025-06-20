@@ -24,8 +24,9 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableSwapEntries)
 from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
-                                                                RHManageTimetableOld, RHTimetableBreak, RHTimetableBreakCreate,
-                                                                RHTimetableContribution, RHTimetableContributionCreate, RHTimetableREST,
+                                                                RHManageTimetableOld, RHTimetableBreak,
+                                                                RHTimetableBreakCreate, RHTimetableContribution,
+                                                                RHTimetableContributionCreate, RHTimetableREST,
                                                                 RHTimetableSessionBlock, RHTimetableSessionBlockCreate)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint

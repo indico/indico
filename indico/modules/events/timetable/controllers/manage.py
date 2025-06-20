@@ -194,6 +194,7 @@ class RHTimetableBreak(RHManageEventBase):
     def _process_GET(self):
         return BreakSchema(context={'event': self.event}).jsonify(self.break_)
 
+
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data):
@@ -216,6 +217,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
                                                     value=entry['value']))
         return references
 
+
 class RHTimetableContribution(RHManageContributionBase):
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
     def _process_PATCH(self, data):
@@ -236,8 +238,7 @@ class RHTimetableContribution(RHManageContributionBase):
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
     def _process_GET(self):
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
-    
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)    
 
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
