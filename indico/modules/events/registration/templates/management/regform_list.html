@@ -97,6 +97,27 @@
                     </div>
                 </div>
             {% endblock %}
+            {% if regforms|length > 1  %}
+                {% block description_section %}
+                    <div class="section">
+                        <div class="icon icon-textarea"></div>
+                        <div class="text">
+                            <div class="label">{% trans %}Registration description{% endtrans %}</div>
+                            {% trans %}Display a text on top of Registration forms{% endtrans %}
+                        </div>
+                        <div class="toolbar">
+                            <div class="group">
+                                <a href="#" id="ngo-quotas" class="i-button icon-settings"
+                                    data-href="{{ url_for('.manage_registration_description', event) }}"
+                                    data-title="{%- trans %}Registration forms description{% endtrans -%}"
+                                    data-ajax-dialog>
+                                    {%- trans %}Configure{% endtrans -%}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endblock %}
+            {% endif %}
         </div>
     {% endblock %}
     {{ template_hook('extra-registration-settings', event=event) }}
