@@ -6,13 +6,12 @@
 # LICENSE file for more details.
 
 from flask import flash
-from wtforms.fields import TextAreaField
 
 from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm
-from indico.web.forms.widgets import TinyMCEWidget
+from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -22,9 +21,7 @@ event_settings = EventSettingsProxy('registration', defaults={
 
 
 class RegistrationDescriptionForm(IndicoForm):
-    description = TextAreaField('Registration Description',
-                                widget=TinyMCEWidget(absolute_urls=True),
-                                render_kw={'rows': 10})
+    description = IndicoMarkdownField('Registration Description', render_kw={'rows': 10})
 
 
 class RHManageRegistrationDescription(RHManageRegFormsBase):
