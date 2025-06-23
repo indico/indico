@@ -8,16 +8,11 @@
 from flask import flash
 
 from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
-from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.events.registration.settings import event_settings
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.util import jsonify_data, jsonify_template
-
-
-event_settings = EventSettingsProxy('registration', defaults={
-    'registration_description': ''
-})
 
 
 class RegistrationDescriptionForm(IndicoForm):
