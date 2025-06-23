@@ -85,6 +85,15 @@ class EmailPrincipal:
     def identifier(self):
         return f'Email:{self.email}'
 
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
     def __eq__(self, other):
         return isinstance(other, EmailPrincipal) and self.email == other.email
 

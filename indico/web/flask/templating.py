@@ -90,6 +90,10 @@ def plusdelta(value, **kwargs):
 def decodeprincipal(value, **kwargs):
     """Decode a principal into an actual object."""
     from indico.util.user import principal_from_identifier
+
+    # this is a template filter, acting on server-side data, which is typically persistent and thus not
+    # signed in case of a `User:id` identifier
+    kwargs.setdefault('require_user_token', False)
     return principal_from_identifier(value, soft_fail=True, **kwargs)
 
 

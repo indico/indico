@@ -308,7 +308,7 @@ class ModelList(fields.Field):
 class Principal(fields.Field):
     """Marshmallow field for a single principal."""
 
-    def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
+    def __init__(self, *, allow_groups=False, allow_external_users=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         super().__init__(**kwargs)
@@ -330,7 +330,7 @@ class Principal(fields.Field):
 class PrincipalList(fields.Field):
     """Marshmallow field for a list of principals."""
 
-    def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+    def __init__(self, *, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                  allow_category_roles=False, allow_registration_forms=False, allow_emails=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users

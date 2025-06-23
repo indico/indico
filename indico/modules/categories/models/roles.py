@@ -86,6 +86,15 @@ class CategoryRole(db.Model):
         return f'CategoryRole:{self.id}'
 
     @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
+    @property
     def obj(self):
         return self.category
 

@@ -389,6 +389,15 @@ class RegistrationForm(db.Model):
     def identifier(self):
         return f'RegistrationForm:{self.id}'
 
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
     @hybrid_property
     def participant_list_disabled(self):
         return (

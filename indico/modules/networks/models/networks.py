@@ -73,6 +73,15 @@ class IPNetworkGroup(db.Model):
     def identifier(self):
         return f'IPNetworkGroup:{self.id}'
 
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
     def __repr__(self):
         return format_repr(self, 'id', 'name', hidden=False, attachment_access_override=False)
 

@@ -64,7 +64,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
                      RHUserPreferencesMastodonServer, methods=('POST',))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
-    _bp.add_url_rule('/api/favorites/users/<int:fav_user_id>', 'favorites_api', RHUserFavoritesAPI,
+    _bp.add_url_rule('/api/favorites/users/<identifier>', 'favorites_api', RHUserFavoritesAPI,
                      methods=('PUT', 'DELETE'))
     _bp.add_url_rule('/api/favorites/categories', 'user_favorites_category_api', RHUserFavoritesCategoryAPI)
     _bp.add_url_rule('/api/favorites/categories/<int:category_id>', 'user_favorites_category_api',

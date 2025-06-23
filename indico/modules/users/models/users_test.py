@@ -162,3 +162,11 @@ def test_no_names(db, first_name, last_name):
 def test_no_names_pending(db):
     db.session.add(User(first_name='', last_name='', is_pending=True))
     db.session.flush()
+
+
+def test_identifiers(app, dummy_user):
+    id1, pid1 = dummy_user.identifier, dummy_user.persistent_identifier
+    app.secret_key += b'x'
+    id2, pid2 = dummy_user.identifier, dummy_user.persistent_identifier
+    assert id1 != id2
+    assert pid1 == pid2

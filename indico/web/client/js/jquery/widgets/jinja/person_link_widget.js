@@ -33,7 +33,7 @@ import {camelizeKeys} from 'indico/utils/case';
       sessionUser.id !== undefined && {
         title: sessionUser.title,
         userId: sessionUser.id,
-        userIdentifier: `User:${sessionUser.id}`,
+        userIdentifier: sessionUser.identifier,
         avatarURL: sessionUser.avatarURL,
         firstName: sessionUser.firstName,
         lastName: sessionUser.lastName,

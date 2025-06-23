@@ -69,6 +69,7 @@ def generate_user_file(user=None):
     else:
         user_vars = {
             'id': user.id,
+            'identifier': user.identifier,
             'title': user._title.name,
             'firstName': user.first_name,
             'lastName': user.last_name,
