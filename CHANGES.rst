@@ -32,6 +32,7 @@ Improvements
 - Allow re-sending emails from their log entries (:issue:`6805`, :pr:`6909`,
   thanks :user:`duartegalvao, unconventionaldotdev`)
 - Allow adding/removing favorite users from search results (:pr:`6950`)
+- Add a text overflow option to the badge designer (:pr:`6944`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
