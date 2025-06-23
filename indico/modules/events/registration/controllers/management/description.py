@@ -12,7 +12,7 @@ from indico.modules.events.registration.settings import event_settings
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.fields import IndicoMarkdownField
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RegistrationDescriptionForm(IndicoForm):
@@ -32,8 +32,5 @@ class RHManageRegistrationDescription(RHManageRegFormsBase):
             event_settings.set(self.event, 'registration_description', form.description.data)
             flash(_('Registration description has been saved'), 'success')
             return jsonify_data()
-        return jsonify_template(
-            'events/registration/management/registration_description.html',
-            form=form,
-            event=self.event
-        )
+        return jsonify_form(form, message=_('Description text that will be displayed in case of multiple '
+                                            'Registration forms.'))
