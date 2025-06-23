@@ -14,7 +14,7 @@
     {% set description = event_settings.get(event, 'registration_description') %}
     {% if description %}
         <div class="registration-description">
-            {{ description | safe }}
+            {{ description | markdown }}
         </div>
     {% endif %}
 {% endblock %}
