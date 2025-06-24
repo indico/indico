@@ -337,6 +337,10 @@ class CountryField(RegistrationFormFieldBase):
             return ''
         return get_country(registration_data.data) if registration_data.data else ''
 
+    @property
+    def filter_choices(self):
+        return {x['countryKey']: x['caption'] for x in self.unprocess_field_data(None, None)['choices']}
+
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
