@@ -77,7 +77,16 @@ function rankTimeOption(_, keywordText, option) {
   return optionRank;
 }
 
-export default function TimePicker({value, startTime, step, min, max, timeFormat, onChange}) {
+export default function TimePicker({
+  value,
+  startTime,
+  step,
+  min,
+  max,
+  timeFormat,
+  onChange,
+  required,
+}) {
   const [inputValue, setInputValue] = useState(Time.fromString(value, '24h').toString());
   const [notice, setNotice] = useState('');
   const valueAsTime = Time.fromString(value, '24h');
@@ -172,6 +181,7 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
         placeholder={TIME_FORMAT_PLACEHOLDER[timeFormat]}
         options={options}
         rankOption={rankTimeOption}
+        required={required}
       />
       <span styleName="notice" aria-live="polite">
         {notice}
@@ -188,6 +198,7 @@ TimePicker.propTypes = {
   min: timeString,
   max: timeString,
   timeFormat: PropTypes.oneOf(['24h', '12h']),
+  required: PropTypes.bool,
 };
 
 TimePicker.defaultProps = {
@@ -198,4 +209,5 @@ TimePicker.defaultProps = {
   min: '',
   max: '',
   timeFormat: '24h',
+  required: false,
 };
