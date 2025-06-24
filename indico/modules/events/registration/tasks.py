@@ -78,7 +78,8 @@ def delete_field_data():
 
 @celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='30', hour='3'))
 def delete_registrations():
-    is_expired = db.and_(RegistrationForm.retention_period.isnot(None),
+    is_expired = db.and_(~RegistrationForm.is_purged,
+                         RegistrationForm.retention_period.isnot(None),
                          db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())
     registrations = (Registration.query
                      .join(RegistrationForm, RegistrationForm.id == Registration.registration_form_id)
