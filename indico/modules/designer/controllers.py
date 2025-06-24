@@ -76,6 +76,7 @@ TEMPLATE_DATA_JSON_SCHEMA = {
                     'text_align': {'type': 'string'},
                     'bold': {'type': 'boolean'},
                     'italic': {'type': 'boolean'},
+                    'text_overflow': {'type': 'string'},
                     'preserve_aspect_ratio': {'type': 'boolean'}
                 }
             },
