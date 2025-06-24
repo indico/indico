@@ -9,7 +9,8 @@ from marshmallow import EXCLUDE, fields, pre_load
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import ContribFieldValueSchema, ContributionReferenceSchema, TimezoneAwareSessionBlockSchema
+from indico.modules.events.contributions.schemas import (ContribFieldValueSchema, ContributionReferenceSchema,
+                                                         TimezoneAwareSessionBlockSchema)
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
