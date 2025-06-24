@@ -365,6 +365,20 @@ describe('Time', () => {
     expect(t.toDurationString()).toBe(durationString);
   });
 
+  it.each([
+    ['0:00', '12h', '12:00 AM'],
+    ['0:00', '24h', '00:00'],
+    ['0:00', 'any', '00:00'],
+    ['8:00', '12h', '8:00 AM'],
+    ['8:00', '24h', '08:00'],
+    ['8:00', 'any', '08:00'],
+    ['12:00', '12h', '12:00 PM'],
+    ['12:00', '24h', '12:00'],
+    ['12:00', 'any', '12:00'],
+  ])('should format a time like %s using format %s', (timeString, timeFormat, expected) => {
+    expect(Time.fromString(timeString, '24h').toFormattedString(timeFormat)).toBe(expected);
+  });
+
   it('should use automatic selection of time format by default', () => {
     const sample12hA = Time.fromString('12:01', '12h');
     const sampleAnyA = Time.fromString('12:01', 'any');
@@ -420,8 +434,8 @@ describe('timeList', () => {
     expectStep(l, 30);
   });
 
-  it('should use a different locale when specified', () => {
-    const l = timeList({locale: 'de'});
+  it('should use a different time format when specified', () => {
+    const l = timeList({timeFormat: '24h'});
 
     expect(l[0].label).toBe('00:00');
   });
