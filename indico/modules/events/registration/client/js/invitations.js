@@ -6,62 +6,58 @@
 // LICENSE file for more details.
 
 /* eslint-disable import/unambiguous */
-/* global handleAjaxError:false */
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Translate} from 'indico/react/i18n';
+import {camelizeKeys} from 'indico/utils/case';
+
 import EmailPendingInvitationsButton from './components/EmailPendingInvitationsButton';
+import InvitationList from './components/InvitationList';
 
 (function(global) {
   global.setupInvitationPage = function setupInvitationPage({
     eventId,
     regformId,
     hasPendingInvitations,
+    invitations,
   }) {
-    $('#invitation-list').on('indico:confirmed', '.js-invitation-action', function(evt) {
-      evt.preventDefault();
-
-      const $this = $(this);
-      $.ajax({
-        url: $this.data('href'),
-        method: $this.data('method'),
-        complete: IndicoUI.Dialogs.Util.progress(),
-        error: handleAjaxError,
-        success(data) {
-          $('#invitation-list').html(data.invitation_list);
-          renderEmailInvitationsBtn({
-            eventId,
-            regformId,
-            hasPendingInvitations: data.has_pending_invitations,
-          });
-        },
-      });
+    renderEmailInvitationsBtn({
+      containerId: 'email-all-pending-invitations-container',
+      eventId,
+      regformId,
+      hasPendingInvitations,
     });
 
-    $('.js-invite-user').ajaxDialog({
-      onClose(data) {
-        if (data) {
-          $('#invitation-list').html(data.invitation_list);
-          renderEmailInvitationsBtn({
-            eventId,
-            regformId,
-            hasPendingInvitations: data.has_pending_invitations,
-          });
-        }
-      },
+    renderInvitationsList({
+      containerId: 'invitation-list-container',
+      eventId,
+      regformId,
+      invitations,
     });
-
-    renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations});
   };
 
-  function renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations}) {
-    const container = document.getElementById('email-pending-invitations-container');
+  function renderEmailInvitationsBtn({containerId, eventId, regformId, hasPendingInvitations}) {
+    const container = document.getElementById(containerId);
     ReactDOM.render(
       <EmailPendingInvitationsButton
         eventId={eventId}
         regformId={regformId}
-        hasPendingInvitations={hasPendingInvitations}
+        label={Translate.string('Remind all')}
+        disabled={!hasPendingInvitations}
+      />,
+      container
+    );
+  }
+
+  function renderInvitationsList({containerId, eventId, regformId, invitations}) {
+    const container = document.getElementById(containerId);
+    ReactDOM.render(
+      <InvitationList
+        eventId={eventId}
+        regformId={regformId}
+        invitations={camelizeKeys(invitations)}
       />,
       container
     );
