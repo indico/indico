@@ -71,7 +71,6 @@ export function preprocessTimetableEntries(
   for (const day in data) {
     dayEntries[day] = [];
     for (const _id in data[day]) {
-      // const id = parseInt(_id.slice(1), 10);
       const type = entryTypeMapping[_id[0]];
       const entry = data[day][_id];
       const {

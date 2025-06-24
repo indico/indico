@@ -192,7 +192,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
   }
 
-  const draftEntry = useSelector(selectors.getDraftEntry); // Select the draftEntry state from Redux
+  const draftEntry = useSelector(selectors.getDraftEntry);
 
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
@@ -207,12 +207,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      if (event.target !== calendarRef.current) {
-        return;
-      }
-
-      if (event.button !== 0) {
-        // TODO: (Ajob) Investigate if we need to handle right-clicks
+      if (event.button !== 0 || event.target !== calendarRef.current) {
         return;
       }
 

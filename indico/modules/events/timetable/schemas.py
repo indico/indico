@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import EXCLUDE, fields, pre_load
+from marshmallow import EXCLUDE, fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution

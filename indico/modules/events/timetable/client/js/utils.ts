@@ -7,8 +7,9 @@
 
 import moment, {Moment} from 'moment';
 
-import {Entry, EntryType, Session, TopLevelEntry} from './types';
-import { camelizeKeys } from 'indico/utils/case';
+import {camelizeKeys} from 'indico/utils/case';
+
+import {Entry, Session, TopLevelEntry} from './types';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);

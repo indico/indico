@@ -178,12 +178,7 @@ export default function ContributionEntry({
           dispatch(actions.selectEntry(id));
         }}
       >
-        {/* TODO: (Ajob) Check if necessary */}
-        {/* <BlockTitle
-          title={formatBlockTitle(sessionTitle, title)}
-          duration={duration}
-          timeRange={timeRange}
-        /> */}
+        {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
         <EntryTitle
           title={title}
           duration={duration}
