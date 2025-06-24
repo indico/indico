@@ -96,6 +96,12 @@ const parsers = {
 export class Time {
   static MAX_TIME = 1439; // last minute of the day, 23:59 in minutes since 0:00
 
+  static TIME_FORMAT_LOCALE = {
+    '12h': 'en-US',
+    '24h': 'de',
+    'any': 'de',
+  };
+
   static fromHour(hour, minute) {
     console.assert(
       isNaN(hour) || (hour >= 0 && hour <= 23),
@@ -198,6 +204,10 @@ export class Time {
     }
   }
 
+  toFormattedString(timeFormat) {
+    return this.toLocaleString(this.constructor.TIME_FORMAT_LOCALE[timeFormat]);
+  }
+
   toLocaleString(locale, options = {hour: 'numeric', minute: 'numeric'}) {
     return this.toDate().toLocaleTimeString(locale, options);
   }
@@ -209,7 +219,6 @@ export class Time {
 
 export function timeList(options = {}) {
   const {
-    locale,
     markCurrent = '',
     startTime = '',
     step = 15,
@@ -228,7 +237,7 @@ export function timeList(options = {}) {
     const t = new Time(i);
     const duration = start ? t.duration(start) : null;
     list.push({
-      label: t.toLocaleString(locale, {hour: 'numeric', minute: 'numeric'}),
+      label: t.toFormattedString(timeFormat),
       time: t.toString(),
       value: t.value,
       durationLabel: duration?.toDurationString() || '',
