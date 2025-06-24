@@ -6,15 +6,22 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import difflib
 import os
 import re
 import subprocess
 import sys
+from datetime import date, datetime
 from pathlib import Path
 
 import click
 from babel.dates import format_date
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 from packaging.version import Version
+from pygments import highlight
+from pygments.formatters.terminal256 import Terminal256Formatter
+from pygments.lexers.diff import DiffLexer
 
 
 CHANGELOG_STUB = '''
@@ -45,6 +52,9 @@ Internal Changes
 
 
 '''.lstrip()
+
+AUTO_GEN_START = '<!-- START AUTO-GENERATED -->'
+AUTO_GEN_END = '<!-- END AUTO-GENERATED -->'
 
 
 def fail(message, *args, **kwargs):
@@ -193,6 +203,80 @@ def _create_changelog_stub(released_version, next_version, *, dry_run=False):
         changes_rst.write_text(content)
 
 
+def _parse_changelog_versions() -> list[tuple[str, date]]:
+    """Retrieve versions from the changelog file."""
+    return [(v, parse(d)) for v, d in re.findall(
+        r'^Version ([0-9.abrc]+)\n-+\n\n\*Released on (.+)\*\n$',
+        Path('CHANGES.rst').read_text(),
+        re.MULTILINE,
+    )]
+
+
+def _split_minor_release(version: str) -> str:
+    v = Version(version)
+    return f'{v.major}.{v.minor}'
+
+
+def _replace_auto_section(content: str, new_table: str) -> str:
+    """Replace content between AUTO_GEN_START and AUTO_GEN_END markers."""
+    pattern = rf'{re.escape(AUTO_GEN_START)}.*?{re.escape(AUTO_GEN_END)}'
+    replacement = f'{AUTO_GEN_START}\n{new_table}\n{AUTO_GEN_END}'
+
+    if not re.search(pattern, content, re.DOTALL):
+        raise ValueError('Could not find AUTO-GENERATED section markers in SECURITY.md')
+
+    return re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+
+def _show_diff(old: str, new: str, filename: str):
+    diff = difflib.unified_diff(old.splitlines(), new.splitlines(), filename, filename, lineterm='')
+    diff = '\n'.join(diff)
+    print(highlight(diff, DiffLexer(), Terminal256Formatter(style='native')))
+
+
+def _update_security_md(new_version: str, dry_run: bool = False):
+    """Update the SECURITY.md file with the new supported version information."""
+    security_md = Path('SECURITY.md')
+    content = security_md.read_text()
+    versions = _parse_changelog_versions()
+
+    first_cur_minor_version_dt = None
+    prev_minor_release = ''
+    target_minor_version = _split_minor_release(new_version)
+
+    # find the date of the first release of the current minor version,
+    # as well as the last release of the previous minor version
+    for version, dt in versions:
+        if not version.startswith(target_minor_version):
+            prev_minor_release = _split_minor_release(version)
+            break
+        first_cur_minor_version_dt = dt
+
+    # 4 months after the first minor version of the current release
+    deadline = first_cur_minor_version_dt + relativedelta(months=4)
+    deadline_txt = format_date(deadline, format='medium', locale='en')
+
+    support_text = (
+        f'❌ No (ended {deadline_txt})'
+        if datetime.now() > deadline
+        else f'🚑 Limited (until {deadline_txt})'
+    )
+
+    new_table = f'''| Version | Supported |
+| ------- | --------- |
+| {target_minor_version}.x | ✅ Yes (latest version) |
+| {prev_minor_release}.x | {support_text} |
+| Others | ❌ No |'''
+
+    # Replace auto-generated section
+    updated_content = _replace_auto_section(content, new_table)
+
+    if dry_run:
+        _show_diff(content, updated_content, security_md.name)
+    else:
+        security_md.write_text(updated_content)
+
+
 @click.command()
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
@@ -215,6 +299,7 @@ def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
         info('Next version will be {}', next_version)
     if not no_changelog:
         _set_changelog_date(new_version, dry_run=dry_run)
+    _update_security_md(new_version, dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
     release_msg = f'Release {new_version}'
     _git_commit(release_msg, ['CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
