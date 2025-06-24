@@ -17,7 +17,6 @@ from indico.modules.events.contributions.controllers.management import (RHManage
                                                                         RHManageContributionsBase)
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
-from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -31,12 +30,12 @@ from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         create_timetable_entry, delete_timetable_entry,
                                                         update_break_entry, update_timetable_entry)
-from indico.modules.events.timetable.schemas import BreakSchema, SessionBlockSchema
+from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
-from indico.web.args import use_args_schema_context
+from indico.web.args import use_rh_args
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -173,7 +172,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 
 
 class RHTimetableBreakCreate(RHManageEventBase):
-    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
+    @use_rh_args(BreakSchema)
     def _process_POST(self, data: Break):
         break_entry = create_break_entry(self.event, data, extend_parent=False)
         return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
@@ -184,7 +183,7 @@ class RHTimetableBreak(RHManageEventBase):
         RHManageEventBase._process_args(self)
         self.break_ = Break.query.filter_by(id=request.view_args['break_id']).one()
 
-    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event}, partial=True)
+    @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
         with (track_time_changes(), track_location_changes()):
             update_break_entry(self.break_, data)
@@ -196,7 +195,7 @@ class RHTimetableBreak(RHManageEventBase):
 
 
 class RHTimetableContributionCreate(RHManageContributionsBase):
-    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
+    @use_rh_args(ContributionSchema)
     def _process_POST(self, data):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
@@ -219,7 +218,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
 
 
 class RHTimetableContribution(RHManageContributionBase):
-    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event}, partial=True)
+    @use_rh_args(ContributionSchema, partial=True)
     def _process_PATCH(self, data):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
@@ -253,7 +252,7 @@ class RHTimetableContribution(RHManageContributionBase):
 
 
 class RHTimetableSessionBlockCreate(RHManageEventBase):
-    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
+    @use_rh_args(SessionBlockSchema)
     def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
 
@@ -269,7 +268,7 @@ class RHTimetableSessionBlock(RHManageEventBase):
         RHManageEventBase._process_args(self)
         self.session_block = SessionBlock.query.filter_by(id=request.view_args['session_block_id']).one()
 
-    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event}, partial=True)
+    @use_rh_args(SessionBlockSchema, partial=True)
     def _process_PATCH(self, data):
         with (track_time_changes(), track_location_changes()):
             update_session_block(self.session_block, data)

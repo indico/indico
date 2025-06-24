@@ -28,6 +28,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
+        rh_context = ('event')
 
     start_dt = fields.DateTime(required=True)
     location_data = fields.Nested(LocationDataSchema)
@@ -44,6 +45,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
         fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type')
+        rh_context = ('event')
 
     title = fields.String(required=True)
     description = fields.String()
@@ -59,6 +61,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
                   'event_id', 'references', 'person_links', 'session_block', 'duration', 'start_dt',
                   'avatar_url', 'name')
+        rh_context = ('event')
 
     start_dt = fields.DateTime(required=True)
     duration = fields.TimeDelta(precision=fields.TimeDelta.SECONDS)
@@ -74,6 +77,7 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
                   'contribution_id', 'break_id', 'type', 'start_dt',
                   'end_dt', 'duration', 'object', 'contribution', 'break_',
                   'session_block')
+        rh_context = ('event')
 
     type = fields.Method('get_type', 'load_type')
     object = fields.Method('get_object', 'load_object')
