@@ -16,14 +16,7 @@ from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSche
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.marshmallow import EventTimezoneDateTimeField
-
-
-class SimplePersonLinkSchema(_ContributionPersonLinkSchema):
-    class Meta:
-        model = _ContributionPersonLinkSchema
-        fields = ('id', 'roles')
 
 
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
@@ -76,57 +69,3 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
-
-
-class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = TimetableEntry
-        fields = ('id', 'event_id', 'parent_id', 'session_block_id',
-                  'contribution_id', 'break_id', 'type', 'start_dt',
-                  'end_dt', 'duration', 'object', 'contribution', 'break_',
-                  'session_block')
-        rh_context = ('event',)
-
-    type = fields.Method('get_type', 'load_type')
-    object = fields.Method('get_object', 'load_object')
-    session_block_id = fields.Nested(SessionBlockSchema, only=('id',), dump_only=True)
-    contribution_id = fields.Nested(ContributionSchema, only=('id',), dump_only=True)
-    break_id = fields.Nested(BreakSchema, only=('id',), dump_only=True)
-
-    @pre_load
-    def _get_type(self, data, **kwargs):
-        if 'type' in data:
-            self.context['type'] = data['type']
-        return data
-
-    def load_type(self, value):
-        try:
-            return TimetableEntryType[value]
-        except KeyError:
-            raise ValueError(f'Unsupported entry type: {value}')
-
-    def get_type(self, obj):
-        return obj.type.name
-
-    def get_object(self, obj):
-        match obj.type:
-            case TimetableEntryType.SESSION_BLOCK:
-                return SessionBlockSchema(context=self.context).dump(obj.session_block)
-            case TimetableEntryType.CONTRIBUTION:
-                return ContributionSchema(context=self.context).dump(obj.contribution)
-            case TimetableEntryType.BREAK:
-                return BreakSchema(context=self.context).dump(obj.break_)
-            case _:
-                return None
-
-    def load_object(self, data, **kwargs):
-        entry_type = TimetableEntryType[self.context['type']]
-        if entry_type == TimetableEntryType.SESSION_BLOCK:
-            return SessionBlockSchema(context=self.context).load(data, **kwargs)
-        elif entry_type == TimetableEntryType.CONTRIBUTION:
-            return ContributionSchema(context=self.context).load(data, **kwargs)
-        elif entry_type == TimetableEntryType.BREAK:
-            return BreakSchema(context=self.context).load(data, **kwargs)
-        else:
-            raise ValueError(f'Unsupported entry type: {entry_type}')
-
