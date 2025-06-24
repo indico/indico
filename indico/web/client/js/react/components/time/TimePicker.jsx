@@ -21,10 +21,6 @@ const TIME_FORMAT_PLACEHOLDER = {
   '12h': '--:-- AM/PM',
   '24h': '--:--',
 };
-const TIME_FORMAT_LOCALE = {
-  '12h': 'en-US',
-  '24h': 'de',
-};
 
 function TimeOptionLabel({value, label, duration}) {
   return (
@@ -48,7 +44,6 @@ function getOptions(currentValue, startTime, step, min, max, timeFormat) {
     step,
     min,
     max,
-    locale: TIME_FORMAT_LOCALE[timeFormat],
     timeFormat,
   }).map(option => {
     const {label, time, duration, disabled} = option;
@@ -61,36 +56,21 @@ function getOptions(currentValue, startTime, step, min, max, timeFormat) {
   });
 }
 
-function formatTimeString(value, timeFormat) {
-  if (!value) {
-    return '';
-  }
-
-  const time = Time.fromString(value, timeFormat);
-  if (isNaN(time.value)) {
-    return '';
-  }
-
-  return time.toLocaleString(TIME_FORMAT_LOCALE[timeFormat]);
-}
-
-function rankTimeOption(timeFormat, _, keywordText, option) {
+function rankTimeOption(_, keywordText, option) {
   const optionDisabled = option.hasAttribute('aria-disabled');
   const optionText = option.textContent.replace(/\s+/g, '').toLowerCase();
   const optionValue = option.firstElementChild.dateTime;
-  const keywordValue = Time.fromString(keywordText, timeFormat).toString();
+  const keywordValue = Time.fromString(keywordText).toString();
 
   keywordText = keywordText.toLowerCase().replace(/\s+/, '');
 
   let optionRank = 0;
 
   if (keywordText && !optionDisabled) {
-    if (keywordText === optionText) {
-      optionRank += 1000;
-    } else if (optionValue === keywordValue) {
-      optionRank += 100;
+    if (optionValue === keywordValue) {
+      optionRank = Infinity;
     } else if (optionText.startsWith(keywordText)) {
-      optionRank += 10;
+      optionRank = 10;
     }
   }
 
@@ -98,7 +78,7 @@ function rankTimeOption(timeFormat, _, keywordText, option) {
 }
 
 export default function TimePicker({value, startTime, step, min, max, timeFormat, onChange}) {
-  const [inputValue, setInputValue] = useState(formatTimeString(value, '24h'));
+  const [inputValue, setInputValue] = useState(Time.fromString(value, '24h').toString());
   const [notice, setNotice] = useState('');
   const valueAsTime = Time.fromString(value, '24h');
 
@@ -129,7 +109,7 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
       const inputTime = Time.fromString(inputValue, 'any');
       // Using Object.is() as value can also be NaN
       if (!Object.is(valueAsTime.value, inputTime.value)) {
-        setInputValue(valueAsTime.toLocaleString(TIME_FORMAT_LOCALE[timeFormat]));
+        setInputValue(valueAsTime.toFormattedString(timeFormat));
       }
     },
     // The purpose of this hook is to sync the prop changes to the
@@ -152,9 +132,12 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
   const handleBlur = ev => {
     // Reformat the value when user leaves the field
 
-    const maybeFixedValue = formatTimeString(ev.target.value, 'any');
+    const maybeTime = Time.fromString(ev.target.value);
+    const maybeFixedValue = Number.isNaN(maybeTime.value)
+      ? ''
+      : maybeTime.toFormattedString(timeFormat);
 
-    // Value was already fixed
+    // Value was already fixed?
     if (maybeFixedValue === ev.target.value) {
       return;
     }
@@ -188,7 +171,7 @@ export default function TimePicker({value, startTime, step, min, max, timeFormat
         onBlur={handleBlur}
         placeholder={TIME_FORMAT_PLACEHOLDER[timeFormat]}
         options={options}
-        rankOption={rankTimeOption.bind(null, timeFormat)}
+        rankOption={rankTimeOption}
       />
       <span styleName="notice" aria-live="polite">
         {notice}
