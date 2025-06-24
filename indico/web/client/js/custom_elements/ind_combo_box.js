@@ -127,6 +127,12 @@ CustomElementBase.defineWhenDomReady(
             }
           }
           const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
+
+          if (topCandidate) {
+            markSelection(topCandidate);
+            moveVirtualCursorToOption(topCandidate);
+          }
+
           if (shouldAutocomplete) {
             selectOption(topCandidate);
             moveVirtualCursorToOption(topCandidate);
@@ -248,10 +254,14 @@ CustomElementBase.defineWhenDomReady(
         listbox.querySelector('[aria-selected=true]')?.removeAttribute('aria-selected');
       }
 
-      function selectOption(option) {
-        // Omit the option to clear the selection and reset the input
+      function markSelection(option) {
         deselectCurrentSelection();
         option?.setAttribute('aria-selected', true);
+      }
+
+      function selectOption(option) {
+        // Omit the option to clear the selection and reset the input
+        markSelection(option);
         CustomElementBase.setValue(input, option?.dataset.value);
         dispatchExternalChangeEvent();
       }
