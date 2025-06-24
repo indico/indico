@@ -35,8 +35,6 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 import {toMoment} from 'indico/utils/date';
 
-import {mapPersonLinkToSchema} from '../../../timetable/client/js/utils';
-
 
 interface CustomField {
   id: number;
@@ -233,7 +231,7 @@ export function ContributionForm({
         invalid,
         detail,
         ...personLinkData
-      }) => mapPersonLinkToSchema({
+      }) => snakifyKeys({
         ...personLinkData,
       })
     );

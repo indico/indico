@@ -12,8 +12,8 @@ import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import { useDroppable } from './dnd';
-import { DraggableEntry } from './Entry';
+import {useDroppable} from './dnd';
+import {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
@@ -40,7 +40,6 @@ export default function ContributionEntry({
   sessionId,
   textColor,
   backgroundColor,
-  conveners,
   selected,
   y,
   listeners,

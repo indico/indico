@@ -9,13 +9,14 @@ from marshmallow import EXCLUDE, fields, pre_load
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import ContributionReferenceSchema
+from indico.modules.events.contributions.schemas import ContribFieldValueSchema, ContributionReferenceSchema, TimezoneAwareSessionBlockSchema
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
 class SimplePersonLinkSchema(_ContributionPersonLinkSchema):
@@ -28,7 +29,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
-        rh_context = ('event')
+        rh_context = ('event',)
 
     start_dt = fields.DateTime(required=True)
     location_data = fields.Nested(LocationDataSchema)
@@ -45,7 +46,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
         fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type')
-        rh_context = ('event')
+        rh_context = ('event',)
 
     title = fields.String(required=True)
     description = fields.String()
@@ -59,15 +60,21 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'event_id', 'references', 'person_links', 'session_block', 'duration', 'start_dt',
-                  'avatar_url', 'name')
-        rh_context = ('event')
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block')
+        rh_context = ('event',)
 
-    start_dt = fields.DateTime(required=True)
-    duration = fields.TimeDelta(precision=fields.TimeDelta.SECONDS)
-    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
+    start_dt = EventTimezoneDateTimeField()
+    # TODO: filter inactive and resitricted contrib fields
+    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
+    person_links = fields.Nested(
+        _ContributionPersonLinkSchema(many=True, partial=False),
+        partial=False,
+        unknown=EXCLUDE
+    )
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
+    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    duration = fields.TimeDelta(required=True)
 
 
 class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
@@ -77,7 +84,7 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
                   'contribution_id', 'break_id', 'type', 'start_dt',
                   'end_dt', 'duration', 'object', 'contribution', 'break_',
                   'session_block')
-        rh_context = ('event')
+        rh_context = ('event',)
 
     type = fields.Method('get_type', 'load_type')
     object = fields.Method('get_object', 'load_object')
