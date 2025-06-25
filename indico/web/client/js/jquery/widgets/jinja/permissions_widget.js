@@ -484,11 +484,11 @@ import Palette from 'indico/utils/palette';
 
       ReactDOM.render(
         <FavoritesProvider>
-          {([favorites]) => (
+          {favoriteUsersController => (
             <>
               <UserSearch
                 withExternalUsers
-                favorites={favorites}
+                favoritesController={favoriteUsersController}
                 existing={existing.filter(e => e.startsWith('User'))}
                 onAddItems={e => {
                   const items = e.map(({identifier, userId, name, firstName, lastName}) => ({

@@ -36,7 +36,7 @@ async function postAndReload(selectedLanguage) {
 }
 
 function UserImpersonation() {
-  const [favoriteUsers] = useFavoriteUsers();
+  const favoriteUsersController = useFavoriteUsers();
 
   return (
     <UserSearch
@@ -47,7 +47,7 @@ function UserImpersonation() {
       )}
       existing={[]}
       onAddItems={({userId}) => impersonateUser(userId)}
-      favorites={favoriteUsers}
+      favoritesController={favoriteUsersController}
       withExternalUsers={false}
       single
       alwaysConfirm

@@ -97,7 +97,7 @@ const PrincipalField = props => {
       onAddItems={handleAddItem}
       onOpen={onFocus}
       onClose={onBlur}
-      favorites={favoriteUsers}
+      favoritesController={favoriteUsersController}
       disabled={disabled}
       withExternalUsers={withExternalUsers}
       single

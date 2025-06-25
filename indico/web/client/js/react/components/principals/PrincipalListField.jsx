@@ -126,7 +126,7 @@ const PrincipalListField = props => {
               <UserSearch
                 existing={value}
                 onAddItems={handleAddItems}
-                favorites={favoriteUsers}
+                favoritesController={favoriteUsersController}
                 disabled={disabled}
                 withExternalUsers={withExternalUsers}
                 onOpen={onFocus}

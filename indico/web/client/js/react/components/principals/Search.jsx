@@ -13,7 +13,7 @@ import userSearchInfoURL from 'indico-url:users.user_search_info';
 import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {
@@ -102,9 +102,10 @@ const searchFactory = config => {
     );
   };
 
-  const SearchForm = ({onSearch, favorites, isAdded, onAdd, onRemove, single}) => {
+  const SearchForm = ({onSearch, favoritesController, isAdded, onAdd, onRemove, single}) => {
     const initialFormValues = useContext(InitialFormValuesContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const favorites = favoritesController?.[0] ?? [];
     return (
       <FinalForm
         onSubmit={onSearch}
@@ -165,6 +166,31 @@ const searchFactory = config => {
     );
   };
 
+  const FavoriteControls = ({favorite, onAddFavorite, onDelFavorite}) =>
+    favorite ? (
+      <Icon
+        styleName="button favorite active"
+        name="star"
+        size="large"
+        title={Translate.string('Remove from favorites')}
+        onClick={evt => {
+          evt.stopPropagation();
+          onDelFavorite();
+        }}
+      />
+    ) : (
+      <Icon
+        styleName="button favorite"
+        name="star outline"
+        size="large"
+        title={Translate.string('Add to favorites')}
+        onClick={evt => {
+          evt.stopPropagation();
+          onAddFavorite();
+        }}
+      />
+    );
+
   const ResultItem = ({
     name,
     detail,
@@ -172,6 +198,8 @@ const searchFactory = config => {
     favorite,
     onAdd,
     onRemove,
+    onAddFavorite,
+    onDelFavorite,
     existsInEvent,
     external,
     avatarURL,
@@ -218,6 +246,13 @@ const searchFactory = config => {
             )}
           </div>
           <div styleName="actions">
+            {!external && onAddFavorite && onDelFavorite && (
+              <FavoriteControls
+                onAddFavorite={onAddFavorite}
+                onDelFavorite={onDelFavorite}
+                favorite={favorite}
+              />
+            )}
             {added ? (
               <Icon name="checkmark" size="large" color="green" />
             ) : (
@@ -238,7 +273,7 @@ const searchFactory = config => {
     onRemove,
     onEnterManually,
     isAdded,
-    favorites,
+    favoritesController,
     // eslint-disable-next-line no-shadow
     getResultsText,
     ...rest
@@ -254,7 +289,21 @@ const searchFactory = config => {
                 name={r.name}
                 detail={r.detail}
                 added={isAdded(r)}
-                favorite={favorites && favoriteKey ? r[favoriteKey] in favorites : false}
+                favorite={
+                  favoritesController && favoriteKey
+                    ? r[favoriteKey] in favoritesController[0]
+                    : false
+                }
+                onAddFavorite={
+                  favoritesController && r.type === 'user' && r.userId !== null
+                    ? () => favoritesController[1][0](r.userId)
+                    : null
+                }
+                onDelFavorite={
+                  favoritesController && r.type === 'user' && r.userId !== null
+                    ? () => favoritesController[1][1](r.userId)
+                    : null
+                }
                 onAdd={() => onAdd(r)}
                 onRemove={() => onRemove(r)}
                 existsInEvent={r.existsInEvent}
@@ -288,13 +337,14 @@ const searchFactory = config => {
     onRemove,
     onEnterManually,
     isAdded,
-    favorites,
+    favoritesController,
     single,
     withEventPersons,
     eventId,
   }) => {
     const [loading, setLoading] = useState(false);
     const [result, _setResult] = useState(null);
+    const [initialFavoritesResults, setInitialFavoritesResults] = useState([]);
     const lastResult = useRef(null);
     const pristine = useRef(true);
     const setResult = value => {
@@ -311,9 +361,25 @@ const searchFactory = config => {
         setLoading(false);
       }
     };
-    const favoriteResults = favorites ? _.sortBy(Object.values(favorites), 'name') : [];
+    const favoriteResults = useMemo(
+      () => (favoritesController ? _.sortBy(Object.values(favoritesController[0]), 'name') : []),
+      [favoritesController]
+    );
+    useEffect(() => {
+      // favoriteResults is empty during the first render, so as soon as we have a value for it
+      // we shove it into local state so later changes to the favorite (ie removing a favorite)
+      // no longer affects that list, since we don't want a user that's removed from favorites
+      // immediately disappear from the visible list (in case someone misclicks and wanted to
+      // select the user instead)
+      if (favoriteResults.length && !initialFavoritesResults.length) {
+        setInitialFavoritesResults(favoriteResults);
+      }
+    }, [favoriteResults, initialFavoritesResults]);
     const resultDisplay = result ||
-      lastResult.current || {results: favoriteResults, total: favoriteResults.length};
+      lastResult.current || {
+        results: initialFavoritesResults,
+        total: initialFavoritesResults.length,
+      };
 
     return (
       <div styleName="search-content">
@@ -323,7 +389,7 @@ const searchFactory = config => {
             onAdd={onAdd}
             onRemove={onRemove}
             isAdded={isAdded}
-            favorites={favorites}
+            favoritesController={favoritesController}
             single={single}
           />
         </div>
@@ -334,7 +400,7 @@ const searchFactory = config => {
             pristine={pristine.current}
             results={resultDisplay.results}
             total={resultDisplay.total}
-            favorites={favorites}
+            favoritesController={favoritesController}
             onAdd={onAdd}
             onRemove={onRemove}
             onEnterManually={onEnterManually}
@@ -395,7 +461,7 @@ const searchFactory = config => {
     disabled,
     existing,
     onAddItems,
-    favorites,
+    favoritesController,
     triggerFactory,
     defaultOpen,
     single,
@@ -495,7 +561,7 @@ const searchFactory = config => {
         </Modal.Header>
         <Modal.Content>
           <SearchContent
-            favorites={favorites}
+            favoritesController={favoritesController}
             onAdd={handleAdd}
             onRemove={handleRemove}
             onEnterManually={onEnterManually ? handleEnterManually : null}
@@ -523,7 +589,7 @@ const searchFactory = config => {
     onAddItems: PropTypes.func.isRequired,
     existing: PropTypes.arrayOf(PropTypes.string).isRequired,
     disabled: PropTypes.bool,
-    favorites: PropTypes.object,
+    favoritesController: PropTypes.array,
     triggerFactory: PropTypes.func,
     defaultOpen: PropTypes.bool,
     single: PropTypes.bool,
@@ -536,7 +602,7 @@ const searchFactory = config => {
   };
 
   Search.defaultProps = {
-    favorites: null,
+    favoritesController: null,
     disabled: false,
     triggerFactory: null,
     defaultOpen: false,
@@ -749,8 +815,11 @@ export const UserSearch = Overridable.component('UserSearch', DefaultUserSearch)
  * Like UserSearch, but lazy-loads the favorite users on demand.
  */
 export function LazyUserSearch(props) {
-  const [favorites, [, , loadFavorites]] = useFavoriteUsers(null, true);
-  return <UserSearch favorites={favorites} onOpen={loadFavorites} {...props} />;
+  const favoriteUsersController = useFavoriteUsers(null, true);
+  const [, [, , loadFavorites]] = favoriteUsersController;
+  return (
+    <UserSearch favoritesController={favoriteUsersController} onOpen={loadFavorites} {...props} />
+  );
 }
 
 export const GroupSearch = searchFactory({
