@@ -12,8 +12,6 @@ import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {optionPropType} from 'indico/react/util/propTypes';
 
-import 'indico/custom_elements/ind_select';
-
 function DefaultLabel({option}) {
   return option.label ?? option.value;
 }
