@@ -268,6 +268,8 @@ def _update_security_md(new_version: str, dry_run: bool = False):
 
     # Replace auto-generated section
     updated_content = _replace_auto_section(content, new_table)
+    if content == updated_content:
+        return
 
     if dry_run:
         _show_diff(content, updated_content, security_md.name)
