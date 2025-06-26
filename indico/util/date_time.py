@@ -149,7 +149,7 @@ def format_interval(start_dt, end_dt, format='yMd', locale=None):
     if not locale:
         locale = get_current_locale()
 
-    if locale and format == 'short':
+    if format == 'short':
         format = 'hm' if 'a' in locale.time_formats['short'].pattern else 'Hm'
 
     return _format_interval(start_dt, end_dt, format, locale=locale)
