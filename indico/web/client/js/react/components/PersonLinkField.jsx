@@ -250,7 +250,7 @@ function PersonLinkField({
   validateEmailUrl,
   extraParams,
 }) {
-  const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
+  const favoriteUsersController = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
   const sections = roles.filter(x => x.section);
@@ -379,7 +379,7 @@ function PersonLinkField({
             </Button>
           )}
           <UserSearch
-            favorites={favoriteUsers}
+            favoritesController={favoriteUsersController}
             existing={persons.map(p => p.userIdentifier)}
             onAddItems={onAdd}
             onEnterManually={customPersonsMode === 'never' ? null : () => setModalOpen('details')}

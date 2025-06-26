@@ -31,6 +31,7 @@ Improvements
 - Log user merges to user log (:issue:`6882`, :pr:`6920`)
 - Allow re-sending emails from their log entries (:issue:`6805`, :pr:`6909`,
   thanks :user:`duartegalvao, unconventionaldotdev`)
+- Allow adding/removing favorite users from search results (:pr:`6950`)
 
 Bugfixes
 ^^^^^^^^

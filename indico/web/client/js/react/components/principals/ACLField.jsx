@@ -172,7 +172,7 @@ const ACLField = props => {
           <DefaultUserSearch
             existing={valueIds}
             onAddItems={handleAddItems}
-            favorites={favoriteUsers}
+            favoritesController={favoriteUsersController}
             disabled={disabled}
           />
           {withGroups && (
