@@ -60,6 +60,7 @@ Bugfixes
   :pr:`6922`)
 - Fix error when searching in user logs (:issue:`6933`, :pr:`6936`)
 - Fix room booking prompt during event creation not showing up (:pr:`6941`)
+- Fix AM/PM indicator based on event language in PDF timetable (:pr:`6888`)
 
 Accessibility
 ^^^^^^^^^^^^^
