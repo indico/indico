@@ -53,8 +53,7 @@ Internal Changes
 
 '''.lstrip()
 
-AUTO_GEN_START = '<!-- START AUTO-GENERATED -->'
-AUTO_GEN_END = '<!-- END AUTO-GENERATED -->'
+VERSIONS_SECTION_PATTERN = r'^([\s\S]*^<!-- VERSIONS .* -->)($[\s\S]+)([\n\r]+^<!-- ENDVERSIONS -->$[\s\S]*)$'
 
 
 def fail(message, *args, **kwargs):
@@ -218,14 +217,10 @@ def _split_minor_release(version: str) -> str:
 
 
 def _replace_auto_section(content: str, new_table: str) -> str:
-    """Replace content between AUTO_GEN_START and AUTO_GEN_END markers."""
-    pattern = rf'{re.escape(AUTO_GEN_START)}.*?{re.escape(AUTO_GEN_END)}'
-    replacement = f'{AUTO_GEN_START}\n{new_table}\n{AUTO_GEN_END}'
-
-    if not re.search(pattern, content, re.DOTALL):
-        raise ValueError('Could not find AUTO-GENERATED section markers in SECURITY.md')
-
-    return re.sub(pattern, replacement, content, flags=re.DOTALL)
+    """Replace content within the VERSIONS_SECTION_PATTERN markers."""
+    if match := re.search(VERSIONS_SECTION_PATTERN, content, re.MULTILINE):
+        return f'{match.group(1)}\n{new_table}{match.group(3)}'
+    raise ValueError('Could not find VERSIONS section markers in SECURITY.md')
 
 
 def _show_diff(old: str, new: str, filename: str):
