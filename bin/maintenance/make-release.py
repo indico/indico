@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 from datetime import date, datetime
 from pathlib import Path
 
@@ -257,11 +258,13 @@ def _update_security_md(new_version: str, dry_run: bool = False):
         else f'🚑 Limited (until {deadline_txt})'
     )
 
-    new_table = f'''| Version | Supported |
-| ------- | --------- |
-| {target_minor_version}.x | ✅ Yes (latest version) |
-| {prev_minor_release}.x | {support_text} |
-| Others | ❌ No |'''
+    new_table = textwrap.dedent(f'''
+        | Version | Supported |
+        | ------- | --------- |
+        | {target_minor_version}.x | ✅ Yes (latest version) |
+        | {prev_minor_release}.x | {support_text} |
+        | Others | ❌ No |
+    ''').strip()
 
     # Replace auto-generated section
     updated_content = _replace_auto_section(content, new_table)
