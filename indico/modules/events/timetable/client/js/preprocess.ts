@@ -138,7 +138,7 @@ export function preprocessTimetableEntries(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
             const childEntry: ChildEntry = {
               type: entryTypeMapping[childId[0]],
-              id: parseInt(childId.slice(1), 10),
+              id,
               title,
               startDt: dateToMoment(startDate),
               duration,
