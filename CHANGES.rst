@@ -10,6 +10,7 @@ Version 3.3.7
 Improvements
 ^^^^^^^^^^^^
 
+- Improved styling on review comments that use markdown
 - Add a new :data:`ALLOWED_LANGUAGES` setting to ``indico.conf`` to restrict which
   languages can be used (:pr:`6818`, thanks :user:`openprojects`)
 - Set reasonable maximum lengths on signup form fields (:pr:`6724`)
