@@ -559,7 +559,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
                          .all())
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
                                                          registrations=registrations)
-        file_name_prefix = 'Tickets' if config_params.pop('is_ticket', False) else 'Badges'
+        file_name_prefix = 'Tickets' if config_params.pop('is_ticket') else 'Badges'
         pdf = pdf_class(self.template, config_params, self.event, registrations,
                         self.regform.tickets_for_accompanying_persons)
         return send_file(f'{file_name_prefix}-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
