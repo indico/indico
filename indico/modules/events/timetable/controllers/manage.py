@@ -294,9 +294,8 @@ class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
             raise NotFound
 
     def _process(self):
-        html = render_entry_info_balloon(
-            self.entry, editable=True, sess=self.session, is_session_timetable=self.is_session_timetable
-        )
+        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session,
+                                         is_session_timetable=self.is_session_timetable)
         return jsonify(html=html)
 
 
@@ -330,7 +329,9 @@ class RHCloneContribution(RHManageTimetableBase):
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
-        self.contrib = Contribution.query.with_parent(self.event).filter_by(id=request.args['id']).one()
+        self.contrib = (Contribution.query.with_parent(self.event)
+                .filter_by(id=request.args['contrib_id'])
+                .one())
 
     def _process(self):
         contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)
