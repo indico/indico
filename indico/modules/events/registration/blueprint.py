@@ -159,7 +159,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invita
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/send', 'api_invitations_reminders_send',
                  invitations.RHRegistrationFormRemindersSend, methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/metadata',
-                 'api_invitations_reminders_metadata', invitations.RHRegistrationFormRemindersMetadata)
+                 'api_invitations_reminders_metadata', invitations.RHRegistrationFormRemindersMetadata,
+                 methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/preview',
                  'api_invitations_reminders_preview', invitations.RHRegistrationFormRemindersPreview,
                  methods=('POST',))
