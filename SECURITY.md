@@ -36,11 +36,11 @@ We will acknowledge your report within 48 hours and work with you to:
 We currently maintain security fixes for the following versions:
 
 <!-- VERSIONS - this is all machine-generated! Don't change it. -->
-| Version | Supported |
-| ------- | --------- |
-| 3.3.x | ✅ Yes (latest version) |
-| 3.2.x | ❌ No (ended Jul 30, 2024) |
-| Others | ❌ No |
+| Version | Supported                  |
+|---------|----------------------------|
+| 3.3.x   | ✅ Yes (latest version)    |
+| 3.2.x   | ❌ No (ended Jul 30, 2024) |
+| Others  | ❌ No                      |
 <!-- ENDVERSIONS -->
 
 ## 🫶 Thanks!

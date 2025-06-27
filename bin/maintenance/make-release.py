@@ -11,7 +11,6 @@ import os
 import re
 import subprocess
 import sys
-import textwrap
 from datetime import date
 from pathlib import Path
 
@@ -23,6 +22,7 @@ from packaging.version import Version
 from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter
 from pygments.lexers.diff import DiffLexer
+from terminaltables import GithubFlavoredMarkdownTable
 
 
 CHANGELOG_STUB = '''
@@ -247,13 +247,14 @@ def _update_security_md(*, dry_run: bool = False):
         else f'🚑 Limited (until {deadline_txt})'
     )
 
-    new_table = textwrap.dedent(f'''
-        | Version | Supported |
-        | ------- | --------- |
-        | {latest_minor_version}.x | ✅ Yes (latest version) |
-        | {prev_minor_release}.x | {support_text} |
-        | Others | ❌ No |
-    ''').strip()
+    new_table = GithubFlavoredMarkdownTable(
+        [
+            ['Version', 'Supported'],
+            [f'{latest_minor_version}.x', '✅ Yes (latest version)'],
+            [f'{prev_minor_release}.x', support_text],
+            ['Others', '❌ No'],
+        ]
+    ).table
 
     # Replace auto-generated section
     updated_content = _replace_auto_section(content, new_table)
