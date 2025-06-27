@@ -267,6 +267,8 @@ _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/reg
                  'api_checkin_registration', api_checkin.RHCheckinAPIRegistration, methods=('GET', 'PATCH'))
 _bp.add_url_rule('!/api/checkin/ticket/<uuid:ticket_uuid>',
                  'api_checkin_registration_uuid', api_checkin.RHCheckinAPIRegistrationUUID)
+_bp.add_url_rule('!/api/checkin/ticket/custom-qr-code', 'api_checkin_registration_custom_qr_code',
+                 api_checkin.RHCheckinAPIRegistrationCustomQRCode, methods=('POST',))
 
 # Deprecated Check-in app API
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
