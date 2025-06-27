@@ -135,7 +135,7 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.entries(entry.entries).map(
-          ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
+          ([childId, {id, title, startDate, duration}]: [string, SchemaBlock]) => {
             const childEntry: ChildEntry = {
               type: entryTypeMapping[childId[0]],
               id,
