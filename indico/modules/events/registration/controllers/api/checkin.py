@@ -5,18 +5,21 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import jsonify, request
 from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
 from werkzeug.exceptions import NotFound
 
 from indico.core import signals
+from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
+from indico.modules.events.registration.util import _base64_encode_uuid
+from indico.util.signals import values_from_signal
 from indico.web.args import use_kwargs
 from indico.web.rh import cors, json_errors, oauth_scope
 
@@ -130,3 +133,33 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
 
     def _process_GET(self):
         return CheckinRegistrationSchema().jsonify(self.registration)
+
+
+class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
+    """Get indico style ticket details for a specific registration from a custom plugin QR Code."""
+
+    def _process_args(self):
+        pass
+
+    def _check_access(self):
+        pass
+
+    @use_kwargs({
+        'data': fields.String(required=True),
+        'name': fields.String(required=True),
+    }, location='json')
+    def _process_POST(self, data, name):
+        sig_rvs = values_from_signal(
+            signals.event.registration.handle_custom_ticket_qr_code.send(data, qr_code_name=name),
+            as_list=True,
+        )
+        if len(sig_rvs) == 1:
+            reg = sig_rvs[0]
+            if isinstance(reg, Registration):
+                url = config.BASE_URL.removeprefix('https://')
+                qr_code_version = 2
+                result = {
+                  'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
+                }
+                return jsonify(result)
+        return NotFound('Unknown QR code data.')
