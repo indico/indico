@@ -321,6 +321,7 @@ ul.category-list {
       display: block;
       color: lighten($dark-blue, 6%);
       padding: 0 0 0 1em;
+      position: relative;
 
       &.invisible-block {
         color: inherit !important;
