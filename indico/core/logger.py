@@ -44,7 +44,7 @@ class RequestInfoFormatter(logging.Formatter):
 
 class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
     def getSubject(self, record):  # noqa: N802
-        return self.subject % record.__dict__
+        return (self.subject % record.__dict__).splitlines()[0]
 
 
 class BlacklistFilter(logging.Filter):
