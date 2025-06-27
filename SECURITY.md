@@ -43,6 +43,9 @@ We currently maintain security fixes for the following versions:
 | Others  | ❌ No                      |
 <!-- ENDVERSIONS -->
 
+If a version has "Limited" support, only important security fixes ("High" or "Critical" severity)
+will be backported.
+
 ## 🫶 Thanks!
 
 We deeply appreciate the efforts of security researchers and the wider Indico community in making
