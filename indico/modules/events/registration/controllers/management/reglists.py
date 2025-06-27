@@ -559,9 +559,10 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
                          .all())
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
                                                          registrations=registrations)
+        file_name_prefix = 'Tickets' if config_params.pop('is_ticket') else 'Badges'
         pdf = pdf_class(self.template, config_params, self.event, registrations,
                         self.regform.tickets_for_accompanying_persons)
-        return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
+        return send_file(f'{file_name_prefix}-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
@@ -623,6 +624,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             if data.pop('save_values', False):
                 self._set_event_badge_settings(self.event, data)
             data['registration_ids'] = [x.id for x in registrations]
+            data['is_ticket'] = self.TICKET_BADGES
 
             key = str(uuid.uuid4())
             badge_cache.set(key, data, timeout=1800)
