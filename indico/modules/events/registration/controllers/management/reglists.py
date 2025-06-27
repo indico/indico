@@ -779,38 +779,6 @@ class RHRegistrationRemoveModification(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationCheckIn(RHManageRegistrationBase):
-    """Set checked in state of a registration."""
-
-    def _process_PUT(self):
-        if self.registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
-            raise BadRequest(_('This registration cannot be marked as checked-in'))
-        self.registration.checked_in = True
-        signals.event.registration_checkin_updated.send(self.registration)
-        return jsonify_data(html=_render_registration_details(self.registration))
-
-    def _process_DELETE(self):
-        self.registration.checked_in = False
-        signals.event.registration_checkin_updated.send(self.registration)
-        return jsonify_data(html=_render_registration_details(self.registration))
-
-
-class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
-    """Bulk apply check-in/not checked-in state to registrations."""
-
-    def _process(self):
-        check_in = request.form['flag'] == '1'
-        msg = 'checked-in' if check_in else 'not checked-in'
-        for registration in self.registrations:
-            if registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
-                continue
-            registration.checked_in = check_in
-            signals.event.registration_checkin_updated.send(registration)
-            logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
-        flash(_('Selected registrations marked as {} successfully.').format(msg), 'success')
-        return jsonify_data(**self.list_generator.render_list())
-
-
 class RHRegistrationsApprove(RHRegistrationsActionBase):
     """Accept selected registrations from registration list."""
 

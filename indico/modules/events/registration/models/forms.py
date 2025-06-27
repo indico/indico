@@ -12,7 +12,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import UUID as pg_UUID  # noqa: N811
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property, subqueryload
+from sqlalchemy.orm import aliased, column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.core.config import config
@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
+from indico.modules.events.registration.models.checks import RegistrationCheck
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
                                                                      RegistrationState)
@@ -599,6 +600,27 @@ class RegistrationForm(db.Model):
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the regform."""
         return self.event.log(*args, meta={'registration_form_id': self.id}, **kwargs)
+
+    def get_checked_in_registrations_count(self, check_type_id):
+        registration_check = aliased(RegistrationCheck)
+        subquery = (db.session.query(
+                        registration_check.registration_id,
+                        registration_check.is_check_out
+                    )
+                    .filter(registration_check.check_type_id == check_type_id)
+                    .order_by(registration_check.registration_id, registration_check.timestamp.desc())
+                    .distinct(registration_check.registration_id)
+                    .subquery())
+
+        query = (db.session.query(db.func.coalesce(db.func.sum(Registration.occupied_slots), 0))
+                 .select_from(Registration)
+                 .join(subquery, subquery.c.registration_id == Registration.id)
+                 .filter(
+                     Registration.registration_form_id == self.id,
+                     ~Registration.is_deleted,
+                     subquery.c.is_check_out.is_(False)
+                 ))
+        return query.scalar()
 
 
 @listens_for(orm.mapper, 'after_configured', once=True)
