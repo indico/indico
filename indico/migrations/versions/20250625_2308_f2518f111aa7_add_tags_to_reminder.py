@@ -7,7 +7,6 @@ Create Date: 2025-04-12 23:08:57.532639
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects.postgresql import ARRAY
 
 
 # revision identifiers, used by Alembic.
@@ -18,6 +17,14 @@ depends_on = None
 
 
 def upgrade():
+    op.create_table('reminders_forms',
+        sa.Column('reminder_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('reminder_form_id', sa.Integer(), nullable=False, index=True),
+        sa.ForeignKeyConstraint(['reminder_id'], ['events.reminders.id']),
+        sa.ForeignKeyConstraint(['reminder_form_id'], ['event_registration.forms.id']),
+        sa.PrimaryKeyConstraint('reminder_id', 'reminder_form_id'),
+        schema='events'
+    )
     op.create_table('reminders_tags',
         sa.Column('reminder_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reminder_tag_id', sa.Integer(), nullable=False, index=True),
@@ -30,13 +37,9 @@ def upgrade():
                   sa.Column('all_tags', sa.Boolean(), nullable=False, server_default='false'),
                   schema='events')
     op.alter_column('reminders', 'all_tags', server_default=None, schema='events')
-    op.add_column('reminders',
-                  sa.Column('registration_form_ids', ARRAY(sa.Integer()), nullable=False, server_default='{}'),
-                  schema='events')
-    op.alter_column('reminders', 'registration_form_ids', server_default=None, schema='events')
 
 
 def downgrade():
-    op.drop_column('reminders', 'registration_form_ids', schema='events')
     op.drop_column('reminders', 'all_tags', schema='events')
     op.drop_table('reminders_tags', schema='events')
+    op.drop_table('reminders_forms', schema='events')
