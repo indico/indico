@@ -10,7 +10,7 @@ import ReactDOM from 'react-dom';
 
 import {WTFMultipleTagSelectField} from 'indico/react/components';
 
-window.setupMultipleTagSelectWidget = function setupMultipleTagSelectWidget({fieldId, choices}) {
+window.setupMultipleTagSelectWidget = function setupMultipleTagSelectWidget({fieldId, choices, inputArgs, initialSelection}) {
   const wrapperId = `${fieldId}-wrapper`;
   // The form dialog has a combination of overflow: hidden and auto.
   // Since WTFMultipleTagSelectField is much larger when expanded, most of its
@@ -21,7 +21,7 @@ window.setupMultipleTagSelectWidget = function setupMultipleTagSelectWidget({fie
   dialog.css('overflow', 'visible');
 
   ReactDOM.render(
-    <WTFMultipleTagSelectField fieldId={fieldId} wrapperId={wrapperId} choices={choices} />,
+    <WTFMultipleTagSelectField fieldId={fieldId} wrapperId={wrapperId} choices={choices} inputArgs={inputArgs} initialSelection={initialSelection} />,
     document.getElementById(wrapperId)
   );
 };

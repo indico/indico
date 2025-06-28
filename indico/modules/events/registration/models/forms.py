@@ -368,6 +368,7 @@ class RegistrationForm(db.Model):
     # - in_event_acls (EventPrincipal.registration_form)
     # - in_menu_entry_acls (MenuEntryPrincipal.registration_form)
     # - in_session_acls (SessionPrincipal.registration_form)
+    # - reminders (EventReminder.forms)
 
     def __contains__(self, user):
         if user is None:
