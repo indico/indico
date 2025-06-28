@@ -21,8 +21,7 @@ from indico.web.forms.widgets import TinyMCEWidget
 
 
 class ReminderForm(IndicoForm):
-    recipient_fields = ['recipients', 'send_to_participants', 'registration_form_ids',
-                        'tags', 'all_tags', 'send_to_speakers']
+    recipient_fields = ['recipients', 'send_to_participants', 'forms', 'tags', 'all_tags', 'send_to_speakers']
     schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
     schedule_recipient_fields = recipient_fields + schedule_fields
 
@@ -39,10 +38,11 @@ class ReminderForm(IndicoForm):
     recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
     send_to_participants = BooleanField(_('Participants'),
                                         description=_('Send the reminder to participants/registrants of the event.'))
-    registration_form_ids = IndicoSelectMultipleCheckboxField(_('Filter by registration forms'),
-                                                              [HiddenUnless('send_to_participants')],
-                                                              description=_('Limit reminders to participants of '
-                                                                            'these registration forms.'))
+
+    forms = IndicoSelectMultipleCheckboxField(_('Filter by registration forms'),
+                                              [HiddenUnless('send_to_participants')],
+                                              description=_('Limit reminders to participants of '
+                                                            'these registration forms.'))
     tags = IndicoMultipleTagSelectField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
                                         description=_('Limit reminders to participants with these tags.'))
     all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
@@ -73,14 +73,12 @@ class ReminderForm(IndicoForm):
             del self.include_summary
         regforms = sorted([rf for rf in self.event.registration_forms if not rf.is_deleted], key=lambda rf: rf.title)
         if len(regforms) > 1:
-            regform_choices = [(str(rf.id), rf.title) for rf in regforms]
-            self.registration_form_ids.choices = regform_choices
+            self.forms.choices = [(str(rf.id), rf.title) for rf in regforms]
         else:
-            del self.registration_form_ids
+            del self.forms
         tags = sorted(self.event.registration_tags, key=lambda tag: natural_sort_key(tag.title))
         if tags:
-            tag_choices = [(str(tag.id), (tag.title, tag.color)) for tag in tags]
-            self.tags.choices = tag_choices
+            self.tags.choices = [(str(tag.id), (tag.title, tag.color)) for tag in tags]
         else:
             del self.tags
             del self.all_tags
