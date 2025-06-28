@@ -28,6 +28,29 @@ from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
 
 
+reminders_forms_table = db.Table(
+    'reminders_forms',
+    db.metadata,
+    db.Column(
+        'reminder_id',
+        db.Integer,
+        db.ForeignKey('events.reminders.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    db.Column(
+        'reminder_form_id',
+        db.Integer,
+        db.ForeignKey('event_registration.forms.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    schema='events'
+)
+
+
 reminders_tags_table = db.Table(
     'reminders_tags',
     db.metadata,
@@ -113,12 +136,6 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
-    #: If participants should be filtered by registration forms
-    registration_form_ids = db.Column(
-        ARRAY(db.Integer),
-        nullable=False,
-        default=[]
-    )
     #: If all the of the selected tags must be present for the participants (ie. AND relation)
     all_tags = db.Column(
         db.Boolean,
@@ -180,7 +197,19 @@ class EventReminder(db.Model):
         )
     )
 
-    #: The registration tags assigned to this registration
+    #: The registration forms assigned to this reminder
+    forms = db.relationship(
+        'RegistrationForm',
+        secondary=reminders_forms_table,
+        passive_deletes=True,
+        collection_class=set,
+        backref=db.backref(
+            'reminders',
+            lazy=True
+        )
+    )
+
+    #: The registration tags assigned to this reminder
     tags = db.relationship(
         'RegistrationTag',
         secondary=reminders_tags_table,
@@ -209,8 +238,9 @@ class EventReminder(db.Model):
                           .join(Registration.registration_form)
                           .filter(Registration.is_active,
                                   ~RegistrationForm.is_deleted))
-            if self.registration_form_ids:
-                regs_query = regs_query.filter(RegistrationForm.id.in_(self.registration_form_ids))
+            if self.forms:
+                form_ids = [form.id for form in self.forms]
+                regs_query = regs_query.filter(RegistrationForm.id.in_(form_ids))
             if self.tags:
                 tag_ids = [tag.id for tag in self.tags]
                 if self.all_tags:
