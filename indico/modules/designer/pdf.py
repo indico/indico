@@ -114,13 +114,6 @@ class DesignerPDFBase:
             resized_font -= 0.25
         return {'fontSize': resized_font, 'leading': resized_font}
 
-    def _get_truncated_text_with_ellipsis(self, content, font_size, font_name, width):
-        text = content
-        item_width = width / PIXELS_CM * cm
-        while len(text) > 4 and stringWidth(text, font_name, font_size) > item_width:
-            text = text[:-4] + '...'
-        return text
-
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
         font_size = _extract_font_size(item['font_size'])
         styles = {
@@ -141,12 +134,8 @@ class DesignerPDFBase:
         else:
             styles['fontName'] = FONT_STYLES[item['font_family']][0]
 
-        if not isinstance(content, BytesIO):
-            overflow = item.get('text_overflow', 'wrap')
-            if overflow == 'resize':
-                styles.update(self._get_resized_font(content, font_size, styles['fontName'], item['width']))
-            elif overflow == 'ellipsis':
-                content = self._get_truncated_text_with_ellipsis(content, font_size, styles['fontName'], item['width'])
+        if not isinstance(content, BytesIO) and item.get('text_overflow', 'wrap') == 'resize':
+            styles.update(self._get_resized_font(content, font_size, styles['fontName'], item['width']))
 
         for update in values_from_signal(
             signals.event.designer.update_badge_style.send(self.template, item=item, styles=styles),

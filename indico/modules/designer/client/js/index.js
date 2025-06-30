@@ -107,13 +107,7 @@ import {$T} from 'indico/utils/i18n';
   }
 
   function getStyleForTextOverflow(overflowType) {
-    if (overflowType === 'ellipsis') {
-      return {
-        'white-space': 'nowrap',
-        'overflow': 'hidden',
-        'text-overflow': 'ellipsis',
-      };
-    } else if (overflowType === 'wrap') {
+    if (overflowType === 'wrap') {
       return {
         'white-space': 'normal',
         'overflow': 'visible',
