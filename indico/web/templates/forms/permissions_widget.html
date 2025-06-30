@@ -61,7 +61,8 @@
             isUnlisted: {{ field.is_unlisted | tojson }},
             permissionsInfo: {{ field.permissions_info | tojson }},
             hiddenPermissions: {{ field.hidden_permissions | default([]) | tojson }},
-            hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }}
+            hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }},
+            searchToken: {{ field.search_token | tojson }},
         });
 
         // make sure permission widget updates even if protection widget is not there to trigger an update

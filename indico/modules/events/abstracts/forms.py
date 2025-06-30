@@ -502,16 +502,15 @@ class AbstractForm(IndicoForm):
     submission_comment = TextAreaField(_('Comments'))
     attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        self.abstract = kwargs.pop('abstract', None)
-        is_invited = kwargs.pop('invited', False)
-        management = kwargs.pop('management', False)
+    def __init__(self, *args, event, abstract=None, invited=False, management=False, **kwargs):
+        self.event = event
+        self.abstract = abstract
+        self.allow_user_search = management or config.ALLOW_PUBLIC_USER_SEARCH
         description_settings = abstracts_settings.get(self.event, 'description_settings')
-        description_validators = self._get_description_validators(description_settings, invited=is_invited)
+        description_validators = self._get_description_validators(description_settings, invited=invited)
         if description_validators:
             inject_validators(self, 'description', description_validators)
-        if not is_invited:
+        if not invited:
             inject_validators(self, 'person_links', [DataRequired()])
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
@@ -532,7 +531,7 @@ class AbstractForm(IndicoForm):
             del self.attachments
         if not description_settings['is_active']:
             del self.description
-        if not is_invited:
+        if not invited:
             self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
             self.person_links.require_speaker = abstracts_settings.get(self.event, 'speakers_required')
         else:

@@ -152,7 +152,7 @@
         </div>
         {% if session.user.is_admin %}
             <div class="settingsWidgetSection">
-                <div id="login-as"></div>
+                <div id="login-as" data-search-token="{{ make_user_search_token() }}"></div>
             </div>
         {% endif %}
         {% if 'login_as_orig_user' in session %}

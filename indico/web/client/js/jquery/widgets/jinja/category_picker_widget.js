@@ -79,6 +79,9 @@
             .val(JSON.stringify(hiddenData))
             .trigger('change')
             .trigger(event, [category, dfd]);
+          // jquery events are not compatible with normal DOM events, so we also trigger a normal
+          // one so modern code can react to it
+          $field[0].dispatchEvent(new Event('change', {bubbles: true}));
           if (event.isDefaultPrevented()) {
             return dfd;
           }

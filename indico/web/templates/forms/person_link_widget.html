@@ -36,6 +36,8 @@
             sessionUser: Indico.User,
             validateEmailUrl: {{ field.validate_email_url | tojson }},
             extraParams: {{ field.extra_params | tojson }},
+            searchToken: {{ (field.search_token if not field.search_token_source|default(none) else none) | tojson }},
+            searchTokenSource: {{ field.search_token_source|default(none) | tojson }},
         });
     </script>
 {% endblock %}
