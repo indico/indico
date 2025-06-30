@@ -42,6 +42,6 @@ def test_event_reminder_email_plaintext(snapshot, create_contribution, create_ti
     agenda = event.timetable_entries.filter_by(parent_id=None).all()
     template = get_template_module('events/reminders/emails/event_reminder.txt',
                                    event=event, url='http://localhost/', with_description=True,
-                                   note='Meow.\nNyah!', with_agenda=True, agenda=agenda)
+                                   note='<p>Meow.</p><p>Nyah!</p>', with_agenda=True, agenda=agenda)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     assert_email_snapshot(snapshot, template, snapshot_filename)
