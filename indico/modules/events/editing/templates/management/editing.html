@@ -1,5 +1,5 @@
 {% extends 'events/editing/management/base.html' %}
 
 {% block content %}
-    <div id="editing-management"></div>
+    <div id="editing-management" data-search-token="{{ make_user_search_token() }}"></div>
 {% endblock %}

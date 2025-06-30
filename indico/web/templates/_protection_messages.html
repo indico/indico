@@ -24,9 +24,14 @@
                 <div class="label">
                     {% trans %}Protected{% endtrans %}
                 </div>
-                <div>
+                <div class="has-acl">
                     {% trans -%}
                         This object is <strong>only</strong> accessible by the <strong>users specified</strong> above and the <strong>managers</strong> of <strong>parent resources</strong>.
+                    {%- endtrans %}
+                </div>
+                <div class="no-acl">
+                    {% trans -%}
+                        This object is <strong>only</strong> accessible by the <strong>managers</strong> of <strong>parent resources</strong>.
                     {%- endtrans %}
                 </div>
             </div>

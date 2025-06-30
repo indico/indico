@@ -4,7 +4,7 @@
 {% block title %}{% trans %}Roles Setup{% endtrans %}{% endblock %}
 
 {% block content %}
-    <table class="i-table-widget multi-tbody" id="event-roles">
+    <table class="i-table-widget multi-tbody" id="event-roles" data-search-token="{{ make_user_search_token() }}">
         {{ render_roles(roles) }}
     </table>
     <div class="toolbar f-j-end space-before">

@@ -25,6 +25,7 @@
             withRegistrants: {{ field.allow_registration_forms | tojson }},
             withEmails: {{ field.allow_emails | tojson }},
             protectedFieldId: {{ field.protected_field_id | default(none) | tojson }},
+            searchToken: {{ field.search_token | tojson }},
         });
     </script>
 {% endblock %}

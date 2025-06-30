@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {Button, Segment, List, Label, Icon, Popup, Ref} from 'semantic-ui-react';
+import {Button, Icon, Label, List, Popup, Ref, Segment} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
@@ -246,9 +246,11 @@ function PersonLinkField({
   customPersonsMode,
   requiredPersonFields,
   defaultSearchExternal,
+  userSearchDisabled,
   nameFormat,
   validateEmailUrl,
   extraParams,
+  searchToken,
 }) {
   const favoriteUsersController = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState('');
@@ -393,7 +395,8 @@ function PersonLinkField({
             withEventPersons={eventId !== null}
             initialFormValues={{external: defaultSearchExternal}}
             eventId={eventId}
-            disabled={!sessionUser}
+            disabled={!sessionUser || !searchToken || userSearchDisabled}
+            searchToken={searchToken}
           />
           {customPersonsMode === 'always' && (
             <Button type="button" onClick={() => setModalOpen('details')}>
@@ -443,9 +446,11 @@ PersonLinkField.propTypes = {
   customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
   requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
+  userSearchDisabled: PropTypes.bool,
   nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
+  searchToken: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 };
 
 PersonLinkField.defaultProps = {
@@ -460,9 +465,11 @@ PersonLinkField.defaultProps = {
   customPersonsMode: 'always',
   requiredPersonFields: [],
   defaultSearchExternal: false,
+  userSearchDisabled: false,
   nameFormat: '',
   validateEmailUrl: null,
   extraParams: {},
+  searchToken: null,
 };
 
 export function WTFPersonLinkField({
@@ -477,9 +484,11 @@ export function WTFPersonLinkField({
   customPersonsMode,
   requiredPersonFields,
   defaultSearchExternal,
+  userSearchDisabled,
   nameFormat,
   validateEmailUrl,
   extraParams,
+  searchToken,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -538,6 +547,8 @@ export function WTFPersonLinkField({
       nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
       extraParams={extraParams}
+      searchToken={searchToken}
+      userSearchDisabled={userSearchDisabled}
     />
   );
 }
@@ -555,8 +566,10 @@ WTFPersonLinkField.propTypes = {
   customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
   requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
+  userSearchDisabled: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
+  searchToken: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -570,7 +583,9 @@ WTFPersonLinkField.defaultProps = {
   customPersonsMode: 'always',
   requiredPersonFields: [],
   defaultSearchExternal: false,
+  userSearchDisabled: false,
   nameFormat: '',
   validateEmailUrl: null,
   extraParams: {},
+  searchToken: null,
 };

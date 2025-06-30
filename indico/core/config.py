@@ -32,6 +32,7 @@ __all__ = ['config']
 # Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
     'ALLOW_ADMIN_USER_DELETION': False,
+    'ALLOW_PUBLIC_USER_SEARCH': True,
     'ALLOWED_LANGUAGES': None,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
