@@ -128,7 +128,7 @@ def flush_email_queue():
 
 @make_interceptable
 def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None, reply_address=None, attachments=None,
-               subject=None, body=None, template=None, html=False):
+               subject=None, body=None, template=None, html=False, alternatives=None):
     """Create an email.
 
     The preferred way to specify the email content is using the
@@ -155,6 +155,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
     :param template: A template module containing ``get_subject`` and
                      ``get_body`` macros.
     :param html: ``True`` if the email body is HTML
+    :param alternatives: List of (content, mimetype) tuple of alternative representations of the message
     """
     from indico.core.emails import get_actual_sender_address
     if template is not None and (subject is not None or body is not None):
@@ -187,4 +188,5 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
         'subject': subject.strip(),
         'body': body.strip(),
         'html': html,
+        'alternatives': alternatives,
     }

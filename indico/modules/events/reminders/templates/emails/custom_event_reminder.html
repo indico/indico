@@ -1,0 +1,7 @@
+{% extends 'emails/base_i18n.html' %}
+
+{% block subject -%}{{ subject }}{%- endblock %}
+{% block header %}{% endblock %}
+{% block footer_url %}{{ url }}{% endblock %}
+
+{% block body -%}{{ message }}{% endblock %}

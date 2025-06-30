@@ -10,6 +10,7 @@
     <script>
         setupTinyMCEWidget({
             fieldId: {{ field.id | tojson }},
+            disabled: {{ disabled|default(false) | tojson }},
             images: {{ images | tojson }},
             imageUploadURL: {{ field.get_form().editor_upload_url|default(none) | tojson }},
             forceAbsoluteURLs: {{ absolute_urls | tojson }},

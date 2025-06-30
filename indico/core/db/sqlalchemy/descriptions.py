@@ -58,7 +58,9 @@ class RenderModeMixin:
                              if len(self.possible_render_modes) == 1 or self.render_mode is None
                              else self.render_mode)
             description_wrapper = RENDER_MODE_WRAPPER_MAP[selected_mode]
-            return description_wrapper(getattr(self, attr_name))
+            if (attr_value := getattr(self, attr_name)) is not None:
+                return description_wrapper(attr_value)
+            return description_wrapper()
         return _getter
 
     @classmethod
