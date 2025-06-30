@@ -114,7 +114,7 @@ import {$T} from 'indico/utils/i18n';
       };
     } else if (overflowType === 'resize') {
       return {
-        'white-space': 'nowrap',
+        'white-space': 'pre',
       };
     }
     return {};
