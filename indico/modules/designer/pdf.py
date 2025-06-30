@@ -107,7 +107,7 @@ class DesignerPDFBase:
         return color
 
     def _get_resized_font(self, content, font_size, font_name, width):
-        min_font_size = 4
+        min_font_size = 6
         resized_font = font_size
         item_width = width / PIXELS_CM * cm
         while resized_font > min_font_size and item_width < stringWidth(content, font_name, resized_font):

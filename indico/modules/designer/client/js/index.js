@@ -82,7 +82,7 @@ import {$T} from 'indico/utils/i18n';
     const $item = divContainer.find('.designer-item');
     const pattern = /([0-9.]+)pt/g;
     let fontSize = parseFloat(pattern.exec(item.font_size)[1]);
-    const minFontSize = 4;
+    const minFontSize = 6;
 
     const resizer = $('<div>', {
       id: 'font-resizer',
