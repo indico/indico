@@ -114,13 +114,13 @@ const PrincipalField = props => {
             <PrincipalListItem
               name={details.name}
               detail={details.detail}
-              favorite={details.userId in favoriteUsers}
+              favorite={details.identifier in favoriteUsers}
               isPendingUser={details.userId === null}
               invalid={details.invalid}
               canDelete={!required}
               onDelete={() => !disabled && handleClear()}
-              onAddFavorite={() => !disabled && handleAddFavorite(details.userId)}
-              onDelFavorite={() => !disabled && handleDelFavorite(details.userId)}
+              onAddFavorite={() => !disabled && handleAddFavorite(details.identifier)}
+              onDelFavorite={() => !disabled && handleDelFavorite(details.identifier)}
               disabled={disabled}
               search={userSearch}
             />

@@ -296,12 +296,12 @@ const searchFactory = config => {
                 }
                 onAddFavorite={
                   favoritesController && r.type === 'user' && r.userId !== null
-                    ? () => favoritesController[1][0](r.userId)
+                    ? () => favoritesController[1][0](r.identifier)
                     : null
                 }
                 onDelFavorite={
                   favoritesController && r.type === 'user' && r.userId !== null
-                    ? () => favoritesController[1][1](r.userId)
+                    ? () => favoritesController[1][1](r.identifier)
                     : null
                 }
                 onAdd={() => onAdd(r)}
@@ -659,7 +659,7 @@ const InnerUserSearch = searchFactory({
   modalTitle: single =>
     single ? Translate.string('Select user') : Translate.string('Select users'),
   resultIcon: 'user',
-  favoriteKey: 'userId',
+  favoriteKey: 'identifier',
   searchFields: <UserSearchFields />,
   validateForm: values => {
     if (!values.first_name && !values.last_name && !values.email && !values.affiliation) {

@@ -479,18 +479,19 @@ class RHUserFavorites(RHUserBase):
 
 
 class RHUserFavoritesAPI(RHUserBase):
-    def _process_args(self):
+    @use_kwargs({
+        'fav_user': Principal(load_default=None, data_key='identifier')
+    }, location='view_args')
+    def _process_args(self, fav_user):
         RHUserBase._process_args(self)
-        self.fav_user = (
-            User.get_or_404(request.view_args['fav_user_id']) if 'fav_user_id' in request.view_args else None
-        )
+        self.fav_user = fav_user
 
     def _process_GET(self):
-        return jsonify(sorted(u.id for u in self.user.favorite_users))
+        return jsonify(sorted(u.identifier for u in self.user.favorite_users))
 
     def _process_PUT(self):
         self.user.favorite_users.add(self.fav_user)
-        return jsonify(self.user.id), 201
+        return jsonify(self.user.identifier), 201
 
     def _process_DELETE(self):
         self.user.favorite_users.discard(self.fav_user)

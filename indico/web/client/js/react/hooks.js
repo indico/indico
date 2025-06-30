@@ -38,7 +38,7 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
       let response;
       const args = {};
       if (id !== null) {
-        args.fav_user_id = id;
+        args.identifier = id;
       }
       if (userId !== null) {
         args.user_id = userId;
@@ -58,27 +58,26 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
     [userId]
   );
 
-  const fetchDetails = async (ids, signal = null) => {
-    const values = ids.map(id => `User:${id}`);
+  const fetchDetails = async (identifiers, signal = null) => {
     let response;
     try {
-      response = await indicoAxios.post(principalsURL(), {values}, {signal});
+      response = await indicoAxios.post(principalsURL(), {values: identifiers}, {signal});
     } catch (error) {
       handleAxiosError(error);
       return null;
     }
-    return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.userId, x]));
+    return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.identifier, x]));
   };
 
-  const del = async id => {
-    if ((await apiCall('DELETE', id)) !== null) {
-      setFavorites(values => _.omit(values, id));
+  const del = async identifier => {
+    if ((await apiCall('DELETE', identifier)) !== null) {
+      setFavorites(values => _.omit(values, identifier));
     }
   };
 
-  const add = async id => {
-    if ((await apiCall('PUT', id)) !== null) {
-      const data = await fetchDetails([id]);
+  const add = async identifier => {
+    if ((await apiCall('PUT', identifier)) !== null) {
+      const data = await fetchDetails([identifier]);
       if (data !== null) {
         setFavorites(values => ({...values, ...data}));
       }

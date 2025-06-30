@@ -223,6 +223,15 @@ class EventPerson(PersonMixin, db.Model):
     def identifier(self):
         return f'EventPerson:{self.id}'
 
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,

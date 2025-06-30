@@ -282,7 +282,7 @@ function FavoriteUserManager({userId}) {
                         <Icon
                           styleName="delete-button"
                           name="close"
-                          onClick={() => deleteFavoriteUser(user.userId)}
+                          onClick={() => deleteFavoriteUser(user.identifier)}
                           link
                         />
                       }
@@ -302,7 +302,7 @@ function FavoriteUserManager({userId}) {
       </div>
       <UserSearch
         existing={Object.values(favoriteUsers).map(u => u.identifier)}
-        onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
+        onAddItems={e => e.forEach(u => addFavoriteUser(u.identifier))}
         triggerFactory={searchTrigger}
       />
     </div>

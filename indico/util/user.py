@@ -7,6 +7,7 @@
 
 from indico.core.cache import make_scoped_cache
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.util.signing import static_secure_serializer
 
 
 def iter_acl(acl):
@@ -25,10 +26,10 @@ def iter_acl(acl):
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 
-def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+def principal_from_identifier(identifier, *, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                               allow_event_persons=False, allow_category_roles=False, allow_registration_forms=False,
                               allow_emails=False, allow_networks=False, event_id=None, category_id=None,
-                              soft_fail=False):
+                              soft_fail=False, require_user_token=True):
     from indico.modules.categories.models.categories import Category
     from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.models.events import Event
@@ -56,10 +57,22 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         raise ValueError('Invalid data')
 
     if type_ == 'User':
+        if ':' in data:
+            user_id, signed_user_id = data.split(':', 1)
+        else:
+            user_id, signed_user_id = data, None
         try:
-            user_id = int(data)
+            user_id = int(user_id)
         except ValueError:
             raise ValueError('Invalid data')
+        if signed_user_id or require_user_token:
+            signed_user_id = (
+                static_secure_serializer.loads(signed_user_id, salt='principal-id') if signed_user_id else None
+            )
+            if signed_user_id is None:
+                raise ValueError(f'User id signature missing for {user_id}')
+            elif signed_user_id != user_id:
+                raise ValueError(f'Invalid user id signature: {signed_user_id} != {user_id}')
         user = User.get(user_id, is_deleted=(None if soft_fail else False))
         if user is None:
             raise ValueError(f'Invalid user: {user_id}')
