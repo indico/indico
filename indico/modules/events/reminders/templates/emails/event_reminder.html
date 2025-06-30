@@ -1,0 +1,80 @@
+{% extends 'emails/base_i18n.html' %}
+{% from 'events/reminders/emails/_agenda.html' import render_agenda %}
+
+{% set address = event.address %}
+{% set location = event.venue_name %}
+{% set room = event.room_name %}
+{% set label = ' {%s}'|format(event.label.title) if event.label else '' %}
+
+
+{% block subject -%}
+    [{% trans %}Event reminder{% endtrans %}] {{ event.title }}{{ label }} ({{ event.start_dt | format_datetime('short', timezone=event.tzinfo) }} {{ event.timezone }})
+{%- endblock %}
+{% block header %}{% endblock %}
+{% block footer_url %}{{ url }}{% endblock %}
+
+
+{% block body -%}
+    <p>
+    {%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
+        Please note that the event "{{ title }}"{{ label }} will start on {{ start }} ({{ tz }}).
+    {%- endtrans %}
+    </p>
+    <p>
+    {%- if location or room -%}
+        {% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}
+    {%- elif address %}
+        {% trans %}It will take place at the following address:{% endtrans %}
+        {{ address | trim | indent }}
+    {%- endif %}
+    </p>
+    <p>{% trans %}You can access the full event here:{% endtrans %}{{ url }}</p>
+    {%- if with_description and event.description %}
+        <p><strong>{% trans %}Description{% endtrans %}</strong></p>
+        {{ event.description | trim }}
+    {%- endif -%}
+
+    {#- Blank lines are intended #}
+    {%- if note %}
+        <br><p><strong>{% trans %}Note{% endtrans %}</strong></p>
+        {{ note | safe }}
+    {%- endif -%}
+
+    {# Blank lines are intended #}
+    {%- if with_agenda %}
+        {{ render_agenda(event, agenda) }}
+    {%- endif -%}
+{%- endblock %}
+
+{%- macro render_location() -%}
+    {%- if location -%}
+        {%- if room -%}
+            {{ location | trim }} {{ render_room() }}.
+        {%- else -%}
+            {{ location | trim }}.
+        {%- endif -%}
+        {{- render_address() }}
+    {%- elif room -%}
+        {{ render_room() }}.
+        {{- render_address() }}
+    {%- else -%}
+        {{ render_address() }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_room() -%}
+    {%- if room -%}
+        {%- if location -%}
+            ({{ room | trim }})
+        {%- else -%}
+            {% trans r=room|trim %}room {{ r }}{% endtrans %}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_address() -%}
+    {%- if address %}
+        {% trans %}Address:{% endtrans %}
+        {{ address | trim | indent }}
+    {%- endif -%}
+{%- endmacro -%}

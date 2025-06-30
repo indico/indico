@@ -26,7 +26,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import truncate
 from indico.vendor.django_mail import get_connection
-from indico.vendor.django_mail.message import EmailMessage
+from indico.vendor.django_mail.message import EmailMultiAlternatives
 
 
 logger = Logger.get('emails')
@@ -108,9 +108,10 @@ def do_send_email(email, log_entry=None, _from_task=False):
                        the celery task responsible for sending emails.
     """
     with get_connection() as conn:
-        msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
-                           to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
-                           attachments=email['attachments'], connection=conn)
+        msg = EmailMultiAlternatives(subject=email['subject'], body=email['body'], from_email=email['from'],
+                                     to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
+                                     attachments=email['attachments'], alternatives=email.get('alternatives'),
+                                     connection=conn)
         if not msg.to:
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
         if email['html']:

@@ -5,25 +5,81 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from enum import Enum
+
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.notifications import make_email, send_email
 from indico.modules.core.settings import core_settings
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.models.events import EventType
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration, registrations_tags_table
 from indico.modules.events.reminders import logger
-from indico.modules.events.reminders.util import make_reminder_email
+from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.util.date_time import now_utc
 from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
+from indico.web.flask.templating import get_template_module
+
+
+class ReminderType(int, Enum):
+    classic = 1
+    custom = 2
+
+
+reminders_forms_table = db.Table(
+    'reminders_forms',
+    db.metadata,
+    db.Column(
+        'reminder_id',
+        db.Integer,
+        db.ForeignKey('events.reminders.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    db.Column(
+        'reminder_form_id',
+        db.Integer,
+        db.ForeignKey('event_registration.forms.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    schema='events'
+)
+
+
+reminders_tags_table = db.Table(
+    'reminders_tags',
+    db.metadata,
+    db.Column(
+        'reminder_id',
+        db.Integer,
+        db.ForeignKey('events.reminders.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    db.Column(
+        'reminder_tag_id',
+        db.Integer,
+        db.ForeignKey('event_registration.tags.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    schema='events'
+)
 
 
 class EventReminder(db.Model):
@@ -88,6 +144,12 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
+    #: If all the of the selected tags must be present for the participants (ie. AND relation)
+    all_tags = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: If the notification should also be sent to all event speakers
     send_to_speakers = db.Column(
         db.Boolean,
@@ -117,11 +179,22 @@ class EventReminder(db.Model):
         db.String,
         nullable=False
     )
-    #: Custom message to include in the email
+    #: Subject of reminder email for customized reminder.
+    subject = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    #: Custom message to include in the email (ReminderType.classic) or the complete message (ReminderType.custom).
     message = db.Column(
         db.String,
         nullable=False,
         default=''
+    )
+    #: It is a classic reminder or a customized one.
+    reminder_type = db.Column(
+        PyIntEnum(ReminderType),
+        nullable=False
     )
 
     #: The user who created the reminder
@@ -143,6 +216,30 @@ class EventReminder(db.Model):
         )
     )
 
+    #: The registration forms assigned to this reminder
+    forms = db.relationship(
+        'RegistrationForm',
+        secondary=reminders_forms_table,
+        passive_deletes=True,
+        collection_class=set,
+        backref=db.backref(
+            'reminders',
+            lazy=True
+        )
+    )
+
+    #: The registration tags assigned to this reminder
+    tags = db.relationship(
+        'RegistrationTag',
+        secondary=reminders_tags_table,
+        passive_deletes=True,
+        collection_class=set,
+        backref=db.backref(
+            'reminders',
+            lazy=True
+        )
+    )
+
     @property
     def locator(self):
         return dict(self.event.locator, reminder_id=self.id)
@@ -156,7 +253,26 @@ class EventReminder(db.Model):
         """
         recipients = set(self.recipients)
         if self.send_to_participants:
-            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event))
+            regs_query = (self.event.registrations
+                          .join(Registration.registration_form)
+                          .filter(Registration.is_active,
+                                  ~RegistrationForm.is_deleted))
+            if self.forms:
+                form_ids = [form.id for form in self.forms]
+                regs_query = regs_query.filter(RegistrationForm.id.in_(form_ids))
+            if self.tags:
+                tag_ids = [tag.id for tag in self.tags]
+                if self.all_tags:
+                    tags_query = (db.session.query(registrations_tags_table.c.registration_id)
+                                  .filter(registrations_tags_table.c.registration_tag_id.in_(tag_ids))
+                                  .group_by(registrations_tags_table.c.registration_id)
+                                  .having(func.count(registrations_tags_table.c.registration_id) == len(tag_ids)))
+                else:
+                    tags_query = (db.session.query(registrations_tags_table.c.registration_id.distinct())
+                                  .filter(registrations_tags_table.c.registration_tag_id.in_(tag_ids)))
+                regs_query = regs_query.filter(Registration.id.in_(tags_query))
+
+            recipients.update(reg.email for reg in regs_query)
 
         if self.send_to_speakers:
             recipients.update(person_link.email for person_link in self.event.person_links)
@@ -205,17 +321,28 @@ class EventReminder(db.Model):
     def is_overdue(self):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
-    def _make_email(self, sender, recipient, template, attachments):
+    def _make_email(self, sender, recipient, template, attachments, html, alternatives):
         email_params = {
             'to_list': recipient,
             'sender_address': sender,
             'template': template,
-            'attachments': attachments
+            'attachments': attachments,
+            'html': html,
+            'alternatives': alternatives
         }
         extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
         for param in values_from_signal(extra_params, as_list=True):
             email_params.update(param)
         return make_email(**email_params)
+
+    def _get_reminder_email_tpl(self):
+        with_agenda = self.include_summary
+        if self.event.type_ == EventType.lecture:
+            with_agenda = False
+        agenda = self.event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
+        return get_template_module('events/reminders/emails/event_reminder.txt', event=self.event,
+                                   url=self.event.short_external_url, note=self.note, with_agenda=with_agenda,
+                                   with_description=self.with_description, agenda=agenda)
 
     def send(self):
         """Send the reminder to its recipients."""
@@ -225,7 +352,9 @@ class EventReminder(db.Model):
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
         with self.event.force_event_locale():
-            email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
+            text_email_tpl, html_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type,
+                                                                    self.include_summary, self.include_description,
+                                                                    self.subject, self.message)
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
@@ -233,9 +362,11 @@ class EventReminder(db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         sender = self.event.get_verbose_email_sender(self.reply_to_address)
+        alternatives = [(text_email_tpl.get_body(), 'text/plain')] if text_email_tpl else None
         for recipient in recipients:
             with self.event.force_event_locale():
-                email = self._make_email(sender, recipient, email_tpl, attachments)
+                email = self._make_email(sender, recipient, html_email_tpl, attachments, html=True,
+                                         alternatives=alternatives)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

@@ -1,0 +1,4 @@
+<strong>{% trans %}Subject{% endtrans %}</strong>
+<br>{{ subject }}<br><br>
+<strong>{% trans %}Body{% endtrans %}</strong>
+<br>{{ body | sanitize_html }}
