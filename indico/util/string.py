@@ -242,7 +242,7 @@ def truncate(text, max_size, ellipsis='...'):
 
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
-    return do_striptags(text)
+    return do_striptags(text or '')
 
 
 def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **kwargs):
