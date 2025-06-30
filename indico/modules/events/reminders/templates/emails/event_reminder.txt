@@ -43,7 +43,7 @@
 
 
 {% filter underline %}{% trans %}Note{% endtrans %}{% endfilter %}
-{{ note }}
+{{ note | html_to_plaintext | trim }}
 {%- endif -%}
 
 {# Blank lines are intended #}
