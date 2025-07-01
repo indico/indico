@@ -440,6 +440,7 @@ class User(PersonMixin, db.Model):
     # - abstracts (Abstract.submitter)
     # - agreements (Agreement.user)
     # - anonymous_survey_submissions (AnonymousSurveySubmission.user)
+    # - app_log_entries (AppLogEntry.user)
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
     # - blockings (Blocking.created_by_user)

@@ -7,20 +7,24 @@
 
 from flask import request
 
-from indico.modules.logs.controllers import (RHCategoryLogs, RHCategoryLogsJSON, RHEventLogs, RHEventLogsJSON,
-                                             RHResendEmail, RHUserLogs, RHUserLogsJSON)
+from indico.modules.logs.controllers import (RHAppLogs, RHAppLogsJSON, RHCategoryLogs, RHCategoryLogsJSON, RHEventLogs,
+                                             RHEventLogsJSON, RHResendEmail, RHUserLogs, RHUserLogsJSON)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('logs', __name__, template_folder='templates', virtual_template_folder='logs')
 
-# Events
-_bp.add_url_rule('/event/<int:event_id>/manage/logs/', 'event', RHEventLogs)
-_bp.add_url_rule('/event/<int:event_id>/manage/logs/api/logs', 'api_event_logs', RHEventLogsJSON)
+# App
+_bp.add_url_rule('/admin/logs/', 'app', RHAppLogs)
+_bp.add_url_rule('/admin/logs/api/logs', 'api_app_logs', RHAppLogsJSON)
 
 # Categories
 _bp.add_url_rule('/category/<int:category_id>/manage/logs/', 'category', RHCategoryLogs)
 _bp.add_url_rule('/category/<int:category_id>/manage/logs/api/logs', 'api_category_logs', RHCategoryLogsJSON)
+
+# Events
+_bp.add_url_rule('/event/<int:event_id>/manage/logs/', 'event', RHEventLogs)
+_bp.add_url_rule('/event/<int:event_id>/manage/logs/api/logs', 'api_event_logs', RHEventLogsJSON)
 
 # Users
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
