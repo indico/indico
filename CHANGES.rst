@@ -34,6 +34,8 @@ Improvements
 - Allow adding/removing favorite users from search results (:pr:`6950`)
 - Make text overflow behavior in badge designer configurable (:pr:`6944`, thanks
   :user:`SegiNyn`)
+- Allow selecting which invitees to remind on the invitations list (:issue:`6804`,
+  :pr:`6918`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
