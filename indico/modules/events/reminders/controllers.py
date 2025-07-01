@@ -9,6 +9,8 @@ from flask import flash, jsonify, redirect, render_template, request, session
 
 from indico.core.db import db
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
 from indico.modules.events.reminders.models.reminders import EventReminder
@@ -79,7 +81,9 @@ class RHEditReminder(RHSpecificReminderBase):
         else:
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_dt': reminder.scheduled_dt}
-        return FormDefaults(reminder, **defaults_kwargs)
+        defaults_kwargs['forms'] = [str(form.id) for form in reminder.forms]
+        defaults_kwargs['tags'] = [str(tag.id) for tag in reminder.tags]
+        return FormDefaults(reminder, skip_attrs=['forms', 'tags'], **defaults_kwargs)
 
     def _process(self):
         reminder = self.reminder
@@ -88,7 +92,22 @@ class RHEditReminder(RHSpecificReminderBase):
             if reminder.is_sent:
                 flash(_('This reminder has already been sent and cannot be modified anymore.'), 'error')
                 return redirect(url_for('.edit', reminder))
-            form.populate_obj(reminder, existing_only=True)
+            form.populate_obj(reminder, skip=['forms', 'tags'], existing_only=True)
+
+            forms = set()
+            tags = set()
+            if form.send_to_participants.data:
+                if form.forms:
+                    form_ids = [int(id) for id in form.forms.data]
+                    forms = set(RegistrationForm.query.with_parent(self.event)
+                                .filter(RegistrationForm.id.in_(form_ids)).all())
+                if form.tags:
+                    tag_ids = [int(id) for id in form.tags.data]
+                    tags = set(RegistrationTag.query.with_parent(self.event)
+                               .filter(RegistrationTag.id.in_(tag_ids)).all())
+            reminder.forms = forms
+            reminder.tags = tags
+
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
@@ -108,7 +127,22 @@ class RHAddReminder(RHRemindersBase):
         form = ReminderForm(event=self.event, schedule_type='relative', attach_ical=True)
         if form.validate_on_submit():
             reminder = EventReminder(creator=session.user, event=self.event)
-            form.populate_obj(reminder, existing_only=True)
+            form.populate_obj(reminder, skip=['forms', 'tags'], existing_only=True)
+
+            forms = set()
+            tags = set()
+            if form.send_to_participants.data:
+                if form.forms:
+                    form_ids = [int(id) for id in form.forms.data]
+                    forms = set(RegistrationForm.query.with_parent(self.event)
+                                .filter(RegistrationForm.id.in_(form_ids)).all())
+                if form.tags:
+                    tag_ids = [int(id) for id in form.tags.data]
+                    tags = set(RegistrationTag.query.with_parent(self.event)
+                               .filter(RegistrationTag.id.in_(tag_ids)).all())
+            reminder.forms = forms
+            reminder.tags = tags
+
             db.session.add(reminder)
             db.session.flush()
             if form.schedule_type.data == 'now':
@@ -129,8 +163,11 @@ class RHPreviewReminder(RHRemindersBase):
         include_summary = request.form.get('include_summary') == '1'
         include_description = request.form.get('include_description') == '1'
         with self.event.force_event_locale():
-            tpl = make_reminder_email(self.event, include_summary, include_description, request.form.get('message'))
-            subject = tpl.get_subject()
-            body = tpl.get_body()
-        html = render_template('events/reminders/preview.html', subject=subject, body=body)
-        return jsonify(html=html)
+            text_email_tpl, html_email_tpl = make_reminder_email(self.event, include_summary, include_description,
+                                                                 request.form.get('message'))
+            subject = html_email_tpl.get_subject()
+            html_body = html_email_tpl.get_html_body()
+            text_body = text_email_tpl.get_body()
+        html_preview = render_template('events/reminders/preview_html.html', subject=subject, body=html_body)
+        text_preview = render_template('events/reminders/preview_text.html', subject=subject, body=text_body)
+        return jsonify(html=html_preview, text=text_preview)
