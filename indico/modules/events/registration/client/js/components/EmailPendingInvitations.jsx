@@ -14,11 +14,21 @@ import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {indicoAxios} from 'indico/utils/axios';
 
-export default function EmailPendingInvitations({metadataURL, previewURL, sendURL, onClose}) {
+export default function EmailPendingInvitations({
+  metadataURL,
+  previewURL,
+  sendURL,
+  selectedInvitations,
+  onClose,
+}) {
   const successTimeout = 5000;
   const [sentCount, setSentCount] = useState(0);
 
-  const {data, loading} = useIndicoAxios(metadataURL);
+  const {data, loading} = useIndicoAxios({
+    url: metadataURL,
+    method: 'POST',
+    data: {invitation_ids: selectedInvitations},
+  });
   const {
     senders = [],
     recipients = [],
@@ -30,7 +40,7 @@ export default function EmailPendingInvitations({metadataURL, previewURL, sendUR
   const handleSubmit = async data => {
     let resp;
     try {
-      resp = await indicoAxios.post(sendURL, data);
+      resp = await indicoAxios.post(sendURL, {...data, invitation_ids: selectedInvitations});
     } catch (err) {
       return handleSubmitError(err);
     }
@@ -53,6 +63,7 @@ export default function EmailPendingInvitations({metadataURL, previewURL, sendUR
       senders={senders}
       recipients={recipients}
       previewURL={previewURL}
+      previewContext={{invitation_ids: selectedInvitations}}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody}}
       sentEmailsCount={sentCount}
@@ -64,5 +75,6 @@ EmailPendingInvitations.propTypes = {
   metadataURL: PropTypes.string.isRequired,
   previewURL: PropTypes.string.isRequired,
   sendURL: PropTypes.string.isRequired,
+  selectedInvitations: PropTypes.arrayOf(PropTypes.number).isRequired,
   onClose: PropTypes.func.isRequired,
 };
