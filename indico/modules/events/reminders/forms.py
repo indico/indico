@@ -16,7 +16,7 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoRadioField,
                                      IndicoSelectMultipleCheckboxField, TimeDeltaField)
 from indico.web.forms.fields.simple import IndicoMultipleTagSelectField
-from indico.web.forms.validators import DateTimeRange, HiddenUnless
+from indico.web.forms.validators import DateTimeRange, HiddenUnless, NoRelativeURLs
 from indico.web.forms.widgets import TinyMCEWidget
 
 
@@ -53,7 +53,7 @@ class ReminderForm(IndicoForm):
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
-    message = TextAreaField(_('Note'), widget=TinyMCEWidget(),
+    message = TextAreaField(_('Note'), [NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True, height=300),
                             description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
