@@ -353,19 +353,6 @@ describe('Time', () => {
   });
 
   it.each([
-    ['0:00', '0h'],
-    ['0:01', '0:01'],
-    ['0:30', '0.5h'],
-    ['0:59', '0:59'],
-    ['1:00', '1h'],
-    ['13:45', '13:45'],
-  ])('should format time like %s to duration string', (timeString, durationString) => {
-    const t = Time.fromString(timeString);
-
-    expect(t.toDurationString()).toBe(durationString);
-  });
-
-  it.each([
     ['0:00', '12h', '12:00 AM'],
     ['0:00', '24h', '00:00'],
     ['0:00', 'any', '00:00'],
@@ -406,8 +393,7 @@ describe('timeList', () => {
       label: '12:00 AM',
       time: '00:00',
       value: 0,
-      durationLabel: '',
-      duration: '',
+      duration: null,
       current: false,
     });
 
@@ -415,10 +401,31 @@ describe('timeList', () => {
       label: '11:45 PM',
       time: '23:45',
       value: 1425,
-      durationLabel: '',
-      duration: '',
+      duration: null,
       current: false,
     });
+  });
+
+  it('should start from minTime', () => {
+    const l = timeList({minTime: '14:55'});
+
+    expect(l[0].time).toBe('14:55');
+    expect(l[1].time).toBe('15:10');
+    expect(l.at(-1).time).toBe('23:55');
+  });
+
+  it('should end before maxTime', () => {
+    const l = timeList({maxTime: '14:55'});
+
+    expect(l[0].time).toBe('00:00');
+    expect(l.at(-1).time).toBe('14:45');
+  });
+
+  it('should include the maxTime', () => {
+    const l = timeList({maxTime: '13:30'});
+
+    expect(l[0].time).toBe('00:00');
+    expect(l.at(-1).time).toBe('13:30');
   });
 
   it('should use 15 minutes as default step', () => {
@@ -453,6 +460,13 @@ describe('timeList', () => {
 
     const marked = l.find(t => t.current);
     expect(marked).toBeUndefined();
+  });
+
+  it('should return durations when startTime is specified', () => {
+    const l = timeList({minTime: '13:00', startTime: '12:05'});
+
+    expect(l[0].duration).toEqual(new Time(55));
+    expect(l[1].duration).toEqual(new Time(70));
   });
 });
 
