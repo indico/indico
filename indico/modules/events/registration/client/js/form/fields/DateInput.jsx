@@ -68,6 +68,8 @@ export function DateInputComponent({
             disabled={disabled}
             required={required}
             timeFormat={timeFormat}
+            min="12:05"
+            startTime="12:05"
             value={timeValue}
             onChange={handleTimeChange}
           />

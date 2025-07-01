@@ -6,14 +6,15 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState, useRef} from 'react';
 
-import ComboBox from 'indico/react/components/ComboBox';
-import {Translate} from 'indico/react/i18n';
+import {useNativeEvent} from 'indico/react/hooks';
+import {Translate, PluralTranslate} from 'indico/react/i18n';
+import {Time, timeList} from 'indico/utils/time_value.js';
 
 import {timeString} from './prop_types.js';
-import {Time, timeList} from './time_value.js';
 
+import 'indico/custom_elements/ind_time_picker.js';
 import './TimePicker.module.scss';
 
 const DEFAULT_STEP_SIZE = 15; // minutes
@@ -22,59 +23,55 @@ const TIME_FORMAT_PLACEHOLDER = {
   '24h': '--:--',
 };
 
-function TimeOptionLabel({value, label, duration}) {
-  return (
-    <time dateTime={value}>
-      <span>{label}</span>
-      {duration ? <span>{duration}</span> : null}
-    </time>
-  );
+function formatDuration(duration) {
+  const durationInMins = duration.value;
+  if (durationInMins < 60) {
+    return PluralTranslate.string('{time} min', '{time} mins', durationInMins, {
+      time: durationInMins,
+    });
+  }
+  if (durationInMins % 30 === 0) {
+    // 'Nice' hours like, either whole or half-hour
+    const durationInHours = durationInMins / 60;
+    return PluralTranslate.string('{time} hr', '{time} hrs', durationInHours, {
+      time: durationInHours,
+    });
+  }
+  // 'Ugly' hours, like 1:15, 1:05, won't display well as decimals
+  return duration.toShortString();
 }
 
-TimeOptionLabel.propTypes = {
-  value: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  duration: PropTypes.string.isRequired,
-};
-
-function getOptions(currentValue, startTime, step, min, max, timeFormat) {
+function getOptions(currentValue, startTime, step, minTime, maxTime, timeFormat) {
   return timeList({
     markCurrent: currentValue,
     startTime,
     step,
-    min,
-    max,
+    minTime,
+    maxTime,
     timeFormat,
   }).map(option => {
     const {label, time, duration, disabled} = option;
 
-    return {
-      value: label,
-      disabled,
-      label: <TimeOptionLabel value={time} label={label} duration={duration} />,
-    };
-  });
-}
+    const itemProps = {};
 
-function rankTimeOption(_, keywordText, option) {
-  const optionDisabled = option.hasAttribute('aria-disabled');
-  const optionText = option.textContent.replace(/\s+/g, '').toLowerCase();
-  const optionValue = option.firstElementChild.dateTime;
-  const keywordValue = Time.fromString(keywordText).toString();
-
-  keywordText = keywordText.toLowerCase().replace(/\s+/, '');
-
-  let optionRank = 0;
-
-  if (keywordText && !optionDisabled) {
-    if (optionValue === keywordValue) {
-      optionRank = Infinity;
-    } else if (optionText.startsWith(keywordText)) {
-      optionRank = 10;
+    if (disabled) {
+      itemProps['aria-disabled'] = true;
     }
-  }
 
-  return optionRank;
+    return (
+      <li role="option" data-value={label} data-time={time} key={time} {...itemProps}>
+        <time dateTime={time} styleName="option-label">
+          <span>{label}</span>
+          {duration ? (
+            <>
+              {' '}
+              <span>({formatDuration(duration)})</span>
+            </>
+          ) : null}
+        </time>
+      </li>
+    );
+  });
 }
 
 export default function TimePicker({
@@ -85,11 +82,14 @@ export default function TimePicker({
   max,
   timeFormat,
   onChange,
-  required,
+  ...inputProps
 }) {
-  const [inputValue, setInputValue] = useState(Time.fromString(value, '24h').toString());
+  const pickerRef = useRef();
+  const [inputValue, setInputValue] = useState(
+    value && Time.fromString(value, '24h').toFormattedString(timeFormat)
+  );
   const [notice, setNotice] = useState('');
-  const valueAsTime = Time.fromString(value, '24h');
+  const placeholder = TIME_FORMAT_PLACEHOLDER[timeFormat];
 
   const options = useMemo(() => getOptions(value, startTime, step, min, max, timeFormat), [
     value,
@@ -115,10 +115,12 @@ export default function TimePicker({
 
   useEffect(
     () => {
-      const inputTime = Time.fromString(inputValue, 'any');
+      const propTime = Time.fromString(value, '24h');
+      const internalTime = Time.fromString(inputValue, 'any');
+
       // Using Object.is() as value can also be NaN
-      if (!Object.is(valueAsTime.value, inputTime.value)) {
-        setInputValue(valueAsTime.toFormattedString(timeFormat));
+      if (!Object.is(propTime.value, internalTime.value)) {
+        setInputValue(propTime.toFormattedString(timeFormat));
       }
     },
     // The purpose of this hook is to sync the prop changes to the
@@ -132,10 +134,9 @@ export default function TimePicker({
   );
 
   const handleChange = ev => {
-    const newValue = ev.target.value;
-    const formattedNewValue = Time.fromString(newValue).toString();
-    setInputValue(newValue);
-    onChange(formattedNewValue === 'Invalid time' ? '' : formattedNewValue);
+    setInputValue(ev.target.value);
+    const newTime = Time.fromString(ev.target.value, 'any');
+    onChange(newTime.isValid ? newTime.toString() : '');
   };
 
   const handleBlur = ev => {
@@ -170,23 +171,31 @@ export default function TimePicker({
     }
   };
 
+  useNativeEvent(pickerRef, 'change', handleChange);
+
   return (
-    <>
-      <ComboBox
-        styleName="time-picker"
-        data-time-format={timeFormat}
-        value={inputValue}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        placeholder={TIME_FORMAT_PLACEHOLDER[timeFormat]}
-        options={options}
-        rankOption={rankTimeOption}
-        required={required}
-      />
+    <div styleName="time-picker">
+      <ind-time-picker ref={pickerRef} value={inputValue}>
+        <input
+          type="text"
+          role="combobox"
+          autoComplete="off"
+          placeholder={placeholder}
+          onBlur={handleBlur}
+          data-time-format={timeFormat}
+          {...inputProps}
+        />
+        <ul role="listbox">{options}</ul>
+        {inputProps.required ? null : (
+          <button type="button" value="clear" disabled={inputProps.disabled}>
+            <Translate as="span">Clear the time picker</Translate>
+          </button>
+        )}
+      </ind-time-picker>
       <span styleName="notice" aria-live="polite">
         {notice}
       </span>
-    </>
+    </div>
   );
 }
 
@@ -206,8 +215,8 @@ TimePicker.defaultProps = {
   value: '',
   startTime: '',
   step: DEFAULT_STEP_SIZE,
-  min: '',
-  max: '',
+  min: '0:00',
+  max: '23:59',
   timeFormat: '24h',
   required: false,
 };

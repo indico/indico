@@ -145,7 +145,7 @@ export class Time {
    *
    * See tests for a more complete list of examples.
    */
-  static fromString(timeOfDayString, format) {
+  static fromString(timeOfDayString, format = 'any') {
     const parser = parsers[format] || parseAny;
     const [hour, minute] = parser(timeOfDayString.trim());
     return this.fromHour(hour, minute);
@@ -172,6 +172,10 @@ export class Time {
     date.setHours(this.hour, this.minute, 0, 0);
   }
 
+  get isValid() {
+    return !Number.isNaN(this.value);
+  }
+
   toDate() {
     const date = new Date();
     date.setHours(this.hour, this.minute, 0, 0);
@@ -192,16 +196,11 @@ export class Time {
     return `${zeroPad(this.hour)}:${zeroPad(this.minute)}`;
   }
 
-  toDurationString() {
-    const hours = this.value / 60;
-    const fitsHalfHourStep = this.value % 30 === 0;
-    if (fitsHalfHourStep) {
-      return `${hours}h`;
-    } else {
-      const wholeHours = Math.floor(hours);
-      const minutes = this.value % 60;
-      return `${wholeHours}:${minutes.toString().padStart(2, '0')}`;
+  toShortString() {
+    if (isNaN(this.value)) {
+      return '';
     }
+    return `${this.hour}:${zeroPad(this.minute)}`;
   }
 
   toFormattedString(timeFormat) {
@@ -229,8 +228,8 @@ export function timeList(options = {}) {
 
   const min = Time.fromString(minTime, '24h').value;
   const max = Time.fromString(maxTime, '24h').value;
-  const current = markCurrent ? Time.fromString(markCurrent, timeFormat) : null;
-  const start = startTime ? Time.fromString(startTime, timeFormat) : null;
+  const current = markCurrent ? Time.fromString(markCurrent, '24h') : null;
+  const start = startTime ? Time.fromString(startTime, '24h') : null;
 
   const list = [];
   for (let i = min; i <= max; i += step) {
@@ -240,8 +239,7 @@ export function timeList(options = {}) {
       label: t.toFormattedString(timeFormat),
       time: t.toString(),
       value: t.value,
-      durationLabel: duration?.toDurationString() || '',
-      duration: duration?.toString() || '',
+      duration,
       current: current?.value === t.value,
     });
   }
