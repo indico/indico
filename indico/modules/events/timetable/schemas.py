@@ -27,11 +27,8 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
 
     start_dt = fields.DateTime(required=True)
     location_data = fields.Nested(LocationDataSchema)
-    # TODO: Make it so that passing explicit `many=True` is not required
     conveners = fields.List(fields.Nested(
-        _SessionBlockPersonLinkSchema(partial=False, unknown=EXCLUDE),
-        partial=False,
-        unknown=EXCLUDE
+        _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
     ), attribute='person_links')
     duration = fields.TimeDelta(required=True)
 
@@ -60,11 +57,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     start_dt = EventTimezoneDateTimeField()
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
-    person_links = fields.Nested(
-        _ContributionPersonLinkSchema(many=True, partial=False),
-        partial=False,
-        unknown=EXCLUDE
-    )
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
