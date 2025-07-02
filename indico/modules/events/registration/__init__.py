@@ -20,7 +20,7 @@ from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.modules.events.registration.wallets.google import GoogleWalletManager
 from indico.util.i18n import _, ngettext
-from indico.util.signals import named_objects_from_signal, values_from_signal
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -274,6 +274,9 @@ def _patch_google_wallet_ticket(registration, change, **kwargs):
             gwm.patch_ticket_object(registration)
 
 
-def get_custom_ticket_qr_code_handlers():
-    """Get a dict containing custom ticket QR code handlers."""
-    return named_objects_from_signal(signals.event.registration.custom_ticket_qr_code_handler.send())
+@signals.core.app_created.connect
+def _check_custom_ticket_qr_code_handlers(app, **kwargs):
+    from indico.modules.events.registration.util import get_custom_ticket_qr_code_handlers
+
+    # This will raise RuntimeError if the handler names are not unique
+    get_custom_ticket_qr_code_handlers()

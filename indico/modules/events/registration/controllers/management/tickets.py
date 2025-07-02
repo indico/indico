@@ -14,9 +14,9 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.modules.designer import PageOrientation, PageSize
-from indico.modules.events.registration import get_custom_ticket_qr_code_handlers
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
+from indico.modules.events.registration.util import get_custom_ticket_qr_code_handlers
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -74,10 +74,11 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
                 'scope': 'registrants',
             }
         }
-        custom_qr_code_handlers = get_custom_ticket_qr_code_handlers()
-        if custom_qr_code_handlers:
-            qr_code_handler = custom_qr_code_handlers[0]
-            qr_data['regex'] = {'name': qr_code_handler.name, 'pattern': qr_code_handler.regex}
+        ticker_qr_code_handlers = get_custom_ticket_qr_code_handlers()
+        if ticker_qr_code_handlers and 'regex' not in qr_data:
+            qr_data['regex'] = []
+        for name, qr_code_handler in ticker_qr_code_handlers.items():
+            qr_data['regex'].append({'name': name, 'pattern': qr_code_handler.regex})
 
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)

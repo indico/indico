@@ -14,12 +14,11 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
-from indico.modules.events.registration import get_custom_ticket_qr_code_handlers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
-from indico.modules.events.registration.util import _base64_encode_uuid
+from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
 from indico.web.args import use_kwargs
 from indico.web.rh import RH, cors, json_errors, oauth_scope
 
@@ -150,12 +149,11 @@ class RHCheckinAPIRegistrationCustomQRCode(RH):
             custom_qr_code_handler = get_custom_ticket_qr_code_handlers()[qr_name]
         except KeyError:
             return
-        reg = custom_qr_code_handler.lookup_registration(data)
-        if reg:
+        if reg := custom_qr_code_handler.lookup_registration(data):
             url = config.BASE_URL.removeprefix('https://')
             qr_code_version = 2
             result = {
                 'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
             }
             return jsonify(result)
-        return NotFound('Unknown QR code data.')
+        return
