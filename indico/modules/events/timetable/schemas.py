@@ -55,6 +55,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
+    _description = fields.String(attribute='description')
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
     person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))

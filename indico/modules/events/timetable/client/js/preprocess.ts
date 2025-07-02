@@ -17,12 +17,11 @@ interface SchemaDate {
 }
 
 interface SchemaEntry {
-  id: string;
+  id: number;
   title: string;
   textColor?: string;
   color?: string;
   slotTitle?: string;
-  conveners?: any[];
 }
 
 interface SchemaSession extends SchemaEntry {
@@ -35,7 +34,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionId?: number;
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
-  id: number; // ID of contribution, session_block or break
+  conveners?: any[];
 }
 
 const entryTypeMapping = {

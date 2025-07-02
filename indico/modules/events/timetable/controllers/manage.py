@@ -224,12 +224,6 @@ class RHTimetableContribution(RHManageContributionBase):
             data['references'] = self._get_references(references)
 
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-
-        # TODO: (Ajob)  Find cleaner solution for marshmallow alias. I think there's already something there
-        #               in the schema itself called marshmallow_alias which makes _description into description
-        #               but it doesn't work for dumping, only for loading.
-        if '_description' in data:
-            data['description'] = data.pop('_description')
         
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)
