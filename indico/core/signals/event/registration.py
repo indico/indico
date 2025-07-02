@@ -155,22 +155,7 @@ Called when the Pass object for an Apple Wallet has been generated. The `sender`
 `Registration` object, the `obj` kwarg contains the Pass object.
 ''')
 
-generate_regform_ticket_config_qr_code = _signals.signal('generate-regform-ticket-config-qr-code', '''
-Called when generating the QR code to configure a registration form for the check-in app.
-The `sender` is the registration form being configured and the data included in the QR code
-is passed in the `qr_data` kwarg and may be modified.
-Plugins may additionally update the `qr_data` with content of the following example format:
-```
-'regex': {
-    'pattern': 'xxx',
-    'name': 'name'
-}
-```
-This will allow the check-in app to recognize custom QR codes using the regex pattern.
-''')
-
-handle_custom_ticket_qr_code = _signals.signal('handle-custom-ticket-qr-code', '''
-Called when processing a QR code of an unknown pattern sent by the check-in app.
-The QR code `data` and a `name` for the QR code pattern are sent in the kwargs.
-This signal should handle the pattern set by `generate_regform_ticket_config_qr_code` signal.
+custom_ticket_qr_code_handler = _signals.signal('custom-ticket-qr-code-handler', '''
+Expected to return a subclass of ``CustomTicketCode`` implementing a custom ticket
+QR code handler. This can be used to handle custom ticket QR codes.
 ''')

@@ -10,14 +10,13 @@ from io import BytesIO
 import qrcode
 from flask import json, render_template
 
-from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.modules.designer import PageOrientation, PageSize
+from indico.modules.events.registration import get_custom_ticket_qr_code_handlers
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
-from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -75,12 +74,11 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
                 'scope': 'registrants',
             }
         }
-        sig_rvs = values_from_signal(
-            signals.event.registration.generate_regform_ticket_config_qr_code.send(self.regform, qr_data=qr_data),
-            as_list=True,
-        )
-        if len(sig_rvs) == 1:
-            qr_data = sig_rvs[0]
+        custom_qr_code_handlers = get_custom_ticket_qr_code_handlers()
+        if custom_qr_code_handlers:
+            qr_code_handler = custom_qr_code_handlers[0]
+            qr_data['regex'] = {'name': qr_code_handler.name, 'pattern': qr_code_handler.regex}
+
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)

@@ -1135,3 +1135,18 @@ def load_registration_schema(regform, schema_cls, *, registration=None, partial_
     #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
     schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
     return parser.parse(schema)
+
+
+class CustomTicketCode:
+    """Base class for custom ticket codes."""
+
+    #: unique name of the code - must be all-lowercase
+    name = None
+    #: Regex used by the checkin app to match all ticket codes that should be handled by this class.
+    #: This regex will be used in JavaScript code, so make sure to not use anything Python-specific.
+    regex = r'...'
+
+    @classmethod
+    def lookup_registration(cls, data: str) -> Registration | None:
+        """Lookup a registration based on custom ticket code data."""
+        raise NotImplementedError

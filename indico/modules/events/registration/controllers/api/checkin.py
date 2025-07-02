@@ -14,14 +14,14 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration import get_custom_ticket_qr_code_handlers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
 from indico.modules.events.registration.util import _base64_encode_uuid
-from indico.util.signals import values_from_signal
 from indico.web.args import use_kwargs
-from indico.web.rh import cors, json_errors, oauth_scope
+from indico.web.rh import RH, cors, json_errors, oauth_scope
 
 
 @json_errors
@@ -135,31 +135,27 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
         return CheckinRegistrationSchema().jsonify(self.registration)
 
 
-class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
+@json_errors
+@cors
+@oauth_scope('registrants')
+class RHCheckinAPIRegistrationCustomQRCode(RH):
     """Get indico style ticket details for a specific registration from a custom plugin QR Code."""
-
-    def _process_args(self):
-        pass
-
-    def _check_access(self):
-        pass
 
     @use_kwargs({
         'data': fields.String(required=True),
-        'name': fields.String(required=True),
+        'qr_name': fields.String(required=True),
     }, location='json')
-    def _process_POST(self, data, name):
-        sig_rvs = values_from_signal(
-            signals.event.registration.handle_custom_ticket_qr_code.send(data, qr_code_name=name),
-            as_list=True,
-        )
-        if len(sig_rvs) == 1:
-            reg = sig_rvs[0]
-            if isinstance(reg, Registration):
-                url = config.BASE_URL.removeprefix('https://')
-                qr_code_version = 2
-                result = {
-                  'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
-                }
-                return jsonify(result)
+    def _process_POST(self, data, qr_name):
+        try:
+            custom_qr_code_handler = get_custom_ticket_qr_code_handlers()[qr_name]
+        except KeyError:
+            return
+        reg = custom_qr_code_handler.lookup_registration(data)
+        if reg:
+            url = config.BASE_URL.removeprefix('https://')
+            qr_code_version = 2
+            result = {
+                'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
+            }
+            return jsonify(result)
         return NotFound('Unknown QR code data.')
