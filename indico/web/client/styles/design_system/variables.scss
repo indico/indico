@@ -61,6 +61,7 @@ body {
   --control-padding: 0.5em 1em;
   --control-internal-gap: 0.2em;
   --control-raised-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
+  --control-input-bg-color: var(--background-primary);
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);
