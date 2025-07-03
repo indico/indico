@@ -5,8 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TopLevelEntry, BlockEntry, BreakEntry, ChildBreakEntry, ContribEntry, ChildContribEntry} from './types';
+import {
+  TopLevelEntry,
+  BlockEntry,
+  BreakEntry,
+  ChildBreakEntry,
+  ContribEntry,
+  ChildContribEntry,
+} from './types';
 
+export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
 export const ADD_SESSION_DATA = 'Add session data';
@@ -32,9 +40,15 @@ export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
 export const ADD_ENTRY = 'Add entry';
 export const CREATE_ENTRY = 'Create entry';
+export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
 export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
+
+interface SetDraftEntryAction {
+  type: typeof SET_DRAFT_ENTRY;
+  data: TopLevelEntry | null;
+}
 
 interface ResizeEntryAction {
   type: typeof RESIZE_ENTRY;
@@ -77,6 +91,12 @@ interface CreateEntryAction {
   entry: TopLevelEntry;
 }
 
+interface UpdateEntryAction {
+  type: typeof UPDATE_ENTRY;
+  entryType: string;
+  entry: TopLevelEntry;
+}
+
 interface DeleteBreakAction {
   type: typeof DELETE_BREAK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
@@ -95,8 +115,10 @@ export type Action =
   | ScheduleEntryAction
   | UnscheduleEntryAction
   | CreateEntryAction
+  | UpdateEntryAction
   | DeleteBreakAction
-  | DeleteBlockAction;
+  | DeleteBlockAction
+  | SetDraftEntryAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -108,6 +130,10 @@ export function setSessionData(data) {
 
 export function addSessionData(data) {
   return {type: ADD_SESSION_DATA, data};
+}
+
+export function setDraftEntry(data): SetDraftEntryAction {
+  return {type: SET_DRAFT_ENTRY, data};
 }
 
 export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
@@ -199,6 +225,9 @@ export function toggleShowAllTimeslots() {
   return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
 }
 
+// TODO: (Ajob) Evaluate addEntry and editEntry vs createEntry and updateEntry,
+//              the latter two were implemented later and might be duplicate
+
 export function addEntry(entryType) {
   return {type: ADD_ENTRY, entryType};
 }
@@ -209,6 +238,10 @@ export function createEntry(entryType, entry) {
 
 export function editEntry(entryType, entry) {
   return {type: EDIT_ENTRY, entryType, entry};
+}
+
+export function updateEntry(entryType, entry) {
+  return {type: UPDATE_ENTRY, entryType, entry};
 }
 
 export function closeModal() {

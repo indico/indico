@@ -5,6 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@container (max-width: 60px) {
+  button .title-wrapper {
+    &.long {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .title,
+    .time {
+      display: none;
+    }
+  }
+}
+
+.simple .title-wrapper {
+  max-width: unset;
+}
+
 .title-wrapper {
   &.tiny {
     white-space: nowrap;
