@@ -51,15 +51,6 @@ def create_break_entry(event, data, session_block=None, extend_parent=True):
     return create_timetable_entry(event, entry_data, parent=parent, extend_parent=extend_parent)
 
 
-def create_contribution_entry(event, data, session_block=None, extend_parent=True):
-    start_dt = data.pop('start_dt')
-    contribution_ = Contribution(event=event)
-    contribution_.populate_from_dict(data)
-    entry_data = {'object': contribution_, 'start_dt': start_dt}
-    parent = session_block.timetable_entry if session_block else None
-    return create_timetable_entry(event, entry_data, parent=parent, extend_parent=extend_parent)
-
-
 def create_session_block_entry(session_, data, extend_parent=True):
     start_dt = data.pop('start_dt')
     block = create_session_block(session_=session_, data=data)
