@@ -14,7 +14,6 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events import EventLogRealm
-from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.operations import create_session_block, update_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
