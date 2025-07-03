@@ -67,6 +67,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionId: number;
   sessionTitle: string;
   children: ChildEntry[];
+  conveners?: any[];
 }
 
 // TODO: (Ajob) Find correct place for these interfaces
