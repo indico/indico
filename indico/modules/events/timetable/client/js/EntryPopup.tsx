@@ -26,7 +26,7 @@ import {
 
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
@@ -95,6 +95,45 @@ function EntryPopupContent({
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
+  const onDelete = async (e: MouseEvent) => {
+    if (!draftEntry.id) {
+      return;
+    }
+
+    e.stopPropagation();
+
+    const deleteURL = {
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: draftEntry.id}),
+      [EntryType.SessionBlock]: sessionBlockURL({
+        event_id: eventId,
+        session_block_id: draftEntry.id,
+      }),
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: draftEntry.id}),
+    }[draftEntry.type];
+
+    try {
+      await indicoAxios.delete(deleteURL);
+
+      const deleteHandlers = {
+        [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry)),
+        [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry.id)),
+        [EntryType.Contribution]: () =>
+          dispatch(actions.unscheduleEntry(draftEntry as ContribEntry)),
+      };
+
+      const deleteHandler = deleteHandlers[draftEntry.type];
+
+      if (!deleteHandler) {
+        throw new Error('Invalid entry type');
+      }
+
+      deleteHandler();
+      onClose();
+    } catch (err) {
+      return handleAxiosError(err);
+    }
+  };
+
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
       <Card.Content>
@@ -104,7 +143,7 @@ function EntryPopupContent({
               <Button icon="edit" onClick={onEdit} />
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
-              <Button icon="trash" />
+              <Button icon="trash" onClick={onDelete} />
               {type === EntryType.SessionBlock && (
                 <Dropdown button inline icon="ellipsis vertical">
                   <DropdownMenu>
