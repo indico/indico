@@ -58,6 +58,11 @@ ind-time-picker {
     min-width: var(--anchor-width);
     max-height: min(75vh, 16em);
     overflow-y: auto;
+    margin: 0;
+
+    &:not(#bump-specificity) {
+      padding: 0;
+    }
 
     @include sui_debt.input-border();
     @include sui_debt.input-background();
@@ -85,6 +90,7 @@ ind-time-picker {
     @include sui_debt.input-padding();
     list-style: none;
     color: var(--text-color);
+    padding: 1em;
 
     &:not([aria-selected='true']) {
       cursor: pointer;
