@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
-import breakCreateURL from 'indico-url:timetable.api_create_break';
+import breakCreateURL from 'indico-url:timetable.tt_break_create';
 
 import _ from 'lodash';
 import React, {useEffect, useState} from 'react';
@@ -50,6 +50,7 @@ export function BreakFormFields({
     extraOptions = {},
 }: BreakFormFieldsProps) {
     const {minStartDt, maxEndDt} = extraOptions;
+
     return (
         <>
             <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
