@@ -8,7 +8,7 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import ValidationError, fields, post_dump, post_load, validates
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump, post_load, validates
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -160,16 +160,23 @@ class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
     end_dt = EventTimezoneDateTimeField()
 
 
+# TODO: (Ajob) Evaluate this schema vs timetable one
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block')
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
+                  'timetable_entry')
 
     start_dt = EventTimezoneDateTimeField()
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
-    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
+    person_links = fields.Nested(
+        _ContributionPersonLinkSchema(many=True, partial=False),
+        partial=False,
+        unknown=EXCLUDE
+    )
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    duration = fields.TimeDelta(required=True)
