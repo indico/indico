@@ -15,9 +15,8 @@ import {OnChange} from 'react-final-form-listeners';
 import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'semantic-ui-react';
 
 import Checkbox from 'indico/react/components/Checkbox';
+import DatePicker from 'indico/react/components/DatePicker';
 import {toMoment} from 'indico/utils/date';
-
-import {DatePicker} from '../components';
 
 import formatters from './formatters';
 import parsers from './parsers';
