@@ -74,8 +74,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
                 'scope': 'registrants',
             }
         }
-        ticker_qr_code_handlers = get_custom_ticket_qr_code_handlers()
-        if ticker_qr_code_handlers and 'regex' not in qr_data:
+        if ticker_qr_code_handlers := get_custom_ticket_qr_code_handlers():
             qr_data['regex'] = []
         for name, qr_code_handler in ticker_qr_code_handlers.items():
             qr_data['regex'].append({'name': name, 'pattern': qr_code_handler.regex})
