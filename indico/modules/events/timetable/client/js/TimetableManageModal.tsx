@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import breakCreateURL from 'indico-url:timetable.api_create_break';
-import contributionCreateURL from 'indico-url:timetable.api_create_contrib';
-import sessionBlockCreateURL from 'indico-url:timetable.api_create_session_block';
+import breakCreateURL from 'indico-url:timetable.tt_break_create';
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import _ from 'lodash';
-import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
@@ -19,6 +21,7 @@ import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
 import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
@@ -27,8 +30,8 @@ import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {EntryType, Session, TopLevelEntry} from './types';
-import {mapPersonLinkToSchema} from './utils';
+import {EntryType, Session} from './types';
+import {mapTTDataToEntry} from './utils';
 
 // Generic models
 
@@ -37,26 +40,48 @@ interface EntryColors {
   text: string;
 }
 
-// TOOD: (Ajob) Make an interface for each entry and then make
+interface LocationData {
+  inheriting: boolean;
+  address?: string;
+  room_id?: string;
+  room_name?: string;
+  venue_id?: string;
+  venue_name?: string;
+}
+
+interface PersonLink {
+  email: string;
+  first_name: string;
+  last_name: string;
+  roles: string[];
+  title: string;
+  type: string;
+  phone?: string;
+  address?: string;
+  affiliation?: string;
+  affiliation_id?: number;
+}
+
+// TODO: (Ajob) Make an interface for each entry and then make
 //              the draftentry the union of it.
 interface DraftEntry {
   title: string;
   duration: number;
   keywords: string[];
   references: string[];
-  location_data: object;
+  location_data: LocationData;
   start_dt: Date;
-  person_links?: any[];
-  conveners?: any[];
+  person_links?: PersonLink[];
   description?: string;
   colors?: EntryColors;
   session_id?: number;
   code?: string;
+  board_number?: string;
   id?: number;
 }
 
 // Prop interface
-interface TimetableCreateModalProps {
+interface TimetableManageModalProps {
   eventId: number;
   // TODO: (Ajob) Replace with proper passed entry, probably define it higher in hierarchy
   entry: any;
@@ -64,16 +89,14 @@ interface TimetableCreateModalProps {
   onSubmit?: () => void;
 }
 
-const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
+const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   eventId,
   entry,
   onClose = () => null,
   onSubmit = () => null,
 }) => {
   const dispatch = useDispatch();
-
   const isEditing = !!entry.id;
-
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -84,17 +107,28 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
-    title: '',
-    description: '',
-    person_links: [],
-    keywords: [],
-    references: [],
-    location_data: {inheriting: false},
-    conveners: [],
-    start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
+    id: entry.id,
+    title: entry.title,
+    description: entry.description,
+    person_links: entry.personLinks || [],
+    keywords: entry.keywords || [],
+    references: entry.references || [],
+    // TODO: (Ajob) Clean up the location data
+    location_data: snakifyKeys(entry.location) || {inheriting: false},
+    // TODO: (Ajob) Check how we can clean up the required format
+    //       as it seems like Contributions need it to be without tzinfo
+    start_dt: entry.startDt.format(),
     duration: entry.duration * 60, // Minutes to seconds
-    session_id: null,
-    code: null,
+    session_id: entry.sessionId,
+    board_number: entry.boardNumber,
+    code: entry.code,
+    colors: entry.colors,
+  };
+
+  const typeLongNames = {
+    [EntryType.Contribution]: Translate.string('Contribution'),
+    [EntryType.SessionBlock]: Translate.string('Session Block'),
+    [EntryType.Break]: Translate.string('Break'),
   };
 
   const sessions = useSelector(selectors.getSessions);
@@ -117,8 +151,12 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
       <>
-        <SessionSelect sessions={sessionValues} required />
-        <SessionBlockFormFields eventId={eventId} extraOptions={extraOptions} />
+        {!isEditing && <SessionSelect sessions={sessionValues} required />}
+        <SessionBlockFormFields
+          eventId={eventId}
+          extraOptions={extraOptions}
+          locationParent={null}
+        />
       </>
     ) : (
       <Message
@@ -139,49 +177,12 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
-  const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
+  const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
-  const _mapDataToEntry = (data): TopLevelEntry => {
-    const {
-      type: rawType,
-      start_dt: startDt,
-      id,
-      object: {title, duration: rawDuration, colors, session_id: sessionId},
-    } = data;
-
-    const duration = rawDuration / 60; // Seconds to minutes
-    const type = {
-      BREAK: EntryType.Break,
-      CONTRIBUTION: EntryType.Contribution,
-      SESSION_BLOCK: EntryType.SessionBlock,
-    }[rawType];
-
-    if (!type) {
-      throw new Error('Invalid entry type', rawType);
-    }
-
-    const mappedObj = {
-      id: id || -1,
-      type,
-      title,
-      duration,
-      startDt: moment(startDt),
-      x: 0,
-      y: 0,
-      column: 0,
-      maxColumn: 0,
-      children: [],
-      textColor: colors ? colors.text : '',
-      backgroundColor: colors ? colors.background : '',
-      sessionId: sessionId || null,
-    };
-
-    return mappedObj;
-  };
-
-  const _handleSubmitContribution = async data => {
+  const _handleCreateContribution = async data => {
     data = _.pick(data, [
       'title',
+      'description',
       'duration',
       'person_links',
       'keywords',
@@ -189,73 +190,121 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'location_data',
       'inheriting',
       'start_dt',
+      'keywords',
+      'board_number',
+      'code',
     ]);
-    data['person_link_data'] = data.person_links.map(mapPersonLinkToSchema);
-    delete data.person_links;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
-  const _handleSubmitSessionBlock = async data => {
-    // data = _.omitBy(data, 'conveners'); // TODO person links
-    // data.conveners = [];
+  const _handleCreateSessionBlock = async data => {
+    data.conveners = data.person_links;
     data = _.pick(data, [
+      'session_id',
       'title',
+      'description',
       'duration',
       'location_data',
       'inheriting',
       'start_dt',
-      'person_links',
-      'session_id',
+      'conveners',
+      'code',
     ]);
-    data.person_links = data.person_links.map(mapPersonLinkToSchema);
-    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
+    const resData = await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
+    resData['person_links'] = resData['conveners'];
+    delete resData['conveners'];
+    return resData;
   };
 
   // TODO: Implement logic for breaks
-  const _handleSubmitBreak = async data => {
-    data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt', 'colors']);
+  const _handleCreateBreak = async data => {
+    data = _.pick(data, [
+      'title',
+      'description',
+      'break',
+      'duration',
+      'location_data',
+      'inheriting',
+      'start_dt',
+      'colors',
+    ]);
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
-  const handleSubmit = async data => {
-    const submitHandlers = {
-      [EntryType.Contribution]: _handleSubmitContribution,
-      [EntryType.SessionBlock]: _handleSubmitSessionBlock,
-      [EntryType.Break]: _handleSubmitBreak,
-    };
+  const _handleEditContribution = async data => {
+    return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data);
+  };
 
-    const submitHandler = submitHandlers[activeForm];
+  const _handleEditSessionBlock = async data => {
+    return indicoAxios.patch(
+      sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
+      data
+    );
+  };
+
+  const _handleEditBreak = async data => {
+    return indicoAxios.patch(breakURL({event_id: eventId, break_id: entry.id}), data);
+  };
+
+  const handleSubmit = async data => {
+    const submitHandlers = isEditing
+      ? {
+          [EntryType.Contribution]: _handleEditContribution,
+          [EntryType.SessionBlock]: _handleEditSessionBlock,
+          [EntryType.Break]: _handleEditBreak,
+        }
+      : {
+          [EntryType.Contribution]: _handleCreateContribution,
+          [EntryType.SessionBlock]: _handleCreateSessionBlock,
+          [EntryType.Break]: _handleCreateBreak,
+        };
+
+    const submitHandler = submitHandlers[activeType];
 
     if (!submitHandler) {
       throw new Error('Invalid form or no submit function found');
     }
 
-    const {data: resData} = await submitHandler(data);
-    const newTopLevelEntry = _mapDataToEntry(resData);
+    if (data['start_dt']) {
+      data['start_dt'] =
+        activeType === EntryType.Contribution
+          ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
+          : entry.startDt.format();
+    }
 
-    dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
+    const submitData = snakifyKeys(data);
+    // TODO: (Ajob) Remove once personlinks is fixed
+    if (isEditing) {
+      delete submitData['person_links'];
+    }
+
+    const {data: resData} = await submitHandler(submitData);
+    resData['type'] = activeType;
+
+    const resEntry = mapTTDataToEntry(resData);
+
+    if (isEditing) {
+      dispatch(actions.updateEntry(activeType, resEntry));
+    } else {
+      dispatch(actions.createEntry(activeType, resEntry));
+    }
+
     onSubmit();
     onClose();
   };
 
   const changeForm = (key: EntryType) => {
-    setActiveForm(key);
+    setActiveType(key);
     if (key === EntryType.SessionBlock && !sessionValues.length) {
-      forms[activeForm];
+      forms[activeType];
     }
-  };
-
-  const btnNames = {
-    [EntryType.Contribution]: Translate.string('Contribution'),
-    [EntryType.SessionBlock]: Translate.string('Session Block'),
-    [EntryType.Break]: Translate.string('Break'),
   };
 
   const meetsSubmitConditions = () => {
     // Allows to prevent submitting with pre-conditions, such as
     // not having any sessions available for session blocks. Can
     // be extended for other conditions and forms.
-    if (activeForm === EntryType.SessionBlock) {
+    if (activeType === EntryType.SessionBlock) {
       return !!sessionValues.length;
     }
     return true;
@@ -272,7 +321,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       size="small"
       header={
         isEditing
-          ? Translate.string('Edit timetable entry')
+          ? `${Translate.string('Edit')} ${typeLongNames[entry.type]}`
           : Translate.string('Create new timetable entry')
       }
       noSubmitButton
@@ -300,9 +349,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
                   onClick={() => {
                     changeForm(key);
                   }}
-                  color={activeForm === key ? 'blue' : undefined}
+                  color={activeType === key ? 'blue' : undefined}
                 >
-                  {btnNames[key]}
+                  {typeLongNames[key]}
                 </Button>
               ))}
             </div>
@@ -310,9 +359,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
           <Divider />
         </>
       )}
-      {forms[activeForm]}
+      {forms[activeType]}
     </FinalModalForm>
   );
 };
 
-export default TimetableCreateModal;
+export default TimetableManageModal;

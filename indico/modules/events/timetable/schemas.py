@@ -5,44 +5,39 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields
+from marshmallow import EXCLUDE, fields
 
 from indico.core.marshmallow import mm
-from indico.modules.events.sessions.schemas import LocationDataSchema, SessionBlockSchema, SessionColorSchema
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.schemas import (ContribFieldValueSchema, ContributionReferenceSchema,
+                                                         TimezoneAwareSessionBlockSchema)
+from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
+from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.search.schemas import ContributionSchema
+from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
-class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
+class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
-        model = TimetableEntry
-        fields = ('id', 'event_id', 'parent_id', 'session_block_id',
-                  'contribution_id', 'break_id', 'type', 'start_dt',
-                  'end_dt', 'duration', 'object')
+        model = SessionBlock
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
+        rh_context = ('event',)
 
-    type = fields.Method('get_type')
-    object = fields.Method('get_object')
-
-    def get_type(self, obj):
-        return obj.type.name
-
-    def get_object(self, obj):
-        match obj.type:
-            case TimetableEntryType.SESSION_BLOCK:
-                return SessionBlockSchema().dump(obj.session_block)
-            case TimetableEntryType.CONTRIBUTION:
-                return ContributionSchema().dump(obj.contribution)
-            case TimetableEntryType.BREAK:
-                return BreakSchema().dump(obj.break_)
-            case _:
-                return None
+    start_dt = fields.DateTime(required=True)
+    location_data = fields.Nested(LocationDataSchema)
+    conveners = fields.List(fields.Nested(
+        _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
+    ), attribute='person_links')
+    duration = fields.TimeDelta(required=True)
 
 
 class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
-        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors')
+        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type')
+        rh_context = ('event',)
 
     title = fields.String(required=True)
     description = fields.String()
@@ -50,3 +45,21 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
+
+
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block')
+        rh_context = ('event',)
+
+    start_dt = EventTimezoneDateTimeField()
+    _description = fields.String(attribute='description')
+    # TODO: filter inactive and resitricted contrib fields
+    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
+    references = fields.List(fields.Nested(ContributionReferenceSchema))
+    location_data = fields.Nested(LocationDataSchema)
+    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    duration = fields.TimeDelta(required=True)

@@ -457,7 +457,7 @@ export function useDroppableData({id}: {id: string}) {
   return droppables[id];
 }
 
-export function useDraggable({id, fixed = false}: {id: string; fixed: boolean}) {
+export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean}) {
   const ref = useRef<HTMLElement | null>(null);
   const _onMouseDown = useContextSelector(DnDContext, ctx => ctx.onMouseDown);
   const draggable = useContextSelector(DnDContext, ctx => ctx.draggableData[id]);
