@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+const TIME_PATTERN = /^(?:[01]?\d|2[0-3]):[0-5]\d$/;
 
 export function timeString(props, propName, componentName) {
   const value = props[propName];
