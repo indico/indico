@@ -65,6 +65,7 @@ export const getChildren = createSelector(
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.children, sessions)
 );
+
 export const getVisibleChildren = createSelector(
   getChildren,
   children => children.filter(c => !c.isPoster)
@@ -92,7 +93,10 @@ export const getSelectedEntry = createSelector(
     return entries.find(e => e.id === id);
   }
 );
-
+export const getDraftEntry = createSelector(
+  getEntries,
+  entries => entries.draftEntry
+);
 export const canUndo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx > 0
