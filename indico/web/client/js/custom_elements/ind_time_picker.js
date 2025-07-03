@@ -7,21 +7,30 @@
 
 import CustomElementBase from 'indico/custom_elements/_base';
 import * as positioning from 'indico/utils/positioning';
+import {Time} from 'indico/utils/time_value';
 
-import './ind_combobox.scss';
+import './ind_time_picker.scss';
 
-customElements.define(
-  'ind-combo-box',
+CustomElementBase.defineWhenDomReady(
+  'ind-time-picker',
   class extends CustomElementBase {
     static lastId = 1;
 
-    get value() {
-      return this.querySelector('input').value;
-    }
+    static attributes = {
+      value: class InputValueProxy extends CustomElementBase.CustomAttribute {
+        setValue(newValue) {
+          CustomElementBase.setValue(this.elemenet.querySelector('input'), newValue);
+        }
+
+        getValue() {
+          return this.element.querySelector('input').value;
+        }
+      },
+    };
 
     setup() {
-      const indComboBox = this;
       const id = `combo-box-${this.constructor.lastId++}`;
+      const indTimePicker = this;
       const listbox = this.querySelector('[role=listbox]');
       const input = this.querySelector('input');
       const clearButton = this.querySelector('button[value=clear]');
@@ -40,12 +49,12 @@ customElements.define(
       input.setAttribute('aria-haspopup', true);
       input.setAttribute('aria-controls', listbox.id);
       this.toggleAttribute('clearable', clearButton);
+      CustomElementBase.setValue(input, this.getAttribute('value'));
 
-      // Since the end goal is to enter one of the provided items, we do not
-      // expect spelling to be an issue. We also do not want the screen reader
-      // announcing spelling errors for autocompleted text, as that would be
-      // silly.
+      // We don't care about spelling. We're only working with times.
       input.setAttribute('spellcheck', false);
+
+      CustomElementBase.setValue(input, this.getAttribute('value'));
 
       // Each option is given a unique id so that aria-activedescendant can
       // point to them when they are selected using arrow keys.
@@ -62,6 +71,10 @@ customElements.define(
       toggleClearButton();
 
       // Event handlers
+
+      indTimePicker.addEventListener('x-attrchange.value', () => {
+        CustomElementBase.setValue(input, this.getAttribute('value'));
+      });
 
       input.addEventListener('click', () => {
         // When user clicks the input while no candidates are matching the value,
@@ -82,70 +95,49 @@ customElements.define(
         if (option) {
           selectOption(option);
           toggleClearButton(true);
-          dispatchInternalInputEvent();
         }
       });
 
       input.addEventListener('blur', closeListbox);
 
-      // Perform the inline autocomplete/search
-      input.addEventListener('input', evt => {
-        deselectCurrentSelection();
+      // Perform time matching
+      input.addEventListener(
+        'input',
+        evt => {
+          evt.stopPropagation(); // Prevent React from messing up the standard input operation. Use native change event instead!
+          deselectCurrentSelection();
 
-        const useAutocomplete = input.getAttribute('aria-autocomplete') === 'both';
-        const charactersWereAdded = !evt.inputType?.startsWith('delete'); // Manually triggered events don't have `evt.inputType`.
-        const filterKeyword = input.value;
-        const filterKeywordLC = filterKeyword.toLowerCase();
-        let topRank = 0;
-        let topCandidate;
-        let candidateCount = 0;
+          const filterKeyword = input.value.trim().toLocaleLowerCase();
+          const filterTime = Time.fromString(filterKeyword).toString();
+          let numMatched = 0;
+          let exactMatch;
 
-        for (const option of listbox.children) {
-          const optionValue = option.dataset.value;
-          const optionValueLC = optionValue.toLowerCase();
+          if (filterKeyword) {
+            for (const option of listbox.children) {
+              const optionDisabled = option.hasAttribute('aria-disabled');
+              const optionText = option.textContent.toLowerCase();
+              const optionTime = option.dataset.time;
 
-          // We use the option rank to determine the most likely candidate.
-          // This is not used for sorting the candidates. Candidates retain
-          // their original sort order.
-          let optionRank = 0;
+              const isMatch =
+                !optionDisabled &&
+                (optionText.startsWith(filterKeyword) || filterTime === optionTime);
 
-          // Skip if no filter keyword
-          if (filterKeyword && !option.hasAttribute('aria-disabled')) {
-            // Exact initial match
-            optionRank += optionValue.startsWith(filterKeyword) * 1000;
-            // Case-insensitive initial match
-            optionRank += optionValueLC.startsWith(filterKeywordLC) * 100;
-            if (!useAutocomplete) {
-              // Case-insensitive match anywhere in the string
-              optionRank += optionValueLC.includes(filterKeywordLC);
-              // Exact match anywhere in the string
-              optionRank += optionValue.includes(filterKeyword) * 10;
+              numMatched += isMatch;
+              exactMatch ||= filterTime === optionTime && option;
             }
           }
 
-          option.hidden = filterKeyword && !optionRank;
-          if (!option.hidden) {
-            candidateCount++;
+          if (exactMatch) {
+            markSelection(exactMatch);
+            moveVirtualCursorToOption(exactMatch);
           }
 
-          if (optionRank > topRank) {
-            topRank = optionRank;
-            topCandidate = option;
-          }
-        }
-
-        const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
-        if (shouldAutocomplete) {
-          selectOption(topCandidate);
-          moveVirtualCursorToOption();
-          // Select the portion of the input text that is ahead of the user-inputted filter keyword
-          // (this presents the type-ahead autocomplete)
-          selectInputText(filterKeyword.length);
-        }
-
-        toggleListbox(filterKeyword && candidateCount > 0);
-        toggleClearButton();
-      });
+          dispatchExternalChangeEvent();
+          toggleListbox(filterKeyword && numMatched);
+          toggleClearButton();
+        },
+        {capture: true}
+      );
 
       // Keyboard actions
       input.addEventListener('keydown', ev => {
@@ -153,7 +145,7 @@ customElements.define(
           // Use arrow keys to navigate the options. Selection wraps.
           // When Alt key is held down, the listbox opens, but selection
           // does not change.
-          case 'ArrowDown':
+          case 'ArrowDown': {
             ev.preventDefault();
             toggleListbox(true);
             if (ev.altKey) {
@@ -161,9 +153,9 @@ customElements.define(
             }
             selectOptionViaKeyboard(findNextSelectableOption());
             toggleClearButton(true);
-            dispatchInternalInputEvent();
             break;
-          case 'ArrowUp':
+          }
+          case 'ArrowUp': {
             ev.preventDefault();
             toggleListbox(true);
             if (ev.altKey) {
@@ -171,29 +163,33 @@ customElements.define(
             }
             selectOptionViaKeyboard(findPreviousSelectableOption());
             toggleClearButton(true);
-            dispatchInternalInputEvent();
             break;
-
+          }
           // Use Enter or Escape to close
-          case 'Enter':
+          case 'Enter': {
             // Conditionally return so that Enter has the default behavior
             // when listbox is already closed.
             if (input.getAttribute('aria-expanded') !== 'true') {
               return;
             }
             ev.preventDefault();
+            const marked = findMarkedOption();
+            if (marked) {
+              selectOptionViaKeyboard(marked);
+            }
             closeListbox();
             break;
-
-          case 'Escape':
+          }
+          case 'Escape': {
             ev.preventDefault();
             closeListbox();
             break;
+          }
         }
       });
 
       clearButton?.addEventListener('click', () => {
-        input.value = '';
+        CustomElementBase.setValue(input, '');
         input.dispatchEvent(new Event('input'));
       });
 
@@ -209,8 +205,8 @@ customElements.define(
         }
       }
 
-      function dispatchInternalInputEvent() {
-        input.dispatchEvent(new Event('change', {bubbles: true}));
+      function dispatchExternalChangeEvent() {
+        indTimePicker.dispatchEvent(new Event('change', {bubbles: true}));
       }
 
       let abortPositioning;
@@ -224,14 +220,14 @@ customElements.define(
             listbox,
             input,
             positioning.dropdownPositionStrategy,
-            () => indComboBox.toggleAttribute('open', true)
+            () => indTimePicker.toggleAttribute('open', true)
           );
           listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
         } else {
           abortPositioning?.();
           input.removeAttribute('aria-expanded');
           listbox.hidden = true;
-          indComboBox.removeAttribute('open');
+          indTimePicker.removeAttribute('open');
         }
       }
 
@@ -254,17 +250,26 @@ customElements.define(
         listbox.querySelector('[aria-selected=true]')?.removeAttribute('aria-selected');
       }
 
-      function selectOption(option) {
-        // Omit the option to clear the selection and reset the input
+      function markSelection(option) {
         deselectCurrentSelection();
         option?.setAttribute('aria-selected', true);
+      }
+
+      function findMarkedOption() {
+        return listbox.querySelector('[aria-selected=true]');
+      }
+
+      function selectOption(option) {
+        // Omit the option to clear the selection and reset the input
+        markSelection(option);
         CustomElementBase.setValue(input, option?.dataset.value);
+        dispatchExternalChangeEvent();
       }
 
       function moveVirtualCursorToOption(option) {
         // Omit the option to remove selection
         input.setAttribute('aria-activedescendant', option?.id || '');
-        option.scrollIntoView({block: 'nearest'});
+        option?.scrollIntoView({block: 'nearest'});
       }
 
       function selectInputText(startIndex = input.value.length) {
