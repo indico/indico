@@ -22,11 +22,12 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
-from indico.modules.events.timetable.controllers.manage import (RHAPICreateBreak, RHAPICreateContribution,
-                                                                RHAPICreateSessionBlock, RHCloneContribution,
-                                                                RHManageSessionTimetable, RHManageTimetable,
-                                                                RHManageTimetableEntryInfo, RHManageTimetableOld,
-                                                                RHTimetableREST)
+from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
+                                                                RHManageTimetable, RHManageTimetableEntryInfo,
+                                                                RHManageTimetableOld, RHTimetableBreak,
+                                                                RHTimetableBreakCreate, RHTimetableContribution,
+                                                                RHTimetableContributionCreate, RHTimetableREST,
+                                                                RHTimetableSessionBlock, RHTimetableSessionBlockCreate)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -70,10 +71,18 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
                      methods=('GET', 'POST'))
     _bp.add_url_rule('/clone-contribution', 'clone_contribution', RHCloneContribution, methods=('POST',))
 
-# API
-_bp.add_url_rule('/api/breaks/create', 'api_create_break', RHAPICreateBreak, methods=('POST',))
-_bp.add_url_rule('/api/contrib/create', 'api_create_contrib', RHAPICreateContribution, methods=('POST',))
-_bp.add_url_rule('/api/session-block/create', 'api_create_session_block', RHAPICreateSessionBlock, methods=('POST',))
+# TODO: (Ajob) Replace API routes below with generic
+_bp.add_url_rule('/timetable/break', 'tt_break_create', RHTimetableBreakCreate, methods=('POST',))
+_bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetableBreak,
+                 methods=('GET', 'PATCH', 'DELETE'))
+
+_bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContributionCreate, methods=('POST',))
+_bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution,
+                 methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
+                 methods=('POST',))
+_bp.add_url_rule('/timetable/session-block/<int:session_block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
+                 methods=('GET', 'PATCH', 'DELETE'))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

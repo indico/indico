@@ -27,6 +27,7 @@ interface Change {
 }
 
 interface Entries {
+  draftEntry: any | null;
   changes: Change[];
   currentChangeIdx: number;
   selectedId: number | null;
@@ -46,6 +47,7 @@ export interface ReduxState {
 export default {
   entries: (
     state: Entries = {
+      draftEntry: null,
       changes: [],
       currentChangeIdx: 0,
       selectedId: null,
@@ -55,6 +57,8 @@ export default {
     action: actions.Action
   ) => {
     switch (action.type) {
+      case actions.SET_DRAFT_ENTRY:
+        return {...state, draftEntry: action.data};
       case actions.SET_TIMETABLE_DATA: {
         const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
@@ -100,6 +104,39 @@ export default {
             {
               entries: newEntries,
               change: 'create',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.UPDATE_ENTRY: {
+        const {
+          entry,
+          entryType,
+          entry: {startDt},
+        } = action;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+
+        const dayKey = moment(startDt).format('YYYYMMDD');
+        const dayEntries = newEntries[dayKey];
+
+        const editedIndex = dayEntries.findIndex(e => {
+          return e.id === entry.id && e.type === entryType;
+        });
+
+        newEntries[dayKey][editedIndex] = entry;
+
+        // TODO: (Ajob) make sure to edit entry first
+        newEntries[dayKey] = layout([...dayEntries]);
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'update',
               unscheduled: state.changes[state.currentChangeIdx].unscheduled,
             },
           ],
