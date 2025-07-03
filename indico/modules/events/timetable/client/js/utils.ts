@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Entry, Session} from './types';
 import moment, {Moment} from 'moment';
+
+import {camelizeKeys} from 'indico/utils/case';
+
+import {Entry, Session, TopLevelEntry} from './types';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
@@ -46,21 +49,49 @@ function gcd(a: number, b: number) {
   return a;
 }
 
-// Data mapping functions
-export const mapPersonLinkToSchema = data => ({
-  title: data.title,
-  name: data.name,
-  first_name: data.firstName,
-  last_name: data.lastName,
-  affiliation: data.affiliation,
-  affiliation_id: data.affiliationId,
-  email: data.email,
-  address: data.address,
-  phone: data.phone,
-  roles: data.roles,
-  type: data.type,
-  avatar_url: data.avatarURL,
-});
+export const mapTTDataToEntry = (data): TopLevelEntry => {
+  const {
+    type,
+    startDt,
+    id,
+    duration,
+    title,
+    description,
+    conveners,
+    personLinks,
+    colors,
+    boardNumber,
+    locationData,
+    code,
+    keywords,
+    sessionId,
+  } = camelizeKeys(data);
+
+  const mappedObj = {
+    id,
+    type,
+    title,
+    description,
+    duration: duration / 60,
+    startDt: moment(startDt),
+    x: 0,
+    y: 0,
+    personLinks: personLinks || conveners || [],
+    boardNumber,
+    location: locationData,
+    code,
+    keywords,
+    column: 0,
+    maxColumn: 0,
+    children: [],
+    colors,
+    textColor: colors ? colors.text : '',
+    backgroundColor: colors ? colors.background : '',
+    sessionId: sessionId || null,
+  };
+
+  return mappedObj;
+};
 
 const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
 const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
