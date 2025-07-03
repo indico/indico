@@ -70,9 +70,21 @@
 }
 
 %text-input {
-  background: var(--control-text-box-bg-color);
+  background: var(--control-input-bg-color);
   border: var(--control-border);
   border-radius: var(--control-border-radius);
+
+  // This covers cases where we want the container to look like
+  // an input, while hosting the input itself and additional
+  // controls and/or decoration (e.g., clear button, icon).
+  input {
+    background: transparent;
+    border: 0 !important; // FIXME: conflict with _input.scss which should be phased out
+    border-radius: 0;
+    color: inherit;
+    font: inherit;
+    padding: 0.3em 0.5em;
+  }
 
   &:is(input, textarea) {
     padding: 0.3em 0.5em;
@@ -89,15 +101,11 @@
     @extend %default-focus-ring;
   }
 
-  // This covers cases where we want the container to look like
-  // an input, while hosting the input itself and additional
-  // controls and/or decoration (e.g., clear button, icon).
-  input {
-    background: transparent;
-    border: 0 !important; // FIXME: conflict with _input.scss which should be phased out
-    border-radius: 0;
-    color: inherit;
-    font: inherit;
-    padding: 0.3em 0.5em;
+  &:disabled,
+  &[data-disabled],
+  :has(input:disabled) {
+    background: var(--control-disabled-indented-bg-color);
+    color: var(--control-disabled-text-color);
+    border-color: var(--control-disabled-border-color);
   }
 }

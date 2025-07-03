@@ -34,12 +34,12 @@
   gap: 0.5em;
 }
 
-.option-label span:first-child {
+.option-label span:first-child:not(:last-child) {
   flex: 1;
   text-align: right;
 }
 
-.option-label span:last-child {
+.option-label span:last-child:not(:first-child) {
   flex: none;
   display: inline-block;
   width: 4.5em;
