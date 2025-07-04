@@ -197,8 +197,7 @@ class TimetableSerializer:
         items = obj.attached_items
         data['files'] = list(map(serialize_attachment, items.get('files', [])))
         data['folders'] = list(map(serialize_folder, items.get('folders', [])))
-        if not data['files'] and not data['folders']:
-            return None
+
         return data
 
     def _get_color_data(self, obj):
