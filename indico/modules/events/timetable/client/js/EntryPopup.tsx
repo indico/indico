@@ -52,7 +52,9 @@ function ColoredDot({color}: {color: string}) {
 
 function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactNode}) {
   return (
-    <Card.Description style={{marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 5, textAlign: 'left'}}>
+    <Card.Description
+      style={{marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 5, textAlign: 'left'}}
+    >
       <Icon name={icon} size="large" />
       {children}
     </Card.Description>
@@ -71,7 +73,7 @@ function EntryPopupContent({
     type,
     title,
     locationData: {address, venueName, room},
-    attachments,
+    attachments: {files = [], folders = []},
     personLinks,
   } = entry;
   const sessions = useSelector(selectors.getSessions);
@@ -80,6 +82,11 @@ function EntryPopupContent({
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const eventId = useSelector(selectors.getEventId);
   const locationArray = Object.values([address, venueName, room]).filter(Boolean);
+  const presenters = personLinks
+    .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
+    .map(p => p.name)
+    .join(', ');
+  const fileCount = files.length + folders.length;
 
   const onEdit = async (e: MouseEvent) => {
     const {objId} = entry;
@@ -183,16 +190,11 @@ function EntryPopupContent({
         ) : null}
         {type !== EntryType.Break && (
           <>
-            <CardItem icon="microphone">
-              {personLinks
-                .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
-                .map(p => p.name).join(', ')
-              }
-            </CardItem>
-            {attachments && (
+            <CardItem icon="microphone">{presenters}</CardItem>
+            {fileCount && (
               <CardItem icon="file outline">
-                { Translate.string('{fileCount} files', {
-                    fileCount: (attachments.files?.length || 0) + (attachments.folders?.length || 0),
+                {Translate.string('{fileCount} files', {
+                  fileCount,
                 })}
               </CardItem>
             )}

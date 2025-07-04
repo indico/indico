@@ -198,7 +198,6 @@ class TimetableSerializer:
         data['files'] = list(map(serialize_attachment, items.get('files', [])))
         data['folders'] = list(map(serialize_folder, items.get('folders', [])))
         if not data['files'] and not data['folders']:
-            data['files'] = None
             return None
         return data
 
