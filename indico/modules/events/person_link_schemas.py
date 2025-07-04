@@ -8,7 +8,6 @@
 import operator
 
 from marshmallow import SchemaOpts, ValidationError, fields, post_dump, post_load, pre_load, validates_schema
-from marshmallow_enum import EnumField
 from sqlalchemy import inspect
 
 from indico.core import signals
@@ -51,7 +50,7 @@ class PersonLinkBaseSchema(mm.Schema):
     name = fields.String(attribute='display_full_name', dump_only=True)
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
-    _title = EnumField(UserTitle, data_key='title')
+    _title = fields.Enum(UserTitle, data_key='title')
     affiliation = fields.String(load_default='')
     affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None, load_only=True)
     affiliation_id = fields.Integer(load_default=None, dump_only=True)
