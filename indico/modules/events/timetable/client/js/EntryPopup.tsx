@@ -136,7 +136,11 @@ function TimetablePopupContent({
               <Button icon="edit" onClick={onEdit} />
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
-              <Button icon="trash" onClick={onDelete} />
+              {type === EntryType.Contribution ? (
+                <Button icon="calendar times" onClick={onDelete} />
+              ) : (
+                <Button icon="trash" onClick={onDelete} />
+              )}
               {type === EntryType.SessionBlock && (
                 <Dropdown button inline icon="ellipsis vertical">
                   <DropdownMenu>
