@@ -22,6 +22,7 @@ import Timetable from './Timetable';
     const root = document.querySelector('#timetable-container');
     if (root) {
       const timetableData = JSON.parse(root.dataset.timetableData);
+      console.log('tt data', timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const initialData = {
         staticData: {

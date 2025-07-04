@@ -10,6 +10,24 @@ import moment from 'moment';
 
 import {ChildEntry, DayEntries, EntryType, Session, UnscheduledContrib} from './types';
 
+export enum PersonLinkRole {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  SPEAKER = 'speaker',
+  SUBMITTER = 'submitter',
+}
+
+interface PersonLink {
+  affiliation: string;
+  avatarURL: string;
+  email: string;
+  emailHash: string;
+  familyName: string;
+  firstName: string;
+  name: string;
+  roles: PersonLinkRole[];
+}
+
 interface SchemaDate {
   date: string;
   time: string;
@@ -35,7 +53,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionId?: number;
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
-  conveners?: any[];
+  personLinks?: PersonLink[];
 }
 
 const entryTypeMapping = {
@@ -79,35 +97,22 @@ export function preprocessTimetableEntries(
     dayEntries[day] = [];
     for (const _id in data[day]) {
       const type = entryTypeMapping[_id[0]];
-      const entry = data[day][_id];
+      // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
+      const entry: any = data[day][_id];
       const {
         duration,
         description = '',
         address = '',
         room = '',
         location: venueName = '',
-        presenters = [],
-        conveners = [],
-        boardNumber = '',
+        personLinks,
+        board_number: boardNumber = '',
         code,
         title,
         id,
         objId,
-      } = entry as any;
-
-      // TODO: (Ajob) Currently not passing roles as they do not exist
-      //              here. Update the schema to include roles.
-      const personLinks = [...presenters, ...conveners].map(
-        ({affiliation, familyName: lastName, firstName, email, name, roles, avatarURL}) => ({
-          affiliation,
-          email,
-          lastName,
-          firstName,
-          name,
-          roles,
-          avatarURL,
-        })
-      );
+        attachments,
+      } = entry;
 
       dayEntries[day].push({
         type,
@@ -131,6 +136,7 @@ export function preprocessTimetableEntries(
           room,
           venueName,
         },
+        attachments,
       });
 
       if (entry.sessionId) {
@@ -169,6 +175,18 @@ export function preprocessTimetableEntries(
       }
     }
   }
+
+  // TODO: (Ajob) Temporary logs for debugging purposes. Remove later
+  console.group(
+    `%c Preprocessed Data `,
+    'font-size: 1.2em; background-color: lightgreen; color: green;'
+  );
+  Object.keys(dayEntries).forEach(k => {
+    console.group(`%c[${k}]`, 'color: orange;');
+    console.dir(dayEntries[k]);
+    console.groupEnd();
+  });
+  console.groupEnd();
 
   return {
     dayEntries,
