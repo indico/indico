@@ -168,13 +168,13 @@ function TimetablePopupContent({
         {type !== EntryType.Break && (
           <>
             <CardItem icon="microphone">{presenters}</CardItem>
-            {fileCount && (
+            {fileCount ? (
               <CardItem icon="file outline">
                 {Translate.string('{fileCount} files', {
                   fileCount,
                 })}
               </CardItem>
-            )}
+            ) : null}
           </>
         )}
       </Card.Content>
