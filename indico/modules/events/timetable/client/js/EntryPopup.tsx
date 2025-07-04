@@ -26,7 +26,7 @@ import {
 
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
@@ -94,6 +94,39 @@ function TimetablePopupContent({
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
+  const onDelete = async (e: MouseEvent) => {
+    e.stopPropagation();
+
+    const deleteURL = {
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: draftEntry.id}),
+      [EntryType.SessionBlock]: sessionBlockURL({
+        event_id: eventId,
+        session_block_id: draftEntry.id,
+      }),
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: draftEntry.id}),
+    }[draftEntry.type];
+
+    await indicoAxios.delete(deleteURL);
+
+    const deleteHandlers = {
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry.id)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(draftEntry as ContribEntry)),
+    };
+
+    const deleteHandler = deleteHandlers[draftEntry.type];
+
+    if (!deleteHandler) {
+      throw new Error('Invalid entry type');
+    }
+    try {
+      await deleteHandler();
+      onClose();
+    } catch (err) {
+      return handleAxiosError(err);
+    }
+  };
+
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
       <Card.Content>
@@ -103,7 +136,11 @@ function TimetablePopupContent({
               <Button icon="edit" onClick={onEdit} />
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
-              <Button icon="trash" />
+              {type === EntryType.Contribution ? (
+                <Button icon="calendar times" onClick={onDelete} />
+              ) : (
+                <Button icon="trash" onClick={onDelete} />
+              )}
               {type === EntryType.SessionBlock && (
                 <Dropdown button inline icon="ellipsis vertical">
                   <DropdownMenu>
