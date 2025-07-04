@@ -96,10 +96,6 @@ function EntryPopupContent({
   };
 
   const onDelete = async (e: MouseEvent) => {
-    if (!draftEntry.id) {
-      return;
-    }
-
     e.stopPropagation();
 
     const deleteURL = {
@@ -111,23 +107,21 @@ function EntryPopupContent({
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: draftEntry.id}),
     }[draftEntry.type];
 
+    await indicoAxios.delete(deleteURL);
+
+    const deleteHandlers = {
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry.id)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(draftEntry as ContribEntry)),
+    };
+
+    const deleteHandler = deleteHandlers[draftEntry.type];
+
+    if (!deleteHandler) {
+      throw new Error('Invalid entry type');
+    }
     try {
-      await indicoAxios.delete(deleteURL);
-
-      const deleteHandlers = {
-        [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry)),
-        [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry.id)),
-        [EntryType.Contribution]: () =>
-          dispatch(actions.unscheduleEntry(draftEntry as ContribEntry)),
-      };
-
-      const deleteHandler = deleteHandlers[draftEntry.type];
-
-      if (!deleteHandler) {
-        throw new Error('Invalid entry type');
-      }
-
-      deleteHandler();
+      await deleteHandler();
       onClose();
     } catch (err) {
       return handleAxiosError(err);
