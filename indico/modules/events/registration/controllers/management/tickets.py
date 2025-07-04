@@ -72,13 +72,11 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
                 'base_url': config.BASE_URL,
                 'client_id': checkin_app.client_id,
                 'scope': 'registrants',
+            },
+            'custom_code_handlers': {
+                x.name: x.regex for x in get_custom_ticket_qr_code_handlers().values()
             }
         }
-        if ticker_qr_code_handlers := get_custom_ticket_qr_code_handlers():
-            qr_data['regex'] = []
-        for name, qr_code_handler in ticker_qr_code_handlers.items():
-            qr_data['regex'].append({'name': name, 'pattern': qr_code_handler.regex})
-
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)

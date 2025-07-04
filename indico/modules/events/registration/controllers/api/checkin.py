@@ -8,7 +8,7 @@
 from flask import jsonify, request
 from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.config import config
@@ -148,12 +148,12 @@ class RHCheckinAPIRegistrationCustomQRCode(RH):
         try:
             custom_qr_code_handler = get_custom_ticket_qr_code_handlers()[qr_name]
         except KeyError:
-            return
-        if reg := custom_qr_code_handler.lookup_registration(data):
-            url = config.BASE_URL.removeprefix('https://')
-            qr_code_version = 2
-            result = {
-                'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
-            }
-            return jsonify(result)
-        return
+            raise BadRequest('Unknown code')
+        if not (reg := custom_qr_code_handler.lookup_registration(data)):
+            raise NotFound('No registration found')
+        url = config.BASE_URL.removeprefix('https://')
+        qr_code_version = 2
+        result = {
+            'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
+        }
+        return jsonify(result)
