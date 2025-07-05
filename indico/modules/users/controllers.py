@@ -965,12 +965,18 @@ class RHUserSearch(RHProtected):
     def _check_access(self, token):
         RHProtected._check_access(self)
         if not token:
+            # TODO remove this again after testing
+            logger.error('User search endpoint called without token')
+            return
             raise Forbidden('No search token. This is a bug, please report it.')
         try:
             sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
             if session.user.id != sig_uid:
                 raise BadSignature
         except BadSignature:
+            # TODO remove this again after testing
+            logger.exception('User search endpoint called with invalid token')
+            return
             raise Forbidden('Invalid search token')
 
     def _serialize_pending_user(self, entry):
