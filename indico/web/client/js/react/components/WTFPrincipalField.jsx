@@ -19,6 +19,7 @@ export default function WTFPrincipalField({
   required,
   disabled,
   withExternalUsers,
+  searchToken,
 }) {
   const favoriteUsersController = useFavoriteUsers();
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
@@ -44,6 +45,7 @@ export default function WTFPrincipalField({
       onBlur={() => {}}
       value={value}
       styleName="fixed-width"
+      searchToken={searchToken}
     />
   );
 }
@@ -54,6 +56,7 @@ WTFPrincipalField.propTypes = {
   withExternalUsers: PropTypes.bool,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
+  searchToken: PropTypes.string,
 };
 
 WTFPrincipalField.defaultProps = {
@@ -61,4 +64,5 @@ WTFPrincipalField.defaultProps = {
   withExternalUsers: false,
   required: false,
   disabled: false,
+  searchToken: null,
 };

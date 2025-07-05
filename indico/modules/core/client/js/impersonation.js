@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginAs) {
     ReactDOM.render(
       <LazyUserSearch
+        searchToken={loginAs.dataset.searchToken}
         existing={[]}
         onAddItems={e => impersonateUser(e.userId)}
         triggerFactory={searchTrigger}

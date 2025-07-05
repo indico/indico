@@ -42,6 +42,7 @@ import './items.module.scss';
 import './Search.module.scss';
 
 const InitialFormValuesContext = React.createContext({});
+export const UserSearchTokenContext = React.createContext(null);
 
 const searchFactory = config => {
   const {
@@ -341,6 +342,7 @@ const searchFactory = config => {
     single,
     withEventPersons,
     eventId,
+    searchToken,
   }) => {
     const [loading, setLoading] = useState(false);
     const [result, _setResult] = useState(null);
@@ -356,7 +358,7 @@ const searchFactory = config => {
     const handleSearch = async data => {
       setLoading(true);
       try {
-        await runSearch(data, setResult, withEventPersons, eventId);
+        await runSearch(data, setResult, withEventPersons, eventId, searchToken);
       } finally {
         setLoading(false);
       }
@@ -471,7 +473,9 @@ const searchFactory = config => {
     onEnterManually,
     withEventPersons,
     eventId,
+    searchToken,
   }) => {
+    const searchTokenFromContext = useContext(UserSearchTokenContext);
     const [open, setOpen] = useState(defaultOpen);
     const [staged, setStaged] = useState([]);
 
@@ -569,6 +573,7 @@ const searchFactory = config => {
             single={single}
             withEventPersons={withEventPersons}
             eventId={eventId}
+            searchToken={searchToken ?? searchTokenFromContext}
           />
         </Modal.Content>
         <Modal.Actions>
@@ -599,6 +604,7 @@ const searchFactory = config => {
     onEnterManually: PropTypes.func,
     withEventPersons: PropTypes.bool,
     eventId: PropTypes.number,
+    searchToken: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   };
 
   Search.defaultProps = {
@@ -613,6 +619,7 @@ const searchFactory = config => {
     onEnterManually: null,
     withEventPersons: false,
     eventId: null,
+    searchToken: null,
   };
 
   const component = React.memo(Search);
@@ -667,10 +674,16 @@ const InnerUserSearch = searchFactory({
       return {[FORM_ERROR]: 'No criteria specified'};
     }
   },
-  runSearch: async (data, setResult, withEventPersons, eventId) => {
+  runSearch: async (data, setResult, withEventPersons, eventId, searchToken) => {
     setResult(null);
     const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
     values.favorites_first = true;
+    if (_.isFunction(searchToken)) {
+      searchToken = await searchToken();
+    }
+    if (searchToken) {
+      values.token = searchToken;
+    }
     let response;
     try {
       response = await indicoAxios.get(userSearchURL(values));

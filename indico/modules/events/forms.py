@@ -11,6 +11,7 @@ from flask import session
 from wtforms.fields import BooleanField, StringField, TextAreaField, URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
@@ -128,6 +129,12 @@ class LectureCreationForm(EventCreationFormBase):
     person_link_data = EventPersonLinkListField(_('Speakers'), event_type=EventType.lecture)
     description = TextAreaField(_('Description'), widget=TinyMCEWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not config.ALLOW_PUBLIC_USER_SEARCH:
+            # setting a token source disables providing a token unconditionally
+            self.person_link_data.search_token_source = 'event-creation-category'  # noqa: S105
 
 
 class UnlistedEventsForm(IndicoForm):

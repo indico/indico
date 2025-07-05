@@ -26,7 +26,7 @@
             var form = $('#attachment-link-form');
             aclIfProtected(
                 $('#{{ form.protected.id }}'),
-                $('#{{ form.acl.id }}'),
+                {% if form.acl %}$('#{{ form.acl.id }}'){% else %}null{% endif %},
                 form.find('.protected-protection-message'),
                 form.find('.inheriting-protection-message'),
                 $('#{{ form.folder.id }}')

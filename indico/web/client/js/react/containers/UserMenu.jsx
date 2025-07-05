@@ -11,7 +11,7 @@ import {Provider, connect} from 'react-redux';
 
 import UserMenu from '../components/UserMenu';
 
-export default function setupUserMenu(element, store, userInfoSelectors, configSelectors) {
+export default function setupUserMenu(element, store, userInfoSelectors, configSelectors, Wrapper) {
   const Connector = connect(state => ({
     userData: userInfoSelectors.getUserInfo(state),
     languages: configSelectors.getLanguages(state),
@@ -21,7 +21,9 @@ export default function setupUserMenu(element, store, userInfoSelectors, configS
 
   ReactDOM.render(
     <Provider store={store}>
-      <Connector />
+      <Wrapper>
+        <Connector />
+      </Wrapper>
     </Provider>,
     element
   );

@@ -20,7 +20,7 @@ from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.schemas import IPNetworkGroupSchema
 from indico.modules.users.util import serialize_user
-from indico.util.user import principal_from_identifier
+from indico.util.user import make_user_search_token, principal_from_identifier
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 
@@ -46,7 +46,16 @@ def serialize_principal(principal):
         raise ValueError(f'Invalid principal: {principal} ({principal.principal_type})')
 
 
-class PrincipalListField(HiddenField):
+class SearchTokenMixin:
+    @property
+    def search_token(self):
+        if not getattr(self.get_form(), 'allow_user_search', True):
+            # allow forms to disable user search
+            return None
+        return make_user_search_token()
+
+
+class PrincipalListField(SearchTokenMixin, HiddenField):
     """A field that lets you select a list of principals.
 
     Principals are users or other objects representing users such as
@@ -110,7 +119,7 @@ class AccessControlListField(PrincipalListField):
         super().__init__(*args, **kwargs)
 
 
-class PrincipalField(HiddenField):
+class PrincipalField(SearchTokenMixin, HiddenField):
     """A field that lets you select a single Indico user.
 
     :param allow_external_users: If "search users with no indico account"
@@ -138,7 +147,7 @@ class PrincipalField(HiddenField):
             return self.data.identifier if self.data else ''
 
 
-class PermissionsField(JSONField):
+class PermissionsField(SearchTokenMixin, JSONField):
     from indico.modules.categories.models.categories import Category
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
 

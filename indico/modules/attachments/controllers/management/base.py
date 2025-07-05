@@ -115,7 +115,7 @@ class AddAttachmentFilesMixin:
                 filename = secure_client_filename(f.filename)
                 attachment = Attachment(folder=folder, user=session.user, title=f.filename,
                                         type=AttachmentType.file, protection_mode=form.protection_mode.data)
-                if attachment.is_self_protected:
+                if attachment.is_self_protected and form.acl:
                     attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
@@ -162,7 +162,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             logger.info('Attachment %s edited by %s', self.attachment, session.user)
             self.attachment.folder = folder
             form.populate_obj(self.attachment, skip={'acl', 'file', 'folder'})
-            if self.attachment.is_self_protected:
+            if self.attachment.is_self_protected and form.acl:
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.attachment.acl |= form.acl.data
                 self.attachment.acl &= form.acl.data
@@ -194,7 +194,7 @@ class CreateFolderMixin:
         if form.validate_on_submit():
             folder = AttachmentFolder(object=self.object)
             form.populate_obj(folder, skip={'acl'})
-            if folder.is_self_protected:
+            if folder.is_self_protected and form.acl:
                 folder.acl = form.acl.data
             db.session.add(folder)
             logger.info('Folder %s created by %s', folder, session.user)
@@ -213,7 +213,7 @@ class EditFolderMixin(SpecificFolderMixin):
         form = AttachmentFolderForm(obj=defaults, linked_object=self.object)
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
-            if self.folder.is_self_protected:
+            if self.folder.is_self_protected and form.acl:
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.folder.acl |= form.acl.data
                 self.folder.acl &= form.acl.data

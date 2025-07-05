@@ -6,11 +6,13 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {OverridableContext} from 'react-overridable';
-import {Provider} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import setupUserMenu from 'indico/react/containers/UserMenu';
 
 import {init} from './actions';
@@ -24,6 +26,19 @@ import createRBStore from './store';
 
 import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';
+
+function UserSearchTokenProvider({children}) {
+  const userSearchToken = useSelector(userSelectors.getSearchToken);
+  return (
+    <UserSearchTokenContext.Provider value={userSearchToken}>
+      {children}
+    </UserSearchTokenContext.Provider>
+  );
+}
+
+UserSearchTokenProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default function setup(overrides = {}, postReducers = []) {
   window.addEventListener(
@@ -56,13 +71,16 @@ export default function setup(overrides = {}, postReducers = []) {
       document.getElementById('indico-user-menu-container'),
       store,
       userSelectors,
-      configSelectors
+      configSelectors,
+      UserSearchTokenProvider
     );
 
     ReactDOM.render(
       <OverridableContext.Provider value={overrides}>
         <Provider store={store}>
-          <App history={history} />
+          <UserSearchTokenProvider>
+            <App history={history} />
+          </UserSearchTokenProvider>
         </Provider>
       </OverridableContext.Provider>,
       appContainer

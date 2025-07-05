@@ -14,7 +14,8 @@
             fieldId: {{ field.id | tojson }},
             required: {{ input_args.required | default(false) | tojson }},
             withExternalUsers: {{ field.allow_external_users | tojson }},
-            disabled: {{ (field.render_kw.disabled if field.render_kw else false) | tojson }}
+            disabled: {{ (field.render_kw.disabled if field.render_kw else false) | tojson }},
+            searchToken: {{ field.search_token | tojson }},
         });
     </script>
 {% endblock %}

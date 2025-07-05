@@ -48,6 +48,7 @@ from indico.util.i18n import (_, babel, get_all_locales, get_current_locale, get
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
+from indico.util.user import make_user_search_token
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
@@ -219,6 +220,7 @@ def setup_jinja(app):
     app.add_template_global(render_session_bar)
     app.add_template_global(get_request_stats)
     app.add_template_global(_get_indico_version(), 'indico_version')
+    app.add_template_global(make_user_search_token)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
