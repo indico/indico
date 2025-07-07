@@ -25,6 +25,8 @@ import {
   SemanticICONS,
 } from 'semantic-ui-react';
 
+import {TooltipIfTruncated} from 'indico/react/components';
+
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -152,7 +154,13 @@ function TimetablePopupContent({
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
               {type === EntryType.Contribution ? (
-                <Button icon="calendar times" onClick={onDelete} />
+                <Popup
+                  content={<Translate>Unschedule contribution</Translate>}
+                  inverted
+                  size="mini"
+                  position="bottom center"
+                  trigger={<Button icon="calendar times" onClick={onDelete} color="orange" />}
+                />
               ) : (
                 <Button icon="trash" onClick={onDelete} />
               )}
