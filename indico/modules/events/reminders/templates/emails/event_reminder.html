@@ -17,7 +17,7 @@
 {% block body -%}
     <p>
     {%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
-        Please note that the event <a href="{{ url }}">"{{ title }}"{{ label }}</a> will start on {{ start }} ({{ tz }}).
+        Please note that the event "{{ title }}"{{ label }} will start on {{ start }} ({{ tz }}).
     {%- endtrans %}
     </p>
     <p>
@@ -25,19 +25,22 @@
         {% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}
     {%- elif address %}
         {% trans %}It will take place at the following address:{% endtrans %}
-        {{ address }}
+        {{ address | trim | indent }}
     {%- endif %}
     </p>
+    <p>{% trans %}You can access the full event here:{% endtrans %}{{ url }}</p>
     {%- if with_description and event.description %}
-        <h3>{% trans %}Description{% endtrans %}</h3>
-        {{ event.description }}
+        <p><strong>{% trans %}Description{% endtrans %}</strong></p>
+        {{ event.description | trim }}
     {%- endif -%}
 
+    {#- Blank lines are intended #}
     {%- if note %}
-        <h3>{% trans %}Note{% endtrans %}</h3>
-        {{ note | sanitize_html }}
+        <br><p><strong>{% trans %}Note{% endtrans %}</strong></p>
+        {{ note | safe }}
     {%- endif -%}
 
+    {# Blank lines are intended #}
     {%- if with_agenda %}
         {{ render_agenda(event, agenda) }}
     {%- endif -%}
@@ -46,9 +49,9 @@
 {%- macro render_location() -%}
     {%- if location -%}
         {%- if room -%}
-            {{ location }} {{ render_room() }}.
+            {{ location | trim }} {{ render_room() }}.
         {%- else -%}
-            {{ location }}.
+            {{ location | trim }}.
         {%- endif -%}
         {{- render_address() }}
     {%- elif room -%}
@@ -62,7 +65,7 @@
 {%- macro render_room() -%}
     {%- if room -%}
         {%- if location -%}
-            ({{ room }})
+            ({{ room | trim }})
         {%- else -%}
             {% trans r=room|trim %}room {{ r }}{% endtrans %}
         {%- endif -%}
@@ -72,6 +75,6 @@
 {%- macro render_address() -%}
     {%- if address %}
         {% trans %}Address:{% endtrans %}
-        {{ address }}
+        {{ address | trim | indent }}
     {%- endif -%}
 {%- endmacro -%}

@@ -1,13 +1,12 @@
 {%- macro render_agenda(event, agenda) -%}
-    <h3>{% trans title=event.title %}Agenda for {{ title }}{% endtrans %}</h3>
+    <p><strong>{% trans title=event.title %}Agenda for {{ title }}{% endtrans %}</strong></p>
     {% if not agenda -%}
         <p>{% trans %}There are no events scheduled.{% endtrans %}</p>
     {%- endif -%}
-        <ul>
+
         {%- for item in agenda %}
             {{ render_item(item) }}
         {%- endfor -%}
-        </ul>
 {%- endmacro -%}
 
 {%- macro render_item(item) -%}
@@ -19,18 +18,14 @@
 {%- endmacro -%}
 
 {%- macro render_session_block(entry) -%}
-    <li>
-        {{ render_times(entry) }} {{ entry.object.full_title }}
-        <ul>
-        {%- for item in entry.children %}
-            {{ render_entry(item) }}
-        {%- endfor -%}
-        </ul>
-    </li>
+    <p>- {{ render_times(entry) }} {{ entry.object.full_title }}</p>
+    {%- for item in entry.children %}
+        {{ render_entry(item) }}
+    {%- endfor -%}
 {%- endmacro -%}
 
 {%- macro render_entry(entry) -%}
-    <li>{{ render_times(entry) }} {{ entry.object.title }}</li>
+    <p>- {{ render_times(entry) }} {{ entry.object.title }}</p>
 {%- endmacro -%}
 
 {%- macro render_times(entry) -%}
