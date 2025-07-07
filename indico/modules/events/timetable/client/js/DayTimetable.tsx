@@ -220,9 +220,9 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     ];
   }
 
-  function canInteractWithTimeline(y) {
+  function canInteractWithTimeline(y, offsets = [0, 0]) {
     const pixelLimits = limits.map(l => (calendarRef.current.clientHeight / 100) * l);
-    return y >= pixelLimits[0] && y <= pixelLimits[1];
+    return y > pixelLimits[0] + offsets[0] && y < pixelLimits[1] - offsets[1];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -243,7 +243,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       if (
         event.button !== 0 ||
         event.target !== calendarRef.current ||
-        !canInteractWithTimeline(event.offsetY)
+        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(5)])
       ) {
         return;
       }
