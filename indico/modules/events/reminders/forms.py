@@ -69,7 +69,7 @@ class ReminderForm(IndicoForm):
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary
-        regforms = sorted([rf for rf in self.event.registration_forms if not rf.is_deleted], key=lambda rf: rf.title)
+        regforms = sorted(self.event.registration_forms, key=lambda rf: natural_sort_key(rf.title))
         if len(regforms) > 1:
             self.forms.choices = [(str(rf.id), rf.title) for rf in regforms]
         else:
