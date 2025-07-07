@@ -302,14 +302,13 @@ class EventReminder(db.Model):
     def is_overdue(self):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
-    def _make_email(self, sender, recipient, template, attachments, html, alternatives):
+    def _make_email(self, sender, recipient, template, attachments):
         email_params = {
             'to_list': recipient,
             'sender_address': sender,
             'template': template,
             'attachments': attachments,
-            'html': html,
-            'alternatives': alternatives
+            'html': False
         }
         extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
         for param in values_from_signal(extra_params, as_list=True):
@@ -324,8 +323,7 @@ class EventReminder(db.Model):
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
         with self.event.force_event_locale():
-            text_email_tpl, html_email_tpl = make_reminder_email(self.event, self.include_summary,
-                                                                 self.include_description, self.message)
+            email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
@@ -335,8 +333,7 @@ class EventReminder(db.Model):
         sender = self.event.get_verbose_email_sender(self.reply_to_address)
         for recipient in recipients:
             with self.event.force_event_locale():
-                email = self._make_email(sender, recipient, html_email_tpl, attachments, html=True,
-                                         alternatives=[(text_email_tpl.get_body(), 'text/plain')])
+                email = self._make_email(sender, recipient, email_tpl, attachments)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

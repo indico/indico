@@ -1,4 +1,5 @@
 <strong>{% trans %}Subject{% endtrans %}</strong>
-<br>{{ subject }}<br><br>
+<pre class="mono">{{ subject }}</pre>
+<br>
 <strong>{% trans %}Body{% endtrans %}</strong>
-<br>{{ body | sanitize_html }}
+<pre class="mono">{{ body | safe }}</pre>
