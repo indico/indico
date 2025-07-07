@@ -20,16 +20,16 @@ def upgrade():
     op.create_table('reminders_forms',
         sa.Column('reminder_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reminder_form_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['reminder_id'], ['events.reminders.id']),
-        sa.ForeignKeyConstraint(['reminder_form_id'], ['event_registration.forms.id']),
+        sa.ForeignKeyConstraint(['reminder_id'], ['events.reminders.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['reminder_form_id'], ['event_registration.forms.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('reminder_id', 'reminder_form_id'),
         schema='events'
     )
     op.create_table('reminders_tags',
         sa.Column('reminder_id', sa.Integer(), nullable=False, index=True),
         sa.Column('reminder_tag_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['reminder_id'], ['events.reminders.id']),
-        sa.ForeignKeyConstraint(['reminder_tag_id'], ['event_registration.tags.id']),
+        sa.ForeignKeyConstraint(['reminder_id'], ['events.reminders.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['reminder_tag_id'], ['event_registration.tags.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('reminder_id', 'reminder_tag_id'),
         schema='events'
     )
