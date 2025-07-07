@@ -13,7 +13,6 @@ import {getConfig} from 'indico/tinymce';
   global.setupTinyMCEWidget = async function setupTinyMCEWidget(options) {
     const {
       fieldId,
-      disabled = false,
       images = true,
       imageUploadURL = null,
       forceAbsoluteURLs = false,
@@ -29,6 +28,6 @@ import {getConfig} from 'indico/tinymce';
       // closed and then reopened) won't do anything
       tinymce.remove(old);
     }
-    tinymce.init(getConfig(field, {disabled, images, imageUploadURL, forceAbsoluteURLs, height, contentCSS}));
+    tinymce.init(getConfig(field, {images, imageUploadURL, forceAbsoluteURLs, height, contentCSS}));
   };
 })(window);

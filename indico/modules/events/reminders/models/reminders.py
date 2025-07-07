@@ -308,7 +308,6 @@ class EventReminder(db.Model):
             'sender_address': sender,
             'template': template,
             'attachments': attachments,
-            'html': False
         }
         extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
         for param in values_from_signal(extra_params, as_list=True):
