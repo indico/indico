@@ -307,24 +307,14 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
 
-  const startHourLimit =
-    eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
-  const endHourLimit =
-    eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
-
-  const limits = [
-    ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
-    (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
-  ];
-
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
       <UnscheduledContributions dt={dt} />
       <div className="wrapper">
-        <div styleName="wrapper" style={{background: getTimelineLimitGradient()}}>
+        <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
-            <div ref={calendarRef}>
+            <div ref={calendarRef} style={{background: getTimelineLimitGradient()}}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
