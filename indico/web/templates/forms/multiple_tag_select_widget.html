@@ -2,6 +2,16 @@
 
 {% block html %}
     <div id="{{ field.id }}-wrapper"></div>
+    <select id="{{ field.id }}"
+            name="{{ field.name }}"
+            style="display: none;"
+            multiple
+            readonly
+            {{ input_args | html_params }}>
+        {% for value, label, selected, render_kw in field.iter_choices() %}
+            <option value="{{ value }}" {% if selected %}selected{% endif %}>{{ label[0] }}</option>
+        {% endfor %}
+    </select>
 {% endblock %}
 
 {% block javascript %}
@@ -9,6 +19,8 @@
         setupMultipleTagSelectWidget({
             fieldId: {{ field.id | tojson }},
             choices: {{ field.choices | tojson }},
+            inputArgs: {{ input_args | tojson }},
+            initialSelection: {{ field.initial_selection | tojson }},
         });
     </script>
 {% endblock %}

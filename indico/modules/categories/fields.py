@@ -63,7 +63,7 @@ class CategoryField(HiddenField):
 
 class EventRequestList(ModelList):
     def __init__(self, category, **kwargs):
-        def _get_query(m):
+        def _get_query(m, ctx):
             return m.query.filter(
                 EventMoveRequest.category == category,
                 EventMoveRequest.state == MoveRequestState.pending

@@ -24,7 +24,7 @@ class EditingFilesField(Dict):
         self.contrib = contrib
         self.editing_file_types_query = EditingFileType.query.with_parent(event).filter_by(type=editable_type)
 
-        keys_field = ModelField(EditingFileType, get_query=lambda m: self.editing_file_types_query)
+        keys_field = ModelField(EditingFileType, get_query=lambda m, ctx: self.editing_file_types_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
         validators = [*kwargs.pop('validate', []), self.validate_files]
         super().__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
@@ -77,7 +77,7 @@ class EditingFilesField(Dict):
 
 class EditingTagsField(ModelList):
     def __init__(self, event, allow_system_tags=False, **kwargs):
-        def _get_query(m):
+        def _get_query(m, ctx):
             query = m.query.with_parent(event)
             if not allow_system_tags:
                 query = query.filter_by(system=False)
@@ -88,7 +88,7 @@ class EditingTagsField(ModelList):
 
 class EditableList(ModelList):
     def __init__(self, event, editable_type, **kwargs):
-        def _get_query(m):
+        def _get_query(m, ctx):
             return (m.query
                     .join(Contribution)
                     .filter(~Contribution.is_deleted, Contribution.event_id == event.id, m.type == editable_type))

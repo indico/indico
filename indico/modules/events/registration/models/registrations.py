@@ -303,7 +303,7 @@ class Registration(db.Model):
         order_by='RegistrationTag.title',
         backref=db.backref(
             'registrations',
-            lazy=False
+            lazy=True
         )
     )
     #: The serial number assigned to the Apple Wallet pass
