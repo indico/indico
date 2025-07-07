@@ -139,7 +139,8 @@ class IndicoMultipass(Multipass):
     def handle_login_form(self, provider, data):
         signal_res = signals.users.check_login_data.send(type(provider), provider=provider, data=data)
         if errors := values_from_signal(signal_res, as_list=True):
-            self.handle_auth_error(InvalidCredentials(errors[0], provider=provider, identifier=data['email']))
+            identifier = provider.get_identifier(data)
+            self.handle_auth_error(InvalidCredentials(errors[0], provider=provider, identifier=identifier))
             return
         return super().handle_login_form(provider, data)
 

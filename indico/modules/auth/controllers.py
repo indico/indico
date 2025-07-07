@@ -110,14 +110,14 @@ class RHLogin(RH):
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            limiter = get_exceeded_login_rate_limiter()
-            if not limiter and form.validate_on_submit():
-                limiter = get_exceeded_login_rate_limiter(form.identifier.data)
+            if form.validate_on_submit():
+                identifier = provider.get_identifier(form.data)
+                limiter = get_exceeded_login_rate_limiter() or get_exceeded_login_rate_limiter(identifier)
                 if not limiter:
                     if response := multipass.handle_login_form(provider, form.data):
                         return response
                     # re-check since a failed login may have triggered the rate limit
-                    limiter = get_exceeded_login_rate_limiter(form.identifier.data)
+                    limiter = get_exceeded_login_rate_limiter(identifier)
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
