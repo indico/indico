@@ -22,7 +22,5 @@
             inputArgs: {{ input_args | tojson }},
             initialSelection: {{ field.initial_selection | tojson }},
         });
-        {# Call `initForms()` again because `WTFMultipleTagSelectField` has been rendered only after its first call. #}
-        initForms($('form'));
     </script>
 {% endblock %}
