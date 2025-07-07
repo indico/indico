@@ -18,7 +18,8 @@ from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.auth import login_rate_limiter, multipass, signup_rate_limiter
+from indico.core.auth import (get_exceeded_login_rate_limiter, get_exceeded_signup_rate_limiter, multipass,
+                              signup_rate_limiter, signup_rate_limiter_email)
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.marshmallow import mm
@@ -105,24 +106,25 @@ class RHLogin(RH):
             return provider.initiate_external_login()
 
         # If we have a POST request we submitted a login form for a local provider
-        rate_limit_exceeded = False
+        limiter = None
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            rate_limit_exceeded = not login_rate_limiter.test()
-            if not rate_limit_exceeded and form.validate_on_submit():
-                response = multipass.handle_login_form(provider, form.data)
-                if response:
-                    return response
-                # re-check since a failed login may have triggered the rate limit
-                rate_limit_exceeded = not login_rate_limiter.test()
+            if form.validate_on_submit():
+                identifier = provider.get_identifier(form.data)
+                limiter = get_exceeded_login_rate_limiter() or get_exceeded_login_rate_limiter(identifier)
+                if not limiter:
+                    if response := multipass.handle_login_form(provider, form.data):
+                        return response
+                    # re-check since a failed login may have triggered the rate limit
+                    limiter = get_exceeded_login_rate_limiter(identifier)
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
             form = active_provider.login_form() if active_provider else None
 
         providers = _sort_providers(multipass.auth_providers.values())
-        retry_in = login_rate_limiter.get_reset_delay() if rate_limit_exceeded else None
+        retry_in = limiter.get_reset_delay() if limiter else None
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
                                login_reason=login_reason, retry_in=retry_in, force=(force or None))
 
@@ -297,16 +299,16 @@ class RHRegister(RH):
     def _process_verify(self, handler):
         email_sent = session.pop('register_verification_email_sent', False)
         form = handler.create_verify_email_form()
-        rate_limit_exceeded = not signup_rate_limiter.test()
-        if not email_sent and rate_limit_exceeded:
-            # tell users that they exceeded the rate limit, but NOT if they just
-            # used their last attempt successfully
-            retry_in = login_rate_limiter.get_reset_delay()
-            delay = format_human_timedelta(retry_in, 'minutes')
-            flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
-        if not rate_limit_exceeded and form.validate_on_submit():
-            signup_rate_limiter.hit()
-            return self._send_confirmation(form.email.data)
+        if form.validate_on_submit():
+            limiter = get_exceeded_signup_rate_limiter()
+            if not limiter:
+                signup_rate_limiter.hit()
+                signup_rate_limiter_email.hit(form.email.data)
+                return self._send_confirmation(form.email.data)
+            else:
+                retry_in = limiter.get_reset_delay()
+                delay = format_human_timedelta(retry_in, 'minutes')
+                flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
         return WPSignup.render_template('register_verify.html', form=form, email_sent=email_sent)
 
     def _process_post(self, handler):

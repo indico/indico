@@ -34,6 +34,9 @@ Improvements
 - Allow adding/removing favorite users from search results (:pr:`6950`)
 - Make text overflow behavior in badge designer configurable (:pr:`6944`, thanks
   :user:`SegiNyn`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings to prevent locking out users during brute-force attacks (or more likely) poorly
+  behaving users behind a NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

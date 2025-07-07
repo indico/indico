@@ -19,8 +19,18 @@ from indico.util.signals import values_from_signal
 
 
 logger = Logger.get('auth')
-login_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT)))
-signup_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('signup', config.SIGNUP_RATE_LIMIT)))
+login_rate_limiter = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT))
+)
+login_rate_limiter_user = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('login-user', config.FAILED_LOGIN_RATE_LIMIT_USER))
+)
+signup_rate_limiter = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('signup', config.SIGNUP_RATE_LIMIT))
+)
+signup_rate_limiter_email = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('signup-email', config.SIGNUP_RATE_LIMIT_EMAIL))
+)
 
 
 class IndicoMultipass(Multipass):
@@ -106,11 +116,17 @@ class IndicoMultipass(Multipass):
                 raise ValueError('There is no default auth provider')
 
     def handle_auth_error(self, exc, redirect_to_login=False):
-        if isinstance(exc, (NoSuchUser, InvalidCredentials)):
+        if isinstance(exc, NoSuchUser):
             if not getattr(exc, '_indico_no_rate_limit', False):
                 login_rate_limiter.hit()
+                login_rate_limiter_user.hit(exc.identifier)
             logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
+        elif isinstance(exc, InvalidCredentials):
+            login_rate_limiter.hit()
+            login_rate_limiter_user.hit(exc.identifier)
+            logger.warning('Invalid credentials (ip=%s, provider=%s, identifier=%s): %s',
+                           request.remote_addr, exc.provider.name if exc.provider else None, exc.identifier, exc)
         else:
             exc_str = str(exc)
             fn = logger.error
@@ -123,9 +139,34 @@ class IndicoMultipass(Multipass):
     def handle_login_form(self, provider, data):
         signal_res = signals.users.check_login_data.send(type(provider), provider=provider, data=data)
         if errors := values_from_signal(signal_res, as_list=True):
-            self.handle_auth_error(InvalidCredentials(errors[0], provider=provider))
+            identifier = provider.get_identifier(data)
+            self.handle_auth_error(InvalidCredentials(errors[0], provider=provider, identifier=identifier))
             return
         return super().handle_login_form(provider, data)
+
+
+def get_exceeded_login_rate_limiter(identifier=None):
+    """Return the rate limiter that has been exceeded for login."""
+    if login_rate_limiter.test():
+        return None
+    elif not login_rate_limiter_user.limits or not identifier:
+        return login_rate_limiter
+    elif login_rate_limiter_user.test(identifier):
+        return None
+    else:
+        return login_rate_limiter_user
+
+
+def get_exceeded_signup_rate_limiter(email=None):
+    """Return the rate limiter that has been exceeded for signup."""
+    if signup_rate_limiter.test():
+        return None
+    elif not signup_rate_limiter_email.limits or not email:
+        return signup_rate_limiter
+    elif signup_rate_limiter_email.test(email):
+        return None
+    else:
+        return signup_rate_limiter_email
 
 
 multipass = IndicoMultipass()
