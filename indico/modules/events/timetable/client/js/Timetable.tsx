@@ -25,35 +25,41 @@ export default function Timetable() {
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
-  // TODO: (Ajob) Get rid of this after disabled areas are merged
-  const showAllTimeslots = true;
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDateEntries = entries[getDateKey(currentDate)];
+  const isSingleDayEvent = eventStartDt.day() === eventEndDt.day();
+
   const useWeekView = false;
-  const minHour = showAllTimeslots
-    ? 0
-    : Math.max(
-        Math.min(
-          eventStartDt.hour(),
-          ...(useWeekView
-            ? Object.values(entries)
-                .flat()
-                .map(e => e.startDt.hour())
-            : currentDateEntries.map(e => e.startDt.hour()))
-        ) - 1,
-        0
-      );
-  const maxHour = showAllTimeslots
-    ? 24
-    : Math.max(
-        eventEndDt.hour(),
+
+  let minHour = 0;
+  let maxHour = 23;
+
+  if (isSingleDayEvent) {
+    minHour = Math.max(
+      Math.min(
+        eventStartDt.hour(),
         ...(useWeekView
           ? Object.values(entries)
               .flat()
-              .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e => moment(e.startDt).add(e.duration, 'minutes').hour()))
-      );
+              .map(e => e.startDt.hour())
+          : currentDateEntries.map(e => e.startDt.hour()))
+      ) - 1,
+      0
+    );
+    maxHour = Math.max(
+      eventEndDt.hour(),
+      ...(useWeekView
+        ? Object.values(entries)
+            .flat()
+            .map(e => e.startDt.add(e.duration, 'minutes').hour())
+        : currentDateEntries.map(e =>
+            moment(e.startDt)
+              .add(e.duration, 'minutes')
+              .hour()
+          ))
+    );
+  }
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
