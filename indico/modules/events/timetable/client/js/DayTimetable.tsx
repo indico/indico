@@ -85,6 +85,8 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+  const eventStartDt = useSelector(selectors.getEventStartDt);
+  const eventEndDt = useSelector(selectors.getEventEndDt);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -204,6 +206,20 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
+  function getTimelineLimitGradient(): string {
+    const startHourLimit =
+      eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
+    const endHourLimit =
+      eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
+
+    const limits = [
+      ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
+      (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
+    ];
+
+    return `linear-gradient(180deg,rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) ${limits[0]}%, transparent ${limits[0]}%, transparent ${limits[1]}%, rgba(0,0,0,0.05) ${limits[1]}%, rgba(0,0,0,0.05) 100%)`;
+  }
+
   const draftEntry = useSelector(selectors.getDraftEntry);
 
   useEffect(() => {
@@ -291,11 +307,21 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
 
+  const startHourLimit =
+    eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
+  const endHourLimit =
+    eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
+
+  const limits = [
+    ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
+    (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
+  ];
+
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
       <UnscheduledContributions dt={dt} />
       <div className="wrapper">
-        <div styleName="wrapper">
+        <div styleName="wrapper" style={{background: getTimelineLimitGradient()}}>
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
             <div ref={calendarRef}>
@@ -333,12 +359,12 @@ interface TimeGutterProps {
 }
 
 export function Lines({
-  minHour,
-  maxHour,
+  minHour = 0,
+  maxHour = 23,
   first = true,
 }: {
-  minHour: number;
-  maxHour: number;
+  minHour?: number;
+  maxHour?: number;
   first?: boolean;
 }) {
   const oneHour = minutesToPixels(60);
