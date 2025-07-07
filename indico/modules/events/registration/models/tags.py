@@ -56,6 +56,7 @@ class RegistrationTag(db.Model):
 
     # relationship backrefs:
     # - registrations (Registration.tags)
+    # - reminders (EventReminder.tags)
 
     @property
     def locator(self):
