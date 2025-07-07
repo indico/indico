@@ -9,6 +9,7 @@ import React, {useState} from 'react';
 import {Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
 
 import EmailPendingInvitationsButton from './EmailPendingInvitationsButton';
 
@@ -46,12 +47,22 @@ function InvitationRow({
   } = invitation;
 
   const name = registrationDetailsURL ? (
-    <a href="{{ url_for('.registration_details', invitation.registration) }}">
+    <a href={registrationDetailsURL}>
       {firstName} {lastName}
     </a>
   ) : (
     `${firstName} ${lastName}`
   );
+
+  const handleChange = () => {
+    if (!onChange) {
+      return;
+    }
+    const newSelected = selected.includes(id)
+      ? selected.filter(selectedId => id !== selectedId)
+      : [...selected, id];
+    onChange(newSelected);
+  };
 
   return (
     <tr>
@@ -64,23 +75,18 @@ function InvitationRow({
             autoComplete="off"
             id={`invitation-${id}`}
             checked={selected.includes(id)}
-            onChange={e => {
-              const newSelected = e.target.checked
-                ? [...selected, id]
-                : selected.filter(selectedId => id !== selectedId);
-              onChange(newSelected);
-            }}
+            onChange={handleChange}
           />
         </td>
       )}
-      <td className="name">
-        {onChange ? <label htmlFor={`invitation-${id}`}>{name}</label> : name}
+      <td className="name" onClick={handleChange}>
+        {name}
       </td>
-      <td className="email">
-        {onChange ? <label htmlFor={`invitation-${id}`}>{email}</label> : email}
+      <td className="email" onClick={handleChange}>
+        {email}
       </td>
-      <td className="affiliation">
-        {onChange ? <label htmlFor={`invitation-${id}`}>{affiliation}</label> : affiliation}
+      <td className="affiliation" onClick={handleChange}>
+        {affiliation}
       </td>
       <td className="actions hide-if-locked">
         {state === 'pending' && (
@@ -122,7 +128,7 @@ function InvitationsBlock({
   return (
     <>
       <div className="titled-rule">{title}</div>
-      <table className="invitation-table">
+      <table className={toClasses({'invitation-table': true, 'selectable': !!onChange})}>
         <tbody>
           {invitations.map(invitation => (
             <InvitationRow
@@ -159,7 +165,13 @@ export default function InvitationList({
   }
 
   return (
-    <div className={`i-box invitation-list${pendingInvitations.length ? '' : ' titled'}`}>
+    <div
+      className={toClasses({
+        'i-box': true,
+        'invitation-list': true,
+        'titled': pendingInvitations.length === 0,
+      })}
+    >
       {pendingInvitations.length > 0 && (
         <>
           <div className="toolbar hide-if-locked">

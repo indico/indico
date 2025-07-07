@@ -564,6 +564,14 @@ form .regform-section:has(> .i-box-content:empty) {
       }
     }
 
+    &.selectable {
+      td.name,
+      td.email,
+      td.affiliation {
+        cursor: pointer;
+      }
+    }
+
     tr:nth-child(odd) > td {
       background: $light-gray;
     }
