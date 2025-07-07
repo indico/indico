@@ -254,10 +254,17 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
           GRID_SIZE_MINUTES
       );
 
-      const startDt = moment(dt)
+      let startDt = moment(dt)
         .startOf('days')
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
+
+      if (startDt < dt) {
+        startDt = dt;
+      }
+
+      // TODO: (Ajob) Make it so that duration can never go beyond max event time. Issue arises when using
+      //              end date that is not dividible by 5.
 
       setIsDragging(true);
       dispatch(
