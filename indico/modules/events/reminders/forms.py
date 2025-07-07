@@ -38,10 +38,10 @@ class ReminderForm(IndicoForm):
     send_to_participants = BooleanField(_('Participants'),
                                         description=_('Send the reminder to participants/registrants of the event.'))
 
-    forms = IndicoSelectMultipleCheckboxField(_('Filter by registration forms'),
+    forms = IndicoSelectMultipleCheckboxField(_('Filter by forms'),
                                               [HiddenUnless('send_to_participants')],
-                                              description=_('Limit reminders to participants of '
-                                                            'these registration forms.'))
+                                              description=_('Only send the reminder to participants registered in the '
+                                                            'selected forms.'))
     tags = IndicoMultipleTagSelectField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
                                         description=_('Limit reminders to participants with these tags.'))
     all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
