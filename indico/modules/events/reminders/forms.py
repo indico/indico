@@ -12,14 +12,19 @@ from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoRadioField, TimeDeltaField)
-from indico.web.forms.fields.simple import IndicoMultipleTagSelectField
+from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless
+
+
+def _sort_fn(object_list):
+    return sorted(object_list, key=lambda x: natural_sort_key(x[1].title))
 
 
 class ReminderForm(IndicoForm):
@@ -44,11 +49,12 @@ class ReminderForm(IndicoForm):
     forms = IndicoQuerySelectMultipleCheckboxField(_('Filter by forms'),
                                                    [HiddenUnless('send_to_participants')],
                                                    collection_class=set,
+                                                   modify_object_list=_sort_fn,
                                                    get_label=attrgetter('title'),
                                                    description=_('Only send the reminder to participants registered in '
                                                                  'the selected forms.'))
-    tags = IndicoMultipleTagSelectField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
-                                        description=_('Limit reminders to participants with these tags.'))
+    tags = IndicoQuerySelectMultipleTagField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
+                                             description=_('Limit reminders to participants with these tags.'))
     all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
                             description=_('Participants must have all of the selected tags. '
                                           'Otherwise at least one of them.'))
@@ -74,14 +80,14 @@ class ReminderForm(IndicoForm):
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary
-        regforms_query = RegistrationForm.query.with_parent(self.event).order_by(RegistrationForm.title)
+        regforms_query = RegistrationForm.query.with_parent(self.event)
         if regforms_query.count() > 1:
             self.forms.query = regforms_query
         else:
             del self.forms
-        tags = sorted(self.event.registration_tags, key=lambda tag: natural_sort_key(tag.title))
-        if tags:
-            self.tags.choices = [(str(tag.id), (tag.title, tag.color)) for tag in tags]
+        tags_query = RegistrationTag.query.with_parent(self.event)
+        if tags_query.has_rows():
+            self.tags.query = tags_query
         else:
             del self.tags
             del self.all_tags
