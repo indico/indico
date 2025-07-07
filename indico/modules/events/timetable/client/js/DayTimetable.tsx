@@ -87,6 +87,8 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
+  const limits = getTimelineLimits();
+
   function handleDragEnd(
     who: string,
     over: Over[],
@@ -194,18 +196,21 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
   }
 
-  function getTimelineLimitGradient(): string {
+  function getTimelineLimits(): number[] {
     const startHourLimit =
       eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
     const endHourLimit =
       eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
 
-    const limits = [
+    return [
       ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
       (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
     ];
+  }
 
-    return `linear-gradient(180deg,rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) ${limits[0]}%, transparent ${limits[0]}%, transparent ${limits[1]}%, rgba(0,0,0,0.05) ${limits[1]}%, rgba(0,0,0,0.05) 100%)`;
+  function canInteractWithTimeline(y) {
+    const pixelLimits = limits.map(l => (calendarRef.current.clientHeight / 100) * l);
+    return y >= pixelLimits[0] && y <= pixelLimits[1];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -223,7 +228,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      if (event.button !== 0 || event.target !== calendarRef.current) {
+      if (
+        event.button !== 0 ||
+        event.target !== calendarRef.current ||
+        !canInteractWithTimeline(event.offsetY)
+      ) {
         return;
       }
 
@@ -249,7 +258,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (!isDragging || !draftEntry) {
+      if (!isDragging || !draftEntry || !canInteractWithTimeline(event.offsetY)) {
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
@@ -294,6 +303,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
+  const limitsGradient = `linear-gradient(180deg,rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) ${limits[0]}%, transparent ${limits[0]}%, transparent ${limits[1]}%, rgba(0,0,0,0.05) ${limits[1]}%, rgba(0,0,0,0.05) 100%)`;
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
@@ -302,7 +312,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
-            <div ref={calendarRef} style={{background: getTimelineLimitGradient()}}>
+            <div ref={calendarRef} style={{background: limitsGradient}}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
