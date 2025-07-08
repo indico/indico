@@ -34,34 +34,35 @@ export default function Timetable() {
 
   const useWeekView = false;
 
-  let minHour = 0;
-  let maxHour = 23;
-
-  if (!showAllTimeslots || isSingleDayEvent) {
-    minHour = Math.max(
-      Math.min(
-        eventStartDt.hour(),
-        ...(useWeekView
-          ? Object.values(entries)
-              .flat()
-              .map(e => e.startDt.hour())
-          : currentDateEntries.map(e => e.startDt.hour()))
-      ) - 1,
-      0
-    );
-    maxHour = Math.max(
-      eventEndDt.hour(),
-      ...(useWeekView
-        ? Object.values(entries)
-            .flat()
-            .map(e => e.startDt.add(e.duration, 'minutes').hour())
-        : currentDateEntries.map(e =>
-            moment(e.startDt)
-              .add(e.duration, 'minutes')
-              .hour()
-          ))
-    );
-  }
+  const minHour =
+    showAllTimeslots && !isSingleDayEvent
+      ? 0
+      : Math.max(
+          Math.min(
+            eventStartDt.hour(),
+            ...(useWeekView
+              ? Object.values(entries)
+                  .flat()
+                  .map(e => e.startDt.hour())
+              : currentDateEntries.map(e => e.startDt.hour()))
+          ) - 1,
+          0
+        );
+  const maxHour =
+    showAllTimeslots && !isSingleDayEvent
+      ? 24
+      : Math.max(
+          eventEndDt.hour(),
+          ...(useWeekView
+            ? Object.values(entries)
+                .flat()
+                .map(e => e.startDt.add(e.duration, 'minutes').hour())
+            : currentDateEntries.map(e =>
+                moment(e.startDt)
+                  .add(e.duration, 'minutes')
+                  .hour()
+              ))
+        );
 
   return (
     <div styleName="timetable">
