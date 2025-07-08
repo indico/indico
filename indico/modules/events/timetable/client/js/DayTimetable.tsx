@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment, {duration, Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -263,14 +263,15 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         startDt = dt;
       }
 
-      // TODO: (Ajob) Make it so that duration can never go beyond max event time. Issue arises when using
-      //              end date that is not dividible by 5.
+      const newEndDt = startDt.add(GRID_SIZE_MINUTES, 'minutes');
+      const draftDuration =
+        newEndDt > eventEndDt ? newEndDt.diff(eventEndDt, 'minutes') : GRID_SIZE_MINUTES;
 
       setIsDragging(true);
       dispatch(
         actions.setDraftEntry({
           startDt,
-          duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
+          duration: draftDuration, // TODO: (Ajob) Replace with default duration
           y,
         })
       );
