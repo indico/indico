@@ -130,7 +130,7 @@ class TimetableSerializer:
                      'attachments': self._get_attachment_data(block.session),
                      'code': block.session.code,
                      'contribDuration': block.session.default_contribution_duration.seconds / 60,
-                     'conveners': [self._get_person_data(x) for x in block.person_links],
+                     'personLinks': [self._get_person_data(x) for x in block.person_links],
                      'description': block.session.description,
                      'duration': block.duration.seconds / 60,
                      'isPoster': block.session.is_poster,
@@ -158,11 +158,7 @@ class TimetableSerializer:
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds / 60,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
-                     'presenters': list(map(self._get_person_data,
-                                            sorted((p for p in contribution.person_links if p.is_speaker),
-                                                   key=lambda x: (x.author_type != AuthorType.primary,
-                                                                  x.author_type != AuthorType.secondary,
-                                                                  x.display_order_key)))),
+                     'personLinks': [self._get_person_data(x) for x in contribution.person_links],
                      'code': contribution.code,
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
@@ -231,8 +227,7 @@ class TimetableSerializer:
         items = obj.attached_items
         data['files'] = list(map(serialize_attachment, items.get('files', [])))
         data['folders'] = list(map(serialize_folder, items.get('folders', [])))
-        if not data['files'] and not data['folders']:
-            data['files'] = None
+
         return data
 
     def _get_color_data(self, obj):
