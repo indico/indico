@@ -263,15 +263,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         startDt = dt;
       }
 
-      const newEndDt = startDt.add(GRID_SIZE_MINUTES, 'minutes');
-      const draftDuration =
-        newEndDt > eventEndDt ? newEndDt.diff(eventEndDt, 'minutes') : GRID_SIZE_MINUTES;
-
       setIsDragging(true);
       dispatch(
         actions.setDraftEntry({
           startDt,
-          duration: draftDuration, // TODO: (Ajob) Replace with default duration
+          duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
           y,
         })
       );
@@ -282,17 +278,22 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
-      const duration = Math.max(
+      let draftDuration = Math.max(
         Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
         GRID_SIZE_MINUTES // TODO: Replace with default duration
       );
 
-      if (draftEntry.duration === duration) {
+      const newEndDt = moment(draftEntry.startDt).add(draftDuration, 'minutes');
+      if (newEndDt > eventEndDt) {
+        draftDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
+      }
+
+      if (draftEntry.duration === draftDuration) {
         return;
       }
 
-      dispatch(actions.setDraftEntry({...draftEntry, duration}));
+      dispatch(actions.setDraftEntry({...draftEntry, duration: draftDuration}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
