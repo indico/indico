@@ -1,5 +1,4 @@
 {% extends 'events/registration/management/_regform_base.html' %}
-{% from 'events/registration/management/_invitation_list.html' import render_invitation_list %}
 
 {% block back_button_url -%}
     {{ url_for('.manage_regform', regform) }}
@@ -57,20 +56,19 @@
                     </div>
                     {% trans %}Send email reminders to users who have not yet registered.{% endtrans %}
                 </div>
-                <div class="toolbar" id="email-pending-invitations-container"></div>
+                <div class="toolbar" id="email-all-pending-invitations-container"></div>
             </div>
         </div>
     {% endif %}
 
-    <div id="invitation-list">
-        {{ render_invitation_list(invitations) }}
-    </div>
+    <div id="invitation-list-container"></div>
 
     <script>
         setupInvitationPage({
             eventId: {{ event.id | tojson }},
             regformId: {{ regform.id | tojson }},
-            hasPendingInvitations: {{ has_pending_invitations | tojson }}
+            hasPendingInvitations: {{ has_pending_invitations | tojson }},
+            invitations: {{ invitations_list | tojson }},
         });
     </script>
 {% endblock %}
