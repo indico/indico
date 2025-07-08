@@ -760,6 +760,8 @@ Security
     Note that this setting is only effective if event creation is properly
     restricted since otherwise any user can just create an event where they
     then have management permissions and thus the ability to search for users.
+    This also means that unlisted events must be disabled or restricted to
+    trusted users.
 
     Default: ``True``
 

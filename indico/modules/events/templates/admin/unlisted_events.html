@@ -6,7 +6,37 @@
 {% endblock %}
 
 {% block description %}
-    {% trans %}Unlisted events enable users to set up and customize events before publishing them into a category.{% endtrans %}
+    <p>
+        {% trans %}
+            Unlisted events enable users to set up and customize events before publishing them into a category.
+        {% endtrans %}
+    </p>
+
+    {% if not indico_config.ALLOW_PUBLIC_USER_SEARCH and unrestricted %}
+        <div class="ui icon orange message">
+            <i class="warning sign orange icon"></i>
+            <div class="content">
+                <div class="header">{% trans %}Potential misconfiguration{% endtrans %}</div>
+                <p>
+                    {%- set link -%}
+                        <a href="https://docs.getindico.io/en/stable/config/settings/#ALLOW_PUBLIC_USER_SEARCH">
+                    {%- endset -%}
+                    {%- set endlink %}</a>{% endset -%}
+                    {% trans -%}
+                        Your Indico system config {{ link }}disallows user search{{ endlink }} for regular users,
+                        but unlisted events are enabled without restricting who can create them.
+                    {%- endtrans %}
+                </p>
+                <p>
+                    {% trans -%}
+                        Unless Indico account creation is restricted/moderated, this means that the configured search
+                        restriction is not effective, as anyone can become an event manager by simply creating an
+                        unlisted event.
+                    {%- endtrans %}
+                </p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
