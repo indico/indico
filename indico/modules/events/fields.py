@@ -145,7 +145,7 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def validate_email_url(self):
-        return url_for('events.check_email', self.object) if self.object else None
+        return url_for('events.check_email', self.object) if self.object and self.search_token else None
 
     @property
     def extra_params(self):
