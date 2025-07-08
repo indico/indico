@@ -10,7 +10,6 @@ import random
 from io import BytesIO
 
 from flask import flash, redirect, request, session
-from marshmallow import EXCLUDE
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
 from webargs import fields
@@ -44,7 +43,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import ModelField, PrincipalList, not_empty
 from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin, RolesAPIMixin
 from indico.util.string import crc32, natural_sort_key
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -139,18 +138,15 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
         move_requests = self.category.event_move_requests.filter(EventMoveRequest.state == MoveRequestState.pending)
         return EventMoveRequestSchema(many=True).jsonify(move_requests)
 
-    @use_kwargs({
+    @use_rh_kwargs({
         'accept': fields.Bool(required=True),
-        'reason': fields.String(load_default=None)
-    })
-    def _process_POST(self, accept, reason):
-        move_requests = parser.parse({
-            'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
-        }, unknown=EXCLUDE)['requests']
-
-        for rq in move_requests:
+        'reason': fields.String(load_default=None),
+        'requests': EventRequestList(required=True, validate=not_empty),
+    }, rh_context=('category',))
+    def _process_POST(self, accept, reason, requests):
+        for rq in requests:
             update_event_move_request(rq, accept, reason)
-        notify_move_request_closure(move_requests, accept, reason)
+        notify_move_request_closure(requests, accept, reason)
 
         return '', 204
 
