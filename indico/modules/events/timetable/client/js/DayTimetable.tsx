@@ -394,7 +394,7 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
     <div styleName="time-gutter">
       <div style={{height: 10}} />
       {Array.from({length: maxHour - minHour + 1}, (_, i) => (
-        <TimeSlot key={i} height={oneHour} time={`${minHour + i}:00`} />
+        <TimeSlot key={i} height={oneHour} time={`${(minHour + i) % 24}:00`} />
       ))}
     </div>
   );
