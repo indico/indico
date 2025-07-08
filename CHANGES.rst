@@ -38,6 +38,10 @@ Improvements
   tags when cloning registrations (:issue:`6820`, :pr:`6964`)
 - Allow restricting reminder recipients by registration form and tags (:pr:`6877`,
   thanks :user:`tomako, unconventionaldotdev`)
+- Searching existing Indico users can be restricted to managers by setting
+  :data:`ALLOW_PUBLIC_USER_SEARCH` to ``False``. This also limits the verbosity of email
+  status checks while registering for events and disallows registering on behalf
+  of another Indico user (:pr:`6960`)
 
 Bugfixes
 ^^^^^^^^
