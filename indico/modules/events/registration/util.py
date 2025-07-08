@@ -276,6 +276,8 @@ def check_registration_email(regform, email, registration=None, management=False
         as_list=True)
     if extra_checks:
         return min(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))
+    if user and user != session.user and not management and not config.ALLOW_PUBLIC_USER_SEARCH:
+        return {'status': 'error', 'conflict': 'email-other-user-restricted'}
     if registration is not None:
         if email_registration and email_registration != registration:
             return {'status': 'error', 'conflict': 'email-already-registered'}
