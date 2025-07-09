@@ -52,11 +52,14 @@ main.main {
 
               & > div.page-content {
                 flex-grow: 1;
+                display: flex;
+                flex-direction: column;
                 overflow: hidden;
 
                 & > #timetable-container {
                   height: 100%;
                   overflow-y: auto;
+                  flex-grow: 0;
 
                   & > div {
                     height: 100%;
