@@ -51,8 +51,8 @@ class ReminderForm(IndicoForm):
                                                    collection_class=set,
                                                    modify_object_list=_sort_fn,
                                                    get_label=attrgetter('title'),
-                                                   description=_('Only send the reminder to participants registered in '
-                                                                 'the selected forms.'))
+                                                   description=_('Select registration forms here to restrict sending '
+                                                                 'the reminder to the selected ones.'))
     tags = IndicoQuerySelectMultipleTagField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
                                              description=_('Limit reminders to participants with these tags.'))
     all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
