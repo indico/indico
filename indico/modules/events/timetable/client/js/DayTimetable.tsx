@@ -221,7 +221,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function canInteractWithTimeline(y, offsets = [0, 0]) {
-    const pixelLimits = limits.map(l => (calendarRef.current.clientHeight / 100) * l);
+    const pixelLimits = limits.map(lim => (calendarRef.current.clientHeight / 100) * lim);
     return y > pixelLimits[0] + offsets[0] && y < pixelLimits[1] - offsets[1];
   }
 
@@ -324,7 +324,15 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
-  const limitsGradient = `linear-gradient(180deg,rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) ${limits[0]}%, transparent ${limits[0]}%, transparent ${limits[1]}%, rgba(0,0,0,0.05) ${limits[1]}%, rgba(0,0,0,0.05) 100%)`;
+  const limitsGradientArg = [
+    'rgba(0, 0, 0, 0.05) 0%',
+    `rgba(0, 0, 0, 0.05) ${limits[0]}%`,
+    `transparent ${limits[0]}%`,
+    `transparent ${limits[1]}%`,
+    `rgba(0, 0, 0, 0.05) ${limits[1]}%`,
+    'rgba(0, 0, 0, 0.05) 100%',
+  ].join(', ');
+  const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
