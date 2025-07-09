@@ -18,8 +18,6 @@ import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
 
-const SCROLL_STEP = 3;
-
 const displayModes = [
   {
     name: 'compact',
@@ -62,20 +60,6 @@ export default function Toolbar({
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
-  console.log('numdays', numDays)
-
-  const handleResize = useCallback(() => {
-    dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
-  }, [currentDayIdx, dispatch]);
-
-  useEffect(() => {
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [handleResize]);
-
   const getDateFromIdx = idx => eventStart.clone().add(idx, 'days');
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
@@ -90,6 +74,12 @@ export default function Toolbar({
       onNavigate(getDateFromIdx(newOffset + maxDays));
     }
     dispatch(actions.scrollNavbar(newOffset));
+  };
+
+  const navigateToDayNumber = (num: number) => _ => {
+    console.log('the offset', offset);
+    onNavigate(getDateFromIdx(num));
+    dispatch(actions.scrollNavbar(num));
   };
 
   return (
@@ -142,33 +132,30 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
-        {numDays > maxDays && (
-          <>
-            <Menu.Item
-              onClick={makeScrollHandler(0, 0)}
-              onMouseEnter={makeScrollHandler(0, 0, true)}
-              disabled={offset === 0}
-              title={Translate.string('Go to start')}
-              icon="angle double left"
-              styleName="action"
-            />
-            <Menu.Item
-              onClick={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0))}
-              onMouseEnter={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0), null, true)}
-              disabled={offset === 0}
-              title={Translate.string('Scroll left')}
-              icon="angle left"
-              styleName="action"
-            />
-          </>
-        )}
+        <Menu.Item
+          onClick={navigateToDayNumber(0)}
+          disabled={offset === 0}
+          title={Translate.string('Go to start')}
+          icon="angle double left"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={navigateToDayNumber(Math.max(offset - 1, 0))}
+          disabled={offset === 0}
+          title={Translate.string('Scroll left')}
+          icon="angle left"
+          styleName="action"
+        />
+        {/* TODO: (Ajob) Remove this temporary menu item */}
+        <Menu.Item fitted>Days: {numDays}</Menu.Item>
         <Menu.Item fitted styleName="days">
           <div styleName="gradient" />
-          {[...Array(Math.min(numDays, numDays)).keys()].map(n => {
+          {[...Array(numDays).keys()].map(n => {
             const d = getDateFromIdx(n + offset);
             return (
               <Menu.Item
                 key={n}
+                styleName="day"
                 content={d.format('ddd DD/MM')}
                 onClick={() => onNavigate(d)}
                 active={n + offset === currentDayIdx}
@@ -177,32 +164,23 @@ export default function Toolbar({
           })}
           <div styleName="gradient" />
         </Menu.Item>
-        {numDays > maxDays && (
-          <>
-            <Menu.Item
-              onClick={makeScrollHandler(Math.min(offset + SCROLL_STEP, numDays - maxDays))}
-              onMouseEnter={makeScrollHandler(
-                Math.min(offset + SCROLL_STEP, numDays - maxDays),
-                null,
-                true
-              )}
-              disabled={numDays - offset <= maxDays}
-              title={Translate.string('Scroll right')}
-              icon="angle right"
-              position="right"
-              styleName="action"
-            />
-            <Menu.Item
-              onClick={makeScrollHandler(numDays - maxDays, numDays)}
-              onMouseEnter={makeScrollHandler(numDays - maxDays, numDays, true)}
-              disabled={numDays - offset <= maxDays}
-              title={Translate.string('Go to end')}
-              icon="angle double right"
-              styleName="action"
-            />
-          </>
-        )}
+        <Menu.Item
+          onClick={navigateToDayNumber(Math.min(offset + 1, maxDays))}
+          disabled={numDays - offset <= maxDays}
+          title={Translate.string('Scroll right')}
+          icon="angle right"
+          position="right"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={navigateToDayNumber(numDays)}
+          disabled={numDays - offset <= maxDays}
+          title={Translate.string('Go to end')}
+          icon="angle double right"
+          styleName="action"
+        />
         <Dropdown
+          // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="columns"
           styleName="action"
           className={numDays <= maxDays ? 'right' : undefined}
