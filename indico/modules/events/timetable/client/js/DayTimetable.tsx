@@ -28,6 +28,7 @@ interface DayTimetableProps {
   minHour: number;
   maxHour: number;
   entries: TopLevelEntry[];
+  scrollPosition?: number;
 }
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
@@ -72,11 +73,19 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
-export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimetableProps) {
+export function DayTimetable({
+  dt,
+  eventId,
+  minHour,
+  maxHour,
+  entries,
+  scrollPosition = 0,
+}: DayTimetableProps) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
 
@@ -308,6 +317,12 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     };
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
+  useEffect(() => {
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTop = scrollPosition;
+    }
+  }, [scrollPosition, entries]);
+
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
   const limitsGradientArg = [
     'rgba(0, 0, 0, 0.05) 0%',
@@ -322,7 +337,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
       <UnscheduledContributions dt={dt} />
-      <div className="wrapper">
+      <div ref={wrapperRef} className="wrapper">
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>

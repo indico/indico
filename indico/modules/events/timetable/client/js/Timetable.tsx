@@ -20,6 +20,7 @@ import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
+import { minutesToPixels } from './utils';
 
 export default function Timetable() {
   const entries = useSelector(selectors.getDayEntries);
@@ -34,20 +35,18 @@ export default function Timetable() {
 
   const useWeekView = false;
 
-  const minHour =
-    showAllTimeslots && !isSingleDayEvent
-      ? 0
-      : Math.max(
-          Math.min(
-            eventStartDt.hour(),
-            ...(useWeekView
-              ? Object.values(entries)
-                  .flat()
-                  .map(e => e.startDt.hour())
-              : currentDateEntries.map(e => e.startDt.hour()))
-          ) - 1,
-          0
-        );
+  const minScrollHour = Math.max(
+    Math.min(
+      eventStartDt.hour(),
+      ...(useWeekView
+        ? Object.values(entries)
+            .flat()
+            .map(e => e.startDt.hour())
+        : currentDateEntries.map(e => e.startDt.hour()))
+    ) - 1,
+    0
+  );
+  const minHour = showAllTimeslots && !isSingleDayEvent ? 0 : minScrollHour;
   const maxHour =
     showAllTimeslots && !isSingleDayEvent
       ? 24
@@ -78,6 +77,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
+            scrollPosition={minutesToPixels(minScrollHour * 60)}
           />
         )}
         <ContributionEntryForm />
