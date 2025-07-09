@@ -13,7 +13,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getDateKey} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
@@ -32,19 +32,20 @@ export default function Timetable() {
 
   const useWeekView = false;
 
-  const minHour = !isSingleDayEvent
-    ? 0
-    : Math.max(
-        Math.min(
-          eventStartDt.hour(),
-          ...(useWeekView
-            ? Object.values(entries)
-                .flat()
-                .map(e => e.startDt.hour())
-            : currentDateEntries.map(e => e.startDt.hour()))
-        ) - 1,
-        0
-      );
+  const minHourWithContent = Math.max(
+    Math.min(
+      eventStartDt.hour(),
+      ...(useWeekView
+        ? Object.values(entries)
+            .flat()
+            .map(e => e.startDt.hour())
+        : currentDateEntries.map(e => e.startDt.hour()))
+    ) - 1,
+    0
+  );
+
+  const minScrollHour = !isSingleDayEvent ? minHourWithContent : 0;
+  const minHour = !isSingleDayEvent ? 0 : minHourWithContent;
   const maxHour = !isSingleDayEvent
     ? 24
     : Math.max(
@@ -80,6 +81,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
+            scrollPosition={minutesToPixels(minScrollHour * 60)}
           />
         )}
       </div>
