@@ -34,6 +34,8 @@ Improvements
 - Allow adding/removing favorite users from search results (:pr:`6950`)
 - Make text overflow behavior in badge designer configurable (:pr:`6944`, thanks
   :user:`SegiNyn`)
+- Clone registration tags when cloning registration forms and preserve registration
+  tags when cloning registrations (:pr:`6964`)
 
 Bugfixes
 ^^^^^^^^
