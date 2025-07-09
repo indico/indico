@@ -68,7 +68,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- New time picker with improved accessibility and usability (thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
