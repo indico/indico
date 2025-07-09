@@ -45,6 +45,7 @@ export default function Toolbar({
 }) {
   const dispatch = useDispatch();
   const ref = useRef(null);
+  const daysBarRef = useRef<HTMLDivElement | null>(null);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
@@ -93,7 +94,7 @@ export default function Toolbar({
           onDismiss={() => dispatch(actions.dismissError())}
         />
       )}
-      <Menu tabular>
+      <Menu tabular ref={daysBarRef}>
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
           disabled={!showUnscheduled && numUnscheduled === 0}
@@ -162,8 +163,8 @@ export default function Toolbar({
           <div styleName="gradient" />
         </Menu.Item>
         <Menu.Item
-          onClick={navigateToDayNumber(Math.min(offset + 1, maxDays))}
-          disabled={numDays - offset <= maxDays}
+          onClick={navigateToDayNumber(Math.min(offset + 1, numDays))}
+          disabled={offset >= numDays}
           title={Translate.string('Scroll right')}
           icon="angle right"
           position="right"
@@ -171,7 +172,7 @@ export default function Toolbar({
         />
         <Menu.Item
           onClick={navigateToDayNumber(numDays)}
-          disabled={numDays - offset <= maxDays}
+          disabled={numDays - offset <= numDays}
           title={Translate.string('Go to end')}
           icon="angle double right"
           styleName="action"
@@ -180,7 +181,7 @@ export default function Toolbar({
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="columns"
           styleName="action"
-          className={numDays <= maxDays ? 'right' : undefined}
+          className="right"
           direction="left"
           title={Translate.string('Display mode')}
           item
