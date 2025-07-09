@@ -58,6 +58,7 @@ def _get_reminder_cloner(sender, **kwargs):
 class ReminderCloner(EventCloner):
     name = 'reminders'
     friendly_name = _('Reminders')
+    uses = {'registration_tags', 'registration_forms'}
     is_default = True
 
     @property
@@ -72,9 +73,17 @@ class ReminderCloner(EventCloner):
         return event.reminders.filter(db.m.EventReminder.is_relative)
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
+        regform_map = tag_map = None
+        if 'registration_forms' in cloners:
+            regform_map = shared_data['registration_forms']['form_map']
+        if 'registration_tags' in cloners:
+            tag_map = shared_data['registration_tags']['tag_map']
         attrs = get_attrs_to_clone(db.m.EventReminder, add={'creator_id'},
                                    skip={'created_dt', 'scheduled_dt', 'is_sent'})
         for old_reminder in self._find_reminders(self.old_event):
+            if (old_reminder.forms and regform_map is None) or (old_reminder.tags and tag_map is None):
+                logger.info('Not cloning reminder %s linked to registration forms/tags', old_reminder)
+                continue
             scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.
             # We ignore the time on purpose so cloning an event shortly before will
@@ -84,6 +93,8 @@ class ReminderCloner(EventCloner):
                 continue
             reminder = db.m.EventReminder(**{attr: getattr(old_reminder, attr) for attr in attrs})
             reminder.scheduled_dt = scheduled_dt
+            reminder.forms = {regform_map[x] for x in old_reminder.forms}
+            reminder.tags = {tag_map[x] for x in old_reminder.tags}
             new_event.reminders.append(reminder)
             db.session.flush()
             logger.info('Added reminder during event cloning: %s', reminder)
