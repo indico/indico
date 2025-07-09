@@ -23,12 +23,16 @@
       display: flex;
       flex-shrink: 1;
       width: 100%;
-      padding: 0 0;
       overflow-x: auto;
+
+      .day {
+        // Accounts for scrollbar height
+        padding-bottom: 18px;
+      }
 
       .gradient {
         pointer-events: none;
-        width: 20px;
+        width: 10px;
         height: 100%;
         top: 0;
         bottom: 0;
