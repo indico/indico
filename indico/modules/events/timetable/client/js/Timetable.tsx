@@ -46,20 +46,21 @@ export default function Timetable() {
 
   const minScrollHour = !isSingleDayEvent ? minHourWithContent : 0;
   const minHour = !isSingleDayEvent ? 0 : minHourWithContent;
-  const maxHour = !isSingleDayEvent
-    ? 24
-    : Math.max(
-        eventEndDt.hour(),
-        ...(useWeekView
-          ? Object.values(entries)
-              .flat()
-              .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e =>
-              moment(e.startDt)
-                .add(e.duration, 'minutes')
-                .hour()
-            ))
-      );
+  const maxHour =
+    !isSingleDayEvent
+      ? 24
+      : Math.max(
+          eventEndDt.hour(),
+          ...(useWeekView
+            ? Object.values(entries)
+                .flat()
+                .map(e => e.startDt.add(e.duration, 'minutes').hour())
+            : currentDateEntries.map(e =>
+                moment(e.startDt)
+                  .add(e.duration, 'minutes')
+                  .hour()
+              ))
+        );
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
