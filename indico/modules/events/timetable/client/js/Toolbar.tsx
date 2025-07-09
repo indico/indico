@@ -144,8 +144,6 @@ export default function Toolbar({
           icon="angle left"
           styleName="action"
         />
-        {/* TODO: (Ajob) Remove this temporary menu item */}
-        <Menu.Item fitted>Days: {numDays}</Menu.Item>
         <Menu.Item fitted styleName="days">
           <div styleName="gradient" />
           {[...Array(numDays).keys()].map(n => {
@@ -153,7 +151,6 @@ export default function Toolbar({
             return (
               <Menu.Item
                 key={n}
-                styleName="day"
                 content={d.format('ddd DD/MM')}
                 onClick={() => onNavigate(d)}
                 active={n + offset === currentDayIdx}
