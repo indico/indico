@@ -15,12 +15,12 @@ import {DayTimetable} from './DayTimetable';
 import ContributionEntryForm from './forms/ContributionEntryForm';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
-import { minutesToPixels } from './utils';
 
 export default function Timetable() {
   const entries = useSelector(selectors.getDayEntries);
@@ -35,7 +35,7 @@ export default function Timetable() {
 
   const useWeekView = false;
 
-  const minScrollHour = Math.max(
+  const minHourWithContent = Math.max(
     Math.min(
       eventStartDt.hour(),
       ...(useWeekView
@@ -46,7 +46,9 @@ export default function Timetable() {
     ) - 1,
     0
   );
-  const minHour = showAllTimeslots && !isSingleDayEvent ? 0 : minScrollHour;
+
+  const minScrollHour = showAllTimeslots && !isSingleDayEvent ? minHourWithContent : 0;
+  const minHour = showAllTimeslots && !isSingleDayEvent ? 0 : minHourWithContent;
   const maxHour =
     showAllTimeslots && !isSingleDayEvent
       ? 24
