@@ -17,18 +17,23 @@
 
   :global(.ui.menu) {
     margin-bottom: 0;
+    height: 46px;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
 
     .days {
       position: relative;
-      display: flex;
       flex-shrink: 1;
       width: 100%;
       overflow-x: auto;
+      height: 46px;
+      overflow-y: hidden;
+      box-sizing: content-box;
 
-      .day {
-        // Accounts for scrollbar height
-        padding-bottom: 18px;
-      }
+      // This padding in combination with fixed height
+      // and overflow-y hidden above,it hides the scrollbar
+      padding: 8px 0;
 
       .gradient {
         pointer-events: none;
