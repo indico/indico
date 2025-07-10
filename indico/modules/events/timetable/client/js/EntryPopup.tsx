@@ -20,7 +20,6 @@ import {
   DropdownItem,
   DropdownMenu,
   Icon,
-  List,
   Popup,
   SemanticICONS,
 } from 'semantic-ui-react';
@@ -31,7 +30,6 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
-import {PersonLinkRole} from './preprocess';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
@@ -52,9 +50,7 @@ function ColoredDot({color}: {color: string}) {
 
 function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactNode}) {
   return (
-    <Card.Description
-      style={{marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 5, textAlign: 'left'}}
-    >
+    <Card.Description style={{marginTop: 10, display: 'flex', alignItems: 'center', gap: 5}}>
       <Icon name={icon} size="large" />
       {children}
     </Card.Description>
@@ -69,25 +65,14 @@ function TimetablePopupContent({
   onClose: () => void;
 }) {
   const dispatch = useDispatch();
-  const {
-    type,
-    title,
-    locationData: {address, venueName, room},
-    attachments: {files = [], folders = []},
-    personLinks,
-  } = entry;
+
+  const {type, title} = entry;
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   let draftEntry = {...entry, duration: entry.duration};
   const eventId = useSelector(selectors.getEventId);
-  const locationArray = Object.values([address, venueName, room]).filter(Boolean);
-  const presenters = personLinks
-    .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
-    .map(p => p.name)
-    .join(', ');
-  const fileCount = files.length + folders.length;
 
   const onEdit = async (e: MouseEvent) => {
     if (!draftEntry.id) {
@@ -154,27 +139,11 @@ function TimetablePopupContent({
         </Card.Header>
         {/* TODO: (Ajob) Replace dummy data below */}
         <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
-        {locationArray.length ? (
-          <CardItem icon="map marker alternate">
-            <List style={{textAlign: 'left', marginTop: 0}}>
-              {locationArray.map((v: string, i) => (
-                <List.Item color="red" key={i}>
-                  {v}
-                </List.Item>
-              ))}
-            </List>
-          </CardItem>
-        ) : null}
+        <CardItem icon="map marker alternate">Room 101</CardItem>
         {type !== EntryType.Break && (
           <>
-            <CardItem icon="microphone">{presenters}</CardItem>
-            {fileCount ? (
-              <CardItem icon="file outline">
-                {Translate.string('{fileCount} files', {
-                  fileCount,
-                })}
-              </CardItem>
-            ) : null}
+            <CardItem icon="microphone">John Doe</CardItem>
+            <CardItem icon="file powerpoint outline">slides.pptx</CardItem>
           </>
         )}
       </Card.Content>
