@@ -120,13 +120,19 @@ export default {
           entry: {startDt},
         } = action;
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
-
         const dayKey = moment(startDt).format('YYYYMMDD');
         const dayEntries = newEntries[dayKey];
-
         const editedIndex = dayEntries.findIndex(e => {
           return e.id === entry.id && e.type === entryType;
         });
+
+        const newDayKey = moment(startDt).format('YYYYMMDD');
+        console.log('newDayKey', newDayKey, 'dayKey', dayKey);
+        if (dayKey !== newDayKey) {
+          console.log('Changing day of entry WATCH OUT');
+        }
+        console.log(newEntries[dayKey][editedIndex]);
+        console.log(entry);
 
         newEntries[dayKey][editedIndex] = entry;
 
