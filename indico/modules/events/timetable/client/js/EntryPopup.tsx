@@ -57,7 +57,7 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
   );
 }
 
-function TimetablePopupContent({
+function EntryPopupContent({
   entry,
   onClose,
 }: {
@@ -151,7 +151,7 @@ function TimetablePopupContent({
   );
 }
 
-export function TimetablePopup({
+export function EntryPopup({
   trigger,
   onClose,
   entry,
@@ -170,7 +170,7 @@ export function TimetablePopup({
       basic
       hideOnScroll
     >
-      <TimetablePopupContent entry={entry} onClose={onClose} />
+      <EntryPopupContent entry={entry} onClose={onClose} />
     </Popup>
   );
 }

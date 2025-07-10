@@ -80,10 +80,11 @@ export function preprocessTimetableEntries(
         location: venueName = '',
         presenters = [],
         conveners = [],
-        board_number: boardNumber = '',
+        boardNumber = '',
         code,
         title,
         id,
+        uniqueId,
       } = entry as any;
 
       // TODO: (Ajob) Currently not passing roles as they do not exist
@@ -103,6 +104,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
+        uniqueId,
         title,
         description,
         startDt: dateToMoment(entry.startDate),

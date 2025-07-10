@@ -7,7 +7,6 @@
 
 from collections import defaultdict
 from hashlib import md5
-from itertools import chain
 
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
@@ -50,7 +49,7 @@ class TimetableSerializer:
             if not entry.can_view(self.user):
                 continue
             data = self.serialize_timetable_entry(entry, load_children=False)
-            key = self._get_entry_key(entry)
+            key = self._get_unique_key(entry)
             if entry.parent:
                 parent_code = f's{entry.parent_id}'
                 timetable[date_str][parent_code]['entries'][key] = data
@@ -60,33 +59,6 @@ class TimetableSerializer:
                     # If a session block lasts into another day we need to add it to that day, too
                     timetable[entry.end_dt.astimezone(tzinfo).date().strftime('%Y%m%d')][key] = data
                 timetable[date_str][key] = data
-        if strip_empty_days:
-            timetable = self._strip_empty_days(timetable)
-        return timetable
-
-    def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
-        event_tz = self.event.tzinfo
-        timetable = {}
-        if session_.blocks:
-            start_dt = min(chain((b.start_dt for b in session_.blocks), (self.event.start_dt,))).astimezone(event_tz)
-            end_dt = max(chain((b.end_dt for b in session_.blocks), (self.event.end_dt,))).astimezone(event_tz)
-        else:
-            start_dt = self.event.start_dt_local
-            end_dt = self.event.end_dt_local
-
-        for day in iterdays(start_dt, end_dt):
-            timetable[day.strftime('%Y%m%d')] = {}
-        for block in session_.blocks:
-            block_entry = block.timetable_entry
-            if not block_entry:
-                continue
-            date_key = block_entry.start_dt.astimezone(event_tz).strftime('%Y%m%d')
-            entries = block_entry.children if without_blocks else [block_entry]
-            for entry in entries:
-                if not entry.can_view(self.user):
-                    continue
-                entry_key = self._get_entry_key(entry)
-                timetable[date_key][entry_key] = self.serialize_timetable_entry(entry, load_children=True)
         if strip_empty_days:
             timetable = self._strip_empty_days(timetable)
         return timetable
@@ -117,7 +89,7 @@ class TimetableSerializer:
         if not load_children:
             entries = defaultdict(dict)
         else:
-            entries = {self._get_entry_key(x): self.serialize_timetable_entry(x) for x in entry.children}
+            entries = {self._get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
@@ -172,7 +144,7 @@ class TimetableSerializer:
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
                      'references': list(map(SerializerBase.serialize_reference, contribution.references)),
-                     'board_number': contribution.board_number})
+                     'boardNumber': contribution.board_number})
         if self.api:
             data['authors'] = list(map(self._get_person_data,
                                        sorted((p for p in contribution.person_links if not p.is_speaker),
@@ -256,7 +228,7 @@ class TimetableSerializer:
     def _get_entry_data(self, entry):
         data = {}
         data.update(self._get_date_data(entry))
-        data['id'] = self._get_entry_key(entry)
+        data['id'] = self._get_unique_key(entry)
         data['uniqueId'] = data['id']
         data['conferenceId'] = entry.event_id
         if self.management:
@@ -265,13 +237,13 @@ class TimetableSerializer:
             data['scheduleEntryId'] = entry.id
         return data
 
-    def _get_entry_key(self, entry):
+    def _get_unique_key(self, entry):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return f's{entry.id}'
+            return f's{entry.session_block.id}'
         elif entry.type == TimetableEntryType.CONTRIBUTION:
-            return f'c{entry.id}'
+            return f'c{entry.contribution.id}'
         elif entry.type == TimetableEntryType.BREAK:
-            return f'b{entry.id}'
+            return f'b{entry.break_.id}'
         else:
             raise ValueError
 
