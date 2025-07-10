@@ -13,6 +13,7 @@ import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create'
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import _ from 'lodash';
+import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
@@ -322,6 +323,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       onClose={onClose}
       onSubmit={handleSubmit}
       initialValues={initialValues}
+      initialValuesEqual={_.isEqual}
       disabledUntilChange={false}
       keepDirtyOnReinitialize
       size="small"

@@ -99,9 +99,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       return;
     }
 
-    e.stopPropagation();
-    onClose();
-
     const editURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: objId}),
       [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: objId}),
