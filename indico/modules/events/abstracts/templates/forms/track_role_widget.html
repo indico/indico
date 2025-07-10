@@ -45,6 +45,7 @@
             eventId: {{ field.event.id }},
             eventRoles: {{ field.event_roles|tojson }},
             categoryRoles: {{ field.category_roles|tojson }},
+            searchToken: {{ field.search_token | tojson }},
         });
     </script>
 {% endblock %}

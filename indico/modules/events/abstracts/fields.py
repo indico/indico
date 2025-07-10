@@ -27,6 +27,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
+from indico.web.forms.fields.principals import SearchTokenMixin
 from indico.web.forms.widgets import DropdownWidget, JinjaWidget
 
 
@@ -195,7 +196,7 @@ class AbstractField(QuerySelectField):
         return {'excluded_abstract_id': list(self.excluded_abstract_ids)}
 
 
-class TrackRoleField(JSONField):
+class TrackRoleField(SearchTokenMixin, JSONField):
     """A field to assign track roles to principals."""
 
     CAN_POPULATE = True
