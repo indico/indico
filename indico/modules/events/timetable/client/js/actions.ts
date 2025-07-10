@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {indicoAxios} from 'indico/utils/axios';
+import {ajaxAction} from 'indico/utils/redux';
+
 import {
   TopLevelEntry,
   BlockEntry,
@@ -157,12 +160,20 @@ export function deselectEntry(): DeselectEntryAction {
   return {type: DESELECT_ENTRY};
 }
 
-export function deleteBreak(entry) {
-  return {type: DELETE_BREAK, entry};
+export function deleteBreak(entryURL, entry): DeleteBreakAction {
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: DELETE_BREAK,
+    entryURL,
+    entry,
+  }));
 }
 
-export function deleteBlock(id: number) {
-  return {type: DELETE_BLOCK, id};
+export function deleteBlock(entryURL, entry): DeleteBlockAction {
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: DELETE_BLOCK,
+    entryURL,
+    entry,
+  }));
 }
 
 export function dragUnscheduledContribs(contribIds) {
@@ -185,8 +196,12 @@ export function scheduleEntry(
   return {type: SCHEDULE_ENTRY, date, entries, unscheduled};
 }
 
-export function unscheduleEntry(entry: ContribEntry | ChildContribEntry): UnscheduleEntryAction {
-  return {type: UNSCHEDULE_ENTRY, entry};
+export function unscheduleEntry(entryURL, entry: ContribEntry): UnscheduleEntryAction {
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: UNSCHEDULE_ENTRY,
+    entryURL,
+    entry,
+  }));
 }
 
 export function changeColor(sessionId, color) {
