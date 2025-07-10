@@ -351,7 +351,7 @@ def create_booking_for_event(room_id, event):
 
 def get_active_bookings(limit, start_dt, end_dt=None, last_reservation_id=None, **filters):
     if end_dt:
-        criteria = [db_dates_overlap(ReservationOccurrence, 'start_dt', start_dt, 'end_dt', end_dt, inclusive=True)]
+        criteria = [(ReservationOccurrence.start_dt > start_dt) & (ReservationOccurrence.end_dt <= end_dt)]
     else:
         criteria = [ReservationOccurrence.start_dt > start_dt]
     if last_reservation_id is not None:

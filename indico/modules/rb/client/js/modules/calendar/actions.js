@@ -136,10 +136,10 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     if (Object.keys(data).length) {
       const lastDt = Object.keys(data).reverse()[0];
       params.start_dt = _.maxBy(data[lastDt], rv =>
-        moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
+        moment(rv.startDt, 'YYYY-MM-DDTHH:mm:ss').unix()
       ).startDt;
       params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
-      if (!state.linking?.showNonOverlapping) {
+      if (state.linking) {
         params.end_dt = moment(state.linking.endDt).toISOString();
       }
     } else if (state.linking?.type && state.linking?.showNonOverlapping) {
