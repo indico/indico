@@ -123,12 +123,10 @@ function TimetablePopupContent({
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: draftEntry.id}),
     }[draftEntry.type];
 
-    await indicoAxios.delete(deleteURL);
-
     const deleteHandlers = {
-      [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry)),
-      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry.id)),
-      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(draftEntry as ContribEntry)),
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(deleteURL, draftEntry)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(deleteURL, draftEntry.id)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(deleteURL, draftEntry as ContribEntry)),
     };
 
     const deleteHandler = deleteHandlers[draftEntry.type];
@@ -137,7 +135,7 @@ function TimetablePopupContent({
       throw new Error('Invalid entry type');
     }
     try {
-      await deleteHandler();
+      deleteHandler();
       onClose();
     } catch (err) {
       return handleAxiosError(err);
