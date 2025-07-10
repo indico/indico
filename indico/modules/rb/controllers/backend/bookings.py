@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import uuid
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 import dateutil
 from flask import jsonify, request, session
@@ -112,6 +112,36 @@ class RHCalendar(RHRoomBookingBase):
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
                                      include_inactive=show_inactive, text=text)
         return jsonify(list(serialize_availability(calendar).values()))
+
+
+class RHLinkableBookings(RHRoomBookingBase):
+    @use_kwargs({
+        'earlier': fields.Int(validate=validate.Range(min=0), load_default=0),
+        'later': fields.Int(validate=validate.Range(min=0), load_default=0),
+        'text': fields.String(load_default=None),
+        'link_type': fields.Enum(LinkType, required=True),
+        'link_id': fields.Int(required=True),
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), load_default=None),
+    })
+    def _process(self, link_type, link_id, room_ids, text, earlier, later):
+        obj = get_linked_object(link_type, link_id)
+        if obj is None or not obj.event.can_manage(session.user):
+            raise Forbidden
+        # get the day start of the object's start dt, and the first day after the event
+        start_dt = utc_to_server(obj.start_dt).replace(hour=0, tzinfo=None) - timedelta(days=earlier)
+        end_dt = utc_to_server(obj.end_dt).replace(hour=0, tzinfo=None) + timedelta(days=(1 + later))
+        bookings, rows_left = get_active_bookings(limit=None,
+                                                  start_dt=start_dt,
+                                                  end_dt=end_dt,
+                                                  room_ids=room_ids,
+                                                  booked_for_user=session.user,
+                                                  text=text)
+        # XXX We most likely no longer need `reservation_occurrences_schema_with_ownership` since this is now
+        # always filtered server-side
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema_with_ownership),
+                       rows_left=rows_left)
 
 
 class RHActiveBookings(RHRoomBookingBase):

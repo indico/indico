@@ -66,6 +66,7 @@ _bp.add_url_rule('/api/timeline', 'timeline', bookings.RHTimeline, methods=('GET
 # Bookings
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking, methods=('POST',))
 _bp.add_url_rule('/api/bookings/active', 'active_bookings', bookings.RHActiveBookings, methods=('POST',))
+_bp.add_url_rule('/api/bookings/linkable', 'linkable_bookings', bookings.RHLinkableBookings, methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_details', bookings.RHBookingDetails)
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'delete_booking', bookings.RHDeleteBooking, methods=('DELETE',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'update_booking', bookings.RHUpdateBooking, methods=('PATCH',))
