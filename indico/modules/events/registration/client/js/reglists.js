@@ -111,6 +111,7 @@ import {$T} from 'indico/utils/i18n';
         withExternalUsers: true,
         single: true,
         alwaysConfirm: true,
+        searchToken: document.querySelector('.js-add-user').dataset.searchToken,
       });
       if (user) {
         const url = $('.js-add-user').data('href');

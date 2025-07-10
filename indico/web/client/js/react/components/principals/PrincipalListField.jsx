@@ -45,6 +45,7 @@ const PrincipalListField = props => {
     eventId,
     favoriteUsersController,
     className,
+    searchToken,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -131,6 +132,7 @@ const PrincipalListField = props => {
                 withExternalUsers={withExternalUsers}
                 onOpen={onFocus}
                 onClose={onBlur}
+                searchToken={searchToken}
               />
               {withGroups && (
                 <GroupSearch
@@ -195,6 +197,7 @@ PrincipalListField.propTypes = {
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
   className: PropTypes.string,
+  searchToken: PropTypes.string,
 };
 
 PrincipalListField.defaultProps = {
@@ -206,6 +209,7 @@ PrincipalListField.defaultProps = {
   eventId: null,
   readOnly: false,
   className: undefined,
+  searchToken: null,
 };
 
 export default React.memo(PrincipalListField);

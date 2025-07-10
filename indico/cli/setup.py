@@ -334,6 +334,7 @@ class SetupWizard:
         self.default_timezone = None
         self.rb_active = None
         self.system_notices = True
+        self.public_user_search = None
 
     def run(self, dev):
         self._check_root()
@@ -604,6 +605,16 @@ class SetupWizard:
                                             'administrators. They are retrieved once a day without sending any data '
                                             'related to your Indico instance. It is strongly recommended to enable '
                                             'them.')
+        self.public_user_search = _confirm('Enable public user search?', default=True,
+                                            help='By default, authenticated users can search for other users by name, '
+                                                 'email address and affiliation, and see this data for users in their '
+                                                 'search results. This is usually expected in academic environments '
+                                                 'where the convenience of being able to find someone to add them as '
+                                                 'an abstract author is appreciated. In other environments, you may '
+                                                 'prefer the increased privacy of not revealing email addresses of '
+                                                 'users to other users, in which case you would need to disable this.\n'
+                                                 'Please see the documentation for details if you are unsure:\n'
+                                                 'https://docs.getindico.io/en/stable/config/settings/#ALLOW_PUBLIC_USER_SEARCH')
 
     def _setup(self, dev=False):
         storage_backends = {'default': 'fs:' + os.path.join(self.data_root_path, 'archive')}
@@ -658,6 +669,13 @@ class SetupWizard:
                 '',
                 '# Disable system notices',
                 'SYSTEM_NOTICES_URL = None'
+            ]
+
+        if not self.public_user_search:
+            config_data += [
+                '',
+                '# Disable public user search',
+                'ALLOW_PUBLIC_USER_SEARCH = False'
             ]
 
         config = '\n'.join(x for x in config_data if x is not None)

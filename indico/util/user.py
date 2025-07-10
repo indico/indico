@@ -5,9 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import session
+from itsdangerous import BadSignature
+from werkzeug.exceptions import Forbidden
+
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.util.signing import static_secure_serializer
+from indico.util.signing import secure_serializer, static_secure_serializer
 
 
 def iter_acl(acl):
@@ -195,3 +200,36 @@ def principal_from_identifier(identifier, *, allow_groups=False, allow_external_
         return netgroup
     else:
         raise ValueError('Invalid data')
+
+
+def validate_search_token(token, user):
+    """Check that the search token is valid and belongs to the same user.
+
+    This raises a `Forbidden` exception if the token is missing or invalid.
+    """
+    if not token:
+        raise Forbidden('No search token. This is a bug, please report it.')
+    try:
+        sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
+        if user.id != sig_uid:
+            raise BadSignature
+    except BadSignature:
+        raise Forbidden('Invalid search token')
+
+
+def make_user_search_token(*, public=False) -> str | None:
+    """Generate a token to access user search.
+
+    :param public: If true, a token is only returned if
+                   :data:`ALLOW_PUBLIC_USER_SEARCH` is True.
+                   This should be set when the token is used in
+                   a public place where any (authenticated) user
+                   would get access to it.
+    """
+    if not session.user:
+        # never allow unauthenticated users to search, the search endpoint requires
+        # login anyway, so the token would be useless
+        return None
+    if public and not config.ALLOW_PUBLIC_USER_SEARCH:
+        return None
+    return secure_serializer.dumps(session.user.id, 'user-search-token')

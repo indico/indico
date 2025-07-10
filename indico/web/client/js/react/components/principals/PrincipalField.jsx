@@ -35,6 +35,7 @@ const PrincipalField = props => {
     favoriteUsersController,
     withExternalUsers,
     className,
+    searchToken,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -92,6 +93,7 @@ const PrincipalField = props => {
   );
   const userSearch = (
     <UserSearch
+      searchToken={searchToken}
       triggerFactory={searchTrigger}
       existing={value ? [value] : []}
       onAddItems={handleAddItem}
@@ -143,6 +145,7 @@ PrincipalField.propTypes = {
   favoriteUsersController: PropTypes.array.isRequired,
   withExternalUsers: PropTypes.bool,
   className: PropTypes.string,
+  searchToken: PropTypes.string,
 };
 
 PrincipalField.defaultProps = {
@@ -150,6 +153,7 @@ PrincipalField.defaultProps = {
   required: false,
   withExternalUsers: false,
   className: '',
+  searchToken: null,
 };
 
 export default React.memo(PrincipalField);

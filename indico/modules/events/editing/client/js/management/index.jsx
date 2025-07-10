@@ -8,6 +8,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
+
 import EditingManagement from './EditingManagement';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -15,5 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!editingManagementContainer) {
     return;
   }
-  ReactDOM.render(<EditingManagement />, editingManagementContainer);
+  ReactDOM.render(
+    <UserSearchTokenContext.Provider value={editingManagementContainer.dataset.searchToken}>
+      <EditingManagement />
+    </UserSearchTokenContext.Provider>,
+    editingManagementContainer
+  );
 });

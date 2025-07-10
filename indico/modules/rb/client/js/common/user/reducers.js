@@ -23,6 +23,7 @@ const initialUserInfoState = {
   hasOwnedRooms: false,
   hasModeratedRooms: false,
   isRBLocationManager: false,
+  searchToken: null,
 };
 
 export default combineReducers({
@@ -62,6 +63,7 @@ export default combineReducers({
           hasOwnedRooms: user.has_owned_rooms,
           hasModeratedRooms: user.has_moderated_rooms,
           isRBLocationManager: user.is_rb_location_manager && !user.is_rb_admin,
+          searchToken: user.search_token,
         };
       }
       case actions.TOGGLE_ADMIN_OVERRIDE:

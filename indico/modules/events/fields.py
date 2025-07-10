@@ -30,6 +30,7 @@ from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
+from indico.util.user import make_user_search_token
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -100,6 +101,13 @@ class PersonLinkListFieldBase(PrincipalListField):
         return getattr(self.get_form(), 'event', None)
 
     @property
+    def search_token(self):
+        if not getattr(self.get_form(), 'allow_user_search', True):
+            # allow forms to disable user search, e.g. during abstract submission
+            return None
+        return make_user_search_token()
+
+    @property
     def has_predefined_affiliations(self):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
@@ -137,7 +145,7 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def validate_email_url(self):
-        return url_for('events.check_email', self.object) if self.object else None
+        return url_for('events.check_email', self.object) if self.object and self.search_token else None
 
     @property
     def extra_params(self):
@@ -241,10 +249,10 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         return [{'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
                  'default': self.default_is_submitter}]
 
-    def __init__(self, *args, **kwargs):
-        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+    def __init__(self, *args, default_is_submitter=True, event_type=None, search_token_source=None, **kwargs):
+        self.default_is_submitter = default_is_submitter
         self.empty_message = _('There are no chairpersons')
-        event_type = kwargs.pop('event_type', None)
+        self.search_token_source = search_token_source
         super().__init__(*args, **kwargs)
         if not event_type and self.object:
             event_type = self.object.event.type_

@@ -745,6 +745,26 @@ Logging
 Security
 --------
 
+.. data:: ALLOW_PUBLIC_USER_SEARCH
+
+    If disabled, users without management permissions cannot search for
+    existing Indico users. This affects places such as abstract submission,
+    material ACLs and the verbosity of the email status check (whether the
+    registration will be linked to an Indico account) while registering for
+    an event.
+
+    It is recommended to disable this setting in case you run a public instance
+    with strong privacy requirements that weigh heavier than the convenience
+    of being able to search Indico users.
+
+    Note that this setting is only effective if event creation is properly
+    restricted since otherwise any user can just create an event where they
+    then have management permissions and thus the ability to search for users.
+    This also means that unlisted events must be disabled or restricted to
+    trusted users.
+
+    Default: ``True``
+
 .. data:: SECRET_KEY
 
     The secret key used to sign tokens in URLs.  It must be kept secret

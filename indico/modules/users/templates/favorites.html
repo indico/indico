@@ -2,7 +2,7 @@
 
 {% block user_content %}
     <div class="layout-wrapper">
-        <div id="user-favorites"></div>
+        <div id="user-favorites" data-search-token="{{ make_user_search_token(public=true) or '' }}"></div>
     </div>
     <script>
         setupFavoriteSelection({{ (user.id if user != session.user else none) | tojson }});

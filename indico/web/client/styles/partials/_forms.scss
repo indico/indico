@@ -370,3 +370,25 @@ form {
 .i-form .form-field-warning {
   margin-top: 2px;
 }
+
+.protection-message {
+  &.no-acl-field {
+    .has-acl {
+      display: none;
+    }
+
+    .no-acl {
+      display: block;
+    }
+  }
+
+  &:not(.no-acl-field) {
+    .has-acl {
+      display: block;
+    }
+
+    .no-acl {
+      display: none;
+    }
+  }
+}

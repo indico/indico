@@ -431,10 +431,11 @@ import {natSortCompare} from 'indico/utils/sort';
   }
 
   function setupRolesButtons() {
+    const searchToken = document.querySelector('#event-roles').dataset.searchToken;
     $('#event-roles').on('click', '.js-add-members', async evt => {
       evt.stopPropagation();
       const $this = $(evt.target);
-      const users = await showUserSearch({withExternalUsers: true});
+      const users = await showUserSearch({withExternalUsers: true, searchToken});
       if (users.length) {
         $.ajax({
           url: $this.data('href'),

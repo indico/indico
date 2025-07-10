@@ -76,6 +76,11 @@ export default function EmailInput({htmlId, htmlName, disabled, isRequired}) {
       msg = Translate.string('The user associated with this email address is already registered.');
     } else if (data.conflict === 'no-user') {
       msg = Translate.string('There is no Indico user associated with this email address.');
+    } else if (data.conflict === 'email-other-user-restricted') {
+      msg =
+        Indico.User.id !== undefined
+          ? Translate.string('You cannot use this email address to register.')
+          : Translate.string('Please log in using your Indico account to use this email address.');
     } else if (
       data.status === 'error' &&
       (data.conflict === 'email-other-user' || data.conflict === 'email-no-user')

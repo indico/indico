@@ -38,6 +38,8 @@ from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users import User, logger, user_management_settings
@@ -61,10 +63,11 @@ from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExpor
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
-from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
+from indico.util.marshmallow import HumanizedDate, ModelField, Principal, validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.signing import static_secure_serializer
 from indico.util.string import make_unique_token, remove_accents
+from indico.util.user import make_user_search_token, validate_search_token
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -917,8 +920,51 @@ class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
 search_result_schema = UserSearchResultSchema()
 
 
+class RHUserSearchToken(RHProtected):
+    """Create a token that allows searching users."""
+
+    @use_kwargs({
+        'category': ModelField(Category, filter_deleted=True, load_default=None, data_key='category_id'),
+        'event': ModelField(Event, filter_deleted=True, load_default=None, data_key='event_id'),
+        'contribution': ModelField(Contribution, filter_deleted=True, load_default=None, data_key='contribution_id'),
+        'session': ModelField(Session, filter_deleted=True, load_default=None, data_key='session_id'),
+    }, location='query')
+    def _process_args(self, category, event, contribution, session):
+        self.category = category
+        self.event = event
+        self.contribution = contribution
+        self.session = session
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        # XXX for now we do not give admins a token "for free", since this would make spotting bugs
+        # where no context is passed much harder. of course any of the access checks below will still
+        # be short-circuited for an admin, so calling this endpoint with `category_id=0` would always
+        # work for an admin
+        if self.category and self.category.can_create_events(session.user):
+            return
+        elif self.event and self.event.can_manage(session.user):
+            return
+        elif self.contribution and self.contribution.can_manage(session.user):
+            return
+        elif self.session and self.session.can_manage(session.user):
+            return
+        else:
+            raise Forbidden('Not authorized to search users')
+
+    def _process(self):
+        return jsonify(token=make_user_search_token())
+
+
 class RHUserSearch(RHProtected):
     """Search for users based on given criteria."""
+
+    @use_kwargs({
+        'token': fields.String(load_default=''),
+    }, location='query')
+    def _check_access(self, token):
+        RHProtected._check_access(self)
+        validate_search_token(token, session.user)
 
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''

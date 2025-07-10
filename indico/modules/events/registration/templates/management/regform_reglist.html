@@ -62,7 +62,8 @@
                         <li>
                             <a href="#" class="js-add-user"
                                data-href="{{ url_for('.create_registration', regform) }}"
-                               data-title="{% trans %}Register a Indico user{% endtrans %}">
+                               data-title="{% trans %}Register a Indico user{% endtrans %}"
+                               data-search-token="{{ make_user_search_token() }}">
                                 {% trans %}Indico user{% endtrans %}
                             </a>
                         </li>
