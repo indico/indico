@@ -37,6 +37,7 @@ from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SI
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
+from indico.modules.events.registration.models.checks import RegistrationCheck, RegistrationCheckType
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -564,6 +565,8 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         'price': ('Price', lambda x: x.render_price()),
         'checked_in': ('Checked in', lambda x: x.checked_in),
         'checked_in_date': ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''),
+        'checked_out': ('Checked out', lambda x: x.checked_out),
+        'checked_out_date': ('Check-out date', lambda x: x.checked_out_dt if x.checked_out else ''),
         'payment_date': ('Payment date', lambda x: (x.transaction.timestamp
                                                     if (x.transaction is not None and
                                                         x.transaction.status == TransactionStatus.successful)
@@ -1135,3 +1138,39 @@ def load_registration_schema(regform, schema_cls, *, registration=None, partial_
     #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
     schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
     return parser.parse(schema)
+
+
+def create_registration_check_type(data, event=None):
+    check_type = RegistrationCheckType(event=event, is_system_defined=not event)
+    check_type.populate_from_dict(data)
+    db.session.add(check_type)
+    db.session.flush()
+    logger.info('Registration check type "%s" created by %s', check_type, session.user)
+    return check_type
+
+
+def update_registration_check_type(check_type, data):
+    check_type.populate_from_dict(data)
+    db.session.flush()
+    logger.info('Registration check type "%s" updated by %s', check_type, session.user)
+
+
+def delete_registration_check_type(check_type):
+    db.session.delete(check_type)
+    db.session.flush()
+    logger.info('Registration check type "%s" deleted by %s', check_type, session.user)
+
+
+def create_registration_check(registration, check_type=None, is_check_out=False, checked_by_user=None):
+    if not check_type:
+        check_type = registration.event.default_check_type
+    result = registration.can_perform_check(check_type=check_type, is_check_out=is_check_out)
+    if not result['can_check']:
+        raise ValueError(result['reason'])
+    check = RegistrationCheck(registration=registration, check_type=check_type, is_check_out=is_check_out,
+                              checked_by_user=checked_by_user)
+    db.session.add(check)
+    db.session.flush()
+    signals.event.registration_check_added.send(check)
+    logger.info('Registration %s checked as "%s" by %s', registration, check_type.title, checked_by_user)
+    return check
