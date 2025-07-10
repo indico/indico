@@ -6,6 +6,8 @@
 # LICENSE file for more details.
 
 from flask import session
+from itsdangerous import BadSignature
+from werkzeug.exceptions import Forbidden
 
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
@@ -198,6 +200,21 @@ def principal_from_identifier(identifier, *, allow_groups=False, allow_external_
         return netgroup
     else:
         raise ValueError('Invalid data')
+
+
+def validate_search_token(token, user):
+    """Check that the search token is valid and belongs to the same user.
+
+    This raises a `Forbidden` exception if the token is missing or invalid.
+    """
+    if not token:
+        raise Forbidden('No search token. This is a bug, please report it.')
+    try:
+        sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
+        if user.id != sig_uid:
+            raise BadSignature
+    except BadSignature:
+        raise Forbidden('Invalid search token')
 
 
 def make_user_search_token(*, public=False) -> str | None:

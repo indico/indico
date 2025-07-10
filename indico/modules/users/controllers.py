@@ -65,9 +65,9 @@ from indico.util.i18n import _, force_locale
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, ModelField, Principal, validate_with_message
 from indico.util.signals import values_from_signal
-from indico.util.signing import secure_serializer, static_secure_serializer
+from indico.util.signing import static_secure_serializer
 from indico.util.string import make_unique_token, remove_accents
-from indico.util.user import make_user_search_token
+from indico.util.user import make_user_search_token, validate_search_token
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -964,14 +964,7 @@ class RHUserSearch(RHProtected):
     }, location='query')
     def _check_access(self, token):
         RHProtected._check_access(self)
-        if not token:
-            raise Forbidden('No search token. This is a bug, please report it.')
-        try:
-            sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
-            if session.user.id != sig_uid:
-                raise BadSignature
-        except BadSignature:
-            raise Forbidden('Invalid search token')
+        validate_search_token(token, session.user)
 
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''
