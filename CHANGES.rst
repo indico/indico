@@ -35,7 +35,7 @@ Improvements
 - Make text overflow behavior in badge designer configurable (:pr:`6944`, thanks
   :user:`SegiNyn`)
 - Clone registration tags when cloning registration forms and preserve registration
-  tags when cloning registrations (:pr:`6964`)
+  tags when cloning registrations (:issue:`6820`, :pr:`6964`)
 - Allow restricting reminder recipients by registration form and tags (:pr:`6877`,
   thanks :user:`tomako, unconventionaldotdev`)
 
