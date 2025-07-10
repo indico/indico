@@ -13,6 +13,7 @@ import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create'
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import _ from 'lodash';
+import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
@@ -265,10 +266,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (data['start_dt']) {
+      const startDtMoment = moment(data['start_dt']);
       data['start_dt'] =
         activeType === EntryType.Contribution
-          ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
-          : entry.startDt.format();
+          ? startDtMoment.format('YYYY-MM-DDTHH:mm:ss')
+          : startDtMoment.format();
     }
 
     const submitData = snakifyKeys(data);
@@ -315,6 +317,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       onClose={onClose}
       onSubmit={handleSubmit}
       initialValues={initialValues}
+      initialValuesEqual={_.isEqual}
       disabledUntilChange={false}
       keepDirtyOnReinitialize
       size="small"
