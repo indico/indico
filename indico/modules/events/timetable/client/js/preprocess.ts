@@ -88,7 +88,7 @@ export function preprocessTimetableEntries(
         room = '',
         location: venueName = '',
         personLinks,
-        board_number: boardNumber = '',
+        boardNumber = '',
         code,
         title,
         id,
