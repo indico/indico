@@ -7,12 +7,12 @@
 
 from collections import defaultdict
 from hashlib import md5
-from itertools import chain
 
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
@@ -50,9 +50,9 @@ class TimetableSerializer:
             if not entry.can_view(self.user):
                 continue
             data = self.serialize_timetable_entry(entry, load_children=False)
-            key = self._get_entry_key(entry)
+            key = get_unique_key(entry)
             if entry.parent:
-                parent_code = f's{entry.parent_id}'
+                parent_code = get_unique_key(entry.parent)
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
@@ -60,33 +60,6 @@ class TimetableSerializer:
                     # If a session block lasts into another day we need to add it to that day, too
                     timetable[entry.end_dt.astimezone(tzinfo).date().strftime('%Y%m%d')][key] = data
                 timetable[date_str][key] = data
-        if strip_empty_days:
-            timetable = self._strip_empty_days(timetable)
-        return timetable
-
-    def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
-        event_tz = self.event.tzinfo
-        timetable = {}
-        if session_.blocks:
-            start_dt = min(chain((b.start_dt for b in session_.blocks), (self.event.start_dt,))).astimezone(event_tz)
-            end_dt = max(chain((b.end_dt for b in session_.blocks), (self.event.end_dt,))).astimezone(event_tz)
-        else:
-            start_dt = self.event.start_dt_local
-            end_dt = self.event.end_dt_local
-
-        for day in iterdays(start_dt, end_dt):
-            timetable[day.strftime('%Y%m%d')] = {}
-        for block in session_.blocks:
-            block_entry = block.timetable_entry
-            if not block_entry:
-                continue
-            date_key = block_entry.start_dt.astimezone(event_tz).strftime('%Y%m%d')
-            entries = block_entry.children if without_blocks else [block_entry]
-            for entry in entries:
-                if not entry.can_view(self.user):
-                    continue
-                entry_key = self._get_entry_key(entry)
-                timetable[date_key][entry_key] = self.serialize_timetable_entry(entry, load_children=True)
         if strip_empty_days:
             timetable = self._strip_empty_days(timetable)
         return timetable
@@ -117,12 +90,11 @@ class TimetableSerializer:
         if not load_children:
             entries = defaultdict(dict)
         else:
-            entries = {self._get_entry_key(x): self.serialize_timetable_entry(x) for x in entry.children}
+            entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
-                     'id': block.id,
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
                      'sessionTitle': block.session.title,
@@ -153,7 +125,6 @@ class TimetableSerializer:
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
-                     'id': contribution.id,
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds / 60,
@@ -172,7 +143,7 @@ class TimetableSerializer:
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
                      'references': list(map(SerializerBase.serialize_reference, contribution.references)),
-                     'board_number': contribution.board_number})
+                     'boardNumber': contribution.board_number})
         if self.api:
             data['authors'] = list(map(self._get_person_data,
                                        sorted((p for p in contribution.person_links if not p.is_speaker),
@@ -191,7 +162,6 @@ class TimetableSerializer:
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
-                     'id': break_.id,
                      'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
@@ -256,24 +226,14 @@ class TimetableSerializer:
     def _get_entry_data(self, entry):
         data = {}
         data.update(self._get_date_data(entry))
-        data['id'] = self._get_entry_key(entry)
-        data['uniqueId'] = data['id']
+        data['id'] = get_unique_key(entry)
+        data['objId'] = get_obj_id(entry)
         data['conferenceId'] = entry.event_id
         if self.management:
             data['isParallel'] = entry.is_parallel()
             data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
         return data
-
-    def _get_entry_key(self, entry):
-        if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return f's{entry.id}'
-        elif entry.type == TimetableEntryType.CONTRIBUTION:
-            return f'c{entry.id}'
-        elif entry.type == TimetableEntryType.BREAK:
-            return f'b{entry.id}'
-        else:
-            raise ValueError
 
     def _get_entry_date_dt(self, dt, tzinfo):
         return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
@@ -317,3 +277,90 @@ def serialize_contribution(contribution):
     return {'id': contribution.id,
             'friendly_id': contribution.friendly_id,
             'title': contribution.title}
+
+
+def get_obj_id(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return entry.session_block.id
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return entry.contribution.id
+    elif entry.type == TimetableEntryType.BREAK:
+        return entry.break_.id
+    else:
+        raise ValueError
+
+
+def get_unique_key(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return f's{entry.session_block.id}'
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return f'c{entry.contribution.id}'
+    elif entry.type == TimetableEntryType.BREAK:
+        return f'b{entry.break_.id}'
+    else:
+        raise ValueError
+
+
+# Event related functions:
+
+# TODO: This is only temporary to get unscheduled contributions working
+# before we rewrite the timetable serializer
+def serialize_unscheduled_contribution(contribution):
+    data = {
+        'id': f'c{contribution.id}',
+        'objId': contribution.id
+    }
+    if contribution.session:
+        data.update({'color': '#' + contribution.session.background_color,
+                     'textColor': '#' + contribution.session.text_color})
+    data.update({'entryType': 'Contribution',
+                 '_type': 'ContribSchEntry',
+                 '_fossil': 'contribSchEntryDisplay',
+                 'contributionId': contribution.id,
+                 'attachments': [],
+                 'description': contribution.description,
+                 'duration': contribution.duration_display.seconds / 60,
+                 'pdf': url_for('contributions.export_pdf', contribution),
+                 'presenters': [],
+                 'code': contribution.code,
+                 'sessionCode': None,
+                 'sessionId': contribution.session.id if contribution.session else None,
+                 'sessionSlotId': None,
+                 'sessionSlotEntryId': None,
+                 'title': contribution.title,
+                 'url': url_for('contributions.display_contribution', contribution),
+                 'friendlyId': contribution.friendly_id,
+                 'references': [],
+                 'board_number': contribution.board_number})
+    return data
+
+
+def serialize_event_info(event):
+    from indico.modules.events.contributions import Contribution
+    return {'_type': 'Conference',
+            'id': str(event.id),
+            'title': event.title,
+            'startDate': event.start_dt_local,
+            'endDate': event.end_dt_local,
+            'isConference': event.type_ == EventType.conference,
+            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
+            'contributions': [serialize_unscheduled_contribution(c)
+                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
+
+
+def serialize_session(sess):
+    """Return data for a single session."""
+    return {
+        '_type': 'Session',
+        'address': sess.address,
+        'color': '#' + sess.colors.background,
+        'description': sess.description,
+        'id': sess.id,
+        'isPoster': sess.is_poster,
+        'location': sess.venue_name,
+        'room': sess.room_name,
+        'roomFullname': sess.room_name,
+        'textColor': '#' + sess.colors.text,
+        'title': sess.title,
+        'url': url_for('sessions.display_session', sess)
+    }

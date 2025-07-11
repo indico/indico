@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {Entry, Session, TopLevelEntry} from './types';
+import {Entry, EntryType, Session, TopLevelEntry} from './types';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
@@ -49,6 +49,17 @@ function gcd(a: number, b: number) {
   return a;
 }
 
+export const getEntryUniqueId = (entry): string => {
+  switch (entry.type) {
+    case EntryType.SessionBlock:
+      return `s${entry.id}`;
+    case EntryType.Contribution:
+      return `c${entry.id}`;
+    case EntryType.Break:
+      return `b${entry.id}`;
+  }
+};
+
 export const mapTTDataToEntry = (data): TopLevelEntry => {
   const {
     type,
@@ -68,7 +79,8 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
   } = camelizeKeys(data);
 
   const mappedObj = {
-    id,
+    id: getEntryUniqueId(data),
+    objId: id,
     type,
     title,
     description,
