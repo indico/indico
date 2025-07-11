@@ -20,6 +20,7 @@ export default function FormSection({
   title,
   description,
   isManagerOnly,
+  readonlyEmail,
   items,
   sortHandle,
   itemComponent: ItemComponent,
@@ -62,6 +63,7 @@ export default function FormSection({
             key={item.id}
             index={index}
             setupMode={setupMode}
+            readonlyEmail={readonlyEmail}
             {...itemProps}
             {...item}
           />
@@ -101,6 +103,8 @@ FormSection.propTypes = {
   isManagerOnly: PropTypes.bool.isRequired,
   /** Whether the section is the special "personal data" section */
   isPersonalData: PropTypes.bool.isRequired,
+  /** Whether the email field in the section should be read-only */
+  readonlyEmail: PropTypes.bool.isRequired,
   /** The form items in the section */
   items: PropTypes.arrayOf(PropTypes.shape(FormItem.propTypes)).isRequired,
   /** The handle to sort the section during setup */
