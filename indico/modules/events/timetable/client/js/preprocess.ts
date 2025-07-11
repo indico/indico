@@ -17,7 +17,8 @@ interface SchemaDate {
 }
 
 interface SchemaEntry {
-  id: number;
+  id: string;
+  objId: number;
   title: string;
   textColor?: string;
   color?: string;
@@ -63,7 +64,14 @@ const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.t
 export function preprocessTimetableEntries(
   data: Record<string, Record<string, SchemaBlock>>,
   eventInfo: {
-    contributions?: {uniqueId: number; title: string; duration: number; sessionId: number}[];
+    contributions?: {
+      id: string;
+      objId: number;
+      title: string;
+      description: string;
+      duration: number;
+      sessionId: number;
+    }[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   const dayEntries = {};
@@ -80,10 +88,11 @@ export function preprocessTimetableEntries(
         location: venueName = '',
         presenters = [],
         conveners = [],
-        board_number: boardNumber = '',
+        boardNumber = '',
         code,
         title,
         id,
+        objId,
       } = entry as any;
 
       // TODO: (Ajob) Currently not passing roles as they do not exist
@@ -103,6 +112,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
+        objId,
         title,
         description,
         startDt: dateToMoment(entry.startDate),
@@ -133,29 +143,28 @@ export function preprocessTimetableEntries(
       } else if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
-        const children = Object.entries(entry.entries).map(
-          ([childId, {id, title, startDate, duration}]: [string, SchemaBlock]) => {
-            const childEntry: ChildEntry = {
-              type: entryTypeMapping[childId[0]],
-              id,
-              title,
-              startDt: dateToMoment(startDate),
-              duration,
-              parentId: dayEntries[day].at(-1).id,
-              x: 0,
-              y: 0,
-              width: 0,
-              column: 0,
-              maxColumn: 0,
-            };
+        const children = Object.values(entry.entries).map((c: SchemaBlock) => {
+          const childEntry: ChildEntry = {
+            type: entryTypeMapping[c.id[0]],
+            objId: c.objId,
+            id: c.id,
+            title: c.title,
+            startDt: dateToMoment(c.startDate),
+            duration: c.duration,
+            parentId: dayEntries[day].at(-1).id,
+            x: 0,
+            y: 0,
+            width: 0,
+            column: 0,
+            maxColumn: 0,
+          };
 
-            if (entry.sessionId) {
-              childEntry.sessionId = entry.sessionId;
-            }
-
-            return childEntry;
+          if (entry.sessionId) {
+            childEntry.sessionId = entry.sessionId;
           }
-        );
+
+          return childEntry;
+        });
         dayEntries[day].at(-1).children = children;
       }
     }
@@ -163,12 +172,16 @@ export function preprocessTimetableEntries(
 
   return {
     dayEntries,
-    unscheduled: (eventInfo.contributions || []).map(c => ({
-      type: 'contrib',
-      id: c.uniqueId,
-      sessionId: c.sessionId,
-      title: c.title,
-      duration: c.duration,
-    })),
+    unscheduled: (eventInfo.contributions || []).map(
+      ({id, objId, sessionId, title, description, duration}) => ({
+        type: EntryType.Contribution,
+        id,
+        objId,
+        sessionId,
+        title,
+        description,
+        duration,
+      })
+    ),
   };
 }
