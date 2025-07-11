@@ -351,7 +351,7 @@ class CalendarListView extends React.Component {
                   <Translate>Showing bookings around the event dates.</Translate>
                 )}{' '}
                 <a onClick={() => addEarlier(BOOKING_LINKING_RANGE_INCREASE)}>
-                  <Translate>Load more</Translate>
+                  <Translate>Load earlier bookings</Translate>
                 </a>
               </Message>
             )}
@@ -380,7 +380,7 @@ class CalendarListView extends React.Component {
                   <Translate>Showing bookings around the event dates.</Translate>
                 )}{' '}
                 <a onClick={() => addLater(BOOKING_LINKING_RANGE_INCREASE)}>
-                  <Translate>Load more</Translate>
+                  <Translate>Load later bookings</Translate>
                 </a>
               </Message>
             )}
