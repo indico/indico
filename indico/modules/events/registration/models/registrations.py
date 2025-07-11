@@ -906,10 +906,6 @@ class RegistrationData(StoredFileMixin, db.Model):
         return self.field_data.field.calculate_price(self)
 
     @property
-    def summary_data(self):
-        return {'data': self.friendly_data, 'price': self.price}
-
-    @property
     def user_data(self):
         from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
         if self.field_data.field.field_impl.is_file_field:
