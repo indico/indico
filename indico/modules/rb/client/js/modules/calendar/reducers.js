@@ -244,7 +244,7 @@ export default combineReducers({
         return {...state, rows: camelizeKeys(action.data)};
       case calendarActions.ROOM_IDS_RECEIVED:
         return {...state, roomIds: action.data.slice()};
-      case calendarActions.FILTER_ADD_EARLIER:
+      case calendarActions.LINKING_ADD_EARLIER:
         return {
           ...state,
           bookingLinkingDisplayRange: {
@@ -252,7 +252,7 @@ export default combineReducers({
             earlier: state.bookingLinkingDisplayRange.earlier + action.days,
           },
         };
-      case calendarActions.FILTER_ADD_LATER:
+      case calendarActions.LINKING_ADD_LATER:
         return {
           ...state,
           bookingLinkingDisplayRange: {

@@ -38,8 +38,8 @@ export const FETCH_ACTIVE_BOOKINGS_ERROR = 'calendar/FETCH_ACTIVE_BOOKINGS_ERROR
 export const ACTIVE_BOOKINGS_RECEIVED = 'calendar/ACTIVE_BOOKINGS_RECEIVED';
 export const CLEAR_ACTIVE_BOOKINGS = 'calendar/CLEAR_ACTIVE_BOOKINGS';
 
-export const FILTER_ADD_LATER = 'linking/FILTER_ADD_LATER';
-export const FILTER_ADD_EARLIER = 'linking/FILTER_ADD_EARLIER';
+export const LINKING_ADD_LATER = 'linking/ADD_LATER';
+export const LINKING_ADD_EARLIER = 'linking/ADD_EARLIER';
 
 export function changeView(view) {
   return {type: CHANGE_VIEW, view};
@@ -181,9 +181,9 @@ export function clearActiveBookings() {
 }
 
 export function addLater(days) {
-  return {type: FILTER_ADD_LATER, days};
+  return {type: LINKING_ADD_LATER, days};
 }
 
 export function addEarlier(days) {
-  return {type: FILTER_ADD_EARLIER, days};
+  return {type: LINKING_ADD_EARLIER, days};
 }
