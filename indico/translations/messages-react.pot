@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-04-25 11:59+0200\n"
+"POT-Creation-Date: 2025-07-25 18:25+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -2351,7 +2351,7 @@ msgid "Fields with errors"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
-msgid "Visit incomplete field {field}: {error}"
+msgid "Go to incomplete field {field}: {error}"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormItem.jsx
@@ -2375,6 +2375,10 @@ msgid "Field data will be purged {retentionPeriod} week after the event ended."
 msgid_plural "Field data will be purged {retentionPeriod} weeks after the event ended."
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx
+msgid "This field is conditionally shown"
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormSection.jsx
 msgid "This section is only visible to managers."
@@ -2496,6 +2500,14 @@ msgstr ""
 msgid "Default value"
 msgstr ""
 
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
+msgid "Checked"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
+msgid "Unchecked"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx
 msgid ""
 "The currently chosen option is not available anymore. If you unselect it "
@@ -2605,6 +2617,14 @@ msgid "There is no Indico user associated with this email address."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+msgid "You cannot use this email address to register."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+msgid "Please log in using your Indico account to use this email address."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 msgid "This email address is not associated with your Indico account."
 msgstr ""
 
@@ -2698,6 +2718,31 @@ msgstr[1] ""
 
 #: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx
 msgid "No places left"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Show if"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+#. Form field
+msgid "Field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Select field..."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Has values"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Has value"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Select values..."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
@@ -2855,11 +2900,19 @@ msgid "There are no disabled sections."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
-msgid "Remove field"
+msgid "Fields that are a condition for other fields cannot be deleted."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
+msgid "Delete field"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
 msgid "Enable field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
+msgid "Fields that are a condition for other fields cannot be disabled."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
@@ -2918,8 +2971,7 @@ msgid "Privacy"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
-msgid "Permanent"
+msgid "Indefinite"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
@@ -2928,8 +2980,19 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid ""
-"Specify how long user-provided data for this field will be preserved in the "
-"database."
+"Since the registration form has a limited retention period ({period}), data "
+"in this field is automatically deleted after that period. However, you can "
+"set a shorter duration here."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "{n} week"
+msgid_plural "{n} weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Specify how long user-provided data for this field will be preserved."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
@@ -3040,6 +3103,10 @@ msgstr ""
 
 #: indico/modules/logs/client/js/components/LogEntryList.jsx
 msgid "Sending this email failed."
+msgstr ""
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx
+msgid "No logs to show"
 msgstr ""
 
 #: indico/modules/logs/client/js/components/LogEntryModal.jsx
@@ -3939,11 +4006,13 @@ msgstr ""
 
 #: indico/modules/rb/client/js/components/Room.jsx
 #: indico/modules/users/client/js/Favorites.jsx
+#: indico/web/client/js/react/components/principals/Search.jsx
 #: indico/web/client/js/react/components/principals/items.jsx
 msgid "Remove from favorites"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/Room.jsx
+#: indico/web/client/js/react/components/principals/Search.jsx
 #: indico/web/client/js/react/components/principals/items.jsx
 msgid "Add to favorites"
 msgstr ""
@@ -4939,6 +5008,34 @@ msgid "Already linked"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Outside of the event schedule"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings up to {days} day before the event."
+msgid_plural "Showing bookings up to {days} days before the event."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings around the event dates."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Load earlier bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings up to {days} day after the event."
+msgid_plural "Showing bookings up to {days} days after the event."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Load later bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 msgid "There are no bookings matching the criteria."
 msgstr ""
 
@@ -5104,7 +5201,9 @@ msgid "Event Logo"
 msgstr ""
 
 #: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx
-msgid "This field only accepts jpg, png, gif and webp picture formats."
+msgid ""
+"This field only accepts jpg, png, gif and webp picture formats, and "
+"extremely large images cannot be used."
 msgstr ""
 
 #: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx
@@ -6163,6 +6262,10 @@ msgstr ""
 
 #: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
 msgid "Visibility duration (weeks)"
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
+msgid "Permanent"
 msgstr ""
 
 #: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
