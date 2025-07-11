@@ -67,8 +67,8 @@
         {%- set html_name = regdata.field_data.field.html_field_name -%}
         {%- set old = diff.old -%}
         {%- set new = diff.new -%}
-        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type, regdata) -%}
-        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type, regdata) -%}
+        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type, regdata, true) -%}
+        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type, regdata, true) -%}
         <span>
             {%- if old_friendly_data and type != 'picture' -%}
                 <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
@@ -89,7 +89,7 @@
 {% endmacro %}
 
 
-{% macro render_friendly_data(friendly_data, type, raw_data) %}
+{% macro render_friendly_data(friendly_data, type, raw_data, from_diff=false) %}
     {%- if type == 'accommodation' and friendly_data -%}
         {{- render_accommodation(friendly_data) -}}
     {%- elif type == 'multi_choice' -%}
@@ -98,8 +98,10 @@
         {{- render_sessions(friendly_data) -}}
     {%- elif type == 'picture' and friendly_data -%}
         {{- render_picture(friendly_data, raw_data) -}}
+    {%- elif from_diff -%}
+        {{- raw_data.field_data.field.field_impl.render_email_diff_data(friendly_data) -}}
     {%- else -%}
-        {{- friendly_data -}}
+        {{- raw_data.field_data.field.field_impl.render_email_data(raw_data) -}}
     {%- endif -%}
 {% endmacro %}
 
