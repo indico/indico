@@ -326,6 +326,58 @@ class CalendarListView extends React.Component {
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
     const hasData = Object.keys(sortedEntries).length !== 0;
 
+    const linkingShowEarlier = (
+      <Message info>
+        {earlier ? (
+          <PluralTranslate count={earlier}>
+            <Singular>
+              Showing bookings up to <Param name="days" value={earlier} /> day before the event.
+            </Singular>
+            <Plural>
+              Showing bookings up to <Param name="days" value={earlier} /> days before the event.
+            </Plural>
+          </PluralTranslate>
+        ) : (
+          <Translate>Showing bookings around the event dates.</Translate>
+        )}{' '}
+        <a
+          href="#"
+          onClick={evt => {
+            evt.preventDefault();
+            addEarlier(BOOKING_LINKING_RANGE_INCREASE);
+          }}
+        >
+          <Translate>Load earlier bookings</Translate>
+        </a>
+      </Message>
+    );
+
+    const linkingShowLater = (
+      <Message info>
+        {later ? (
+          <PluralTranslate count={later}>
+            <Singular>
+              Showing bookings up to <Param name="days" value={later} /> day after the event.
+            </Singular>
+            <Plural>
+              Showing bookings up to <Param name="days" value={later} /> days after the event.
+            </Plural>
+          </PluralTranslate>
+        ) : (
+          <Translate>Showing bookings around the event dates.</Translate>
+        )}{' '}
+        <a
+          href="#"
+          onClick={evt => {
+            evt.preventDefault();
+            addLater(BOOKING_LINKING_RANGE_INCREASE);
+          }}
+        >
+          <Translate>Load later bookings</Translate>
+        </a>
+      </Message>
+    );
+
     return (
       <div styleName="active-bookings">
         {(isFetchingActiveBookings || hasData) && (
@@ -334,33 +386,7 @@ class CalendarListView extends React.Component {
             loadMore={this.fetchMoreBookings}
             isFetching={isFetchingActiveBookings}
           >
-            {linkData && (
-              <Message info compact>
-                {earlier ? (
-                  <PluralTranslate count={earlier}>
-                    <Singular>
-                      Showing bookings up to <Param name="days" value={earlier} /> day before the
-                      event.
-                    </Singular>
-                    <Plural>
-                      Showing bookings up to <Param name="days" value={earlier} /> days before the
-                      event.
-                    </Plural>
-                  </PluralTranslate>
-                ) : (
-                  <Translate>Showing bookings around the event dates.</Translate>
-                )}{' '}
-                <a
-                  href="#"
-                  onClick={evt => {
-                    evt.preventDefault();
-                    addEarlier(BOOKING_LINKING_RANGE_INCREASE);
-                  }}
-                >
-                  <Translate>Load earlier bookings</Translate>
-                </a>
-              </Message>
-            )}
+            {linkData && linkingShowEarlier}
             {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
               <CardPlaceholder.Group
@@ -369,39 +395,17 @@ class CalendarListView extends React.Component {
                 withImage={false}
               />
             )}
-            {linkData && (
-              <Message info compact>
-                {later ? (
-                  <PluralTranslate count={later}>
-                    <Singular>
-                      Showing bookings up to <Param name="days" value={later} /> day after the
-                      event.
-                    </Singular>
-                    <Plural>
-                      Showing bookings up to <Param name="days" value={later} /> days after the
-                      event.
-                    </Plural>
-                  </PluralTranslate>
-                ) : (
-                  <Translate>Showing bookings around the event dates.</Translate>
-                )}{' '}
-                <a
-                  href="#"
-                  onClick={evt => {
-                    evt.preventDefault();
-                    addLater(BOOKING_LINKING_RANGE_INCREASE);
-                  }}
-                >
-                  <Translate>Load later bookings</Translate>
-                </a>
-              </Message>
-            )}
+            {linkData && linkingShowLater}
           </LazyScroll>
         )}
         {!isFetchingActiveBookings && !hasData && (
-          <Message info>
-            <Translate>There are no bookings matching the criteria.</Translate>
-          </Message>
+          <>
+            {linkData && linkingShowEarlier}
+            <Message info>
+              <Translate>There are no bookings matching the criteria.</Translate>
+            </Message>
+            {linkData && linkingShowLater}
+          </>
         )}
       </div>
     );
