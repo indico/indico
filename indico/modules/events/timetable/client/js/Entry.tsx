@@ -11,7 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as actions from './actions';
 import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
-import {TimetablePopup} from './EntryPopup';
+import {EntryPopup} from './EntryPopup';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 
@@ -81,7 +81,7 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
 
   if (popupsEnabled && isSelected && !isDragging) {
     return (
-      <TimetablePopup
+      <EntryPopup
         trigger={entry}
         onClose={() => {
           dispatch(actions.deselectEntry());
