@@ -9,6 +9,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {combineReducers} from 'redux';
 
+import * as linkingActions from 'indico/modules/rb/common/linking/actions';
 import {camelizeKeys} from 'indico/utils/case';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
@@ -157,7 +158,8 @@ export default combineReducers({
       calendarActions.FETCH_CALENDAR_SUCCESS,
       calendarActions.FETCH_CALENDAR_ERROR,
       calendarActions.FILTER_ADD_EARLIER,
-      calendarActions.FILTER_ADD_LATER
+      calendarActions.FILTER_ADD_LATER,
+      linkingActions.CLEAR_OBJECT
     ),
     activeBookings: requestReducer(
       calendarActions.FETCH_ACTIVE_BOOKINGS_REQUEST,
@@ -250,7 +252,7 @@ export default combineReducers({
           ...state,
           bookingLinkingDisplayRange: {
             ...state.bookingLinkingDisplayRange,
-            earlier: state.bookingLinkingDisplayRange.earlier + 7,
+            earlier: state.bookingLinkingDisplayRange.earlier + action.days,
           },
         };
       case calendarActions.FILTER_ADD_LATER:
@@ -258,7 +260,15 @@ export default combineReducers({
           ...state,
           bookingLinkingDisplayRange: {
             ...state.bookingLinkingDisplayRange,
-            later: state.bookingLinkingDisplayRange.later + 7,
+            later: state.bookingLinkingDisplayRange.later + action.days,
+          },
+        };
+      case linkingActions.CLEAR_OBJECT:
+        return {
+          ...state,
+          bookingLinkingDisplayRange: {
+            earlier: 0,
+            later: 0,
           },
         };
       case bookingActions.DELETE_BOOKING_SUCCESS: {

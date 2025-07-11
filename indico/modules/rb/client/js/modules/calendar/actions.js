@@ -167,10 +167,10 @@ export function clearActiveBookings() {
   return {type: CLEAR_ACTIVE_BOOKINGS};
 }
 
-export function addLater() {
-  return {type: FILTER_ADD_LATER};
+export function addLater(days) {
+  return {type: FILTER_ADD_LATER, days};
 }
 
-export function addEarlier() {
-  return {type: FILTER_ADD_EARLIER};
+export function addEarlier(days) {
+  return {type: FILTER_ADD_EARLIER, days};
 }

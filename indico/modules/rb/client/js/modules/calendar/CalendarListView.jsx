@@ -39,6 +39,7 @@ import * as calendarSelectors from './selectors';
 import './CalendarListView.module.scss';
 
 const ACTIVE_BOOKINGS_LIMIT = 40;
+const BOOKING_LINKING_RANGE_INCREASE = 7;
 
 class CalendarListView extends React.Component {
   static propTypes = {
@@ -318,6 +319,7 @@ class CalendarListView extends React.Component {
       rowsLeft,
       isFetchingActiveBookings,
       linkData,
+      bookingLinkingDisplayRange: {earlier, later},
       actions: {addEarlier, addLater},
     } = this.props;
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
@@ -332,9 +334,15 @@ class CalendarListView extends React.Component {
             isFetching={isFetchingActiveBookings}
           >
             {linkData && (
-              <a onClick={addEarlier}>
-                <Translate>Load more</Translate>
-              </a>
+              <div onClick={() => addEarlier(BOOKING_LINKING_RANGE_INCREASE)}>
+                <a>
+                  <Translate>
+                    Load bookings{' '}
+                    <Param name="count" value={earlier + BOOKING_LINKING_RANGE_INCREASE} /> days
+                    before the event...
+                  </Translate>
+                </a>
+              </div>
             )}
             {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
@@ -345,9 +353,15 @@ class CalendarListView extends React.Component {
               />
             )}
             {linkData && (
-              <a onClick={addLater}>
-                <Translate>Load more</Translate>
-              </a>
+              <div onClick={() => addLater(BOOKING_LINKING_RANGE_INCREASE)}>
+                <a>
+                  <Translate>
+                    Load bookings{' '}
+                    <Param name="count" value={later + BOOKING_LINKING_RANGE_INCREASE} /> days after
+                    the event...
+                  </Translate>
+                </a>
+              </div>
             )}
           </LazyScroll>
         )}
