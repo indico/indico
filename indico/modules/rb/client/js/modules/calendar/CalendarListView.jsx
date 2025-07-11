@@ -80,9 +80,8 @@ class CalendarListView extends React.Component {
   componentDidMount() {
     const {
       actions: {fetchActiveBookings},
-      bookingLinkingDisplayRange,
     } = this.props;
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false, bookingLinkingDisplayRange);
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -130,20 +129,18 @@ class CalendarListView extends React.Component {
   refetchActiveBookings(roomFiltersChanged) {
     const {
       actions: {fetchActiveBookings, clearActiveBookings},
-      bookingLinkingDisplayRange,
     } = this.props;
     clearActiveBookings();
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged, bookingLinkingDisplayRange);
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
   }
 
   fetchMoreBookings = () => {
     const {
       actions: {fetchActiveBookings},
       linkData,
-      bookingLinkingDisplayRange,
     } = this.props;
     if (!linkData) {
-      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false, bookingLinkingDisplayRange);
+      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
     }
   };
 

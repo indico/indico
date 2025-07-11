@@ -113,7 +113,7 @@ export function fetchCalendar(fetchRooms = true) {
   };
 }
 
-export function fetchActiveBookings(limit, fetchRooms = true, range = null) {
+export function fetchActiveBookings(limit, fetchRooms = true) {
   return async (dispatch, getState) => {
     dispatch({type: FETCH_ACTIVE_BOOKINGS_REQUEST});
 
@@ -121,7 +121,10 @@ export function fetchActiveBookings(limit, fetchRooms = true, range = null) {
     const {myBookings} = getCalendarFilters(state);
     const {text} = getRoomFilters(state);
     const {
-      data: {roomIds},
+      data: {
+        roomIds,
+        bookingLinkingDisplayRange: {earlier, later},
+      },
       activeBookings: {data},
     } = state.calendar;
     let newRoomIds = roomIds;
@@ -140,7 +143,13 @@ export function fetchActiveBookings(limit, fetchRooms = true, range = null) {
 
     if (state.linking?.type) {
       url = fetchLinkableBookingsURL();
-      params = {...params, ...range, link_type: state.linking.type, link_id: state.linking.id};
+      params = {
+        ...params,
+        earlier,
+        later,
+        link_type: state.linking.type,
+        link_id: state.linking.id,
+      };
     } else {
       url = fetchActiveBookingsURL();
       params = {...params, limit};
