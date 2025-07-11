@@ -25,7 +25,7 @@ import {
 } from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Param, Translate} from 'indico/react/i18n';
+import {Plural, PluralTranslate, Singular, Param, Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 
 import {actions as bookingsActions} from '../../common/bookings';
@@ -338,15 +338,25 @@ class CalendarListView extends React.Component {
             isFetching={isFetchingActiveBookings}
           >
             {linkData && (
-              <div onClick={() => addEarlier(BOOKING_LINKING_RANGE_INCREASE)}>
-                <a>
-                  <Translate>
-                    Load bookings{' '}
-                    <Param name="count" value={earlier + BOOKING_LINKING_RANGE_INCREASE} /> days
-                    before the event...
-                  </Translate>
+              <Message info compact>
+                {earlier ? (
+                  <PluralTranslate count={earlier}>
+                    <Singular>
+                      Showing bookings up to <Param name="days" value={earlier} /> day before the
+                      event.
+                    </Singular>
+                    <Plural>
+                      Showing bookings up to <Param name="days" value={earlier} /> days before the
+                      event.
+                    </Plural>
+                  </PluralTranslate>
+                ) : (
+                  <Translate>Showing bookings around the event dates.</Translate>
+                )}{' '}
+                <a onClick={() => addEarlier(BOOKING_LINKING_RANGE_INCREASE)}>
+                  <Translate>Load more</Translate>
                 </a>
-              </div>
+              </Message>
             )}
             {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
@@ -357,15 +367,25 @@ class CalendarListView extends React.Component {
               />
             )}
             {linkData && (
-              <div onClick={() => addLater(BOOKING_LINKING_RANGE_INCREASE)}>
-                <a>
-                  <Translate>
-                    Load bookings{' '}
-                    <Param name="count" value={later + BOOKING_LINKING_RANGE_INCREASE} /> days after
-                    the event...
-                  </Translate>
+              <Message info compact>
+                {later ? (
+                  <PluralTranslate count={later}>
+                    <Singular>
+                      Showing bookings up to <Param name="days" value={later} /> day after the
+                      event.
+                    </Singular>
+                    <Plural>
+                      Showing bookings up to <Param name="days" value={later} /> days after the
+                      event.
+                    </Plural>
+                  </PluralTranslate>
+                ) : (
+                  <Translate>Showing bookings around the event dates.</Translate>
+                )}{' '}
+                <a onClick={() => addLater(BOOKING_LINKING_RANGE_INCREASE)}>
+                  <Translate>Load more</Translate>
                 </a>
-              </div>
+              </Message>
             )}
           </LazyScroll>
         )}
