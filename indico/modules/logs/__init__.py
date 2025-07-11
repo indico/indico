@@ -8,7 +8,6 @@
 from flask import session
 
 from indico.core import signals
-from indico.core.db import db
 from indico.modules.logs.models.entries import AppLogEntry, CategoryLogEntry, EventLogEntry, EventLogRealm, LogKind
 from indico.modules.logs.renderers import EmailRenderer, SimpleRenderer
 from indico.modules.logs.util import get_log_renderers
@@ -54,14 +53,3 @@ def _check_log_renderers(app, **kwargs):
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
         return SideMenuItem('logs', _('Logs'), url_for('logs.app'), -100, icon='stack')
-
-
-@signals.core.app_created.connect
-def _set_app_logger(app, **kwargs):
-    def _log(realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
-        entry = AppLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
-                            data=(data or {}), meta=(meta or {}))
-        db.session.add(entry)
-        return entry
-
-    app.log = _log

@@ -279,5 +279,12 @@ class AppLogEntry(LogEntryBase):
         nullable=False
     )
 
+    @staticmethod
+    def log(realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
+        entry = AppLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
+                            data=(data or {}), meta=(meta or {}))
+        db.session.add(entry)
+        return entry
+
     def __repr__(self):
         return format_repr(self, 'id', 'logged_dt', 'realm', 'module', _text=self.summary)

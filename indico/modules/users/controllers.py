@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 from uuid import uuid4
 
 from dateutil.relativedelta import relativedelta
-from flask import current_app, flash, jsonify, redirect, render_template, request, session
+from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
@@ -41,7 +41,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import serialize_event_for_ical
-from indico.modules.logs.models.entries import AppLogRealm, LogKind, UserLogRealm
+from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
@@ -695,7 +695,7 @@ class RHAdmins(RHAdminBase):
             removed = admins - form.admins.data
             for user in added:
                 user.is_admin = True
-                current_app.log(AppLogRealm.admin, LogKind.positive, 'Admins',
+                AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
                                 f'Admin privileges granted to {user.full_name}',
                                 session.user, data={'IP': request.remote_addr, 'User ID': user.id})
                 user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session.user,
@@ -704,7 +704,7 @@ class RHAdmins(RHAdminBase):
                 flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
             for user in removed:
                 user.is_admin = False
-                current_app.log(AppLogRealm.admin, LogKind.negative, 'Admins',
+                AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
                                 f'Admin privileges revoked from {user.full_name}',
                                 session.user, data={'IP': request.remote_addr, 'User ID': user.id})
                 user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session.user,
