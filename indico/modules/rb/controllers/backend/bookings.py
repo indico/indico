@@ -35,7 +35,7 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
 from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, ReservationOccurrenceLinkSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
-                                       reservation_occurrences_schema_with_ownership, reservation_user_event_schema)
+                                       reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
@@ -138,9 +138,7 @@ class RHLinkableBookings(RHRoomBookingBase):
                                                   room_ids=room_ids,
                                                   booked_for_user=session.user,
                                                   text=text)
-        # XXX We most likely no longer need `reservation_occurrences_schema_with_ownership` since this is now
-        # always filtered server-side
-        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema_with_ownership),
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema),
                        rows_left=rows_left)
 
 
@@ -164,7 +162,7 @@ class RHActiveBookings(RHRoomBookingBase):
                                                   room_ids=room_ids,
                                                   booked_for_user=booked_for_user,
                                                   text=text)
-        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema_with_ownership),
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema),
                        rows_left=rows_left)
 
 
