@@ -59,6 +59,8 @@ class CalendarListView extends React.Component {
       linkBookingOccurrence: PropTypes.func.isRequired,
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
+      addEarlier: PropTypes.func.isRequired,
+      addLater: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -311,7 +313,13 @@ class CalendarListView extends React.Component {
   };
 
   render() {
-    const {bookings, rowsLeft, isFetchingActiveBookings} = this.props;
+    const {
+      bookings,
+      rowsLeft,
+      isFetchingActiveBookings,
+      linkData,
+      actions: {addEarlier, addLater},
+    } = this.props;
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
     const hasData = Object.keys(sortedEntries).length !== 0;
 
@@ -323,6 +331,11 @@ class CalendarListView extends React.Component {
             loadMore={this.fetchMoreBookings}
             isFetching={isFetchingActiveBookings}
           >
+            {linkData && (
+              <a onClick={addEarlier}>
+                <Translate>Load more</Translate>
+              </a>
+            )}
             {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
               <CardPlaceholder.Group
@@ -330,6 +343,11 @@ class CalendarListView extends React.Component {
                 itemsPerRow={4}
                 withImage={false}
               />
+            )}
+            {linkData && (
+              <a onClick={addLater}>
+                <Translate>Load more</Translate>
+              </a>
             )}
           </LazyScroll>
         )}
@@ -362,6 +380,8 @@ export default connect(
         linkBookingOccurrence: bookingsActions.linkBookingOccurrence,
         fetchActiveBookings: calendarActions.fetchActiveBookings,
         clearActiveBookings: calendarActions.clearActiveBookings,
+        addEarlier: calendarActions.addEarlier,
+        addLater: calendarActions.addLater,
       },
       dispatch
     ),

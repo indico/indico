@@ -58,8 +58,6 @@ class Calendar extends React.Component {
       openBookingDetails: PropTypes.func.isRequired,
       setFilterParameter: PropTypes.func.isRequired,
       changeView: PropTypes.func.isRequired,
-      addEarlier: PropTypes.func.isRequired,
-      addLater: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -216,11 +214,10 @@ class Calendar extends React.Component {
   renderViewSwitch = () => {
     const {
       view,
-      actions: {changeView, setFilterParameter, addEarlier, addLater},
+      actions: {changeView, setFilterParameter},
       isFetching,
       isFetchingActiveBookings,
     } = this.props;
-    const isListView = view === 'list';
     const timelineBtn = (
       <Button
         icon={<Icon name="calendar" />}
@@ -234,7 +231,7 @@ class Calendar extends React.Component {
     const listBtn = (
       <Button
         icon={<Icon name="list" />}
-        primary={isListView}
+        primary={view === 'list'}
         onClick={() => {
           setFilterParameter('showInactive', null);
           changeView('list');
@@ -244,39 +241,9 @@ class Calendar extends React.Component {
         circular
       />
     );
-    const minusButton = (
-      <Button
-        icon={<Icon name="minus circle" />}
-        primary={false}
-        onClick={addEarlier}
-        disabled={isFetching || isFetchingActiveBookings}
-        size="small"
-        circular
-      />
-    );
-    const plusButton = (
-      <Button
-        icon={<Icon name="plus circle" />}
-        primary={false}
-        onClick={addLater}
-        disabled={isFetching || isFetchingActiveBookings}
-        size="small"
-        circular
-      />
-    );
     return (
       <div styleName="view-switch">
         <Responsive.Tablet andLarger orElse={view === 'timeline' ? listBtn : timelineBtn}>
-          {isListView && (
-            <>
-              <Popup trigger={minusButton}>
-                <Translate>Show earlier bookings</Translate>
-              </Popup>
-              <Popup trigger={plusButton}>
-                <Translate>Show later bookings</Translate>
-              </Popup>
-            </>
-          )}
           <Popup trigger={timelineBtn} position="bottom center">
             <Translate>Show calendar view</Translate>
           </Popup>
@@ -377,8 +344,6 @@ export default connect(
         setFilterParameter: (name, value) =>
           filtersActions.setFilterParameter('calendar', name, value),
         changeView: calendarActions.changeView,
-        addEarlier: calendarActions.addEarlier,
-        addLater: calendarActions.addLater,
       },
       dispatch
     ),
