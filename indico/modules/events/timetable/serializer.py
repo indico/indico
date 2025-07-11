@@ -12,6 +12,7 @@ from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
@@ -49,9 +50,9 @@ class TimetableSerializer:
             if not entry.can_view(self.user):
                 continue
             data = self.serialize_timetable_entry(entry, load_children=False)
-            key = self._get_unique_key(entry)
+            key = get_unique_key(entry)
             if entry.parent:
-                parent_code = self._get_unique_key(entry.parent)
+                parent_code = get_unique_key(entry.parent)
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
@@ -89,7 +90,7 @@ class TimetableSerializer:
         if not load_children:
             entries = defaultdict(dict)
         else:
-            entries = {self._get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
+            entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
@@ -225,34 +226,14 @@ class TimetableSerializer:
     def _get_entry_data(self, entry):
         data = {}
         data.update(self._get_date_data(entry))
-        data['id'] = self._get_unique_key(entry)
-        data['objId'] = self._get_obj_id(entry)
+        data['id'] = get_unique_key(entry)
+        data['objId'] = get_obj_id(entry)
         data['conferenceId'] = entry.event_id
         if self.management:
             data['isParallel'] = entry.is_parallel()
             data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
         return data
-
-    def _get_obj_id(self, entry):
-        if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return entry.session_block.id
-        elif entry.type == TimetableEntryType.CONTRIBUTION:
-            return entry.contribution.id
-        elif entry.type == TimetableEntryType.BREAK:
-            return entry.break_.id
-        else:
-            raise ValueError
-
-    def _get_unique_key(self, entry):
-        if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return f's{entry.session_block.id}'
-        elif entry.type == TimetableEntryType.CONTRIBUTION:
-            return f'c{entry.contribution.id}'
-        elif entry.type == TimetableEntryType.BREAK:
-            return f'b{entry.break_.id}'
-        else:
-            raise ValueError
 
     def _get_entry_date_dt(self, dt, tzinfo):
         return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
@@ -296,3 +277,90 @@ def serialize_contribution(contribution):
     return {'id': contribution.id,
             'friendly_id': contribution.friendly_id,
             'title': contribution.title}
+
+
+def get_obj_id(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return entry.session_block.id
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return entry.contribution.id
+    elif entry.type == TimetableEntryType.BREAK:
+        return entry.break_.id
+    else:
+        raise ValueError
+
+
+def get_unique_key(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return f's{entry.session_block.id}'
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return f'c{entry.contribution.id}'
+    elif entry.type == TimetableEntryType.BREAK:
+        return f'b{entry.break_.id}'
+    else:
+        raise ValueError
+
+
+# Event related functions:
+
+# TODO: This is only temporary to get unscheduled contributions working
+# before we rewrite the timetable serializer
+def serialize_unscheduled_contribution(contribution):
+    data = {
+        'id': f'c{contribution.id}',
+        'objId': contribution.id
+    }
+    if contribution.session:
+        data.update({'color': '#' + contribution.session.background_color,
+                     'textColor': '#' + contribution.session.text_color})
+    data.update({'entryType': 'Contribution',
+                 '_type': 'ContribSchEntry',
+                 '_fossil': 'contribSchEntryDisplay',
+                 'contributionId': contribution.id,
+                 'attachments': [],
+                 'description': contribution.description,
+                 'duration': contribution.duration_display.seconds / 60,
+                 'pdf': url_for('contributions.export_pdf', contribution),
+                 'presenters': [],
+                 'code': contribution.code,
+                 'sessionCode': None,
+                 'sessionId': contribution.session.id if contribution.session else None,
+                 'sessionSlotId': None,
+                 'sessionSlotEntryId': None,
+                 'title': contribution.title,
+                 'url': url_for('contributions.display_contribution', contribution),
+                 'friendlyId': contribution.friendly_id,
+                 'references': [],
+                 'board_number': contribution.board_number})
+    return data
+
+
+def serialize_event_info(event):
+    from indico.modules.events.contributions import Contribution
+    return {'_type': 'Conference',
+            'id': str(event.id),
+            'title': event.title,
+            'startDate': event.start_dt_local,
+            'endDate': event.end_dt_local,
+            'isConference': event.type_ == EventType.conference,
+            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
+            'contributions': [serialize_unscheduled_contribution(c)
+                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
+
+
+def serialize_session(sess):
+    """Return data for a single session."""
+    return {
+        '_type': 'Session',
+        'address': sess.address,
+        'color': '#' + sess.colors.background,
+        'description': sess.description,
+        'id': sess.id,
+        'isPoster': sess.is_poster,
+        'location': sess.venue_name,
+        'room': sess.room_name,
+        'roomFullname': sess.room_name,
+        'textColor': '#' + sess.colors.text,
+        'title': sess.title,
+        'url': url_for('sessions.display_session', sess)
+    }

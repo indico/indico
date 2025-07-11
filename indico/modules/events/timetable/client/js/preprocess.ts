@@ -63,7 +63,14 @@ const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.t
 export function preprocessTimetableEntries(
   data: Record<string, Record<string, SchemaBlock>>,
   eventInfo: {
-    contributions?: {title: string; duration: number; sessionId: number}[];
+    contributions?: {
+      id: string;
+      objId: number;
+      title: string;
+      description: string;
+      duration: number;
+      sessionId: number;
+    }[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   const dayEntries = {};
@@ -165,11 +172,16 @@ export function preprocessTimetableEntries(
 
   return {
     dayEntries,
-    unscheduled: (eventInfo.contributions || []).map(c => ({
-      type: 'contrib',
-      sessionId: c.sessionId,
-      title: c.title,
-      duration: c.duration,
-    })),
+    unscheduled: (eventInfo.contributions || []).map(
+      ({id, objId, sessionId, title, description, duration}) => ({
+        type: EntryType.Contribution,
+        id,
+        objId,
+        sessionId,
+        title,
+        description,
+        duration,
+      })
+    ),
   };
 }
