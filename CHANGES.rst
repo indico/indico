@@ -42,8 +42,9 @@ Improvements
   :data:`ALLOW_PUBLIC_USER_SEARCH` to ``False``. This also limits the verbosity of email
   status checks while registering for events and disallows registering on behalf
   of another Indico user (:pr:`6960`)
-- Improve the booking linking feature (:issue:`6568`, :issue:`6811`, :pr:`6846`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+- Allow linking existing booking to an event even if there's no exact date/time overlap,
+  and do not show a large number of unrelated bookings (:issue:`6568`, :issue:`6811`,
+  :pr:`6846`, thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
