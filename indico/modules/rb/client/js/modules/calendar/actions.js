@@ -7,6 +7,7 @@
 
 import fetchActiveBookingsURL from 'indico-url:rb.active_bookings';
 import fetchCalendarURL from 'indico-url:rb.calendar';
+import fetchLinkableBookingsURL from 'indico-url:rb.linkable_bookings';
 import searchRoomsURL from 'indico-url:rb.search_rooms';
 
 import _ from 'lodash';
@@ -114,7 +115,6 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     dispatch({type: FETCH_ACTIVE_BOOKINGS_REQUEST});
 
     const state = getState();
-    const {myBookings} = getCalendarFilters(state);
     const {text} = getRoomFilters(state);
     const {
       data: {roomIds},
@@ -130,19 +130,39 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
       }
     }
 
-    const params = preProcessParameters({myBookings, text}, ajaxRules);
-    const body = {room_ids: newRoomIds, limit};
+    let url, params, body;
+    if (state.linking?.type) {
+      const {earlier, later} = state.linking;
+      const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(state);
+      url = fetchLinkableBookingsURL();
+      body = {room_ids: newRoomIds};
+      params = {
+        ...preProcessParameters({text}, ajaxRules),
+        earlier,
+        later,
+        link_type: state.linking.type,
+        link_id: state.linking.id,
+      };
+      if (isAdminOverrideEnabled) {
+        params.admin_override_enabled = true;
+      }
+    } else {
+      const {myBookings} = getCalendarFilters(state);
+      url = fetchActiveBookingsURL();
+      body = {room_ids: newRoomIds, limit};
+      params = preProcessParameters({myBookings, text}, ajaxRules);
 
-    if (Object.keys(data).length) {
-      const lastDt = Object.keys(data).reverse()[0];
-      params.start_dt = _.maxBy(data[lastDt], rv =>
-        moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
-      ).startDt;
-      params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
+      if (Object.keys(data).length) {
+        const lastDt = Object.keys(data).reverse()[0];
+        params.start_dt = _.maxBy(data[lastDt], rv =>
+          moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
+        ).startDt;
+        params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
+      }
     }
 
     return await ajaxAction(
-      () => indicoAxios.post(fetchActiveBookingsURL(), body, {params}),
+      () => indicoAxios.post(url, body, {params}),
       null,
       [ACTIVE_BOOKINGS_RECEIVED, FETCH_ACTIVE_BOOKINGS_SUCCESS],
       [FETCH_ACTIVE_BOOKINGS_ERROR]

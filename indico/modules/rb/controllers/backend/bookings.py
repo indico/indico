@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import uuid
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 import dateutil
 from flask import jsonify, request, session
@@ -35,12 +35,12 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
 from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, ReservationOccurrenceLinkSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
-                                       reservation_occurrences_schema_with_ownership, reservation_user_event_schema)
+                                       reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
-                                    group_by_occurrence_date, is_booking_start_within_grace_period,
+                                    group_by_occurrence_date, is_booking_start_within_grace_period, rb_is_admin,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
-from indico.util.date_time import now_utc, overlaps, server_to_utc, utc_to_server
+from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -114,6 +114,36 @@ class RHCalendar(RHRoomBookingBase):
         return jsonify(list(serialize_availability(calendar).values()))
 
 
+class RHLinkableBookings(RHRoomBookingBase):
+    @use_kwargs({
+        'earlier': fields.Int(validate=validate.Range(min=0), load_default=0),
+        'later': fields.Int(validate=validate.Range(min=0), load_default=0),
+        'text': fields.String(load_default=None),
+        'link_type': fields.Enum(LinkType, required=True),
+        'link_id': fields.Int(required=True),
+        'admin_override_enabled': fields.Bool(load_default=False),
+    }, location='query')
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), load_default=None),
+    })
+    def _process(self, link_type, link_id, room_ids, text, earlier, later, admin_override_enabled):
+        obj = get_linked_object(link_type, link_id)
+        if obj is None or not obj.event.can_manage(session.user):
+            raise Forbidden
+        # get the day start of the object's start dt, and the first day after the event
+        start_dt = utc_to_server(obj.start_dt).replace(hour=0, tzinfo=None) - timedelta(days=earlier)
+        end_dt = utc_to_server(obj.end_dt).replace(hour=0, tzinfo=None) + timedelta(days=(1 + later))
+        booked_for_user = session.user if not admin_override_enabled or not rb_is_admin(session.user) else None
+        bookings, rows_left = get_active_bookings(limit=None,
+                                                  start_dt=start_dt,
+                                                  end_dt=end_dt,
+                                                  room_ids=room_ids,
+                                                  booked_for_user=booked_for_user,
+                                                  text=text)
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema),
+                       rows_left=rows_left)
+
+
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(load_default=None),
@@ -134,7 +164,7 @@ class RHActiveBookings(RHRoomBookingBase):
                                                   room_ids=room_ids,
                                                   booked_for_user=booked_for_user,
                                                   text=text)
-        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema_with_ownership),
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema),
                        rows_left=rows_left)
 
 
@@ -450,10 +480,6 @@ class RHBookingOccurrenceLink(RHBookingBase):
         self.admin_override_enabled = admin_override_enabled
         if self.occurrence.link is not None:
             raise BadRequest('This booking occurrence is already linked')
-        if not overlaps((self.event.start_dt, self.event.end_dt),
-                        (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
-                        inclusive=True):
-            raise BadRequest('The event and booking occurrence times do not overlap')
 
     def _check_access(self):
         RHBookingBase._check_access(self)

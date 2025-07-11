@@ -5,6 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
+$already-linked: repeating-linear-gradient(
+  -45deg,
+  $pastel-gray,
+  $pastel-gray 10px,
+  $light-gray 10px,
+  $light-gray 20px
+);
+
 .active-bookings {
   margin-top: 15px;
 
@@ -37,6 +47,14 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+      }
+
+      &.already-linked {
+        background: $already-linked;
+
+        &:hover {
+          background: $already-linked;
+        }
       }
     }
   }

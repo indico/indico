@@ -156,14 +156,6 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-class ReservationSchemaWithOwnership(ReservationSchema):
-    booked_for_self = Function(lambda r: session.user and r.booked_for_id == session.user.id)
-    booked_by_self = Function(lambda r: session.user and r.created_by_id == session.user.id)
-
-    class Meta(ReservationSchema.Meta):
-        fields = (*ReservationSchema.Meta.fields, 'booked_for_self', 'booked_by_self')
-
-
 class ReservationLinkedObjectDataSchema(mm.Schema):
     id = Number()
     title = Method('_get_title')
@@ -217,10 +209,6 @@ class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReservationOccurrence
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state', 'link_id')
-
-
-class ReservationOccurrenceSchemaWithOwnership(ReservationOccurrenceSchema):
-    reservation = Nested(ReservationSchemaWithOwnership)
 
 
 class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
@@ -618,7 +606,6 @@ room_update_schema = RoomUpdateSchema()
 room_equipment_schema = RoomEquipmentSchema()
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
-reservation_occurrences_schema_with_ownership = ReservationOccurrenceSchemaWithOwnership(many=True)
 reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)
 concurrent_pre_bookings_schema = ReservationConcurrentOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()

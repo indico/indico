@@ -15,6 +15,8 @@ import {camelizeKeys} from 'indico/utils/case';
 
 export const SET_OBJECT = 'linking/SET_OBJECT';
 export const CLEAR_OBJECT = 'linking/CLEAR_OBJECT';
+export const ADD_LATER = 'linking/ADD_LATER';
+export const ADD_EARLIER = 'linking/ADD_EARLIER';
 
 export function setObjectFromURL(queryString) {
   return async dispatch => {
@@ -53,4 +55,12 @@ export function setObjectFromURL(queryString) {
 
 export function clearObject() {
   return {type: CLEAR_OBJECT};
+}
+
+export function addLater(days) {
+  return {type: ADD_LATER, days};
+}
+
+export function addEarlier(days) {
+  return {type: ADD_EARLIER, days};
 }
