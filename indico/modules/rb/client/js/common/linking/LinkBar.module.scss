@@ -8,12 +8,11 @@
 @use 'rb:styles/palette' as *;
 
 .link-bar {
-  justify-content: center;
   display: flex;
   padding: 0 20px 0 10px;
   margin: 0;
-  height: 40px;
-  line-height: 40px;
+  height: 30px;
+  line-height: 30px;
   background-color: $primary-color;
   color: $white;
 
