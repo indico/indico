@@ -25,15 +25,14 @@ import {
   SemanticICONS,
 } from 'semantic-ui-react';
 
+import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 import './Entry.module.scss';
-import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
-import {PersonLinkRole} from './preprocess';
 import * as selectors from './selectors';
-import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
+import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
 
 function ColoredDot({color}: {color: string}) {
@@ -65,28 +64,35 @@ function EntryPopupContent({
   entry,
   onClose,
 }: {
-  entry: BlockEntry | ContribEntry | BreakEntry;
+  entry;
   onClose: () => void;
 }) {
   const dispatch = useDispatch();
-  const {
-    type,
-    title,
-    locationData: {address, venueName, room},
-    attachments: {files = [], folders = []},
-    personLinks,
-  } = entry;
+  const {type, title} = entry;
   const sessions = useSelector(selectors.getSessions);
+  const eventId = useSelector(selectors.getEventId);
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
-  const eventId = useSelector(selectors.getEventId);
-  const locationArray = Object.values([address, venueName, room]).filter(Boolean);
-  const presenters = personLinks
-    .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
-    .map(p => p.name)
-    .join(', ');
-  const fileCount = files.length + folders.length;
+
+  const _getFileCount = () => {
+    const {attachments = {}} = entry
+    const {files = [], folders = []} = attachments;
+    return files.length + folders.length;
+  };
+
+  const _getOrderedLocationArray = () => {
+    const {locationData = {}} = entry
+    const {address, venueName, room} = locationData;
+    return Object.values([address, venueName, room]).filter(Boolean);
+  };
+
+  const _getPresentersArray = () => {
+    const {personLinks = []} = entry;
+    return personLinks
+      .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
+      .map(p => p.name);
+  };
 
   const onEdit = async (e: MouseEvent) => {
     const {objId} = entry;
@@ -121,6 +127,13 @@ function EntryPopupContent({
     deleteEntry();
     onClose();
   };
+
+  const locationArray = _getOrderedLocationArray();
+  let presenters, fileCount;
+  if (type !== EntryType.Break) {
+    presenters = _getPresentersArray();
+    fileCount = _getFileCount();
+  }
 
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
@@ -175,7 +188,6 @@ function EntryPopupContent({
             <div>{title}</div>
           </div>
         </Card.Header>
-        {/* TODO: (Ajob) Replace dummy data below */}
         <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
         {locationArray.length ? (
           <CardItem icon="map marker alternate">
@@ -188,18 +200,23 @@ function EntryPopupContent({
             </List>
           </CardItem>
         ) : null}
-        {type !== EntryType.Break && (
-          <>
-            <CardItem icon="microphone">{presenters}</CardItem>
-            {fileCount ? (
-              <CardItem icon="file outline">
-                {Translate.string('{fileCount} files', {
-                  fileCount,
-                })}
-              </CardItem>
-            ) : null}
-          </>
-        )}
+        {presenters?.length ? (
+          <CardItem icon="microphone">
+            {presenters.join(', ') || Translate.string('No presenters')}
+          </CardItem>
+        ) : null}
+        {fileCount ? (
+          <CardItem icon="file outline">
+            <PluralTranslate count={fileCount}>
+              <Singular>
+                <Param name="count" value={fileCount} /> file
+              </Singular>
+              <Plural>
+                <Param name="count" value={fileCount} /> files
+              </Plural>
+            </PluralTranslate>
+          </CardItem>
+        ) : null}
       </Card.Content>
     </Card>
   );

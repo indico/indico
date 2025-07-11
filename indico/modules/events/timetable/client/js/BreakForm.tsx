@@ -25,7 +25,15 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
-import { LocationParent } from './types';
+// TODO: (Ajob) Evaluate if this should be re-used
+interface LocationParent {
+  venue: string;
+  room: string;
+  venue_name: string;
+  room_name: string;
+  address: string;
+  inheriting: boolean;
+}
 
 interface BreakFormProps {
     eventId: number;
