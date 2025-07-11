@@ -13,6 +13,30 @@ export enum EntryType {
   Break = 'break',
 }
 
+export enum PersonLinkRole {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  SPEAKER = 'speaker',
+  SUBMITTER = 'submitter',
+}
+
+export interface PersonLink {
+  affiliation: string;
+  avatarURL: string;
+  email: string;
+  emailHash: string;
+  familyName: string;
+  firstName: string;
+  name: string;
+  roles: PersonLinkRole[];
+}
+
+export interface LocationData {
+  address: string;
+  venueName: string;
+  room: string;
+}
+
 export interface Session {
   id?: number;
   title: string;
@@ -68,39 +92,6 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionId: number;
   sessionTitle: string;
   children: ChildEntry[];
-  conveners?: any[];
-}
-
-// TODO: (Ajob) Find correct place for these interfaces
-
-export interface LocationParent {
-  venue: string;
-  room: string;
-  venue_name: string;
-  room_name: string;
-  address: string;
-  inheriting: boolean;
-}
-
-export interface RequestEntryObjectData {
-  description: string;
-  duration: number;
-  start_dt: string;
-  end_dt: string;
-  event_id: number;
-  location: Location;
-  title: string;
-  type: string;
-}
-
-export interface RequestEntryObject {
-  duration: number;
-  end_dt: string;
-  event_id: number;
-  id: number;
-  object: RequestEntryObjectData;
-  start_dt: string;
-  type: string;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
