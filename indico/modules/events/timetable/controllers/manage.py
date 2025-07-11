@@ -31,7 +31,9 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         create_timetable_entry, delete_timetable_entry,
                                                         update_break_entry, update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
+# TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
+from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
@@ -46,7 +48,7 @@ class RHManageTimetable(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
     def _process(self):
-        event_info = serialize_event_info(self.event)
+        event_info = serialize_event_info_new(self.event)
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event, management=True).serialize_timetable()
         return WPManageTimetable.render_template(
