@@ -120,6 +120,7 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     const state = getState();
     const {myBookings} = getCalendarFilters(state);
     const {text} = getRoomFilters(state);
+    const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(state);
     const {
       data: {
         roomIds,
@@ -150,6 +151,9 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
         link_type: state.linking.type,
         link_id: state.linking.id,
       };
+      if (isAdminOverrideEnabled) {
+        params.admin_override_enabled = true;
+      }
     } else {
       url = fetchActiveBookingsURL();
       params = {...params, limit};

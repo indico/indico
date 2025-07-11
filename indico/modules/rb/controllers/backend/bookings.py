@@ -38,7 +38,7 @@ from indico.modules.rb.schemas import (CreateBookingSchema, ReservationOccurrenc
                                        reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
-                                    group_by_occurrence_date, is_booking_start_within_grace_period,
+                                    group_by_occurrence_date, is_booking_start_within_grace_period, rb_is_admin,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
@@ -121,22 +121,24 @@ class RHLinkableBookings(RHRoomBookingBase):
         'text': fields.String(load_default=None),
         'link_type': fields.Enum(LinkType, required=True),
         'link_id': fields.Int(required=True),
+        'admin_override_enabled': fields.Bool(load_default=False),
     }, location='query')
     @use_kwargs({
         'room_ids': fields.List(fields.Int(), load_default=None),
     })
-    def _process(self, link_type, link_id, room_ids, text, earlier, later):
+    def _process(self, link_type, link_id, room_ids, text, earlier, later, admin_override_enabled):
         obj = get_linked_object(link_type, link_id)
         if obj is None or not obj.event.can_manage(session.user):
             raise Forbidden
         # get the day start of the object's start dt, and the first day after the event
         start_dt = utc_to_server(obj.start_dt).replace(hour=0, tzinfo=None) - timedelta(days=earlier)
         end_dt = utc_to_server(obj.end_dt).replace(hour=0, tzinfo=None) + timedelta(days=(1 + later))
+        booked_for_user = session.user if not admin_override_enabled or not rb_is_admin(session.user) else None
         bookings, rows_left = get_active_bookings(limit=None,
                                                   start_dt=start_dt,
                                                   end_dt=end_dt,
                                                   room_ids=room_ids,
-                                                  booked_for_user=session.user,
+                                                  booked_for_user=booked_for_user,
                                                   text=text)
         return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema),
                        rows_left=rows_left)

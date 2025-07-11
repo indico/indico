@@ -91,6 +91,7 @@ class CalendarListView extends React.Component {
       calendarFilters: prevCalendarFilters,
       bookingLinkingDisplayRange: prevBookingLinkingDisplayRange,
       linkData: prevLinkData,
+      isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
     } = prevProps;
     const {
       datePicker: {selectedDate, mode},
@@ -98,6 +99,7 @@ class CalendarListView extends React.Component {
       calendarFilters,
       bookingLinkingDisplayRange,
       linkData,
+      isAdminOverrideEnabled,
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
@@ -107,13 +109,15 @@ class CalendarListView extends React.Component {
       bookingLinkingDisplayRange
     );
     const linkDataChanged = !_.isEqual(prevLinkData, linkData);
+    const adminOverrideChanged = prevIsAdminOverrideEnabled !== isAdminOverrideEnabled;
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
       calendarFiltersChanged ||
       bookingDisplayFiltersChanged ||
-      linkDataChanged
+      linkDataChanged ||
+      (linkData && adminOverrideChanged)
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
