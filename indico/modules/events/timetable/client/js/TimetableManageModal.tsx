@@ -77,7 +77,6 @@ interface DraftEntry {
   session_id?: number;
   code?: string;
   board_number?: string;
-  id?: number;
 }
 
 // Prop interface
@@ -96,7 +95,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch = useDispatch();
-  const isEditing = !!entry.id;
+  // Within this timetable we only care about the database ID,
+  // not the unique ID generated for the timetable
+  const {objId} = entry;
+  const isEditing = !!objId;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -107,7 +109,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
-    id: entry.id,
     title: entry.title,
     description: entry.description,
     person_links: entry.personLinks || [],
@@ -232,18 +233,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _handleEditContribution = async data => {
-    return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: entry.id}), data);
+    return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: objId}), data);
   };
 
   const _handleEditSessionBlock = async data => {
-    return indicoAxios.patch(
-      sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
-      data
-    );
+    return indicoAxios.patch(sessionBlockURL({event_id: eventId, session_block_id: objId}), data);
   };
 
   const _handleEditBreak = async data => {
-    return indicoAxios.patch(breakURL({event_id: eventId, break_id: entry.id}), data);
+    return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
   const handleSubmit = async data => {
