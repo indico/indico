@@ -9,7 +9,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import {combineReducers} from 'redux';
 
-import * as linkingActions from 'indico/modules/rb/common/linking/actions';
 import {camelizeKeys} from 'indico/utils/case';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
@@ -48,10 +47,6 @@ const datePickerReducer = (state = datePickerState(), action) => {
 export const initialDataState = {
   rows: [],
   roomIds: [],
-  bookingLinkingDisplayRange: {
-    earlier: 0,
-    later: 0,
-  },
 };
 
 const initialActiveBookingsState = {
@@ -244,31 +239,6 @@ export default combineReducers({
         return {...state, rows: camelizeKeys(action.data)};
       case calendarActions.ROOM_IDS_RECEIVED:
         return {...state, roomIds: action.data.slice()};
-      case calendarActions.LINKING_ADD_EARLIER:
-        return {
-          ...state,
-          bookingLinkingDisplayRange: {
-            ...state.bookingLinkingDisplayRange,
-            earlier: state.bookingLinkingDisplayRange.earlier + action.days,
-          },
-        };
-      case calendarActions.LINKING_ADD_LATER:
-        return {
-          ...state,
-          bookingLinkingDisplayRange: {
-            ...state.bookingLinkingDisplayRange,
-            later: state.bookingLinkingDisplayRange.later + action.days,
-          },
-        };
-      case linkingActions.CLEAR_OBJECT:
-        return {
-          ...state,
-          linkData: null,
-          bookingLinkingDisplayRange: {
-            earlier: 0,
-            later: 0,
-          },
-        };
       case bookingActions.DELETE_BOOKING_SUCCESS: {
         const {bookingId, roomId} = camelizeKeys(action.data);
         const {rows} = state;

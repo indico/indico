@@ -25,11 +25,11 @@ import {
 } from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Plural, PluralTranslate, Singular, Param, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 
 import {actions as bookingsActions} from '../../common/bookings';
-import {selectors as linkingSelectors} from '../../common/linking';
+import {actions as linkingActions, selectors as linkingSelectors} from '../../common/linking';
 import {selectors as userSelectors} from '../../common/user';
 import CardPlaceholder from '../../components/CardPlaceholder';
 
@@ -54,7 +54,7 @@ class CalendarListView extends React.Component {
     bookingLinkingDisplayRange: PropTypes.exact({
       earlier: PropTypes.number.isRequired,
       later: PropTypes.number.isRequired,
-    }),
+    }).isRequired,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
       linkBookingOccurrence: PropTypes.func.isRequired,
@@ -67,10 +67,6 @@ class CalendarListView extends React.Component {
 
   static defaultProps = {
     linkData: null,
-    bookingLinkingDisplayRange: {
-      earlier: 0,
-      later: 0,
-    },
   };
 
   state = {
@@ -421,7 +417,7 @@ export default connect(
     datePicker: calendarSelectors.getDatePickerInfo(state),
     linkData: linkingSelectors.getLinkObject(state),
     isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
-    bookingLinkingDisplayRange: calendarSelectors.getBookingLinkingDisplayRange(state),
+    bookingLinkingDisplayRange: linkingSelectors.getLinkingDisplayRange(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -430,8 +426,8 @@ export default connect(
         linkBookingOccurrence: bookingsActions.linkBookingOccurrence,
         fetchActiveBookings: calendarActions.fetchActiveBookings,
         clearActiveBookings: calendarActions.clearActiveBookings,
-        addEarlier: calendarActions.addEarlier,
-        addLater: calendarActions.addLater,
+        addEarlier: linkingActions.addEarlier,
+        addLater: linkingActions.addLater,
       },
       dispatch
     ),

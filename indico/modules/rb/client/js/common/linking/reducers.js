@@ -17,6 +17,8 @@ const initialState = {
   eventTitle: null,
   ownRoomId: null,
   ownRoomName: null,
+  earlier: 0,
+  later: 0,
 };
 
 export default (state = initialState, action) => {
@@ -32,10 +34,22 @@ export default (state = initialState, action) => {
         ownRoomName: action.ownRoomName,
         startDt: action.startDt,
         endDt: action.endDt,
+        earlier: 0,
+        later: 0,
       };
     case linkingActions.CLEAR_OBJECT:
     case bookRoomActions.CREATE_BOOKING_SUCCESS:
       return initialState;
+    case linkingActions.ADD_EARLIER:
+      return {
+        ...state,
+        earlier: state.earlier + action.days,
+      };
+    case linkingActions.ADD_LATER:
+      return {
+        ...state,
+        later: state.later + action.days,
+      };
     default:
       return state;
   }

@@ -38,9 +38,6 @@ export const FETCH_ACTIVE_BOOKINGS_ERROR = 'calendar/FETCH_ACTIVE_BOOKINGS_ERROR
 export const ACTIVE_BOOKINGS_RECEIVED = 'calendar/ACTIVE_BOOKINGS_RECEIVED';
 export const CLEAR_ACTIVE_BOOKINGS = 'calendar/CLEAR_ACTIVE_BOOKINGS';
 
-export const LINKING_ADD_LATER = 'linking/ADD_LATER';
-export const LINKING_ADD_EARLIER = 'linking/ADD_EARLIER';
-
 export function changeView(view) {
   return {type: CHANGE_VIEW, view};
 }
@@ -122,10 +119,7 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     const {text} = getRoomFilters(state);
     const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(state);
     const {
-      data: {
-        roomIds,
-        bookingLinkingDisplayRange: {earlier, later},
-      },
+      data: {roomIds},
       activeBookings: {data},
     } = state.calendar;
     let newRoomIds = roomIds;
@@ -143,6 +137,7 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     const body = {room_ids: newRoomIds};
 
     if (state.linking?.type) {
+      const {earlier, later} = state.linking;
       url = fetchLinkableBookingsURL();
       params = {
         ...params,
@@ -178,12 +173,4 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
 
 export function clearActiveBookings() {
   return {type: CLEAR_ACTIVE_BOOKINGS};
-}
-
-export function addLater(days) {
-  return {type: LINKING_ADD_LATER, days};
-}
-
-export function addEarlier(days) {
-  return {type: LINKING_ADD_EARLIER, days};
 }
