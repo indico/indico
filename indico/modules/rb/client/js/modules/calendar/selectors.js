@@ -17,8 +17,8 @@ const CALENDAR_FILTERS = ['myBookings', 'showInactive'];
 const LOCAL_FILTERS = ['hideUnused', 'onlyAuthorized'];
 export const getFilters = ({calendar}) => calendar.filters;
 
-export const getBookingLinkingDisplayRange = state =>
-  state.calendar.data.bookingLinkingDisplayRange || {earlier: 0, later: 0};
+export const getBookingLinkingDisplayRange = ({calendar}) =>
+  calendar.data.bookingLinkingDisplayRange;
 
 export const getRoomFilters = createSelector(
   getFilters,
