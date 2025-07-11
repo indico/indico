@@ -8,25 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import {ChildEntry, DayEntries, EntryType, Session, UnscheduledContrib} from './types';
-
-export enum PersonLinkRole {
-  PRIMARY = 'primary',
-  SECONDARY = 'secondary',
-  SPEAKER = 'speaker',
-  SUBMITTER = 'submitter',
-}
-
-interface PersonLink {
-  affiliation: string;
-  avatarURL: string;
-  email: string;
-  emailHash: string;
-  familyName: string;
-  firstName: string;
-  name: string;
-  roles: PersonLinkRole[];
-}
+import {ChildEntry, DayEntries, EntryType, PersonLink, Session, UnscheduledContrib} from './types';
 
 interface SchemaDate {
   date: string;
