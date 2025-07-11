@@ -8,7 +8,7 @@
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
-from webargs import fields
+from webargs import fields, validate
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_ical
@@ -28,16 +28,22 @@ class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
         'scope': fields.Enum(CalendarScope, load_default=None),
         'detail': fields.String(load_default=None),
-        'series': fields.Boolean(load_default=False)  # Export the full event series
+        'series': fields.Boolean(load_default=False),  # Export the full event series
+        'reminder': fields.Int(load_default=None, validate=validate.Range(0))
     }, location='query')
-    def _process(self, scope, detail, series):
+    def _process(self, scope, detail, series, reminder):
         if not scope and detail == 'contributions':
             scope = CalendarScope.contribution
+
         if not series:
-            event_ical = event_to_ical(self.event, session.user, scope)
+            event_ical = event_to_ical(self.event, session.user, scope, reminder_minutes=reminder)
             return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
         else:
-            events_ical = events_to_ical(self.event.series.events, session.user, scope)
+            events_ical = events_to_ical(
+                self.event.series.events,
+                session.user, scope,
+                reminder_minutes=reminder
+            )
             return send_file('event-series.ics', BytesIO(events_ical), 'text/calendar')
 
 

@@ -18,7 +18,10 @@ from indico.modules.events.settings import event_contact_settings
 from indico.util.string import sanitize_html
 
 
-def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
+def serialize_categories_ical(
+    category_ids, user, event_filter=True, event_filter_fn=None,
+    update_query=None, *, reminder_minutes=None
+):
     """Export the events in a category to iCal.
 
     :param category_ids: Category IDs to export
@@ -29,6 +32,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     :param event_filter_fn: A callable that determines which events to include (after querying)
     :param update_query: A callable that can update the query used to retrieve the events.
                          Must return the updated query object.
+    :param reminder_minutes: If specified, enable reminders in the ical events
     """
     own_room_strategy = joinedload('own_room')
     own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
@@ -62,7 +66,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                                joinedload('acl_entries'))
                       .all())
 
-    return BytesIO(events_to_ical(events, user))
+    return BytesIO(events_to_ical(events, user, reminder_minutes=reminder_minutes))
 
 
 def serialize_category_atom(category, url, user, event_filter):
