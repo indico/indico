@@ -115,9 +115,7 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
     dispatch({type: FETCH_ACTIVE_BOOKINGS_REQUEST});
 
     const state = getState();
-    const {myBookings} = getCalendarFilters(state);
     const {text} = getRoomFilters(state);
-    const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(state);
     const {
       data: {roomIds},
       activeBookings: {data},
@@ -132,15 +130,14 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
       }
     }
 
-    let url;
-    let params = preProcessParameters({text}, ajaxRules);
-    const body = {room_ids: newRoomIds};
-
+    let url, params, body;
     if (state.linking?.type) {
       const {earlier, later} = state.linking;
+      const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(state);
       url = fetchLinkableBookingsURL();
+      body = {room_ids: newRoomIds};
       params = {
-        ...params,
+        ...preProcessParameters({text}, ajaxRules),
         earlier,
         later,
         link_type: state.linking.type,
@@ -150,13 +147,15 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
         params.admin_override_enabled = true;
       }
     } else {
+      const {myBookings} = getCalendarFilters(state);
       url = fetchActiveBookingsURL();
-      params = {...params, limit};
+      body = {room_ids: newRoomIds, limit};
+      params = preProcessParameters({myBookings, text}, ajaxRules);
+
       if (Object.keys(data).length) {
-        params = {...params, ...preProcessParameters({myBookings}, ajaxRules)};
         const lastDt = Object.keys(data).reverse()[0];
         params.start_dt = _.maxBy(data[lastDt], rv =>
-          moment(rv.startDt, 'YYYY-MM-DDTHH:mm:ss').unix()
+          moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
         ).startDt;
         params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
       }
