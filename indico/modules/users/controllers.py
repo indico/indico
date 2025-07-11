@@ -41,7 +41,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import serialize_event_for_ical
-from indico.modules.logs.models.entries import LogKind, UserLogRealm
+from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
@@ -695,12 +695,18 @@ class RHAdmins(RHAdminBase):
             removed = admins - form.admins.data
             for user in added:
                 user.is_admin = True
+                AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
+                                f'Admin privileges granted to {user.full_name}',
+                                session.user, data={'IP': request.remote_addr, 'User ID': user.id})
                 user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session.user,
                          data={'IP': request.remote_addr})
                 logger.warning('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
                 flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
             for user in removed:
                 user.is_admin = False
+                AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
+                                f'Admin privileges revoked from {user.full_name}',
+                                session.user, data={'IP': request.remote_addr, 'User ID': user.id})
                 user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session.user,
                          data={'IP': request.remote_addr})
                 logger.warning('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)

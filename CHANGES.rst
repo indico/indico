@@ -45,6 +45,8 @@ Improvements
 - Allow linking existing booking to an event even if there's no exact date/time overlap,
   and do not show a large number of unrelated bookings (:issue:`6568`, :issue:`6811`,
   :pr:`6846`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Add a log for global admin actions, similar to that in events, categories and users
+  (:pr:`6868`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^
