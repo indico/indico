@@ -23,7 +23,8 @@ export interface Session {
 
 export interface BaseEntry {
   type: EntryType;
-  id: number;
+  id: string;
+  objId: number;
   title: string;
   duration: number;
   description: string;
