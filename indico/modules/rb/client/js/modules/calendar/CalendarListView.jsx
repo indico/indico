@@ -77,7 +77,7 @@ class CalendarListView extends React.Component {
     const {
       actions: {fetchActiveBookings},
     } = this.props;
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT);
   }
 
   componentDidUpdate(prevProps) {
