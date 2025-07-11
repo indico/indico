@@ -77,8 +77,6 @@ interface DraftEntry {
   session_id?: number;
   code?: string;
   board_number?: string;
-  objId?: number;
-  id?: string;
 }
 
 // Prop interface
@@ -111,7 +109,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
-    id,
     title: entry.title,
     description: entry.description,
     person_links: entry.personLinks || [],
