@@ -51,7 +51,7 @@ class TimetableSerializer:
             data = self.serialize_timetable_entry(entry, load_children=False)
             key = self._get_unique_key(entry)
             if entry.parent:
-                parent_code = f's{entry.parent_id}'
+                parent_code = self._get_unique_key(entry.parent)
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
@@ -94,7 +94,6 @@ class TimetableSerializer:
         data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
-                     'id': block.id,
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
                      'sessionTitle': block.session.title,
@@ -125,7 +124,6 @@ class TimetableSerializer:
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
-                     'id': contribution.id,
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds / 60,
@@ -163,7 +161,6 @@ class TimetableSerializer:
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
-                     'id': break_.id,
                      'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
@@ -229,13 +226,23 @@ class TimetableSerializer:
         data = {}
         data.update(self._get_date_data(entry))
         data['id'] = self._get_unique_key(entry)
-        data['uniqueId'] = data['id']
+        data['objId'] = self._get_obj_id(entry)
         data['conferenceId'] = entry.event_id
         if self.management:
             data['isParallel'] = entry.is_parallel()
             data['isParallelInSession'] = entry.is_parallel(in_session=True)
             data['scheduleEntryId'] = entry.id
         return data
+
+    def _get_obj_id(self, entry):
+        if entry.type == TimetableEntryType.SESSION_BLOCK:
+            return entry.session_block.id
+        elif entry.type == TimetableEntryType.CONTRIBUTION:
+            return entry.contribution.id
+        elif entry.type == TimetableEntryType.BREAK:
+            return entry.break_.id
+        else:
+            raise ValueError
 
     def _get_unique_key(self, entry):
         if entry.type == TimetableEntryType.SESSION_BLOCK:

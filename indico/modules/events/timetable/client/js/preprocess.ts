@@ -63,7 +63,7 @@ const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.t
 export function preprocessTimetableEntries(
   data: Record<string, Record<string, SchemaBlock>>,
   eventInfo: {
-    contributions?: {uniqueId: number; title: string; duration: number; sessionId: number}[];
+    contributions?: {title: string; duration: number; sessionId: number}[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   const dayEntries = {};
@@ -84,7 +84,7 @@ export function preprocessTimetableEntries(
         code,
         title,
         id,
-        uniqueId,
+        objId,
       } = entry as any;
 
       // TODO: (Ajob) Currently not passing roles as they do not exist
@@ -104,7 +104,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
-        uniqueId,
+        objId,
         title,
         description,
         startDt: dateToMoment(entry.startDate),
@@ -167,7 +167,6 @@ export function preprocessTimetableEntries(
     dayEntries,
     unscheduled: (eventInfo.contributions || []).map(c => ({
       type: 'contrib',
-      id: c.uniqueId,
       sessionId: c.sessionId,
       title: c.title,
       duration: c.duration,

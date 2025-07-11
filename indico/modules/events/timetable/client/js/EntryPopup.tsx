@@ -75,7 +75,7 @@ function EntryPopupContent({
   const eventId = useSelector(selectors.getEventId);
 
   const onEdit = async (e: MouseEvent) => {
-    if (!draftEntry.id) {
+    if (!draftEntry.objId) {
       return;
     }
 
@@ -83,9 +83,9 @@ function EntryPopupContent({
     e.stopPropagation();
     // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
     const editURL = {
-      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.id}),
-      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
-      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.id}),
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
     }[type];
 
     const {data} = await indicoAxios.get(editURL);
