@@ -24,9 +24,11 @@ import {
   SemanticICONS,
 } from 'semantic-ui-react';
 
+import {TooltipIfTruncated} from 'indico/react/components';
+
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
@@ -95,6 +97,37 @@ function EntryPopupContent({
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
+  const onDelete = async (e: MouseEvent) => {
+    e.stopPropagation();
+
+    const deleteURL = {
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: draftEntry.id}),
+      [EntryType.SessionBlock]: sessionBlockURL({
+        event_id: eventId,
+        session_block_id: draftEntry.id,
+      }),
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: draftEntry.id}),
+    }[draftEntry.type];
+
+    const deleteHandlers = {
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(deleteURL, draftEntry)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(deleteURL, draftEntry.id)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(deleteURL, draftEntry as ContribEntry)),
+    };
+
+    const deleteHandler = deleteHandlers[draftEntry.type];
+
+    if (!deleteHandler) {
+      throw new Error('Invalid entry type');
+    }
+    try {
+      deleteHandler();
+      onClose();
+    } catch (err) {
+      return handleAxiosError(err);
+    }
+  };
+
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
       <Card.Content>
@@ -104,7 +137,17 @@ function EntryPopupContent({
               <Button icon="edit" onClick={onEdit} />
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
-              <Button icon="trash" />
+              {type === EntryType.Contribution ? (
+                <Popup
+                  content={<Translate>Unschedule contribution</Translate>}
+                  inverted
+                  size="mini"
+                  position="bottom center"
+                  trigger={<Button icon="calendar times" onClick={onDelete} color="orange" />}
+                />
+              ) : (
+                <Button icon="trash" onClick={onDelete} />
+              )}
               {type === EntryType.SessionBlock && (
                 <Dropdown button inline icon="ellipsis vertical">
                   <DropdownMenu>
