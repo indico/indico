@@ -156,10 +156,7 @@ export default combineReducers({
     calendar: requestReducer(
       calendarActions.FETCH_CALENDAR_REQUEST,
       calendarActions.FETCH_CALENDAR_SUCCESS,
-      calendarActions.FETCH_CALENDAR_ERROR,
-      calendarActions.FILTER_ADD_EARLIER,
-      calendarActions.FILTER_ADD_LATER,
-      linkingActions.CLEAR_OBJECT
+      calendarActions.FETCH_CALENDAR_ERROR
     ),
     activeBookings: requestReducer(
       calendarActions.FETCH_ACTIVE_BOOKINGS_REQUEST,
@@ -266,6 +263,7 @@ export default combineReducers({
       case linkingActions.CLEAR_OBJECT:
         return {
           ...state,
+          linkData: null,
           bookingLinkingDisplayRange: {
             earlier: 0,
             later: 0,

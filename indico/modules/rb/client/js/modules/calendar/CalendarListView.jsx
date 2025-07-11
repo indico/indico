@@ -91,12 +91,14 @@ class CalendarListView extends React.Component {
       roomFilters: prevRoomFilters,
       calendarFilters: prevCalendarFilters,
       bookingLinkingDisplayRange: prevBookingLinkingDisplayRange,
+      linkData: prevLinkData,
     } = prevProps;
     const {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
       bookingLinkingDisplayRange,
+      linkData,
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
@@ -105,12 +107,14 @@ class CalendarListView extends React.Component {
       prevBookingLinkingDisplayRange,
       bookingLinkingDisplayRange
     );
+    const linkDataChanged = !_.isEqual(prevLinkData, linkData);
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
       calendarFiltersChanged ||
-      bookingDisplayFiltersChanged
+      bookingDisplayFiltersChanged ||
+      linkDataChanged
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
