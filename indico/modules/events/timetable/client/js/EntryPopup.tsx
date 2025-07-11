@@ -57,7 +57,7 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
   );
 }
 
-function TimetablePopupContent({
+function EntryPopupContent({
   entry,
   onClose,
 }: {
@@ -75,17 +75,18 @@ function TimetablePopupContent({
   const eventId = useSelector(selectors.getEventId);
 
   const onEdit = async (e: MouseEvent) => {
-    if (!draftEntry.id) {
+    const {objId} = draftEntry;
+    if (!objId) {
       return;
     }
 
-    onClose();
     e.stopPropagation();
-    // TODO: (Ajob) Requires cleanup of old draftEntry strategy for editing as we now take data from the get request
+    onClose();
+
     const editURL = {
-      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.id}),
-      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.id}),
-      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.id}),
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: objId}),
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: objId}),
     }[type];
 
     const {data} = await indicoAxios.get(editURL);
@@ -151,7 +152,7 @@ function TimetablePopupContent({
   );
 }
 
-export function TimetablePopup({
+export function EntryPopup({
   trigger,
   onClose,
   entry,
@@ -170,7 +171,7 @@ export function TimetablePopup({
       basic
       hideOnScroll
     >
-      <TimetablePopupContent entry={entry} onClose={onClose} />
+      <EntryPopupContent entry={entry} onClose={onClose} />
     </Popup>
   );
 }
