@@ -273,7 +273,7 @@ class AppLogEntry(LogEntryBase):
     __auto_table_args = {'schema': 'indico'}
     user_backref_name = 'app_log_entries'
 
-    #: The general area of the user the entry comes from
+    #: The general area of the application the entry comes from
     realm = db.Column(
         PyIntEnum(AppLogRealm),
         nullable=False
