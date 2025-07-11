@@ -7,6 +7,7 @@
 
 import fetchActiveBookingsURL from 'indico-url:rb.active_bookings';
 import fetchCalendarURL from 'indico-url:rb.calendar';
+import fetchLinkableBookingsURL from 'indico-url:rb.linkable_bookings';
 import searchRoomsURL from 'indico-url:rb.search_rooms';
 
 import _ from 'lodash';
@@ -36,6 +37,9 @@ export const FETCH_ACTIVE_BOOKINGS_SUCCESS = 'calendar/FETCH_ACTIVE_BOOKINGS_SUC
 export const FETCH_ACTIVE_BOOKINGS_ERROR = 'calendar/FETCH_ACTIVE_BOOKINGS_ERROR';
 export const ACTIVE_BOOKINGS_RECEIVED = 'calendar/ACTIVE_BOOKINGS_RECEIVED';
 export const CLEAR_ACTIVE_BOOKINGS = 'calendar/CLEAR_ACTIVE_BOOKINGS';
+
+export const FILTER_ADD_LATER = 'linking/FILTER_ADD_LATER';
+export const FILTER_ADD_EARLIER = 'linking/FILTER_ADD_EARLIER';
 
 export function changeView(view) {
   return {type: CHANGE_VIEW, view};
@@ -109,7 +113,7 @@ export function fetchCalendar(fetchRooms = true) {
   };
 }
 
-export function fetchActiveBookings(limit, fetchRooms = true) {
+export function fetchActiveBookings(limit, fetchRooms = true, range = null) {
   return async (dispatch, getState) => {
     dispatch({type: FETCH_ACTIVE_BOOKINGS_REQUEST});
 
@@ -130,32 +134,28 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
       }
     }
 
-    const params = preProcessParameters({myBookings, text}, ajaxRules);
-    const body = {room_ids: newRoomIds, limit};
+    let url;
+    let params = preProcessParameters({text}, ajaxRules);
+    const body = {room_ids: newRoomIds};
 
-    if (Object.keys(data).length) {
-      const lastDt = Object.keys(data).reverse()[0];
-      params.start_dt = _.maxBy(data[lastDt], rv =>
-        moment(rv.startDt, 'YYYY-MM-DDTHH:mm:ss').unix()
-      ).startDt;
-      params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
-      if (state.linking) {
-        params.end_dt = moment(state.linking.endDt).toISOString();
+    if (state.linking?.type) {
+      url = fetchLinkableBookingsURL();
+      params = {...params, ...range, link_type: state.linking.type, link_id: state.linking.id};
+    } else {
+      url = fetchActiveBookingsURL();
+      params = {...params, limit};
+      if (Object.keys(data).length) {
+        params = {...params, ...preProcessParameters({myBookings}, ajaxRules)};
+        const lastDt = Object.keys(data).reverse()[0];
+        params.start_dt = _.maxBy(data[lastDt], rv =>
+          moment(rv.startDt, 'YYYY-MM-DDTHH:mm:ss').unix()
+        ).startDt;
+        params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
       }
-    } else if (state.linking?.type && state.linking?.showNonOverlapping) {
-      params.start_dt = moment(state.linking.startDt)
-        .startOf('day')
-        .toISOString();
-    } else if (state.linking?.type) {
-      // Set it right before the event starts
-      params.start_dt = moment(state.linking.startDt)
-        .subtract(1, 'second')
-        .toISOString();
-      params.end_dt = moment(state.linking.endDt).toISOString();
     }
 
     return await ajaxAction(
-      () => indicoAxios.post(fetchActiveBookingsURL(), body, {params}),
+      () => indicoAxios.post(url, body, {params}),
       null,
       [ACTIVE_BOOKINGS_RECEIVED, FETCH_ACTIVE_BOOKINGS_SUCCESS],
       [FETCH_ACTIVE_BOOKINGS_ERROR]
@@ -165,4 +165,12 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
 
 export function clearActiveBookings() {
   return {type: CLEAR_ACTIVE_BOOKINGS};
+}
+
+export function addLater() {
+  return {type: FILTER_ADD_LATER};
+}
+
+export function addEarlier() {
+  return {type: FILTER_ADD_EARLIER};
 }

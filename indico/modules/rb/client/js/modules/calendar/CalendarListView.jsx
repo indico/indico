@@ -50,6 +50,10 @@ class CalendarListView extends React.Component {
     datePicker: PropTypes.object.isRequired,
     linkData: PropTypes.object,
     isAdminOverrideEnabled: PropTypes.bool.isRequired,
+    bookingLinkingDisplayRange: PropTypes.exact({
+      earlier: PropTypes.number.isRequired,
+      later: PropTypes.number.isRequired,
+    }),
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
       linkBookingOccurrence: PropTypes.func.isRequired,
@@ -60,6 +64,10 @@ class CalendarListView extends React.Component {
 
   static defaultProps = {
     linkData: null,
+    bookingLinkingDisplayRange: {
+      earlier: 0,
+      later: 0,
+    },
   };
 
   state = {
@@ -69,8 +77,9 @@ class CalendarListView extends React.Component {
   componentDidMount() {
     const {
       actions: {fetchActiveBookings},
+      bookingLinkingDisplayRange,
     } = this.props;
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT);
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false, bookingLinkingDisplayRange);
   }
 
   componentDidUpdate(prevProps) {
@@ -78,25 +87,27 @@ class CalendarListView extends React.Component {
       datePicker: {selectedDate: prevDate, mode: prevMode},
       roomFilters: prevRoomFilters,
       calendarFilters: prevCalendarFilters,
-      linkData: prevLinkData,
+      bookingLinkingDisplayRange: prevBookingLinkingDisplayRange,
     } = prevProps;
     const {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
-      linkData,
+      bookingLinkingDisplayRange,
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
     const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
-    const showNonOverlappingChanged =
-      linkData?.showNonOverlapping !== prevLinkData?.showNonOverlapping;
+    const bookingDisplayFiltersChanged = !_.isEqual(
+      prevBookingLinkingDisplayRange,
+      bookingLinkingDisplayRange
+    );
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
       calendarFiltersChanged ||
-      showNonOverlappingChanged
+      bookingDisplayFiltersChanged
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
@@ -112,16 +123,21 @@ class CalendarListView extends React.Component {
   refetchActiveBookings(roomFiltersChanged) {
     const {
       actions: {fetchActiveBookings, clearActiveBookings},
+      bookingLinkingDisplayRange,
     } = this.props;
     clearActiveBookings();
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged, bookingLinkingDisplayRange);
   }
 
   fetchMoreBookings = () => {
     const {
       actions: {fetchActiveBookings},
+      linkData,
+      bookingLinkingDisplayRange,
     } = this.props;
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
+    if (!linkData) {
+      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false, bookingLinkingDisplayRange);
+    }
   };
 
   renderDayBookings = (day, bookings) => {
@@ -337,6 +353,7 @@ export default connect(
     datePicker: calendarSelectors.getDatePickerInfo(state),
     linkData: linkingSelectors.getLinkObject(state),
     isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+    bookingLinkingDisplayRange: calendarSelectors.getBookingLinkingDisplayRange(state),
   }),
   dispatch => ({
     actions: bindActionCreators(

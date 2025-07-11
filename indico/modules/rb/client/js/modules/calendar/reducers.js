@@ -47,6 +47,10 @@ const datePickerReducer = (state = datePickerState(), action) => {
 export const initialDataState = {
   rows: [],
   roomIds: [],
+  bookingLinkingDisplayRange: {
+    earlier: 0,
+    later: 0,
+  },
 };
 
 const initialActiveBookingsState = {
@@ -151,7 +155,9 @@ export default combineReducers({
     calendar: requestReducer(
       calendarActions.FETCH_CALENDAR_REQUEST,
       calendarActions.FETCH_CALENDAR_SUCCESS,
-      calendarActions.FETCH_CALENDAR_ERROR
+      calendarActions.FETCH_CALENDAR_ERROR,
+      calendarActions.FILTER_ADD_EARLIER,
+      calendarActions.FILTER_ADD_LATER
     ),
     activeBookings: requestReducer(
       calendarActions.FETCH_ACTIVE_BOOKINGS_REQUEST,
@@ -239,6 +245,22 @@ export default combineReducers({
         return {...state, rows: camelizeKeys(action.data)};
       case calendarActions.ROOM_IDS_RECEIVED:
         return {...state, roomIds: action.data.slice()};
+      case calendarActions.FILTER_ADD_EARLIER:
+        return {
+          ...state,
+          bookingLinkingDisplayRange: {
+            ...state.bookingLinkingDisplayRange,
+            earlier: state.bookingLinkingDisplayRange.earlier + 7,
+          },
+        };
+      case calendarActions.FILTER_ADD_LATER:
+        return {
+          ...state,
+          bookingLinkingDisplayRange: {
+            ...state.bookingLinkingDisplayRange,
+            later: state.bookingLinkingDisplayRange.later + 7,
+          },
+        };
       case bookingActions.DELETE_BOOKING_SUCCESS: {
         const {bookingId, roomId} = camelizeKeys(action.data);
         const {rows} = state;

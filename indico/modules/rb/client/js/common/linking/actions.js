@@ -15,7 +15,6 @@ import {camelizeKeys} from 'indico/utils/case';
 
 export const SET_OBJECT = 'linking/SET_OBJECT';
 export const CLEAR_OBJECT = 'linking/CLEAR_OBJECT';
-export const SHOW_NON_OVERLAPPING = 'linking/SHOW_NON_OVERLAPPING';
 
 export function setObjectFromURL(queryString) {
   return async dispatch => {
@@ -54,11 +53,4 @@ export function setObjectFromURL(queryString) {
 
 export function clearObject() {
   return {type: CLEAR_OBJECT};
-}
-
-export function toggleNonOverlapping(value) {
-  return {
-    type: SHOW_NON_OVERLAPPING,
-    value,
-  };
 }
