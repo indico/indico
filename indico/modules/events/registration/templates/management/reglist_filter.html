@@ -1,8 +1,8 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, filter_only=false) %}
-    {% set filters = filters['items'] if is_static_item else filters['fields'] %}
-    {% set filter_title = item.get('filter_title', item.title) if is_static_item else item.title %}
+{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, is_extra_item=false, filter_only=false) %}
+    {% set filters = filters['items'] if is_static_item else filters.get('extra', {}) if is_extra_item else filters['fields'] %}
+    {% set filter_title = item.filter_title|default(item.title) if is_static_item or is_extra_item else item.title %}
     <div class="label-group list-column">
         <div class="i-label title-wrapper" {% if filter_only %}data-only-filter{% endif %}
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
@@ -89,6 +89,15 @@
                 {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, filter_only=filter_only) }}
             {% endfor %}
         </div>
+
+        {% if custom_items %}
+            <h3>{% trans %}Additional data{% endtrans %}</h3>
+            <div class="flexrow f-wrap">
+                {% for item_id, item in custom_items.items() %}
+                    {{ _render_column_selector(item_id, item, item.filter_choices, is_extra_item=true, filter_only=item.filter_only) }}
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% for section in regform.sections if section.is_visible and section.available_fields %}
             {{ _render_regform_item_col_selector(section) }}

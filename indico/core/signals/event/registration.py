@@ -133,6 +133,11 @@ at the top of the list of registrants/participants. The `sender` is the correspo
 registration form.
 ''')
 
+registrant_list_items = _signals.signal('registrant-list-item', '''
+Expected to return `CustomRegistrationListItem` subclasses. The `sender` is the
+`RegistrationForm` object for which to get the custom items.
+''')
+
 google_wallet_ticket_class_data = _signals.signal('google-wallet-ticket-class-data', '''
 Called when data for a Google Wallet ticket class has been generated. The `sender` is the
 `Event` object, the `data` kwarg contains the data that will be passed to the Google

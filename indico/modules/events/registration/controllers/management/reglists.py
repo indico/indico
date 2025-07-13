@@ -194,6 +194,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
                                 RegistrationFormItemType=RegistrationFormItemType,
                                 visible_items=reg_list_config['items'],
                                 static_items=self.list_generator.static_items,
+                                custom_items=self.list_generator.extra_filters,  # XXX weird name, ListGen is a mess
                                 filters=reg_list_config['filters'])
 
     def _process_POST(self):
@@ -470,7 +471,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style."""
 
     def _process(self):
-        static_item_ids, item_ids = self.list_generator.get_item_ids()
+        static_item_ids, item_ids, _extra_item_ids = self.list_generator.get_item_ids()
         pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids)
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
