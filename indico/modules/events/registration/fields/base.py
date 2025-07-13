@@ -8,9 +8,11 @@
 from copy import deepcopy
 from decimal import Decimal
 
+from markupsafe import Markup
 from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -252,6 +254,50 @@ class RegistrationFormFieldBase:
     def get_places_used(self):
         """Return the number of used places for the field."""
         return 0
+
+    def render_summary_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in the registration summary."""
+        return data.friendly_data
+
+    def render_invoice_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in the registration invoice."""
+        return data.friendly_data
+
+    def render_email_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in a registration notification email.
+
+        In case the field is being modified in an existing registration, this method
+        is not called.
+        """
+        return data.friendly_data
+
+    def render_email_diff_data(self, diff_data) -> str | Markup:
+        """Render the field's data in a registraiton notification email.
+
+        This method is called when an existing registration is being modified and
+        the field already contained data. `diff_data` contains the value as returned
+        by :meth:`get_snapshot_data`.
+        """
+        return diff_data
+
+    def get_snapshot_data(self, data: RegistrationData):
+        """Get the field's data for snapshotting.
+
+        The snapshot is used to generate the diff view in notification emails, so
+        this should usually use same format as :meth:`render_email_data.
+        """
+        return self.render_email_data(data)
+
+    def render_reglist_column(self, data: RegistrationData) -> RegistrationListColumn:
+        """Render the field's data in the management registration list table."""
+        return RegistrationListColumn(data.friendly_data, data.search_data)
+
+    def render_spreadsheet_data(self, data: RegistrationData):
+        """Render the field's data in a spreadsheet.
+
+        This may return any data type that's handled by Indico's spreadsheet utils.
+        """
+        return data.friendly_data
 
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):

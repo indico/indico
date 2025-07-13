@@ -106,8 +106,8 @@
         {% set picture_url = url_for('.manage_registration_file', data[field.id].locator.file) if from_management else
                              url_for('.registration_picture', data[field.id].locator.registrant_file) %}
         <img class="picture-preview" src="{{ picture_url }}" alt="{{ friendly_data }}">
-    {% elif friendly_data is not none %}
-        {{- friendly_data -}}
+    {% elif friendly_data is not none and friendly_data != '' %}
+        {{- field.field_impl.render_summary_data(data[field.id]) -}}
     {% endif %}
 {% endmacro %}
 
@@ -278,7 +278,7 @@
                                 {% elif item.field_data.field.input_type == 'multi_choice' %}
                                     {{ item.friendly_data | join(', ') }}
                                 {% else %}
-                                   {{ item.friendly_data }}
+                                   {{ item.field_data.field.field_impl.render_invoice_data(item) }}
                                 {% endif %}
                             </td>
                             <td class="text-right">{{ item.render_price() }}</td>
