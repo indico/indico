@@ -97,20 +97,14 @@ function EntryPopupContent({
   const onDelete = async (e: MouseEvent) => {
     e.stopPropagation();
 
-    const deleteHandlers = {
+    const deleteEntry = {
       [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
       [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(entry, eventId)),
       [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(entry, eventId)),
-    };
+    }[entry.type];
 
-    const deleteHandler = deleteHandlers[entry.type];
-
-    try {
-      deleteHandler();
-      onClose();
-    } catch (err) {
-      return handleAxiosError(err);
-    }
+    deleteEntry();
+    onClose();
   };
 
   return (
