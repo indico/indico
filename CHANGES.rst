@@ -94,6 +94,7 @@ Internal Changes
 - Allow disabling arbitrary dates in date picker / calendar controls (:pr:`6905`, thanks
   :user:`foxbunny`)
 - Support custom data rendering logic in custom registration form fields (:pr:`6967`)
+- Support custom columns and filters in mangement registrant list (:pr:`6968`)
 
 
 Version 3.3.6

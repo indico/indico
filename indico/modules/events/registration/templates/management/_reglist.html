@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_registration_list(regform, registrations, dynamic_columns, static_columns, total_registrations) %}
+{% macro render_registration_list(regform, registrations, dynamic_columns, static_columns, extra_columns, total_registrations) %}
     {% if registrations %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -24,6 +24,9 @@
                             <th class="i-table">{% trans %}Full name{% endtrans %}</th>
                             {% for item in static_columns if not item.get('filter_only') %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
+                            {% endfor %}
+                            {% for item in extra_columns if not item.filter_only %}
+                                <th class="i-table" data-sorter="text">{{ item.title }}</th>
                             {% endfor %}
                             {% for item in dynamic_columns %}
                                 <th class="i-table" data-sorter="text">{{ item.title }}</th>
@@ -120,6 +123,16 @@
                                                 {{- data[item.id].friendly_data }}
                                             {%- endif %}
                                         </td>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for item in extra_columns if not item.filter_only %}
+                                    {% set spec = item.data.get(registration) %}
+                                    {% if spec %}
+                                        <td class="i-table" data-text="{{ spec.text_value }}" {{ spec.td_attrs | html_params }}>
+                                            {{ spec.content }}
+                                        </td>
+                                    {% else %}
+                                        <td class="i-table" data-text=""></td>
                                     {% endif %}
                                 {% endfor %}
                                 {% for item in dynamic_columns %}
