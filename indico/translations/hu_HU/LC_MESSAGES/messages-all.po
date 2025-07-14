@@ -5,7 +5,6 @@
 # 
 # Translators:
 # 23ce5df0e27397a18e616631b9f6d4eb, 2024
-# Transifex Bot <>, 2025
 # Ajob Kustra, 2025
 # Anna Szabó, 2025
 # Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2025
@@ -13,9 +12,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.6-dev\n"
+"Project-Id-Version: Indico 3.3.7-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:55+0100\n"
+"POT-Creation-Date: 2025-07-14 12:20+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2025\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
@@ -406,6 +405,7 @@ msgstr "Nincsenek eseményáthelyezési kérelmek."
 #: indico/modules/api/templates/admin_keys.html
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx
 #: indico/modules/events/surveys/templates/management/survey.html
+#: indico/modules/logs/models/entries.py
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js
 #: indico/web/client/js/react/components/principals/Search.jsx
 msgid "User"
@@ -1077,6 +1077,7 @@ msgstr "Biztosan törölni szeretné ezt a hozzászólást?"
 #: indico/modules/events/templates/admin/_event_label_list.html
 #: indico/modules/events/templates/admin/_reference_type_list.html
 #: indico/modules/groups/templates/_group_members.html
+#: indico/modules/logs/templates/entry_email.html
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
 msgid "Actions"
 msgstr "Műveletek"
@@ -1584,6 +1585,7 @@ msgstr ""
 #: indico/modules/events/contributions/lists.py
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/static/templates/static_sites.html
+#: indico/modules/logs/templates/entry_email.html
 msgid "Status"
 msgstr "Állapot"
 
@@ -1612,7 +1614,7 @@ msgstr "Szekció"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "Has updates"
-msgstr ""
+msgstr "Frissítésekkel rendelkezik"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "List of papers"
@@ -1717,7 +1719,7 @@ msgstr "Rev."
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "There has been an update to the latest revision"
-msgstr ""
+msgstr "Frissítés történt a legutóbbi változathoz"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -1725,6 +1727,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
+#: indico/modules/events/persons/placeholders.py
 msgid "n/a"
 msgstr "nem elérhető"
 
@@ -3068,14 +3071,14 @@ msgstr "Résztvevők listája"
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
 msgid "You need to review some of the fields"
-msgstr ""
+msgstr "Át kell tekintenie néhány mezőt"
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
 msgid "Fields with errors"
-msgstr ""
+msgstr "Hibás mezők"
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
-msgid "Visit incomplete field {field}: {error}"
+msgid "Go to incomplete field {field}: {error}"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormItem.jsx
@@ -3106,6 +3109,10 @@ msgstr[1] ""
 "A mező adatai {retentionPeriod}héttel az esemény befejezése után törlésre "
 "kerülnek."
 
+#: indico/modules/events/registration/client/js/form/FormItem.jsx
+msgid "This field is conditionally shown"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/FormSection.jsx
 msgid "This section is only visible to managers."
 msgstr "Ez a rész csak a szervezők számára látható."
@@ -3124,7 +3131,7 @@ msgstr "{price} / éjszaka"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Pick the arrival and departure dates"
-msgstr ""
+msgstr "Válassza ki az érkezés és távozás dátumát"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Arrival"
@@ -3231,6 +3238,14 @@ msgstr "Helyek korlátja"
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 msgid "Default value"
 msgstr "Alap érték"
+
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
+msgid "Checked"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
+msgid "Unchecked"
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx
 msgid ""
@@ -3350,6 +3365,14 @@ msgid "There is no Indico user associated with this email address."
 msgstr "Nincs indico felhasználó társítva ehhez az e-mail címhez."
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+msgid "You cannot use this email address to register."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+msgid "Please log in using your Indico account to use this email address."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 msgid "This email address is not associated with your Indico account."
 msgstr "Ez az e-mail cím nincs társítva az Indico fiókjához."
 
@@ -3449,6 +3472,31 @@ msgstr[1] "{count} hely maradt"
 #: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx
 msgid "No places left"
 msgstr "Nem maradt hely"
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Show if"
+msgstr ""
+
+#. Form field
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Select field..."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Has values"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Has value"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
+msgid "Select values..."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
 msgid "Select extra slots"
@@ -3610,7 +3658,7 @@ msgstr "Ütemtervi szekciók"
 
 #: indico/modules/events/registration/client/js/form/selectors.js
 msgid "Captcha"
-msgstr ""
+msgstr "Captcha"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 #: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx
@@ -3633,12 +3681,20 @@ msgid "There are no disabled sections."
 msgstr "Nincsenek letiltott szekciók."
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
-msgid "Remove field"
-msgstr "Mező eltávolítása"
+msgid "Fields that are a condition for other fields cannot be deleted."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
+msgid "Delete field"
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
 msgid "Enable field"
 msgstr "Mező engedélyezése"
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
+msgid "Fields that are a condition for other fields cannot be disabled."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx
 msgid "Disable field"
@@ -3724,10 +3780,11 @@ msgstr "Kötelező mező"
 msgid "Privacy"
 msgstr "Adatvédelem"
 
+#: indico/modules/events/forms.py
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
-msgid "Permanent"
-msgstr "Állandó"
+#: indico/modules/events/registration/forms.py
+msgid "Indefinite"
+msgstr "Határozatlan"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "Retention period (weeks)"
@@ -3735,11 +3792,20 @@ msgstr "Megtartási idő (hetek)"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid ""
-"Specify how long user-provided data for this field will be preserved in the "
-"database."
+"Since the registration form has a limited retention period ({period}), data "
+"in this field is automatically deleted after that period. However, you can "
+"set a shorter duration here."
 msgstr ""
-"Adja meg, hogy a felhasználó által megadott adatok mennyi ideig maradnak meg"
-" az adatbázisban."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "{n} week"
+msgid_plural "{n} weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Specify how long user-provided data for this field will be preserved."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid ""
@@ -3871,6 +3937,10 @@ msgstr "Ezt az e-mailt elküldtük."
 #: indico/modules/logs/templates/entry_email.html
 msgid "Sending this email failed."
 msgstr "Az e-mail küldése sikertelen."
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx
+msgid "No logs to show"
+msgstr ""
 
 #: indico/modules/events/management/templates/clone_event.html
 #: indico/modules/events/management/templates/import_event.html
@@ -4834,12 +4904,14 @@ msgstr "Ez a hely nem nyilvános"
 
 #: indico/modules/rb/client/js/components/Room.jsx
 #: indico/modules/users/client/js/Favorites.jsx
+#: indico/web/client/js/react/components/principals/Search.jsx
 #: indico/web/client/js/react/components/principals/items.jsx
 msgid "Remove from favorites"
 msgstr "Eltávolítás a kedvencek közül"
 
 #: indico/modules/rb/client/js/components/Room.jsx
 #: indico/modules/users/templates/_category.html
+#: indico/web/client/js/react/components/principals/Search.jsx
 #: indico/web/client/js/react/components/principals/items.jsx
 msgid "Add to favorites"
 msgstr "Kedvencekhez"
@@ -4909,7 +4981,7 @@ msgstr "Saját zárolásaim"
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx
 msgid "My Locations"
-msgstr ""
+msgstr "Helyszíneim"
 
 #: indico/modules/admin/__init__.py indico/modules/admin/views.py
 #: indico/modules/api/templates/user_profile.html
@@ -4937,14 +5009,14 @@ msgstr "Lásd az idővonalban"
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx
 msgid "{count} hour"
 msgid_plural "{count} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} óra"
+msgstr[1] "{count} óra"
 
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx
 msgid "{count} min"
 msgid_plural "{count} min"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} perc"
+msgstr[1] "{count} perc"
 
 #: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx
 msgid "This location does not exist."
@@ -5267,16 +5339,22 @@ msgid ""
 "By default only admins and location managers can modify rooms, but you can "
 "allow room owners and managers to modify them as well."
 msgstr ""
+"Alapértelmezés szerint csak az adminok és a helyszínkezelők módosíthatják a "
+"termeket, de engedélyezheti, hogy a termek tulajdonosai és kezelői is "
+"módosíthassák azokat."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Hide booking details"
-msgstr ""
+msgstr "Foglalási részletek elrejtése"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid ""
 "If enabled, only room managers and people involved in a booking can see "
 "details such as who made the booking and its history."
 msgstr ""
+"Ha engedélyezve van, csak a teremkezelők és a foglalásban részt vevő "
+"személyek láthatják az olyan részleteket, mint például, hogy ki végezte a "
+"foglalást és annak előzményeit."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Hide the Room Booking system from unauthorized users"
@@ -5941,6 +6019,34 @@ msgid "Already linked"
 msgstr "Már össze van kapcsolva"
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Outside of the event schedule"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings up to {days} day before the event."
+msgid_plural "Showing bookings up to {days} days before the event."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings around the event dates."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Load earlier bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Showing bookings up to {days} day after the event."
+msgid_plural "Showing bookings up to {days} days after the event."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgid "Load later bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 msgid "There are no bookings matching the criteria."
 msgstr "Nincsenek a kritériumoknak megfelelő foglalások."
 
@@ -5991,11 +6097,11 @@ msgstr "Csak a..."
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
 msgid "Deselect all rooms"
-msgstr ""
+msgstr "Az összes terem kijelölésének törlése"
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
 msgid "Select all rooms"
-msgstr ""
+msgstr "Az összes terem kijelölése"
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
 msgid "Block rooms"
@@ -6025,8 +6131,8 @@ msgstr "Kedvenc helyiségeim"
 
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
 #: indico/modules/rb/settings.py
-msgid "Rooms I manage"
-msgstr "Termek, amelyeket kezelek"
+msgid "Rooms I manage or moderate"
+msgstr "Az általam kezelt vagy moderált termek"
 
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
 msgid "Rooms I am authorized to book"
@@ -6109,8 +6215,10 @@ msgid "Event Logo"
 msgstr "Esemény logó"
 
 #: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx
-msgid "This field only accepts jpg, png, gif and webp picture formats."
-msgstr "Ez a mező csak jpg, png, gif és webp képformátumokat fogad el."
+msgid ""
+"This field only accepts jpg, png, gif and webp picture formats, and "
+"extremely large images cannot be used."
+msgstr ""
 
 #: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx
 msgid "Select an image from the event"
@@ -6643,35 +6751,36 @@ msgstr "Egyéni kép"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Unblock {first_name} {last_name}?"
-msgstr ""
+msgstr "Feloldja a tiltást rajta: {last_name}{first_name}?"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Block {first_name} {last_name}?"
-msgstr ""
+msgstr "Letiltja {last_name}{first_name}-t?"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Are you sure you want to unblock {first_name}?"
-msgstr ""
+msgstr "Biztos, hogy fel szeretné oldani a tiltást rajta: {first_name}?"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Are you sure you want to block {first_name}?"
-msgstr ""
+msgstr "Biztos, hogy tiltani szeretné őt: {first_name}?"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "{first_name} {last_name} will regain access to Indico."
 msgstr ""
+"{last_name}{first_name} vissza fogja kapni az Indicóhoz való hozzáférést."
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "{first_name} {last_name} will no longer be able to access Indico."
-msgstr ""
+msgstr "{last_name}{first_name} többé nem fog tudni hozzáférni az Indicóhoz."
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Unblock {first_name}"
-msgstr ""
+msgstr "Tiltás feloldása rajta: {first_name}"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Block {first_name}"
-msgstr ""
+msgstr "{first_name} letiltása"
 
 #: indico/modules/users/client/js/UserBlock.jsx
 msgid "Block User"
@@ -6688,23 +6797,23 @@ msgstr "Felhasználó letiltásának feloldása"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Delete {first_name} {last_name}?"
-msgstr ""
+msgstr "Törli {last_name}{first_name}-t?"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "This action is irreversible"
-msgstr ""
+msgstr "Ez a művelet visszafordíthatatlan"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Deleted user accounts cannot be restored."
-msgstr ""
+msgstr "A törölt felhasználói fiókok nem állíthatók vissza."
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Once deleted, the following will happen:"
-msgstr ""
+msgstr "A törlés után a következők történnek:"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "{first_name} will no longer be able to access Indico."
-msgstr ""
+msgstr "{first_name} többé nem fog tudni hozzáférni az Indicóhoz."
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid ""
@@ -6712,40 +6821,46 @@ msgid ""
 " their presence in events as a speaker or other role; they will still be "
 "listed in such capacities where applicable."
 msgstr ""
+"{first_name} az Indico minden területéről eltávolításra kerül - ez nem "
+"érinti a rendezvényeken való előadói vagy egyéb szerepkörben való "
+"jelenlétüket; adott esetben továbbra is szerepelnek ilyen minőségben."
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid ""
 "Where it is not possible to delete {first_name}, they will be anonymized and"
 " all personal data associated with the user will be removed from Indico."
 msgstr ""
+"Ahol nem lehetséges {first_name} törlése, ott anonimizálásra kerül, és a "
+"felhasználóval kapcsolatos összes személyes adat eltávolításra kerül az "
+"Indicóból."
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Are you sure you want to delete {first_name} {last_name}?"
-msgstr ""
+msgstr "Biztos, hogy törölni szeretné {last_name}{first_name}-t?"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "No, I don't"
-msgstr ""
+msgstr "Nem, nem szeretném"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Yes, I want to delete {first_name} ({countdown_seconds})"
-msgstr ""
+msgstr "Igen, törölni szeretném {first_name}-t ({countdown_seconds})"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Yes, I want to delete {first_name}"
-msgstr ""
+msgstr "Igen, törölni szeretném {first_name}-t"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "Delete User"
-msgstr ""
+msgstr "Felhasználó törlése"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "You cannot delete an admin account"
-msgstr ""
+msgstr "Admin fiókot nem lehet törölni"
 
 #: indico/modules/users/client/js/UserDelete.jsx
 msgid "You cannot delete your own account"
-msgstr ""
+msgstr "Nem törölheti a saját fiókját"
 
 #: indico/modules/users/client/js/dashboard.jsx
 msgid "Events at hand"
@@ -6928,7 +7043,7 @@ msgstr "Következő év"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Select a date range"
-msgstr ""
+msgstr "Dátumtartomány kiválasztása"
 
 #: indico/modules/events/abstracts/forms.py indico/modules/events/forms.py
 #: indico/modules/events/management/forms.py
@@ -6950,27 +7065,30 @@ msgstr "Befejezés"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please enter the start date using the specified format"
-msgstr ""
+msgstr "Dátumtartomány kiválasztása"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please provide the start date"
-msgstr ""
+msgstr "Kérjük, adja meg a kezdés dátumát"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please enter the end date using the specified format"
-msgstr ""
+msgstr "Kérjük, adja meg a befejezés dátumát a megadott formátumban"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please provide the end date"
-msgstr ""
+msgstr "Kérjük, adja meg a befejezés dátumát"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please make sure the start date is between {start} and {end}"
 msgstr ""
+"Kérjük, győződjön meg arról, hogy a kezdési dátum {start} és {end} között "
+"van"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please make sure the end date is between {start} and {end}"
 msgstr ""
+"Kérjük, győződjön meg róla, hogy a végdátum {start} és {end} között van"
 
 #: indico/web/client/js/react/components/EmailListField.jsx
 msgid "Please enter an email address"
@@ -7079,7 +7197,7 @@ msgstr "Intézmény kiválasztási vagy saját megadása"
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
 msgid "Select an affiliation"
-msgstr ""
+msgstr "Válasszon ki egy szervezetet"
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
@@ -7089,7 +7207,7 @@ msgstr "Intézmény keresése vagy kézi megadása"
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
 msgid "Search an affiliation"
-msgstr ""
+msgstr "Szervezet keresése"
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
@@ -7222,6 +7340,12 @@ msgid "Logout"
 msgstr "Kilépés"
 
 #: indico/web/client/js/react/components/WTFDateField.jsx
+#: indico/web/client/js/react/components/WTFDateTimeField.jsx
+#: indico/web/client/js/react/components/WTFOccurrencesField.jsx
+msgid "The entered date is invalid."
+msgstr "A megadott dátum érvénytelen."
+
+#: indico/web/client/js/react/components/WTFDateField.jsx
 msgid "Clear date"
 msgstr "Törlés dátuma"
 
@@ -7266,6 +7390,10 @@ msgstr "Láthatóság mindenkinek"
 #: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
 msgid "Visibility duration (weeks)"
 msgstr "Láthatóság időtartama (hetek)"
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
+msgid "Permanent"
+msgstr "Állandó"
 
 #: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx
 msgid ""
@@ -7498,11 +7626,11 @@ msgstr "Kamera"
 #. Capture an image with a webcam
 #: indico/web/client/js/react/components/pictures/PictureWebcam.jsx
 msgid "Capture"
-msgstr ""
+msgstr "Kép rögzítése"
 
 #: indico/web/client/js/react/components/pictures/PictureWebcam.jsx
 msgid "Or click anywhere on the image to take a picture"
-msgstr ""
+msgstr "Vagy kattintson bárhol a képre a fényképezéshez."
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx
 #: indico/web/client/js/react/components/principals/PrincipalListField.jsx
@@ -7548,13 +7676,15 @@ msgstr "A személynek még nincs Indico fiókja"
 
 #: indico/web/client/js/react/components/principals/Search.jsx
 msgid "I could not find the right person"
-msgstr ""
+msgstr "Nem találtam a megfelelő személyt"
 
 #: indico/web/client/js/react/components/principals/Search.jsx
 msgid ""
 "If nobody on the search results corresponds to the person you were looking "
 "for, you can {enterManuallyLink}add them manually{/enterManuallyLink}."
 msgstr ""
+"Ha a keresési eredmények közül senki sem felel meg a keresett személynek, "
+"akkor {enterManuallyLink}manuálisan is hozzáadhatja{/enterManuallyLink}."
 
 #: indico/web/client/js/react/components/principals/Search.jsx
 msgid "{total} favorite"
@@ -7752,6 +7882,10 @@ msgstr "Az érték legfeljebb {maxValue} lehet"
 msgid "Value must be at least {length} chars"
 msgstr "Az értéknek legalább {length} karakternek kell lennie"
 
+#: indico/web/client/js/react/forms/validators.js
+msgid "Value must be at most {length} chars"
+msgstr "Az érték legfeljebb {length} karakterből állhat"
+
 #: indico/web/client/js/utils/palette.js
 msgid "Red"
 msgstr "Piros"
@@ -7825,57 +7959,57 @@ msgstr "Hozzászólás"
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgctxt "Editable"
 msgid "Not submitted"
-msgstr ""
+msgstr "Nem került benyújtásra"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Ready for review"
-msgstr ""
+msgstr "Felülvizsgálatra kész"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Accepted by Submitter"
-msgstr ""
+msgstr "A beküldő által elfogadva"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasított"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Needs submitter changes"
-msgstr ""
+msgstr "Szükség van a beküldő módosításaira"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Needs submitter confirmation"
-msgstr ""
+msgstr "Szükség van a beküldő megerősítésére"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgctxt "Editable"
 msgid "Unassign"
-msgstr ""
+msgstr "Hozzárendelés törlése"
 
 #: indico/modules/events/editing/client/js/models.js
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "New"
-msgstr ""
+msgstr "Új"
 
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx
 msgctxt "Judge paper (verb)"
@@ -7901,7 +8035,7 @@ msgstr "Nincs"
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
 msgctxt "Choice"
 msgid "Add new"
-msgstr ""
+msgstr "Új hozzáadása"
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
 msgctxt "Choice"
@@ -7921,7 +8055,7 @@ msgstr "Korlátlan"
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgctxt "Minimum size"
 msgid "Unlimited"
-msgstr ""
+msgstr "Korlátlan"
 
 #: indico/modules/events/management/forms.py
 #: indico/modules/events/management/templates/_settings.html
@@ -7929,7 +8063,7 @@ msgstr ""
 #: indico/modules/events/templates/admin/_event_label_list.html
 msgctxt "Classification"
 msgid "Label"
-msgstr ""
+msgstr "Címke"
 
 #. Apply for participation (analogous to 'Register' but 'Apply' is used when
 #. the registration form is moderated)
@@ -7937,28 +8071,28 @@ msgstr ""
 #: indico/modules/events/registration/templates/display/regform_list.html
 msgctxt "Registration"
 msgid "Apply"
-msgstr ""
+msgstr "Jelentkezés"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasítva"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 msgctxt "Booking"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Cancelled"
-msgstr ""
+msgstr "Törölve"
 
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Will be cancelled"
-msgstr ""
+msgstr "Visszavonásra kerül"
 
 #. A button that applies filtering options to some items
 #: indico/modules/categories/templates/display/overview/base.html
@@ -7975,22 +8109,22 @@ msgstr "Alkalmaz"
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx
 msgctxt "Building site/location"
 msgid "Site"
-msgstr ""
+msgstr "Webhely"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
 msgctxt "Room number"
 msgid "Number"
-msgstr ""
+msgstr "Szám"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
 msgctxt "Booking mode"
 msgid "Public"
-msgstr ""
+msgstr "Nyilvános"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
 msgctxt "Booking mode"
 msgid "Restricted"
-msgstr ""
+msgstr "Korlátozott"
 
 #. 'Every' is used in the context of 'Every year', 'Every month', etc.
 #: indico/modules/events/management/forms.py
@@ -7998,12 +8132,12 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx
 msgctxt "Repetition"
 msgid "Every"
-msgstr ""
+msgstr "Minden"
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 msgctxt "Room attribute"
 msgid "Hidden"
-msgstr ""
+msgstr "Rejtett"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
 msgctxt "Map template"
@@ -8013,7 +8147,7 @@ msgstr "Nincs"
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
 msgctxt "Map template"
 msgid "Custom"
-msgstr ""
+msgstr "Egyedi"
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 msgctxt "Link a booking to an event (verb)"
@@ -8167,7 +8301,7 @@ msgstr "Teljes vezetői hozzáférés a terem felett"
 
 #: indico/core/permissions.py
 msgid "Full management access over the location"
-msgstr ""
+msgstr "Teljes körű kezelési hozzáférés a helyszín felett"
 
 #: indico/core/permissions.py
 msgid ""
@@ -8490,7 +8624,7 @@ msgstr "Vélemények:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
 msgid "Submitted by {0} <{1}> on {2}"
-msgstr ""
+msgstr "Beküldte {0} <{1}>. Beküldés időpontja: {2}"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html
@@ -9498,7 +9632,7 @@ msgstr "Ez a felhasználónév már használatban van."
 
 #: indico/modules/auth/controllers.py indico/modules/auth/forms.py
 msgid "Your username cannot be an email address."
-msgstr ""
+msgstr "A felhasználónév nem lehet e-mail cím."
 
 #: indico/modules/auth/controllers.py
 msgid "Your password has been changed successfully."
@@ -9514,7 +9648,7 @@ msgstr "Az e-mail cím le van tiltva."
 
 #: indico/modules/auth/forms.py
 msgid "Username or email"
-msgstr ""
+msgstr "Felhasználónév vagy e-mail cím"
 
 #: indico/modules/auth/forms.py
 msgid "Current password"
@@ -9538,7 +9672,7 @@ msgstr "Ezzel az e-mail címmel nincs profil."
 
 #: indico/modules/auth/providers.py
 msgid "Please use your email address to log in"
-msgstr ""
+msgstr "Kérjük, használja az e-mail címét a bejelentkezéshez"
 
 #: indico/modules/auth/providers.py
 msgid ""
@@ -9546,6 +9680,10 @@ msgid ""
 "email notifications will always be sent to your primary email address "
 "({email}). Go to <a href=\"{url}\">\"My profile\"</a> to manage your emails."
 msgstr ""
+"Ön egy másodlagos e-mail címmel jelentkezik be. Kérjük, vegye figyelembe, "
+"hogy az e-mail értesítések mindig az elsődleges e-mail címére ({email}) "
+"kerülnek elküldésre. Menjen a <a href=\"{url}\">„Profilom”</a> menüpontba, "
+"hogy kezelje az e-mailjeit."
 
 #: indico/modules/auth/templates/_login_form.html
 msgid "Forgot my password"
@@ -9647,6 +9785,8 @@ msgid ""
 "You're setting a password for your Indico account <strong>%(name)s</strong> "
 "(%(email)s)."
 msgstr ""
+"Jelszót állít be a(z) <strong>%(name)s</strong> Indico fiókjához "
+"(%(email)s)."
 
 #: indico/modules/auth/templates/link_identity.html
 msgid "New authentication method"
@@ -9771,7 +9911,7 @@ msgstr "Jelszó módosítása"
 
 #: indico/modules/auth/templates/emails/create_local_identity.txt
 msgid "Set your password"
-msgstr ""
+msgstr "Jelszó beállítása"
 
 #: indico/modules/auth/templates/emails/create_local_identity.txt
 msgid ""
@@ -9786,6 +9926,8 @@ msgid ""
 "Currently there is no password set, but you can use the link below (within "
 "an hour) to set one:"
 msgstr ""
+"Jelenleg nincs jelszó beállítva, de az alábbi linken (egy órán belül) "
+"beállíthat egyet:"
 
 #: indico/modules/auth/templates/emails/link_identity_verify_email.txt
 #: indico/modules/auth/templates/emails/register_verify_email.txt
@@ -10481,7 +10623,7 @@ msgstr ""
 " osztályozzuk, így az alacsonyabb súlyú események valószínűleg kimaradnak, "
 "ha túl sok eseményt kell megjeleníteni."
 
-#: indico/modules/categories/forms.py
+#: indico/modules/categories/forms.py indico/web/forms/fields/datetime.py
 msgid "Days"
 msgstr "Nap"
 
@@ -10590,6 +10732,8 @@ msgstr ""
 #: indico/modules/categories/controllers/display.py
 msgid "There are no previous events for this category"
 msgstr ""
+"Jelenleg nincs jelszó beállítva, de az alábbi linken (egy órán belül) "
+"beállíthat egyet:"
 
 #: indico/modules/categories/controllers/display.py
 msgid "There are no upcoming events for this category"
@@ -10597,7 +10741,7 @@ msgstr "Nincsenek közelgő események ebben a kategóriában"
 
 #: indico/modules/categories/controllers/display.py
 msgid "There are no close events for this category"
-msgstr ""
+msgstr "Nincsenek közeli események ebben a kategóriában"
 
 #: indico/modules/categories/controllers/management.py
 msgid "Category settings saved!"
@@ -10777,12 +10921,13 @@ msgid "Inheriting: Use value from parent category (Disabled)"
 msgstr "Öröklés: A szülői kategória értékének használata (Letiltva)"
 
 #: indico/modules/categories/templates/category_statistics.html
-msgid "Category page"
-msgstr "Kategória oldal"
+msgid "Global statistics"
+msgstr "Globális statisztikák"
 
 #: indico/modules/categories/templates/category_statistics.html
-msgid "statistics"
-msgstr "statisztikák"
+#, python-format
+msgid "Statistics for %(category)s"
+msgstr "Statisztikák erről: %(category)s"
 
 #: indico/modules/categories/templates/display/_calendar_ongoing_events.html
 msgid "There are no ongoing events during selected month."
@@ -10827,7 +10972,7 @@ msgstr "Minden kategória eseményei"
 
 #: indico/modules/categories/templates/display/base.html
 msgid "Previous event"
-msgstr ""
+msgstr "Előző esemény"
 
 #: indico/modules/categories/templates/display/base.html
 msgid "Upcoming event"
@@ -10835,7 +10980,7 @@ msgstr "Közelgő esemény"
 
 #: indico/modules/categories/templates/display/base.html
 msgid "Closest event"
-msgstr ""
+msgstr "Legközelebbi esemény"
 
 #: indico/modules/categories/templates/display/base.html
 msgid "Today's events"
@@ -10855,7 +11000,7 @@ msgstr "Kategória kezelése"
 
 #: indico/modules/categories/templates/display/base.html
 msgid "Skip to sidebar"
-msgstr ""
+msgstr "Ugrás az oldalsávra"
 
 #: indico/modules/categories/templates/display/calendar.html
 #: indico/modules/categories/templates/display/overview/base.html
@@ -11425,6 +11570,7 @@ msgstr ""
 "id=\"cur-indico-plugins-version\"></strong>."
 
 #: indico/modules/core/templates/admin/settings.html
+#: indico/modules/logs/models/entries.py
 #: indico/modules/users/templates/users_admin.html
 msgid "System"
 msgstr "Rendszer"
@@ -12011,6 +12157,14 @@ msgid "Justified"
 msgstr "Igazolt"
 
 #: indico/modules/designer/templates/template.html
+msgid "Wrap"
+msgstr ""
+
+#: indico/modules/designer/templates/template.html
+msgid "Resize"
+msgstr ""
+
+#: indico/modules/designer/templates/template.html
 msgid "Element dimensions"
 msgstr "Az elem méretei"
 
@@ -12113,7 +12267,7 @@ msgstr "Esemény cimkék"
 
 #: indico/modules/events/__init__.py
 msgid "Allowed Keywords"
-msgstr ""
+msgstr "Engedélyezett kulcsszavak"
 
 #: indico/modules/events/__init__.py
 #: indico/modules/events/templates/admin/unlisted_events.html
@@ -12292,7 +12446,7 @@ msgstr "Esemény kulcsszavak"
 
 #: indico/modules/events/forms.py
 msgid "Contribution Keywords"
-msgstr ""
+msgstr "Felszólalás Kulcsszavak"
 
 #: indico/modules/events/forms.py
 msgid "Listing"
@@ -12368,10 +12522,6 @@ msgstr ""
 "megőrzési idejét is. Vegye figyelembe, hogy ennek az értéknek a beállítása "
 "kötelezővé teszi a megőrzési időszak mezőt a regisztrációs űrlap beállítása "
 "során."
-
-#: indico/modules/events/forms.py indico/modules/events/registration/forms.py
-msgid "Indefinite"
-msgstr "Határozatlan"
 
 #: indico/modules/events/forms.py
 msgid "The retention period cannot be zero or negative."
@@ -12456,7 +12606,7 @@ msgstr ""
 
 #: indico/modules/events/util.py
 msgid "Invalid ACL entry: {}"
-msgstr ""
+msgstr "Érvénytelen ACL-bejegyzés: {}"
 
 #: indico/modules/events/util.py
 msgid "Registrants cannot have management permissions: {}"
@@ -13101,6 +13251,7 @@ msgid "No type selected"
 msgstr "Nincs típus kiválasztva"
 
 #: indico/modules/events/abstracts/forms.py
+#: indico/modules/logs/templates/entry_email.html
 msgid "Attachments"
 msgstr "Csatolmányok"
 
@@ -13636,7 +13787,7 @@ msgstr "Duplikált"
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Invited"
-msgstr ""
+msgstr "Meghívva"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgid "Awaiting Review"
@@ -13874,7 +14025,7 @@ msgstr "Szekcióelnök"
 #: indico/modules/events/abstracts/templates/emails/comment.html
 #, python-format
 msgid "New comment on abstract %(title)s"
-msgstr ""
+msgstr "Új megjegyzés a(z) %(title)s  absztrakthoz"
 
 #: indico/modules/events/abstracts/templates/emails/comment.html
 msgid "New abstract comment"
@@ -13922,6 +14073,12 @@ msgid ""
 " Co-authors: {co_authors}%(linebreak)s Track classification: "
 "{abstract_track}%(linebreak)s Presentation type: {contribution_type}"
 msgstr ""
+"Az alábbiakban a beküldött absztrakt összefoglalója olvasható:%(linebreak)s "
+"Konferencia: {event_title}%(linebreak)s Beküldte: "
+"{submitter_name}%(linebreak)s Címe: {abstract_title}%(linebreak)s  Szerzők: "
+"{primary_authors}%(linebreak)s Társszerzők: {co_authors}%(linebreak)s Sáv "
+"besorolása: {abstract_track}%(linebreak)s Prezentáció típusa: "
+"{contribution_type}"
 
 #: indico/modules/events/abstracts/templates/emails/default_accept_notification.txt
 msgid "For a more detailed summary please visit the page of your abstract:"
@@ -14220,7 +14377,7 @@ msgstr "Absztaktok listája"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgctxt "Abstract"
 msgid "New"
-msgstr ""
+msgstr "Új"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgid "Do you really want to delete the selected abstracts?"
@@ -14260,7 +14417,7 @@ msgstr "URL generálása a kiválasztott szűrőkhöz és oszlopokhoz."
 
 #: indico/modules/events/abstracts/templates/management/abstract_list_filter.html
 msgid "Customize abstract list"
-msgstr ""
+msgstr "Absztrakt lista testreszabása"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list_filter.html
 #, python-format
@@ -15046,7 +15203,7 @@ msgstr "Hiányzó helyőrzők: {}"
 #: indico/modules/events/agreements/forms.py
 msgctxt "Agreement answer (noun)"
 msgid "Answer"
-msgstr ""
+msgstr "Válasz"
 
 #: indico/modules/events/agreements/forms.py indico/modules/legal/views.py
 msgid "Agreement"
@@ -15087,27 +15244,27 @@ msgstr "Link a megállapodás oldalához"
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Pending"
-msgstr ""
+msgstr "Függőben"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasítva"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted on behalf"
-msgstr ""
+msgstr "Nevében elfogadva:"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected on behalf"
-msgstr ""
+msgstr "Nevében elutasítva:"
 
 #: indico/modules/events/agreements/templates/agreement_form.html
 #, python-format
@@ -16373,17 +16530,17 @@ msgstr "Nincs engedélye arra, hogy kijelölje önmagát"
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Ready for Review"
-msgstr ""
+msgstr "Felülvizsgálatra kész"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Confirmation"
-msgstr ""
+msgstr "Megerősítésre van szükség"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Changes"
-msgstr ""
+msgstr "Változtatás szükséges"
 
 #: indico/modules/events/editing/templates/emails/base_email.txt
 msgid "You can view details on the following URL:"
@@ -16529,6 +16686,10 @@ msgid_plural "Features disabled: {features}"
 msgstr[0] "Letiltott funkció: {features}"
 msgstr[1] "Letiltott funkciók: {features}"
 
+#: indico/modules/events/features/util.py
+msgid "The '{feature_name}' feature is not enabled for this event."
+msgstr "A(z) '{feature_name}' funkció nincs engedélyezve ehhez az eseményhez."
+
 #: indico/modules/events/features/templates/features.html
 msgid ""
 "You can enable/disable various features for your event. Disabling a feature "
@@ -16585,12 +16746,12 @@ msgstr "Nincs sablon kiválasztva"
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Orange"
-msgstr ""
+msgstr "Narancssárga"
 
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Brown"
-msgstr ""
+msgstr "Barna"
 
 #: indico/modules/events/layout/forms.py
 msgid "Right menu"
@@ -16808,6 +16969,8 @@ msgstr ""
 #: indico/modules/events/layout/controllers/layout.py
 msgid "You cannot upload this file as a logo, it may be corrupted or too big."
 msgstr ""
+"Ezt a fájlt nem töltheti fel logóként, mert lehet, hogy sérült vagy túl "
+"nagy."
 
 #: indico/modules/events/layout/controllers/layout.py
 msgid ""
@@ -17180,7 +17343,7 @@ msgstr "Érvénytelen e-mail cím: {}"
 #: indico/modules/events/management/forms.py
 msgctxt "Classification"
 msgid "Label message"
-msgstr ""
+msgstr "Címke üzenet"
 
 #: indico/modules/events/management/forms.py
 msgid ""
@@ -17349,6 +17512,7 @@ msgid "The time period must be positive"
 msgstr "Az időszaknak pozitívnak kell lennie"
 
 #: indico/modules/events/management/forms.py
+#: indico/web/forms/fields/datetime.py
 msgid "Months"
 msgstr "Hónap"
 
@@ -18466,17 +18630,17 @@ msgstr "Látható a közreműködőknek, az értékelőknek és a bírálóknak"
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Submitted"
-msgstr ""
+msgstr "Beküldve"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasítva"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
@@ -18604,7 +18768,7 @@ msgstr "A kiválasztott tanulmányok elfogadása"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgctxt "Paper"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "Reject selected papers"
@@ -18613,7 +18777,7 @@ msgstr "A kiválasztott tanulmányok elutasítása"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgctxt "Paper"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasítva"
 
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "Mark to be corrected selected papers"
@@ -19664,7 +19828,7 @@ msgstr "Résztvevők szerepkörei"
 
 #: indico/modules/events/persons/__init__.py
 msgid "After search"
-msgstr ""
+msgstr "Keresés után"
 
 #: indico/modules/events/persons/controllers.py
 #: indico/modules/events/templates/display/indico/meeting.html
@@ -19718,13 +19882,15 @@ msgstr "A személylisták beállításai sikeresen megváltoztak"
 
 #: indico/modules/events/persons/forms.py
 msgid "Allow manually adding people"
-msgstr ""
+msgstr " Személyek manuális hozzáadásának engedélyezése"
 
 #: indico/modules/events/persons/forms.py
 msgid ""
 "Controls when users can manually add people to person lists, such as "
 "speakers/authors of contributions."
 msgstr ""
+"Szabályozza, hogy a felhasználók mikor adhatnak hozzá manuálisan személyeket"
+" a személylistákhoz, például a felszólalások előadóit/szerzőit."
 
 #: indico/modules/events/persons/forms.py
 msgid "Include users with no Indico account by default"
@@ -19791,6 +19957,14 @@ msgstr "A felszólalás címe"
 #: indico/modules/events/persons/placeholders.py
 msgid "The program code of the contribution"
 msgstr "A felszólalás programkódja"
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The duration of the contribution (e.g. \"20 minutes\")"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The scheduled date/time of the contribution, or \"n/a\" if unscheduled"
+msgstr ""
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
 msgid "Not scheduled yet"
@@ -19956,7 +20130,7 @@ msgstr "A nem meghívott felhasználók számára"
 
 #: indico/modules/events/persons/templates/management/person_list.html
 msgid "Filter role"
-msgstr ""
+msgstr "Szerep szűrése"
 
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/sessions/forms.py
@@ -20043,6 +20217,16 @@ msgstr "Hozzáférést biztosít a menedzsment számára a regisztrációs űrla
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
 msgstr "A sablon méretei túl nagyok a kiválasztott oldalmérethez képest"
+
+#: indico/modules/events/registration/clone.py
+#: indico/modules/events/registration/templates/management/regform_list.html
+#: indico/modules/events/registration/templates/management/registration_tags.html
+msgid "Registration tags"
+msgstr "Regisztrációs címkék"
+
+#: indico/modules/events/registration/clone.py
+msgid "The target event already has registration tags"
+msgstr ""
 
 #: indico/modules/events/registration/clone.py
 msgid "The target event already has registration forms"
@@ -20893,6 +21077,32 @@ msgstr ""
 "A megőrzési időszak nem lehet hosszabb 10 évnél. A határozatlan időre szóló "
 "mezőt üresen kell hagyni."
 
+#: indico/modules/events/registration/controllers/management/fields.py
+msgid ""
+"This field depends on \"{field}\", which has a shorter retention period "
+"({period})."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+msgid ""
+"This field is a condition for \"{field}\", which has a longer retention "
+"period (indefinite)."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+msgid ""
+"This field is a condition for \"{field}\", which has a longer retention "
+"period ({period})."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+msgid "Fields used as conditional cannot be disabled"
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+msgid "Fields used as conditional cannot be deleted"
+msgstr ""
+
 #: indico/modules/events/registration/controllers/management/invitations.py
 msgid "The invitation has been sent."
 msgid_plural "{n} invitations have been sent."
@@ -21061,7 +21271,7 @@ msgstr "A kiválasztott regisztrációkat sikeresen elutasították."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The selected registrations were successfully reset."
-msgstr ""
+msgstr "A kiválasztott regisztrációk sikeresen visszaállításra kerültek."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "Registration fee has been updated for {} registration."
@@ -21103,6 +21313,10 @@ msgstr "'{}' dokumentum közzététele sikeresen eltávolítva"
 msgid "Document '{}' successfully deleted"
 msgstr "'{}' dokumentum sikeresen törölve"
 
+#: indico/modules/events/registration/controllers/management/sections.py
+msgid "Sections with fields used as conditional cannot be disabled"
+msgstr ""
+
 #: indico/modules/events/registration/controllers/management/tags.py
 msgid "A new tag has been created."
 msgstr "Egy új címkét hoztunk létre."
@@ -21119,6 +21333,10 @@ msgstr "A {} címke módosult."
 #: indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
 msgstr "Erre a lehetőségre már nem maradt hely."
+
+#: indico/modules/events/registration/fields/base.py
+msgid "Value of \"{form_item}\" ({parent_form_item})"
+msgstr "A(z) „{form_item}” értéke ({parent_form_item})"
 
 #: indico/modules/events/registration/fields/choices.py
 msgid "No places left for the option: {0}"
@@ -21186,17 +21404,17 @@ msgstr "Elfogadásig"
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Pending"
-msgstr ""
+msgstr "Függőben"
 
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Declined"
-msgstr ""
+msgstr "Elutasítva"
 
 #: indico/modules/events/registration/models/registrations.py
 msgid "Completed"
@@ -21563,7 +21781,7 @@ msgstr "Jelentkezés a részvételre"
 
 #: indico/modules/events/registration/templates/display/event_header.html
 msgid "View full list"
-msgstr ""
+msgstr "Teljes lista megtekintése"
 
 #: indico/modules/events/registration/templates/display/event_header.html
 #, python-format
@@ -22857,11 +23075,6 @@ msgid "Customize"
 msgstr "Testreszabás"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
-#: indico/modules/events/registration/templates/management/registration_tags.html
-msgid "Registration tags"
-msgstr "Regisztrációs címkék"
-
-#: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Create tags to mark and filter registrations"
 msgstr "Címkék létrehozása a regisztrációk megjelöléséhez és szűréséhez"
 
@@ -22956,11 +23169,11 @@ msgstr "A regisztrációk elutasítása"
 
 #: indico/modules/events/registration/templates/management/regform_reglist.html
 msgid "Do you really want to reset the selected registrations?"
-msgstr ""
+msgstr "Tényleg vissza szeretné állítani a kiválasztott regisztrációkat?"
 
 #: indico/modules/events/registration/templates/management/regform_reglist.html
 msgid "Reset registrations"
-msgstr ""
+msgstr "Regisztrációk visszaállítása"
 
 #: indico/modules/events/registration/templates/management/regform_reglist.html
 msgid "Check-in control"
@@ -23022,6 +23235,8 @@ msgstr "Regisztrációk hozzáadása"
 #, python-format
 msgid "Details for #%(friendly_id)s: %(registrant_name)s in \"%(regform_title)s\""
 msgstr ""
+"Részletek #%(friendly_id)s-hez: %(registrant_name)s "
+"\"%(regform_title)s\"-ben"
 
 #: indico/modules/events/registration/templates/management/registration_details.html
 msgid ""
@@ -23061,7 +23276,7 @@ msgstr "Nincsennek címkék."
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 msgid "Customize registration list"
-msgstr ""
+msgstr "Regisztrációs lista testreszabása"
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 #, python-format
@@ -23076,6 +23291,10 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 msgid "General registration info"
 msgstr "Általános regisztrációs információk"
+
+#: indico/modules/events/registration/templates/management/reglist_filter.html
+msgid "Additional data"
+msgstr ""
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 msgid "Click to show/hide disabled sections"
@@ -23176,9 +23395,36 @@ msgid "One email address per line."
 msgstr "Soronként egy E-mail cím."
 
 #: indico/modules/events/reminders/forms.py
-msgid "Send the reminder to all participants/registrants of the event."
+msgid "Send the reminder to participants/registrants of the event."
 msgstr ""
-"Küldjön emlékeztetőt az esemény minden résztvevőjének/regisztrálójának."
+
+#: indico/modules/events/reminders/forms.py
+msgid "Filter by forms"
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid ""
+"Select registration forms here to restrict sending the reminder to the "
+"selected ones."
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid "Filter by tags"
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid "Limit reminders to participants with these tags."
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid "All tags must be present"
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid ""
+"Participants must have all of the selected tags. Otherwise at least one of "
+"them."
+msgstr ""
 
 #: indico/modules/events/reminders/forms.py
 msgid "Send the reminder to all speakers/chairpersons of the event."
@@ -23374,22 +23620,22 @@ msgstr "Ön visszavonta kérelmét ({0})"
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Pending"
-msgstr ""
+msgstr "Függőben"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Accepted"
-msgstr ""
+msgstr "Elfogadva"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Rejected"
-msgstr ""
+msgstr "Visszautasítva"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Withdrawn"
-msgstr ""
+msgstr "Visszavonva"
 
 #: indico/modules/events/requests/templates/event_request_details.html
 msgid "Send request"
@@ -23993,12 +24239,12 @@ msgstr "Meglévő offline másolatok"
 #: indico/modules/events/static/templates/static_sites.html
 msgctxt "Offline copy of an event"
 msgid "Requested by"
-msgstr ""
+msgstr "Kérte:"
 
 #: indico/modules/events/static/templates/static_sites.html
 msgctxt "Offline copy of an event"
 msgid "Requested on"
-msgstr ""
+msgstr "Igényelt"
 
 #: indico/modules/events/static/templates/static_sites.html
 msgid "There are no offline copies of this event."
@@ -24271,7 +24517,7 @@ msgstr "A kérdés címe"
 
 #: indico/modules/events/surveys/fields/base.py
 msgid "The description (shown below the question's field)."
-msgstr ""
+msgstr "A leírás (a kérdés mezője alatt jelenik meg)."
 
 #: indico/modules/events/surveys/fields/base.py
 msgid "If the user has to answer the question."
@@ -24907,13 +25153,15 @@ msgstr "Még nincsenek külső azonosító típusok."
 
 #: indico/modules/events/templates/admin/allowed_keywords.html
 msgid "Allowed keywords"
-msgstr ""
+msgstr "Megengedett kulcsszavak"
 
 #: indico/modules/events/templates/admin/allowed_keywords.html
 msgid ""
 "Define the list of allowed keywords. An empty list implies any keyword is "
 "valid."
 msgstr ""
+"A megengedett kulcsszavak listájának meghatározása. Az üres lista azt "
+"jelenti, hogy bármelyik kulcsszó érvényes."
 
 #: indico/modules/events/templates/admin/autolinker.html
 msgid "Auto-linked Patterns"
@@ -24983,6 +25231,25 @@ msgstr ""
 "események beállítását és testreszabását, mielőtt közzéteszik azokat egy "
 "kategóriában."
 
+#: indico/modules/events/templates/admin/unlisted_events.html
+msgid "Potential misconfiguration"
+msgstr ""
+
+#: indico/modules/events/templates/admin/unlisted_events.html
+#, python-format
+msgid ""
+"Your Indico system config %(link)sdisallows user search%(endlink)s for "
+"regular users, but unlisted events are enabled without restricting who can "
+"create them."
+msgstr ""
+
+#: indico/modules/events/templates/admin/unlisted_events.html
+msgid ""
+"Unless Indico account creation is restricted/moderated, this means that the "
+"configured search restriction is not effective, as anyone can become an "
+"event manager by simply creating an unlisted event."
+msgstr ""
+
 #: indico/modules/attachments/client/js/legacy.js
 #: indico/modules/events/templates/display/access_key.html
 #: indico/web/flask/errors.py
@@ -25014,7 +25281,7 @@ msgstr "Vissza a főoldalra"
 #: indico/modules/events/templates/display/indico/meeting.html
 #: indico/web/templates/layout/base.html
 msgid "Skip to main content"
-msgstr ""
+msgstr "Ugrás a fő tartalomra"
 
 #: indico/modules/events/templates/display/conference.html
 msgid "Date/Time"
@@ -25313,7 +25580,7 @@ msgstr "%(dt)s-n %(name)s-tól"
 #: indico/modules/events/templates/reviews/_common.html
 msgctxt "Review comment"
 msgid "edited"
-msgstr ""
+msgstr "szerkesztve"
 
 #: indico/modules/events/templates/reviews/_common.html
 #, python-format
@@ -25465,7 +25732,7 @@ msgstr "Dokumentum beállításai"
 
 #: indico/modules/events/timetable/forms.py
 msgid "Top-level items"
-msgstr ""
+msgstr "Felső szintű elemek"
 
 #: indico/modules/events/timetable/forms.py
 #: indico/modules/users/models/export.py
@@ -25707,22 +25974,22 @@ msgstr ""
 #: indico/modules/events/timetable/templates/pdf/_cover_page.html
 msgctxt "Timetable"
 msgid "Session Program"
-msgstr ""
+msgstr "Szekció-program"
 
 #: indico/modules/events/timetable/templates/pdf/_cover_page.html
 msgctxt "Timetable"
 msgid "Program"
-msgstr ""
+msgstr "Program"
 
 #: indico/modules/events/timetable/templates/pdf/_program.html
 msgid "Poster Session"
-msgstr ""
+msgstr "Poszter szekció"
 
 #: indico/modules/events/timetable/templates/pdf/_program.html
 msgid "Convener:"
 msgid_plural "Conveners:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Szekcióelnök:"
+msgstr[1] "Szekcióelnökök:"
 
 #: indico/modules/events/tracks/__init__.py
 #: indico/modules/events/tracks/forms.py
@@ -25925,7 +26192,7 @@ msgstr "Csoportok"
 #: indico/modules/groups/controllers.py
 msgctxt "User groups"
 msgid "All"
-msgstr ""
+msgstr "Összes"
 
 #: indico/modules/groups/controllers.py
 msgid "Local Groups"
@@ -26151,7 +26418,7 @@ msgstr ""
 
 #: indico/modules/legal/templates/admin_agreement_banner.html
 msgid "This user has not accepted the latest terms."
-msgstr ""
+msgstr "Ez a felhasználó nem fogadta el a legújabb feltételeket."
 
 #: indico/modules/legal/templates/admin_agreement_banner.html
 #, python-format
@@ -26191,6 +26458,20 @@ msgstr "Felhasználási feltételek"
 msgid "Required Terms"
 msgstr "Kötelező feltételek"
 
+#: indico/modules/logs/controllers.py
+msgid "The email has been re-sent."
+msgstr ""
+
+#. Access Control List
+#: indico/modules/logs/models/entries.py indico/modules/vc/forms.py
+msgid "ACL"
+msgstr "ACL"
+
+#: indico/modules/logs/models/entries.py
+#: indico/modules/users/templates/_labels.html
+msgid "Admin"
+msgstr "Admin"
+
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"
 msgstr "Feladó"
@@ -26198,6 +26479,48 @@ msgstr "Feladó"
 #: indico/modules/logs/templates/entry_email.html
 msgid "To"
 msgstr "Címzett"
+
+#: indico/modules/logs/templates/entry_email.html
+msgid "No attachments"
+msgstr ""
+
+#. Status
+#: indico/modules/logs/templates/entry_email.html
+msgctxt "status"
+msgid "Pending"
+msgstr ""
+
+#. Status
+#: indico/modules/logs/templates/entry_email.html
+msgctxt "status"
+msgid "Sent"
+msgstr ""
+
+#. Status
+#: indico/modules/logs/templates/entry_email.html
+msgctxt "status"
+msgid "Failed"
+msgstr ""
+
+#: indico/modules/logs/templates/entry_email.html
+msgid "Re-send email"
+msgstr ""
+
+#: indico/modules/logs/templates/entry_email.html
+#, python-format
+msgid "Do you really want to re-send this email to %(count)s recipient?"
+msgid_plural ""
+"Do you really want to re-send this email to %(count)s recipients?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/logs/templates/entry_email.html
+msgid "Re-sending emails with attachments is not supported."
+msgstr ""
+
+#: indico/modules/logs/templates/entry_email.html
+msgid "This email has not been sent yet."
+msgstr ""
 
 #: indico/modules/logs/templates/entry_simple.html
 msgid "No data to display"
@@ -26232,7 +26555,7 @@ msgstr "IPv4 vagy IPv6 alhálózatok CIDR jelölésben"
 #: indico/modules/networks/forms.py
 msgctxt "IP network"
 msgid "Hidden"
-msgstr ""
+msgstr "Rejtett"
 
 #: indico/modules/networks/forms.py
 msgid "Hidden IP networks cannot be added to ACLs by users"
@@ -26478,7 +26801,7 @@ msgstr ""
 
 #: indico/modules/oauth/forms.py
 msgid "Allowed scopes"
-msgstr ""
+msgstr "Megengedett hatókörök"
 
 #: indico/modules/oauth/forms.py
 msgid "Only scopes from this list may be requested by the app."
@@ -26526,7 +26849,7 @@ msgstr "Mire használják ezt a tokent?"
 
 #: indico/modules/oauth/forms.py
 msgid "Scopes"
-msgstr ""
+msgstr "Terjedelmek"
 
 #: indico/modules/oauth/forms.py
 msgid "Scopes define what kind of access the token has."
@@ -26745,12 +27068,12 @@ msgstr "Teremfoglalások"
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Book"
-msgstr ""
+msgstr "Foglalás"
 
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Prebook"
-msgstr ""
+msgstr "Előfoglalás"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows booking the room"
@@ -26762,16 +27085,16 @@ msgstr "A terem előfoglalásának engedélyezése"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows booking rooms in the location"
-msgstr ""
+msgstr "Lehetővé teszi a termek foglalását a helyszínen"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows prebooking rooms in the location"
-msgstr ""
+msgstr "Lehetővé teszi a termek előfoglalását a helyszínen"
 
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Override"
-msgstr ""
+msgstr "Felülírás"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows overriding restrictions when booking the room"
@@ -26780,7 +27103,7 @@ msgstr "Lehetővé teszi a korlátozások felülbírálását a terem foglalása
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Moderate"
-msgstr ""
+msgstr "Moderálás"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows moderating bookings (approving/rejecting/editing)"
@@ -26801,8 +27124,8 @@ msgid "Rooms I own"
 msgstr "Saját termeim"
 
 #: indico/modules/rb/settings.py
-msgid "Rooms I own or manage"
-msgstr "Saját vagy kezelt termeim"
+msgid "Rooms I own, manage or moderate"
+msgstr "Termek, amelyek tulajdonosa, kezelője vagy moderátora vagyok"
 
 #: indico/modules/rb/user_prefs.py
 msgid "Room notifications"
@@ -26810,11 +27133,12 @@ msgstr "Terem értesítések"
 
 #: indico/modules/rb/user_prefs.py
 msgid ""
-"If you own or manage any rooms, you can choose whether to receive "
+"If you own, manage or moderate any rooms, you can choose whether to receive "
 "notifications about activity related to them."
 msgstr ""
-"Ha Ön a tulajdonosa vagy kezelője valamelyik teremnek, kiválaszthatja, hogy "
-"szeretne-e értesítéseket kapni az azokkal kapcsolatos tevékenységekről."
+"Ha Ön a tulajdonosa, kezelője vagy moderátora valamelyik szobának, akkor "
+"kiválaszthatja, hogy szeretne-e értesítéseket kapni az azokkal kapcsolatos "
+"tevékenységekről."
 
 #: indico/modules/rb/user_prefs.py
 msgid "Room blacklist"
@@ -27411,7 +27735,7 @@ msgstr ""
 #: indico/modules/search/templates/search.html indico/modules/search/views.py
 msgctxt "Page title"
 msgid "Search"
-msgstr ""
+msgstr "Keresés"
 
 #: indico/modules/search/templates/category_search.html
 #, python-format
@@ -27602,7 +27926,7 @@ msgstr "A felhasználók sikeresen összevonásra kerültek."
 
 #: indico/modules/users/controllers.py
 msgid "A user with this email address already exists."
-msgstr ""
+msgstr "Ezzel az e-mail címmel már létezik egy felhasználó."
 
 #: indico/modules/users/controllers.py
 msgid "The request has been approved."
@@ -27621,12 +27945,12 @@ msgid "{name} has been unblocked."
 msgstr "{name} blokkolása feloldásra került."
 
 #: indico/modules/users/controllers.py
-msgid "{user_name} has been anonymized."
-msgstr ""
+msgid "{user_name} has been deleted."
+msgstr "{user_name} törölve lett."
 
 #: indico/modules/users/controllers.py
-msgid "{user_name} has been deleted."
-msgstr ""
+msgid "{user_name} has been anonymized."
+msgstr "{user_name}-t anonimizálták."
 
 #: indico/modules/users/forms.py
 msgid "Language"
@@ -27809,13 +28133,15 @@ msgstr ""
 
 #: indico/modules/users/forms.py
 msgid "Restrict affiliations"
-msgstr ""
+msgstr "Szervezetek korlátozása"
 
 #: indico/modules/users/forms.py
 msgid ""
 "If enabled, users can only choose from predefined affiliations but not enter"
 " custom ones."
 msgstr ""
+"Ha engedélyezve van, a felhasználók az előre megadott szervezetek közül "
+"választhatnak, de egyéni szervezeteket nem adhatnak meg."
 
 #: indico/modules/users/forms.py
 msgid "Set login details"
@@ -27837,22 +28163,22 @@ msgstr "Nincs"
 #: indico/modules/users/models/export.py
 msgctxt "Export request state"
 msgid "Running"
-msgstr ""
+msgstr "Fut"
 
 #: indico/modules/users/models/export.py
 msgctxt "Export request state"
 msgid "Success"
-msgstr ""
+msgstr "Siker"
 
 #: indico/modules/users/models/export.py
 msgctxt "Export request state"
 msgid "Failed"
-msgstr ""
+msgstr "Sikertelen"
 
 #: indico/modules/users/models/export.py
 msgctxt "Export request state"
 msgid "Expired"
-msgstr ""
+msgstr "Lejárt"
 
 #: indico/modules/users/models/export.py
 msgid "Abstracts & Papers"
@@ -27973,10 +28299,6 @@ msgid "Click here to remove this suggestion. It will not be suggested again."
 msgstr "Kattintson ide a javaslat eltávolításához. Nem lesz újra javasolva."
 
 #: indico/modules/users/templates/_labels.html
-msgid "Admin"
-msgstr "Admin"
-
-#: indico/modules/users/templates/_labels.html
 msgid "Blocked"
 msgstr "Blokkolt"
 
@@ -28068,7 +28390,7 @@ msgstr ""
 #: indico/modules/users/templates/emails.html
 msgctxt "E-mail"
 msgid "Primary"
-msgstr ""
+msgstr "Elsődleges"
 
 #: indico/modules/users/templates/emails.html
 msgid "Set as primary"
@@ -28271,63 +28593,61 @@ msgstr "Már van egy videokonferencia csatolva ehhez: '{link_object_title}\"."
 
 #: indico/modules/vc/controllers.py
 msgid "This {plugin_name} videoconference is already attached to the event."
-msgstr ""
+msgstr "Ez a(z) {plugin_name} videokonferencia már az eseményhez kapcsolódik."
 
 #: indico/modules/vc/controllers.py
 msgid ""
 "You are not allowed to create {plugin_name} videoconferences for this event."
-msgstr ""
+msgstr "Ehhez az eseményhez nem hozhat létre {plugin_name} videokonferenciát."
 
 #: indico/modules/vc/controllers.py
 msgid "{plugin_name} videoconference '{room.name}' created"
-msgstr ""
+msgstr "{plugin_name} videokonferencia '{room.name}' létrehozva"
 
 #: indico/modules/vc/controllers.py
 msgid "You are not allowed to modify {} videoconferences for this event."
-msgstr ""
+msgstr "Nem módosíthatja a(z( {} videokonferenciákat ehhez az eseményhez."
 
 #: indico/modules/vc/controllers.py
 msgid "{plugin_name} videoconference '{room.name}' updated"
-msgstr ""
+msgstr "{plugin_name} videokonferencia '{room.name}' frissítve"
 
 #: indico/modules/vc/controllers.py
 msgid ""
 "You are not allowed to refresh {plugin_name} videoconferences for this "
 "event."
 msgstr ""
+"Ezen az eseményen nem engedélyezett a(z) {plugin_name} videokonferenciák "
+"frissítése."
 
 #: indico/modules/vc/controllers.py
 msgid "{plugin_name} videoconference '{room.name}' refreshed"
-msgstr ""
+msgstr "{plugin_name} videokonferencia '{room.name}' frissítve"
 
 #: indico/modules/vc/controllers.py
 msgid "You are not allowed to remove {} videoconferences from this event."
-msgstr ""
+msgstr "Nem távolíthatja el a(z) {} videokonferenciákat ebből az eseményből."
 
 #: indico/modules/vc/controllers.py
 msgid "{plugin_name} videoconference '{room.name}' removed"
-msgstr ""
+msgstr "{plugin_name} videokonferencia '{room.name}' eltávolítva"
 
 #: indico/modules/vc/controllers.py
 msgid ""
 "You are not allowed to attach {plugin_name} videoconferences to this event."
-msgstr ""
+msgstr "Nem csatolhat {plugin_name} videokonferenciákat ehhez az eseményhez."
 
 #: indico/modules/vc/controllers.py
 msgid "You are not authorized to attach the videoconference '{}'"
-msgstr ""
+msgstr "Ön nem jogosult a '{}' videokonferencia csatolására."
 
 #: indico/modules/vc/controllers.py
 msgid "The videoconference has been attached to the event."
-msgstr ""
+msgstr "A videokonferenciát az eseményhez csatolták."
 
 #: indico/modules/vc/forms.py
 msgid "Service managers"
 msgstr "Szolgáltatásvezetők"
-
-#: indico/modules/vc/forms.py
-msgid "ACL"
-msgstr "ACL"
 
 #: indico/modules/vc/forms.py
 msgid "Users and Groups authorized to create videoconferences"
@@ -28351,11 +28671,11 @@ msgstr "Link a következőhöz:"
 
 #: indico/modules/vc/forms.py
 msgid "Show in event"
-msgstr ""
+msgstr "Megjelenítés az eseményben"
 
 #: indico/modules/vc/forms.py
 msgid "Display this videoconference on the event page"
-msgstr ""
+msgstr "A videokonferencia megjelenítése az eseményoldalon"
 
 #: indico/modules/vc/forms.py
 msgid "Please select a contribution"
@@ -28367,7 +28687,7 @@ msgstr "Kérjük, válasszon ki egy szekcióblokkot"
 
 #: indico/modules/vc/forms.py
 msgid "Videoconference to link"
-msgstr ""
+msgstr "Videokonferencia csatolásra"
 
 #: indico/modules/vc/forms.py
 msgid ""
@@ -28375,14 +28695,17 @@ msgid ""
 "attach. Indico will suggest existing videoconferences. Only those created "
 "through Indico can be attached."
 msgstr ""
+"Kérjük, kezdje el írni annak a videokonferenciának a nevét, amelyet csatolni"
+" szeretne. Az Indico javaslatot fog tenni a meglévő videokonferenciákra. "
+"Csak az Indicón keresztül létrehozott konferenciák csatolhatók."
 
 #: indico/modules/vc/forms.py
 msgid "The name of the videoconference."
-msgstr ""
+msgstr "A videokonferencia neve."
 
 #: indico/modules/vc/forms.py
 msgid "There is already a videoconference with this name"
-msgstr ""
+msgstr "Már létezik egy videokonferencia ezzel a névvel."
 
 #: indico/modules/vc/forms.py
 msgid "Sort direction"
@@ -28438,7 +28761,7 @@ msgstr "Videokonferencia állapotának ellenőrzése"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "Edit videoconference"
-msgstr ""
+msgstr "Videokonferencia szerkesztése"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "Detach"
@@ -28451,7 +28774,7 @@ msgstr "Még nem adtunk hozzá videokonferenciákat."
 #: indico/modules/vc/templates/manage_event.html
 #, python-format
 msgid "Create %(plugin_name)s videoconference"
-msgstr ""
+msgstr "%(plugin_name)s videokonferencia létrehozása"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "Create videoconference"
@@ -28459,12 +28782,12 @@ msgstr "Videokonferencia létrehozása"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "Create new videoconference"
-msgstr ""
+msgstr "Új videokonferencia létrehozása"
 
 #: indico/modules/vc/templates/manage_event.html
 #, python-format
 msgid "Attach %(plugin_name)s videoconference"
-msgstr ""
+msgstr "%(plugin_name)s videokonferencia csatolása"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "Attach videoconference"
@@ -28473,7 +28796,7 @@ msgstr "Videokonferencia csatolása"
 #: indico/modules/vc/templates/manage_event.html
 msgctxt "Videoconference"
 msgid "Add existing one"
-msgstr ""
+msgstr "Meglévő hozzáadása"
 
 #: indico/modules/vc/templates/manage_event.html
 msgid "There are no Videoconference plugins available."
@@ -28484,12 +28807,16 @@ msgid ""
 "The following video services are available. Click on one to attach an "
 "existing videoconference:"
 msgstr ""
+"A következő videószolgáltatások állnak rendelkezésre. Kattintson az egyikre "
+"egy meglévő videokonferencia csatolásához:"
 
 #: indico/modules/vc/templates/manage_event_select.html
 msgid ""
 "The following video services are available. Click on one to create a new "
 "videoconference:"
 msgstr ""
+"A következő videószolgáltatások állnak rendelkezésre. Kattintson az egyikre "
+"egy új videokonferencia létrehozásához:"
 
 #: indico/modules/vc/templates/manage_event_select.html
 msgid "Attach"
@@ -28498,7 +28825,7 @@ msgstr "Csatolni"
 #: indico/modules/vc/templates/manage_event_select.html
 #, python-format
 msgid "%(action)s %(plugin_name)s videoconference"
-msgstr ""
+msgstr "%(action)s%(plugin_name)s videokonferencia"
 
 #: indico/modules/vc/templates/vc_room_list.html
 msgid "Videoconferences"
@@ -28518,6 +28845,8 @@ msgid ""
 "A videoconference has just been created for the event "
 "\"%(link)s%(title)s%(endlink)s\"."
 msgstr ""
+"A(z) „%(link)s%(title)s%(endlink)s” eseményhez most hoztak létre egy "
+"videokonferenciát."
 
 #: indico/modules/vc/templates/emails/created.html
 msgid "You can manage it from:"
@@ -28525,7 +28854,7 @@ msgstr "Ezt kezelheti a következőkből:"
 
 #: indico/modules/vc/templates/emails/created.html
 msgid "Videoconference information"
-msgstr ""
+msgstr "Videokonferencia információ"
 
 #: indico/modules/vc/templates/emails/created.html
 msgid "Linked to:"
@@ -28538,7 +28867,7 @@ msgstr "Videokonferencia törölve:"
 #: indico/modules/vc/templates/emails/deleted.html
 #, python-format
 msgid "The videoconference \"%(room)s\" has been deleted by %(name)s."
-msgstr ""
+msgstr "A(z) „%(room)s” videokonferenciát %(name)s törölte."
 
 #: indico/util/date_time.py
 msgid "{0} second"
@@ -28565,28 +28894,45 @@ msgstr[0] "{0} nap"
 msgstr[1] "{0} nap"
 
 #: indico/util/date_time.py
+msgid "{0} week"
+msgid_plural "{0} weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Shorthand form for the number of seconds
+#: indico/util/date_time.py
 msgid "{0}s"
 msgid_plural "{0}s"
 msgstr[0] "{0}s"
 msgstr[1] "{0}s"
 
+#. Shorthand form for the number of minutes
 #: indico/util/date_time.py
 msgid "{0}m"
 msgid_plural "{0}m"
 msgstr[0] "{0}m"
 msgstr[1] "{0}m"
 
+#. Shorthand form for the number of hours
 #: indico/util/date_time.py
 msgid "{0}h"
 msgid_plural "{0}h"
 msgstr[0] "{0}h"
 msgstr[1] "{0}h"
 
+#. Shorthand form for the number of days
 #: indico/util/date_time.py
 msgid "{0}d"
 msgid_plural "{0}d"
 msgstr[0] "{0}d"
 msgstr[1] "{0}d"
+
+#. Shorthand form for the number of weeks
+#: indico/util/date_time.py
+msgid "{0}w"
+msgid_plural "{0}w"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/util/date_time.py
 msgid "yesterday"
@@ -28702,7 +29048,7 @@ msgstr "A YAML-kódban szereplő metaadatok érvénytelenek: {error}"
 
 #: indico/util/passwords.py
 msgid "Passwords must be at least {} characters long."
-msgstr ""
+msgstr "A jelszavaknak legalább {} karakter hosszúaknak kell lenniük."
 
 #: indico/util/passwords.py
 msgid "Passwords may not contain the word \"indico\" or variations."
@@ -28715,7 +29061,7 @@ msgstr "A jelszavak nem tartalmazhatják az Ön felhasználónevét."
 
 #: indico/util/passwords.py
 msgid "Passwords may not contain your email address."
-msgstr ""
+msgstr "A jelszavak nem tartalmazhatják az Ön e-mail címét."
 
 #: indico/util/passwords.py
 msgid "This password has been seen in previous data breaches."
@@ -29059,6 +29405,23 @@ msgid "Invalid color selected"
 msgstr "Érvénytelen szín van kiválasztva"
 
 #: indico/web/forms/fields/datetime.py
+msgid "Seconds"
+msgstr ""
+
+#: indico/web/forms/fields/datetime.py
+msgctxt "Duration"
+msgid "Minutes"
+msgstr ""
+
+#: indico/web/forms/fields/datetime.py
+msgid "Hours"
+msgstr ""
+
+#: indico/web/forms/fields/datetime.py
+msgid "Weeks"
+msgstr "Hét"
+
+#: indico/web/forms/fields/datetime.py
 msgid "Please choose a valid unit."
 msgstr "Válasszon egy érvényes egységet."
 
@@ -29066,6 +29429,10 @@ msgstr "Válasszon egy érvényes egységet."
 msgid "Please choose a different unit or keep the previous value."
 msgstr ""
 "Kérjük, válasszon egy másik egységet, vagy tartsa meg az előző értéket."
+
+#: indico/web/forms/fields/datetime.py
+msgid "Years"
+msgstr ""
 
 #: indico/web/forms/fields/datetime.py
 msgid "Date must be specified"
@@ -29109,7 +29476,7 @@ msgstr "Menübejegyzés"
 
 #: indico/web/forms/fields/simple.py
 msgid "Invalid keyword found"
-msgstr ""
+msgstr "Érvénytelen kulcsszót találtunk"
 
 #: indico/web/forms/fields/simple.py
 msgid "URL is required"
@@ -29150,6 +29517,12 @@ msgstr ""
 "Ehhez az objektumhoz <strong>csak</strong> a <strong>megadott "
 "felhasználók</strong> és a <strong>szülői erőforrások</strong> "
 "<strong>kezelői</strong> férhetnek hozzá."
+
+#: indico/web/templates/_protection_messages.html
+msgid ""
+"This object is <strong>only</strong> accessible by the "
+"<strong>managers</strong> of <strong>parent resources</strong>."
+msgstr ""
 
 #: indico/web/templates/_protection_messages.html
 #, python-format
@@ -29249,7 +29622,7 @@ msgstr "A profil időzónája:"
 
 #: indico/web/templates/_session_bar.html
 msgid "Use timezone based on:"
-msgstr ""
+msgstr "Használja az időzónát ez alapján:"
 
 #: indico/web/templates/_session_bar.html
 msgid "Use the event/category timezone"
