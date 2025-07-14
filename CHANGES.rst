@@ -7,6 +7,25 @@ Version 3.3.7
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Prevent dumping basic user details (name, affiliation and email) in bulk using the
+  user id (:cve:`2025-53640`)
+
+.. note::
+
+    With Indico being a tool that is primarily used for academic events, where it is
+    expected behavior that you can look users up by name and email and use the email
+    address as a common way of identifying someone (as names are not unique, often not
+    even combined with someone's affiliation), we only classify this as "medium"
+    severity. Looking up *some* users is normal, but obviously being able to look up
+    *all* of them at once, is not something that's intended.
+
+    In case you want to lock down user search much more strongly, please have a look
+    at the :data:`ALLOW_PUBLIC_USER_SEARCH` setting which has been added in this release
+    as well.
+
 Improvements
 ^^^^^^^^^^^^
 
@@ -77,11 +96,6 @@ Bugfixes
 - Fix error when searching in user logs (:issue:`6933`, :pr:`6936`)
 - Fix room booking prompt during event creation not showing up (:pr:`6941`)
 - Fix AM/PM indicator based on event language in PDF timetable (:pr:`6888`)
-
-Accessibility
-^^^^^^^^^^^^^
-
-- Nothing so far
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
