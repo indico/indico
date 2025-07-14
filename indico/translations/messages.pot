@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.7-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-11 18:24+0200\n"
+"POT-Creation-Date: 2025-07-14 12:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3345,7 +3345,8 @@ msgid ""
 "available! Your current version is <strong id=\"cur-indico-plugins-version\"></strong>."
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html indico/modules/users/templates/users_admin.html
+#: indico/modules/core/templates/admin/settings.html indico/modules/logs/models/entries.py
+#: indico/modules/users/templates/users_admin.html
 msgid "System"
 msgstr ""
 
@@ -14167,6 +14168,10 @@ msgstr ""
 msgid "General registration info"
 msgstr ""
 
+#: indico/modules/events/registration/templates/management/reglist_filter.html
+msgid "Additional data"
+msgstr ""
+
 #. Refers to sections in registration forms
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 msgid "Disabled sections"
@@ -17178,6 +17183,10 @@ msgstr ""
 msgid "ACL"
 msgstr ""
 
+#: indico/modules/logs/models/entries.py indico/modules/users/templates/_labels.html
+msgid "Admin"
+msgstr ""
+
 #: indico/modules/logs/templates/entry_email.html
 msgid "This email is pending and will be sent soon."
 msgstr ""
@@ -18848,10 +18857,6 @@ msgstr ""
 
 #: indico/modules/users/templates/_category.html
 msgid "Click here to remove this suggestion. It will not be suggested again."
-msgstr ""
-
-#: indico/modules/users/templates/_labels.html
-msgid "Admin"
 msgstr ""
 
 #: indico/modules/users/templates/_labels.html
