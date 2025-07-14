@@ -103,3 +103,14 @@ export type DayEntries = Record<string, TopLevelEntry[]>;
 export function isChildEntry(entry: Entry): entry is ChildEntry {
   return 'parentId' in entry;
 }
+
+// Request objects (lowercase)
+
+export interface LocationParentObj {
+  venue: string;
+  room: string;
+  venue_name: string;
+  room_name: string;
+  address: string;
+  inheriting: boolean;
+}
