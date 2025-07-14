@@ -8,7 +8,15 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import {ChildEntry, DayEntries, EntryType, PersonLink, Session, UnscheduledContrib} from './types';
+import {
+  Attachments,
+  ChildEntry,
+  DayEntries,
+  EntryType,
+  PersonLink,
+  Session,
+  UnscheduledContrib,
+} from './types';
 
 interface SchemaDate {
   date: string;
@@ -36,6 +44,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
+  attachments?: Attachments;
   address?: string;
   venueName?: string;
   room?: string;
@@ -135,8 +144,9 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
+          const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
-            type: entryTypeMapping[c.id[0]],
+            type: entryTypeMapping[childType],
             objId: c.objId,
             id: c.id,
             title: c.title,
@@ -150,11 +160,15 @@ export function preprocessTimetableEntries(
               room: c.room,
               venueName: c.venueName,
             },
-            personLinks: c.personLinks,
             width: 0,
             column: 0,
             maxColumn: 0,
           };
+
+          if (childType === EntryType.Contribution) {
+            childEntry.attachments = c.attachments;
+            childEntry.personLinks = c.personLinks;
+          }
 
           if (entry.sessionId) {
             childEntry.sessionId = entry.sessionId;
