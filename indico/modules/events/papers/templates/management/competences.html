@@ -15,7 +15,8 @@
     <table class="i-table-widget">
         <thead>
             <tr>
-                <th class="name-column">{% trans %}Name{% endtrans %}</th>
+                {# i18n: Full name of the person #}
+                <th class="name-column">{{ pgettext('Person', 'Name') }}</th>
                 <th>{% trans %}Competences{% endtrans %}</th>
             </tr>
         </thead>
