@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
+
+import {DEFAULT_STEP_SIZE} from './shared';
+
 const TIME_PATTERN = /^(?:[01]?\d|2[0-3]):[0-5]\d$/;
 
 export function timeString(props, propName, componentName) {
@@ -29,4 +33,20 @@ timeString.isRequired = function(props, propName, componentName) {
     );
   }
   return timeString(props, propName, componentName);
+};
+
+export const commonProps = {
+  onChange: PropTypes.func,
+  step: PropTypes.number, // minutes
+  min: timeString,
+  max: timeString,
+  timeFormat: PropTypes.oneOf(['24h', '12h']),
+};
+
+export const commonDefaults = {
+  onChange: undefined,
+  step: DEFAULT_STEP_SIZE,
+  min: '0:00',
+  max: '23:59',
+  timeFormat: '24h',
 };
