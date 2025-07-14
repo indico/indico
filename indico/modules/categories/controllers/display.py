@@ -379,15 +379,16 @@ class RHCategoryOverview(RHDisplayCategoryBase):
                                       detail_level=self.detail, tz=self.category.display_tzinfo,
                                       from_categ=self.category, grouped=False)
 
-    def _process_args(self):
+    @use_kwargs({
+        'detail': fields.String(load_default='event', validate=validate.OneOf(['event', 'session', 'contribution'])),
+        'period': fields.String(load_default='day', validate=validate.OneOf(['day', 'month', 'week'])),
+        'date_arg': fields.String(load_default=None, data_key='date'),
+    }, location='query')
+    def _process_args(self, detail, period, date_arg):
         RHDisplayCategoryBase._process_args(self)
-        self.detail = request.args.get('detail', 'event')
-        if self.detail not in ('event', 'session', 'contribution'):
-            raise BadRequest('Invalid detail argument')
-        self.period = request.args.get('period', 'day')
-        if self.period not in ('day', 'month', 'week'):
-            raise BadRequest('Invalid period argument')
-        if (date_arg := request.args.get('date')) in {'prev', 'next'}:
+        self.detail = detail
+        self.period = period
+        if date_arg in {'prev', 'next'}:
             delta = relativedelta(**{f'{self.period}s': 1})
             if date_arg == 'prev':
                 date = datetime.now() - delta
@@ -400,6 +401,8 @@ class RHCategoryOverview(RHDisplayCategoryBase):
                 raise BadRequest('Invalid date argument')
         else:
             date = datetime.now()
+        if date.year < 1900:
+            raise BadRequest('Invalid date argument')
         date = self.category.display_tzinfo.localize(date)
         date = date.replace(hour=0, minute=0, second=0, microsecond=0)
         if self.period == 'day':
