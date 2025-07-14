@@ -5,6 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
+
+import {indicoAxios} from 'indico/utils/axios';
+import {ajaxAction} from 'indico/utils/redux';
+
 import {
   TopLevelEntry,
   BlockEntry,
@@ -83,6 +90,7 @@ interface ScheduleEntryAction {
 interface UnscheduleEntryAction {
   type: typeof UNSCHEDULE_ENTRY;
   entry: ContribEntry | ChildContribEntry;
+  eventId: number;
 }
 
 interface CreateEntryAction {
@@ -100,11 +108,13 @@ interface UpdateEntryAction {
 interface DeleteBreakAction {
   type: typeof DELETE_BREAK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
+  eventId: number;
 }
 
 interface DeleteBlockAction {
   type: typeof DELETE_BLOCK;
-  id: number;
+  entry: BlockEntry | BreakEntry | ChildBreakEntry;
+  eventId: number;
 }
 
 export type Action =
@@ -157,12 +167,32 @@ export function deselectEntry(): DeselectEntryAction {
   return {type: DESELECT_ENTRY};
 }
 
-export function deleteBreak(entry) {
-  return {type: DELETE_BREAK, entry};
+// TODO: (Marina) Look into ThunkActions for typing
+export function deleteBreak(entry, eventId) {
+  const entryURL = breakURL({event_id: eventId, break_id: entry.objId});
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: DELETE_BREAK,
+    entryURL,
+    entry,
+  }));
 }
 
-export function deleteBlock(id: number) {
-  return {type: DELETE_BLOCK, id};
+export function deleteBlock(entry, eventId) {
+  const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: DELETE_BLOCK,
+    entryURL,
+    entry,
+  }));
+}
+
+export function unscheduleEntry(entry, eventId) {
+  const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+    type: UNSCHEDULE_ENTRY,
+    entryURL,
+    entry,
+  }));
 }
 
 export function dragUnscheduledContribs(contribIds) {
@@ -183,10 +213,6 @@ export function scheduleEntry(
   unscheduled: any[]
 ): ScheduleEntryAction {
   return {type: SCHEDULE_ENTRY, date, entries, unscheduled};
-}
-
-export function unscheduleEntry(entry: ContribEntry | ChildContribEntry): UnscheduleEntryAction {
-  return {type: UNSCHEDULE_ENTRY, entry};
 }
 
 export function changeColor(sessionId, color) {
