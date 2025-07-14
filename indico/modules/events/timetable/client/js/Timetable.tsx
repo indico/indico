@@ -15,6 +15,7 @@ import {DayTimetable} from './DayTimetable';
 import ContributionEntryForm from './forms/ContributionEntryForm';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 import WeekViewToolbar from './WeekViewToolbar';
 
@@ -30,36 +31,39 @@ export default function Timetable() {
 
   const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
+  const isSingleDayEvent = eventStartDt.day() === eventEndDt.day();
 
   const useWeekView = false;
 
-  const minHour = showAllTimeslots
-    ? 0
-    : Math.max(
-        Math.min(
-          eventStartDt.hour(),
+  const minHourWithContent = Math.max(
+    Math.min(
+      eventStartDt.hour(),
+      ...(useWeekView
+        ? Object.values(entries)
+            .flat()
+            .map(e => e.startDt.hour())
+        : currentDateEntries.map(e => e.startDt.hour()))
+    ) - 1,
+    0
+  );
+
+  const minScrollHour = showAllTimeslots && !isSingleDayEvent ? minHourWithContent : 0;
+  const minHour = showAllTimeslots && !isSingleDayEvent ? 0 : minHourWithContent;
+  const maxHour =
+    showAllTimeslots && !isSingleDayEvent
+      ? 24
+      : Math.max(
+          eventEndDt.hour(),
           ...(useWeekView
             ? Object.values(entries)
                 .flat()
-                .map(e => e.startDt.hour())
-            : currentDateEntries.map(e => e.startDt.hour()))
-        ) - 1,
-        0
-      );
-  const maxHour = showAllTimeslots
-    ? 24
-    : Math.max(
-        eventEndDt.hour(),
-        ...(useWeekView
-          ? Object.values(entries)
-              .flat()
-              .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e =>
-              moment(e.startDt)
-                .add(e.duration, 'minutes')
-                .hour()
-            ))
-      );
+                .map(e => e.startDt.add(e.duration, 'minutes').hour())
+            : currentDateEntries.map(e =>
+                moment(e.startDt)
+                  .add(e.duration, 'minutes')
+                  .hour()
+              ))
+        );
 
   return (
     <div styleName="timetable">
@@ -75,6 +79,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
+            scrollPosition={minutesToPixels(minScrollHour * 60)}
           />
         )}
         <ContributionEntryForm />
