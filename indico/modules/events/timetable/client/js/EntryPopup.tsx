@@ -26,7 +26,7 @@ import {
 
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
@@ -71,11 +71,10 @@ function EntryPopupContent({
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
-  let draftEntry = {...entry, duration: entry.duration};
   const eventId = useSelector(selectors.getEventId);
 
   const onEdit = async (e: MouseEvent) => {
-    const {objId} = draftEntry;
+    const {objId} = entry;
     if (!objId) {
       return;
     }
@@ -91,8 +90,21 @@ function EntryPopupContent({
 
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
-    draftEntry = mapTTDataToEntry(data);
-    dispatch(actions.setDraftEntry(draftEntry));
+    entry = mapTTDataToEntry(data);
+    dispatch(actions.setDraftEntry(entry));
+  };
+
+  const onDelete = async (e: MouseEvent) => {
+    e.stopPropagation();
+
+    const deleteEntry = {
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(entry, eventId)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(entry, eventId)),
+    }[entry.type];
+
+    deleteEntry();
+    onClose();
   };
 
   return (
@@ -104,7 +116,17 @@ function EntryPopupContent({
               <Button icon="edit" onClick={onEdit} />
               {/* TODO: (Ajob) Evaluate if we actually need the button below */}
               {/* <Button icon="paint brush" /> */}
-              <Button icon="trash" />
+              {type === EntryType.Contribution ? (
+                <Popup
+                  content={<Translate>Unschedule contribution</Translate>}
+                  inverted
+                  size="mini"
+                  position="bottom center"
+                  trigger={<Button icon="calendar times" onClick={onDelete} color="orange" />}
+                />
+              ) : (
+                <Button icon="trash" onClick={onDelete} />
+              )}
               {type === EntryType.SessionBlock && (
                 <Dropdown button inline icon="ellipsis vertical">
                   <DropdownMenu>
