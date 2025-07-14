@@ -195,6 +195,10 @@ class RHTimetableBreak(RHManageEventBase):
     def _process_GET(self):
         return BreakSchema(context={'event': self.event}).jsonify(self.break_)
 
+    def _process_DELETE(self):
+        delete_timetable_entry(self.break_.timetable_entry)
+        return '', 204
+
 
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionSchema)
@@ -235,6 +239,10 @@ class RHTimetableContribution(RHManageContributionBase):
     def _process_GET(self):
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
+    def _process_DELETE(self):
+        delete_contribution(self.contrib)
+        return '', 204
+
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
         references = []
@@ -274,6 +282,9 @@ class RHTimetableSessionBlock(RHManageEventBase):
     def _process_GET(self):
         return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
 
+    def _process_DELETE(self):
+        delete_session_block(self.session_block)
+        return '', 204
 
 # END OF REST API
 
