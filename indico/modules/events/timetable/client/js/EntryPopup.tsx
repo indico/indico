@@ -105,9 +105,6 @@ function EntryPopupContent({
 
     const deleteHandler = deleteHandlers[entry.type];
 
-    if (!deleteHandler) {
-      throw new Error('Invalid entry type');
-    }
     try {
       deleteHandler();
       onClose();
