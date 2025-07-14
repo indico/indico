@@ -36,6 +36,9 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
+  address?: string;
+  venueName?: string;
+  room?: string;
 }
 
 const entryTypeMapping = {
@@ -143,11 +146,11 @@ export function preprocessTimetableEntries(
             x: 0,
             y: 0,
             locationData: {
-              address,
-              room,
-              venueName,
+              address: c.address,
+              room: c.room,
+              venueName: c.venueName,
             },
-            personLinks,
+            personLinks: c.personLinks,
             width: 0,
             column: 0,
             maxColumn: 0,
