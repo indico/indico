@@ -24,14 +24,18 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import './Favorites.module.scss';
 
 window.setupFavoriteSelection = function setupFavoriteSelection(userId) {
-  ReactDOM.render(<FavoriteManager userId={userId} />, document.getElementById('user-favorites'));
+  const container = document.getElementById('user-favorites');
+  ReactDOM.render(
+    <FavoriteManager userId={userId} searchToken={container.dataset.searchToken || null} />,
+    container
+  );
 };
 
-function FavoriteManager({userId}) {
+function FavoriteManager({userId, searchToken}) {
   return (
     <>
       <div className="row">
-        <FavoriteUserManager userId={userId} />
+        <FavoriteUserManager userId={userId} searchToken={searchToken} />
         <FavoriteCatManager userId={userId} />
       </div>
       <div className="row">
@@ -43,10 +47,12 @@ function FavoriteManager({userId}) {
 
 FavoriteManager.propTypes = {
   userId: PropTypes.number,
+  searchToken: PropTypes.string,
 };
 
 FavoriteManager.defaultProps = {
   userId: null,
+  searchToken: null,
 };
 
 function FavoriteCatManager({userId}) {
@@ -246,7 +252,7 @@ FavoriteEventManager.defaultProps = {
   userId: null,
 };
 
-function FavoriteUserManager({userId}) {
+function FavoriteUserManager({userId, searchToken}) {
   const [favoriteUsers, [addFavoriteUser, deleteFavoriteUser], loading] = useFavoriteUsers(userId);
 
   const searchTrigger = triggerProps => (
@@ -282,7 +288,7 @@ function FavoriteUserManager({userId}) {
                         <Icon
                           styleName="delete-button"
                           name="close"
-                          onClick={() => deleteFavoriteUser(user.userId)}
+                          onClick={() => deleteFavoriteUser(user.identifier)}
                           link
                         />
                       }
@@ -300,19 +306,24 @@ function FavoriteUserManager({userId}) {
           )}
         </div>
       </div>
-      <UserSearch
-        existing={Object.values(favoriteUsers).map(u => u.identifier)}
-        onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
-        triggerFactory={searchTrigger}
-      />
+      {searchToken && (
+        <UserSearch
+          existing={Object.values(favoriteUsers).map(u => u.identifier)}
+          onAddItems={e => e.forEach(u => addFavoriteUser(u.identifier))}
+          triggerFactory={searchTrigger}
+          searchToken={searchToken}
+        />
+      )}
     </div>
   );
 }
 
 FavoriteUserManager.propTypes = {
   userId: PropTypes.number,
+  searchToken: PropTypes.string,
 };
 
 FavoriteUserManager.defaultProps = {
   userId: null,
+  searchToken: null,
 };

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFPrincipalField} from 'indico/react/components';
 
 window.setupPrincipalWidget = function setupPrincipalWidget({
@@ -14,6 +15,7 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
   required,
   withExternalUsers,
   disabled,
+  searchToken,
 }) {
   const field = document.getElementById(fieldId);
 
@@ -24,6 +26,7 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
       required={required}
       withExternalUsers={withExternalUsers}
       disabled={disabled}
+      searchToken={searchToken}
     />,
     document.getElementById(`principalField-${fieldId}`)
   );

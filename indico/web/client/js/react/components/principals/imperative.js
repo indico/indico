@@ -18,9 +18,9 @@ import {UserSearch, GroupSearch} from './Search';
 export function showUserSearch(searchProps = {}, existing = []) {
   return injectModal(resolve => (
     <FavoritesProvider>
-      {([favorites]) => (
+      {favoriteUsersController => (
         <UserSearch
-          favorites={favorites}
+          favoritesController={favoriteUsersController}
           existing={existing}
           onAddItems={users => {
             resolve(searchProps.single ? users?.identifier : users.map(u => u.identifier));

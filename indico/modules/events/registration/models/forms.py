@@ -368,6 +368,7 @@ class RegistrationForm(db.Model):
     # - in_event_acls (EventPrincipal.registration_form)
     # - in_menu_entry_acls (MenuEntryPrincipal.registration_form)
     # - in_session_acls (SessionPrincipal.registration_form)
+    # - reminders (EventReminder.forms)
 
     def __contains__(self, user):
         if user is None:
@@ -388,6 +389,15 @@ class RegistrationForm(db.Model):
     @property
     def identifier(self):
         return f'RegistrationForm:{self.id}'
+
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
 
     @hybrid_property
     def participant_list_disabled(self):

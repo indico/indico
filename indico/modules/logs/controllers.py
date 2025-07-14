@@ -6,19 +6,22 @@
 # LICENSE file for more details.
 
 from babel.dates import get_timezone
-from flask import jsonify, request, session
-from werkzeug.exceptions import Forbidden
+from flask import flash, jsonify, redirect, request, session
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
+from indico.core.notifications import make_email, send_email
+from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.logs.models.entries import (CategoryLogEntry, CategoryLogRealm, EventLogEntry, EventLogRealm,
-                                                UserLogEntry, UserLogRealm)
+from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
+                                                EventLogEntry, EventLogRealm, UserLogEntry, UserLogRealm)
 from indico.modules.logs.util import serialize_log_entry
-from indico.modules.logs.views import WPCategoryLogs, WPEventLogs, WPUserLogs
+from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
@@ -36,14 +39,15 @@ def _get_metadata_query():
             if k.startswith('meta.')}
 
 
-class RHEventLogs(RHManageEventBase):
-    """Show the modification/action log for the event."""
+class RHAppLogs(RHAdminBase):
+    """Show app logs."""
 
     def _process(self):
         metadata_query = _get_metadata_query()
-        realms = {realm.name: realm.title for realm in EventLogRealm}
-        return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
-                                           logs_api_url=url_for('.api_event_logs', self.event))
+        realms = {realm.name: realm.title for realm in AppLogRealm}
+        return WPAppLogs.render_template('logs.html', 'logs',
+                                         realms=realms, metadata_query=metadata_query,
+                                         logs_api_url=url_for('.api_app_logs'))
 
 
 class RHCategoryLogs(RHManageCategoryBase):
@@ -55,6 +59,16 @@ class RHCategoryLogs(RHManageCategoryBase):
         return WPCategoryLogs.render_template('logs.html', self.category, 'logs',
                                               realms=realms, metadata_query=metadata_query,
                                               logs_api_url=url_for('.api_category_logs', self.category))
+
+
+class RHEventLogs(RHManageEventBase):
+    """Show the modification/action log for the event."""
+
+    def _process(self):
+        metadata_query = _get_metadata_query()
+        realms = {realm.name: realm.title for realm in EventLogRealm}
+        return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
+                                           logs_api_url=url_for('.api_event_logs', self.event))
 
 
 class RHUserLogs(RHUserBase):
@@ -94,7 +108,8 @@ class LogsAPIMixin:
         if not filters and not metadata_query:
             return jsonify(current_page=1, pages=[], entries=[], total_page_count=0)
 
-        query = self.object.log_entries.order_by(self.model.logged_dt.desc())
+        query = self.object.log_entries if self.object else self.model.query
+        query = query.order_by(self.model.logged_dt.desc())
         realms = {self.realm_enum.get(f) for f in filters if self.realm_enum.get(f)}
         if realms:
             query = query.filter(self.model.realm.in_(realms))
@@ -110,7 +125,7 @@ class LogsAPIMixin:
                        _contains(self.model.data['from'].astext, text),
                        _contains(self.model.data['to'].astext, text),
                        _contains(self.model.data['cc'].astext, text))
-            ).outerjoin(db.m.User)
+            ).outerjoin(db.m.User, db.m.User.id == self.model.user_id)
 
         if metadata_query:
             query = query.filter(self.model.meta.contains(metadata_query))
@@ -122,17 +137,17 @@ class LogsAPIMixin:
         return jsonify(current_page=page, pages=list(query.iter_pages()), total_page_count=query.pages, entries=entries)
 
 
-class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
-    model = EventLogEntry
-    realm_enum = EventLogRealm
+class RHAppLogsJSON(LogsAPIMixin, RHAdminBase):
+    model = AppLogEntry
+    realm_enum = AppLogRealm
 
     @property
     def object(self):
-        return self.event
+        return None
 
     @property
     def object_tzinfo(self):
-        return self.event.tzinfo
+        return get_timezone(config.DEFAULT_TIMEZONE)
 
 
 class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
@@ -148,6 +163,19 @@ class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
         return self.category.tzinfo
 
 
+class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
+    model = EventLogEntry
+    realm_enum = EventLogRealm
+
+    @property
+    def object(self):
+        return self.event
+
+    @property
+    def object_tzinfo(self):
+        return self.event.tzinfo
+
+
 class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
     model = UserLogEntry
     realm_enum = UserLogRealm
@@ -159,3 +187,40 @@ class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
     @property
     def object_tzinfo(self):
         return get_timezone(config.DEFAULT_TIMEZONE)
+
+
+class RHResendEmail(RHManageEventBase):
+    """Resend an email log entry."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.entry
+        }
+    }
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.entry = (EventLogEntry.query
+                      .with_parent(self.event)
+                      .filter_by(id=request.view_args['log_entry_id'])
+                      .first_or_404())
+
+    def _process(self):
+        if self.entry.type != 'email':
+            raise BadRequest('Invalid log entry type')
+        elif self.entry.data.get('attachments'):
+            raise BadRequest('Cannot re-send email with attachments')
+        email = make_email(
+            to_list=self.entry.data['to'],
+            cc_list=self.entry.data.get('cc', []),
+            bcc_list=self.entry.data.get('bcc', []),
+            sender_address=self.entry.data['from'],
+            reply_address=self.entry.data.get('reply_to', []),
+            subject=self.entry.data['subject'],
+            body=self.entry.data['body'],
+            html=self.entry.data['content_type'] == 'text/html',
+        )
+        send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
+                   log_metadata=self.entry.meta, log_summary=f'Resent email: {self.entry.data['subject']}')
+        flash(_('The email has been re-sent.'), 'success')
+        return redirect(url_for('.event', self.event))

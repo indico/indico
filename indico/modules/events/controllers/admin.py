@@ -167,12 +167,16 @@ class RHUnlistedEvents(RHAdminBase):
     """Manage unlisted events in the server admin area."""
 
     def _process(self):
-        form = UnlistedEventsForm(obj=FormDefaults(**unlisted_events_settings.get_all()))
+        settings = unlisted_events_settings.get_all()
+        form = UnlistedEventsForm(obj=FormDefaults(**settings))
         if form.validate_on_submit():
             unlisted_events_settings.set_multi(form.data)
             flash(_('Settings have been saved'), 'success')
             return redirect(url_for('events.unlisted_events'))
-        return WPEventAdmin.render_template('admin/unlisted_events.html', 'unlisted_events', form=form)
+
+        unrestricted = settings['enabled'] and not settings['restricted']
+        return WPEventAdmin.render_template('admin/unlisted_events.html', 'unlisted_events', form=form,
+                                            unrestricted=unrestricted)
 
 
 class RHAutoLinker(RHAdminBase):

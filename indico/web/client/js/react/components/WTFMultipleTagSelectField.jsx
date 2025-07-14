@@ -6,22 +6,21 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from '../i18n';
 
-export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices}) {
-  const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
-  // Trigger change only after the DOM has changed
-  useEffect(() => {
-    parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [selectedOptions, parentElement]);
+export default function WTFMultipleTagSelectField({fieldId, choices, inputArgs, initialSelection}) {
+  const selectField = useMemo(() => document.getElementById(fieldId), [fieldId]);
+  const [selectedOptions, setSelectedOptions] = useState(initialSelection);
 
   const handleChange = (e, {value}) => {
     setSelectedOptions(value);
+    [...selectField.querySelectorAll('option')].forEach(opt => {
+      opt.selected = value.includes(opt.value);
+    });
+    selectField.dispatchEvent(new Event('change', {bubbles: true}));
   };
 
   const renderLabel = label => ({
@@ -42,40 +41,23 @@ export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices})
   }));
 
   return (
-    <div>
-      <Dropdown
-        fluid
-        multiple
-        onChange={handleChange}
-        options={options}
-        placeholder={Translate.string('Choose an option')}
-        selection
-        value={selectedOptions}
-        renderLabel={renderLabel}
-      />
-      {/* Since Dropdown does not render as a <select> element, we use a dummy <select>
-       * with the correct name attribute and options selected which are used when the form is submitted.
-       */}
-      <select
-        id={fieldId}
-        name={fieldId}
-        multiple
-        readOnly
-        value={selectedOptions}
-        style={{display: 'none'}}
-      >
-        {options.map(({key, text, value}) => (
-          <option key={key} value={value}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Dropdown
+      fluid
+      multiple
+      onChange={handleChange}
+      options={options}
+      placeholder={Translate.string('Choose an option')}
+      selection
+      value={selectedOptions}
+      renderLabel={renderLabel}
+      disabled={inputArgs.disabled ?? false}
+    />
   );
 }
 
 WTFMultipleTagSelectField.propTypes = {
   fieldId: PropTypes.string.isRequired,
-  wrapperId: PropTypes.string.isRequired,
   choices: PropTypes.array.isRequired,
+  inputArgs: PropTypes.object.isRequired,
+  initialSelection: PropTypes.array.isRequired,
 };

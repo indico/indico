@@ -22,10 +22,11 @@ import {
 } from 'indico/react/forms';
 import {Fieldset} from 'indico/react/forms/fields';
 import {FinalModalForm} from 'indico/react/forms/final-form';
-import {Translate, Param} from 'indico/react/i18n';
+import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {getFieldRegistry} from '../form/fields/registry';
+import {ShowIfInput} from '../form/fields/ShowIfInput';
 import {getStaticData, getItemById} from '../form/selectors';
 
 import * as actions from './actions';
@@ -70,7 +71,6 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
       initialValues = {...(initialValues || {}), price: 0};
     }
   }
-
   const handleChangeItemType = (dirty, value) => {
     if (
       newItemType &&
@@ -153,20 +153,43 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
+          {!fieldIsRequired && <ShowIfInput fieldId={id} />}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput
                 name="retentionPeriod"
                 type="number"
-                placeholder={Translate.string('Permanent')}
+                placeholder={
+                  dataRetentionRange.regform
+                    ? String(dataRetentionRange.regform)
+                    : Translate.string('Indefinite')
+                }
                 step="1"
                 min={dataRetentionRange.min}
                 max={dataRetentionRange.max}
                 validate={v.optional(v.range(dataRetentionRange.min, dataRetentionRange.max))}
                 label={Translate.string('Retention period (weeks)')}
-                description={Translate.string(
-                  'Specify how long user-provided data for this field will be preserved in the database.'
-                )}
+                description={
+                  dataRetentionRange.regform
+                    ? Translate.string(
+                        'Since the registration form has a limited retention period ({period}), ' +
+                          'data in this field is automatically deleted after that period. ' +
+                          'However, you can set a shorter duration here.',
+                        {
+                          period: PluralTranslate.string(
+                            '{n} week',
+                            '{n} weeks',
+                            dataRetentionRange.regform,
+                            {
+                              n: dataRetentionRange.regform,
+                            }
+                          ),
+                        }
+                      )
+                    : Translate.string(
+                        'Specify how long user-provided data for this field will be preserved.'
+                      )
+                }
               />
               <FormSpy subscription={{values: true}}>
                 {({values}) =>

@@ -28,11 +28,15 @@ def postgresql():
     """Provide a clean temporary PostgreSQL server/database.
 
     If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
-    will do nothing and simply return the connection string from that variable
+    will do nothing and simply return the connection string from that variable.
+    If set to an empty string, tests relying on the database will be skipped.
     """
     # Use existing database
     if 'INDICO_TEST_DATABASE_URI' in os.environ:
-        yield os.environ['INDICO_TEST_DATABASE_URI']
+        dsn = os.environ['INDICO_TEST_DATABASE_URI']
+        if not dsn:
+            pytest.skip('Database explicitly disabled')
+        yield dsn
         return
 
     db_name = 'test'

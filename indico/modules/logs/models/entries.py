@@ -15,6 +15,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
@@ -34,9 +35,22 @@ class CategoryLogRealm(RichIntEnum):
 
 
 class UserLogRealm(RichIntEnum):
-    __titles__ = (None, _('User'), _('Management'))
+    __titles__ = (
+        None,
+        _('User'),
+        _('Management'),
+        # i18n: Access Control List
+        _('ACL')
+    )
     user = 1
     management = 2
+    acl = 3
+
+
+class AppLogRealm(RichIntEnum):
+    __titles__ = (None, _('System'), _('Admin'))
+    system = 1
+    admin = 2
 
 
 class LogKind(IndicoIntEnum):
@@ -184,6 +198,10 @@ class EventLogEntry(LogEntryBase):
         )
     )
 
+    @locator_property
+    def locator(self):
+        return dict(self.event.locator, log_entry_id=self.id)
+
 
 class CategoryLogEntry(LogEntryBase):
     """Log entries for categories."""
@@ -247,3 +265,26 @@ class UserLogEntry(LogEntryBase):
         ),
         foreign_keys=[target_user_id]
     )
+
+
+class AppLogEntry(LogEntryBase):
+    """Log entries for the application."""
+
+    __auto_table_args = {'schema': 'indico'}
+    user_backref_name = 'app_log_entries'
+
+    #: The general area of the application the entry comes from
+    realm = db.Column(
+        PyIntEnum(AppLogRealm),
+        nullable=False
+    )
+
+    @staticmethod
+    def log(realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
+        entry = AppLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
+                            data=(data or {}), meta=(meta or {}))
+        db.session.add(entry)
+        return entry
+
+    def __repr__(self):
+        return format_repr(self, 'id', 'logged_dt', 'realm', 'module', _text=self.summary)

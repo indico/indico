@@ -20,7 +20,7 @@ from wtforms_dateutil import DateField, DateTimeField
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.util.date_time import localize_as_utc, relativedelta
-from indico.util.i18n import _, get_current_locale
+from indico.util.i18n import _, get_current_locale, pgettext
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
@@ -39,13 +39,12 @@ class TimeDeltaField(Field):
     """
 
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
-    # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': 'Seconds',
-        'minutes': 'Minutes',
-        'hours': 'Hours',
-        'days': 'Days',
-        'weeks': 'Weeks',
+        'seconds': _('Seconds'),
+        'minutes': pgettext('Duration', 'Minutes'),
+        'hours': _('Hours'),
+        'days': _('Days'),
+        'weeks': _('Weeks'),
     }
     magnitudes = {
         'weeks': 7*86400,
@@ -120,15 +119,14 @@ class RelativeDeltaField(Field):
     """
 
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
-    # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': 'Seconds',
-        'minutes': 'Minutes',
-        'hours': 'Hours',
-        'days': 'Days',
-        'weeks': 'Weeks',
-        'months': 'Months',
-        'years': 'Years'
+        'seconds': _('Seconds'),
+        'minutes': pgettext('Duration', 'Minutes'),
+        'hours': _('Hours'),
+        'days': _('Days'),
+        'weeks': _('Weeks'),
+        'months': _('Months'),
+        'years': _('Years')
     }
     magnitudes = {
         'years': relativedelta(years=1),
@@ -205,8 +203,10 @@ class IndicoDurationField(Field):
 class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, allow_clear=None, **kwargs):
+    def __init__(self, *args, allow_clear=None, weekend_disabled=False, disabled_dates=None, **kwargs):
         self.allow_clear = allow_clear
+        self.weekend_disabled = weekend_disabled
+        self.disabled_dates = disabled_dates
         super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
@@ -242,19 +242,22 @@ class IndicoDateTimeField(DateTimeField):
     """Friendly datetime field that handles timezones and validations.
 
     Important: When the form has a `timezone` field it must be
-    declared before any `IndicoDateTimeField`.  Otherwise its
+    declared before any `IndicoDateTimeField`. Otherwise, its
     value is not available in this field resulting in an error
     during form submission.
     """
 
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, timezone=None, default_time=time(0, 0), allow_clear=None, **kwargs):
+    def __init__(self, *args, timezone=None, default_time=time(0, 0), allow_clear=None,
+                 weekend_disabled=False, disabled_dates=None, **kwargs):
         self._timezone = timezone
         self.default_time = default_time
         self.date_missing = False
         self.time_missing = False
         self.allow_clear = allow_clear
+        self.weekend_disabled = weekend_disabled
+        self.disabled_dates = disabled_dates
         super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required

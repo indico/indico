@@ -215,10 +215,6 @@ def validate_keywords_field(obj_type: t.Literal['event', 'contribution'], field)
             raise ValidationError(_('Invalid keyword found'))
 
 
-class IndicoMultipleTagSelectField(SelectMultipleField):
-    widget = JinjaWidget('forms/multiple_tag_select_widget.html', single_kwargs=True, single_line=True)
-
-
 class IndicoLinkListField(JSONField):
     widget = JinjaWidget('forms/link_list_widget.html', single_kwargs=True, single_line=True)
 

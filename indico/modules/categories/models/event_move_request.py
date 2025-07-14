@@ -11,6 +11,7 @@ from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.locators import locator_property
+from indico.util.string import format_repr
 
 
 class MoveRequestState(RichIntEnum):
@@ -127,3 +128,6 @@ class EventMoveRequest(db.Model):
         self.category.log(CategoryLogRealm.events, LogKind.change, 'Moderation',
                           f'Event move request withdrawn: "{self.event.title}"', user,
                           data={'Event ID': self.event.id}, meta={'event_move_request_id': self.id})
+
+    def __repr__(self):
+        return format_repr(self, 'id', 'state', 'category_id', 'event_id')

@@ -54,7 +54,8 @@ def test_can_undo_review(db, dummy_contribution, dummy_user, type, ok):
         undo_review(rev)
         assert rev.is_undone
     else:
-        pytest.raises(InvalidEditableState, undo_review, rev)
+        with pytest.raises(InvalidEditableState):
+            undo_review(rev)
         assert not rev.is_undone
 
     db.session.expire(editable)  # so a deleted revision shows up in the relationship

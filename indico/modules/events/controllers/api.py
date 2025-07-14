@@ -8,6 +8,7 @@
 from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.modules.events import Event
 from indico.modules.events.persons.util import check_person_link_email
 from indico.modules.events.util import get_object_from_args
@@ -49,6 +50,14 @@ class RHEventCheckEmail(RHProtected):
         method = obj.can_edit if self.object_type in ('contribution', 'subcontribution', 'abstract') else obj.can_manage
         if not method(session.user):
             raise Forbidden
+        # Abstract submission is usually open to unknown people, so in case of search restrictions we require
+        # at least abstract management access
+        if (
+            not config.ALLOW_PUBLIC_USER_SEARCH
+            and self.object_type == 'abstract'
+            and not self.event.can_manage(session.user, permission='abstracts')
+        ):
+            raise Forbidden('You are not allowed to search users')
 
     @use_kwargs({
         'email': LowercaseString(required=True),

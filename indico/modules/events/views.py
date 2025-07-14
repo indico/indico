@@ -157,6 +157,7 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
     bundles = (
+        'markdown.js',
         'module_vc.js',
         'module_vc.css',
         'module_events.cloning.js',

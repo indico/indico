@@ -34,7 +34,7 @@ revision:
     avatar_url: /user/1337/picture-default/signature
     full_name: Guinea Pig
     id: <id>
-    identifier: User:1337
+    identifier: User:1337:signature
 user:
   editor: false
   email: 1337@example.test

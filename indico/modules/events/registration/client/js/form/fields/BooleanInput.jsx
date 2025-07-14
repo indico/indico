@@ -200,3 +200,14 @@ export function BooleanSettings() {
     </>
   );
 }
+
+export function booleanShowIfOptions() {
+  return [
+    {value: true, text: Translate.string('Yes')},
+    {value: false, text: Translate.string('No')},
+  ];
+}
+
+export function booleanGetDataForCondition(value) {
+  return [value];
+}

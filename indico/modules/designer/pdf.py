@@ -16,6 +16,7 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 
@@ -105,6 +106,14 @@ class DesignerPDFBase:
             color = f'#{color}'
         return color
 
+    def _get_resized_font(self, content, font_size, font_name, width):
+        min_font_size = 6
+        resized_font = font_size
+        item_width = width / PIXELS_CM * cm
+        while resized_font > min_font_size and item_width < stringWidth(content, font_name, resized_font):
+            resized_font -= 0.25
+        return {'fontSize': resized_font, 'leading': resized_font}
+
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
         font_size = _extract_font_size(item['font_size'])
         styles = {
@@ -124,6 +133,9 @@ class DesignerPDFBase:
             styles['fontName'] = FONT_STYLES[item['font_family']][1]
         else:
             styles['fontName'] = FONT_STYLES[item['font_family']][0]
+
+        if not isinstance(content, BytesIO) and item.get('text_overflow', 'wrap') == 'resize':
+            styles.update(self._get_resized_font(content, font_size, styles['fontName'], item['width']))
 
         for update in values_from_signal(
             signals.event.designer.update_badge_style.send(self.template, item=item, styles=styles),

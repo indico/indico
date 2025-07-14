@@ -48,7 +48,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import LowercaseString, no_relative_urls, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
-from indico.util.user import principal_from_identifier
+from indico.util.user import principal_from_identifier, validate_search_token
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
@@ -464,6 +464,13 @@ class RHSyncEventPerson(RHEventPersonActionBase):
 
 
 class RHEventPersonSearch(RHAuthenticatedEventBase):
+    @use_kwargs({
+        'token': fields.String(load_default=''),
+    }, location='query')
+    def _check_access(self, token):
+        RHAuthenticatedEventBase._check_access(self)
+        validate_search_token(token, session.user)
+
     def _search_event_persons(self, exact=False, **criteria):
         criteria = {key: v for key, value in criteria.items() if (v := value.strip())}
 

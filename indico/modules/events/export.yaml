@@ -145,6 +145,7 @@ export:
       - EventRole.event_id
       - EventPrincipal.event_id
       - EventNote.event_id
+      - RegistrationTag.event_id
       - RegistrationForm.event_id
       - Survey.event_id
       - DesignerTemplate.event_id
@@ -497,12 +498,31 @@ export:
       ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationData.registration_id
+      - Registration.tags.prop.secondary.c.registration_id
       - PaymentTransaction.registration_id
       - ReceiptFile.registration_id
 
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
     order: RegistrationFormItem.parent_id.isnot(None)
+    # we need to make sure that the idrefs of `show_if_id`` can be resolved during import time
+    python_order: |
+      def _topological_sort(objects):
+          def _get_ref_id(obj):
+              return obj.show_if_id
+
+          from graphlib import TopologicalSorter
+          sorter = TopologicalSorter()
+          obj_by_id = {obj.id: obj for obj in objects}  # Mapping from id to object
+          for obj in objects:
+              ref_id = _get_ref_id(obj)
+              if ref_obj := obj_by_id.get(ref_id):
+                  sorter.add(obj.id, ref_obj.id)
+              else:
+                  sorter.add(obj.id)
+          return [obj_by_id[x] for x in sorter.static_order()]
+
+      rows = _topological_sort(ROWS)
     fks:
       - RegistrationFormFieldData.field_id
 
@@ -511,6 +531,8 @@ export:
   RegistrationInvitation:
     cols:
       uuid: uuid = VALUE if KEEP_UUIDS else SKIP
+  RegistrationTag: {}
+  event_registration.registration_tags: {}
 
   PaymentTransaction: {}
 

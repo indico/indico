@@ -162,6 +162,7 @@ class TransactionSchema(mm.SQLAlchemyAutoSchema):
     amount = fields.Number(required=True)
     _status = fields.String(attribute='status.name', data_key='status', dump_only=True)
     status = fields.String(load_only=True)
+    data = fields.Dict(allow_none=True)
 
 
 class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):

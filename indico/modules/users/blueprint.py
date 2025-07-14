@@ -20,7 +20,7 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHUserPreferencesMarkdownAPI, RHUserPreferencesMastodonServer,
                                               RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
                                               RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
-                                              RHUserSearchInfo, RHUserSuggestionsRemove)
+                                              RHUserSearchInfo, RHUserSearchToken, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -64,7 +64,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
                      RHUserPreferencesMastodonServer, methods=('POST',))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
-    _bp.add_url_rule('/api/favorites/users/<int:fav_user_id>', 'favorites_api', RHUserFavoritesAPI,
+    _bp.add_url_rule('/api/favorites/users/<identifier>', 'favorites_api', RHUserFavoritesAPI,
                      methods=('PUT', 'DELETE'))
     _bp.add_url_rule('/api/favorites/categories', 'user_favorites_category_api', RHUserFavoritesCategoryAPI)
     _bp.add_url_rule('/api/favorites/categories/<int:category_id>', 'user_favorites_category_api',
@@ -89,6 +89,7 @@ _bp.add_url_rule('/<int:user_id>/picture-<slug>/<signature>', 'user_profile_pict
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
 _bp.add_url_rule('/search/', 'user_search', RHUserSearch)
+_bp.add_url_rule('/search/token', 'user_search_token', RHUserSearchToken)
 
 # Users API
 _bp.add_url_rule('!/api/user/', 'authenticated_user', RHUserAPI)

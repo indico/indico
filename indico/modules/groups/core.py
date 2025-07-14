@@ -82,6 +82,15 @@ class GroupProxy:
         provider, id_or_name = self.as_principal[1]
         return 'Group:{}:{}'.format(provider or '', id_or_name)
 
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
+
     def has_member(self, user):
         """Check if the user is a member of the group.
 

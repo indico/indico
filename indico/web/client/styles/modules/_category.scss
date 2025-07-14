@@ -145,14 +145,20 @@
 
 .category-sidebar {
   grid-area: sb;
-  min-width: 26em;
+  padding: 1em;
 
   background: #fafafa;
   background-image: linear-gradient(to bottom, #fafafa 95%, #fff 100%);
   border-left: 1px solid #f2f2f2;
   color: #666;
-  float: right;
-  padding: 1em;
+
+  @media (width < 66em) {
+    padding: 2em var(--horizontal-padding);
+  }
+
+  @media (width >= 66em) {
+    width: 26em;
+  }
 
   &:empty {
     padding: 0;
@@ -315,6 +321,7 @@ ul.category-list {
       display: block;
       color: lighten($dark-blue, 6%);
       padding: 0 0 0 1em;
+      position: relative;
 
       &.invisible-block {
         color: inherit !important;

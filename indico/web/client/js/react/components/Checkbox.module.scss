@@ -14,6 +14,15 @@
   align-items: center;
 }
 
+.required-checkbox-asterisk {
+  color: #c00;
+  margin-left: 0.25rem;
+}
+
+.checkbox-field::after {
+  display: none !important;
+}
+
 .checkbox {
   appearance: none;
 
@@ -21,7 +30,7 @@
 
   &:not([data-as-toggle]) {
     --checkbox-size: 1.2em;
-
+    flex-shrink: 0;
     display: inline-flex;
     justify-content: center;
     align-items: center;

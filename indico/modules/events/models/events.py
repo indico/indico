@@ -95,7 +95,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     allow_location_inheritance = False
     possible_render_modes = {RenderMode.html}
     default_render_mode = RenderMode.html
-    __logging_disabled = False
+    _logging_disabled = False
 
     ATTACHMENT_FOLDER_ID_COLUMN = 'event_id'
 
@@ -669,11 +669,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         creation or at other times where adding entries to the event
         log doesn't make sense.
         """
-        self.__logging_disabled = True
+        self._logging_disabled = True
         try:
             yield
         finally:
-            self.__logging_disabled = False
+            self._logging_disabled = False
 
     @hybrid_method
     def happens_between(self, from_dt=None, to_dt=None):
@@ -965,7 +965,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         alphabetically or a list of ``key, value`` pairs which will
         be displayed in the given order.
         """
-        if self.__logging_disabled:
+        if self._logging_disabled:
             return
         entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
                               data=(data or {}), meta=(meta or {}))
@@ -1175,7 +1175,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check if the event has any receipt document templates."""
         from indico.modules.receipts.util import has_any_templates
         return has_any_templates(self)
-    
+
     @property
     def ical_uid(self) -> str:
         """Return the event UID used by iCalendar."""

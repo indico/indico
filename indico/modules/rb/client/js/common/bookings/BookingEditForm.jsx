@@ -370,6 +370,7 @@ class BookingEditForm extends React.Component {
                   name="user"
                   favoriteUsersController={favoriteUsersController}
                   disabled={submitSucceeded}
+                  withExternalUsers
                   required
                 />
               )}

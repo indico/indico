@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import * as FinalForm from 'final-form';
+import * as FlaskUrls from 'flask-urls';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import * as ReactDnd from 'react-dnd';
@@ -17,6 +18,7 @@ import * as ReactRouterDom from 'react-router-dom';
 import * as Redux from 'redux';
 import * as SUIR from 'semantic-ui-react';
 
+import * as IndicoCustomElements from 'indico/custom_elements';
 import * as IndicoReactComponents from 'indico/react/components';
 import * as IndicoPrincipalsImperative from 'indico/react/components/principals/imperative';
 import * as IndicoSyncedInputs from 'indico/react/components/syncedInputs';
@@ -41,6 +43,7 @@ window._IndicoCoreRedux = Redux;
 window._IndicoCoreSUIR = SUIR;
 window._IndicoCoreReactFinalForm = ReactFinalForm;
 window._IndicoCoreFinalForm = FinalForm;
+window._IndicoCoreFlaskUrls = FlaskUrls;
 window._IndicoSyncedInputs = IndicoSyncedInputs;
 window._IndicoReactComponents = IndicoReactComponents;
 window._IndicoReactForm = IndicoReactForm;
@@ -52,3 +55,4 @@ window._IndicoUtilsDate = IndicoUtilsDate;
 window._IndicoUtilsCase = IndicoUtilsCase;
 window._IndicoUtilsPlugins = IndicoUtilsPlugins;
 window._IndicoPrincipalsImperative = IndicoPrincipalsImperative;
+window._IndicoCustomElements = IndicoCustomElements;

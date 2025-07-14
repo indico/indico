@@ -56,7 +56,8 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
-                                                     import_registrations_from_csv, make_registration_schema)
+                                                     import_registrations_from_csv, load_registration_schema,
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -69,7 +70,7 @@ from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -379,10 +380,10 @@ class RHRegistrationCreate(RHManageRegFormBase):
         if self.regform.is_purged:
             raise Forbidden(_('Registration is disabled due to an expired retention period'))
         override_required = request.json.get('override_required', False)
-        schema = make_registration_schema(self.regform, management=True, override_required=override_required)()
-        form = parser.parse(schema)
-        session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
-        create_registration(self.regform, form, management=True, notify_user=notify_user)
+        schema_cls = make_registration_schema(self.regform, management=True, override_required=override_required)
+        form_data = load_registration_schema(self.regform, schema_cls)
+        session['registration_notify_user_default'] = notify_user = form_data.pop('notify_user', False)
+        create_registration(self.regform, form_data, management=True, notify_user=notify_user)
         flash(_('The registration was created.'), 'success')
         return jsonify({'redirect': url_for('event_registration.manage_reglist', self.regform)})
 
@@ -558,9 +559,10 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
                          .all())
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
                                                          registrations=registrations)
+        file_name_prefix = 'Tickets' if config_params.pop('is_ticket') else 'Badges'
         pdf = pdf_class(self.template, config_params, self.event, registrations,
                         self.regform.tickets_for_accompanying_persons)
-        return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
+        return send_file(f'{file_name_prefix}-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
@@ -622,6 +624,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             if data.pop('save_values', False):
                 self._set_event_badge_settings(self.event, data)
             data['registration_ids'] = [x.id for x in registrations]
+            data['is_ticket'] = self.TICKET_BADGES
 
             key = str(uuid.uuid4())
             badge_cache.set(key, data, timeout=1800)
@@ -921,11 +924,14 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         RHRegistrationsExportBase._process_args(self)
         self.flat = flat
 
+    def _get_registrant_name(self, registration):
+        return secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}',
+                               str(registration.friendly_id))
+
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
-        registrant_name = secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}',
-                                          registration.friendly_id)
+        registrant_name = self._get_registrant_name(registration)
         file_name = secure_filename(
             f'{attachment.field_data.field.title}_{attachment.field_data.field_id}_{attachment.filename}',
             attachment.filename
@@ -937,16 +943,29 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
         for reg_attachments in attachments.values():
             yield from reg_attachments
 
+    def _get_registration_attachments(self, registration, file_fields):
+        data = registration.data_by_field
+        return [
+            field_data
+            for file_field in file_fields
+            if (field_data := data.get(file_field.id)) and field_data.storage_file_id
+        ]
+
+    def _get_file_fields(self):
+        return [
+            item
+            for item in self.regform.form_items
+            if item.is_field and item.is_enabled and item.field_impl.is_file_field
+        ]
+
     def _process(self):
-        attachments = {}
-        file_fields = [item for item in self.regform.form_items if item.is_field and item.field_impl.is_file_field]
-        for registration in self.registrations:
-            data = registration.data_by_field
-            attachments_for_registration = [data.get(file_field.id) for file_field in file_fields
-                                            if data.get(file_field.id) and data.get(file_field.id).storage_file_id]
-            if attachments_for_registration:
-                attachments[registration.id] = attachments_for_registration
-        return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.regform.id)
+        file_fields = self._get_file_fields()
+        attachments = {
+            reg.id: reg_attachments
+            for reg in self.registrations
+            if (reg_attachments := self._get_registration_attachments(reg, file_fields))
+        }
+        return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.event.id)
 
 
 @dataclasses.dataclass

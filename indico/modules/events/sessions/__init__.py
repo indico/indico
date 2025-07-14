@@ -8,6 +8,7 @@
 from flask import flash, session
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.modules.events.sessions.models.sessions import Session
@@ -19,6 +20,7 @@ from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.sessions')
+
 session_settings = EventSettingsProxy('sessions', {
     # Whether session coordinators can manage contributions inside their sessions
     'coordinators_manage_contributions': False,
@@ -34,6 +36,9 @@ COORDINATOR_PRIV_TITLES = {'manage-contributions': _('Contributions'),
 COORDINATOR_PRIV_DESCS = {'manage-contributions': _('Allows coordinators to modify contributions in their sessions.'),
                           'manage-blocks': _('Allows coordinators to manage/reschedule session blocks of their '
                                              'sessions.  This includes creating new session blocks.')}
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Session), sender=Session, weak=False)
 
 
 @signals.users.merged.connect

@@ -12,6 +12,7 @@ import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
+import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 
 import {INVALID} from './DatePicker';
 
@@ -27,6 +28,8 @@ export default function WTFDateField({
   earliest,
   latest,
   linkedField,
+  weekendDisabled,
+  disabledDates,
 }) {
   // The hidden field that holds the date (in isoformat) which is used during form submission.
   // It also contains the initial value coming from the WTForms field.
@@ -45,6 +48,13 @@ export default function WTFDateField({
     dateField.value ? toMoment(dateField.value, moment.HTML5_FMT.DATE) : null
   );
   const clearRef = useRef(null);
+  const filter = (d, meta) => {
+    const dateStr = formatDate(ISO_FORMAT, d);
+    if (disabledDates?.includes(dateStr)) {
+      return false;
+    }
+    return !(weekendDisabled && meta.weekInfo.weekend.includes(d.getDay() || 7));
+  };
 
   const updateDate = useCallback(
     (value, updatePicker = false) => {
@@ -107,6 +117,7 @@ export default function WTFDateField({
         onChange={updateDate}
         min={min}
         max={max}
+        filter={filter}
         required={required}
         disabled={disabled}
       />
@@ -127,6 +138,8 @@ WTFDateField.propTypes = {
   earliest: PropTypes.string,
   latest: PropTypes.string,
   linkedField: PropTypes.object,
+  weekendDisabled: PropTypes.bool,
+  disabledDates: PropTypes.arrayOf(PropTypes.string),
 };
 
 WTFDateField.defaultProps = {
@@ -136,4 +149,6 @@ WTFDateField.defaultProps = {
   earliest: null,
   latest: null,
   linkedField: null,
+  weekendDisabled: false,
+  disabledDates: null,
 };

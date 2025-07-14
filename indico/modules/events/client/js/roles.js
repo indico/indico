@@ -31,10 +31,11 @@ import {showUserSearch} from 'indico/react/components/principals/imperative';
   }
 
   function setupButtons() {
+    const searchToken = document.querySelector('#event-roles').dataset.searchToken;
     $('#event-roles').on('click', '.js-add-members', async evt => {
       evt.stopPropagation();
       const $this = $(evt.target);
-      const users = await showUserSearch({withExternalUsers: true});
+      const users = await showUserSearch({withExternalUsers: true, searchToken});
       if (users.length) {
         $.ajax({
           url: $this.data('href'),

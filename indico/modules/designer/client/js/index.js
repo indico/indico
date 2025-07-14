@@ -77,6 +77,49 @@ import {$T} from 'indico/utils/i18n';
     return itemIdCounter;
   }
 
+  function resizeFont(divContainer, item) {
+    // Adapted from https://stackoverflow.com/a/4166021
+    const $item = divContainer.find('.designer-item');
+    const pattern = /([0-9.]+)pt/g;
+    let fontSize = parseFloat(pattern.exec(item.font_size)[1]);
+    const minFontSize = 6;
+
+    const resizer = $('<div>', {
+      id: 'font-resizer',
+      text: item.type === 'fixed' ? item.text : itemTitles[item.type],
+      css: {
+        visibility: 'hidden',
+        whiteSpace: 'nowrap',
+        overflow: 'visible',
+        fontSize: fontSize + 'pt',
+        fontFamily: $item.css('font-family'),
+        fontWeight: $item.css('font-weight'),
+        fontStyle: $item.css('font-style'),
+      },
+    }).appendTo(divContainer);
+
+    while (fontSize > minFontSize && resizer[0].scrollWidth > item.width) {
+      resizer.css('font-size', fontSize + 'pt');
+      $item.css('font-size', zoomFont(fontSize + 'pt'));
+      fontSize -= 0.5;
+    }
+    resizer.remove();
+  }
+
+  function getStyleForTextOverflow(overflowType) {
+    if (overflowType === 'wrap') {
+      return {
+        'white-space': 'normal',
+        'overflow': 'visible',
+      };
+    } else if (overflowType === 'resize') {
+      return {
+        'white-space': 'pre',
+      };
+    }
+    return {};
+  }
+
   function createItem(type) {
     var item = {
       id: generateItemId(),
@@ -94,6 +137,7 @@ import {$T} from 'indico/utils/i18n';
       height: isImage(type) ? 150 : null,
       text: $T('Fixed text'),
       zIndex: itemIdCounter + 10,
+      text_overflow: 'wrap',
 
       // The following attributes have no meaning to the server
       selected: false,
@@ -115,6 +159,7 @@ import {$T} from 'indico/utils/i18n';
           color: this.color,
           backgroundColor: this.background_color,
           zIndex: this.zIndex,
+          ...getStyleForTextOverflow(this.text_overflow),
         })
         .attr('data-type', this.type)
         .text(
@@ -268,6 +313,7 @@ import {$T} from 'indico/utils/i18n';
     $('#alignment-selector').val(item.text_align);
     $('#font-selector').val(item.font_family);
     $('#size-selector').val(item.font_size);
+    $('#overflow-selector').val(item.text_overflow);
     $('#style-selector').val(itemStyles.length ? itemStyles.join('_') : 'normal');
     $('.js-element-width').val(item.width / pixelsPerCm);
     $('.js-element-height').val(item.height / pixelsPerCm);
@@ -311,6 +357,9 @@ import {$T} from 'indico/utils/i18n';
         var div = $item.parent('.ui-draggable');
         item.text = text;
         div.html(item.toHTML());
+        if (item.text_overflow === 'resize') {
+          resizeFont(div, item);
+        }
       }
     }
   }
@@ -380,6 +429,9 @@ import {$T} from 'indico/utils/i18n';
       }
       if (item.selected && !isBackside) {
         selectItem(newDiv.find('.designer-item'));
+      }
+      if (item.text_overflow === 'resize') {
+        resizeFont(newDiv, item);
       }
     });
   }
@@ -543,6 +595,9 @@ import {$T} from 'indico/utils/i18n';
       size: function() {
         selectedItem.font_size = $('#size-selector').val();
       },
+      overflow: function() {
+        selectedItem.text_overflow = $('#overflow-selector').val();
+      },
       style: function() {
         switch ($('#style-selector').val()) {
           case 'normal':
@@ -590,7 +645,11 @@ import {$T} from 'indico/utils/i18n';
       },
     }[attribute]());
 
+    const parentDiv = div.parent('.ui-draggable');
     div.replaceWith(selectedItem.toHTML());
+    if (selectedItem.text_overflow === 'resize') {
+      resizeFont(parentDiv, selectedItem);
+    }
     if (selectedItem.type === 'fixed_image') {
       $('.designer-item.selected').append(createFixedImageElement(selectedItem));
     }

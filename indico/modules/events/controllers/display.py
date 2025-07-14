@@ -88,7 +88,7 @@ class RHEventAccessKey(RHEventBase):
         return jsonify(valid=self.event.check_access_key())
 
 
-class RHDisplayPrivacyPolicy(RHEventBase):
+class RHDisplayPrivacyPolicy(RHDisplayEventBase):
     """Display event privacy policy."""
 
     view_class = WPConferencePrivacyDisplay

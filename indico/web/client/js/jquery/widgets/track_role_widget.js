@@ -7,7 +7,9 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {TrackACLField} from 'indico/react/components';
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 
 (function($) {
   $.widget('indico.trackrolewidget', {
@@ -17,6 +19,7 @@ import {TrackACLField} from 'indico/react/components';
       eventId: null,
       eventRoles: null,
       categoryRoles: null,
+      searchToken: null,
     },
 
     _updateValue(newValue, trackId) {
@@ -28,15 +31,19 @@ import {TrackACLField} from 'indico/react/components';
     _renderACLField(trackId, value) {
       const onChange = newValue => this._updateValue(newValue, trackId);
       const element = document.querySelector(`#track-roles-${trackId}`);
-      const component = React.createElement(TrackACLField, {
-        value,
-        permissionInfo: this.options.permissionsInfo,
-        eventId: this.options.eventId,
-        eventRoles: this.options.eventRoles,
-        categoryRoles: this.options.categoryRoles,
-        scrollOnOpen: true,
-        onChange,
-      });
+      const component = (
+        <UserSearchTokenContext.Provider value={this.options.searchToken}>
+          <TrackACLField
+            value={value}
+            permissionInfo={this.options.permissionsInfo}
+            eventId={this.options.eventId}
+            eventRoles={this.options.eventRoles}
+            categoryRoles={this.options.categoryRoles}
+            scrollOnOpen
+            onChange={onChange}
+          />
+        </UserSearchTokenContext.Provider>
+      );
       ReactDOM.render(component, element);
     },
 

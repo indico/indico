@@ -54,7 +54,7 @@ class PersonLinkMixin:
         for person_link in set(self.person_links) - value.keys():
             principal = person_link.person.principal
             if principal:
-                self.update_principal(principal, del_permissions={'submit'})
+                self.update_principal(principal, del_permissions={'submit'}, quiet=True)
         # Update person links
         self.person_links = list(value.keys())
         for person_link, is_submitter in value.items():
@@ -63,7 +63,7 @@ class PersonLinkMixin:
             if not principal:
                 continue
             action = {'add_permissions': {'submit'}} if is_submitter else {'del_permissions': {'submit'}}
-            self.update_principal(principal, **action)
+            self.update_principal(principal, **action, quiet=True)
 
 
 class AuthorsSpeakersMixin:
@@ -222,6 +222,15 @@ class EventPerson(PersonMixin, db.Model):
     @property
     def identifier(self):
         return f'EventPerson:{self.id}'
+
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is currently identical to the regular identifier, since it does not
+        contain any signatures or similar data that could change.
+        """
+        return self.identifier
 
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):

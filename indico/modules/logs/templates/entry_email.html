@@ -77,6 +77,20 @@
     </tr>
     <tr class="i-table content">
         <td class="i-table caption log-caption">
+            {% trans %}Attachments{% endtrans %}
+        </td>
+        <td class="i-table value searchable">
+            {% if data.attachments %}
+                {{ data.attachments|join(', ') }}
+            {% else %}
+                <span class="text-muted">
+                    {% trans %}No attachments{% endtrans %}
+                </span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
             {% trans %}Body{% endtrans %}
         </td>
         <td class="i-table value email-body">
@@ -87,4 +101,51 @@
             {% endif %}
         </td>
     </tr>
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">
+            {% trans %}Status{% endtrans %}
+        </td>
+        <td class="i-table value">
+            {% if data.state == 'pending' %}
+                {# i18n: Status #}
+                {% trans 'status' %}Pending{% endtrans %}
+            {% elif data.state == 'sent' %}
+                {# i18n: Status #}
+                {% trans 'status' %}Sent{% endtrans %}
+            {% elif data.state == 'failed' %}
+                {# i18n: Status #}
+                {% trans 'status' %}Failed{% endtrans %}
+            {% endif %}
+        </td>
+    </tr>
+    {% if entry.event %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                {% trans %}Actions{% endtrans %}
+            </td>
+            <td class="i-table value">
+                <button type="button"
+                        class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
+                        data-href="{{ url_for('.resend_email', entry) }}"
+                        data-method="post"
+                        data-title="{% trans %}Re-send email{% endtrans %}"
+                        data-confirm="
+                            {%- trans count=data.to|length -%}
+                                Do you really want to re-send this email to {{ count }} recipient?
+                            {%- pluralize -%}
+                                Do you really want to re-send this email to {{ count }} recipients?
+                            {%- endtrans -%}"
+                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}
+                        {% if data.attachments %}
+                            title="{%- trans -%}Re-sending emails with attachments is not supported.{%- endtrans -%}"
+                        {% elif data.state == 'pending' %}
+                            title="{%- trans -%}This email has not been sent yet.{%- endtrans -%}"
+                        {% endif %}>
+                    {% trans %}
+                        Re-send email
+                    {% endtrans %}
+                </button>
+            </td>
+        </tr>
+    {% endif %}
 {% endblock %}

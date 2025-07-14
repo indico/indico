@@ -62,10 +62,10 @@ class CategoryField(HiddenField):
 
 
 class EventRequestList(ModelList):
-    def __init__(self, category, **kwargs):
-        def _get_query(m):
+    def __init__(self, **kwargs):
+        def _get_query(m, ctx):
             return m.query.filter(
-                EventMoveRequest.category == category,
+                EventMoveRequest.category == ctx['category'],
                 EventMoveRequest.state == MoveRequestState.pending
             )
         super().__init__(model=EventMoveRequest, get_query=_get_query, collection_class=set, **kwargs)

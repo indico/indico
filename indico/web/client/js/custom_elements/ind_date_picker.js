@@ -144,6 +144,7 @@ CustomElementBase.define(
       rangeStartMax: Date, // Maximum allowed value for the start of the range (inclusive)
       rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
       rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
+      format: String, // Date format
     };
 
     static observedAttributes = [
@@ -153,6 +154,7 @@ CustomElementBase.define(
       'range-start-max',
       'range-end-min',
       'range-end-max',
+      'format',
     ];
 
     get value() {
@@ -207,18 +209,14 @@ CustomElementBase.define(
         rightTriggerLocked
       );
 
-      const dateFormat = formatDescription.textContent
-        .split(':')[1]
-        .trim()
-        .toLowerCase();
-      const parseDate = createDateParser(dateFormat);
+      const parseDate = createDateParser(this.format);
 
-      indCalendar.format = dateFormat;
+      indCalendar.format = this.format;
       indCalendar.rangeStart = this.rangeStart;
       indCalendar.rangeEnd = this.rangeEnd;
       indCalendar.setSelectionPreview(selection);
-      rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
-      rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
+      rangeStartInput.defaultValue = formatDate(this.format, this.rangeStart);
+      rangeEndInput.defaultValue = formatDate(this.format, this.rangeEnd);
       updateSelectionLimits();
 
       formatDescription.id = `${id}-format`;
@@ -240,11 +238,11 @@ CustomElementBase.define(
       });
       this.addEventListener('x-attrchange.range-start', () => {
         indCalendar.rangeStart = this.rangeStart;
-        rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
+        rangeStartInput.defaultValue = formatDate(this.format, this.rangeStart);
       });
       this.addEventListener('x-attrchange.range-end', () => {
         indCalendar.rangeEnd = this.rangeEnd;
-        rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
+        rangeEndInput.defaultValue = formatDate(this.format, this.rangeEnd);
       });
       this.addEventListener('x-attrchange.range-start-min', updateSelectionLimits);
       this.addEventListener('x-attrchange.range-start-max', updateSelectionLimits);
@@ -285,11 +283,11 @@ CustomElementBase.define(
 
         // Set the input values where the value changed
         if (!isSameDate(selection.left, indCalendar.rangeStart)) {
-          setNativeInputValue(rangeStartInput, formatDate(dateFormat, selection.left));
+          setNativeInputValue(rangeStartInput, formatDate(this.format, selection.left));
           rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
         }
         if (!isSameDate(selection.right, indCalendar.rangeEnd)) {
-          setNativeInputValue(rangeEndInput, formatDate(dateFormat, selection.right));
+          setNativeInputValue(rangeEndInput, formatDate(this.format, selection.right));
           rangeEndInput.dispatchEvent(new Event('change', {bubbles: true}));
         }
 
@@ -898,6 +896,18 @@ CustomElementBase.define(
         }
       });
 
+      let getDateValidity = () => true;
+
+      Object.defineProperty(indDateGrid, 'filter', {
+        set(fn = () => true) {
+          getDateValidity = fn;
+          updateGridDates();
+        },
+        get() {
+          return getDateValidity;
+        },
+      });
+
       let debounceTimer;
 
       function updateGridDates() {
@@ -926,7 +936,6 @@ CustomElementBase.define(
             const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
 
             calendarButton.dataset.currentMonth = belongsToCurrentMonth;
-            calendarButton.disabled = !isRenderable;
 
             if (!isRenderable) {
               calendarButton.textContent = '';
@@ -937,40 +946,43 @@ CustomElementBase.define(
               calendarButton.removeAttribute('data-range-end');
               calendarButton.value = '';
               calendarButton.tabIndex = -1;
-              calendarButton.disabled = true;
-              return;
-            }
-
-            // Update button attributes
-            calendarButton.textContent = date.getDate();
-            calendarButton.setAttribute(
-              'aria-label',
-              date.toLocaleDateString(indDateGrid.locale, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })
-            );
-            calendarButton.toggleAttribute(
-              'data-weekend',
-              weekInfo.weekend.includes(date.getDay() + 1)
-            );
-            calendarButton.tabIndex = -1;
-            calendarButton.value = toDateString(date);
-
-            if (this.allowableSelectionRange.includes(date)) {
-              calendarButton.removeAttribute('aria-disabled');
             } else {
-              calendarButton.setAttribute('aria-disabled', true);
-            }
+              const isValid = getDateValidity(date, {
+                locale: indDateGrid.locale,
+                weekInfo,
+              });
+              const isSelectable = indDateGrid.allowableSelectionRange.includes(date) && isValid;
 
-            if (selectedRange.includes(date)) {
-              calendarButton.setAttribute('aria-selected', true);
-            } else {
-              calendarButton.removeAttribute('aria-selected');
+              calendarButton.textContent = date.getDate();
+              calendarButton.setAttribute(
+                'aria-label',
+                date.toLocaleDateString(indDateGrid.locale, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              );
+              calendarButton.toggleAttribute(
+                'data-weekend',
+                weekInfo.weekend.includes(date.getDay() + 1)
+              );
+              calendarButton.tabIndex = -1;
+              calendarButton.value = toDateString(date);
+
+              if (isSelectable) {
+                calendarButton.removeAttribute('aria-disabled');
+              } else {
+                calendarButton.setAttribute('aria-disabled', true);
+              }
+
+              if (selectedRange.includes(date)) {
+                calendarButton.setAttribute('aria-selected', true);
+              } else {
+                calendarButton.removeAttribute('aria-selected');
+              }
+              calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
+              calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
             }
-            calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
-            calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
           });
 
           const focusableButton = listbox.querySelector(

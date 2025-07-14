@@ -305,7 +305,7 @@ referencing==0.35.1
     #   jsonschema-specifications
 reportlab==4.2.5
     # via -r requirements.in
-requests==2.32.3
+requests==2.32.4
     # via -r requirements.in
 rich==13.9.4
     # via flask-limiter
@@ -371,9 +371,8 @@ ua-parser==1.0.0
     # via -r requirements.in
 ua-parser-builtins==0.18.0.post1
     # via ua-parser
-urllib3==1.26.20
+urllib3==2.5.0
     # via
-    #   -r requirements.in
     #   requests
     #   sentry-sdk
 vine==5.1.0

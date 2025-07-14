@@ -381,6 +381,7 @@ def merge_users(source, target, force=False):
 
     # Move emails to the target user
     primary_source_email = source.email
+    source_extra_emails = sorted(source.secondary_emails)
     logger.info('Target %s initial emails: %s', target, ', '.join(target.all_emails))
     logger.info('Source %s emails to be linked to target %s: %s', source, target, ', '.join(source.all_emails))
     UserEmail.query.filter_by(user_id=source.id).update({
@@ -400,8 +401,9 @@ def merge_users(source, target, force=False):
     # Update category suggestions
     SuggestedCategory.merge_users(target, source)
 
+    source_identities = set(source.identities)
     # Merge identities
-    for identity in set(source.identities):
+    for identity in source_identities:
         identity.user = target
 
     if target.identities:
@@ -422,6 +424,23 @@ def merge_users(source, target, force=False):
     # Restore the source user's primary email
     source.email = primary_source_email
     db.session.flush()
+
+    log_args = {
+        'realm': UserLogRealm.user,
+        'kind': LogKind.other,
+        'module': 'User',
+        'user': session.user if session else None
+    }
+
+    source.log(**log_args, summary=f'User merged into {target.full_name}', data={
+        'Target ID': target.id, 'First Name': target.first_name, 'Last Name': target.last_name, 'Email': target.email
+    })
+
+    target.log(**log_args, summary=f'User merged from {source.full_name}', data={
+        'Source ID': source.id, 'First Name': source.first_name, 'Last Name': source.last_name, 'Email': source.email,
+        'Extra emails': source_extra_emails,
+        'Identities': [f'{x.identifier} ({x.provider})' for x in source_identities],
+    })
 
     logger.info('Successfully merged %s into %s', source, target)
 
@@ -629,7 +648,8 @@ def search_affiliations(q):
     )
 
 
-def log_user_update(user, changes, *, from_sync=False):
+@make_interceptable
+def log_user_update(user, changes, *, from_sync=False, _extra_log_fields=None):
     log_fields = {
         '_title': 'Title',
         'synced_fields': 'Synced fields',
@@ -643,6 +663,7 @@ def log_user_update(user, changes, *, from_sync=False):
             'type': 'number',
             'convert': lambda changes: [x.id if x else None for x in changes]
         },
+        **(_extra_log_fields or {})
     }
     if len(changes) == 1:
         what = log_fields[list(changes)[0]]

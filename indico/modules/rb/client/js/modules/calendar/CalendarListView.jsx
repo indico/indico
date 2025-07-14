@@ -25,10 +25,11 @@ import {
 } from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Param, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
 
 import {actions as bookingsActions} from '../../common/bookings';
-import {selectors as linkingSelectors} from '../../common/linking';
+import {actions as linkingActions, selectors as linkingSelectors} from '../../common/linking';
 import {selectors as userSelectors} from '../../common/user';
 import CardPlaceholder from '../../components/CardPlaceholder';
 
@@ -38,6 +39,7 @@ import * as calendarSelectors from './selectors';
 import './CalendarListView.module.scss';
 
 const ACTIVE_BOOKINGS_LIMIT = 40;
+const BOOKING_LINKING_RANGE_INCREASE = 7;
 
 class CalendarListView extends React.Component {
   static propTypes = {
@@ -49,11 +51,17 @@ class CalendarListView extends React.Component {
     datePicker: PropTypes.object.isRequired,
     linkData: PropTypes.object,
     isAdminOverrideEnabled: PropTypes.bool.isRequired,
+    bookingLinkingDisplayRange: PropTypes.exact({
+      earlier: PropTypes.number.isRequired,
+      later: PropTypes.number.isRequired,
+    }).isRequired,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
       linkBookingOccurrence: PropTypes.func.isRequired,
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
+      addEarlier: PropTypes.func.isRequired,
+      addLater: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -77,20 +85,35 @@ class CalendarListView extends React.Component {
       datePicker: {selectedDate: prevDate, mode: prevMode},
       roomFilters: prevRoomFilters,
       calendarFilters: prevCalendarFilters,
+      bookingLinkingDisplayRange: prevBookingLinkingDisplayRange,
+      linkData: prevLinkData,
+      isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
     } = prevProps;
     const {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
+      bookingLinkingDisplayRange,
+      linkData,
+      isAdminOverrideEnabled,
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
     const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
+    const bookingDisplayFiltersChanged = !_.isEqual(
+      prevBookingLinkingDisplayRange,
+      bookingLinkingDisplayRange
+    );
+    const linkDataChanged = !_.isEqual(prevLinkData, linkData);
+    const adminOverrideChanged = prevIsAdminOverrideEnabled !== isAdminOverrideEnabled;
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
-      calendarFiltersChanged
+      calendarFiltersChanged ||
+      bookingDisplayFiltersChanged ||
+      linkDataChanged ||
+      (linkData && adminOverrideChanged)
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
@@ -114,8 +137,11 @@ class CalendarListView extends React.Component {
   fetchMoreBookings = () => {
     const {
       actions: {fetchActiveBookings},
+      linkData,
     } = this.props;
-    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
+    if (!linkData) {
+      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
+    }
   };
 
   renderDayBookings = (day, bookings) => {
@@ -148,12 +174,7 @@ class CalendarListView extends React.Component {
     }
     const {linkingConfirm} = this.state;
     const {reservation} = booking;
-    const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
-    const datesMatch =
-      moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
-      moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
-    const canLink = isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
-    if (booking.linkId || !datesMatch || !canLink) {
+    if (booking.linkId) {
       return;
     }
     const linkBtn = (
@@ -223,10 +244,25 @@ class CalendarListView extends React.Component {
     const {reservation} = booking;
     const {room, isAccepted} = reservation;
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
+    let datesMatch = false;
+    if (linkData) {
+      const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+      datesMatch =
+        moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+        moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    }
+    const nonOverlapping = !!linkData && !datesMatch;
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
+    const isLinked = !!linkData && !!booking.linkId;
     return (
-      <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
+      <Card
+        styleName={`booking-card ${toClasses({
+          'already-linked': isLinked,
+        })}`}
+        key={key}
+        onClick={() => openBookingDetails(reservation.id)}
+      >
         <Card.Content>
           <Card.Header>
             {!isAccepted && (
@@ -253,10 +289,17 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
-          {linkData && !!booking.linkId && (
+          {isLinked && (
             <TooltipIfTruncated>
               <div styleName="booking-booked-for">
                 <Translate>Already linked</Translate>
+              </div>
+            </TooltipIfTruncated>
+          )}
+          {nonOverlapping && (
+            <TooltipIfTruncated>
+              <div styleName="booking-booked-for">
+                <Translate>Outside of the event schedule</Translate>
               </div>
             </TooltipIfTruncated>
           )}
@@ -267,9 +310,68 @@ class CalendarListView extends React.Component {
   };
 
   render() {
-    const {bookings, rowsLeft, isFetchingActiveBookings} = this.props;
+    const {
+      bookings,
+      rowsLeft,
+      isFetchingActiveBookings,
+      linkData,
+      bookingLinkingDisplayRange: {earlier, later},
+      actions: {addEarlier, addLater},
+    } = this.props;
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
     const hasData = Object.keys(sortedEntries).length !== 0;
+
+    const linkingShowEarlier = (
+      <Message info>
+        {earlier ? (
+          <PluralTranslate count={earlier}>
+            <Singular>
+              Showing bookings up to <Param name="days" value={earlier} /> day before the event.
+            </Singular>
+            <Plural>
+              Showing bookings up to <Param name="days" value={earlier} /> days before the event.
+            </Plural>
+          </PluralTranslate>
+        ) : (
+          <Translate>Showing bookings around the event dates.</Translate>
+        )}{' '}
+        <a
+          href="#"
+          onClick={evt => {
+            evt.preventDefault();
+            addEarlier(BOOKING_LINKING_RANGE_INCREASE);
+          }}
+        >
+          <Translate>Load earlier bookings</Translate>
+        </a>
+      </Message>
+    );
+
+    const linkingShowLater = (
+      <Message info>
+        {later ? (
+          <PluralTranslate count={later}>
+            <Singular>
+              Showing bookings up to <Param name="days" value={later} /> day after the event.
+            </Singular>
+            <Plural>
+              Showing bookings up to <Param name="days" value={later} /> days after the event.
+            </Plural>
+          </PluralTranslate>
+        ) : (
+          <Translate>Showing bookings around the event dates.</Translate>
+        )}{' '}
+        <a
+          href="#"
+          onClick={evt => {
+            evt.preventDefault();
+            addLater(BOOKING_LINKING_RANGE_INCREASE);
+          }}
+        >
+          <Translate>Load later bookings</Translate>
+        </a>
+      </Message>
+    );
 
     return (
       <div styleName="active-bookings">
@@ -279,6 +381,7 @@ class CalendarListView extends React.Component {
             loadMore={this.fetchMoreBookings}
             isFetching={isFetchingActiveBookings}
           >
+            {linkData && linkingShowEarlier}
             {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
               <CardPlaceholder.Group
@@ -287,12 +390,17 @@ class CalendarListView extends React.Component {
                 withImage={false}
               />
             )}
+            {linkData && linkingShowLater}
           </LazyScroll>
         )}
         {!isFetchingActiveBookings && !hasData && (
-          <Message info>
-            <Translate>There are no bookings matching the criteria.</Translate>
-          </Message>
+          <>
+            {linkData && linkingShowEarlier}
+            <Message info>
+              <Translate>There are no bookings matching the criteria.</Translate>
+            </Message>
+            {linkData && linkingShowLater}
+          </>
         )}
       </div>
     );
@@ -309,6 +417,7 @@ export default connect(
     datePicker: calendarSelectors.getDatePickerInfo(state),
     linkData: linkingSelectors.getLinkObject(state),
     isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+    bookingLinkingDisplayRange: linkingSelectors.getLinkingDisplayRange(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
@@ -317,6 +426,8 @@ export default connect(
         linkBookingOccurrence: bookingsActions.linkBookingOccurrence,
         fetchActiveBookings: calendarActions.fetchActiveBookings,
         clearActiveBookings: calendarActions.clearActiveBookings,
+        addEarlier: linkingActions.addEarlier,
+        addLater: linkingActions.addLater,
       },
       dispatch
     ),

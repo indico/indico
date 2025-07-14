@@ -58,6 +58,10 @@
     pointer-events: none;
   }
 
+  li.log-realm-admin span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-settings');
+  }
+
   li.log-realm-emails span.log-module span.log-icon i.log-realm {
     @include icon-before('icon-mail');
   }
@@ -72,6 +76,14 @@
 
   li.log-realm-participants span.log-module span.log-icon i.log-realm {
     @include icon-before('icon-users');
+  }
+
+  li.log-realm-acl span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-shield');
+  }
+
+  li.log-realm-system span.log-module span.log-icon i.log-realm {
+    @include icon-before('icon-wrench');
   }
 
   li.log-realm-user span.log-module span.log-icon i.log-realm {

@@ -5,19 +5,30 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from operator import attrgetter
+
 from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.events.models.events import EventType
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import EmailListField, IndicoDateTimeField, IndicoRadioField, TimeDeltaField
+from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
+                                     IndicoRadioField, TimeDeltaField)
+from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless
 
 
+def _sort_fn(object_list):
+    return sorted(object_list, key=lambda x: natural_sort_key(x[1].title))
+
+
 class ReminderForm(IndicoForm):
-    recipient_fields = ['recipients', 'send_to_participants', 'send_to_speakers']
+    recipient_fields = ['recipients', 'send_to_participants', 'forms', 'tags', 'all_tags', 'send_to_speakers']
     schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
     schedule_recipient_fields = recipient_fields + schedule_fields
 
@@ -33,8 +44,20 @@ class ReminderForm(IndicoForm):
     # Recipients
     recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
     send_to_participants = BooleanField(_('Participants'),
-                                        description=_('Send the reminder to all participants/registrants '
-                                                      'of the event.'))
+                                        description=_('Send the reminder to participants/registrants of the event.'))
+
+    forms = IndicoQuerySelectMultipleCheckboxField(_('Filter by forms'),
+                                                   [HiddenUnless('send_to_participants')],
+                                                   collection_class=set,
+                                                   modify_object_list=_sort_fn,
+                                                   get_label=attrgetter('title'),
+                                                   description=_('Select registration forms here to restrict sending '
+                                                                 'the reminder to the selected ones.'))
+    tags = IndicoQuerySelectMultipleTagField(_('Filter by tags'), [HiddenUnless('send_to_participants')],
+                                             description=_('Limit reminders to participants with these tags.'))
+    all_tags = BooleanField(_('All tags must be present'), [HiddenUnless('send_to_participants')],
+                            description=_('Participants must have all of the selected tags. '
+                                          'Otherwise at least one of them.'))
     send_to_speakers = BooleanField(_('Speakers'),
                                     description=_('Send the reminder to all speakers/chairpersons of the event.'))
     # Misc
@@ -57,6 +80,17 @@ class ReminderForm(IndicoForm):
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary
+        regforms_query = RegistrationForm.query.with_parent(self.event)
+        if regforms_query.count() > 1:
+            self.forms.query = regforms_query
+        else:
+            del self.forms
+        tags_query = RegistrationTag.query.with_parent(self.event)
+        if tags_query.has_rows():
+            self.tags.query = tags_query
+        else:
+            del self.tags
+            del self.all_tags
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:

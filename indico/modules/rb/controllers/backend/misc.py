@@ -28,6 +28,7 @@ from indico.modules.rb.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.util.string import sanitize_html
+from indico.util.user import make_user_search_token
 from indico.web.flask.util import send_file, url_for
 
 
@@ -73,6 +74,18 @@ class RHUserInfo(RHRoomBookingBase):
         data = rb_user_schema.dump(session.user)
         data['language'] = session.lang
         data['momentLanguage'] = session.moment_lang
+        # we assume room booking users are always a restricted/trusted audience who should be
+        # able to search for users. hence, we give them a search token straight away instead of
+        # linking it to an explicit access check to a room.
+        # the only exception here is that if there are no rooms, then we don't issue a token to
+        # avoid giving users an easy way to get a token in case of a poorly configured indico
+        # instance that has room booking enabled but never configured (and thus likely neither
+        # any rooms nor an ACL on who can access the module)
+        data['search_token'] = (
+            make_user_search_token()
+            if Room.query.filter(~Room.is_deleted).has_rows()
+            else None
+        )
         return jsonify(data)
 
 

@@ -129,20 +129,16 @@ body {
 }
 
 /* Main content */
-.session-block.contribution .inherited-bg-color {
-  background-color: #af4571;
-}
-
-.session-block.contribution .inherited-bg-color-trans {
-  background-color: #af457166;
+.session-block.contribution :is(.inherited-bg-color, .inherited-bg-color-trans) {
+  background-color: var(--primary-color-trans);
 }
 
 .session-block.contribution .inherited-txt-color {
-  color: white;
+  color: black;
 }
 
 .session-block.contribution .inherited-border-color {
-  border-color: #af4571;
+  border-color: rgb(146, 182, 219);
 }
 
 .session-block-wrapper {

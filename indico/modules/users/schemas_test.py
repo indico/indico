@@ -9,8 +9,9 @@ import pytest
 from marshmallow import ValidationError
 
 
-def test_personal_data_schema():
+def test_personal_data_schema(mocker):
     from indico.modules.users.schemas import UserPersonalDataSchema
+    mocker.patch('indico.modules.users.schemas.user_management_settings.get')  # avoid db access
     schema = UserPersonalDataSchema(partial=True)
     assert schema.load({'first_name': 'Test'}) == {'first_name': 'Test'}
     # make sure the schema rejects user columns that should never be settable

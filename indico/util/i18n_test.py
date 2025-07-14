@@ -7,6 +7,7 @@
 
 import os
 from datetime import datetime
+from textwrap import dedent
 
 import pytest
 from babel.messages import Catalog
@@ -19,7 +20,8 @@ from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
 from indico.util.date_time import format_datetime
-from indico.util.i18n import _, force_locale, gettext_context, make_bound_gettext, ngettext, pgettext
+from indico.util.i18n import (_, force_locale, gettext_context, make_bound_gettext, ngettext, orig_string, pgettext,
+                              po_to_json)
 
 
 def _to_msgid(context, message):
@@ -232,3 +234,57 @@ def test_force_user_locale(dummy_user):
     assert _('I need a drink.') == "I be needin' a bottle of rhum!"
 
     assert session.lang == 'en_AU'
+
+
+def test_po_to_json(tmp_path):
+    po_file = tmp_path / 'messages.po'
+    po_content = dedent(r'''
+        msgid ""
+        msgstr ""
+        "Content-Type: text/plain; charset=UTF-8\n"
+        "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+        msgid "foo"
+        msgstr "bar"
+
+        msgctxt "context"
+        msgid "foo"
+        msgstr "bar with context"
+
+        msgid "baz"
+        msgid_plural "bazs"
+        msgstr[0] "qux"
+        msgstr[1] "quxs"
+
+        msgctxt "context"
+        msgid "baz"
+        msgid_plural "bazs"
+        msgstr[0] "qux with context"
+        msgstr[1] "quxs with context"
+    ''')
+    po_file.write_text(po_content, encoding='utf-8')
+
+    expected_json = {
+        'messages': {
+            '': {
+                'domain': 'messages',
+                'lang': 'cs_CZ',
+                'plural_forms': 'nplurals=2; plural=(n != 1);'
+            },
+            'foo': ('bar',),
+            'context\x04foo': ('bar with context',),
+            'baz': ('qux', 'quxs'),
+            'context\x04baz': ('qux with context', 'quxs with context'),
+        },
+    }
+    result = po_to_json(po_file, domain='messages', locale='cs_CZ')
+    assert result == expected_json
+
+
+@pytest.mark.parametrize(('string', 'expected_orig_string'), (
+    ('The wheels', 'The wheels'),
+    (_('The wheels'), 'The wheels'),
+    (pgettext('Monty Python', 'The wheels'), 'The wheels'),
+), ids=('not-lazy-string', 'gettext', 'pgettext'))
+def test_orig_string(string, expected_orig_string):
+    assert orig_string(string) == expected_orig_string

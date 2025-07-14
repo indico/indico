@@ -11,8 +11,7 @@ from decimal import Decimal
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
 
-from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.modules.files.models.files import File
@@ -30,7 +29,7 @@ from indico.util.string import remove_accents, str_to_ascii, validate_email
 KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
-class TextFieldDataSchema(mm.Schema):
+class TextFieldDataSchema(FieldSetupSchemaBase):
     min_length = fields.Integer(load_default=0, validate=validate.And(validate.Range(0), validate.NoneOf((1,))))
     max_length = fields.Integer(load_default=0, validate=validate.Range(0))
 
@@ -106,6 +105,7 @@ class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
+    allow_condition = True
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -153,8 +153,11 @@ class CheckboxField(RegistrationFormBillableField):
     def default_value(self):
         return False
 
+    def get_data_for_condition(self, value) -> set:
+        return {value}
 
-class DateFieldDataSchema(mm.Schema):
+
+class DateFieldDataSchema(FieldSetupSchemaBase):
     date_format = fields.String(required=True, validate=validate.OneOf([
         '%d/%m/%Y %I:%M %p',
         '%d.%m.%Y %I:%M %p',
@@ -250,6 +253,7 @@ class BooleanField(RegistrationFormBillableField):
     mm_field_class = fields.Boolean
     setup_schema_base_cls = BooleanFieldSetupSchema
     not_empty_if_required = False
+    allow_condition = True
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -287,6 +291,9 @@ class BooleanField(RegistrationFormBillableField):
     @property
     def empty_value(self):
         return None
+
+    def get_data_for_condition(self, value) -> set:
+        return {value}
 
     def get_places_used(self):
         places_used = 0
@@ -329,6 +336,10 @@ class CountryField(RegistrationFormFieldBase):
             # this method returning `None` and thus breaking the participant list..
             return ''
         return get_country(registration_data.data) if registration_data.data else ''
+
+    @property
+    def filter_choices(self):
+        return {x['countryKey']: x['caption'] for x in self.unprocess_field_data(None, None)['choices']}
 
 
 class FileField(RegistrationFormFieldBase):

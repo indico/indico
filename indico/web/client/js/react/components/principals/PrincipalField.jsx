@@ -35,6 +35,7 @@ const PrincipalField = props => {
     favoriteUsersController,
     withExternalUsers,
     className,
+    searchToken,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -92,12 +93,13 @@ const PrincipalField = props => {
   );
   const userSearch = (
     <UserSearch
+      searchToken={searchToken}
       triggerFactory={searchTrigger}
       existing={value ? [value] : []}
       onAddItems={handleAddItem}
       onOpen={onFocus}
       onClose={onBlur}
-      favorites={favoriteUsers}
+      favoritesController={favoriteUsersController}
       disabled={disabled}
       withExternalUsers={withExternalUsers}
       single
@@ -114,13 +116,13 @@ const PrincipalField = props => {
             <PrincipalListItem
               name={details.name}
               detail={details.detail}
-              favorite={details.userId in favoriteUsers}
+              favorite={details.identifier in favoriteUsers}
               isPendingUser={details.userId === null}
               invalid={details.invalid}
               canDelete={!required}
               onDelete={() => !disabled && handleClear()}
-              onAddFavorite={() => !disabled && handleAddFavorite(details.userId)}
-              onDelFavorite={() => !disabled && handleDelFavorite(details.userId)}
+              onAddFavorite={() => !disabled && handleAddFavorite(details.identifier)}
+              onDelFavorite={() => !disabled && handleDelFavorite(details.identifier)}
               disabled={disabled}
               search={userSearch}
             />
@@ -143,6 +145,7 @@ PrincipalField.propTypes = {
   favoriteUsersController: PropTypes.array.isRequired,
   withExternalUsers: PropTypes.bool,
   className: PropTypes.string,
+  searchToken: PropTypes.string,
 };
 
 PrincipalField.defaultProps = {
@@ -150,6 +153,7 @@ PrincipalField.defaultProps = {
   required: false,
   withExternalUsers: false,
   className: '',
+  searchToken: null,
 };
 
 export default React.memo(PrincipalField);

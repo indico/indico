@@ -6,15 +6,23 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import difflib
 import os
 import re
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 import click
+import dateutil.parser
 from babel.dates import format_date
+from dateutil.relativedelta import relativedelta
 from packaging.version import Version
+from pygments import highlight
+from pygments.formatters.terminal256 import Terminal256Formatter
+from pygments.lexers.diff import DiffLexer
+from terminaltables import GithubFlavoredMarkdownTable
 
 
 CHANGELOG_STUB = '''
@@ -45,6 +53,8 @@ Internal Changes
 
 
 '''.lstrip()
+
+VERSIONS_SECTION_PATTERN = r'^([\s\S]*^<!-- VERSIONS .* -->)($[\s\S]+)([\n\r]+^<!-- ENDVERSIONS -->$[\s\S]*)$'
 
 
 def fail(message, *args, **kwargs):
@@ -193,6 +203,70 @@ def _create_changelog_stub(released_version, next_version, *, dry_run=False):
         changes_rst.write_text(content)
 
 
+def _parse_changelog_versions() -> list[tuple[str, date]]:
+    """Retrieve versions from the changelog file."""
+    return [(v, dateutil.parser.parse(d).date()) for v, d in re.findall(
+        r'^Version ([0-9.abrc]+)\n-+\n\n\*Released on (.+)\*\n$',
+        Path('CHANGES.rst').read_text(),
+        re.MULTILINE,
+    )]
+
+
+def _replace_auto_section(content: str, new_table: str) -> str:
+    """Replace content within the VERSIONS_SECTION_PATTERN markers."""
+    if match := re.search(VERSIONS_SECTION_PATTERN, content, re.MULTILINE):
+        return f'{match.group(1)}\n{new_table}{match.group(3)}'
+    raise ValueError('Could not find VERSIONS section markers in SECURITY.md')
+
+
+def _show_diff(old: str, new: str, filename: str):
+    diff = difflib.unified_diff(old.splitlines(), new.splitlines(), filename, filename, lineterm='')
+    diff = '\n'.join(diff)
+    print(highlight(diff, DiffLexer(), Terminal256Formatter(style='native')))
+
+
+def _update_security_md(*, dry_run: bool = False):
+    """Update the SECURITY.md file with the new supported version information."""
+    security_md = Path('SECURITY.md')
+    content = security_md.read_text()
+    versions = _parse_changelog_versions()
+
+    # find the date of the first release of the current minor version,
+    # as well as the last release of the previous minor version
+    minor_releases = [(version, release_date) for version, release_date in versions if not Version(version).micro]
+    latest_minor_version, latest_minor_version_date = minor_releases[0]
+    prev_minor_release = minor_releases[1][0]
+
+    # 4 months after the first minor version of the current release
+    deadline = latest_minor_version_date + relativedelta(months=4)
+    deadline_txt = format_date(deadline, format='medium', locale='en')
+
+    support_text = (
+        f'❌ No (ended {deadline_txt})'
+        if date.today() > deadline
+        else f'🚑 Limited (until {deadline_txt})'
+    )
+
+    new_table = GithubFlavoredMarkdownTable(
+        [
+            ['Version', 'Supported'],
+            [f'{latest_minor_version}.x', '✅ Yes (latest version)'],
+            [f'{prev_minor_release}.x', support_text],
+            ['Others', '❌ No'],
+        ]
+    ).table
+
+    # Replace auto-generated section
+    updated_content = _replace_auto_section(content, new_table)
+    if content == updated_content:
+        return
+
+    if dry_run:
+        _show_diff(content, updated_content, security_md.name)
+    else:
+        security_md.write_text(updated_content)
+
+
 @click.command()
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
@@ -215,9 +289,10 @@ def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
         info('Next version will be {}', next_version)
     if not no_changelog:
         _set_changelog_date(new_version, dry_run=dry_run)
+    _update_security_md(dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
     release_msg = f'Release {new_version}'
-    _git_commit(release_msg, ['CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
+    _git_commit(release_msg, ['SECURITY.md', 'CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
     _git_tag(new_version, release_msg, sign=sign, dry_run=dry_run)
     prompt = 'Build release wheel before bumping version?' if next_version else 'Build release wheel now?'
     if click.confirm(click.style(prompt, fg='blue', bold=True), default=False):

@@ -440,6 +440,7 @@ class User(PersonMixin, db.Model):
     # - abstracts (Abstract.submitter)
     # - agreements (Agreement.user)
     # - anonymous_survey_submissions (AnonymousSurveySubmission.user)
+    # - app_log_entries (AppLogEntry.user)
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
     # - blockings (Blocking.created_by_user)
@@ -511,6 +512,18 @@ class User(PersonMixin, db.Model):
 
     @property
     def identifier(self):
+        signed_id = static_secure_serializer.dumps(self.id, 'principal-id')
+        return f'User:{self.id}:{signed_id}'
+
+    @property
+    def persistent_identifier(self):
+        """A persistent version of this object's identifier.
+
+        This is the regular identifier, but without the signature, so it cannot be
+        used with most API endpoints that require a signed user identifier. However,
+        by being immutable (even if the `SECRET_KEY` is changed), it is suitable for
+        use e.g. by plugins that store a user's identifier in external places.
+        """
         return f'User:{self.id}'
 
     @property

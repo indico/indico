@@ -78,7 +78,8 @@ def delete_field_data():
 
 @celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='30', hour='3'))
 def delete_registrations():
-    is_expired = db.and_(RegistrationForm.retention_period.isnot(None),
+    is_expired = db.and_(~RegistrationForm.is_purged,
+                         RegistrationForm.retention_period.isnot(None),
                          db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())
     registrations = (Registration.query
                      .join(RegistrationForm, RegistrationForm.id == Registration.registration_form_id)
@@ -107,8 +108,12 @@ def delete_registrations():
 
 
 @celery.task(name='delete_previous_registration_file')
-def delete_previous_registration_file(reg_data, storage_backend, storage_file_id):
-    if reg_data.storage_backend == storage_backend and reg_data.storage_file_id == storage_file_id:
+def delete_previous_registration_file(registration_id, field_data_id, storage_backend, storage_file_id):
+    reg_data = RegistrationData.get((registration_id, field_data_id))
+    if reg_data and reg_data.storage_backend == storage_backend and reg_data.storage_file_id == storage_file_id:
+        # If we still have registration data (ie a file was replaced/removed but the field is still there),
+        # we abort the deletion in case the file that's about to be deleted is still referenced in it.
+        # This happens only if the commit failed for some reason.
         return
     logger.debug('Deleting registration file: %s from %s storage', storage_file_id, storage_backend)
     storage = get_storage(storage_backend)

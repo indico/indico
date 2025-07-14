@@ -51,6 +51,7 @@ export default env => {
     externals: {
       'jquery': 'jQuery',
       'moment': 'moment',
+      'flask-urls': '_IndicoCoreFlaskUrls',
       'react': '_IndicoCoreReact',
       'react-dnd': '_IndicoCoreReactDnd',
       'react-dom': '_IndicoCoreReactDom',
@@ -72,6 +73,7 @@ export default env => {
       'indico/utils/case': '_IndicoUtilsCase',
       'indico/utils/plugins': '_IndicoUtilsPlugins',
       'indico/react/components/principals/imperative': '_IndicoPrincipalsImperative',
+      'indico/custom_elements': '_IndicoCustomElements',
     },
     module: {
       rules: [

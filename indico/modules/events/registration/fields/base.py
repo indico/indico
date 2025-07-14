@@ -8,20 +8,39 @@
 from copy import deepcopy
 from decimal import Decimal
 
+from markupsafe import Markup
 from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 
 
-class BillableFieldDataSchema(mm.Schema):
+class FieldSetupSchemaBase(mm.Schema):
+    """Base schema for configuring registration form fields.
+
+    Any global options that go into every field's JSON config data can be
+    added here; if the options are stored in a dedicated column, they should
+    go to `GeneralFieldDataSchema` instead.
+    """
+
+
+class BillableFieldDataSchema(FieldSetupSchemaBase):
+    """Base config schema for fields that can have a price."""
+
     price = fields.Float(load_default=0)
 
 
 class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
+    """Base config schema for fields that can have a price and limited places."""
+
     places_limit = fields.Integer(load_default=0, validate=validate.Range(0))
+
+
+class LimitedPlacesBillableItemSchema(LimitedPlacesBillableFieldDataSchema):
+    """Base config schema for field items that can have a price and limited places."""
 
 
 class RegistrationFormFieldBase:
@@ -38,7 +57,7 @@ class RegistrationFormFieldBase:
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
     #: whether this field is associated with a file instead of normal data
@@ -47,6 +66,10 @@ class RegistrationFormFieldBase:
     is_invalid_field = False
     #: whether this field must not be "empty" (falsy value) if required
     not_empty_if_required = True
+    #: whether this field may be used as a condition; this is purely for validation,
+    #: on the frontend it depends solely on the config in the field registry whether
+    #: the field can be selected as a condition.
+    allow_condition = False
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -86,6 +109,19 @@ class RegistrationFormFieldBase:
         assert default is not NotImplemented
         return default
 
+    def get_data_for_condition(self, value) -> set:
+        """Convert field value to the format expected in a condition check.
+
+        If this field can be used for a condition, this method needs to return a
+        set of values (based on the `value` the field currently contains). If this
+        set intersects with the other field's configured condition, that field will
+        be visible.
+
+        The logic in this method must match the corresponding ``getDataForCondition``
+        function in the frontend field registry.
+        """
+        raise NotImplementedError('Field cannot be used as a condition')
+
     def get_validators(self, existing_registration):
         """Return a list of marshmallow validators for this field.
 
@@ -114,10 +150,10 @@ class RegistrationFormFieldBase:
         """
         return RegistrationData.data.op('#>>')('{}').in_(data_list)
 
-    def create_setup_schema(self):
+    def create_setup_schema(self, context=None):
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
-        return schema()
+        return schema(context=context)
 
     def create_mm_field(self, registration=None, override_required=False):
         """
@@ -219,6 +255,50 @@ class RegistrationFormFieldBase:
         """Return the number of used places for the field."""
         return 0
 
+    def render_summary_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in the registration summary."""
+        return data.friendly_data
+
+    def render_invoice_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in the registration invoice."""
+        return data.friendly_data
+
+    def render_email_data(self, data: RegistrationData) -> str | Markup:
+        """Render the field's data in a registration notification email.
+
+        In case the field is being modified in an existing registration, this method
+        is not called.
+        """
+        return data.friendly_data
+
+    def render_email_diff_data(self, diff_data) -> str | Markup:
+        """Render the field's data in a registraiton notification email.
+
+        This method is called when an existing registration is being modified and
+        the field already contained data. `diff_data` contains the value as returned
+        by :meth:`get_snapshot_data`.
+        """
+        return diff_data
+
+    def get_snapshot_data(self, data: RegistrationData):
+        """Get the field's data for snapshotting.
+
+        The snapshot is used to generate the diff view in notification emails, so
+        this should usually use same format as :meth:`render_email_data.
+        """
+        return self.render_email_data(data)
+
+    def render_reglist_column(self, data: RegistrationData) -> RegistrationListColumn:
+        """Render the field's data in the management registration list table."""
+        return RegistrationListColumn(data.friendly_data, data.search_data)
+
+    def render_spreadsheet_data(self, data: RegistrationData):
+        """Render the field's data in a spreadsheet.
+
+        This may return any data type that's handled by Indico's spreadsheet utils.
+        """
+        return data.friendly_data
+
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):
     setup_schema_base_cls = BillableFieldDataSchema
@@ -245,7 +325,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):

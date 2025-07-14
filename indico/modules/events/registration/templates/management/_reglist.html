@@ -161,11 +161,12 @@
                                                 {{- data[item.id].friendly_data | join('; ') }}
                                             {%- endif %}
                                         </td>
+                                    {% elif item.id not in data %}
+                                        <td class="i-table" data-text=""></td>
                                     {% else %}
-                                        <td class="i-table" data-text="{{ search_value }}">
-                                            {%- if item.id in data and data[item.id].friendly_data %}
-                                                {{- data[item.id].friendly_data }}
-                                            {%- endif %}
+                                        {% set spec = data[item.id].field_data.field.field_impl.render_reglist_column(data[item.id]) %}
+                                        <td class="i-table" data-text="{{ spec.text_value }}" {{ spec.td_attrs | html_params }}>
+                                            {{ spec.content }}
                                         </td>
                                     {% endif %}
                                 {% endfor %}

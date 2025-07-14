@@ -45,6 +45,7 @@ const PrincipalListField = props => {
     eventId,
     favoriteUsersController,
     className,
+    searchToken,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -101,10 +102,10 @@ const PrincipalListField = props => {
             type={data.type}
             invalid={data.invalid}
             isPendingUser={data.type === PrincipalType.user && data.userId === null}
-            favorite={data.type === PrincipalType.user && data.userId in favoriteUsers}
+            favorite={data.type === PrincipalType.user && data.identifier in favoriteUsers}
             onDelete={() => !disabled && handleDelete(data.identifier)}
-            onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
-            onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}
+            onAddFavorite={() => !disabled && handleAddFavorite(data.identifier)}
+            onDelFavorite={() => !disabled && handleDelFavorite(data.identifier)}
             disabled={disabled}
             readOnly={readOnly}
           />
@@ -126,11 +127,12 @@ const PrincipalListField = props => {
               <UserSearch
                 existing={value}
                 onAddItems={handleAddItems}
-                favorites={favoriteUsers}
+                favoritesController={favoriteUsersController}
                 disabled={disabled}
                 withExternalUsers={withExternalUsers}
                 onOpen={onFocus}
                 onClose={onBlur}
+                searchToken={searchToken}
               />
               {withGroups && (
                 <GroupSearch
@@ -195,6 +197,7 @@ PrincipalListField.propTypes = {
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
   className: PropTypes.string,
+  searchToken: PropTypes.string,
 };
 
 PrincipalListField.defaultProps = {
@@ -206,6 +209,7 @@ PrincipalListField.defaultProps = {
   eventId: null,
   readOnly: false,
   className: undefined,
+  searchToken: null,
 };
 
 export default React.memo(PrincipalListField);

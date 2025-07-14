@@ -8,7 +8,8 @@
 from flask import session
 
 from indico.core import signals
-from indico.modules.logs.models.entries import CategoryLogEntry, EventLogEntry, EventLogRealm, LogKind
+from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
+                                                EventLogEntry, EventLogRealm, LogKind)
 from indico.modules.logs.renderers import EmailRenderer, SimpleRenderer
 from indico.modules.logs.util import get_log_renderers
 from indico.util.i18n import _
@@ -16,21 +17,20 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('CategoryLogEntry', 'EventLogEntry', 'LogKind', 'EventLogRealm')
+__all__ = ('AppLogEntry', 'CategoryLogEntry', 'EventLogEntry', 'EventLogRealm', 'AppLogRealm', 'CategoryLogRealm',
+           'LogKind')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
-        return
-    return SideMenuItem('logs', _('Logs'), url_for('logs.event', event), section='reports')
+    if event.can_manage(session.user):
+        return SideMenuItem('logs', _('Logs'), url_for('logs.event', event), section='reports')
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
-def _extend_profile_sidemenu(sender, user, **kwargs):
-    if not session.user.is_admin:
-        return
-    return SideMenuItem('logs', _('Logs'), url_for('logs.user'), -100)
+def _extend_user_profile_sidemenu(sender, user, **kwargs):
+    if session.user.is_admin:
+        return SideMenuItem('logs', _('Logs'), url_for('logs.user'), -100)
 
 
 @signals.users.merged.connect
@@ -49,3 +49,9 @@ def _get_log_renderers(sender, **kwargs):
 def _check_log_renderers(app, **kwargs):
     # This will raise RuntimeError if the log renderer types are not unique
     get_log_renderers()
+
+
+@signals.menu.items.connect_via('admin-sidemenu')
+def _extend_admin_menu(sender, **kwargs):
+    if session.user.is_admin:
+        return SideMenuItem('logs', _('Logs'), url_for('logs.app'), -100, icon='stack')

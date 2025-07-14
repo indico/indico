@@ -80,7 +80,7 @@ export default function FormErrorList() {
           <li key={field.id}>
             <a
               href={`#${field.id}`}
-              aria-label={Translate.string('Visit incomplete field {field}: {error}', {
+              aria-label={Translate.string('Go to incomplete field {field}: {error}', {
                 field: field.label,
                 error: field.message,
               })}

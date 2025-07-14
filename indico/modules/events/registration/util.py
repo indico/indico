@@ -10,6 +10,7 @@ import csv
 import dataclasses
 import itertools
 import uuid
+from datetime import datetime
 from io import BytesIO
 from operator import attrgetter
 
@@ -50,11 +51,12 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import format_date, now_utc
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
+from indico.web.args import parser
 
 
 @dataclasses.dataclass
@@ -274,6 +276,8 @@ def check_registration_email(regform, email, registration=None, management=False
         as_list=True)
     if extra_checks:
         return min(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))
+    if user and user != session.user and not management and not config.ALLOW_PUBLIC_USER_SEARCH:
+        return {'status': 'error', 'conflict': 'email-other-user-restricted'}
     if registration is not None:
         if email_registration and email_registration != registration:
             return {'status': 'error', 'conflict': 'email-already-registered'}
@@ -394,8 +398,10 @@ def create_registration(regform, data, invitation=None, management=False, notify
                                 base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
     if skip_moderation is None:
         skip_moderation = management
+    all_data_by_id = {f.id: data.get(f.html_field_name) for f in regform.active_fields}
+    hidden_fields = get_hidden_conditional_fields(regform, all_data_by_id)
     for form_item in regform.active_fields:
-        if form_item.is_purged or form_item.get_locked_reason(None):
+        if form_item in hidden_fields or form_item.is_purged or form_item.get_locked_reason(None):
             # Leave the registration data empty
             continue
         default = form_item.field_impl.default_value
@@ -435,6 +441,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 def modify_registration(registration, data, management=False, notify_user=True):
     from indico.modules.events.registration.tasks import delete_previous_registration_file
 
+    user = session.user if session else None
     old_data = snapshot_registration_data(registration)
     old_price = registration.price
     personal_data_changes = {}
@@ -444,13 +451,44 @@ def modify_registration(registration, data, management=False, notify_user=True):
         registration.user = get_user_by_email(data['email'])
 
     billable_items_locked = not management and registration.is_paid
-    for form_item in regform.active_fields:
+    active_fields = regform.active_fields
+
+    # Get both the existing data and the new data from the client as modifying registrations
+    # sends a PATCH with only updated fields in the payload.
+    all_data_by_id = {field_id: field_data.data for field_id, field_data in data_by_field.items()}
+    all_data_by_id.update({f.id: data[f.html_field_name] for f in regform.active_fields if f.html_field_name in data})
+    hidden_fields = get_hidden_conditional_fields(regform, all_data_by_id)
+
+    def _set_data(field, value):
+        attrs = field.field_impl.process_form_data(registration, value, data_by_field[field.id],
+                                                   billable_items_locked=billable_items_locked)
+        for key, val in attrs.items():
+            setattr(data_by_field[field.id], key, val)
+        if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.column:
+            key = field.personal_data_type.column
+            if getattr(registration, key) != value:
+                personal_data_changes[key] = value
+            setattr(registration, key, value)
+
+    for form_item in active_fields:
         if form_item.is_purged or form_item.get_locked_reason(registration):
             continue
 
         field_impl = form_item.field_impl
         has_data = form_item.html_field_name in data
         can_modify = management or not form_item.parent.is_manager_only
+        existing_data = data_by_field.get(form_item.id)
+
+        if form_item in hidden_fields:
+            if not existing_data:
+                continue
+            if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
+                delete_previous_registration_file.apply_async([existing_data.registration_id,
+                                                               existing_data.field_data_id,
+                                                               existing_data.storage_backend,
+                                                               existing_data.storage_file_id], countdown=600)
+            registration.data.remove(existing_data)
+            continue
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
@@ -467,23 +505,15 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if value is NotImplemented:  # un-modifiable field w/ no existing nor default value
             continue
 
-        if (field_impl.is_file_field and (file_data := data_by_field.get(form_item.id))
-                and file_data.storage_file_id is not None):
-            delete_previous_registration_file.apply_async([file_data, file_data.storage_backend,
-                                                           file_data.storage_file_id], countdown=600)
+        if field_impl.is_file_field and existing_data and existing_data.storage_file_id is not None:
+            delete_previous_registration_file.apply_async([existing_data.registration_id,
+                                                           existing_data.field_data_id,
+                                                           existing_data.storage_backend,
+                                                           existing_data.storage_file_id], countdown=600)
         if form_item.id not in data_by_field:
             data_by_field[form_item.id] = RegistrationData(registration=registration,
                                                            field_data=form_item.current_data)
-
-        attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
-                                             billable_items_locked=billable_items_locked)
-        for key, val in attrs.items():
-            setattr(data_by_field[form_item.id], key, val)
-        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-            key = form_item.personal_data_type.column
-            if getattr(registration, key) != value:
-                personal_data_changes[key] = value
-            setattr(registration, key, value)
+        _set_data(form_item, value)
 
     if not management and regform.needs_publish_consent:
         consent_to_publish = data.get('consent_to_publish')
@@ -504,11 +534,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
     diff = diff_registration_data(old_data, new_data)
     notify_registration_modification(registration, notify_user=notify_user, diff=diff, old_price=old_price,
                                      from_management=management)
-    logger.info('Registration %s modified by %s', registration, session.user)
+    logger.info('Registration %s modified by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      LogKind.change, 'Registration',
                      f'Registration modified: {registration.full_name}',
-                     session.user, data={'Email': registration.email})
+                     user, data={'Email': registration.email})
 
 
 def update_registration_consent_to_publish(registration, consent_to_publish):
@@ -555,18 +585,30 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             'ID': registration.friendly_id,
             'Name': f'{registration.first_name} {registration.last_name}'
         }
+        tzinfo = registration.event.tzinfo
         for item in regform_items:
             key = unique_col(item.title, item.id)
             if item.input_type == 'accommodation':
                 registration_dict[key] = data[item.id].friendly_data.get('choice') if item.id in data else ''
                 key = unique_col('{} ({})'.format(item.title, 'Arrival'), item.id)
                 arrival_date = data[item.id].friendly_data.get('arrival_date') if item.id in data else None
-                registration_dict[key] = format_date(arrival_date) if arrival_date else ''
+                registration_dict[key] = arrival_date or ''
                 key = unique_col('{} ({})'.format(item.title, 'Departure'), item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
-                registration_dict[key] = format_date(departure_date) if departure_date else ''
+                registration_dict[key] = departure_date or ''
+            elif item.input_type == 'date':
+                if item.id not in data or not data[item.id].data:  # missing or empty data for the field
+                    registration_dict[key] = ''
+                    continue
+                dt = datetime.fromisoformat(data[item.id].data).replace(tzinfo=tzinfo)
+                if ':' in item.data.get('date_format'):
+                    registration_dict[key] = dt
+                else:
+                    registration_dict[key] = dt.date()
+            elif item.id in data:
+                registration_dict[key] = item.field_impl.render_spreadsheet_data(data[item.id])
             else:
-                registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
+                registration_dict[key] = ''
         for name, (title, fn) in special_item_mapping.items():
             if name not in static_items:
                 continue
@@ -965,12 +1007,12 @@ def serialize_registration_form(regform):
 
 def snapshot_registration_data(registration):
     data = {}
-    for regfields in registration.summary_data.values():
+    for regfields in registration.get_summary_data().values():
         for field, regdata in regfields.items():
             data[field.html_field_name] = {'price': regdata.price, 'data': regdata.data,
                                            'storage_file_id': regdata.storage_file_id,
                                            'is_file_field': field.field_impl.is_file_field,
-                                           'friendly_data': regdata.friendly_data}
+                                           'friendly_data': field.field_impl.get_snapshot_data(regdata)}
     return data
 
 
@@ -981,10 +1023,21 @@ def diff_registration_data(old_data, new_data):
              the old and new friendly data and the field price
     """
     diff = {}
-    for html_field_name in old_data:
-        old = old_data[html_field_name]
-        new = new_data[html_field_name]
-        if old['data'] != new['data'] or (old['is_file_field'] and old['storage_file_id'] != new['storage_file_id']):
+    for html_field_name in old_data.keys() | new_data.keys():
+        old = old_data.get(html_field_name)
+        new = new_data.get(html_field_name)
+        if old is None:
+            diff[html_field_name] = {
+                'old': {'price': 0, 'friendly_data': ''},
+                'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
+            }
+        elif new is None:
+            # XXX this doesn't actually get displayed in the emails
+            diff[html_field_name] = {
+                'old': {'price': old['price'], 'friendly_data': old['friendly_data']},
+                'new': {'price': 0, 'friendly_data': ''}
+            }
+        elif old['data'] != new['data'] or (old['is_file_field'] and old['storage_file_id'] != new['storage_file_id']):
             diff[html_field_name] = {
                 'old': {'price': old['price'], 'friendly_data': old['friendly_data']},
                 'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
@@ -1036,3 +1089,53 @@ def process_registration_picture(source, *, thumbnail=False):
     picture.save(image_bytes, 'JPEG')
     image_bytes.seek(0)
     return image_bytes
+
+
+def is_conditional_field_shown(field, data, *, is_db_data=False):
+    # not conditional
+    if not field.show_if_field:
+        return True
+    # condition field has no data
+    if (show_if_data := data.get(field.show_if_id)) is None:
+        return False
+    if is_db_data:
+        show_if_data = show_if_data.data
+        if show_if_data is None:
+            return False
+    current_values = field.show_if_field.field_impl.get_data_for_condition(show_if_data)
+    condition_values = set(field.show_if_values)
+    if not (current_values & condition_values):
+        return False
+    # recurse to the condition field in case it's also conditional
+    return is_conditional_field_shown(field.show_if_field, data, is_db_data=is_db_data)
+
+
+def get_hidden_conditional_fields(regform, data_by_id):
+    return {f for f in regform.active_fields if not is_conditional_field_shown(f, data_by_id)}
+
+
+def load_registration_schema(regform, schema_cls, *, registration=None, partial_fields=frozenset()):
+    """Process data using the registration schema.
+
+    This takes conditional fields into account so required fields which
+    are disabled due to a condition do not cause a validation error, but
+    required fields that are active are actually enforced as required.
+    """
+    # During the first parse all fields may be omitted; we could limit this to conditional
+    # fields but it doesn't really matter as we just need to get field values.
+    schema = schema_cls(partial=True)
+    all_form_data = parser.parse(schema)
+    if registration:
+        # Use existing data from the registration, and then extend/overwrite it with new data
+        data_by_id = {field_id: field_data.data for field_id, field_data in registration.data_by_field.items()}
+        data_by_id.update({f.id: all_form_data[f.html_field_name] for f in regform.active_fields
+                           if f.html_field_name in all_form_data})
+    else:
+        data_by_id = {f.id: all_form_data.get(f.html_field_name) for f in regform.active_fields}
+    hidden_fields = get_hidden_conditional_fields(regform, data_by_id)
+    # Now that we know which fields are disabled due to unmet conditions, we can parse
+    # the form data again and properly fail if any required fields are missing/empty.
+    # XXX: The frontend is not supposed to send data for any field that is disabled,
+    #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
+    schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
+    return parser.parse(schema)

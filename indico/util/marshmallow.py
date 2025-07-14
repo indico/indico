@@ -212,7 +212,7 @@ class ModelField(I18nAwareField):
         'type': 'Invalid input type.'
     }
 
-    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, filter_deleted=False,
+    def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, filter_deleted=False,
                  none_if_missing=False, **kwargs):
         self.model = model
         self.get_query = get_query
@@ -240,7 +240,7 @@ class ModelField(I18nAwareField):
             value = self.column_type(value)
         except (TypeError, ValueError):
             self.fail('type')
-        query = self.get_query(self.model).filter(self.column == value)
+        query = self.get_query(self.model, self.context).filter(self.column == value)
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         obj = query.one_or_none()
@@ -264,7 +264,7 @@ class ModelList(fields.Field):
         'type': 'Invalid input type.'
     }
 
-    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, collection_class=list,
+    def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, collection_class=list,
                  filter_deleted=False, **kwargs):
         self.model = model
         self.get_query = get_query
@@ -293,7 +293,7 @@ class ModelList(fields.Field):
         except (TypeError, ValueError):
             self.fail('type')
         requested = set(value)
-        query = self.get_query(self.model).filter(self.column.in_(value))
+        query = self.get_query(self.model, self.context).filter(self.column.in_(value))
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         objs = query.all()
@@ -308,7 +308,7 @@ class ModelList(fields.Field):
 class Principal(fields.Field):
     """Marshmallow field for a single principal."""
 
-    def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
+    def __init__(self, *, allow_groups=False, allow_external_users=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         super().__init__(**kwargs)
@@ -330,7 +330,7 @@ class Principal(fields.Field):
 class PrincipalList(fields.Field):
     """Marshmallow field for a list of principals."""
 
-    def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+    def __init__(self, *, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                  allow_category_roles=False, allow_registration_forms=False, allow_emails=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users

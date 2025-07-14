@@ -5,8 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import session
+from itsdangerous import BadSignature
+from werkzeug.exceptions import Forbidden
+
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.util.signing import secure_serializer, static_secure_serializer
 
 
 def iter_acl(acl):
@@ -25,10 +31,10 @@ def iter_acl(acl):
                                       not getattr(getattr(x, 'principal', x), 'is_local', None)))
 
 
-def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+def principal_from_identifier(identifier, *, allow_groups=False, allow_external_users=False, allow_event_roles=False,
                               allow_event_persons=False, allow_category_roles=False, allow_registration_forms=False,
                               allow_emails=False, allow_networks=False, event_id=None, category_id=None,
-                              soft_fail=False):
+                              soft_fail=False, require_user_token=True):
     from indico.modules.categories.models.categories import Category
     from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.models.events import Event
@@ -56,10 +62,22 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         raise ValueError('Invalid data')
 
     if type_ == 'User':
+        if ':' in data:
+            user_id, signed_user_id = data.split(':', 1)
+        else:
+            user_id, signed_user_id = data, None
         try:
-            user_id = int(data)
+            user_id = int(user_id)
         except ValueError:
             raise ValueError('Invalid data')
+        if signed_user_id or require_user_token:
+            signed_user_id = (
+                static_secure_serializer.loads(signed_user_id, salt='principal-id') if signed_user_id else None
+            )
+            if signed_user_id is None:
+                raise ValueError(f'User id signature missing for {user_id}')
+            elif signed_user_id != user_id:
+                raise ValueError(f'Invalid user id signature: {signed_user_id} != {user_id}')
         user = User.get(user_id, is_deleted=(None if soft_fail else False))
         if user is None:
             raise ValueError(f'Invalid user: {user_id}')
@@ -182,3 +200,36 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         return netgroup
     else:
         raise ValueError('Invalid data')
+
+
+def validate_search_token(token, user):
+    """Check that the search token is valid and belongs to the same user.
+
+    This raises a `Forbidden` exception if the token is missing or invalid.
+    """
+    if not token:
+        raise Forbidden('No search token. This is a bug, please report it.')
+    try:
+        sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
+        if user.id != sig_uid:
+            raise BadSignature
+    except BadSignature:
+        raise Forbidden('Invalid search token')
+
+
+def make_user_search_token(*, public=False) -> str | None:
+    """Generate a token to access user search.
+
+    :param public: If true, a token is only returned if
+                   :data:`ALLOW_PUBLIC_USER_SEARCH` is True.
+                   This should be set when the token is used in
+                   a public place where any (authenticated) user
+                   would get access to it.
+    """
+    if not session.user:
+        # never allow unauthenticated users to search, the search endpoint requires
+        # login anyway, so the token would be useless
+        return None
+    if public and not config.ALLOW_PUBLIC_USER_SEARCH:
+        return None
+    return secure_serializer.dumps(session.user.id, 'user-search-token')

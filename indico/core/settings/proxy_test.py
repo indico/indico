@@ -34,11 +34,16 @@ def test_proxy_strict_off():
 @pytest.mark.usefixtures('db')
 def test_proxy_strict():
     proxy = SettingsProxy('test', {'hello': 'world'})
-    pytest.raises(ValueError, proxy.get, 'foo')
-    pytest.raises(ValueError, proxy.get, 'foo', 'bar')
-    pytest.raises(ValueError, proxy.set, 'foo', 'foobar')
-    pytest.raises(ValueError, proxy.set_multi, {'hello': 'world', 'foo': 'foobar'})
-    pytest.raises(ValueError, proxy.delete, 'hello', 'foo')
+    with pytest.raises(ValueError):
+        proxy.get('foo')
+    with pytest.raises(ValueError):
+        proxy.get('foo', 'bar')
+    with pytest.raises(ValueError):
+        proxy.set('foo', 'foobar')
+    with pytest.raises(ValueError):
+        proxy.set_multi({'hello': 'world', 'foo': 'foobar'})
+    with pytest.raises(ValueError):
+        proxy.delete('hello', 'foo')
     assert proxy.get('hello') == 'world'
 
 
@@ -111,13 +116,20 @@ def test_proxy_cache_mutable():
 def test_acls_invalid():
     user = User()
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
-    pytest.raises(ValueError, proxy.get, 'acl')
-    pytest.raises(ValueError, proxy.set, 'acl', 'foo')
-    pytest.raises(ValueError, proxy.acls.get, 'reg')
-    pytest.raises(ValueError, proxy.acls.set, 'reg', {user})
-    pytest.raises(ValueError, proxy.acls.contains_user, 'reg', user)
-    pytest.raises(ValueError, proxy.acls.add_principal, 'reg', user)
-    pytest.raises(ValueError, proxy.acls.remove_principal, 'reg', user)
+    with pytest.raises(ValueError):
+        proxy.get('acl')
+    with pytest.raises(ValueError):
+        proxy.set('acl', 'foo')
+    with pytest.raises(ValueError):
+        proxy.acls.get('reg')
+    with pytest.raises(ValueError):
+        proxy.acls.set('reg', {user})
+    with pytest.raises(ValueError):
+        proxy.acls.contains_user('reg', user)
+    with pytest.raises(ValueError):
+        proxy.acls.add_principal('reg', user)
+    with pytest.raises(ValueError):
+        proxy.acls.remove_principal('reg', user)
 
 
 @pytest.mark.usefixtures('db')
@@ -167,10 +179,14 @@ def test_prefix_settings_invalid():
     foo_proxy = SettingsProxy('foo', {'a': 1, 'b': 2})
     bar_proxy = SettingsProxy('bar', {'x': 3, 'y': 4})
     proxy = PrefixSettingsProxy({'foo': foo_proxy, 'bar': bar_proxy})
-    pytest.raises(ValueError, proxy.get, 'x')
-    pytest.raises(ValueError, proxy.get, 'x_y')
-    pytest.raises(ValueError, proxy.set, 'x', 'test')
-    pytest.raises(ValueError, proxy.set, 'x_y', 'test')
+    with pytest.raises(ValueError):
+        proxy.get('x')
+    with pytest.raises(ValueError):
+        proxy.get('x_y')
+    with pytest.raises(ValueError):
+        proxy.set('x', 'test')
+    with pytest.raises(ValueError):
+        proxy.set('x_y', 'test')
 
 
 @pytest.mark.parametrize('with_arg', (True, False))

@@ -25,6 +25,8 @@ window.setupDateWidget = function setupDateWidget(options) {
         notBefore: false,
         notAfter: false,
       },
+      weekendDisabled: false,
+      disabledDates: null
     },
     options
   );
@@ -43,6 +45,8 @@ window.setupDateWidget = function setupDateWidget(options) {
       earliest={options.earliest}
       latest={options.latest}
       linkedField={options.linkedField}
+      weekendDisabled={options.weekendDisabled}
+      disabledDates={options.disabledDates}
     />,
     document.getElementById(options.fieldId)
   );

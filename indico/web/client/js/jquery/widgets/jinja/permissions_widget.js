@@ -25,6 +25,7 @@ import Palette from 'indico/utils/palette';
       permissionsInfo: null,
       hiddenPermissions: null,
       hiddenPermissionsInfo: null,
+      searchToken: null,
     },
 
     _update() {
@@ -484,11 +485,11 @@ import Palette from 'indico/utils/palette';
 
       ReactDOM.render(
         <FavoritesProvider>
-          {([favorites]) => (
+          {favoriteUsersController => (
             <>
               <UserSearch
                 withExternalUsers
-                favorites={favorites}
+                favoritesController={favoriteUsersController}
                 existing={existing.filter(e => e.startsWith('User'))}
                 onAddItems={e => {
                   const items = e.map(({identifier, userId, name, firstName, lastName}) => ({
@@ -502,6 +503,7 @@ import Palette from 'indico/utils/palette';
                   this._addItems(items, [READ_ACCESS_PERMISSIONS]);
                 }}
                 triggerFactory={userSearchTrigger}
+                searchToken={this.options.searchToken}
               />
               <GroupSearch
                 existing={existing.filter(e => e.startsWith('Group'))}

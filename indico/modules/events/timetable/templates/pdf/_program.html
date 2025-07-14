@@ -113,7 +113,7 @@
                     <div class="contrib-heading">
                         {% if not sess.is_poster %}
                             <span class="timebox inherited-bg-color inherited-txt-color">
-                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='HHmm') }}
+                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='short') }}
                                 {% if config.show_length_contribs %}
                                     ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                 {% endif %}
@@ -267,7 +267,7 @@
         <p class="session-block-date">
             <b>{{ day|format_skeleton('EEEEdMMMM') }}</b>
             <span class="timebox">
-                {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='HHmm') }}
+                {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='short') }}
             </span>
         </p>
     {% endif %}

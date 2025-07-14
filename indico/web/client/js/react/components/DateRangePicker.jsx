@@ -16,8 +16,6 @@ import {DateRange} from 'indico/utils/date';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
-import 'indico/custom_elements/ind_date_picker';
-
 const INVALID = '__invalid__';
 
 export default function DateRangePicker({
@@ -39,6 +37,7 @@ export default function DateRangePicker({
   onChange,
   onFocus,
   onBlur,
+  filter,
 }) {
   format ??= moment.localeData().longDateFormat('L');
 
@@ -90,6 +89,7 @@ export default function DateRangePicker({
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
       range-end-max={rangeEndMax}
+      format={format}
       onChange={handleChange}
     >
       <fieldset>
@@ -145,8 +145,8 @@ export default function DateRangePicker({
 
       <DatePickerCalendar>
         <div className="calendars">
-          <DatePickerGrid includeMonthHeader />
-          <DatePickerGrid includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
+          <DatePickerGrid filter={filter} includeMonthHeader />
         </div>
       </DatePickerCalendar>
     </ind-date-range-picker>
@@ -175,6 +175,7 @@ DateRangePicker.propTypes = {
   rangeEndMax: PropTypes.string,
   min: PropTypes.string,
   max: PropTypes.string,
+  filter: PropTypes.func,
 };
 
 DateRangePicker.defaultProps = {
@@ -193,6 +194,7 @@ DateRangePicker.defaultProps = {
   rangeEndMax: '',
   min: '',
   max: '',
+  filter: undefined,
 };
 
 function validDate(key, required, invalidMessage, missingMessage) {
