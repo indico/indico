@@ -267,7 +267,7 @@ export default {
         }
       }
       case actions.DELETE_BLOCK: {
-        const {id} = action;
+        const {id} = action.entry;
         let block = null;
         for (const dayEntries of Object.values(state.changes[state.currentChangeIdx].entries)) {
           block = dayEntries.find(e => e.id === id);
