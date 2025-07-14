@@ -68,7 +68,7 @@ def convert_to_markdown(text):
     # github references
     text = re.sub(r':(?:issue|pr):`([\d, ]+)`', _replace_unsplit('#'), text)  # issue/pr
     text = re.sub(r':user:`([^`]+)`', _replace_unsplit('@'), text)  # user
-    text = re.sub(r':cve:`([^`]+)`', _replace_unsplit(''), text)  # CVE
+    text = re.sub(r':cve:`([^`]+)`', _replace_unsplit('CVE-'), text)  # CVE
     # documentation references
     text = re.sub(r':data:`([^`]+)`', r'[`\1`](https://docs.getindico.io/en/stable/config/settings/#\1)', text)
     text = re.sub(r':ref:`([^<]+) <[^>]+>`', r'\1', text)
