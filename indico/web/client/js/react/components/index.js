@@ -46,6 +46,7 @@ export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as ManageNotes} from './notes/ManageNotes';
 export {default as Select} from './Select';
 export {default as TimePicker} from './time/TimePicker';
+export {default as TimeRangePicker} from './time/TimeRangePicker';
 export {default as TinyMCETextEditor, FinalTinyMCETextEditor} from './TinyMCETextEditor';
 export {default as WTFButtonsBooleanField} from './WTFButtonsBooleanField';
 export {default as WTFDateField} from './WTFDateField';

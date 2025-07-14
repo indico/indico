@@ -7,11 +7,15 @@
 
 @use 'design_system';
 
+%time-picker-input {
+  max-width: var(--time-picker-width, 8em);
+}
+
 .time-picker input {
   @extend %text-input;
 
   :global(.ui.form) &:not(.bump-specificity)[type='text'] {
-    max-width: var(--time-picker-width, 8em);
+    @extend %time-picker-input;
   }
 
   &[data-time-format='12h'] {
@@ -23,24 +27,63 @@
   @extend %visually-hidden;
 }
 
+.time-range-picker {
+  @extend %text-input;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+
+  input {
+    @extend %time-picker-input;
+  }
+
+  legend {
+    @extend %visually-hidden;
+  }
+
+  ind-time-picker {
+    flex: 1;
+    border: none;
+
+    input {
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 0.5em;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    &:not(:last-of-type) {
+      border-right: 1px solid var(--gray-300);
+    }
+  }
+}
+
 .time-option-label {
   display: inline-block;
   min-width: 4.5em;
-  text-align: right;
+  text-align: left;
 }
 
 .option-label {
   display: flex;
   gap: 0.5em;
+  align-items: center;
 }
 
 .option-label span:first-child:not(:last-child) {
-  flex: 1;
-  text-align: right;
+  flex: none;
+  min-width: 4.5em;
+  text-align: left;
 }
 
 .option-label span:last-child:not(:first-child) {
   flex: none;
   display: inline-block;
   width: 4.5em;
+  text-align: left;
+  color: var(--gray-600);
 }
