@@ -72,10 +72,9 @@ function EntryPopupContent({
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const eventId = useSelector(selectors.getEventId);
-  let draftEntry = {...entry};
 
   const onEdit = async (e: MouseEvent) => {
-    const {objId} = draftEntry;
+    const {objId} = entry;
     if (!objId) {
       return;
     }
@@ -91,20 +90,20 @@ function EntryPopupContent({
 
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
-    draftEntry = mapTTDataToEntry(data);
-    dispatch(actions.setDraftEntry(draftEntry));
+    entry = mapTTDataToEntry(data);
+    dispatch(actions.setDraftEntry(entry));
   };
 
   const onDelete = async (e: MouseEvent) => {
     e.stopPropagation();
 
     const deleteHandlers = {
-      [EntryType.Break]: () => dispatch(actions.deleteBreak(draftEntry, eventId)),
-      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(draftEntry, eventId)),
-      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(draftEntry, eventId)),
+      [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
+      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(entry, eventId)),
+      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(entry, eventId)),
     };
 
-    const deleteHandler = deleteHandlers[draftEntry.type];
+    const deleteHandler = deleteHandlers[entry.type];
 
     if (!deleteHandler) {
       throw new Error('Invalid entry type');

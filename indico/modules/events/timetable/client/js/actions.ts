@@ -20,8 +20,6 @@ import {
   ContribEntry,
   ChildContribEntry,
 } from './types';
-import { AnyAction } from 'redux';
-import { ThunkAction } from 'redux-thunk/es';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
