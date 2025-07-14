@@ -49,7 +49,7 @@ plantweb==1.3.0
     # via -r docs/requirements.in
 pygments==2.18.0
     # via sphinx
-pytz==2024.2
+pytz==2025.2
     # via flask-babel
 pyyaml==6.0.2
     # via sphinxcontrib-mermaid
