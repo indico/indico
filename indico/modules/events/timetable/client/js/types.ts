@@ -52,6 +52,7 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  locationData?: LocationData;
 }
 
 export interface ScheduledMixin {
@@ -75,6 +76,7 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
   sessionId?: number;
   textColor: string;
   backgroundColor: string;
+  personLinks?: PersonLink[];
 }
 
 export interface ChildContribEntry extends ContribEntry {

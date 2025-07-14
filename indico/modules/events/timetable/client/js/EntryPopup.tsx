@@ -67,6 +67,7 @@ function EntryPopupContent({
   entry;
   onClose: () => void;
 }) {
+  console.log('the entry', entry);
   const dispatch = useDispatch();
   const {type, title} = entry;
   const sessions = useSelector(selectors.getSessions);

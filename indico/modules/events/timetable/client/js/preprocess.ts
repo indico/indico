@@ -142,6 +142,12 @@ export function preprocessTimetableEntries(
             parentId: dayEntries[day].at(-1).id,
             x: 0,
             y: 0,
+            locationData: {
+              address,
+              room,
+              venueName,
+            },
+            personLinks,
             width: 0,
             column: 0,
             maxColumn: 0,
