@@ -1,0 +1,57 @@
+{% extends 'events/management/base.html' %}
+{% from 'message_box.html' import message_box %}
+{% from 'events/registration/management/_registration_check_type_list.html' import render_check_types %}
+
+
+{% block title %}
+    {%- trans %}Registration checks{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    <p>
+        {% trans -%}
+            Define checks and rules to check-in/check-out registrations. Example:
+            "Entrance Check" or "Collect souvenir".
+        {%- endtrans %}
+    </p>
+    <p>
+        {% trans -%}
+            Also specify rules such as once, daily or multiple and whether it can be checked out.
+            Do not define 2 checks for inverse actions, e.g "Entered room" and "Exited room".
+            Instead define one check "Entered room" with "Check out" enabled.
+        {%- endtrans %}
+    </p>
+{% endblock %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width">
+        <div class="i-box">
+            <div class="i-box-header" style="margin-bottom: 10px;">
+                <div class="i-box-title">{%- trans %}Event Defined Check Types{% endtrans -%}</div>
+                <div class="i-box-buttons hide-if-locked">
+                    <button class="i-button icon-plus" data-href="{{ url_for('.manage_registration_check_types_add', event) }}"
+                       data-title="{%- trans %}Create a check type{% endtrans -%}"
+                       data-ajax-dialog
+                       data-update="#check-types">
+                        {%- trans %}Create a check type{% endtrans -%}
+                    </button>
+                </div>
+            </div>
+            {% if event.check_types %}
+                <div id="check-types" class="i-box-content">
+                    {{ render_check_types(event.check_types, event) }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="i-box-group vert fixed-width">
+        <div class="i-box">
+            <div class="i-box-header" style="margin-bottom: 10px;">
+                <div class="i-box-title">{%- trans %}System Defined Check Types{% endtrans -%}</div>
+            </div>
+            <div id="system-check-types" class="i-box-content">
+                {{ render_check_types(system_check_types, event) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
