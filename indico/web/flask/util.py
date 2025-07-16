@@ -240,7 +240,7 @@ def _is_office_mimetype(mimetype):
 
 
 def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, inline=None,
-              max_age=86400, conditional=False, safe=True, **kwargs):
+              max_age=86400, conditional=False, safe=True, safe_root=None, **kwargs):
     """Send a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -257,6 +257,7 @@ def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, 
     text/html mimetypes
     `max_age` sets the number of seconds to cache a file for in the browser - defaults to 86400 seconds (24 hours). This
     can only be used in combination with `no_cache=False`.
+    `safe_root` specifies the root directory within which the file must reside.
     """
     name = re.sub(r'\s+', ' ', name).strip()  # get rid of crap like linebreaks
     assert '/' in mimetype
@@ -271,6 +272,10 @@ def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, 
         inline = False
     if not no_cache:
         kwargs['max_age'] = max_age
+    if safe_root and isinstance(path_or_fd, str):
+        normalized_path = os.path.normpath(path_or_fd)
+        if not normalized_path.startswith(safe_root):
+            raise Forbidden(f'Access to the file is not allowed: {path_or_fd}')
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=(not inline), download_name=name,
                         conditional=conditional, last_modified=last_modified, **kwargs)

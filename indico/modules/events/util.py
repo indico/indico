@@ -369,6 +369,11 @@ def create_event_logo_tmp_file(event, tmpdir=None):
     """
     logo_meta = event.logo_metadata
     logo_extension = guess_extension(logo_meta['content_type']) or os.path.splitext(logo_meta['filename'])[1]
+    # Normalize and validate the logo extension
+    allowed_extensions = {'.png', '.jpeg', '.gif'}
+    logo_extension = os.path.normpath(logo_extension).lower()
+    if logo_extension not in allowed_extensions:
+        raise ValueError(f"Invalid file extension: {logo_extension}")
     with NamedTemporaryFile(delete=False, dir=(tmpdir or config.TEMP_DIR), suffix=logo_extension) as temp_file:
         temp_file.write(event.logo)
         temp_file.flush()
