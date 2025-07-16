@@ -25,7 +25,7 @@ from indico.modules.events.papers.schemas import CallForPapersSchema, PaperDumpS
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.util.fs import secure_filename, secure_client_filename
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext, pgettext
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
