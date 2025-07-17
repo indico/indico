@@ -33,6 +33,7 @@ import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
+import { on } from 'process';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -73,14 +74,11 @@ function EntryPopupContent({
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const eventId = useSelector(selectors.getEventId);
 
-  const onEdit = async (e: MouseEvent) => {
+  const onEdit = async () => {
     const {objId} = entry;
     if (!objId) {
       return;
     }
-
-    e.stopPropagation();
-    onClose();
 
     const editURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: objId}),
@@ -92,6 +90,7 @@ function EntryPopupContent({
     data['type'] = type;
     entry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(entry));
+    onClose();
   };
 
   const onDelete = async (e: MouseEvent) => {
