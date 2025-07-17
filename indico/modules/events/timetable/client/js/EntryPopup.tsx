@@ -93,7 +93,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       .map(p => p.name);
   };
 
-  const onEdit = async (e: MouseEvent) => {
+  const onEdit = async () => {
     const {objId} = entry;
     if (!objId) {
       return;
@@ -109,6 +109,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     data['type'] = type;
     entry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(entry));
+    onClose();
   };
 
   const onCreateChild = async (e: MouseEvent) => {

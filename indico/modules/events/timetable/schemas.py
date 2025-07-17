@@ -73,3 +73,11 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
+
+
+class SessionBlockChildrenSchema(SessionBlockSchema):
+    class Meta(SessionBlockSchema.Meta):
+        model = SessionBlock
+        fields = (*SessionBlockSchema.Meta.fields, 'contributions')
+
+    contributions = fields.List(fields.Nested(ContributionSchema), attribute='contributions')
