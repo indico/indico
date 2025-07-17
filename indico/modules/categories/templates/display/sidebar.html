@@ -74,11 +74,11 @@
                     <span class="timing">
                         {% if happening_now(event) %}
                             {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                ongoing until {{ time }}
+                                Ongoing until {{ time }}
                             {%- endtrans %}
                         {% else %}
                             {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                starts {{ time }}
+                                Starts {{ time }}
                             {%- endtrans %}
                         {% endif %}
                     </span>
