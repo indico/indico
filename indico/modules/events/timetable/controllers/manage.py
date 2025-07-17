@@ -240,7 +240,7 @@ class RHTimetableContribution(RHManageContributionBase):
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
     def _process_DELETE(self):
-        delete_contribution(self.contrib)
+        delete_timetable_entry(self.contrib.timetable_entry)
         return '', 204
 
     @no_autoflush
