@@ -34,6 +34,7 @@ import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
+import { on } from 'process';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -94,7 +95,7 @@ function EntryPopupContent({
       .map(p => p.name);
   };
 
-  const onEdit = async (e: MouseEvent) => {
+  const onEdit = async () => {
     const {objId} = entry;
     if (!objId) {
       return;
@@ -110,6 +111,7 @@ function EntryPopupContent({
     data['type'] = type;
     entry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(entry));
+    onClose();
   };
 
   const onDelete = async (e: MouseEvent) => {
