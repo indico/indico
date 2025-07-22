@@ -12,7 +12,7 @@ import {useDispatch} from 'react-redux';
 import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {TimeGutter, Lines} from './DayTimetable';
-import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
+import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroupAfterMove} from './layout';
@@ -83,7 +83,7 @@ export function WeekTimetable({
     handleDropOnDay(who, day, delta, mouse);
   }
 
-  function handleDropOnDay(who: UniqueId, over: Over, delta: Transform, mouse: MousePosition) {
+  function handleDropOnDay(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [from, to] = layoutAfterDropOnDay(entries, who, over, delta, mouse) || [];
     if (!from) {
       return;
@@ -157,7 +157,7 @@ function DnDDay({dt, children}: {dt: string; children: React.ReactNode}) {
 
 function layoutAfterDropOnDay(
   entries: Record<string, TopLevelEntry[]>,
-  who: UniqueId,
+  who: string,
   over: Over,
   delta: Transform,
   mouse: MousePosition

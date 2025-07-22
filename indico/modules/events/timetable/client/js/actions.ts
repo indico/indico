@@ -60,9 +60,9 @@ interface SetDraftEntryAction {
 interface ResizeEntryAction {
   type: typeof RESIZE_ENTRY;
   date: string;
-  id: number;
+  id: string;
   duration: number;
-  parentId?: number;
+  parentId?: string;
 }
 
 interface MoveEntryAction {
@@ -73,7 +73,7 @@ interface MoveEntryAction {
 
 interface SelectEntryAction {
   type: typeof SELECT_ENTRY;
-  id: number;
+  id: string;
 }
 
 interface DeselectEntryAction {
@@ -152,14 +152,14 @@ export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryActi
 
 export function resizeEntry(
   date: string,
-  id: number,
+  id: string,
   duration: number,
-  parentId?: number
+  parentId?: string
 ): ResizeEntryAction {
   return {type: RESIZE_ENTRY, date, id, duration, parentId};
 }
 
-export function selectEntry(id: number): SelectEntryAction {
+export function selectEntry(id: string): SelectEntryAction {
   return {type: SELECT_ENTRY, id};
 }
 
