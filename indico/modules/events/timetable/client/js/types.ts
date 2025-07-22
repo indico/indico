@@ -77,7 +77,7 @@ export interface UnscheduledContrib extends BaseEntry {
 export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
   type: EntryType.Contribution;
   attachments?: Attachments;
-  personLinks?: PersonLink[];
+  personLinks: PersonLink[];
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
