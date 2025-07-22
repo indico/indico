@@ -455,31 +455,36 @@ function EditableListDisplay({
   };
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
-    const labelTags = () => {
-      return (
-        <div style={{display: 'flex', flexWrap: 'nowrap'}}>
-          {tags.map(t => {
-            return (
-              <Label key={t.code} size="small" color={t.color}>
-                {t.code}
-              </Label>
-            );
-          })}
-        </div>
-      );
-    };
+    console.log(tags);
+    const labelTags = (
+      <div style={{display: 'flex', flexWrap: 'nowrap'}}>
+        {tags.map(t => (
+          <Label key={t.code} size="small" color={t.color}>
+            {t.code}
+          </Label>
+        ))}
+      </div>
+    );
 
-    const colorTags = () => {
-      return (
-        <div>
-          {tags.map(t => {
-            return <Label key={t.code} circular empty color={t.color} />;
-          })}
-        </div>
-      );
-    };
+    const colorTags = (
+      <div>
+        {tags.map(t => (
+          <Label key={t.code} circular empty color={t.color} />
+        ))}
+      </div>
+    );
 
-    return [labelTags(), colorTags()];
+    const longTags = (
+      <div>
+        {tags.map(t => (
+          <Label key={t.code} size="small" color={t.color}>
+            `{t.code}: {t.title}`
+          </Label>
+        ))}
+      </div>
+    );
+
+    return [labelTags, colorTags, longTags];
   };
   const renderFuncs = {
     friendlyId: renderId,
@@ -509,11 +514,11 @@ function EditableListDisplay({
         </TooltipIfTruncated>
       );
     } else if (row.editable?.tags) {
-      const [labels, colors] = fn(row[dataKey], row.editable, rowIndex);
+      const [labels, colors, longTag] = fn(row[dataKey], row.editable, rowIndex);
       return (
         <Popup
           position="top center"
-          content={labels}
+          content={row.editable.tags.length === 1 ? longTag : labels}
           trigger={
             row.editable.tags.length > 1 ? (
               <div styleName="rowcolumn-tooltip" role="gridcell">
