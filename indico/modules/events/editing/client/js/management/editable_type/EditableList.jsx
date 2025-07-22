@@ -478,7 +478,7 @@ function EditableListDisplay({
       <div>
         {tags.map(t => (
           <Label key={t.code} size="small" color={t.color}>
-            `{t.code}: {t.title}`
+            {t.code}: {t.title}
           </Label>
         ))}
       </div>
