@@ -159,15 +159,15 @@ export function layoutGroupAfterMove<T extends Entry>(
  * See getGroup for more details on what a 'group' is.
  */
 export function getGroups(entries: TopLevelEntry[]) {
-  const groups: Set<number>[] = [];
-  const seen = new Set<number>();
+  const groups: Set<string>[] = [];
+  const seen = new Set<string>();
 
   for (const entry of entries) {
     if (seen.has(entry.id)) {
       continue;
     }
 
-    const group = new Set<number>();
+    const group = new Set<string>();
     group.add(entry.id);
     seen.add(entry.id);
     dfs(entry, entries, group, seen);
@@ -185,14 +185,14 @@ export function getGroups(entries: TopLevelEntry[]) {
  * be {B, C}. because B is 'reachable' from A via C.
  */
 export function getGroup(entry: TopLevelEntry, entries: TopLevelEntry[]) {
-  const group = new Set<number>();
-  const seen = new Set<number>();
+  const group = new Set<string>();
+  const seen = new Set<string>();
   seen.add(entry.id);
   dfs(entry, entries, group, seen);
   return group;
 }
 
-function dfs(curr: Entry, entries: TopLevelEntry[], group: Set<number>, seen: Set<number>) {
+function dfs(curr: Entry, entries: TopLevelEntry[], group: Set<string>, seen: Set<string>) {
   for (const entry of entries) {
     if (seen.has(entry.id)) {
       continue;
