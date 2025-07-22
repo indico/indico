@@ -22,9 +22,6 @@ import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types
 import UnscheduledContributions from './UnscheduledContributions';
 import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
-// TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
-type UniqueId = string;
-
 interface DayTimetableProps {
   dt: Moment;
   eventId: number;
@@ -48,7 +45,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
   const setChildDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (id: number) => (duration: number) =>
+      obj[e.id] = (id: string) => (duration: number) =>
         dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), id, duration, e.id));
     }
     return obj;
@@ -130,7 +127,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleUnscheduledDrop(
-    who: UniqueId,
+    who: string,
     over: Over,
     delta: Transform,
     mouse: MousePosition,
@@ -145,7 +142,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleUnscheduledDropOnBlock(
-    who: UniqueId,
+    who: string,
     over: Over,
     delta: Transform,
     mouse: MousePosition,
@@ -170,7 +167,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.scheduleEntry(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
   }
 
-  function handleDropOnCalendar(who: UniqueId, over: Over, delta: Transform, mouse: MousePosition) {
+  function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const newLayout = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
     if (!newLayout) {
       return;
@@ -179,7 +176,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleDropOnBlock(
-    who: UniqueId,
+    who: string,
     over: Over,
     delta: Transform,
     mouse: MousePosition,
@@ -329,7 +326,7 @@ export function Lines({
 }: {
   minHour: number;
   maxHour: number;
-  first: boolean;
+  first?: boolean;
 }) {
   const oneHour = minutesToPixels(60);
 
@@ -377,30 +374,29 @@ function DnDCalendar({children}: {children: React.ReactNode}) {
 
 function layoutAfterDropOnCalendar(
   entries: TopLevelEntry[],
-  who: UniqueId,
+  who: string,
   over: Over,
   delta: Transform,
   mouse: MousePosition
 ) {
-  const id = parseInt(who, 10);
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
-  let fromEntry: Entry | undefined = entries.find(e => e.id === id);
+  let fromEntry: Entry | undefined = entries.find(e => e.id === who);
   let fromBlock: BlockEntry | undefined;
   if (!fromEntry) {
     // If we didn't find the entry in the top level,
     // it must be a break inside a session block.
     fromBlock = entries
       .filter(e => e.type === EntryType.SessionBlock)
-      .find(b => b.children.find(c => c.id === id));
+      .find(b => b.children.find(c => c.id === who));
 
     if (!fromBlock) {
       return;
     }
 
-    fromEntry = fromBlock.children.find(c => c.id === id);
+    fromEntry = fromBlock.children.find(c => c.id === who);
     if (!fromEntry || fromEntry.type !== EntryType.Break) {
       return;
     }
@@ -463,14 +459,13 @@ function layoutAfterDropOnCalendar(
 
 function layoutAfterDropOnBlock(
   entries: TopLevelEntry[],
-  who: UniqueId,
+  who: string,
   over: Over,
   delta: Transform,
   mouse: MousePosition,
   calendar: Over
 ) {
-  const id = parseInt(who, 10);
-  const overId = parseInt(over.id, 10);
+  const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
 
   if (!toBlock || toBlock.type !== EntryType.SessionBlock) {
@@ -479,7 +474,7 @@ function layoutAfterDropOnBlock(
 
   const fromBlock = entries
     .filter(e => e.type === EntryType.SessionBlock)
-    .find(entry => !!entry.children.find(c => c.id === id));
+    .find(entry => !!entry.children.find(c => c.id === who));
 
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
@@ -487,12 +482,12 @@ function layoutAfterDropOnBlock(
 
   let fromEntry: Entry | undefined;
   if (!fromBlock) {
-    fromEntry = entries.find(e => e.id === id);
+    fromEntry = entries.find(e => e.id === who);
     if (!fromEntry) {
       return;
     }
   } else {
-    fromEntry = fromBlock.children.find(e => e.id === id);
+    fromEntry = fromBlock.children.find(e => e.id === who);
   }
 
   if (!fromEntry) {
@@ -579,7 +574,7 @@ function layoutAfterUnscheduledDrop(
   mouse: MousePosition,
   offset
 ) {
-  const id = parseInt(who.slice('unscheduled-'.length), 10);
+  const id = who.slice('unscheduled-'.length);
   const deltaMinutes = 0;
   const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
   const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
@@ -629,8 +624,8 @@ function layoutAfterUnscheduledDropOnBlock(
   offset,
   calendar: Over
 ) {
-  const id = parseInt(who.slice('unscheduled-'.length), 10);
-  const overId = parseInt(over.id, 10);
+  const id = who.slice('unscheduled-'.length);
+  const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
   if (toBlock.type !== EntryType.SessionBlock) {
     return;
