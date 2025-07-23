@@ -15,7 +15,7 @@ const LAX_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5
 const STRICT_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)$/i;
 
 // Matches zero-padded and non-zero-padded hours and minutes with or without ':'.
-const T24H_PATTERN = /^(?<hours>[01]\d|2[0-3]|\d)(?: *[:.h]? *(?<minutes>[0-5]?\d))?$/i;
+const T24H_PATTERN = /^([01]\d|2[0-3]|\d)(?: *[:.h]? *([0-5]?\d))?$/i;
 
 const meridiemFixups = {
   true: hour => (hour % 12) + 12,
@@ -36,14 +36,6 @@ function regexMatch12To24h(match) {
   return [hour, minute];
 }
 
-function regexMatch24To24h(match) {
-  const hourString = match.groups.hours;
-  const minuteString = match.groups.minutes ?? '0';
-  const hour = parseInt(hourString, 10);
-  const minute = parseInt(minuteString, 10);
-  return [hour, minute];
-}
-
 function parse12h(timeOfDayString) {
   let match;
 
@@ -55,13 +47,37 @@ function parse12h(timeOfDayString) {
 }
 
 function parse24h(timeOfDayString) {
-  let match;
+  let hour = NaN;
+  let minute = NaN;
 
-  if ((match = T24H_PATTERN.exec(timeOfDayString))) {
-    return regexMatch24To24h(match);
+  const match = T24H_PATTERN.exec(timeOfDayString);
+
+  if (match) {
+    // Concatenate captured digits
+    const digits = match[1] + (match[2] || '');
+
+    if (digits.length >= 1 && digits.length <= 4) {
+      if (digits.length <= 2) {
+        hour = parseInt(digits, 10);
+        minute = 0;
+      } else if (digits.length === 3) {
+        hour = parseInt(digits[0], 10);
+        minute = parseInt(digits.slice(1), 10);
+      } else {
+        // length === 4
+        hour = parseInt(digits.slice(0, 2), 10);
+        minute = parseInt(digits.slice(2), 10);
+      }
+
+      // Validate ranges
+      if (hour > 23 || minute > 59) {
+        hour = NaN;
+        minute = NaN;
+      }
+    }
   }
 
-  return [NaN, NaN];
+  return [hour, minute];
 }
 
 function parseAny(timeOfDayString) {
@@ -71,11 +87,8 @@ function parseAny(timeOfDayString) {
     return regexMatch12To24h(match);
   }
 
-  if ((match = T24H_PATTERN.exec(timeOfDayString))) {
-    return regexMatch24To24h(match);
-  }
-
-  return [NaN, NaN];
+  // Use our new parse24h function for 24-hour format
+  return parse24h(timeOfDayString);
 }
 
 const parsers = {
@@ -168,6 +181,11 @@ export class Time {
     return new Time(diff);
   }
 
+  addDuration(duration) {
+    this.value = Math.min(this.constructor.MAX_TIME, this.value + duration.value);
+    return this;
+  }
+
   setTimeFor(date) {
     date.setHours(this.hour, this.minute, 0, 0);
   }
@@ -190,10 +208,17 @@ export class Time {
   }
 
   toString() {
-    if (isNaN(this.value)) {
+    if (!this.isValid) {
       return 'Invalid time';
     }
     return `${zeroPad(this.hour)}:${zeroPad(this.minute)}`;
+  }
+
+  toSafeString() {
+    if (!this.isValid) {
+      return '';
+    }
+    return this.toString();
   }
 
   toShortString() {

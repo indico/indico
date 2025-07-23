@@ -14,14 +14,19 @@ import {Translate} from 'indico/react/i18n';
 import {commonDefaults, commonProps, timeString} from './prop_types.js';
 import {
   TIME_FORMAT_PLACEHOLDER,
-  useHandleBlur,
+  createBlurHandler,
   useInputValue,
   useNotice,
   useOptions,
+  useSyncInputWithProp,
 } from './shared.js';
 
 import 'indico/custom_elements/ind_time_picker.js';
 import './time.module.scss';
+
+const getTimeClearedMessage = () => Translate.string('The time value was invalid and was cleared');
+const getTimeFormattedMessage = time =>
+  Translate.string('The time value was automatically formatted as {time}', {time});
 
 export default function TimePicker({
   value,
@@ -36,16 +41,24 @@ export default function TimePicker({
   const pickerRef = useRef();
   const placeholder = TIME_FORMAT_PLACEHOLDER[timeFormat];
 
-  const [inputValue, setInputValue, handleChange] = useInputValue(value, timeFormat, onChange);
   const [notice, setNotice] = useNotice();
+  const [inputValue, setInputValue] = useInputValue(value, timeFormat);
   const options = useOptions(value, startTime, step, min, max, timeFormat);
-  const handleBlur = useHandleBlur(
+
+  useSyncInputWithProp(value, inputValue, setInputValue, timeFormat);
+
+  const handleBlur = createBlurHandler(
     timeFormat,
     setInputValue,
-    () => setNotice(Translate.string('The time value was invalid and was cleared')),
-    time =>
-      setNotice(Translate.string('The time value was automatically formatted as {time}', {time}))
+    onChange,
+    setNotice,
+    getTimeClearedMessage,
+    getTimeFormattedMessage
   );
+
+  const handleChange = evt => {
+    setInputValue(evt.target.value);
+  };
 
   useNativeEvent(pickerRef, 'change', handleChange);
 

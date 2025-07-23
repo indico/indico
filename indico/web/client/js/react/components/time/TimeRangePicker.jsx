@@ -10,18 +10,28 @@ import React, {useRef} from 'react';
 
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {Time} from 'indico/utils/time_value.js';
 
 import {timeString, commonDefaults, commonProps} from './prop_types.js';
 import {
   TIME_FORMAT_PLACEHOLDER,
-  useHandleBlur,
+  createBlurHandler,
   useInputValue,
   useNotice,
   useOptions,
+  useSyncInputWithProp,
 } from './shared.js';
 
 import 'indico/custom_elements/ind_time_picker.js';
 import './time.module.scss';
+
+const getStartTimeClearedMessage = () =>
+  Translate.string('The start time was invalid and was cleared');
+const getStartTimeFormattedMessage = time =>
+  Translate.string('The start time was automatically formatted as {time}', {time});
+const getEndTimeClearedMessage = () => Translate.string('The end time was invalid and was cleared');
+const getEndTimeFormattedMessage = time =>
+  Translate.string('The end time was automatically formatted as {time}', {time});
 
 function TimePicker({pickerRef, value, timeFormat, options, ...inputProps}) {
   return (
@@ -67,35 +77,73 @@ export default function TimeRangePicker({
 
   const placeholder = TIME_FORMAT_PLACEHOLDER[timeFormat];
 
-  const onStartChange = newStart => onChange([newStart, end]);
-  const onEndChange = newEnd => onChange([start, newEnd]);
-
-  const [startValue, setStartValue, handleStartChange] = useInputValue(
-    start,
-    timeFormat,
-    onStartChange
-  );
-  const [endValue, setEndValue, handleEndChange] = useInputValue(end, timeFormat, onEndChange);
-
   const [notice, setNotice] = useNotice();
+  const [startValue, setStartValue] = useInputValue(start, timeFormat);
+  const [endValue, setEndValue] = useInputValue(end, timeFormat);
+  // Calculate duration from the prop values, not the input field values
+  const duration = Time.fromString(start, '24h').duration(Time.fromString(end, '24h'));
+
+  useSyncInputWithProp(start, startValue, setStartValue, timeFormat);
+  useSyncInputWithProp(end, endValue, setEndValue, timeFormat);
 
   const startOptions = useOptions(start, '', step, min, max, timeFormat);
   const endOptions = useOptions(end, start, step, min, max, timeFormat);
 
-  const handleStartBlur = useHandleBlur(
+  const sendChangeUpstream = (startTimeString, endTimeString) => {
+    onChange([startTimeString, endTimeString]);
+  };
+
+  const handleStartTimeChange = newStartTimeString => {
+    const newStartTime = Time.fromString(newStartTimeString, '24h');
+    let newEndTime = new Time(newStartTime.value).addDuration(duration);
+
+    if (newEndTime.isValid) {
+      const newEndTimeString = newEndTime.toFormattedString(timeFormat);
+      setEndValue(newEndTimeString);
+    } else {
+      newEndTime = Time.fromString(endValue, timeFormat);
+    }
+
+    sendChangeUpstream(newStartTime.toSafeString(), newEndTime.toSafeString());
+  };
+
+  const handleEndTimeChange = newEndTimeString => {
+    const newEndTime = Time.fromString(newEndTimeString, '24h');
+    const startTime = Time.fromString(startValue, timeFormat);
+    let newStartTime = startTime;
+
+    if (startTime.value > newEndTime.value) {
+      newStartTime = new Time(Math.max(0, newEndTime.value - step));
+    }
+
+    sendChangeUpstream(newStartTime.toSafeString(), newEndTime.toSafeString());
+  };
+
+  const handleStartBlur = createBlurHandler(
     timeFormat,
     setStartValue,
-    () => setNotice(Translate.string('The start time was invalid and was cleared')),
-    time =>
-      setNotice(Translate.string('The start time was automatically formatted as {time}', {time}))
+    handleStartTimeChange,
+    setNotice,
+    getStartTimeClearedMessage,
+    getStartTimeFormattedMessage
   );
-  const handleEndBlur = useHandleBlur(
+
+  const handleEndBlur = createBlurHandler(
     timeFormat,
     setEndValue,
-    () => setNotice(Translate.string('The end time was invalid and was cleared')),
-    time =>
-      setNotice(Translate.string('The end time was automatically formatted as {time}', {time}))
+    handleEndTimeChange,
+    setNotice,
+    getEndTimeClearedMessage,
+    getEndTimeFormattedMessage
   );
+
+  const handleStartChange = evt => {
+    setStartValue(evt.target.value);
+  };
+
+  const handleEndChange = evt => {
+    setEndValue(evt.target.value);
+  };
 
   useNativeEvent(startPickerRef, 'change', handleStartChange);
   useNativeEvent(endPickerRef, 'change', handleEndChange);

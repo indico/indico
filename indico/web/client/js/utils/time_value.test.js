@@ -110,6 +110,80 @@ describe('Time', () => {
     expect(d1 - d2).toBe(0);
   });
 
+  it('should add duration to time', () => {
+    const t = Time.fromString('10:30');
+    const duration = new Time(90); // 90 minutes
+
+    t.addDuration(duration);
+
+    expect(t.toString()).toBe('12:00');
+    expect(t.hour).toBe(12);
+    expect(t.minute).toBe(0);
+  });
+
+  it('should add multiple durations', () => {
+    const t = Time.fromString('8:00');
+    const duration1 = new Time(30);
+    const duration2 = new Time(45);
+
+    t.addDuration(duration1);
+    t.addDuration(duration2);
+
+    expect(t.toString()).toBe('09:15');
+    expect(t.hour).toBe(9);
+    expect(t.minute).toBe(15);
+  });
+
+  it('should clamp to maximum time when adding duration', () => {
+    const t = Time.fromString('23:30');
+    const duration = new Time(60); // 60 minutes
+
+    t.addDuration(duration);
+
+    expect(t.toString()).toBe('23:59');
+    expect(t.value).toBe(Time.MAX_TIME);
+  });
+
+  it('should handle edge case at end of day', () => {
+    const t = Time.fromString('23:59');
+    const duration = new Time(1); // 1 minute
+
+    t.addDuration(duration);
+
+    expect(t.toString()).toBe('23:59');
+    expect(t.value).toBe(Time.MAX_TIME);
+  });
+
+  it('should handle zero duration', () => {
+    const t = Time.fromString('15:45');
+    const duration = new Time(0);
+
+    t.addDuration(duration);
+
+    expect(t.toString()).toBe('15:45');
+  });
+
+  it('should work with duration from duration() method', () => {
+    const t1 = Time.fromString('9:00');
+    const t2 = Time.fromString('10:30');
+    const duration = t1.duration(t2);
+    const t3 = Time.fromString('14:00');
+
+    t3.addDuration(duration);
+
+    expect(t3.toString()).toBe('15:30');
+  });
+
+  it('should handle invalid duration (NaN)', () => {
+    const t = Time.fromString('10:30');
+    const invalidDuration = Time.fromString('invalid time');
+
+    t.addDuration(invalidDuration);
+
+    expect(t.value).toBe(NaN);
+    expect(t.toString()).toBe('Invalid time');
+  });
+
   it.each([
     // 24-hour format
     ['00:00', 0, 0],
@@ -145,7 +219,9 @@ describe('Time', () => {
     ['700', 7, 0],
     ['0730', 7, 30],
     ['1234', 12, 34],
-    ['56', 5, 6],
+    ['233', 2, 33],
+    ['933', 9, 33],
+    ['123', 1, 23],
 
     // Noisy but valid
     [' 7:00 ', 7, 0], // trim spaces
@@ -241,7 +317,9 @@ describe('Time', () => {
     ['700', 7, 0],
     ['0730', 7, 30],
     ['1234', 12, 34],
-    ['56', 5, 6],
+    ['233', 2, 33],
+    ['933', 9, 33],
+    ['123', 1, 23],
     [' 7:00 ', 7, 0],
     ['07 : 00', 7, 0],
   ])(
