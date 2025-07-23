@@ -19,7 +19,7 @@ CustomElementBase.defineWhenDomReady(
     static attributes = {
       value: class InputValueProxy extends CustomElementBase.CustomAttribute {
         setValue(newValue) {
-          CustomElementBase.setValue(this.elemenet.querySelector('input'), newValue);
+          CustomElementBase.setValue(this.element.querySelector('input'), newValue);
         }
 
         getValue() {
@@ -49,7 +49,6 @@ CustomElementBase.defineWhenDomReady(
       input.setAttribute('aria-haspopup', true);
       input.setAttribute('aria-controls', listbox.id);
       this.toggleAttribute('clearable', clearButton);
-      CustomElementBase.setValue(input, this.getAttribute('value'));
 
       // We don't care about spelling. We're only working with times.
       input.setAttribute('spellcheck', false);
@@ -73,7 +72,17 @@ CustomElementBase.defineWhenDomReady(
       // Event handlers
 
       indTimePicker.addEventListener('x-attrchange.value', () => {
-        CustomElementBase.setValue(input, this.getAttribute('value'));
+        const newValue = this.getAttribute('value');
+        CustomElementBase.setValue(input, newValue);
+
+        // Update the selection highlight
+        deselectCurrentSelection();
+        for (const option of listbox.children) {
+          if (option.dataset.value === newValue) {
+            markSelection(option);
+            break;
+          }
+        }
       });
 
       input.addEventListener('click', () => {
@@ -108,7 +117,8 @@ CustomElementBase.defineWhenDomReady(
           deselectCurrentSelection();
 
           const filterKeyword = input.value.trim().toLocaleLowerCase();
-          const filterTime = Time.fromString(filterKeyword).toString();
+          const parsedTime = Time.fromString(filterKeyword);
+          const filterTime = parsedTime.isValid ? parsedTime.toString() : '';
           let numMatched = 0;
           let exactMatch;
 
@@ -122,8 +132,14 @@ CustomElementBase.defineWhenDomReady(
                 !optionDisabled &&
                 (optionText.startsWith(filterKeyword) || filterTime === optionTime);
 
+              option.hidden = !isMatch;
               numMatched += isMatch;
               exactMatch ||= filterTime === optionTime && option;
+            }
+          } else {
+            // Show all options when filter is empty
+            for (const option of listbox.children) {
+              option.hidden = false;
             }
           }
 
@@ -132,7 +148,6 @@ CustomElementBase.defineWhenDomReady(
             moveVirtualCursorToOption(exactMatch);
           }
 
-          dispatchExternalChangeEvent();
           toggleListbox(filterKeyword && numMatched);
           toggleClearButton();
         },
@@ -211,6 +226,11 @@ CustomElementBase.defineWhenDomReady(
 
       let abortPositioning;
 
+      // Cleanup on disconnect
+      indTimePicker.addEventListener('x-disconnect', () => {
+        abortPositioning?.();
+      });
+
       function toggleListbox(isOpen) {
         // The list box visibility is controlled using CSS based on aria-expanded on the input
         if (isOpen) {
@@ -222,7 +242,9 @@ CustomElementBase.defineWhenDomReady(
             positioning.dropdownPositionStrategy,
             () => indTimePicker.toggleAttribute('open', true)
           );
-          listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
+          // Scroll selected item into view within the listbox only (don't scroll the page)
+          const selectedOption = listbox.querySelector('[aria-selected=true]');
+          revealSelected(selectedOption, listbox);
         } else {
           abortPositioning?.();
           input.removeAttribute('aria-expanded');
@@ -255,6 +277,24 @@ CustomElementBase.defineWhenDomReady(
         option?.setAttribute('aria-selected', true);
       }
 
+      function revealSelected(option, container) {
+        if (!option || !container) {
+          return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const optionRect = option.getBoundingClientRect();
+
+        // Check if option is above the visible area
+        if (optionRect.top < containerRect.top) {
+          container.scrollTop -= containerRect.top - optionRect.top;
+        }
+        // Check if option is below the visible area
+        else if (optionRect.bottom > containerRect.bottom) {
+          container.scrollTop += optionRect.bottom - containerRect.bottom;
+        }
+      }
+
       function findMarkedOption() {
         return listbox.querySelector('[aria-selected=true]');
       }
@@ -269,7 +309,7 @@ CustomElementBase.defineWhenDomReady(
       function moveVirtualCursorToOption(option) {
         // Omit the option to remove selection
         input.setAttribute('aria-activedescendant', option?.id || '');
-        option?.scrollIntoView({block: 'nearest'});
+        revealSelected(option, listbox);
       }
 
       function selectInputText(startIndex = input.value.length) {
