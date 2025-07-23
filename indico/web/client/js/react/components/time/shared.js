@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {PluralTranslate} from 'indico/react/i18n';
 import {Time, timeList} from 'indico/utils/time_value';
@@ -62,46 +62,55 @@ export function getOptions(currentValue, startTime, step, minTime, maxTime, time
   });
 }
 
-export function useOptions(...args) {
+export function useOptions(currentValue, startTime, step, minTime, maxTime, timeFormat) {
   return useMemo(
-    () => getOptions(...args),
+    () => getOptions(currentValue, startTime, step, minTime, maxTime, timeFormat),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    args
+    [startTime, step, minTime, maxTime, timeFormat]
   );
 }
 
-export function useHandleBlur(
+export function createBlurHandler(
   timeFormat,
   setInputValue,
-  setTimeClearedNotice,
-  setTimeFormattedNotice
+  onChange,
+  setNotice,
+  getTimeClearedMessage,
+  getTimeFormattedMessage
 ) {
-  return useCallback(
-    ev => {
-      // Reformat the value when user leaves the field
+  return ev => {
+    // Reformat the value when user leaves the field
 
-      const maybeTime = Time.fromString(ev.target.value);
-      const maybeFixedValue = Number.isNaN(maybeTime.value)
-        ? ''
-        : maybeTime.toFormattedString(timeFormat);
+    const maybeTime = Time.fromString(ev.target.value);
+    const maybeFixedValue = Number.isNaN(maybeTime.value)
+      ? ''
+      : maybeTime.toFormattedString(timeFormat);
 
-      // Value was already fixed?
-      if (maybeFixedValue === ev.target.value) {
-        return;
+    // Value was already fixed?
+    if (maybeFixedValue === ev.target.value) {
+      // Still call onChange even if value wasn't reformatted
+      if (onChange) {
+        onChange(maybeTime.isValid ? maybeTime.toString() : '');
       }
+      return;
+    }
 
-      setInputValue(maybeFixedValue);
+    setInputValue(maybeFixedValue);
 
-      // Announce any changes to screen readers
+    // Call onChange with the final value
+    if (onChange) {
+      const finalTime = Time.fromString(maybeFixedValue, 'any');
+      onChange(finalTime.isValid ? finalTime.toString() : '');
+    }
 
-      if (!maybeFixedValue) {
-        setTimeClearedNotice();
-      } else {
-        setTimeFormattedNotice(maybeFixedValue);
-      }
-    },
-    [timeFormat, setInputValue, setTimeClearedNotice, setTimeFormattedNotice]
-  );
+    // Announce any changes to screen readers
+
+    if (!maybeFixedValue) {
+      setNotice(getTimeClearedMessage());
+    } else {
+      setNotice(getTimeFormattedMessage(maybeFixedValue));
+    }
+  };
 }
 
 export function useNotice() {
@@ -123,14 +132,10 @@ export function useNotice() {
   return [notice, setNotice];
 }
 
-export function useInputValue(value, timeFormat, onChange) {
-  const [inputValue, setInputValue] = useState(
-    value && Time.fromString(value, '24h').toFormattedString(timeFormat)
-  );
-
+export function useSyncInputWithProp(propValue, inputValue, setInputValue, timeFormat) {
   useEffect(
     () => {
-      const propTime = Time.fromString(value, '24h');
+      const propTime = Time.fromString(propValue, '24h');
       const internalTime = Time.fromString(inputValue, 'any');
 
       // Using Object.is() as value can also be NaN
@@ -145,14 +150,10 @@ export function useInputValue(value, timeFormat, onChange) {
     // here would have undesired consequences.
     //
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [value, timeFormat]
+    [propValue, timeFormat]
   );
+}
 
-  const handleChange = ev => {
-    setInputValue(ev.target.value);
-    const newTime = Time.fromString(ev.target.value, 'any');
-    onChange(newTime.isValid ? newTime.toString() : '');
-  };
-
-  return [inputValue, setInputValue, handleChange];
+export function useInputValue(value, timeFormat) {
+  return useState(value && Time.fromString(value, '24h').toFormattedString(timeFormat));
 }
