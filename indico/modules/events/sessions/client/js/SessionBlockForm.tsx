@@ -13,7 +13,7 @@ import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
-import {LocationParent} from 'indico/modules/events/timetable/client/js/types';
+import {LocationParentObj} from 'indico/modules/events/timetable/client/js/types';
 import {FinalLocationField} from 'indico/react/components';
 import {FinalSessionBlockPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput} from 'indico/react/forms';
@@ -33,7 +33,7 @@ interface SessionBlockEditFormProps {
 
 interface SessionBlockFormFieldProps {
   eventId: number;
-  locationParent: LocationParent;
+  locationParent: LocationParentObj;
   extraOptions?: Record<string, any>;
   [key: string]: any; // Allow additional props
 }
