@@ -90,7 +90,7 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     y: 0,
     personLinks: personLinks || conveners || [],
     boardNumber,
-    location: locationData,
+    locationData,
     code,
     keywords,
     column: 0,

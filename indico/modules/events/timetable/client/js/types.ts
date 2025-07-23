@@ -13,6 +13,35 @@ export enum EntryType {
   Break = 'break',
 }
 
+export enum PersonLinkRole {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  SPEAKER = 'speaker',
+  SUBMITTER = 'submitter',
+}
+
+export interface PersonLink {
+  affiliation: string;
+  avatarURL: string;
+  email: string;
+  emailHash: string;
+  familyName: string;
+  firstName: string;
+  name: string;
+  roles: PersonLinkRole[];
+}
+
+export interface LocationData {
+  address: string;
+  venueName: string;
+  room: string;
+}
+
+export interface Attachments {
+  files: object[];
+  folders: object[];
+}
+
 export interface Session {
   id?: number;
   title: string;
@@ -28,6 +57,7 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  locationData?: LocationData;
 }
 
 export interface ScheduledMixin {
@@ -44,7 +74,11 @@ export interface UnscheduledContrib extends BaseEntry {
   sessionId?: number;
 }
 
-export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {}
+export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
+  type: EntryType.Contribution;
+  attachments?: Attachments;
+  personLinks: PersonLink[];
+}
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
@@ -68,39 +102,8 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionId: number;
   sessionTitle: string;
   children: ChildEntry[];
-  conveners?: any[];
-}
-
-// TODO: (Ajob) Find correct place for these interfaces
-
-export interface LocationParent {
-  venue: string;
-  room: string;
-  venue_name: string;
-  room_name: string;
-  address: string;
-  inheriting: boolean;
-}
-
-export interface RequestEntryObjectData {
-  description: string;
-  duration: number;
-  start_dt: string;
-  end_dt: string;
-  event_id: number;
-  location: Location;
-  title: string;
-  type: string;
-}
-
-export interface RequestEntryObject {
-  duration: number;
-  end_dt: string;
-  event_id: number;
-  id: number;
-  object: RequestEntryObjectData;
-  start_dt: string;
-  type: string;
+  personLinks: PersonLink[];
+  attachments: Attachments;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
@@ -109,4 +112,15 @@ export type DayEntries = Record<string, TopLevelEntry[]>;
 
 export function isChildEntry(entry: Entry): entry is ChildEntry {
   return 'parentId' in entry;
+}
+
+// Request objects (lowercase)
+
+export interface LocationParentObj {
+  venue: string;
+  room: string;
+  venue_name: string;
+  room_name: string;
+  address: string;
+  inheriting: boolean;
 }
