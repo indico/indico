@@ -38,6 +38,7 @@ interface DnDState {
 }
 
 interface DnDContextType {
+  draggables: Draggables;
   droppables: Droppables;
   draggableData: DraggableData;
   onDrop: OnDrop;
@@ -47,10 +48,12 @@ interface DnDContextType {
   unregisterDraggable: (id: string) => void;
   onMouseDown: (
     id: string,
+    draggable: Draggable,
     position: {x: number; y: number; offsetX: number; offsetY: number}
   ) => void;
 }
 const DnDContext = createContext<DnDContextType>({
+  draggables: {},
   droppables: {},
   draggableData: {},
   onDrop: null,
@@ -258,33 +261,29 @@ export function DnDProvider({
     setDraggables(d => removeKey(d, id));
   }, []);
 
-  const onMouseDown = useCallback(
-    (id, {x, y, offsetX, offsetY}) => {
-      if (state.current.state === 'idle') {
-        const draggable = draggables[id];
-        if (!draggable) {
-          return;
-        }
-
-        const scrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
-        state.current = {
-          state: 'mousedown',
-          initialMousePosition: {x, y},
-          scrollPosition: {x: 0, y: 0},
-          initialScrollPosition: {x: scrollParent.scrollLeft, y: scrollParent.scrollTop},
-          initialOffset: {x: offsetX, y: offsetY},
-          activeDraggable: id,
-        };
-        setDraggableData(d =>
-          setInitialOffset(setBoundingRectAndScroll(d, draggable.node, id), id, {
-            x: offsetX,
-            y: offsetY,
-          })
-        );
+  const onMouseDown = useCallback((id: string, draggable: Draggable, {x, y, offsetX, offsetY}) => {
+    if (state.current.state === 'idle') {
+      if (!draggable) {
+        return;
       }
-    },
-    [draggables]
-  );
+
+      const scrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
+      state.current = {
+        state: 'mousedown',
+        initialMousePosition: {x, y},
+        scrollPosition: {x: 0, y: 0},
+        initialScrollPosition: {x: scrollParent.scrollLeft, y: scrollParent.scrollTop},
+        initialOffset: {x: offsetX, y: offsetY},
+        activeDraggable: id,
+      };
+      setDraggableData(d =>
+        setInitialOffset(setBoundingRectAndScroll(d, draggable.node, id), id, {
+          x: offsetX,
+          y: offsetY,
+        })
+      );
+    }
+  }, []);
 
   const onMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -404,6 +403,7 @@ export function DnDProvider({
 
   const value = useMemo(
     () => ({
+      draggables,
       droppables,
       draggableData,
       onDrop,
@@ -414,6 +414,7 @@ export function DnDProvider({
       onMouseDown,
     }),
     [
+      draggables,
       droppables,
       draggableData,
       onDrop,
@@ -460,7 +461,8 @@ export function useDroppableData({id}: {id: string}) {
 export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean}) {
   const ref = useRef<HTMLElement | null>(null);
   const _onMouseDown = useContextSelector(DnDContext, ctx => ctx.onMouseDown);
-  const draggable = useContextSelector(DnDContext, ctx => ctx.draggableData[id]);
+  const draggable = useContextSelector(DnDContext, ctx => ctx.draggables[id]);
+  const draggableData = useContextSelector(DnDContext, ctx => ctx.draggableData[id]);
   const registerDraggable = useContextSelector(DnDContext, ctx => ctx.registerDraggable);
   const unregisterDraggable = useContextSelector(DnDContext, ctx => ctx.unregisterDraggable);
 
@@ -476,9 +478,9 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
       const rect = e.currentTarget.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
       const offsetY = e.clientY - rect.top;
-      _onMouseDown(id, {x: e.pageX, y: e.pageY, offsetX, offsetY});
+      _onMouseDown(id, draggable, {x: e.pageX, y: e.pageY, offsetX, offsetY});
     },
-    [_onMouseDown, id]
+    [_onMouseDown, id, draggable]
   );
 
   // The identity of the listeners object must not change,
@@ -495,11 +497,11 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
     };
   }, [id, fixed, registerDraggable, unregisterDraggable]);
 
-  const transform = (draggable || {}).transform;
-  const rect = (draggable || {}).rect;
-  const initialScroll = (draggable || {}).initialScroll;
-  const mouse = (draggable || {}).mouse;
-  const offset = (draggable || {}).initialOffset;
+  const transform = (draggableData || {}).transform;
+  const rect = (draggableData || {}).rect;
+  const initialScroll = (draggableData || {}).initialScroll;
+  const mouse = (draggableData || {}).mouse;
+  const offset = (draggableData || {}).initialOffset;
 
   return {
     setNodeRef,
