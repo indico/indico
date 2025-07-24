@@ -352,7 +352,7 @@ class RHTimetableSessionBlock(RHManageEventBase):
         with (track_time_changes(), track_location_changes()):
             update_session_block(self.session_block, data)
 
-        return SessionBlockChildrenSchema(context={'event': self.event}).jsonify(self.session_block)
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
 
     def _process_GET(self):
         return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)

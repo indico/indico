@@ -287,9 +287,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     const {data: resData} = await submitHandler(submitData);
     resData['type'] = activeType;
-    if (resData['contributions']) {
-      resData['contributions'].map(c => (c['type'] = EntryType.Contribution));
-    }
 
     const resEntry = mapTTDataToEntry(resData);
     if (isEditing) {
