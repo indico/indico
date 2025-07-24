@@ -34,7 +34,6 @@ import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
-import { on } from 'process';
 
 function ColoredDot({color}: {color: string}) {
   return (
