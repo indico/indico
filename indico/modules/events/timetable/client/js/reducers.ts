@@ -41,7 +41,6 @@ export interface ReduxState {
   navigation: {numDays: number; offset: number};
   display: {mode: string; showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
-  experimental: {popupsEnabled: boolean};
 }
 
 export default {
@@ -481,14 +480,6 @@ export default {
         return {type: action.entryType, entry: action.entry};
       case actions.CLOSE_MODAL:
         return {type: null, entry: null};
-      default:
-        return state;
-    }
-  },
-  experimental: (state = {popupsEnabled: true}, action) => {
-    switch (action.type) {
-      case actions.EXPERIMENTAL_TOGGLE_POPUPS:
-        return {popupsEnabled: !state.popupsEnabled};
       default:
         return state;
     }
