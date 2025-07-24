@@ -191,6 +191,7 @@ $toolbar-spacing: 10px;
   display: flex;
   flex-shrink: 0;
   align-items: center;
+  gap: 0.5em;
   min-height: $toolbar-height;
 
   &.fixed-height {

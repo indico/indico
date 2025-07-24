@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix missing spacing between toolbar button groups (:pr:`6981`)
 
 Accessibility
 ^^^^^^^^^^^^^
