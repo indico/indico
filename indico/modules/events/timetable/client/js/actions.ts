@@ -50,7 +50,6 @@ export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
-export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
 
 interface SetDraftEntryAction {
   type: typeof SET_DRAFT_ENTRY;
@@ -272,10 +271,6 @@ export function updateEntry(entryType, entry) {
 
 export function closeModal() {
   return {type: CLOSE_MODAL};
-}
-
-export function experimentalTogglePopups() {
-  return {type: EXPERIMENTAL_TOGGLE_POPUPS};
 }
 
 // redux actions
