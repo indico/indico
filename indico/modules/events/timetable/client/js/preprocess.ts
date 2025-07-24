@@ -146,7 +146,7 @@ export function preprocessTimetableEntries(
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
-            type: entryTypeMapping[childType],
+            type: childType,
             objId: c.objId,
             id: c.id,
             title: c.title,
