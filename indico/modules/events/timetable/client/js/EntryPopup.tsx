@@ -26,14 +26,13 @@ import {
 
 import './Entry.module.scss';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType} from './types';
 import {getEntryColor, mapTTDataToEntry} from './utils';
-import { on } from 'process';
 
 function ColoredDot({color}: {color: string}) {
   return (

@@ -30,8 +30,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         create_timetable_entry, delete_timetable_entry,
                                                         update_break_entry, update_timetable_entry)
-from indico.modules.events.timetable.schemas import (BreakSchema, ContributionSchema, SessionBlockChildrenSchema,
-                                                     SessionBlockSchema)
+from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
 # TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
@@ -278,7 +277,7 @@ class RHTimetableSessionBlock(RHManageEventBase):
         with (track_time_changes(), track_location_changes()):
             update_session_block(self.session_block, data)
 
-        return SessionBlockChildrenSchema(context={'event': self.event}).jsonify(self.session_block)
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
 
     def _process_GET(self):
         return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
