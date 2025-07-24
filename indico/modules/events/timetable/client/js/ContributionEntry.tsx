@@ -90,10 +90,10 @@ export default function ContributionEntry({
     backgroundColor: backgroundColor
       ? backgroundColor
       : sessionData
-        ? isChild
-          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-          : sessionData.backgroundColor
-        : '#5b1aff',
+      ? isChild
+        ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
+        : sessionData.backgroundColor
+      : '#5b1aff',
     color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
   };
 
@@ -108,7 +108,7 @@ export default function ContributionEntry({
     startDt: moment(child.startDt)
       .add(deltaMinutes, 'minutes')
       .format(),
-  })) ?? [];
+  }));
 
   // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);
   // const setChildDuration = useCallback(() => {}, [])
@@ -117,7 +117,6 @@ export default function ContributionEntry({
     const endDt = moment(child.startDt).add(child.duration, 'minutes');
     return endDt.isAfter(acc) ? endDt : acc;
   }, moment(startDt));
-
 
   useEffect(() => {
     setDuration(_duration);
@@ -179,12 +178,7 @@ export default function ContributionEntry({
         }}
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
-        <EntryTitle
-          title={title}
-          duration={duration}
-          timeRange={timeRange}
-          type={type}
-        />
+        <EntryTitle title={title} duration={duration} timeRange={timeRange} type={type} />
         {children.length ? (
           <div
             ref={setDroppableNodeRef}
