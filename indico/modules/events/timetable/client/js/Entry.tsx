@@ -28,7 +28,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
   });
-  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -79,7 +78,7 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
     />
   );
 
-  if (popupsEnabled && isSelected && !isDragging) {
+  if (isSelected && !isDragging) {
     return (
       <EntryPopup
         trigger={entry}
