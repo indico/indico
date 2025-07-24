@@ -28,7 +28,7 @@ export default function WTFDateField({
   earliest,
   latest,
   linkedField,
-  weekendDisabled,
+  disabledDays,
   disabledDates,
 }) {
   // The hidden field that holds the date (in isoformat) which is used during form submission.
@@ -48,12 +48,12 @@ export default function WTFDateField({
     dateField.value ? toMoment(dateField.value, moment.HTML5_FMT.DATE) : null
   );
   const clearRef = useRef(null);
-  const filter = (d, meta) => {
+  const filter = d => {
     const dateStr = formatDate(ISO_FORMAT, d);
     if (disabledDates?.includes(dateStr)) {
       return false;
     }
-    return !(weekendDisabled && meta.weekInfo.weekend.includes(d.getDay() || 7));
+    return !(disabledDays && disabledDays.includes(d.getDay()));
   };
 
   const updateDate = useCallback(
@@ -138,7 +138,7 @@ WTFDateField.propTypes = {
   earliest: PropTypes.string,
   latest: PropTypes.string,
   linkedField: PropTypes.object,
-  weekendDisabled: PropTypes.bool,
+  disabledDays: PropTypes.arrayOf(PropTypes.oneOf([0, 1, 2, 3, 4, 5, 6])),
   disabledDates: PropTypes.arrayOf(PropTypes.string),
 };
 
@@ -149,6 +149,6 @@ WTFDateField.defaultProps = {
   earliest: null,
   latest: null,
   linkedField: null,
-  weekendDisabled: false,
+  disabledDays: null,
   disabledDates: null,
 };

@@ -25,7 +25,7 @@
             required: {{ input_args.required | default(false) | tojson }},
             disabled: {{ input_args.disabled | default(false) | tojson }},
             allowClear: {{ (field.allow_clear if field.allow_clear else false) | tojson }},
-            weekendDisabled: {{ field.weekend_disabled | default(false) | tojson }},
+            disabledDays: {{ field.disabled_days_js | tojson }},
             disabledDates: {{ field.disabled_dates | tojson }},
             earliest: {{ (field.earliest_dt.astimezone(field.tzinfo).replace(tzinfo=none).isoformat() if field.earliest_dt else none) | tojson }},
             latest: {{ (field.latest_dt.astimezone(field.tzinfo).replace(tzinfo=none).isoformat() if field.latest_dt else none) | tojson }},
