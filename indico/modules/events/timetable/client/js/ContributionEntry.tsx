@@ -172,10 +172,6 @@ export default function ContributionEntry({
         }}
         ref={setNodeRef}
         {...listeners}
-        onClick={e => {
-          e.stopPropagation();
-          dispatch(actions.selectEntry(id));
-        }}
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
         <EntryTitle title={title} duration={duration} timeRange={timeRange} type={type} />
