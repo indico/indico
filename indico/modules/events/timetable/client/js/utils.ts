@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
+import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -134,4 +135,24 @@ export function getEntryColor(
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
+}
+
+/*
+ * Custom hook to log changes to props.
+ * Useful for figuring out why a component is re-rendering.
+ */
+export function useTraceUpdate(props) {
+  const prev = useRef(props);
+  useEffect(() => {
+    const changedProps = Object.entries(props).reduce((ps, [k, v]) => {
+      if (prev.current[k] !== v) {
+        ps[k] = [prev.current[k], v];
+      }
+      return ps;
+    }, {});
+    if (Object.keys(changedProps).length > 0) {
+      console.log('Changed props:', changedProps);
+    }
+    prev.current = props;
+  });
 }
