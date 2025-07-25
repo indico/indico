@@ -165,7 +165,6 @@ export default function Toolbar({
               key={n}
               content={d.format('ddd DD/MM')}
               onClick={() => onNavigate(d)}
-              onMouseEnter={e => e.buttons === 1 && onNavigate(d)}
               active={n + offset === currentDayIdx}
             />
           );
