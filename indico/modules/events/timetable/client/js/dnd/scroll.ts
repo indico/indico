@@ -11,7 +11,8 @@ import {getScrollParent} from './modifiers';
 import {Draggable, MousePosition} from './types';
 
 const SCROLL_MARGIN_PERCENT = 0.15;
-const BASE_SPEED = 30;
+const BASE_SPEED = 3;
+const SCROLL_INTERVAL_MS = 5;
 
 type Timeout = ReturnType<typeof setInterval>;
 
@@ -56,7 +57,7 @@ export function useScrollIntent({
             if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
               scrollParent.scrollBy(scrollSpeed.current.x, scrollSpeed.current.y);
             }
-          }, 50);
+          }, SCROLL_INTERVAL_MS);
         }
       } else {
         cleanUp();
