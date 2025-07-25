@@ -26,6 +26,7 @@ import bleach
 import email_validator
 import html5lib
 import markdown
+import translitcodec
 import unidecode
 from bleach.css_sanitizer import CSSSanitizer
 from flask import has_app_context
