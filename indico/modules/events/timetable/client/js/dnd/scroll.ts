@@ -75,6 +75,11 @@ function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement) {
   const rect = scrollParent.getBoundingClientRect();
   const mouseYPercent = (mouse.y - rect.top) / rect.height;
   const mouseXPercent = (mouse.x - rect.left) / rect.width;
+
+  if (mouseYPercent < 0 || mouseYPercent > 1 || mouseXPercent < 0 || mouseXPercent > 1) {
+    return {x: 0, y: 0}; // Mouse is outside the scrollable area
+  }
+
   let speedX = 0;
   let speedY = 0;
 
