@@ -60,7 +60,7 @@ export const getEntryUniqueId = (entry): string => {
   }
 };
 
-export const mapTTDataToEntry = (data): TopLevelEntry => {
+export const mapTTDataToEntry = (data): Entry => {
   const {
     type,
     startDt,
@@ -76,6 +76,7 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     code,
     keywords,
     sessionId,
+    parentId,
   } = camelizeKeys(data);
 
   const mappedObj = {
@@ -100,6 +101,7 @@ export const mapTTDataToEntry = (data): TopLevelEntry => {
     textColor: colors ? colors.text : '',
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
+    parentId: parentId || null,
   };
 
   return mappedObj;

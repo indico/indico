@@ -173,6 +173,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={undefined}
         initialValues={initialValues}
         extraOptions={extraOptions}
+        hasParent={entry.parentId !== null}
       />
     ),
   };
