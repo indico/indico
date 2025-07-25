@@ -13,7 +13,7 @@ import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
-import {createRestrictToCalendar} from './dnd/modifiers';
+import {createRestrictToCalendar, createRestrictToCalendarWithLimits} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {
   computeYoffset,
@@ -101,7 +101,12 @@ export function DayTimetable({
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
-  const limits = getTimelineLimits();
+  const startHourLimit =
+    eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
+  const endHourLimit =
+    eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
+  const limits: [number, number] = getTimelineLimits();
+  const pixelLimits: [number, number] = getTimelinePixelLimits();
 
   function handleDragEnd(
     who: string,
@@ -217,20 +222,23 @@ export function DayTimetable({
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
-  function getTimelineLimits(): number[] {
-    const startHourLimit =
-      eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
-    const endHourLimit =
-      eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
-
+  function getTimelineLimits(): [number, number] {
     return [
       ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
       (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
     ];
   }
 
+  function getTimelinePixelLimits(offsetType: 'delta' | 'total' = 'delta'): [number, number] {
+    return [
+      minutesToPixels((startHourLimit - minHour) * 60),
+      offsetType === 'delta'
+        ? minutesToPixels((maxHour + 1 - endHourLimit) * 60)
+        : minutesToPixels((endHourLimit - minHour) * 60),
+    ];
+  }
+
   function canInteractWithTimeline(y, offsets = [0, 0]) {
-    const pixelLimits = limits.map(lim => (calendarRef.current.clientHeight / 100) * lim);
     return y > pixelLimits[0] + offsets[0] && y < pixelLimits[1] - offsets[1];
   }
 
@@ -338,7 +346,10 @@ export function DayTimetable({
     }
   }, [scrollPosition, entries]);
 
-  const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
+  const restrictToCalendar = useMemo(() => {
+    return createRestrictToCalendarWithLimits(calendarRef, pixelLimits);
+  }, [pixelLimits]);
+
   const limitsGradientArg = [
     'rgba(0, 0, 0, 0.05) 0%',
     `rgba(0, 0, 0, 0.05) ${limits[0]}%`,
@@ -350,7 +361,11 @@ export function DayTimetable({
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
   return (
-    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
+    <DnDProvider
+      onDrop={handleDragEnd}
+      modifier={restrictToCalendar}
+      limits={getTimelinePixelLimits('total')}
+    >
       <UnscheduledContributions dt={dt} />
       <div ref={wrapperRef} className="wrapper">
         <div styleName="wrapper">
