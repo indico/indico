@@ -16,6 +16,7 @@ from indico.core.oauth.models.applications import OAuthApplication, SystemAppTyp
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
+from indico.modules.events.registration.util import get_custom_ticket_qr_code_handlers
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -71,6 +72,9 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
                 'base_url': config.BASE_URL,
                 'client_id': checkin_app.client_id,
                 'scope': 'registrants',
+            },
+            'custom_code_handlers': {
+                x.name: x.regex for x in get_custom_ticket_qr_code_handlers().values()
             }
         }
         json_qr_data = json.dumps(qr_data)

@@ -273,3 +273,11 @@ def _patch_google_wallet_ticket(registration, change, **kwargs):
         gwm = GoogleWalletManager(registration.event)
         if gwm.is_configured:
             gwm.patch_ticket_object(registration)
+
+
+@signals.core.app_created.connect
+def _check_custom_ticket_qr_code_handlers(app, **kwargs):
+    from indico.modules.events.registration.util import get_custom_ticket_qr_code_handlers
+
+    # This will raise RuntimeError if the handler names are not unique
+    get_custom_ticket_qr_code_handlers()

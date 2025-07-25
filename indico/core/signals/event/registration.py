@@ -159,3 +159,8 @@ apple_wallet_object = _signals.signal('apple-wallet-object', '''
 Called when the Pass object for an Apple Wallet has been generated. The `sender` is the
 `Registration` object, the `obj` kwarg contains the Pass object.
 ''')
+
+custom_ticket_qr_code_handler = _signals.signal('custom-ticket-qr-code-handler', '''
+Expected to return a subclass of ``CustomTicketCode`` implementing a custom ticket
+QR code handler. This can be used to handle custom ticket QR codes.
+''')
