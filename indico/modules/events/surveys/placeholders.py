@@ -28,7 +28,7 @@ class SurveyLinkPlaceholder(ParametrizedPlaceholder):
 
     @classmethod
     def render(cls, param, survey, **kwargs):
-        url = url_for('.display_survey_form', survey, survey.locator.token, _external=True)
+        url = url_for('surveys.display_survey_form', survey, survey.locator.token, _external=True)
         return Markup(f'<a href="{url}" title="{escape(survey.title)}">{param or url}</a>')
 
     @classmethod
