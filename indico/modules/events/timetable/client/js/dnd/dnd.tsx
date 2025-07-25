@@ -207,14 +207,17 @@ export function DnDProvider({
   children,
   onDrop,
   modifier = ({transform}) => transform,
+  limits = [0, 0],
 }: {
   children: React.ReactNode;
   onDrop: OnDrop;
   modifier?: Modifier;
+  limits?: [number, number];
 }) {
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
   const [draggableData, setDraggableData] = useState<DraggableData>({});
+  const [isWithinLimits, setIsWithinLimits] = useState<boolean>(true);
   const state = useRef<DnDState>({
     state: 'idle',
     initialMousePosition: {x: 0, y: 0},
@@ -229,8 +232,7 @@ export function DnDProvider({
     draggables,
     enabled:
       // TODO: does not really work atm
-      state.current.activeDraggable === null ||
-      !state.current.activeDraggable.startsWith('unscheduled'),
+      isWithinLimits && state.current.activeDraggable !== null,
   });
 
   const registerDroppable = useCallback((id, node) => {
@@ -291,22 +293,29 @@ export function DnDProvider({
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
         }
-        setDraggableData(d =>
-          setMousePosition(
-            setTransform(
-              d,
+        const mousePosition = {
+          x: e.pageX + state.current.scrollPosition.x,
+          y: e.pageY + state.current.scrollPosition.y,
+        };
+        // TODO: (Ajob) Doesn't work properly because e.pageY is more than just the timetable lines
+        const withinLimits = mousePosition.y >= limits[0] && mousePosition.y <= limits[1];
+        setIsWithinLimits(withinLimits);
+
+        if (withinLimits) {
+          setDraggableData(d =>
+            setMousePosition(
+              setTransform(
+                d,
+                state.current.activeDraggable,
+                state.current.initialMousePosition,
+                mousePosition,
+                modifier
+              ),
               state.current.activeDraggable,
-              state.current.initialMousePosition,
-              {
-                x: e.pageX + state.current.scrollPosition.x,
-                y: e.pageY + state.current.scrollPosition.y,
-              },
-              modifier
-            ),
-            state.current.activeDraggable,
-            {x: e.pageX, y: e.pageY}
-          )
-        );
+              {x: e.pageX, y: e.pageY}
+            )
+          );
+        }
       }
     },
     [modifier]
