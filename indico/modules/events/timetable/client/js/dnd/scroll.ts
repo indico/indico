@@ -74,8 +74,9 @@ export function useScrollIntent({
 
 function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement) {
   const rect = scrollParent.getBoundingClientRect();
-  const mouseYPercent = (mouse.y - rect.top) / rect.height;
-  const mouseXPercent = (mouse.x - rect.left) / rect.width;
+  const mouseYPercent = Math.min(1, Math.max(0, (mouse.y - rect.top) / rect.height));
+  const mouseXPercent = Math.min(1, Math.max(0, (mouse.x - rect.left) / rect.width));
+
   let speedX = 0;
   let speedY = 0;
 
