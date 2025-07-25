@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment, {duration, Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,7 +13,7 @@ import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
-import {createRestrictToCalendar} from './dnd/modifiers';
+import {createRestrictToCalendar, createRestrictToCalendarWithLimits} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
@@ -28,6 +28,7 @@ interface DayTimetableProps {
   minHour: number;
   maxHour: number;
   entries: TopLevelEntry[];
+  scrollPosition?: number;
 }
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
@@ -72,15 +73,32 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
-export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimetableProps) {
+export function DayTimetable({
+  dt,
+  eventId,
+  minHour,
+  maxHour,
+  entries,
+  scrollPosition = 0,
+}: DayTimetableProps) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const eventStartDt = useSelector(selectors.getEventStartDt);
+  const eventEndDt = useSelector(selectors.getEventEndDt);
 
   const [isDragging, setIsDragging] = useState(false);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
+
+  const startHourLimit =
+    eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
+  const endHourLimit =
+    eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
+  const limits: [number, number] = getTimelineLimits();
+  const pixelLimits: [number, number] = getTimelinePixelLimits();
 
   function handleDragEnd(
     who: string,
@@ -189,6 +207,26 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
   }
 
+  function getTimelineLimits(): [number, number] {
+    return [
+      ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
+      (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
+    ];
+  }
+
+  function getTimelinePixelLimits(offsetType: 'delta' | 'total' = 'delta'): [number, number] {
+    return [
+      minutesToPixels((startHourLimit - minHour) * 60),
+      offsetType === 'delta'
+        ? minutesToPixels((maxHour + 1 - endHourLimit) * 60)
+        : minutesToPixels((endHourLimit - minHour) * 60),
+    ];
+  }
+
+  function canInteractWithTimeline(y, offsets = [0, 0]) {
+    return y > pixelLimits[0] + offsets[0] && y < pixelLimits[1] - offsets[1];
+  }
+
   const draftEntry = useSelector(selectors.getDraftEntry);
 
   useEffect(() => {
@@ -204,7 +242,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      if (event.button !== 0 || event.target !== calendarRef.current) {
+      if (
+        event.button !== 0 ||
+        event.target !== calendarRef.current ||
+        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(5)])
+      ) {
         return;
       }
 
@@ -214,10 +256,14 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
           GRID_SIZE_MINUTES
       );
 
-      const startDt = moment(dt)
+      let startDt = moment(dt)
         .startOf('days')
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
+
+      if (startDt < dt) {
+        startDt = dt;
+      }
 
       setIsDragging(true);
       dispatch(
@@ -230,21 +276,26 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (!isDragging || !draftEntry) {
+      if (!isDragging || !draftEntry || !canInteractWithTimeline(event.offsetY)) {
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
-      const duration = Math.max(
+      let draftDuration = Math.max(
         Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
         GRID_SIZE_MINUTES // TODO: Replace with default duration
       );
 
-      if (draftEntry.duration === duration) {
+      const newEndDt = moment(draftEntry.startDt).add(draftDuration, 'minutes');
+      if (newEndDt > eventEndDt) {
+        draftDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
+      }
+
+      if (draftEntry.duration === draftDuration) {
         return;
       }
 
-      dispatch(actions.setDraftEntry({...draftEntry, duration}));
+      dispatch(actions.setDraftEntry({...draftEntry, duration: draftDuration}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
@@ -274,16 +325,38 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     };
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
-  const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
+  useEffect(() => {
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTop = scrollPosition;
+    }
+  }, [scrollPosition, entries]);
+
+  const restrictToCalendar = useMemo(() => {
+    return createRestrictToCalendarWithLimits(calendarRef, pixelLimits);
+  }, [pixelLimits]);
+
+  const limitsGradientArg = [
+    'rgba(0, 0, 0, 0.05) 0%',
+    `rgba(0, 0, 0, 0.05) ${limits[0]}%`,
+    `transparent ${limits[0]}%`,
+    `transparent ${limits[1]}%`,
+    `rgba(0, 0, 0, 0.05) ${limits[1]}%`,
+    'rgba(0, 0, 0, 0.05) 100%',
+  ].join(', ');
+  const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
   return (
-    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
+    <DnDProvider
+      onDrop={handleDragEnd}
+      modifier={restrictToCalendar}
+      limits={getTimelinePixelLimits('total')}
+    >
       <UnscheduledContributions dt={dt} />
-      <div className="wrapper">
+      <div ref={wrapperRef} className="wrapper">
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
-            <div ref={calendarRef}>
+            <div ref={calendarRef} style={{background: limitsGradient}}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
@@ -320,12 +393,12 @@ interface TimeGutterProps {
 }
 
 export function Lines({
-  minHour,
-  maxHour,
+  minHour = 0,
+  maxHour = 23,
   first = true,
 }: {
-  minHour: number;
-  maxHour: number;
+  minHour?: number;
+  maxHour?: number;
   first?: boolean;
 }) {
   const oneHour = minutesToPixels(60);
@@ -346,7 +419,7 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
     <div styleName="time-gutter">
       <div style={{height: 10}} />
       {Array.from({length: maxHour - minHour + 1}, (_, i) => (
-        <TimeSlot key={i} height={oneHour} time={`${minHour + i}:00`} />
+        <TimeSlot key={i} height={oneHour} time={`${(minHour + i) % 24}:00`} />
       ))}
     </div>
   );
