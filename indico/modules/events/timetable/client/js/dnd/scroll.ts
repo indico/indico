@@ -11,8 +11,8 @@ import {getScrollParent} from './modifiers';
 import {Draggable, MousePosition} from './types';
 
 const SCROLL_MARGIN_PERCENT = 0.15;
-const BASE_SPEED = 3;
 const SCROLL_INTERVAL_MS = 5;
+const BASE_SPEED = 3;
 
 type Timeout = ReturnType<typeof setInterval>;
 
