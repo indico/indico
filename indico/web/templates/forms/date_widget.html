@@ -19,7 +19,7 @@
             allowClear: {{ (field.allow_clear if field.allow_clear else false) | tojson }},
             earliest: {{ (field.earliest_date.isoformat() if field.earliest_date else none) | tojson }},
             latest: {{ (field.latest_date.isoformat() if field.latest_date else none) | tojson }},
-            weekendDisabled: {{ field.weekend_disabled | default(false) | tojson }},
+            disabledDays: {{ field.disabled_days_js | tojson }},
             disabledDates: {{ field.disabled_dates | tojson }},
             {% if field.flags.linked_date %}
                 linkedField: {

@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import timezone
 
-from indico.util.date_time import (_adjust_skeleton, as_utc, format_human_timedelta, format_skeleton, iterdays,
-                                   strftime_all_years)
+from indico.util.date_time import (_adjust_skeleton, as_utc, convert_py_weekdays_to_js, format_human_timedelta,
+                                   format_skeleton, iterdays, strftime_all_years)
 
 
 @pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
@@ -101,3 +101,14 @@ def test__adjust_skeleton_skeleton(skeleton, format, expected):
 def test_format_skeleton(skeleton, expected):
     dt = as_utc(datetime(2021, 2, 8)).astimezone(timezone('Europe/Zurich'))
     assert format_skeleton(dt, skeleton, 'en_GB', 'Europe/Zurich') == expected
+
+
+@pytest.mark.parametrize(('py_weekdays', 'expected_js_weekdays'), (
+    ([0], [1]),
+    ([6], [0]),
+    ([0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 0]),
+    ([5, 6], [6, 0]),
+    ([], []),
+))
+def test_convert_py_weekdays_to_js(py_weekdays, expected_js_weekdays):
+    assert convert_py_weekdays_to_js(py_weekdays) == expected_js_weekdays
