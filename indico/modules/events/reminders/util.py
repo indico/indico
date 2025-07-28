@@ -35,7 +35,7 @@ def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_
             with_agenda = False
         agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
         note = str(message)  # Legacy reminder (text/plain email only)
-        if render_mode == RenderMode.html:
+        if note and render_mode == RenderMode.html:
             note = html_to_plaintext(note).strip()  # Standard reminder (text/html -> text/plain)
         text_tpl = get_template_module('events/reminders/emails/event_reminder.txt', event=event,
                                         url=event.short_external_url, note=note, with_agenda=with_agenda,

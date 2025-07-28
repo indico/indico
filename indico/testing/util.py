@@ -15,6 +15,8 @@ from itertools import product
 
 import yaml
 
+from indico.util.string import strip_html_whitespace
+
 
 def bool_matrix(template, mask=None, expect=None):
     """Create a boolean matrix suitable for parametrized tests.
@@ -186,7 +188,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     return found
 
 
-def assert_email_snapshot(snapshot, template, snapshot_filename):
+def assert_email_snapshot(snapshot, template, snapshot_filename, html=False):
     """Assert that an email matches a snapshot.
 
     This verifies that both the subject and the body match the snapshots.
@@ -196,6 +198,9 @@ def assert_email_snapshot(snapshot, template, snapshot_filename):
     :param snapshot_filename: The filename for the snapshot
     """
     body = template.get_body()
+    if html:
+        # we add a trailing linebreak so make manually editing the snapshot easier
+        body = strip_html_whitespace(body) + '\n'
     subject = template.get_subject()
     name, ext = os.path.splitext(snapshot_filename)
     snapshot_filename_subject = f'{name}.subject{ext}'
