@@ -107,6 +107,7 @@ class DesignerPDFBase:
         return color
 
     def _get_resized_font(self, content, font_size, font_name, width):
+        content = str(content)  # resolve LazyString
         min_font_size = 6
         resized_font = font_size
         item_width = width / PIXELS_CM * cm
