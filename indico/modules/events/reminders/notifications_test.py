@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from indico.testing.util import assert_email_snapshot
+from indico.util.string import RichMarkup
 from indico.web.flask.templating import get_template_module
 
 
@@ -45,3 +46,36 @@ def test_event_reminder_email_plaintext(snapshot, create_contribution, create_ti
                                    note='Meow.\nNyah!', with_agenda=True, agenda=agenda)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     assert_email_snapshot(snapshot, template, snapshot_filename)
+
+
+@pytest.mark.parametrize(('with_label', 'venue', 'room', 'address', 'snapshot_filename'), (
+    (True, '', '', '', 'event_reminder_label.html'),
+    (False, '', '', '', 'event_reminder.html'),
+    (False, 'Home', '', '', 'event_reminder_v.html'),
+    (False, '', 'Bed', '', 'event_reminder_r.html'),
+    (False, '', '', 'Some\nWhere', 'event_reminder_a.html'),
+    (False, 'Home', 'Bed', '', 'event_reminder_vr.html'),
+    (False, '', 'Bed', 'Some\nWhere', 'event_reminder_ra.html'),
+    (False, 'Home', '', 'Some\nWhere', 'event_reminder_va.html'),
+    (False, 'Home', 'Bed', 'Some\nWhere', 'event_reminder_vra.html'),
+))
+def test_event_reminder_email_html(snapshot, create_contribution, create_timetable_entry, create_event,
+                                   create_label, with_label, venue, room, address, snapshot_filename):
+    event = create_event(start_dt=datetime(2022, 11, 11, 13, 37),
+                         end_dt=datetime(2022, 11, 11, 23, 37), title='Baking with Cats')
+    event.venue_name = venue
+    event.room_name = room
+    event.address = address
+    c1 = create_contribution(event, 'Kneading Dough', timedelta(minutes=23))
+    c2 = create_contribution(event, 'Pure Bread Cats', timedelta(minutes=40))
+    create_timetable_entry(event, c1, datetime(2022, 11, 11, 13, 37))
+    create_timetable_entry(event, c2, datetime(2022, 11, 11, 15, 50))
+    if with_label:
+        label = create_label('POSTPONED')
+        event.label = label
+    agenda = event.timetable_entries.filter_by(parent_id=None).all()
+    template = get_template_module('events/reminders/emails/event_reminder.html',
+                                   event=event, url='http://localhost/', with_description=True,
+                                   note=RichMarkup('<p>Meow.</p><p>Nyah!</p>'), with_agenda=True, agenda=agenda)
+    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
+    assert_email_snapshot(snapshot, template, snapshot_filename, html=True)

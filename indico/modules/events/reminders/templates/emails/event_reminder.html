@@ -1,7 +1,7 @@
 {% extends 'emails/base_i18n.html' %}
 {% from 'events/reminders/emails/_agenda.html' import render_agenda %}
 
-{% set address = event.address %}
+{% set address = event.address | markdown %}
 {% set location = event.venue_name %}
 {% set room = event.room_name %}
 {% set label = ' {%s}'|format(event.label.title) if event.label else '' %}
@@ -18,16 +18,15 @@
     <p>
     {%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
         Please note that the event <a href="{{ url }}">"{{ title }}"{{ label }}</a> will start on {{ start }} ({{ tz }}).
-    {%- endtrans %}
+    {%- endtrans -%}
     </p>
-    <p>
-    {%- if location or room -%}
-        {% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}
+    {%- if location or room %}
+        <p>{% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}</p>
+        {{ render_address() }}
     {%- elif address %}
-        {% trans %}It will take place at the following address:{% endtrans %}
+        <p>{% trans %}It will take place at the following address:{% endtrans %}</p>
         {{ address }}
-    {%- endif %}
-    </p>
+    {%- endif -%}
     {%- if with_description and event.description %}
         <h3>{% trans %}Description{% endtrans %}</h3>
         {{ event.description }}
@@ -50,12 +49,8 @@
         {%- else -%}
             {{ location }}.
         {%- endif -%}
-        {{- render_address() }}
     {%- elif room -%}
         {{ render_room() }}.
-        {{- render_address() }}
-    {%- else -%}
-        {{ render_address() }}
     {%- endif -%}
 {%- endmacro -%}
 
@@ -71,7 +66,7 @@
 
 {%- macro render_address() -%}
     {%- if address %}
-        {% trans %}Address:{% endtrans %}
+        <p>{% trans %}Address:{% endtrans %}</p>
         {{ address }}
     {%- endif -%}
 {%- endmacro -%}
