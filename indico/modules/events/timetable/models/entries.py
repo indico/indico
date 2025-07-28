@@ -99,6 +99,12 @@ class TimetableEntry(db.Model):
         UTCDateTime,
         nullable=False
     )
+    # column_index is used to order entries in the timetable
+    column_index = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0,
+    )
 
     event = db.relationship(
         'Event',
