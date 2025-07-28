@@ -16,6 +16,8 @@ Bugfixes
 ^^^^^^^^
 
 - Fix missing spacing between toolbar button groups (:pr:`6981`)
+- Fix error with certain registration form field types if the badge text overflow
+  behavior was set to "resize" (:pr:`6993`)
 
 Accessibility
 ^^^^^^^^^^^^^
