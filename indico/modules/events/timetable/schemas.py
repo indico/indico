@@ -37,7 +37,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
         fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type',
-                   'parent_id')
+                  'parent_id')
         rh_context = ('event',)
 
     title = fields.String(required=True)
