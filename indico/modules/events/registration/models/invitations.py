@@ -81,7 +81,7 @@ class RegistrationInvitation(db.Model):
         default=False
     )
     #: Whether the email address is bound to the invitation
-    bind_email = db.Column(
+    lock_email = db.Column(
         db.Boolean,
         nullable=False,
         default=False
