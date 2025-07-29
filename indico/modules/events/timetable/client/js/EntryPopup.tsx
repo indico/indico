@@ -107,7 +107,13 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
 
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
+
+    const children = entry.children;
     entry = mapTTDataToEntry(data);
+
+    if (entry.type === EntryType.SessionBlock) {
+      entry.children = children;
+    }
     dispatch(actions.setDraftEntry(entry));
     onClose();
   };
