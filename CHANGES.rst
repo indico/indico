@@ -10,7 +10,7 @@ Version 3.3.8
 Improvements
 ^^^^^^^^^^^^
 
-- Add a CAPTCHA to the material package endpoint (:pr:`6996`)
+- Add a CAPTCHA and rate limiting to the material package endpoint (:pr:`6996`)
 
 Bugfixes
 ^^^^^^^^
