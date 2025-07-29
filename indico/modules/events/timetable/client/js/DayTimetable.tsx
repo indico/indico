@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {duration, Moment} from 'moment';
+import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,7 +13,7 @@ import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
-import {createRestrictToCalendar, createRestrictToCalendarWithLimits} from './dnd/modifiers';
+import {createRestrictToCalendarWithLimits} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {
   computeYoffset,
@@ -38,6 +38,8 @@ interface DayTimetableProps {
   entries: TopLevelEntry[];
   scrollPosition?: number;
 }
+
+const TABLE_MARGIN_TOP = 10;
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch = useDispatch();
@@ -106,7 +108,8 @@ export function DayTimetable({
   const endHourLimit =
     eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
   const limits: [number, number] = getTimelineLimits();
-  const pixelLimits: [number, number] = getTimelinePixelLimits();
+  const pixelLimitsTotal: [number, number] = getTimelinePixelLimits('total');
+  const pixelLimitsDelta: [number, number] = getTimelinePixelLimits('delta');
 
   function handleDragEnd(
     who: string,
@@ -229,7 +232,7 @@ export function DayTimetable({
     ];
   }
 
-  function getTimelinePixelLimits(offsetType: 'delta' | 'total' = 'delta'): [number, number] {
+  function getTimelinePixelLimits(offsetType: 'delta' | 'total' = 'total'): [number, number] {
     return [
       minutesToPixels((startHourLimit - minHour) * 60),
       offsetType === 'delta'
@@ -239,7 +242,10 @@ export function DayTimetable({
   }
 
   function canInteractWithTimeline(y, offsets = [0, 0]) {
-    return y > pixelLimits[0] + offsets[0] && y < pixelLimits[1] - offsets[1];
+    console.log('interact?');
+    console.log(y, pixelLimitsTotal);
+    console.log(y > pixelLimitsTotal[0] + offsets[0] && y < pixelLimitsTotal[1] - offsets[1]);
+    return y > pixelLimitsTotal[0] + offsets[0] && y < pixelLimitsTotal[1] - offsets[1];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -260,7 +266,7 @@ export function DayTimetable({
       if (
         event.button !== 0 ||
         event.target !== calendarRef.current ||
-        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(5)])
+        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(GRID_SIZE_MINUTES)])
       ) {
         return;
       }
@@ -340,15 +346,17 @@ export function DayTimetable({
     };
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
-  useEffect(() => {
-    if (wrapperRef.current) {
-      wrapperRef.current.scrollTop = scrollPosition;
-    }
-  }, [scrollPosition, entries]);
+  // useEffect(() => {
+  //   if (wrapperRef.current && !wrapperRef.current.scrollTop) {
+  //     wrapperRef.current.scrollTop = scrollPosition;
+  //   }
+  // }, [scrollPosition, entries]);
 
   const restrictToCalendar = useMemo(() => {
-    return createRestrictToCalendarWithLimits(calendarRef, pixelLimits);
-  }, [pixelLimits]);
+    const restrictLimits = pixelLimitsDelta;
+    restrictLimits[1] += TABLE_MARGIN_TOP;
+    return createRestrictToCalendarWithLimits(calendarRef, pixelLimitsDelta);
+  }, [pixelLimitsDelta]);
 
   const limitsGradientArg = [
     'rgba(0, 0, 0, 0.05) 0%',
@@ -360,12 +368,12 @@ export function DayTimetable({
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
+  // TODO: (Ajob) The 10px margin impacts calculations and we need to pass it
+  //              here in the limits the offsetTop is different.
+  const dndLimits = pixelLimitsTotal;
+
   return (
-    <DnDProvider
-      onDrop={handleDragEnd}
-      modifier={restrictToCalendar}
-      limits={getTimelinePixelLimits('total')}
-    >
+    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar} limits={dndLimits}>
       <UnscheduledContributions dt={dt} />
       <div ref={wrapperRef} className="wrapper">
         <div styleName="wrapper">
@@ -452,7 +460,7 @@ function DnDCalendar({children}: {children: React.ReactNode}) {
   });
 
   return (
-    <div ref={setNodeRef} styleName="calendar" style={{marginTop: 10}}>
+    <div ref={setNodeRef} styleName="calendar" style={{marginTop: TABLE_MARGIN_TOP}}>
       {children}
     </div>
   );
