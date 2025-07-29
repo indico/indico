@@ -16,7 +16,7 @@ import {Markdown, toClasses} from 'indico/react/util';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {
-  getBindEmail,
+  getLockEmail,
   getManagement,
   getUpdateMode,
   isPaidItemLocked,
@@ -108,7 +108,7 @@ export default function FormItem({
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, id));
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
-  const bindEmail = useSelector(getBindEmail);
+  const lockEmail = useSelector(getLockEmail);
   const form = useForm();
 
   const fieldRegistry = getFieldRegistry();
@@ -116,7 +116,12 @@ export default function FormItem({
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, fieldId: id, fieldIsPersonalData, ...rest};
   const showPurged = !setupMode && isPurged;
-  const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
+  const disabled =
+    !isEnabled ||
+    showPurged ||
+    !!lockedReason ||
+    (paidItemLocked && !isManagement) ||
+    (lockEmail && fieldIsPersonalData && htmlName === 'email');
 
   const fieldOptions = {
     id,
@@ -157,10 +162,6 @@ export default function FormItem({
   const htmlId = `input-${inputProps.fieldId}`;
 
   const show = useSelector(state => !isItemHidden(state, id));
-
-  if (bindEmail && fieldIsPersonalData && htmlName === 'email') {
-    inputProps.disabled = true;
-  }
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (

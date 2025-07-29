@@ -406,7 +406,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
             continue
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
-        if (invitation and invitation.bind_email and form_item.type == RegistrationFormItemType.field_pd and
+        if (invitation and invitation.lock_email and form_item.type == RegistrationFormItemType.field_pd and
                 form_item.personal_data_type == PersonalDataType.email):
             can_modify = False
         value = data.get(form_item.html_field_name, default) if can_modify else default
@@ -901,7 +901,7 @@ def update_regform_item_positions(regform):
 
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
-                      bind_email):
+                      lock_email):
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
@@ -909,7 +909,7 @@ def create_invitation(regform, user, email_sender, email_subject, email_body, *,
         affiliation=user['affiliation'],
         skip_moderation=skip_moderation,
         skip_access_check=skip_access_check,
-        bind_email=bind_email,
+        lock_email=lock_email,
     )
     regform.invitations.append(invitation)
     db.session.flush()
@@ -944,7 +944,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
 
 
 def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *, skip_moderation=True,
-                                skip_access_check=True, skip_existing=False, bind_email=False, delimiter=','):
+                                skip_access_check=True, skip_existing=False, lock_email=False, delimiter=','):
     """Import invitations from a CSV file.
 
     :return: A list of invitations and the number of skipped records which
@@ -983,7 +983,7 @@ def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, e
 
     invitations = [create_invitation(regform, user, email_sender, email_subject, email_body,
                                      skip_moderation=skip_moderation, skip_access_check=skip_access_check,
-                                     bind_email=bind_email)
+                                     lock_email=lock_email)
                    for user in filtered_records]
     skipped_records = len(user_records) - len(filtered_records)
     return invitations, skipped_records
