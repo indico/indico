@@ -12,6 +12,7 @@ import {createPortal} from 'react-dom';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {EntryTitle} from './ContributionEntry';
 import {useDraggable, useDroppableData} from './dnd';
+import {pointerInside} from './dnd/utils';
 import {formatTimeRange} from './i18n';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
@@ -54,14 +55,16 @@ export function DraggableUnscheduledContributionEntry({
   let timeRange = `${duration} minutes`;
   if (transform && droppableData && ref.current) {
     const r = droppableData.node.current.getBoundingClientRect();
-    const mousePositionY = mouse.y - r.top - window.scrollY;
+    if (pointerInside(mouse, r)) {
+      const mousePositionY = mouse.y - r.top - window.scrollY;
 
-    const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
-    const startDt = moment(dt)
-      .startOf('day')
-      .add(start, 'minutes');
-    const newEnd = moment(startDt).add(duration, 'minutes');
-    timeRange = formatTimeRange('en', startDt, newEnd); // TODO: use current locale
+      const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
+      const startDt = moment(dt)
+        .startOf('day')
+        .add(start, 'minutes');
+      const newEnd = moment(startDt).add(duration, 'minutes');
+      timeRange = formatTimeRange('en', startDt, newEnd); // TODO: use current locale
+    }
   }
 
   let style = {
