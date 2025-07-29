@@ -39,6 +39,7 @@ interface BreakFormFieldsProps {
     locationParent?: LocationParentObj;
     initialValues: Record<string, any>;
     extraOptions?: Record<string, any>;
+    hasParent?: boolean;
     [key: string]: any; // Allow additional props
 }
 
@@ -46,6 +47,7 @@ export function BreakFormFields({
     locationParent = {inheriting: false},
     initialValues = {},
     extraOptions = {},
+    hasParent = false,
 }: BreakFormFieldsProps) {
     const {minStartDt, maxEndDt} = extraOptions;
 
@@ -83,7 +85,7 @@ export function BreakFormFields({
                 label={Translate.string('Location')}
                 locationParent={locationParent}
             />
-            <FinalSessionColorPicker name="colors" label={Translate.string('Color')} />
+            {!hasParent && <FinalSessionColorPicker name="colors" label={Translate.string('Color')} />}
         </>
     );
 }
