@@ -18,6 +18,36 @@
   :global(.ui.menu) {
     margin-bottom: 0;
 
+    .days {
+      position: relative;
+      display: flex;
+      flex-shrink: 1;
+      width: 100%;
+      padding: 0 0;
+      overflow-x: auto;
+
+      .gradient {
+        pointer-events: none;
+        width: 20px;
+        height: 100%;
+        top: 0;
+        bottom: 0;
+        flex-shrink: 0;
+        position: sticky;
+        z-index: 1;
+
+        &:first-child {
+          background: linear-gradient(90deg, white, transparent);
+          left: 0;
+        }
+
+        &:last-child {
+          background: linear-gradient(-90deg, white, transparent);
+          right: 0;
+        }
+      }
+    }
+
     .action {
       padding-left: 0.7em;
       padding-right: 0.7em;
