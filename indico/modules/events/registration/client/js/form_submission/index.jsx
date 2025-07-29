@@ -23,7 +23,7 @@ export default function setupRegformSubmission(root) {
     management,
     paid,
     moderated = false,
-    bindEmail = false,
+    lockEmail = false,
     submitUrl,
     formData,
     initialValues = null,
@@ -46,7 +46,7 @@ export default function setupRegformSubmission(root) {
       management: JSON.parse(management),
       paid: paid ? JSON.parse(paid) : false,
       moderated: JSON.parse(moderated),
-      bindEmail: JSON.parse(bindEmail),
+      lockEmail: JSON.parse(lockEmail),
       initialValues: JSON.parse(initialValues),
       submitUrl,
       registrationData: registrationData
