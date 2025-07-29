@@ -36,7 +36,8 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
 class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
-        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type')
+        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type',
+                  'parent_id')
         rh_context = ('event',)
 
     title = fields.String(required=True)
@@ -45,6 +46,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
+    parent_id = fields.Integer(dump_only=True, attribute='timetable_entry.parent_id')
 
 
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
