@@ -101,8 +101,11 @@ export const mapTTDataToEntry = (data): Entry => {
     textColor: colors ? colors.text : '',
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
-    parentId: parentId || null,
   };
+
+  if (parentId) {
+    mappedObj.parentId = parentId;
+  }
 
   return mappedObj;
 };
