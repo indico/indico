@@ -175,7 +175,7 @@ export default function ContributionEntry({
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
         <EntryTitle title={title} duration={duration} timeRange={timeRange} type={type} />
-        {children.length ? (
+        {type === 'block' && (
           <div
             ref={setDroppableNodeRef}
             style={{
@@ -184,21 +184,23 @@ export default function ContributionEntry({
               borderRadius: 6,
             }}
           >
-            {children.map(child => (
-              <DraggableEntry
-                key={child.id}
-                selected={false}
-                setDuration={_children ? setChildDurations[child.id] : null}
-                blockRef={blockRef}
-                parentEndDt={moment(startDt)
-                  .add(deltaMinutes + duration, 'minutes')
-                  .format()}
-                isChild
-                {...child}
-              />
-            ))}
+            {children.length
+              ? children.map(child => (
+                  <DraggableEntry
+                    key={child.id}
+                    selected={false}
+                    setDuration={_children ? setChildDurations[child.id] : null}
+                    blockRef={blockRef}
+                    parentEndDt={moment(startDt)
+                      .add(deltaMinutes + duration, 'minutes')
+                      .format()}
+                    isChild
+                    {...child}
+                  />
+                ))
+              : null}
           </div>
-        ) : null}
+        )}
       </div>
       <ResizeHandle
         duration={duration}
