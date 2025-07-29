@@ -55,6 +55,10 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHDisplayEventBase):
 
 
 class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHDisplayEventBase):
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        AttachmentPackageMixin._check_access(self)
+
     @property
     def wp(self):
         if self.event.type_ == EventType.conference:

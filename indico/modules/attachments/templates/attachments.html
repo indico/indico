@@ -11,12 +11,12 @@
         <ul class="i-dropdown">
             <li>
                 <a href="#"
-                   title="{% trans %}Upload permissions{% endtrans %}"
+                   title="{% trans %}Material permissions{% endtrans %}"
                    data-ajax-dialog
-                   data-title="{% trans %}Set upload permissions{% endtrans %}"
-                   data-href="{{ url_for('.set_upload_permissions', event) }}"
+                   data-title="{% trans %}Material permissions{% endtrans %}"
+                   data-href="{{ url_for('.event_permissions', event) }}"
                    data-qtip-position="right">
-                    {% trans %}Upload permissions{% endtrans %}</a>
+                    {% trans %}Permissions{% endtrans %}</a>
             </li>
         </ul>
     {% endif %}

@@ -15,6 +15,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.attachments.settings import AttachmentPackageAccess
 from indico.modules.attachments.util import get_default_folder_names
 from indico.modules.core.captcha import WTFCaptchaField
 from indico.util.i18n import _
@@ -22,6 +23,7 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (AccessControlListField, EditableFileField, FileField, IndicoDateField,
                                      IndicoRadioField, IndicoSelectMultipleCheckboxField)
+from indico.web.forms.fields.enums import IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
@@ -180,7 +182,9 @@ class AttachmentPackageForm(IndicoForm):
     captcha = WTFCaptchaField()
 
 
-class SetUploadPermissionsForm(IndicoForm):
-    managers_only = BooleanField(_('Managers only'), widget=SwitchWidget(),
+class EventAttachmentPermissionsForm(IndicoForm):
+    managers_only = BooleanField(_('Upload: Managers only'), widget=SwitchWidget(),
                                  description=_('Only allow managers to upload materials to the event, '
                                                'contributions and sessions.'))
+    generate_package = IndicoEnumSelectField(_('Material packages'), enum=AttachmentPackageAccess,
+                                             description=_('Specify who can generate a material package.'))

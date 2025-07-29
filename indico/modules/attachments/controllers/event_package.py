@@ -12,7 +12,7 @@ from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
 from markupsafe import escape
 from sqlalchemy import Date, cast
-from werkzeug.exceptions import TooManyRequests
+from werkzeug.exceptions import Forbidden, TooManyRequests
 from werkzeug.local import LocalProxy
 
 from indico.core.celery import AsyncResult
@@ -189,6 +189,10 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
 class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     wp = None
     management = False
+
+    def _check_access(self):
+        if not self.event.can_generate_attachment_package(session.user):
+            raise Forbidden
 
     def _process(self):
         form = self._prepare_form()
