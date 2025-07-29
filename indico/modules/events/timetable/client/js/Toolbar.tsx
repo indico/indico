@@ -60,6 +60,8 @@ export default function Toolbar({
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const currentDayIdx = date.diff(eventStart, 'days');
 
+  console.log('numdays', numDays)
+
   const handleResize = useCallback(() => {
     dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
   }, [currentDayIdx, dispatch]);
@@ -158,17 +160,21 @@ export default function Toolbar({
             />
           </>
         )}
-        {[...Array(Math.min(numDays, maxDays)).keys()].map(n => {
-          const d = getDateFromIdx(n + offset);
-          return (
-            <Menu.Item
-              key={n}
-              content={d.format('ddd DD/MM')}
-              onClick={() => onNavigate(d)}
-              active={n + offset === currentDayIdx}
-            />
-          );
-        })}
+        <Menu.Item fitted styleName="days">
+          <div styleName="gradient" />
+          {[...Array(Math.min(numDays, numDays)).keys()].map(n => {
+            const d = getDateFromIdx(n + offset);
+            return (
+              <Menu.Item
+                key={n}
+                content={d.format('ddd DD/MM')}
+                onClick={() => onNavigate(d)}
+                active={n + offset === currentDayIdx}
+              />
+            );
+          })}
+          <div styleName="gradient" />
+        </Menu.Item>
         {numDays > maxDays && (
           <>
             <Menu.Item
