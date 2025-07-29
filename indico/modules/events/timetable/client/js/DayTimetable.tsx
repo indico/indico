@@ -282,7 +282,7 @@ export function DayTimetable({
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (!isDragging || !draftEntry || !canInteractWithTimeline(event.offsetY)) {
+      if (!isDragging || !draftEntry) {
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
@@ -331,11 +331,11 @@ export function DayTimetable({
     };
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
-  // useEffect(() => {
-  //   if (wrapperRef.current && !wrapperRef.current.scrollTop) {
-  //     wrapperRef.current.scrollTop = scrollPosition;
-  //   }
-  // }, [scrollPosition, entries]);
+  useEffect(() => {
+    if (wrapperRef.current && !wrapperRef.current.scrollTop) {
+      wrapperRef.current.scrollTop = scrollPosition;
+    }
+  }, [scrollPosition]);
 
   const restrictToCalendar = useMemo(() => {
     const restrictLimits = pixelLimitsDelta;
