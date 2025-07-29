@@ -11,7 +11,7 @@ import {getScrollParent} from './modifiers';
 import {Draggable, MousePosition} from './types';
 
 const SCROLL_MARGIN_PERCENT = 0.15;
-const SCROLL_MAX_OFFSET_PX = 100;
+const SCROLL_MAX_OFFSET_PX = 200;
 const SCROLL_INTERVAL_MS = 5;
 const BASE_SPEED = 3;
 
@@ -53,40 +53,22 @@ export function useScrollIntent({
       const draggable = draggables[state.current.activeDraggable];
       const scrollParent = getScrollParent(draggable.node.current);
 
-      // const rect = scrollParent.getBoundingClientRect();
       // const dragRect = draggable.node.current.getBoundingClientRect();
-
-      // const draggablePosTop = dragRect.top - rect.top + scrollParent.scrollTop;
-      // const draggablePosBottom = draggablePosTop + dragRect.height;
 
       scrollSpeed.current = getScrollSpeed({x: event.clientX, y: event.clientY}, scrollParent);
 
-      // console.log('top', draggablePosTop, 'rrr', Math.random());
-      // console.log(limits);
-      // if (
-      //   draggablePosTop <= limits[0] + BASE_SPEED ||
-      //   draggablePosBottom >= limits[1] - BASE_SPEED
-      // ) {
-      //   console.log('no speed here');
-      //   scrollSpeed.current.y = 0;
-      // }
+      const direction = Math.sign(scrollSpeed.current.y);
 
       if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
         if (intervalRef.current === null) {
           intervalRef.current = setInterval(() => {
-            const parentRect = scrollParent.getBoundingClientRect();
-            const dragRect = draggable.node.current.getBoundingClientRect();
-
-            const draggableTop = dragRect.top - parentRect.top + scrollParent.scrollTop;
-            const draggableBottom = draggableTop + dragRect.height;
-
-            // const newTop = draggableTop + scrollSpeed.current.y;
             const newTop = scrollSpeed.current.y + scrollParent.scrollTop;
-            const newBottom = draggableBottom + scrollSpeed.current.y;
+            const newBottom =
+              scrollSpeed.current.y + scrollParent.scrollTop + scrollParent.clientHeight;
 
-            if (newTop + SCROLL_MAX_OFFSET_PX <= limits[0]) {
+            if (direction === -1 && newTop + SCROLL_MAX_OFFSET_PX <= limits[0]) {
               scrollSpeed.current.y = 0;
-            } else if (newBottom - SCROLL_MAX_OFFSET_PX >= limits[1]) {
+            } else if (direction === 1 && newBottom - SCROLL_MAX_OFFSET_PX >= limits[1]) {
               scrollSpeed.current.y = 0;
             }
 
@@ -105,7 +87,7 @@ export function useScrollIntent({
       window.removeEventListener('mousemove', handleMouseMove);
       clearInterval(id);
     };
-  }, [state, draggables, enabled]);
+  }, [state, draggables, enabled, limits]);
 }
 
 function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement) {
