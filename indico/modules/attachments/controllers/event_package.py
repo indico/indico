@@ -200,7 +200,10 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             attachments = [attachment.id for attachment in self._filter_attachments(form.data)]
             if attachments:
                 if not self.management:
-                    if not material_package_rate_limiter.hit():
+                    # only increment the rate limit if the user is not a manager, so we don't annoy event managers
+                    # who use the button in the display view for some reason, instead of doing it via the management
+                    # area...
+                    if not self.event.can_manage(session.user) and not material_package_rate_limiter.hit():
                         delay = format_human_timedelta(material_package_rate_limiter.get_reset_delay())
                         raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
                     invalidate_captcha()
