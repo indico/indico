@@ -16,6 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_default_folder_names
+from indico.modules.core.captcha import WTFCaptchaField
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
@@ -176,6 +177,7 @@ class AttachmentPackageForm(IndicoForm):
                                                DataRequired()],
                                               description=_('Include materials from sessions/contributions scheduled '
                                                             'on the selected dates'))
+    captcha = WTFCaptchaField()
 
 
 class SetUploadPermissionsForm(IndicoForm):

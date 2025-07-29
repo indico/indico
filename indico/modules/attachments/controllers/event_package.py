@@ -20,6 +20,7 @@ from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.tasks import generate_materials_package
+from indico.modules.core.captcha import invalidate_captcha
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -183,6 +184,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         if form.validate_on_submit():
             attachments = [attachment.id for attachment in self._filter_attachments(form.data)]
             if attachments:
+                if not self.management:
+                    invalidate_captcha()
                 task = generate_materials_package.delay(attachments, self.event)
                 return jsonify(task_id=task.id, success=True)
             else:
@@ -196,6 +199,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
+        if self.management:
+            del form.captcha
         form.dates.choices = list(self._iter_event_days())
         filter_types = {
             'all': _('Everything'),
