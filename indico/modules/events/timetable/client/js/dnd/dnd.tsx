@@ -497,11 +497,7 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
     };
   }, [id, fixed, registerDraggable, unregisterDraggable]);
 
-  const transform = (draggableData || {}).transform;
-  const rect = (draggableData || {}).rect;
-  const initialScroll = (draggableData || {}).initialScroll;
-  const mouse = (draggableData || {}).mouse;
-  const offset = (draggableData || {}).initialOffset;
+  const {transform, rect, initialScroll, mouse, offset} = draggableData || {};
 
   return {
     setNodeRef,
