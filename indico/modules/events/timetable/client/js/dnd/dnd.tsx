@@ -461,6 +461,7 @@ export function useDroppableData({id}: {id: string}) {
 export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean}) {
   const ref = useRef<HTMLElement | null>(null);
   const _onMouseDown = useContextSelector(DnDContext, ctx => ctx.onMouseDown);
+  // TODO: draggable couple potentially be undefined, but TS doesn't curently know that
   const draggable = useContextSelector(DnDContext, ctx => ctx.draggables[id]);
   const draggableData = useContextSelector(DnDContext, ctx => ctx.draggableData[id]);
   const registerDraggable = useContextSelector(DnDContext, ctx => ctx.registerDraggable);
