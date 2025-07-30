@@ -175,7 +175,7 @@ export default function ContributionEntry({
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
         <EntryTitle title={title} duration={duration} timeRange={timeRange} type={type} />
-        {type === EntryType.SESSION_BLOCK && (
+        {type === EntryType.SessionBlock && (
           <div
             ref={setDroppableNodeRef}
             style={{
