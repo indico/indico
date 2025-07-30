@@ -15,11 +15,64 @@
                                                user-last-name="{{ user.last_name }}">
                         </ind-user-block-button>
                         {% if allow_deletion %}
-                            <ind-user-delete-button user-id="{{ (user.id if user != session.user else none) | tojson }}"
-                                                    user-is-admin="{{ user.is_admin | tojson }}"
-                                                    user-first-name="{{ user.first_name }}"
-                                                    user-last-name="{{ user.last_name }}">
-                            </ind-user-delete-button>
+                            {% set is_same_user = user == session.user %}
+                            {% if user.is_admin and not is_same_user %}
+                                {% set disabled_message = _('You cannot delete an admin account') %}
+                            {% elif is_same_user %}
+                                {% set disabled_message = _('You cannot delete your own account') %}
+                            {% else %}
+                                {% set dialog_title = _('Delete') + ' {first_name} {last_name}?'.format(first_name=user.first_name, last_name=user.last_name) %}
+                                {% set disabled_message = none %}
+                            {% endif %}
+                            <ind-delete-button dialog-title="{{ dialog_title }}"
+                                               button-label="{% trans %}Delete User{% endtrans %}"
+                                               is-disabled="{{ user.is_admin | tojson }}"
+                                               disabled-message="{{ disabled_message }}"
+                                               message="{% trans %}Deleted user accounts cannot be restored.{% endtrans %}"
+                                               cancel-text="{% trans %}No, I don't{% endtrans %}"
+                                               confirm-text="{% trans %}Yes, I want to delete{% endtrans %} {{ user.first_name }}?"
+                                               record-name="{{ user.first_name }} {{ user.last_name }}"
+                                               delete-url="{{ url_for('users.user_delete', user) }}"
+                                               redirect-url="{{ url_for('users.users_admin') }}">
+                                {% trans %}Once deleted, the following will happen:{% endtrans %}
+                                <div class="vertical-padding-medium">
+                                    <ul class="ui list">
+                                        <li class="item">
+                                            <i class="minus circle icon"></i>
+                                            <div class="content">
+                                                <span>
+                                                    {% trans first_name=user.first_name %}
+                                                        <strong>{{ first_name }}</strong> will no longer be able to access Indico.
+                                                    {% endtrans %}
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="item">
+                                            <i class="times circle outline icon"></i>
+                                            <div class="content">
+                                                <span>
+                                                    {% trans first_name=user.first_name %}
+                                                        <strong>{{ first_name }}</strong> will be removed from all areas of Indico - this does not affect
+                                                        their presence in events as a speaker or other role; they will still be listed in such
+                                                        capacities where applicable.
+                                                    {% endtrans %}
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="item">
+                                            <i class="trash alternate outline icon"></i>
+                                            <div class="content">
+                                                <span>
+                                                    {% trans first_name=user.first_name %}
+                                                        Where it is not possible to delete <strong>{{ first_name }}</strong>, they will be anonymized and
+                                                        all personal data associated with the user will be removed from Indico.
+                                                    {% endtrans %}
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </ind-delete-button>
                         {% endif %}
                     </div>
                 {% endif %}
