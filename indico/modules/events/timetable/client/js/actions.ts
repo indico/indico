@@ -20,6 +20,7 @@ import {
   ContribEntry,
   ChildContribEntry,
 } from './types';
+import { snakifyKeys } from 'indico/utils/case';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -149,13 +150,32 @@ export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryActi
   return {type: MOVE_ENTRY, date, entries};
 }
 
-export function resizeEntry(
-  date: string,
-  id: string,
-  duration: number,
-  parentId?: string
-): ResizeEntryAction {
-  return {type: RESIZE_ENTRY, date, id, duration, parentId};
+export function resizeEntry(entry, eventId, duration, date) {
+  let entryURL: string;
+
+  switch (entry.type) {
+    case 'break':
+      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
+      break;
+    case 'block':
+      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+      break;
+    case 'contrib':
+      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+      break;
+    default:
+      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+  }
+
+  const entryData = {duration: duration * 60};
+
+  return ajaxAction(() => indicoAxios.patch(entryURL, snakifyKeys(entryData)), null, () => ({
+    type: RESIZE_ENTRY,
+    date,
+    id: entry.id,
+    duration,
+    parentId: entry.parentId ?? entry,
+  }));
 }
 
 export function selectEntry(id: string): SelectEntryAction {
