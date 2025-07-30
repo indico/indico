@@ -10,7 +10,8 @@ Version 3.3.8
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add option in the invitation form to lock registrations to the specified email address
+  (:issue:`6803`, :pr:`6972`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
