@@ -501,7 +501,6 @@ function layoutAfterDropOnBlock(
   const toBlock = entries.find(e => e.id === overId);
 
   if (!toBlock || toBlock.type !== EntryType.SessionBlock) {
-    console.log('Cannot drop on block', who);
     return;
   }
 
