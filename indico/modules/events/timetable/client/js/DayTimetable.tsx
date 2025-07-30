@@ -58,16 +58,17 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (duration: number) =>
-        dispatch(actions.resizeEntry(getDateKey(dt), e.id, duration));
+        dispatch(actions.resizeEntry(getDateKey(dt), e.id, duration, dt));
     }
     return obj;
-  }, [entries, dispatch, dt]);
+  }, [entries, dispatch, dt, eventId]);
 
    const setChildDurations = useMemo(() => {
     const obj = {};
+
     for (const e of entries) {
       obj[e.id] = (id: string) => (duration: number) =>
-        dispatch(actions.resizeEntry(getDateKey(dt), id, duration, e.id));
+        dispatch(actions.resizeEntry(getDateKey(dt), id, duration, e.id, dt));
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -356,7 +357,7 @@ export function DayTimetable({
           <DnDCalendar>
             <div ref={calendarRef} style={{background: limitsGradient}}>
               <Lines minHour={minHour} maxHour={maxHour} />
-              <MemoizedTopLevelEntries dt={dt} entries={entries} />
+              <MemoizedTopLevelEntries dt={dt} entries={entries} eventId={eventId} />
               {draftEntry && (
                 <DraggableEntry
                   id="draft"
