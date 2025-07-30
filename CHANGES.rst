@@ -94,6 +94,7 @@ Improvements
   :pr:`6846`, thanks :user:`Moliholy, unconventionaldotdev`)
 - Add a log for global admin actions, similar to that in events, categories and users
   (:pr:`6868`, thanks :user:`tomako`)
+- Add a new column in the editable list for the editable tags (:pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
