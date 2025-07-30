@@ -498,7 +498,7 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
     };
   }, [id, fixed, registerDraggable, unregisterDraggable]);
 
-  const {transform, rect, initialScroll, mouse, offset} = draggableData || {};
+  const {transform, rect, initialScroll, mouse, initialOffset: offset} = draggableData || {};
 
   return {
     setNodeRef,
