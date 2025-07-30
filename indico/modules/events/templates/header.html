@@ -216,8 +216,10 @@
                        data-ajax-dialog></button>
                 {% endif %}
 
-                <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
-                   title="{% trans %}Download material{% endtrans %}"></a>
+                {% if event.can_generate_attachment_package(session.user) %}
+                    <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
+                       title="{% trans %}Download material{% endtrans %}"></a>
+                {% endif %}
 
                 {{ _render_theme_selector() }}
                 {% if session.user %}

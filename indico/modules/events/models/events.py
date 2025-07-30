@@ -748,6 +748,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check whether the user can display the event in the category."""
         return self.visibility != 0 or self.can_manage(user, allow_admin=allow_admin)
 
+    def can_generate_attachment_package(self, user):
+        """Check whether the user can generate an attachment package."""
+        from indico.modules.attachments.util import can_generate_attachment_package
+        return can_generate_attachment_package(self, user)
+
     @materialize_iterable()
     def get_manage_button_options(self, *, note_may_exist=False):
         if self.is_locked:

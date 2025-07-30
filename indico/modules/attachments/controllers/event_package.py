@@ -5,32 +5,44 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
 import os
 
 from celery.exceptions import TimeoutError
 from flask import flash, jsonify, request, session
 from markupsafe import escape
 from sqlalchemy import Date, cast
+from werkzeug.exceptions import Forbidden, TooManyRequests
+from werkzeug.local import LocalProxy
 
 from indico.core.celery import AsyncResult
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.errors import IndicoError
+from indico.core.limiter import make_rate_limiter
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.tasks import generate_materials_package
+from indico.modules.core.captcha import invalidate_captcha
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.util.date_time import format_date, format_time
+from indico.util.date_time import format_date, format_human_timedelta, format_time
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
+
+
+#: A rate limiter for material packages created by regular users (or guests)
+material_package_rate_limiter = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('material-package', config.MATERIAL_PACKAGE_RATE_LIMIT))
+)
 
 
 def _get_start_dt(obj):
@@ -178,11 +190,31 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
     wp = None
     management = False
 
+    def _check_access(self):
+        if not self.event.can_generate_attachment_package(session.user):
+            raise Forbidden
+
+    @property
+    def should_apply_rate_limit(self):
+        return not self.management and not self.event.can_manage(session.user)
+
+    @property
+    def should_show_captcha(self):
+        return self.should_apply_rate_limit and not session.user
+
     def _process(self):
         form = self._prepare_form()
         if form.validate_on_submit():
             attachments = [attachment.id for attachment in self._filter_attachments(form.data)]
             if attachments:
+                if self.should_apply_rate_limit:
+                    # only increment the rate limit if the user is not a manager, so we don't annoy event managers
+                    # who use the button in the display view for some reason, instead of doing it via the management
+                    # area...
+                    if not material_package_rate_limiter.hit():
+                        delay = format_human_timedelta(material_package_rate_limiter.get_reset_delay())
+                        raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
+                    invalidate_captcha()
                 task = generate_materials_package.delay(attachments, self.event)
                 return jsonify(task_id=task.id, success=True)
             else:
@@ -196,6 +228,8 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
+        if not self.should_show_captcha:
+            del form.captcha
         form.dates.choices = list(self._iter_event_days())
         filter_types = {
             'all': _('Everything'),

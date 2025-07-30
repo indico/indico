@@ -83,6 +83,19 @@ def can_manage_attachments(obj, user, allow_admin=True):
     return False
 
 
+def can_generate_attachment_package(event, user):
+    """Check if the user can generate a material package."""
+    from indico.modules.attachments.settings import AttachmentPackageAccess, attachments_settings
+    mode = attachments_settings.get(event, 'generate_package')
+    match mode:
+        case AttachmentPackageAccess.everyone:
+            return True
+        case AttachmentPackageAccess.logged_in:
+            return user is not None
+        case AttachmentPackageAccess.managers:
+            return event.can_manage(user)
+
+
 def get_default_folder_names():
     return [
         'Agenda',

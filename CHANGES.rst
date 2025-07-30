@@ -10,7 +10,8 @@ Version 3.3.8
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add a CAPTCHA and rate limiting to the material package endpoint, and an event
+  setting to restrict who can generate one (defaults to managers only) (:pr:`6996`)
 
 Bugfixes
 ^^^^^^^^

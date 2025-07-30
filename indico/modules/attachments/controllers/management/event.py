@@ -14,7 +14,7 @@ from indico.modules.attachments.controllers.management.base import (AddAttachmen
                                                                     DeleteAttachmentMixin, DeleteFolderMixin,
                                                                     EditAttachmentMixin, EditFolderMixin,
                                                                     ManageAttachmentsMixin)
-from indico.modules.attachments.forms import SetUploadPermissionsForm
+from indico.modules.attachments.forms import EventAttachmentPermissionsForm
 from indico.modules.attachments.settings import attachments_settings
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
@@ -101,11 +101,16 @@ class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHManageEventB
     management = True
     ALLOW_LOCKED = True
 
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        AttachmentPackageMixin._check_access(self)
 
-class RHSetUploadPermissions(EditEventSettingsMixin, RHManageEventBase):
+
+class RHEventAttachmentPermissions(EditEventSettingsMixin, RHManageEventBase):
     settings_proxy = attachments_settings
-    form_cls = SetUploadPermissionsForm
+    form_cls = EventAttachmentPermissionsForm
     success_message = _('Upload permissions changed successfully')
-    log_module = 'Attachments'
-    log_message = 'Upload settings updated'
-    log_fields = {'managers_only': 'Managers only'}
+    log_module = 'Materials'
+    log_message = 'Settings updated'
+    log_fields = {'managers_only': 'Managers only',
+                  'generate_package': 'Permissions'}
