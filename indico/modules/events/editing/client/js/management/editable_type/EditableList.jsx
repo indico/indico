@@ -455,7 +455,6 @@ function EditableListDisplay({
   };
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
-    console.log(tags);
     const labelTags = (
       <div style={{display: 'flex', flexWrap: 'nowrap'}}>
         {tags.map(t => (
