@@ -194,16 +194,24 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         if not self.event.can_generate_attachment_package(session.user):
             raise Forbidden
 
+    @property
+    def should_apply_rate_limit(self):
+        return not self.management and not self.event.can_manage(session.user)
+
+    @property
+    def should_show_captcha(self):
+        return self.should_apply_rate_limit and not session.user
+
     def _process(self):
         form = self._prepare_form()
         if form.validate_on_submit():
             attachments = [attachment.id for attachment in self._filter_attachments(form.data)]
             if attachments:
-                if not self.management:
+                if self.should_apply_rate_limit:
                     # only increment the rate limit if the user is not a manager, so we don't annoy event managers
                     # who use the button in the display view for some reason, instead of doing it via the management
                     # area...
-                    if not self.event.can_manage(session.user) and not material_package_rate_limiter.hit():
+                    if not material_package_rate_limiter.hit():
                         delay = format_human_timedelta(material_package_rate_limiter.get_reset_delay())
                         raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
                     invalidate_captcha()
@@ -220,7 +228,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
-        if self.management:
+        if not self.should_show_captcha:
             del form.captcha
         form.dates.choices = list(self._iter_event_days())
         filter_types = {
