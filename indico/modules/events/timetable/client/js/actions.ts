@@ -147,11 +147,7 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
-  return {type: MOVE_ENTRY, date, entries};
-}
-
-export function dnDEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
+export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
   let entryURL: string;
 
   switch (entry.type) {
@@ -173,8 +169,7 @@ export function dnDEntry(entry, eventId, entries: TopLevelEntry[], date: string)
   if (entry.type === 'contrib' || entry.type === undefined) {
     entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
   } else {
-    const {startDt} = entry;
-    entryData = {start_dt: startDt};
+    entryData = {start_dt: entry.startDt};
   }
 
   return ajaxAction(() => indicoAxios.patch(entryURL, snakifyKeys(entryData)), null, () => ({

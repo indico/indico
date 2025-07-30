@@ -188,7 +188,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
     const movedEntry = newLayout.find(e => e.id === who);
     if (movedEntry) {
-      dispatch(actions.dnDEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+      dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
     }
   }
 
@@ -217,7 +217,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     if (movedEntry) {
-      dispatch(actions.dnDEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+      dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
     }
   }
 
