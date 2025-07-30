@@ -486,3 +486,8 @@ def get_display_tz(obj=None):
         # Avoid failing in a rather ugly way (unformatted error page) when a user has an invalid timezone
         Logger.get('date_time').warning('Invalid timezone: %s (obj=%r, session_tz=%s)', display_tz, obj, session_tz)
         return pytz.timezone(config.DEFAULT_TIMEZONE)
+
+
+def convert_py_weekdays_to_js(py_weekdays):
+    """Convert Python weekdays (0=Mon, 6=Sun) to JavaScript (0=Sun, 6=Sat)."""
+    return [(d + 1) % 7 for d in py_weekdays]

@@ -30,7 +30,7 @@ window.setupDateTimeWidget = function setupDateTimeWidget(options) {
         notBefore: false,
         notAfter: false,
       },
-      weekendDisabled: false,
+      disabledDays: null,
       disabledDates: null
     },
     options
@@ -55,7 +55,7 @@ window.setupDateTimeWidget = function setupDateTimeWidget(options) {
       latest={options.latest}
       defaultTime={options.defaultTime}
       linkedField={options.linkedField}
-      weekendDisabled={options.weekendDisabled}
+      disabledDays={options.disabledDays}
       disabledDates={options.disabledDates}
     />,
     document.getElementById(options.fieldId)

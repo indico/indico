@@ -19,7 +19,7 @@ from wtforms_dateutil import DateField, DateTimeField
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.util.date_time import localize_as_utc, relativedelta
+from indico.util.date_time import convert_py_weekdays_to_js, localize_as_utc, relativedelta
 from indico.util.i18n import _, get_current_locale, pgettext
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
@@ -203,13 +203,23 @@ class IndicoDurationField(Field):
 class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, allow_clear=None, weekend_disabled=False, disabled_dates=None, **kwargs):
+    def __init__(self, *args, allow_clear=None, disabled_days=None, disabled_dates=None, **kwargs):
         self.allow_clear = allow_clear
-        self.weekend_disabled = weekend_disabled
+        self.disabled_days = disabled_days
         self.disabled_dates = disabled_dates
         super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
+
+    def pre_validate(self, form):
+        if self.data and self.disabled_days and self.data.weekday() in self.disabled_days:
+            raise StopValidation(_('Disabled day selected'))
+        if self.data and self.disabled_dates and self.data in self.disabled_dates:
+            raise StopValidation(_('Disabled date selected'))
+
+    @property
+    def disabled_days_js(self):
+        return convert_py_weekdays_to_js(self.disabled_days) if self.disabled_days else []
 
     @property
     def earliest_date(self):
@@ -250,13 +260,13 @@ class IndicoDateTimeField(DateTimeField):
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True, single_kwargs=True)
 
     def __init__(self, *args, timezone=None, default_time=time(0, 0), allow_clear=None,
-                 weekend_disabled=False, disabled_dates=None, **kwargs):
+                 disabled_days=None, disabled_dates=None, **kwargs):
         self._timezone = timezone
         self.default_time = default_time
         self.date_missing = False
         self.time_missing = False
         self.allow_clear = allow_clear
-        self.weekend_disabled = weekend_disabled
+        self.disabled_days = disabled_days
         self.disabled_dates = disabled_dates
         super().__init__(*args, **kwargs)
         if self.allow_clear is None:
@@ -270,6 +280,10 @@ class IndicoDateTimeField(DateTimeField):
         if self.object_data:
             # Normalize datetime resolution of passed data
             self.object_data = self.object_data.replace(second=0, microsecond=0)
+        if self.data and self.disabled_days and self.data.date().weekday() in self.disabled_days:
+            raise StopValidation(_('Disabled day selected'))
+        if self.data and self.disabled_dates and self.data.date() in self.disabled_dates:
+            raise StopValidation(_('Disabled date selected'))
 
     def process_formdata(self, valuelist):
         if any(valuelist):
@@ -282,6 +296,10 @@ class IndicoDateTimeField(DateTimeField):
         super().process_formdata(valuelist)
         if self.data and not self.data.tzinfo:
             self.data = localize_as_utc(self.data, self.timezone)
+
+    @property
+    def disabled_days_js(self):
+        return convert_py_weekdays_to_js(self.disabled_days) if self.disabled_days else []
 
     @property
     def earliest_dt(self):
