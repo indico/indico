@@ -196,12 +196,9 @@ export function getCurrentDateLocalStorage(eventId: number) {
   return dt ? moment(dt, DATE_KEY_FORMAT) : null;
 }
 
-export function shiftChildrenStartDt(entry: Entry, currentDay: moment.Moment): ChildEntry[] {
-  const deltaStartDt = moment.duration(entry.startDt.diff(currentDay));
-  const newChildren = entry['children'].map(child => ({
+export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number): T[] {
+  return entries.map(child => ({
     ...child,
-    startDt: moment(child.startDt).add(deltaStartDt),
+    startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
-
-  return [...newChildren];
 }
