@@ -11,7 +11,7 @@ import {useEffect, useRef} from 'react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Entry, EntryType, Session} from './types';
+import {Entry, EntryType, Session, ChildEntry} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -194,4 +194,14 @@ export function getCurrentDateLocalStorage(eventId: number) {
   const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
   const dt = (manageTimetableData[eventId] || {}).currentDtKey;
   return dt ? moment(dt, DATE_KEY_FORMAT) : null;
+}
+
+export function shiftChildrenStartDt(entry: Entry, currentDay: moment.Moment): ChildEntry[] {
+  const deltaStartDt = moment.duration(entry.startDt.diff(currentDay));
+  const newChildren = entry['children'].map(child => ({
+    ...child,
+    startDt: moment(child.startDt).add(deltaStartDt),
+  }));
+
+  return [...newChildren];
 }

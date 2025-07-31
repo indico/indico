@@ -32,7 +32,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {Entry, EntryType, Session} from './types';
-import {mapTTDataToEntry} from './utils';
+import {mapTTDataToEntry, shiftChildrenStartDt} from './utils';
 
 // Generic models
 
@@ -292,12 +292,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     resEntry['children'] = [...(entry.children || [])];
 
-    if (!moment(resEntry.startDt).isSame(entry.startDt)) {
-      const deltaStartDt = moment.duration(resEntry.startDt.diff(entry.startDt));
-      resEntry['children'].forEach(child => {
-        child.startDt = moment(child.startDt).add(deltaStartDt);
-      });
-    }
+    resEntry['children'] = shiftChildrenStartDt(resEntry, entry.startDt);
+
     if (isEditing) {
       dispatch(actions.updateEntry(activeType, resEntry));
     } else {
