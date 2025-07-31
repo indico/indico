@@ -115,19 +115,25 @@ export default {
           entry: {startDt},
         } = action;
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const currentDayKey = Object.keys(newEntries).find(key =>
+          newEntries[key].some(e => e.id === entry.id && entry.type === entryType)
+        );
+        let dayEntries = newEntries[currentDayKey];
+        const newDayKey = moment(startDt).format('YYYYMMDD');
 
-        const dayKey = moment(startDt).format('YYYYMMDD');
-        const dayEntries = newEntries[dayKey];
-
-        const editedIndex = dayEntries.findIndex(e => {
-          return e.id === entry.id && e.type === entryType;
-        });
-
-        newEntries[dayKey][editedIndex] = entry;
-
+        if (currentDayKey !== newDayKey) {
+          newEntries[newDayKey].push(entry);
+          const newDayEntries = newEntries[newDayKey];
+          dayEntries = dayEntries.filter(e => e.id !== entry.id);
+          newEntries[newDayKey] = layout([...newDayEntries]);
+        } else {
+          const editedIndex = dayEntries.findIndex(e => {
+            return e.id === entry.id && e.type === entryType;
+          });
+          newEntries[newDayKey][editedIndex] = entry;
+        }
         // TODO: (Ajob) make sure to edit entry first
-        newEntries[dayKey] = layout([...dayEntries]);
-
+        newEntries[currentDayKey] = layout([...dayEntries]);
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
