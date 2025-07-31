@@ -8,6 +8,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+import {camelizeKeys} from 'indico/utils/case';
+
 import {
   Attachments,
   ChildEntry,
@@ -195,16 +197,41 @@ export function preprocessTimetableEntries(
 
   return {
     dayEntries,
-    unscheduled: (eventInfo.contributions || []).map(
-      ({id, objId, sessionId, title, description, duration}) => ({
-        type: EntryType.Contribution,
-        id,
-        objId,
-        sessionId,
-        title,
-        description,
-        duration,
-      })
-    ),
+    unscheduled: (eventInfo.contributions || [])
+      .map(c => camelizeKeys(c))
+      .map(
+        ({
+          id,
+          objId,
+          sessionId,
+          title,
+          description,
+          duration,
+          personLinks,
+          boardNumber,
+          code,
+          address,
+          room,
+          venueName,
+          attachments,
+        }) => ({
+          type: EntryType.Contribution,
+          id,
+          objId,
+          sessionId,
+          title,
+          description,
+          duration,
+          personLinks,
+          boardNumber,
+          code,
+          locationData: {
+            address,
+            room,
+            venueName,
+          },
+          attachments,
+        })
+      ),
   };
 }
