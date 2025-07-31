@@ -19,6 +19,8 @@ Bugfixes
 - Fix missing spacing between toolbar button groups (:pr:`6981`)
 - Fix error with certain registration form field types if the badge text overflow
   behavior was set to "resize" (:pr:`6993`)
+- Fix not being able to update a registration if an accommocation field was added
+  after registering and the user already paid for the registration (:pr:`7000`)
 
 Accessibility
 ^^^^^^^^^^^^^

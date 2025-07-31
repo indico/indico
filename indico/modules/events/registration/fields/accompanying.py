@@ -84,6 +84,10 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
         return max(count, 0)
 
     def calculate_price(self, reg_data, versioned_data):
+        if not reg_data:
+            # this gets called when getting the old price during an update, but when the field was
+            # added after the registration was created, there is no reg data yet.
+            return 0
         return Decimal(str(versioned_data.get('price', 0))) * len(reg_data)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
