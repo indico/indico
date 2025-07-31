@@ -11,7 +11,7 @@ import {useEffect, useRef} from 'react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Entry, EntryType, Session, ChildEntry} from './types';
+import {Entry, EntryType, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
