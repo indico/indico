@@ -10,7 +10,7 @@ import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {Entry, EntryType, Session, TopLevelEntry, ChildEntry} from './types';
+import {Entry, EntryType, Session, TopLevelEntry} from './types';
 
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
