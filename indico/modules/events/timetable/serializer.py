@@ -18,6 +18,52 @@ from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 
 
+def _get_location_data(obj, *, management=False):
+    data = {}
+    data['location'] = obj.venue_name
+    data['room'] = obj.room_name
+    data['inheritLoc'] = obj.inherit_location
+    data['inheritRoom'] = obj.inherit_location
+    if management:
+        data['address'] = obj.address
+    return data
+
+
+def _get_person_link_roles(person_link):
+    roles = []
+
+    if author_type := getattr(person_link, 'author_type', False):
+        roles.append('primary' if author_type == AuthorType.primary else 'secondary')
+    if getattr(person_link, 'is_speaker', False):
+        roles.append('speaker')
+    if getattr(person_link, 'is_submitter', False):
+        roles.append('submitter')
+    return roles
+
+
+def _get_person_data(person_link, *, can_manage_event=False):
+    person = person_link.person
+
+    data = {'firstName': person_link.first_name,
+            'familyName': person_link.last_name,
+            'affiliation': person_link.affiliation,
+            'emailHash': md5(person.email.encode()).hexdigest() if person.email else None,
+            'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
+                                              abbrev_first_name=False, show_title=person.event.show_titles),
+            'displayOrderKey': person_link.display_order_key}
+    if person.user:
+        data['avatarURL'] = person.user.avatar_url
+
+    if can_manage_event:
+        data['email'] = person.email
+
+    # TODO: (Ajob) Replace with proper schemas later
+    if roles := _get_person_link_roles(person_link):
+        data['roles'] = roles
+
+    return data
+
+
 class TimetableSerializer:
     def __init__(self, event, management=False, user=None, api=False):
         self.management = management
@@ -167,17 +213,6 @@ class TimetableSerializer:
                      'title': break_.title})
         return data
 
-    def _get_person_link_roles(self, person_link):
-        roles = []
-
-        if author_type := getattr(person_link, 'author_type', False):
-            roles.append('primary' if author_type == AuthorType.primary else 'secondary')
-        if getattr(person_link, 'is_speaker', False):
-            roles.append('speaker')
-        if getattr(person_link, 'is_submitter', False):
-            roles.append('submitter')
-        return roles
-
     def _get_attachment_data(self, obj):
         def serialize_attachment(attachment):
             return {'id': attachment.id,
@@ -236,36 +271,10 @@ class TimetableSerializer:
                 'tz': str(tzinfo)}
 
     def _get_location_data(self, obj):
-        data = {}
-        data['location'] = obj.venue_name
-        data['room'] = obj.room_name
-        data['inheritLoc'] = obj.inherit_location
-        data['inheritRoom'] = obj.inherit_location
-        if self.management:
-            data['address'] = obj.address
-        return data
+        return _get_location_data(obj, management=self.management)
 
     def _get_person_data(self, person_link):
-        person = person_link.person
-
-        data = {'firstName': person_link.first_name,
-                'familyName': person_link.last_name,
-                'affiliation': person_link.affiliation,
-                'emailHash': md5(person.email.encode()).hexdigest() if person.email else None,
-                'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
-                                                  abbrev_first_name=False, show_title=person.event.show_titles),
-                'displayOrderKey': person_link.display_order_key}
-        if person.user:
-            data['avatarURL'] = person.user.avatar_url
-
-        if self.can_manage_event:
-            data['email'] = person.email
-
-        # TODO: (Ajob) Replace with proper schemas later
-        if roles := self._get_person_link_roles(person_link):
-            data['roles'] = roles
-
-        return data
+        return _get_person_data(person_link, can_manage_event=self.can_manage_event)
 
 
 def serialize_contribution(contribution):
@@ -300,7 +309,7 @@ def get_unique_key(entry):
 
 # TODO: This is only temporary to get unscheduled contributions working
 # before we rewrite the timetable serializer
-def serialize_unscheduled_contribution(contribution):
+def serialize_unscheduled_contribution(contribution, *, management=False, can_manage_event=False):
     data = {
         'id': f'c{contribution.id}',
         'objId': contribution.id
@@ -317,6 +326,8 @@ def serialize_unscheduled_contribution(contribution):
                  'duration': contribution.duration_display.seconds / 60,
                  'pdf': url_for('contributions.export_pdf', contribution),
                  'presenters': [],
+                 'personLinks': [_get_person_data(x, can_manage_event=can_manage_event)
+                                 for x in contribution.person_links],
                  'code': contribution.code,
                  'sessionCode': None,
                  'sessionId': contribution.session.id if contribution.session else None,
@@ -327,11 +338,13 @@ def serialize_unscheduled_contribution(contribution):
                  'friendlyId': contribution.friendly_id,
                  'references': [],
                  'board_number': contribution.board_number})
+    data.update(**_get_location_data(contribution, management=management))
     return data
 
 
-def serialize_event_info(event):
+def serialize_event_info(event, *, management=False, user=None):
     from indico.modules.events.contributions import Contribution
+    can_manage_event = event.can_manage(user)
     return {'_type': 'Conference',
             'id': str(event.id),
             'title': event.title,
@@ -339,7 +352,8 @@ def serialize_event_info(event):
             'endDate': event.end_dt_local,
             'isConference': event.type_ == EventType.conference,
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
-            'contributions': [serialize_unscheduled_contribution(c)
+            'contributions': [serialize_unscheduled_contribution(c, management=management,
+                                                                 can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
 
 
