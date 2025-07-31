@@ -48,7 +48,7 @@ class RHManageTimetable(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
     def _process(self):
-        event_info = serialize_event_info_new(self.event)
+        event_info = serialize_event_info_new(self.event, management=True, user=session.user)
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event, management=True).serialize_timetable()
         return WPManageTimetable.render_template(
