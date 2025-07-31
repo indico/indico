@@ -44,24 +44,15 @@ jobs:
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
       - uses: actions/setup-node@v4
         name: Setup Node
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Get uv cache dir
-        id: uv-cache
-        run: echo "dir=$(uv cache dir)" >> $GITHUB_OUTPUT
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.uv-cache.outputs.dir }}
-          key: uv|${{ runner.os }}|3.12|${{ hashFiles('requirements*.txt') }}
       - name: Install build deps 🔧
         run: |
           sudo apt-get install libpq-dev
-          uv pip install --system -U setuptools wheel
           uv pip install --system -e '.[dev]'
       - name: Install npm deps ☕
         run: npm ci

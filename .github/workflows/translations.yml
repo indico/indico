@@ -22,10 +22,8 @@ jobs:
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements.dev.txt
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
       - uses: actions/setup-node@v4
         name: Setup Node
         with:
@@ -33,8 +31,7 @@ jobs:
       - name: Install build deps 🔧
         run: |
           sudo apt-get install libpq-dev
-          pip install --user -U pip setuptools wheel
-          pip install --user -e '.[dev]'
+          uv pip install --system -e '.[dev]'
       - name: Install npm deps ☕
         run: npm ci
       - name: Install Transifex client 📥
