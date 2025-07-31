@@ -137,10 +137,10 @@ export default function DateInput({
     if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
       return Translate.string('The provided date is invalid.');
     }
-    if (minDate && dateTime && dateTime < `${minDate}T00:00:00`) {
+    if (minDate && dateTime && dateTime < minDate) {
       return Translate.string('The provided date cannot be earlier than {minDate}.', {minDate});
     }
-    if (maxDate && dateTime && dateTime > `${maxDate}T00:00:00`) {
+    if (maxDate && dateTime && dateTime > maxDate) {
       return Translate.string('The provided date cannot be later than {maxDate}.', {maxDate});
     }
   };
@@ -307,10 +307,8 @@ export function DateSettings() {
             <FinalDatePicker
               name="minDate"
               label={Translate.string('Minimum date')}
-              max={maxDate.split('T')[0]}
-              parse={date => {
-                return date ? `${date}T00:00:00` : '';
-              }}
+              max={maxDate}
+              parse={date => date}
             />
           )}
         </Field>
@@ -319,10 +317,8 @@ export function DateSettings() {
             <FinalDatePicker
               name="maxDate"
               label={Translate.string('Maximum date')}
-              min={minDate.split('T')[0]}
-              parse={date => {
-                return date ? `${date}T00:00:00` : '';
-              }}
+              min={minDate}
+              parse={date => date}
             />
           )}
         </Field>

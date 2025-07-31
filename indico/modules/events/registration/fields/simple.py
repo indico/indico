@@ -14,6 +14,7 @@ from PIL import Image
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
+from indico.modules.events.registration.fields.choices import _to_date, _to_machine_date
 from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
@@ -181,8 +182,8 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
         '%m.%Y',
         '%Y'
     ]))
-    min_date = fields.DateTime(allow_none=True)
-    max_date = fields.DateTime(allow_none=True)
+    min_date = fields.Date(allow_none=True)
+    max_date = fields.Date(allow_none=True)
 
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max_dates(self, data, **kwargs):
@@ -200,14 +201,6 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
         return data
 
 
-def _to_machine_date_time(date):
-    return date.strftime('%Y-%m-%dT%H:%M:%S')
-
-
-def _to_date_time(date):
-    return datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
-
-
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     mm_field_class = fields.String
@@ -218,13 +211,13 @@ class DateField(RegistrationFormFieldBase):
             if not date_string:
                 return True
             try:
-                dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
-                if self.form_item.data.get('min_date') and dt < _to_date_time(self.form_item.data['min_date']):
+                dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S').date()
+                if self.form_item.data.get('min_date') and dt < _to_date(self.form_item.data['min_date']):
                     raise ValidationError(_('Date must be after {}').format(self.form_item.data['min_date']))
-                if self.form_item.data.get('max_date') and dt > _to_date_time(self.form_item.data['max_date']):
+                if self.form_item.data.get('max_date') and dt > _to_date(self.form_item.data['max_date']):
                     raise ValidationError(_('Date must be before {}').format(self.form_item.data['max_date']))
-            except ValueError:
-                raise ValidationError(_('Invalid date'))
+            except ValueError as e:
+                raise ValidationError(_('Invalid date')) from e
             return True
 
         return _validate_date
@@ -239,17 +232,17 @@ class DateField(RegistrationFormFieldBase):
                 data['time_format'] = '12h'
             elif time_date_formats[1] == '%H:%M':
                 data['time_format'] = '24h'
-        data['min_date'] = unversioned_data.get('min_date').split('T')[0] if unversioned_data.get('min_date') else None
-        data['max_date'] = unversioned_data.get('max_date').split('T')[0] if unversioned_data.get('max_date') else None
+        data['min_date'] = unversioned_data.get('min_date') or None
+        data['max_date'] = unversioned_data.get('max_date') or None
         return data
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super().process_field_data(data, old_data, old_versioned_data)
         if unversioned_data.get('min_date'):
-            unversioned_data['min_date'] = _to_machine_date_time(unversioned_data['min_date'])
+            unversioned_data['min_date'] = _to_machine_date(unversioned_data['min_date'])
         if unversioned_data.get('max_date'):
-            unversioned_data['max_date'] = _to_machine_date_time(unversioned_data['max_date'])
+            unversioned_data['max_date'] = _to_machine_date(unversioned_data['max_date'])
         return unversioned_data, versioned_data
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
