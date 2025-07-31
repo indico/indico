@@ -71,12 +71,12 @@ export interface ScheduledMixin {
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
+  attachments: Attachments;
   sessionId?: number;
 }
 
 export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
   type: EntryType.Contribution;
-  attachments?: Attachments;
   personLinks: PersonLink[];
 }
 
