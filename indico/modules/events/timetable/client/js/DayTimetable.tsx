@@ -172,7 +172,10 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     if (!newLayout) {
       return;
     }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    const movedEntry = newLayout.find(e => e.id === who);
+    if (movedEntry) {
+      dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    }
   }
 
   function handleDropOnBlock(
@@ -186,7 +189,22 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     if (!newLayout) {
       return;
     }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    let movedEntry = newLayout.find(e => e.id === who);
+
+    if (!movedEntry) {
+      for (const block of newLayout) {
+        if (block.children) {
+          movedEntry = block.children.find(child => child.id === who);
+          if (movedEntry) {
+            break;
+          }
+        }
+      }
+    }
+
+    if (movedEntry) {
+      dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    }
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);

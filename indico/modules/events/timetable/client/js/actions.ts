@@ -9,7 +9,10 @@ import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
+import moment from 'moment';
+
 import {indicoAxios} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
 
 import {
@@ -145,8 +148,36 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
-  return {type: MOVE_ENTRY, date, entries};
+export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
+  let entryURL: string;
+
+  switch (entry.type) {
+    case 'break':
+      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
+      break;
+    case 'block':
+      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+      break;
+    case 'contrib':
+      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+      break;
+    default:
+      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+  }
+
+  let entryData;
+
+  if (entry.type === 'contrib' || entry.type === undefined) {
+    entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
+  } else {
+    entryData = {start_dt: entry.startDt};
+  }
+
+  return ajaxAction(() => indicoAxios.patch(entryURL, snakifyKeys(entryData)), null, () => ({
+    type: MOVE_ENTRY,
+    date,
+    entries,
+  }));
 }
 
 export function resizeEntry(
