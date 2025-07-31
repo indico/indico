@@ -150,7 +150,7 @@ def move_timetable_entry(entry: TimetableEntry, parent: TimetableEntry | None = 
     updates = {}
     contrib_update_data = {}
     if day:
-        new_start_dt = entry.start_dt.replace(day=day.day, month=day.month)
+        new_start_dt = entry.start_dt.replace(day=day.day, month=day.month, year=day.year)
         updates['start_dt'] = new_start_dt
         updates['parent'] = None
         contrib_update_data = {'session_block': None, 'session': None}
