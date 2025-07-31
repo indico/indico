@@ -290,11 +290,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     const resEntry = mapTTDataToEntry(resData);
 
-    resEntry.children = entry.children || [];
+    resEntry['children'] = [...(entry.children || [])];
 
     if (!moment(resEntry.startDt).isSame(entry.startDt)) {
       const deltaStartDt = moment.duration(resEntry.startDt.diff(entry.startDt));
-      resEntry.children.forEach(child => {
+      resEntry['children'].forEach(child => {
         child.startDt = moment(child.startDt).add(deltaStartDt);
       });
     }
