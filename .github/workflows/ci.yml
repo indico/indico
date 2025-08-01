@@ -180,7 +180,6 @@ jobs:
 
   test-python:
     name: test-python-${{ matrix.name }}
-    needs: setup
     runs-on: ubuntu-22.04
 
     strategy:
@@ -207,22 +206,8 @@ jobs:
         with:
           python-version: ${{ env[matrix.python_version_var] }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-
-      - name: Download environment
-        uses: actions/download-artifact@v4
-        with:
-          name: environment-${{ matrix.name }}
-          path: /tmp
-
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
 
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
@@ -250,7 +235,6 @@ jobs:
 
   test-python-nodb:
     name: test-python-${{ matrix.name }}-nodb
-    needs: setup
     runs-on: ubuntu-22.04
 
     strategy:
@@ -268,22 +252,8 @@ jobs:
         with:
           python-version: ${{ env[matrix.python_version_var] }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-
-      - name: Download environment
-        uses: actions/download-artifact@v4
-        with:
-          name: environment-${{ matrix.name }}
-          path: /tmp
-
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
 
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
