@@ -410,13 +410,9 @@ def strip_whitespace(s):
 def strip_html_whitespace(content):
     """Remove trailing/leading whitespace in each line of the input content.
 
-    This utility is useful when would like to compare template result.
+    This utility is useful when comparing HTML template result.
     """
-    lines = []
-    for line in content.splitlines():
-        if line := line.strip():
-            lines.append(line)  # noqa: PERF401
-    return '\n'.join(lines)
+    return '\n'.join(stripped for line in content.splitlines() if (stripped := line.strip()))
 
 
 def make_unique_token(is_unique):

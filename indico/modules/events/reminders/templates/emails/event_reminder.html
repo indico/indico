@@ -16,9 +16,9 @@
 
 {% block body -%}
     <p>
-    {%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
-        Please note that the event <a href="{{ url }}">"{{ title }}"{{ label }}</a> will start on {{ start }} ({{ tz }}).
-    {%- endtrans -%}
+        {%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
+            Please note that the event <a href="{{ url }}">"{{ title }}"{{ label }}</a> will start on {{ start }} ({{ tz }}).
+        {%- endtrans -%}
     </p>
     {%- if location or room %}
         <p>{% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}</p>
