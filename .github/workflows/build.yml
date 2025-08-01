@@ -30,6 +30,9 @@ env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '22.x'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build package 📦
