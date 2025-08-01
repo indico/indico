@@ -145,7 +145,7 @@ boa_settings = EventSettingsProxy('abstracts_book', {
     'extra_text': '',
     'extra_text_end': '',
     'sort_by': BOASortField.id,
-    'corresponding_author': BOACorrespondingAuthorType.submitter,
+    'corresponding_author': BOACorrespondingAuthorType.none,
     'show_abstract_ids': False,
     'cache_path': None,
     'cache_path_tex': None,
