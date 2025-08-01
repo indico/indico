@@ -242,7 +242,7 @@ def truncate(text, max_size, ellipsis='...'):
 
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
-    return do_striptags(text)
+    return do_striptags(text or '')
 
 
 def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **kwargs):
@@ -405,6 +405,14 @@ def strip_whitespace(s):
     if isinstance(s, str) and not isinstance(s, Enum):
         s = s.strip()
     return s
+
+
+def strip_html_whitespace(content):
+    """Remove trailing/leading whitespace in each line of the input content.
+
+    This utility is useful when comparing HTML template result.
+    """
+    return '\n'.join(stripped for line in content.splitlines() if (stripped := line.strip()))
 
 
 def make_unique_token(is_unique):
