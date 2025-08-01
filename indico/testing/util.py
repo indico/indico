@@ -188,7 +188,7 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     return found
 
 
-def assert_email_snapshot(snapshot, template, snapshot_filename, html=False):
+def assert_email_snapshot(snapshot, template, snapshot_filename, *, html=False):
     """Assert that an email matches a snapshot.
 
     This verifies that both the subject and the body match the snapshots.
@@ -196,6 +196,7 @@ def assert_email_snapshot(snapshot, template, snapshot_filename, html=False):
     :param snapshot: The pytest snapshot fixture
     :param template: The email template module
     :param snapshot_filename: The filename for the snapshot
+    :param html: Whether the template is HTML
     """
     body = template.get_body()
     if html:

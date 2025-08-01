@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from enum import Enum
-
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -27,12 +25,13 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoIntEnum
 from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
 from indico.web.flask.templating import get_template_module
 
 
-class ReminderType(int, Enum):
+class ReminderType(IndicoIntEnum):
     standard = 1
     custom = 2
 
@@ -202,6 +201,7 @@ class EventReminder(RenderModeMixin, db.Model):
         PyIntEnum(ReminderType),
         nullable=False
     )
+
     #: The user who created the reminder
     creator = db.relationship(
         'User',

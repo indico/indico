@@ -6,5 +6,8 @@
 
 {% block footer_content %}
     <hr>
-    <p><a href="{% block footer_url %}{{ url_for_index(_external=true) }}{% endblock %}">Indico</a> :: {% block footer_title %}{% trans %}Email Notifier{% endtrans %}{% endblock %}</p>
+    <p>
+        <a href="{% block footer_url %}{{ url_for_index(_external=true) }}{% endblock %}">Indico</a>
+        :: {% block footer_title %}{% trans %}Email Notifier{% endtrans %}{% endblock %}
+    </p>
 {% endblock %}

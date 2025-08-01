@@ -4,9 +4,9 @@
         <p>{% trans %}There are no events scheduled.{% endtrans %}</p>
     {%- endif -%}
         <ul>
-        {%- for item in agenda %}
-            {{ render_item(item) }}
-        {%- endfor %}
+            {%- for item in agenda %}
+                {{ render_item(item) }}
+            {%- endfor %}
         </ul>
 {%- endmacro -%}
 
@@ -22,9 +22,9 @@
     <li>
         {{ render_times(entry) }} {{ entry.object.full_title }}
         <ul>
-        {%- for item in entry.children %}
-            {{ render_entry(item) }}
-        {%- endfor -%}
+            {%- for item in entry.children %}
+                {{ render_entry(item) }}
+            {%- endfor -%}
         </ul>
     </li>
 {%- endmacro -%}
