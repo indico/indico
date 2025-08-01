@@ -25,16 +25,12 @@ jobs:
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements.dev.txt
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
       - name: Install build deps 🔧
-        run: |
-          sudo apt-get install libpq-dev
-          pip install --user -U pip setuptools wheel
+        run: sudo apt-get install libpq-dev
       - name: Check version 🔍
-        run: python .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
+        run: uv run --no-sync --isolated --with hatchling .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
       - name: Extract changelog 📜
         run: python .github/utils/extract_changelog.py "${GITHUB_REF#refs/tags/v}" /tmp/changelog.md
       - uses: actions/setup-node@v4
@@ -42,7 +38,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Indico + Python deps 🔧
-        run: pip install --user -e '.[dev]'
+        run: uv pip install --system -e '.[dev]'
       - name: Install npm deps ☕
         run: npm ci
       - name: Build wheel 🏗

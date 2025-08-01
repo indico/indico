@@ -38,13 +38,16 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install uv
+        if: matrix.language == 'python'
+        uses: astral-sh/setup-uv@v6
+
       - name: Install Python dependencies
         if: matrix.language == 'python'
         run: |
           sudo apt-get install libpq-dev
-          pip install -U pip setuptools wheel
-          pip install -r requirements.dev.txt
-          pip install -r requirements.txt
+          uv pip install --system -r requirements.txt
+          uv pip install --system -r requirements.dev.txt
           echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
 
       - name: Initialize CodeQL

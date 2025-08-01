@@ -2,7 +2,7 @@ name: CI
 
 env:
   TZ: Europe/Zurich
-  PYTHON_VERSION_312: '3.12.7'
+  PYTHON_VERSION_312: '3.12.11'
   NODE_VERSION: '22.x'
 
 on:
@@ -17,88 +17,14 @@ on:
       - '*.x'
       - a11y
 
+permissions:
+  contents: read
+
 jobs:
-  setup:
-    name: setup-${{ matrix.name }}
-    runs-on: ubuntu-22.04
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { name: '3.12', python: '3.12', python_version_var: 'PYTHON_VERSION_312' }
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/cache@v4
-        id: cache-npm
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env[matrix.python_version_var] }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install system dependencies
-        run: sudo apt-get install libpq-dev
-
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Create virtualenv
-        run: |
-          uv venv --python ${{ matrix.python }} --seed .venv
-          source .venv/bin/activate
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
-      - name: Get uv cache dir
-        id: uv-cache
-        run: echo "dir=$(uv cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.uv-cache.outputs.dir }}
-          key: uv|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('requirements*.txt') }}
-
-      - name: Install python dependencies
-        run: |
-          uv pip install -r requirements.dev.txt
-          uv pip install -r requirements.txt
-
-      - name: Install node dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - name: Archive environment
-        run: tar cf /tmp/env.tar .venv node_modules
-
-      - name: Upload environment
-        uses: actions/upload-artifact@v4
-        with:
-          name: environment-${{ matrix.name }}
-          retention-days: 1
-          path: /tmp/env.tar
-
-
   lint:
-    needs: setup
     runs-on: ubuntu-22.04
     steps:
-      # BEGIN common steps - edit all occurrences if needed!
+      # BEGIN common steps (Python+Node) - edit all occurrences if needed!
       - uses: actions/checkout@v4
 
       - name: Setup Python
@@ -110,26 +36,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package*.json
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v6
 
-      - name: Download environment
-        uses: actions/download-artifact@v4
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-npm
         with:
-          name: environment-3.12
-          path: /tmp
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+      - name: Install node dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Check import sorting
@@ -221,7 +146,6 @@ jobs:
 
   test-python:
     name: test-python-${{ matrix.name }}
-    needs: setup
     runs-on: ubuntu-22.04
 
     strategy:
@@ -240,7 +164,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
 
     steps:
-      # BEGIN common steps - edit all occurrences if needed!
+      # BEGIN common steps (Python only) - edit all occurrences if needed!
       - uses: actions/checkout@v4
 
       - name: Setup Python
@@ -248,30 +172,11 @@ jobs:
         with:
           python-version: ${{ env[matrix.python_version_var] }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Download environment
-        uses: actions/download-artifact@v4
-        with:
-          name: environment-${{ matrix.name }}
-          path: /tmp
-
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Install redis
@@ -280,7 +185,7 @@ jobs:
       - name: Setup database
         run: |
           sudo apt-get update
-          sudo apt-get install postgresql-client libpq-dev
+          sudo apt-get install postgresql-client
           export PGHOST=localhost
           export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
@@ -296,7 +201,6 @@ jobs:
 
   test-python-nodb:
     name: test-python-${{ matrix.name }}-nodb
-    needs: setup
     runs-on: ubuntu-22.04
 
     strategy:
@@ -306,7 +210,7 @@ jobs:
           - { name: '3.12', python: '3.12', python_version_var: 'PYTHON_VERSION_312' }
 
     steps:
-      # BEGIN common steps - edit all occurrences if needed!
+      # BEGIN common steps (Python only) - edit all occurrences if needed!
       - uses: actions/checkout@v4
 
       - name: Setup Python
@@ -314,30 +218,11 @@ jobs:
         with:
           python-version: ${{ env[matrix.python_version_var] }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Download environment
-        uses: actions/download-artifact@v4
-        with:
-          name: environment-${{ matrix.name }}
-          path: /tmp
-
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Install redis
@@ -349,10 +234,9 @@ jobs:
           pytest --color=yes
 
   test-js:
-    needs: setup
     runs-on: ubuntu-22.04
     steps:
-      # BEGIN common steps - edit all occurrences if needed!
+      # BEGIN common steps (Python+Node) - edit all occurrences if needed!
       - uses: actions/checkout@v4
 
       - name: Setup Python
@@ -364,26 +248,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package*.json
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        uses: astral-sh/setup-uv@v6
 
-      - name: Download environment
-        uses: actions/download-artifact@v4
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-npm
         with:
-          name: environment-3.12
-          path: /tmp
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
-      - name: Restore environment
-        run: tar xf /tmp/env.tar
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
+      - name: Install node dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Run jest tests
