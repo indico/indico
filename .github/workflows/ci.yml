@@ -37,22 +37,11 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env[matrix.python_version_var] }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install system dependencies
-        run: sudo apt-get install libpq-dev
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
 
       - name: Install node dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -245,7 +234,7 @@ jobs:
       - name: Setup database
         run: |
           sudo apt-get update
-          sudo apt-get install postgresql-client libpq-dev
+          sudo apt-get install postgresql-client
           export PGHOST=localhost
           export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
