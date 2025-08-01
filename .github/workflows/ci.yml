@@ -54,27 +54,12 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Create virtualenv
-        run: |
-          uv venv --python ${{ matrix.python }} --seed .venv
-          source .venv/bin/activate
-
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
-      - name: Install python dependencies
-        run: |
-          uv pip install -r requirements.dev.txt
-          uv pip install -r requirements.txt
-
       - name: Install node dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Archive environment
-        run: tar cf /tmp/env.tar .venv node_modules
+        run: tar cf /tmp/env.tar node_modules
 
       - name: Upload environment
         uses: actions/upload-artifact@v4
@@ -113,13 +98,8 @@ jobs:
       - name: Restore environment
         run: tar xf /tmp/env.tar
 
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Check import sorting
@@ -255,13 +235,8 @@ jobs:
       - name: Restore environment
         run: tar xf /tmp/env.tar
 
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Install redis
@@ -321,13 +296,8 @@ jobs:
       - name: Restore environment
         run: tar xf /tmp/env.tar
 
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Install redis
@@ -367,13 +337,8 @@ jobs:
       - name: Restore environment
         run: tar xf /tmp/env.tar
 
-      - name: Activate virtualenv for later steps
-        run: |
-          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
-          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-
       - name: Install Indico
-        run: uv pip install -e .
+        run: uv pip install --system -e '.[dev]'
       # END common steps
 
       - name: Run jest tests
