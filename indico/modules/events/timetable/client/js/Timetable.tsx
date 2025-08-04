@@ -26,6 +26,7 @@ export default function Timetable() {
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  const isExpanded = useSelector(selectors.getIsExpanded);
 
   const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
@@ -61,7 +62,7 @@ export default function Timetable() {
       );
 
   return (
-    <div styleName="timetable">
+    <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
       {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}

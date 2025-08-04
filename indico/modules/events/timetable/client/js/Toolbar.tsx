@@ -8,7 +8,7 @@
 import {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -58,8 +58,9 @@ export default function Toolbar({
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const currentDayIdx = date.diff(eventStart, 'days');
+  const isExpanded = useSelector(selectors.getIsExpanded);
 
-  const getDateFromIdx = idx => eventStart.clone().add(idx, 'days');
+  const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
     if (mouseDown && e.buttons !== 1) {
@@ -76,7 +77,6 @@ export default function Toolbar({
   };
 
   const navigateToDayNumber = (num: number) => _ => {
-    console.log('the offset', offset);
     onNavigate(getDateFromIdx(num));
     dispatch(actions.scrollNavbar(num));
   };
@@ -92,7 +92,7 @@ export default function Toolbar({
           onDismiss={() => dispatch(actions.dismissError())}
         />
       )}
-      <Menu tabular ref={daysBarRef}>
+      <Menu compact secondary styleName="actions-bar">
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
           disabled={!showUnscheduled && numUnscheduled === 0}
@@ -129,50 +129,6 @@ export default function Toolbar({
           disabled={!canRedo}
           title={Translate.string('Redo change')}
           icon="redo"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={navigateToDayNumber(0)}
-          disabled={offset === 0}
-          title={Translate.string('Go to start')}
-          icon="angle double left"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={navigateToDayNumber(Math.max(offset - 1, 0))}
-          disabled={offset === 0}
-          title={Translate.string('Scroll left')}
-          icon="angle left"
-          styleName="action"
-        />
-        <Menu.Item fitted styleName="days">
-          <div styleName="gradient" />
-          {[...Array(numDays).keys()].map(n => {
-            const d = getDateFromIdx(n + offset);
-            return (
-              <Menu.Item
-                key={n}
-                content={d.format('ddd DD/MM')}
-                onClick={() => onNavigate(d)}
-                active={n + offset === currentDayIdx}
-              />
-            );
-          })}
-          <div styleName="gradient" />
-        </Menu.Item>
-        <Menu.Item
-          onClick={navigateToDayNumber(Math.min(offset + 1, numDays))}
-          disabled={offset >= numDays}
-          title={Translate.string('Scroll right')}
-          icon="angle right"
-          position="right"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={navigateToDayNumber(numDays)}
-          disabled={numDays - offset <= numDays}
-          title={Translate.string('Go to end')}
-          icon="angle double right"
           styleName="action"
         />
         <Dropdown
@@ -213,7 +169,71 @@ export default function Toolbar({
           title={Translate.string('Add new')}
           item
         />
+        <Menu.Item
+          onClick={() => dispatch(actions.toggleExpand())}
+          title={isExpanded ? Translate.string('Compress') : Translate.string('Expand')}
+          icon={isExpanded ? 'compress' : 'expand'}
+          styleName="action"
+        />
+        {/* <Menu.Item>
+          <Button color="orange" circular compact>
+            <Translate>Publish Contributions (WIP)</Translate>
+          </Button>
+        </Menu.Item> */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
+      </Menu>
+      <Menu tabular ref={daysBarRef} styleName="timetable-bar">
+        <Menu.Item
+          onClick={navigateToDayNumber(0)}
+          disabled={offset === 0}
+          title={Translate.string('Go to start')}
+          icon="angle double left"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={navigateToDayNumber(Math.max(offset - 1, 0))}
+          disabled={offset === 0}
+          title={Translate.string('Scroll left')}
+          icon="angle left"
+          styleName="action"
+        />
+        <Menu.Item fitted styleName="days">
+          <div styleName="gradient" />
+          {[...Array(numDays).keys()].map((n, i) => {
+            const d = getDateFromIdx(n + offset);
+            const isActive = n + offset === currentDayIdx;
+            const showMonth = i === 0 || d.date() === 1;
+            return (
+              <Menu.Item
+                fitted="horizontally"
+                key={n}
+                onClick={() => onNavigate(d)}
+                styleName="day"
+                active={isActive}
+              >
+                <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>{d.format('MMM')}</span>
+                <span styleName="day-number">{d.format('DD')}</span>
+                <span styleName="day-name">{d.format('ddd')}</span>
+              </Menu.Item>
+            );
+          })}
+          <div styleName="gradient" />
+        </Menu.Item>
+        <Menu.Item
+          onClick={navigateToDayNumber(Math.min(offset + 1, numDays))}
+          disabled={offset >= numDays}
+          title={Translate.string('Scroll right')}
+          icon="angle right"
+          position="right"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={navigateToDayNumber(numDays)}
+          disabled={numDays - offset <= numDays}
+          title={Translate.string('Go to end')}
+          icon="angle double right"
+          styleName="action"
+        />
       </Menu>
     </div>
   );
