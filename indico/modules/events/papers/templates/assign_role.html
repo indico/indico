@@ -11,7 +11,8 @@
                         <thead>
                             <tr class="i-table">
                                 <th class="i-table thin-column" data-sorter="false"></th>
-                                <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
+                                {# i18n: Full name of the person #}
+                                <th class="i-table name-column">{{ pgettext('Person', 'Name') }}</th>
                                 <th class="i-table competencies-column">{% trans %}Competences{% endtrans %}</th>
                             </tr>
                         </thead>
