@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
 from contextlib import contextmanager
 from datetime import timedelta
 from email.utils import formataddr
@@ -130,7 +131,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         primary_key=True
     )
     #: If the event has been deleted
-    is_deleted = db.Column(
+    is_deleted: t.Any = db.Column(
         db.Boolean,
         nullable=False,
         default=False
