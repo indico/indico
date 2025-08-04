@@ -12,13 +12,11 @@ ${imports + '\n' if imports else ""}
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 % endif
 
-
 # revision identifiers, used by Alembic.
 revision = ${repr(up_revision)}
 down_revision = ${repr(down_revision)}
 branch_labels = ${repr(branch_labels)}
 depends_on = ${repr(depends_on)}
-
 
 ${('\n' + '\n\n\n'.join(x.strip() for x in toplevel_code) + '\n\n') if toplevel_code else ''}
 def upgrade():
