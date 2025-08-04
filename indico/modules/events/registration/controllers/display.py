@@ -585,9 +585,13 @@ class RHRegistrationAvatar(RHDisplayEventBase):
                                      ~Registration.is_deleted,
                                      ~RegistrationForm.is_deleted)
                              .join(Registration.registration_form)
-                             .options(load_only('id', 'registration_form_id', 'first_name', 'last_name'),
+                             .options(load_only('id', 'registration_form_id', 'is_deleted', 'first_name', 'last_name',
+                                                'state', 'participant_hidden', 'consent_to_publish'),
                                       lazyload('*'),
-                                      joinedload('registration_form').load_only('id', 'event_id'),
+                                      joinedload('registration_form').load_only('id', 'event_id', 'is_deleted',
+                                                                                'publish_registrations_duration',
+                                                                                'publish_registrations_public',
+                                                                                'publish_registrations_participants'),
                                       joinedload('user').load_only('id', 'first_name', 'last_name', 'title',
                                                                    'picture_source', 'picture_metadata', 'picture'))
                              .one())

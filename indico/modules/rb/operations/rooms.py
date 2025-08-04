@@ -9,7 +9,7 @@ from datetime import date, datetime, time
 
 from dateutil.relativedelta import relativedelta
 from flask import session
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload, load_only, selectinload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -67,8 +67,9 @@ def _query_managed_rooms(user, *, permission=None, explicit=False):
 def _query_all_rooms_for_acl_check():
     return (Room.query
             .filter(~Room.is_deleted)
-            .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
+            .options(load_only('id', 'location_id', 'protection_mode', 'reservations_need_confirmation'),
                      joinedload('owner').load_only('id'),
+                     selectinload('location').joinedload('acl_entries'),
                      joinedload('acl_entries')))
 
 
