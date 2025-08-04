@@ -32,11 +32,13 @@ main.main {
 
         & > div.layout-side-menu {
           min-height: unset;
+          background: transparent !important;
+          // Necessary to make margin-top: -60px predictable for timetable container
+          height: 60px;
         }
 
         & > div.layout-side-menu:last-child {
           flex-grow: 1;
-          overflow: hidden;
 
           & > div.content-column {
             height: 100%;
@@ -55,6 +57,8 @@ main.main {
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
+                // Not exactly -60px because side button also has 5px margin
+                margin-top: -55px;
 
                 & > #timetable-container {
                   height: 100%;

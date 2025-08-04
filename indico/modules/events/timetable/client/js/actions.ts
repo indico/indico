@@ -42,6 +42,7 @@ export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
 export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
+export const EXPAND_TIMETABLE = 'Expand Timetable';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
@@ -148,6 +149,10 @@ export function setDraftEntry(data): SetDraftEntryAction {
 
 export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
   return {type: MOVE_ENTRY, date, entries};
+}
+
+export function toggleExpand() {
+  return {type: EXPAND_TIMETABLE};
 }
 
 export function resizeEntry(

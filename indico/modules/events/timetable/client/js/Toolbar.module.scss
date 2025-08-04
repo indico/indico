@@ -7,6 +7,8 @@
 
 @use 'base/palette' as *;
 
+$highlight-color: #2e59d1ce;
+
 .toolbar {
   position: sticky;
   top: 0;
@@ -22,37 +24,110 @@
     display: flex;
     align-items: center;
 
-    .days {
-      position: relative;
-      flex-shrink: 1;
-      width: 100%;
-      overflow-x: auto;
-      height: 46px;
-      overflow-y: hidden;
-      box-sizing: content-box;
+    &.actions-bar {
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 1%;
+    }
 
-      // This padding in combination with fixed height
-      // and overflow-y hidden above,it hides the scrollbar
-      padding: 18px 0;
+    &.timetable-bar {
+      height: 100px;
 
-      .gradient {
-        pointer-events: none;
-        width: 10px;
-        height: 100%;
-        top: 0;
-        bottom: 0;
-        flex-shrink: 0;
-        position: sticky;
-        z-index: 1;
+      .days {
+        position: relative;
+        flex-shrink: 1;
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        box-sizing: content-box;
+        display: flex;
+        // gap: 40px;
 
-        &:first-child {
-          background: linear-gradient(90deg, white, transparent);
-          left: 0;
+        // This padding in combination with fixed height
+        // and overflow-y hidden above,it hides the scrollbar
+        padding: 18px;
+
+        .day {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          align-content: center;
+          border: 0;
+          font-weight: normal;
+          margin-bottom: 0;
+
+          &:not(:last-of-type) {
+            margin-right: 20px;
+          }
+
+          &:global(.active) {
+            .day-number {
+              color: white;
+              background-color: $highlight-color;
+            }
+          }
+
+          &:global(:not(.active)) {
+            &:hover {
+              > .day-number {
+                background-color: rgba(0, 0, 0, 0.1);
+              }
+            }
+          }
+
+          > .day-month {
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            background-color: rgba($highlight-color, 0.5);
+            border-radius: 3px;
+            padding: 2px 8px;
+            margin-bottom: 5px;
+
+            &.hidden {
+              visibility: hidden;
+            }
+          }
+
+          > .day-name {
+            color: #555;
+          }
+
+          > .day-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: 0.1s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 100%;
+          }
         }
 
-        &:last-child {
-          background: linear-gradient(-90deg, white, transparent);
-          right: 0;
+        .gradient {
+          pointer-events: none;
+          width: 15px;
+          height: 100%;
+          top: 0;
+          bottom: 0;
+          flex-shrink: 0;
+          position: sticky;
+          z-index: 1;
+
+          &:first-child {
+            background: linear-gradient(90deg, white, transparent);
+            left: 0;
+          }
+
+          &:last-child {
+            background: linear-gradient(-90deg, white, transparent);
+            right: 0;
+          }
         }
       }
     }
