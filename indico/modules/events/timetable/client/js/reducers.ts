@@ -10,13 +10,7 @@ import moment from 'moment';
 
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
-import {
-  scheduleContribs,
-  resizeWindow,
-  changeSessionColor,
-  changeBreakColor,
-  dropUnscheduledContribs,
-} from './operations';
+import {resizeWindow, changeSessionColor, changeBreakColor} from './operations';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {DayEntries} from './types';
 
@@ -303,14 +297,6 @@ export default {
           ],
         };
       }
-      case actions.DRAG_UNSCHEDULED_CONTRIBS:
-        return {...state, draggedIds: action.contribIds};
-      case actions.DROP_UNSCHEDULED_CONTRIBS:
-        return {
-          ...state,
-          ...dropUnscheduledContribs(state, action.contribs, action.args),
-          draggedIds: new Set(),
-        };
       case actions.SCHEDULE_ENTRY: {
         const date = action.date;
         const newEntries = Object.fromEntries(
@@ -387,35 +373,6 @@ export default {
             ],
           };
         }
-      }
-      case actions.SCHEDULE_CONTRIBS: {
-        const [entries, unscheduled] = scheduleContribs(
-          state,
-          action.contribs,
-          action.gap,
-          action.startDt,
-          action.dt
-        );
-        const date = action.startDt.format('YYYYMMDD');
-        const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
-            day,
-            day === date ? entries : dayEntries,
-          ])
-        );
-        return {
-          ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'schedule',
-              unscheduled,
-            },
-          ],
-          draggedIds: new Set(),
-        };
       }
       case actions.CHANGE_COLOR:
         return action.sessionId ? state : {...state, ...changeBreakColor(state, action.color)};
