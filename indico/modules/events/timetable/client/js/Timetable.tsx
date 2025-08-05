@@ -64,7 +64,7 @@ export default function Timetable() {
 
   useEffect(() => {
     setCurrentDateLocalStorage(date, eventId);
-  }, [date, eventId]);
+  }, [date]);
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
