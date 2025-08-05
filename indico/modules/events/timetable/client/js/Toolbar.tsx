@@ -57,8 +57,8 @@ export default function Toolbar({
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const currentDayIdx = date.diff(eventStart, 'days');
   const isExpanded = useSelector(selectors.getIsExpanded);
+  const currentDayIdx = date.date() - eventStart.date();
 
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
@@ -212,7 +212,7 @@ export default function Toolbar({
                 active={isActive}
               >
                 <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>{d.format('MMM')}</span>
-                <span styleName="day-number">{d.format('DD')}</span>
+                <span styleName="day-number">{d.format('D')}</span>
                 <span styleName="day-name">{d.format('ddd')}</span>
               </Menu.Item>
             );
