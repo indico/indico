@@ -10,6 +10,8 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
+import {Moment} from 'moment';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
@@ -184,8 +186,17 @@ export function deleteBlock(entry, eventId) {
   }));
 }
 
-export function scheduleEntry(eventId, contribId, startDt, entries, unscheduled) {
-  const scheduleURL = scheduleContribURL({event_id: eventId});
+export function scheduleEntry(
+  eventId: number,
+  contribId: number,
+  startDt: Moment,
+  entries: TopLevelEntry[],
+  unscheduled: UnscheduledContrib[],
+  blockId?: number
+) {
+  const scheduleURL = scheduleContribURL(
+    blockId ? {event_id: eventId, block_id: blockId} : {event_id: eventId}
+  );
   return ajaxAction(
     () =>
       indicoAxios.post(scheduleURL, {
@@ -208,14 +219,6 @@ export function unscheduleEntry(entry, eventId) {
     entryURL,
     entry,
   }));
-}
-
-export function scheduleEntryInsideBlock(
-  date: string,
-  entries: TopLevelEntry[],
-  unscheduled: any[]
-): ScheduleEntryAction {
-  return {type: SCHEDULE_ENTRY, date, entries, unscheduled};
 }
 
 export function changeColor(sessionId, color) {
