@@ -33,9 +33,6 @@ export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
 export const DELETE_BREAK = 'Delete break';
 export const DELETE_BLOCK = 'Delete block';
-export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
-export const DROP_UNSCHEDULED_CONTRIBS = 'Drop unscheduled contributions';
-export const SCHEDULE_CONTRIBS = 'Schedule contributions';
 export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
 export const CHANGE_COLOR = 'Change color';
@@ -213,18 +210,6 @@ export function unscheduleEntry(entry, eventId) {
   }));
 }
 
-export function dragUnscheduledContribs(contribIds) {
-  return {type: DRAG_UNSCHEDULED_CONTRIBS, contribIds};
-}
-
-export function dropUnscheduledContribs(contribs, args) {
-  return {type: DROP_UNSCHEDULED_CONTRIBS, contribs, args};
-}
-
-export function scheduleContribs(contribs, gap, startDt, dt) {
-  return {type: SCHEDULE_CONTRIBS, contribs, gap, startDt, dt};
-}
-
 export function scheduleEntryInsideBlock(
   date: string,
   entries: TopLevelEntry[],
@@ -291,43 +276,3 @@ export function updateEntry(entryType, entry) {
 export function closeModal() {
   return {type: CLOSE_MODAL};
 }
-
-// redux actions
-export const REGISTER_DROPPABLE = 'REGISTER_DROPPABLE';
-export const UNREGISTER_DROPPABLE = 'UNREGISTER_DROPPABLE';
-export const SET_DROPPABLE_DATA = 'SET_DROPPABLE_DATA';
-export const REGISTER_DRAGGABLE = 'REGISTER_DRAGGABLE';
-export const UNREGISTER_DRAGGABLE = 'UNREGISTER_DRAGGABLE';
-export const REGISTER_ON_DROP = 'REGISTER_ON_DROP';
-
-export const registerDroppable = (id: string, node: HTMLElement) => ({
-  type: REGISTER_DROPPABLE,
-  id,
-  node,
-});
-
-export const unregisterDroppable = (id: string) => ({
-  type: UNREGISTER_DROPPABLE,
-  id,
-});
-
-export const setDroppableData = (id: string, data: any) => ({
-  type: SET_DROPPABLE_DATA,
-  id,
-  data,
-});
-
-export const registerDraggable = (id: string) => ({
-  type: REGISTER_DRAGGABLE,
-  id,
-});
-
-export const unregisterDraggable = (id: string) => ({
-  type: UNREGISTER_DRAGGABLE,
-  id,
-});
-
-export const registerOnDrop = (onDrop: (draggableId: string, droppableId: string) => void) => ({
-  type: REGISTER_ON_DROP,
-  onDrop,
-});
