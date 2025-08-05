@@ -80,7 +80,6 @@ export default function Toolbar({
   };
 
   const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => _ => {
-    console.log('scroll by page');
     if (daysBarRef && daysBarRef.current) {
       const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
       const dayDelta = daysPerPage * pageDelta;
