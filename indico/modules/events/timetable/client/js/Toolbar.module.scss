@@ -35,14 +35,18 @@ $highlight-color: #2e59d1ce;
     &.timetable-bar {
       height: 100px;
 
-      .days {
-        position: relative;
+      .days-wrapper {
         flex-shrink: 1;
-        width: 100%;
-        overflow-x: auto;
         overflow-y: hidden;
         box-sizing: content-box;
+      }
+
+      .days {
+        position: relative;
+        width: 100%;
         display: flex;
+        overflow-x: auto;
+        box-sizing: content-box;
         // gap: 40px;
 
         // This padding in combination with fixed height
@@ -112,7 +116,7 @@ $highlight-color: #2e59d1ce;
         .gradient {
           pointer-events: none;
           width: 15px;
-          height: 100%;
+          height: 100px;
           top: 0;
           bottom: 0;
           flex-shrink: 0;
@@ -120,12 +124,12 @@ $highlight-color: #2e59d1ce;
           z-index: 1;
 
           &:first-child {
-            background: linear-gradient(90deg, red, transparent);
+            background: linear-gradient(90deg, white, transparent);
             left: 0;
           }
 
           &:last-child {
-            background: linear-gradient(-90deg, red, transparent);
+            background: linear-gradient(-90deg, white, transparent);
             right: 0;
           }
         }
