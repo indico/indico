@@ -7,10 +7,13 @@
 
 import dateutil.parser
 from flask import jsonify, request, session
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.errors import UserValueError
+from indico.core.marshmallow import mm
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import (RHManageContributionBase,
@@ -29,7 +32,8 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         create_timetable_entry, delete_timetable_entry,
-                                                        update_break_entry, update_timetable_entry)
+                                                        schedule_contribution, update_break_entry,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
 # TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
@@ -37,7 +41,8 @@ from indico.modules.events.timetable.serializer import serialize_event_info as s
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
-from indico.web.args import use_rh_args
+from indico.util.i18n import _
+from indico.web.args import use_kwargs, use_rh_args
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -253,6 +258,52 @@ class RHTimetableContribution(RHManageContributionBase):
             references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
                                                     value=entry['value']))
         return references
+
+
+class RHTimetableScheduleContribution(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.coordinate
+
+    class ScheduleContribSchema(mm.Schema):
+        contrib_id = fields.Int(required=True)
+        start_dt = fields.DateTime(required=True)
+
+    @use_kwargs({
+        'block_id': fields.Int(load_default=None),
+    }, location='query')
+    def _process_args(self, block_id):
+        RHManageTimetableBase._process_args(self)
+        self.session_block = None
+        if block_id is not None:
+            self.session_block = self.event.get_session_block(request.view_args['block_id'])
+            if self.session_block is None:
+                raise NotFound
+            if self.session and self.session != self.session_block.session:
+                raise BadRequest
+
+    @use_kwargs({
+        'contribs': fields.List(fields.Nested(ScheduleContribSchema), required=True),
+    })
+    def _process(self, contribs):
+        contrib_map = {c['contrib_id']: c['start_dt'] for c in contribs}
+        query = (
+            Contribution
+                .query.with_parent(self.event)
+                .filter(Contribution.id.in_(contrib_map.keys()))
+        )
+
+        with track_time_changes():
+            for contrib in query:
+                if self.session and contrib.session_id != self.session.id:
+                    # TODO(tomas): Allow scheduling contributions assigned to other sessions?
+                    raise Forbidden('Contribution not assigned to this session')
+
+                start_dt = contrib_map[contrib.id]
+                entry = schedule_contribution(contrib, start_dt, session_block=self.session_block,
+                                              extend_parent=False)
+                if entry.end_dt.astimezone(entry.event.tzinfo).date() > start_dt.date():
+                    raise UserValueError(_("Contribution '{}' could not be scheduled since it doesn't fit on this day.")
+                                         .format(contrib.title))
+        return '', 204
 
 
 class RHTimetableSessionBlockCreate(RHManageEventBase):
