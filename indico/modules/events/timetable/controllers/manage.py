@@ -269,7 +269,7 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
 
     @use_kwargs({
         'block_id': fields.Int(load_default=None),
-    }, location='query')
+    }, location='view_args')
     def _process_args(self, block_id):
         RHManageTimetableBase._process_args(self)
         self.session_block = None
