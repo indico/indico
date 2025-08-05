@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 import {Moment} from 'moment';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Divider, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -52,15 +52,12 @@ export default function Toolbar({
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
-  const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  // (Ajob) Math.ceil and float number allows this to work for a difference of a day
-  // but less than 24h, also across multiple months. Hence the 'true'.
-  const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
   const isExpanded = useSelector(selectors.getIsExpanded);
+  const currentDayIdx = date.date() - eventStart.date();
 
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
@@ -194,7 +191,7 @@ export default function Toolbar({
                 active={isActive}
               >
                 <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>{d.format('MMM')}</span>
-                <span styleName="day-number">{d.format('DD')}</span>
+                <span styleName="day-number">{d.format('D')}</span>
                 <span styleName="day-name">{d.format('ddd')}</span>
               </Menu.Item>
             );

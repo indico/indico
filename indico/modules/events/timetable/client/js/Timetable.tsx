@@ -8,7 +8,6 @@
 import moment from 'moment';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-// import {Checkbox} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
@@ -47,7 +46,7 @@ export default function Timetable() {
   const maxHour = showAllTimeslots
     ? 24
     : Math.max(
-        eventEndDt.hour(),
+      eventEndDt.hour(),
         ...(useWeekView
           ? Object.values(entries)
               .flat()
@@ -58,6 +57,10 @@ export default function Timetable() {
                 .hour()
             ))
       );
+
+  useEffect(() => {
+    setCurrentDateLocalStorage(date, eventId);
+  }, [date, eventId]);
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
