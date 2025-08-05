@@ -22,12 +22,13 @@ import {
   layoutGroup,
   layoutGroupAfterMove,
   layoutAfterUnscheduledDrop,
+  layoutAfterUnscheduledDropOnBlock,
 } from './layout';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
+import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -158,7 +159,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     offset,
     calendar: Over
   ) {
-    const [newLayout, newUnscheduled] =
+    const [newLayout, newUnscheduled, startDt, blockId] =
       layoutAfterUnscheduledDropOnBlock(
         dt,
         unscheduled,
@@ -173,7 +174,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     if (!newLayout) {
       return;
     }
-    dispatch(actions.scheduleEntryInsideBlock(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
+    // TODO(tomas): use something better than 'unscheduled-' prefix
+    const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+    dispatch(
+      actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
+    );
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
@@ -571,104 +576,4 @@ function layoutAfterDropOnBlock(
       {...toBlock, children: [...otherChildren, ...group]},
     ]);
   }
-}
-
-function layoutAfterUnscheduledDropOnBlock(
-  dt: Moment,
-  unscheduled: TopLevelEntry[],
-  entries: TopLevelEntry[],
-  who: string,
-  over: Over,
-  delta: Transform,
-  mouse: MousePosition,
-  offset,
-  calendar: Over
-) {
-  const id = who.slice('unscheduled-'.length);
-  const overId = over.id;
-  const toBlock = entries.find(e => e.id === overId);
-  if (toBlock.type !== EntryType.SessionBlock) {
-    return;
-  }
-  const deltaMinutes = 0;
-  const mousePositionX = (mouse.x - over.rect.left) / over.rect.width;
-  const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
-
-  const startDt = moment(dt)
-    .startOf('day')
-    .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
-
-  const entry = unscheduled.find(e => e.id === id);
-  if (!entry) {
-    return;
-  }
-
-  if (entry.type !== EntryType.Contribution) {
-    return;
-  }
-
-  if (entry.sessionId !== toBlock.sessionId) {
-    if (!entry.sessionId) {
-      return layoutAfterUnscheduledDrop(
-        dt,
-        unscheduled,
-        entries,
-        who,
-        calendar,
-        delta,
-        mouse,
-        offset
-      );
-    }
-    return;
-  }
-
-  if (entry.duration > toBlock.duration) {
-    return; // TODO: auto-resize the block?
-  }
-
-  const draftEntry = {
-    ...entry,
-    startDt,
-    y: minutesToPixels(
-      moment(startDt)
-        .add(deltaMinutes, 'minutes')
-        .diff(moment(toBlock.startDt), 'minutes')
-    ),
-    parentId: toBlock.id,
-  };
-
-  // TODO
-  if (draftEntry.backgroundColor) {
-    delete draftEntry.backgroundColor;
-  }
-
-  if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
-    // move start time to the start of the block
-    draftEntry.startDt = moment(toBlock.startDt);
-  } else if (
-    moment(draftEntry.startDt)
-      .add(draftEntry.duration, 'minutes')
-      .isAfter(moment(toBlock.startDt).add(toBlock.duration, 'minutes'))
-  ) {
-    // move end time to the end of the block
-    draftEntry.startDt = moment(toBlock.startDt).add(
-      toBlock.duration - draftEntry.duration,
-      'minutes'
-    );
-  }
-
-  const groupIds = getGroup(draftEntry, toBlock.children.filter(e => e.id !== draftEntry.id));
-  let group = toBlock.children.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, draftEntry, mousePositionX);
-
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
-
-  return [
-    layout([
-      ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
-      {...toBlock, children: [...otherChildren, ...group]},
-    ]),
-    unscheduled.filter(e => e.id !== id),
-  ];
 }
