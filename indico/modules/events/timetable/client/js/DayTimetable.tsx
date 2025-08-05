@@ -15,7 +15,14 @@ import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
-import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
+import {
+  computeYoffset,
+  getGroup,
+  layout,
+  layoutGroup,
+  layoutGroupAfterMove,
+  layoutAfterUnscheduledDrop,
+} from './layout';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
@@ -133,12 +140,14 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     offset
   ) {
-    const [newLayout, newUnscheduled] =
+    const [newLayout, newUnscheduled, startDt] =
       layoutAfterUnscheduledDrop(dt, unscheduled, entries, who, over, delta, mouse, offset) || [];
     if (!newLayout) {
       return;
     }
-    dispatch(actions.scheduleEntry(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
+    // TODO(tomas): use something better than 'unscheduled-' prefix
+    const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+    dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
   }
 
   function handleUnscheduledDropOnBlock(
@@ -164,7 +173,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     if (!newLayout) {
       return;
     }
-    dispatch(actions.scheduleEntry(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
+    dispatch(actions.scheduleEntryInsideBlock(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
@@ -562,55 +571,6 @@ function layoutAfterDropOnBlock(
       {...toBlock, children: [...otherChildren, ...group]},
     ]);
   }
-}
-
-function layoutAfterUnscheduledDrop(
-  dt: Moment,
-  unscheduled: TopLevelEntry[],
-  entries: TopLevelEntry[],
-  who: string,
-  calendar: Over,
-  delta: Transform,
-  mouse: MousePosition,
-  offset
-) {
-  const id = who.slice('unscheduled-'.length);
-  const deltaMinutes = 0;
-  const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
-  const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
-  const startDt = moment(dt)
-    .startOf('day')
-    .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
-
-  let entry = unscheduled.find(e => e.id === id);
-  if (!entry) {
-    return;
-  }
-
-  if (entry.type !== EntryType.Contribution) {
-    return;
-  }
-
-  if (entry.sessionId) {
-    return;
-  }
-
-  entry = {
-    ...entry,
-    startDt,
-    y: minutesToPixels(
-      moment(startDt)
-        .add(deltaMinutes, 'minutes')
-        .diff(moment(entry.startDt).startOf('day'), 'minutes')
-    ),
-  };
-
-  const groupIds = getGroup(entry, entries);
-  let group = entries.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, entry, mousePositionX);
-
-  const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
-  return [layout([...otherEntries, ...group]), unscheduled.filter(e => e.id !== id)];
 }
 
 function layoutAfterUnscheduledDropOnBlock(
