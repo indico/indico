@@ -68,6 +68,18 @@ export default function Toolbar({
     dispatch(actions.scrollNavbar(num));
   };
 
+  useEffect(() => {
+    if (daysBarRef && daysBarRef.current) {
+      const gradientWidth = 10;
+      const dayWidth = 60;
+      const left =
+        currentDayIdx * dayWidth -
+        (daysBarRef.current.clientWidth - gradientWidth) / 2 +
+        dayWidth / 2;
+      daysBarRef.current.scrollTo({left});
+    }
+  }, [daysBarRef]);
+
   return (
     <div styleName="toolbar" ref={ref}>
       {error && (
@@ -163,7 +175,7 @@ export default function Toolbar({
           styleName="action"
         />
       </Menu>
-      <Menu tabular ref={daysBarRef} styleName="timetable-bar">
+      <Menu tabular styleName="timetable-bar">
         <Menu.Item
           onClick={navigateToDayNumber(0)}
           disabled={offset === 0}
@@ -178,27 +190,31 @@ export default function Toolbar({
           icon="angle left"
           styleName="action"
         />
-        <Menu.Item fitted styleName="days">
-          <div styleName="gradient" />
-          {[...Array(numDays).keys()].map((n, i) => {
-            const d = getDateFromIdx(n + offset);
-            const isActive = n + offset === currentDayIdx;
-            const showMonth = i === 0 || d.date() === 1;
-            return (
-              <Menu.Item
-                fitted="horizontally"
-                key={n}
-                onClick={() => onNavigate(d)}
-                styleName="day"
-                active={isActive}
-              >
-                <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>{d.format('MMM')}</span>
-                <span styleName="day-number">{d.format('D')}</span>
-                <span styleName="day-name">{d.format('ddd')}</span>
-              </Menu.Item>
-            );
-          })}
-          <div styleName="gradient" />
+        <Menu.Item fitted styleName="days-wrapper">
+          <div ref={daysBarRef} styleName="days">
+            <div styleName="gradient" />
+            {[...Array(numDays).keys()].map((n, i) => {
+              const d = getDateFromIdx(n + offset);
+              const isActive = n + offset === currentDayIdx;
+              const showMonth = i === 0 || d.date() === 1;
+              return (
+                <Menu.Item
+                  fitted="horizontally"
+                  key={n}
+                  onClick={() => onNavigate(d)}
+                  styleName="day"
+                  active={isActive}
+                >
+                  <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>
+                    {d.format('MMM')}
+                  </span>
+                  <span styleName="day-number">{d.format('D')}</span>
+                  <span styleName="day-name">{d.format('ddd')}</span>
+                </Menu.Item>
+              );
+            })}
+            <div styleName="gradient" />
+          </div>
         </Menu.Item>
         <Menu.Item
           onClick={navigateToDayNumber(Math.min(offset + 1, numDays))}
