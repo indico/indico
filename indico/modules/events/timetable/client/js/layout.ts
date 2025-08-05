@@ -5,10 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 
-import {Entry, TopLevelEntry, DayEntries} from './types.ts';
-import {lcm, minutesToPixels} from './utils.ts';
+import {Transform, Over, MousePosition} from './dnd';
+import {TopLevelEntry, Entry, EntryType, DayEntries} from './types';
+import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils.ts';
 
 function overlap<T extends Entry>(a: T, b: T) {
   const aEnd = a.startDt.clone().add(Math.max(a.duration, 10), 'minutes');
@@ -248,4 +249,53 @@ export function getWidthAndOffset(column, maxColumn) {
     width: `${columnWidth}%`,
     offset: `${column * columnWidth}%`,
   };
+}
+
+export function layoutAfterUnscheduledDrop(
+  dt: Moment,
+  unscheduled: TopLevelEntry[],
+  entries: TopLevelEntry[],
+  who: string,
+  calendar: Over,
+  delta: Transform,
+  mouse: MousePosition,
+  offset: MousePosition
+) {
+  const id = who.slice('unscheduled-'.length);
+  const deltaMinutes = 0;
+  const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
+  const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
+  const startDt = moment(dt)
+    .startOf('day')
+    .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
+
+  let entry = unscheduled.find(e => e.id === id);
+  if (!entry) {
+    return;
+  }
+
+  if (entry.type !== EntryType.Contribution) {
+    return;
+  }
+
+  if (entry.sessionId) {
+    return;
+  }
+
+  entry = {
+    ...entry,
+    startDt,
+    y: minutesToPixels(
+      moment(startDt)
+        .add(deltaMinutes, 'minutes')
+        .diff(moment(entry.startDt).startOf('day'), 'minutes')
+    ),
+  };
+
+  const groupIds = getGroup(entry, entries);
+  let group = entries.filter(e => groupIds.has(e.id));
+  group = layoutGroupAfterMove(group, entry, mousePositionX);
+
+  const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
+  return [layout([...otherEntries, ...group]), unscheduled.filter(e => e.id !== id), startDt];
 }
