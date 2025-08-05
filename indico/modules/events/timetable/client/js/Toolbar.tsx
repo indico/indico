@@ -57,7 +57,9 @@ export default function Toolbar({
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
-  const currentDayIdx = date.date() - eventStart.date();
+  // Math.ceil and float number allows this to work for a difference of a day
+  // but less than 24h, also across multiple months.
+  const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
