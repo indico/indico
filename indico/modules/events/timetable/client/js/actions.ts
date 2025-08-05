@@ -7,6 +7,7 @@
 
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import {indicoAxios} from 'indico/utils/axios';
@@ -19,6 +20,7 @@ import {
   ChildBreakEntry,
   ContribEntry,
   ChildContribEntry,
+  UnscheduledContrib,
 } from './types';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
@@ -83,7 +85,7 @@ interface ScheduleEntryAction {
   type: typeof SCHEDULE_ENTRY;
   date: string;
   entries: TopLevelEntry[];
-  unscheduled: any[];
+  unscheduled: UnscheduledContrib[];
 }
 
 interface UnscheduleEntryAction {
@@ -185,6 +187,23 @@ export function deleteBlock(entry, eventId) {
   }));
 }
 
+export function scheduleEntry(eventId, contribId, startDt, entries, unscheduled) {
+  const scheduleURL = scheduleContribURL({event_id: eventId});
+  return ajaxAction(
+    () =>
+      indicoAxios.post(scheduleURL, {
+        contribs: [{contrib_id: contribId, start_dt: startDt.toISOString()}],
+      }),
+    null,
+    () => ({
+      type: SCHEDULE_ENTRY,
+      date: startDt.format('YYYYMMDD'),
+      entries,
+      unscheduled,
+    })
+  );
+}
+
 export function unscheduleEntry(entry, eventId) {
   const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
@@ -206,7 +225,7 @@ export function scheduleContribs(contribs, gap, startDt, dt) {
   return {type: SCHEDULE_CONTRIBS, contribs, gap, startDt, dt};
 }
 
-export function scheduleEntry(
+export function scheduleEntryInsideBlock(
   date: string,
   entries: TopLevelEntry[],
   unscheduled: any[]
