@@ -364,51 +364,6 @@ export const deleteEntry = (state, entry) => {
 };
 
 /**
- * Schedules a list of contributions
- * @param {object} state State of the timetable
- * @param {array} contribs Contributions to be scheduled
- * @param {object} args {start, resource} Arguments from the Calendar's drop event
- * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
- * currentChangeIdx
- */
-export const dropUnscheduledContribs = (state, contribs, {start, resource}) => {
-  return moveContribs(state, contribs, start, resource);
-};
-
-/**
- * Schedules a list of contributions
- * @param {object} state State of the timetable
- * @param {Set} contribIds Contributions to be scheduled
- * @param {number} gap Gap between contributions in minutes
- * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
- * currentChangeIdx
- */
-export function scheduleContribs(
-  state: any,
-  contribIds: string[],
-  gap: number,
-  startDt: Moment,
-  dt: Moment
-) {
-  let {entries, unscheduled} = state.changes[state.currentChangeIdx];
-  entries = entries[dt.format('YYYYMMDD')];
-  const ids = new Set(contribIds);
-  const contribs = unscheduled.filter(c => ids.has(c.id));
-  const scheduled = [];
-  const time = moment(startDt);
-  for (const contrib of contribs) {
-    scheduled.push({
-      ...contrib,
-      startDt: moment(time),
-      column: Number.MAX_SAFE_INTEGER,
-    });
-    time.add(contrib.duration, 'minutes');
-    time.add(gap, 'minutes');
-  }
-  return [layout([...entries, ...scheduled]), unscheduled.filter(e => !ids.has(e.id))];
-}
-
-/**
  * Changes the color of the selected Break block
  * @param {object} state State of the timetable
  * @param {object} color New color
