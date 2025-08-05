@@ -27,6 +27,7 @@ from indico.modules.events.timetable.controllers.manage import (RHCloneContribut
                                                                 RHManageTimetableOld, RHTimetableBreak,
                                                                 RHTimetableBreakCreate, RHTimetableContribution,
                                                                 RHTimetableContributionCreate, RHTimetableREST,
+                                                                RHTimetableScheduleContribution,
                                                                 RHTimetableSessionBlock, RHTimetableSessionBlockCreate)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -79,6 +80,10 @@ _bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetable
 _bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContributionCreate, methods=('POST',))
 _bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution,
                  methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('/timetable/<int:block_id>/schedule', 'tt_schedule', RHTimetableScheduleContribution,
+                 methods=('POST',))
+_bp.add_url_rule('/timetable/schedule', 'tt_schedule', RHTimetableScheduleContribution,
+                 methods=('POST',))
 _bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
                  methods=('POST',))
 _bp.add_url_rule('/timetable/session-block/<int:session_block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
