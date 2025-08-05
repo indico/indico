@@ -62,6 +62,9 @@ export default function Toolbar({
   // but less than 24h, also across multiple months.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
+  const gradientWidth = 10;
+  const dayWidth = 60;
+
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
@@ -78,21 +81,35 @@ export default function Toolbar({
     dispatch(actions.scrollNavbar(newOffset));
   };
 
-  const navigateToDayNumber = (num: number) => _ => {
+  const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
+    if (daysBarRef && daysBarRef.current) {
+      const left =
+        dayIndex * dayWidth - (daysBarRef.current.clientWidth - gradientWidth) / 2 + dayWidth / 2;
+      daysBarRef.current.scrollTo({left, behavior});
+    }
+  };
+
+  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => _ => {
+    scrollToDay(num, scrollBehavior);
     onNavigate(getDateFromIdx(num));
-    dispatch(actions.scrollNavbar(num));
+  };
+
+  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => _ => {
+    console.log('scroll by page');
+    if (daysBarRef && daysBarRef.current) {
+      const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
+      const dayDelta = daysPerPage * pageDelta;
+      const newDay =
+        Math.sign(pageDelta) === 1
+          ? Math.min(currentDayIdx + dayDelta, numDays - 1)
+          : Math.max(currentDayIdx + dayDelta, 0);
+      scrollToDay(newDay, behavior);
+      onNavigate(getDateFromIdx(newDay));
+    }
   };
 
   useEffect(() => {
-    if (daysBarRef && daysBarRef.current) {
-      const gradientWidth = 10;
-      const dayWidth = 60;
-      const left =
-        currentDayIdx * dayWidth -
-        (daysBarRef.current.clientWidth - gradientWidth) / 2 +
-        dayWidth / 2;
-      daysBarRef.current.scrollTo({left});
-    }
+    scrollToDay(currentDayIdx);
   }, [daysBarRef]);
 
   return (
@@ -199,14 +216,14 @@ export default function Toolbar({
       <Menu tabular styleName="timetable-bar">
         <Menu.Item
           onClick={navigateToDayNumber(0)}
-          disabled={offset === 0}
+          disabled={currentDayIdx === 0}
           title={Translate.string('Go to start')}
           icon="angle double left"
           styleName="action"
         />
         <Menu.Item
-          onClick={navigateToDayNumber(Math.max(offset - 1, 0))}
-          disabled={offset === 0}
+          onClick={scrollByPage(-1)}
+          disabled={currentDayIdx === 0}
           title={Translate.string('Scroll left')}
           icon="angle left"
           styleName="action"
@@ -238,16 +255,16 @@ export default function Toolbar({
           </div>
         </Menu.Item>
         <Menu.Item
-          onClick={navigateToDayNumber(Math.min(offset + 1, numDays))}
-          disabled={offset >= numDays}
+          onClick={scrollByPage(1)}
+          disabled={currentDayIdx >= numDays}
           title={Translate.string('Scroll right')}
           icon="angle right"
           position="right"
           styleName="action"
         />
         <Menu.Item
-          onClick={navigateToDayNumber(numDays)}
-          disabled={numDays - offset <= numDays}
+          onClick={navigateToDayNumber(numDays - 1)}
+          disabled={currentDayIdx >= numDays - 1}
           title={Translate.string('Go to end')}
           icon="angle double right"
           styleName="action"
