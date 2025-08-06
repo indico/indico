@@ -157,16 +157,13 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
     case 'block':
       entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
       break;
-    case 'contrib':
-      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-      break;
     default:
       entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   }
 
   let entryData;
 
-  if (entry.type === 'contrib' || entry.type === undefined) {
+  if (entry.type === 'contrib') {
     entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
   } else {
     entryData = {start_dt: entry.startDt};
