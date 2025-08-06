@@ -115,6 +115,10 @@ export const getError = createSelector(
   entries => entries.error
 );
 
+export const getIsExpanded = createSelector(
+  getNavigation,
+  navigation => navigation.isExpanded
+);
 export const getNavbarMaxDays = createSelector(
   getNavigation,
   navigation => navigation.numDays

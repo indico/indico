@@ -32,7 +32,7 @@ interface Entries {
 export interface ReduxState {
   entries: Entries;
   sessions: any[];
-  navigation: {numDays: number; offset: number};
+  navigation: {numDays: number; offset: number, isExpanded: Boolean};
   display: {mode: string; showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
 }
@@ -407,12 +407,14 @@ export default {
         return state;
     }
   },
-  navigation: (state = {numDays: 2, offset: 0}, action) => {
+  navigation: (state = {numDays: 2, offset: 0, isExpanded: false}, action) => {
     switch (action.type) {
       case actions.SCROLL_NAVBAR:
         return {...state, offset: action.offset};
       case actions.RESIZE_WINDOW:
         return resizeWindow(state, action);
+      case actions.EXPAND_TIMETABLE:
+        return {...state, isExpanded: !state.isExpanded};
       default:
         return state;
     }

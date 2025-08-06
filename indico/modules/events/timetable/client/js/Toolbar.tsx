@@ -8,7 +8,7 @@
 import {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -17,8 +17,6 @@ import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
-
-const SCROLL_STEP = 3;
 
 const displayModes = [
   {
@@ -47,6 +45,7 @@ export default function Toolbar({
 }) {
   const dispatch = useDispatch();
   const ref = useRef(null);
+  const daysBarRef = useRef<HTMLDivElement | null>(null);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
@@ -58,21 +57,15 @@ export default function Toolbar({
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const currentDayIdx = date.diff(eventStart, 'days');
+  const isExpanded = useSelector(selectors.getIsExpanded);
+  // Math.ceil and float number allows this to work for a difference of a day
+  // but less than 24h, also across multiple months.
+  const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
-  const handleResize = useCallback(() => {
-    dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
-  }, [currentDayIdx, dispatch]);
+  const gradientWidth = 10;
+  const dayWidth = 60;
 
-  useEffect(() => {
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [handleResize]);
-
-  const getDateFromIdx = idx => eventStart.clone().add(idx, 'days');
+  const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
     if (mouseDown && e.buttons !== 1) {
@@ -88,6 +81,36 @@ export default function Toolbar({
     dispatch(actions.scrollNavbar(newOffset));
   };
 
+  const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
+    if (daysBarRef && daysBarRef.current) {
+      const left =
+        dayIndex * dayWidth - (daysBarRef.current.clientWidth - gradientWidth) / 2 + dayWidth / 2;
+      daysBarRef.current.scrollTo({left, behavior});
+    }
+  };
+
+  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => _ => {
+    scrollToDay(num, scrollBehavior);
+    onNavigate(getDateFromIdx(num));
+  };
+
+  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => _ => {
+    if (daysBarRef && daysBarRef.current) {
+      const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
+      const dayDelta = daysPerPage * pageDelta;
+      const newDay =
+        Math.sign(pageDelta) === 1
+          ? Math.min(currentDayIdx + dayDelta, numDays - 1)
+          : Math.max(currentDayIdx + dayDelta, 0);
+      scrollToDay(newDay, behavior);
+      onNavigate(getDateFromIdx(newDay));
+    }
+  };
+
+  useEffect(() => {
+    scrollToDay(currentDayIdx);
+  }, [daysBarRef]);
+
   return (
     <div styleName="toolbar" ref={ref}>
       {error && (
@@ -99,7 +122,7 @@ export default function Toolbar({
           onDismiss={() => dispatch(actions.dismissError())}
         />
       )}
-      <Menu tabular>
+      <Menu compact secondary styleName="actions-bar">
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
           disabled={!showUnscheduled && numUnscheduled === 0}
@@ -138,66 +161,11 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
-        {numDays > maxDays && (
-          <>
-            <Menu.Item
-              onClick={makeScrollHandler(0, 0)}
-              onMouseEnter={makeScrollHandler(0, 0, true)}
-              disabled={offset === 0}
-              title={Translate.string('Go to start')}
-              icon="angle double left"
-              styleName="action"
-            />
-            <Menu.Item
-              onClick={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0))}
-              onMouseEnter={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0), null, true)}
-              disabled={offset === 0}
-              title={Translate.string('Scroll left')}
-              icon="angle left"
-              styleName="action"
-            />
-          </>
-        )}
-        {[...Array(Math.min(numDays, maxDays)).keys()].map(n => {
-          const d = getDateFromIdx(n + offset);
-          return (
-            <Menu.Item
-              key={n}
-              content={d.format('ddd DD/MM')}
-              onClick={() => onNavigate(d)}
-              active={n + offset === currentDayIdx}
-            />
-          );
-        })}
-        {numDays > maxDays && (
-          <>
-            <Menu.Item
-              onClick={makeScrollHandler(Math.min(offset + SCROLL_STEP, numDays - maxDays))}
-              onMouseEnter={makeScrollHandler(
-                Math.min(offset + SCROLL_STEP, numDays - maxDays),
-                null,
-                true
-              )}
-              disabled={numDays - offset <= maxDays}
-              title={Translate.string('Scroll right')}
-              icon="angle right"
-              position="right"
-              styleName="action"
-            />
-            <Menu.Item
-              onClick={makeScrollHandler(numDays - maxDays, numDays)}
-              onMouseEnter={makeScrollHandler(numDays - maxDays, numDays, true)}
-              disabled={numDays - offset <= maxDays}
-              title={Translate.string('Go to end')}
-              icon="angle double right"
-              styleName="action"
-            />
-          </>
-        )}
         <Dropdown
+          // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="columns"
           styleName="action"
-          className={numDays <= maxDays ? 'right' : undefined}
+          className="right"
           direction="left"
           title={Translate.string('Display mode')}
           item
@@ -231,7 +199,75 @@ export default function Toolbar({
           title={Translate.string('Add new')}
           item
         />
+        <Menu.Item
+          onClick={() => dispatch(actions.toggleExpand())}
+          title={isExpanded ? Translate.string('Compress') : Translate.string('Expand')}
+          icon={isExpanded ? 'compress' : 'expand'}
+          styleName="action"
+        />
+        {/* <Menu.Item>
+          <Button color="orange" circular compact>
+            <Translate>Publish Contributions (WIP)</Translate>
+          </Button>
+        </Menu.Item> */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
+      </Menu>
+      <Menu tabular styleName="timetable-bar">
+        <Menu.Item
+          onClick={navigateToDayNumber(0)}
+          disabled={currentDayIdx === 0}
+          title={Translate.string('Go to start')}
+          icon="angle double left"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={scrollByPage(-1)}
+          disabled={currentDayIdx === 0}
+          title={Translate.string('Scroll left')}
+          icon="angle left"
+          styleName="action"
+        />
+        <Menu.Item fitted styleName="days-wrapper">
+          <div ref={daysBarRef} styleName="days">
+            <div styleName="gradient" />
+            {[...Array(numDays).keys()].map((n, i) => {
+              const d = getDateFromIdx(n + offset);
+              const isActive = n + offset === currentDayIdx;
+              const showMonth = i === 0 || d.date() === 1;
+              return (
+                <Menu.Item
+                  fitted="horizontally"
+                  key={n}
+                  onClick={() => onNavigate(d)}
+                  styleName="day"
+                  active={isActive}
+                >
+                  <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>
+                    {d.format('MMM')}
+                  </span>
+                  <span styleName="day-number">{d.format('D')}</span>
+                  <span styleName="day-name">{d.format('ddd')}</span>
+                </Menu.Item>
+              );
+            })}
+            <div styleName="gradient" />
+          </div>
+        </Menu.Item>
+        <Menu.Item
+          onClick={scrollByPage(1)}
+          disabled={currentDayIdx >= numDays}
+          title={Translate.string('Scroll right')}
+          icon="angle right"
+          position="right"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={navigateToDayNumber(numDays - 1)}
+          disabled={currentDayIdx >= numDays - 1}
+          title={Translate.string('Go to end')}
+          icon="angle double right"
+          styleName="action"
+        />
       </Menu>
     </div>
   );
