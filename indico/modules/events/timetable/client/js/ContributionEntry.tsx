@@ -7,10 +7,9 @@
 
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
-import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDroppable} from './dnd';
 import {DraggableEntry} from './Entry';
@@ -18,7 +17,7 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes} from './utils';
+import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
 import './ContributionEntry.module.scss';
 import './DayTimetable.module.scss';
 
@@ -38,6 +37,7 @@ export default function ContributionEntry({
   title,
   blockRef,
   sessionId,
+  sessionTitle,
   textColor,
   backgroundColor,
   selected,
@@ -58,7 +58,6 @@ export default function ContributionEntry({
   renderChildren = true,
 }: DraggableEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
-  const dispatch = useDispatch();
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
@@ -174,7 +173,12 @@ export default function ContributionEntry({
         {...listeners}
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
-        <EntryTitle title={title} duration={duration} timeRange={timeRange} type={type} />
+        <EntryTitle
+          title={type === EntryType.SessionBlock ? formatBlockTitle(sessionTitle, title) : title}
+          duration={duration}
+          timeRange={timeRange}
+          type={type}
+        />
         {type === EntryType.SessionBlock && (
           <div
             ref={setDroppableNodeRef}

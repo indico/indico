@@ -33,7 +33,7 @@ import * as actions from './actions';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
-import {getEntryColor, mapTTDataToEntry} from './utils';
+import {formatBlockTitle, getEntryColor, mapTTDataToEntry} from './utils';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -60,15 +60,9 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
   );
 }
 
-function EntryPopupContent({
-  entry,
-  onClose,
-}: {
-  entry;
-  onClose: () => void;
-}) {
+function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title} = entry;
+  const {type, title, sessionTitle} = entry;
   const sessions = useSelector(selectors.getSessions);
   const eventId = useSelector(selectors.getEventId);
   const {backgroundColor} = getEntryColor(entry, sessions);
@@ -76,13 +70,13 @@ function EntryPopupContent({
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
 
   const _getFileCount = () => {
-    const {attachments = {}} = entry
+    const {attachments = {}} = entry;
     const {files = [], folders = []} = attachments;
     return files.length + folders.length;
   };
 
   const _getOrderedLocationArray = () => {
-    const {locationData = {}} = entry
+    const {locationData = {}} = entry;
     const {address, venueName, room} = locationData;
     return Object.values([address, venueName, room]).filter(Boolean);
   };
@@ -185,7 +179,9 @@ function EntryPopupContent({
         <Card.Header style={{marginTop: 20, marginLeft: 4, marginBottom: 20, fontSize: '1.6em'}}>
           <div style={{display: 'flex', gap: 10, alignItems: 'center'}}>
             <ColoredDot color={backgroundColor} />
-            <div>{title}</div>
+            <div>
+              {type === EntryType.SessionBlock ? formatBlockTitle(sessionTitle, title) : title}
+            </div>
           </div>
         </Card.Header>
         <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
@@ -200,7 +196,7 @@ function EntryPopupContent({
             </List>
           </CardItem>
         ) : null}
-        {presenters?.length ? (
+        {presenters && presenters.length ? (
           <CardItem icon="microphone">
             {presenters.join(', ') || Translate.string('No presenters')}
           </CardItem>
