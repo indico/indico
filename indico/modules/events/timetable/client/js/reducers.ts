@@ -123,22 +123,20 @@ export default {
         const currentDayKey = Object.keys(newEntries).find(key =>
           newEntries[key].some(e => e.id === entry.id && entry.type === entryType)
         );
-        let dayEntries = newEntries[currentDayKey];
+        const dayEntries = [...newEntries[currentDayKey]];
         const newDayKey = moment(startDt).format('YYYYMMDD');
 
         if (currentDayKey !== newDayKey) {
-          newEntries[newDayKey].push(entry);
-          const newDayEntries = newEntries[newDayKey];
-          dayEntries = dayEntries.filter(e => e.id !== entry.id);
-          newEntries[newDayKey] = layout([...newDayEntries]);
+          newEntries[newDayKey] = layout([...newEntries[newDayKey], entry]);
+          newEntries[currentDayKey] = layout([...dayEntries.filter(e => e.id !== entry.id)]);
         } else {
-          const editedIndex = dayEntries.findIndex(e => {
-            return e.id === entry.id && e.type === entryType;
-          });
-          newEntries[newDayKey][editedIndex] = entry;
+          newEntries[newDayKey] = layout(
+            newEntries[newDayKey].map(e => {
+              return e.id === entry.id && e.type === entryType ? entry : e;
+            })
+          );
         }
         // TODO: (Ajob) make sure to edit entry first
-        newEntries[currentDayKey] = layout([...dayEntries]);
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
