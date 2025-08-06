@@ -183,18 +183,6 @@ export function preprocessTimetableEntries(
     }
   }
 
-  // TODO: (Ajob) Temporary logs for debugging purposes. Remove later
-  console.group(
-    `%c Preprocessed Data `,
-    'font-size: 1.2em; background-color: lightgreen; color: green;'
-  );
-  Object.keys(dayEntries).forEach(k => {
-    console.group(`%c[${k}]`, 'color: orange;');
-    console.dir(dayEntries[k]);
-    console.groupEnd();
-  });
-  console.groupEnd();
-
   return {
     dayEntries,
     unscheduled: (eventInfo.contributions || [])
