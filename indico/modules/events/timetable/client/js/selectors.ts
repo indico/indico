@@ -110,11 +110,6 @@ export const getMergedChanges = createSelector(
   getSessions,
   (entries, sessions) => mergeChanges(entries, sessions)
 );
-export const getDraggedContribs = createSelector(
-  getEntries,
-  getUnscheduled,
-  (entries, contribs) => contribs.filter(c => entries.draggedIds.has(c.id))
-);
 export const getError = createSelector(
   getEntries,
   entries => entries.error
