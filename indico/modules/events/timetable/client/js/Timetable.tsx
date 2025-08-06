@@ -12,7 +12,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
-import ContributionEntryForm from './forms/ContributionEntryForm';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {WeekTimetable} from './WeekTimetable';
@@ -77,7 +76,6 @@ export default function Timetable() {
             entries={currentDateEntries}
           />
         )}
-        <ContributionEntryForm />
       </div>
     </div>
   );
