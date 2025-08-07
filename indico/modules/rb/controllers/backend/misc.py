@@ -77,7 +77,8 @@ class RHUserInfo(RHRoomBookingBase):
         # we assume room booking users are always a restricted/trusted audience who should be
         # able to search for users. hence, we give them a search token straight away instead of
         # linking it to an explicit access check to a room.
-        # the only exception here is that if there are no rooms, then we don't issue a token to
+        # the only exception here is that if there are no rooms and the requesting user is not
+        # an admin, then we don't issue a token to
         # avoid giving users an easy way to get a token in case of a poorly configured indico
         # instance that has room booking enabled but never configured (and thus likely neither
         # any rooms nor an ACL on who can access the module)
