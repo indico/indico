@@ -10,7 +10,7 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -28,6 +28,7 @@ import {
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
+export const SET_CURRENT_DAY = 'Set current day';
 export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
@@ -278,4 +279,8 @@ export function updateEntry(entryType, entry) {
 
 export function closeModal() {
   return {type: CLOSE_MODAL};
+}
+
+export function setCurrentDay(day: moment.Moment) {
+  return {type: SET_CURRENT_DAY, day};
 }
