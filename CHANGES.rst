@@ -21,6 +21,8 @@ Bugfixes
   behavior was set to "resize" (:pr:`6993`)
 - Fix not being able to update a registration if an accommocation field was added
   after registering and the user already paid for the registration (:pr:`7000`)
+- Fix registration form field type selector not being fully visible on smaller
+  screen widths (:issue:`7012`, :pr:`7013`)
 
 Accessibility
 ^^^^^^^^^^^^^
