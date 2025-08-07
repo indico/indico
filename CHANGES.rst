@@ -23,6 +23,8 @@ Bugfixes
   after registering and the user already paid for the registration (:pr:`7000`)
 - Fix registration form field type selector not being fully visible on smaller
   screen widths (:issue:`7012`, :pr:`7013`)
+- Fix user search not working for admins in room booking module when
+  there are not any rooms yet (:issue:`7016`, :pr:`7017`)
 
 Accessibility
 ^^^^^^^^^^^^^
