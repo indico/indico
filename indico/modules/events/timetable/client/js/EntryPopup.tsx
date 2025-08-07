@@ -88,14 +88,11 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       .map(p => p.name);
   };
 
-  const onEdit = async (e: MouseEvent) => {
+  const onEdit = async () => {
     const {objId} = entry;
     if (!objId) {
       return;
     }
-
-    e.stopPropagation();
-    onClose();
 
     const editURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: objId}),
@@ -105,8 +102,13 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
 
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
-    entry = mapTTDataToEntry(data);
-    dispatch(actions.setDraftEntry(entry));
+    
+    const draftEntry = mapTTDataToEntry(data);
+    if (entry.type === EntryType.SessionBlock) {
+      draftEntry.children = entry.children;
+    }
+    dispatch(actions.setDraftEntry(draftEntry));
+    onClose();
   };
 
   const onDelete = async (e: MouseEvent) => {
