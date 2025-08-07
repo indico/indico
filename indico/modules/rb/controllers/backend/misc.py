@@ -24,7 +24,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.schemas import EquipmentTypeSchema, SettingsSchema, map_areas_schema, rb_user_schema
-from indico.modules.rb.util import build_rooms_spritesheet
+from indico.modules.rb.util import build_rooms_spritesheet, rb_is_admin
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.util.string import sanitize_html
@@ -83,7 +83,7 @@ class RHUserInfo(RHRoomBookingBase):
         # any rooms nor an ACL on who can access the module)
         data['search_token'] = (
             make_user_search_token()
-            if Room.query.filter(~Room.is_deleted).has_rows()
+            if rb_is_admin(session.user) or Room.query.filter(~Room.is_deleted).has_rows()
             else None
         )
         return jsonify(data)
