@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 import pytz
 from sqlalchemy import func, types
 from sqlalchemy.sql import operators
@@ -43,12 +45,19 @@ class UTCDateTime(types.TypeDecorator):
             },
             operators.sub: {
                 Interval: UTCDateTime,
-                UTCDateTime: Interval
+                UTCDateTime: Interval,
+                # not sure why the base DateTime is needed here, but without it the result is
+                # handled as a UTCDateTime instead of an Interval...
+                types.DateTime: Interval,
             }
         }
 
     def process_bind_param(self, value, engine):
         if value is not None:
+            if isinstance(value, timedelta):
+                # XXX don't ask me why this goes through here... but without it, querying something like
+                # `Event.end_dt + timedelta(hours=1)` fails
+                return value
             return value.astimezone(pytz.utc).replace(tzinfo=None)
 
     def process_result_value(self, value, engine):
