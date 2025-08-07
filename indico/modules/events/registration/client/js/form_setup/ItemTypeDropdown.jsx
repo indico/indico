@@ -46,7 +46,13 @@ export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
   const middle = Math.ceil(newItemTypeOptions.length / 2);
 
   return (
-    <Dropdown selectOnNavigation={false} selectOnBlur={false} value={newItemType} {...extraProps}>
+    <Dropdown
+      selectOnNavigation={false}
+      selectOnBlur={false}
+      value={newItemType}
+      direction="left"
+      {...extraProps}
+    >
       <Dropdown.Menu>
         <DropdownItem
           value="label"
