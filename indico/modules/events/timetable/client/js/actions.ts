@@ -24,6 +24,7 @@ import {
   ContribEntry,
   ChildContribEntry,
   UnscheduledContrib,
+  EntryType,
 } from './types';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
@@ -151,10 +152,10 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
   let entryURL: string;
 
   switch (entry.type) {
-    case 'break':
+    case EntryType.Break:
       entryURL = breakURL({event_id: eventId, break_id: entry.objId});
       break;
-    case 'block':
+    case EntryType.SessionBlock:
       entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
       break;
     default:
@@ -163,7 +164,7 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
 
   let entryData;
 
-  if (entry.type === 'contrib') {
+  if (entry.type === EntryType.Contribution) {
     entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
   } else {
     entryData = {start_dt: entry.startDt};

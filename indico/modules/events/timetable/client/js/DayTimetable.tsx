@@ -199,26 +199,19 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     calendar: Over
   ) {
-    const newLayout = layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar);
+    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+      entries,
+      who,
+      over,
+      delta,
+      mouse,
+      calendar
+    );
+
     if (!newLayout) {
       return;
     }
-    let movedEntry = newLayout.find(e => e.id === who);
-
-    if (!movedEntry) {
-      for (const block of newLayout) {
-        if (block.children) {
-          movedEntry = block.children.find(child => child.id === who);
-          if (movedEntry) {
-            break;
-          }
-        }
-      }
-    }
-
-    if (movedEntry) {
-      dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
-    }
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
