@@ -7,7 +7,7 @@
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.models.events import EventType
-from indico.util.string import html_to_plaintext
+from indico.util.string import html_to_markdown
 from indico.web.flask.templating import get_template_module
 
 
@@ -37,11 +37,12 @@ def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_
     if event.type_ == EventType.lecture:
         with_agenda = False
     agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
-    note = str(message)  # Legacy reminder (text/plain email only)
-    if note and render_mode == RenderMode.html:
-        note = html_to_plaintext(note).strip()  # Standard reminder (text/html -> text/plain)
+    text_message = str(message)  # Legacy reminder (text/plain email only)
+    if text_message and render_mode == RenderMode.html:
+        # Standard reminder (text/html -> text/plain)
+        text_message = html_to_markdown(text_message, inline_links=False).strip()
     text_tpl = get_template_module('events/reminders/emails/event_reminder.txt', event=event,
-                                    url=event.short_external_url, note=note, with_agenda=with_agenda,
+                                    url=event.short_external_url, note=text_message, with_agenda=with_agenda,
                                     with_description=with_description, agenda=agenda)
     if render_mode == RenderMode.html:
         html_tpl = get_template_module('events/reminders/emails/event_reminder.html', event=event,
