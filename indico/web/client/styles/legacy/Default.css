@@ -236,10 +236,6 @@ div.exclusivePopup {
   overflow: hidden;
 }
 
-div.exclusivePopup ul {
-  padding-left: 40px;
-}
-
 div.ui-dialog-titlebar {
   padding: 0.4em 15px !important;
   border-bottom-left-radius: 0;
