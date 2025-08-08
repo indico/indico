@@ -29,23 +29,23 @@ def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_
     """
     from indico.modules.events.reminders.models.reminders import ReminderType
 
-    html_tpl = text_tpl = None
-    if reminder_type == ReminderType.standard:
-        if event.type_ == EventType.lecture:
-            with_agenda = False
-        agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
-        note = str(message)  # Legacy reminder (text/plain email only)
-        if note and render_mode == RenderMode.html:
-            note = html_to_plaintext(note).strip()  # Standard reminder (text/html -> text/plain)
-        text_tpl = get_template_module('events/reminders/emails/event_reminder.txt', event=event,
-                                        url=event.short_external_url, note=note, with_agenda=with_agenda,
-                                        with_description=with_description, agenda=agenda)
-        if render_mode == RenderMode.html:
-            html_tpl = get_template_module('events/reminders/emails/event_reminder.html', event=event,
-                                            url=event.short_external_url, note=message, with_agenda=with_agenda,
-                                            with_description=with_description, agenda=agenda)
-    else:
+    if reminder_type == ReminderType.custom:
         html_tpl = get_template_module('emails/custom.html',
                                        url=event.short_external_url, subject=subject, body=message)
+        return html_tpl, None
+
+    if event.type_ == EventType.lecture:
+        with_agenda = False
+    agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
+    note = str(message)  # Legacy reminder (text/plain email only)
+    if note and render_mode == RenderMode.html:
+        note = html_to_plaintext(note).strip()  # Standard reminder (text/html -> text/plain)
+    text_tpl = get_template_module('events/reminders/emails/event_reminder.txt', event=event,
+                                    url=event.short_external_url, note=note, with_agenda=with_agenda,
+                                    with_description=with_description, agenda=agenda)
+    if render_mode == RenderMode.html:
+        html_tpl = get_template_module('events/reminders/emails/event_reminder.html', event=event,
+                                        url=event.short_external_url, note=message, with_agenda=with_agenda,
+                                        with_description=with_description, agenda=agenda)
 
     return html_tpl, text_tpl
