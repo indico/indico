@@ -59,18 +59,20 @@
                 <div class="i-box-title">{%- trans %}Pending reminders{% endtrans -%}</div>
                 <div class="i-box-buttons toolbar right hide-if-locked">
                     <div class="group">
-                        <button class="i-button icon-plus" data-href="{{ url_for('.add', event, reminder_type='custom') }}"
-                            data-title="{%- trans %}Add custom reminder{% endtrans -%}"
-                            data-ajax-dialog
-                            data-reload-after>
+                        <button class="i-button icon-plus"
+                                data-href="{{ url_for('.add', event, reminder_type='custom') }}"
+                                data-title="{%- trans %}Add custom reminder{% endtrans -%}"
+                                data-ajax-dialog
+                                data-reload-after>
                             {%- trans %}Add custom reminder{% endtrans -%}
                         </button>
                     </div>
                     <div class="group">
-                        <button class="i-button icon-plus" data-href="{{ url_for('.add', event, reminder_type='standard') }}"
-                            data-title="{%- trans %}Add standard reminder{% endtrans -%}"
-                            data-ajax-dialog
-                            data-reload-after>
+                        <button class="i-button icon-plus"
+                                data-href="{{ url_for('.add', event, reminder_type='standard') }}"
+                                data-title="{%- trans %}Add standard reminder{% endtrans -%}"
+                                data-ajax-dialog
+                                data-reload-after>
                             {%- trans %}Add standard reminder{% endtrans -%}
                         </button>
                     </div>
