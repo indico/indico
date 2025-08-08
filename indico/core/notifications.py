@@ -78,6 +78,7 @@ def _log_email(email, event, module, user, meta=None, summary=None):
         'body': email['body'].strip(),
         'state': 'pending',
         'sent_dt': None,
+        'alternatives': email['alternatives'],
         'attachments': sorted(
             a.get_filename('unnamed') if isinstance(a, MIMEBase) else a[0]
             for a in email['attachments']
