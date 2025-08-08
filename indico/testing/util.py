@@ -186,7 +186,12 @@ def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kw
     return found
 
 
-def assert_email_snapshot(snapshot, template, snapshot_filename):
+def _strip_html_whitespace(content):
+    """Remove trailing/leading whitespace in each line of the input content."""
+    return '\n'.join(stripped for line in content.splitlines() if (stripped := line.strip()))
+
+
+def assert_email_snapshot(snapshot, template, snapshot_filename, *, html=False):
     """Assert that an email matches a snapshot.
 
     This verifies that both the subject and the body match the snapshots.
@@ -194,8 +199,12 @@ def assert_email_snapshot(snapshot, template, snapshot_filename):
     :param snapshot: The pytest snapshot fixture
     :param template: The email template module
     :param snapshot_filename: The filename for the snapshot
+    :param html: Whether the template is HTML
     """
     body = template.get_body()
+    if html:
+        # we add a trailing linebreak so make manually editing the snapshot easier
+        body = _strip_html_whitespace(body) + '\n'
     subject = template.get_subject()
     name, ext = os.path.splitext(snapshot_filename)
     snapshot_filename_subject = f'{name}.subject{ext}'

@@ -1,0 +1,38 @@
+{%- macro render_agenda(event, agenda) -%}
+    <h3>{% trans title=event.title %}Agenda for {{ title }}{% endtrans %}</h3>
+    {% if not agenda -%}
+        <p>{% trans %}There are no events scheduled.{% endtrans %}</p>
+    {%- endif -%}
+        <ul>
+            {%- for item in agenda %}
+                {{ render_item(item) }}
+            {%- endfor %}
+        </ul>
+{%- endmacro -%}
+
+{%- macro render_item(item) -%}
+    {%- if item.type.name == 'SESSION_BLOCK' -%}
+        {{ render_session_block(item) }}
+    {%- else -%}
+        {{ render_entry(item) }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_session_block(entry) -%}
+    <li>
+        {{ render_times(entry) }} {{ entry.object.full_title }}
+        <ul>
+            {%- for item in entry.children %}
+                {{ render_entry(item) }}
+            {%- endfor -%}
+        </ul>
+    </li>
+{%- endmacro -%}
+
+{%- macro render_entry(entry) -%}
+    <li>{{ render_times(entry) }} {{ entry.object.title }}</li>
+{%- endmacro -%}
+
+{%- macro render_times(entry) -%}
+    [{{ entry.start_dt | format_time(timezone=entry.event.tzinfo) }} - {{ entry.end_dt | format_time(timezone=entry.event.tzinfo) }}]
+{%- endmacro -%}

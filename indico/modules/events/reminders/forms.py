@@ -7,12 +7,15 @@
 
 from operator import attrgetter
 
-from wtforms.fields import BooleanField, SelectField, TextAreaField
+from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
+from wtforms.widgets import TextArea
 
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.tags import RegistrationTag
+from indico.modules.events.reminders.models.reminders import ReminderType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -20,7 +23,8 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoRadioField, TimeDeltaField)
 from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
-from indico.web.forms.validators import DateTimeRange, HiddenUnless
+from indico.web.forms.validators import DateTimeRange, HiddenUnless, NoRelativeURLs
+from indico.web.forms.widgets import TinyMCEWidget
 
 
 def _sort_fn(object_list):
@@ -63,7 +67,10 @@ class ReminderForm(IndicoForm):
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
-    message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
+    subject = StringField(_('Subject'), [DataRequired()])
+    message = TextAreaField(_('Note'), [NoRelativeURLs()],
+                            widget=TinyMCEWidget(absolute_urls=True, height=300),
+                            description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
     include_description = BooleanField(_('Include description'),
@@ -71,8 +78,10 @@ class ReminderForm(IndicoForm):
     attach_ical = BooleanField(_('Attach iCalendar file'),
                                description=_('Attach an iCalendar file to the event reminder.'))
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, reminder_type, render_mode, **kwargs):
+        self.event = event
+        self._reminder_type = reminder_type
+        self._render_mode = render_mode
         self.timezone = self.event.timezone
         super().__init__(*args, **kwargs)
         allowed_senders = self.event.get_allowed_sender_emails(include_noreply=True,
@@ -91,6 +100,18 @@ class ReminderForm(IndicoForm):
         else:
             del self.tags
             del self.all_tags
+        if self._reminder_type == ReminderType.standard:
+            del self.subject
+            # Keep plain/text note editor due to backward compatibility
+            if self._render_mode == RenderMode.plain_text:
+                self.message.widget = TextArea()
+
+        else:
+            self.message.label.text = _('Email body')
+            self.message.validators.append(DataRequired())
+            self.message.flags.required = True
+            del self.include_summary
+            del self.include_description
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:
@@ -129,3 +150,11 @@ class ReminderForm(IndicoForm):
     @generated_data
     def event_start_delta(self):
         return self.relative_delta.data if self.schedule_type.data == 'relative' else None
+
+    @generated_data
+    def reminder_type(self):
+        return self._reminder_type
+
+    @generated_data
+    def render_mode(self):
+        return self._render_mode

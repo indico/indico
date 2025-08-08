@@ -242,7 +242,7 @@ def truncate(text, max_size, ellipsis='...'):
 
 def strip_tags(text):
     """Strip HTML tags and replace adjacent whitespace by one space."""
-    return do_striptags(text)
+    return do_striptags(text or '')
 
 
 def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **kwargs):
@@ -290,7 +290,7 @@ def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **k
         return result
 
 
-def html_to_markdown(html):
+def html_to_markdown(html, **config):
     """Convert basic HTML to Markdown.
 
     This util is meant for cases like comments where the text is generally written
@@ -299,6 +299,8 @@ def html_to_markdown(html):
     """
     ht = HTML2Text(bodywidth=0)
     ht.pad_tables = True
+    for key, value in config.items():
+        setattr(ht, key, value)
     return ht.handle(html)
 
 

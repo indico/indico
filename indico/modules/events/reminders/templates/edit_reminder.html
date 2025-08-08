@@ -37,16 +37,20 @@
                 'use strict';
 
                 $('#preview-reminder').ajaxDialog({
-                    title: $T('Reminder Preview'),
+                    title: $T('Reminder preview'),
                     method: 'POST',
                     data: function() {
                         return {
+                            reminder_type: {{ form.reminder_type.data.name|tojson }},
+                            render_mode: {{ form.render_mode.data.name|tojson }},
                             include_summary: $('#include_summary').prop('checked') ? '1' : '0',
                             include_description: $('#include_description').prop('checked') ? '1' : '0',
                             attach_ical: $('#attach_ical').prop('checked') ? '1' : '0',
+                            subject: $('#subject').val() ?? '',
                             message: $('#message').val()
                         };
-                    }
+                    },
+                    dialogClasses: 'editor-output',
                 });
             })();
         </script>

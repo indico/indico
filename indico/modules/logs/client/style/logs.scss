@@ -200,6 +200,15 @@ table.log-modal-details {
     white-space: normal;
     // For custom HTML where wrapping doesn't work, we at least show a scrollbar.
     overflow-x: auto;
+
+    ul,
+    ol {
+      margin-left: 3em;
+    }
+
+    :is(ul, ol) :is(ul, ol) {
+      margin-left: 1.2em;
+    }
   }
 
   .diff {

@@ -56,14 +56,26 @@
     <div class="i-box-group vert fixed-width reminders">
         <div class="i-box">
             <div class="i-box-header">
-                <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
-                <div class="i-box-buttons hide-if-locked">
-                    <button class="i-button icon-plus" data-href="{{ url_for('.add', event) }}"
-                        data-title="{%- trans %}Add Reminder{% endtrans -%}"
-                        data-ajax-dialog
-                        data-reload-after>
-                        {%- trans %}Add Reminder{% endtrans -%}
-                    </button>
+                <div class="i-box-title">{%- trans %}Pending reminders{% endtrans -%}</div>
+                <div class="i-box-buttons toolbar right hide-if-locked">
+                    <div class="group">
+                        <button class="i-button icon-plus"
+                                data-href="{{ url_for('.add', event, reminder_type='custom') }}"
+                                data-title="{%- trans %}Add custom reminder{% endtrans -%}"
+                                data-ajax-dialog
+                                data-reload-after>
+                            {%- trans %}Add custom reminder{% endtrans -%}
+                        </button>
+                    </div>
+                    <div class="group">
+                        <button class="i-button icon-plus"
+                                data-href="{{ url_for('.add', event, reminder_type='standard') }}"
+                                data-title="{%- trans %}Add standard reminder{% endtrans -%}"
+                                data-ajax-dialog
+                                data-reload-after>
+                            {%- trans %}Add standard reminder{% endtrans -%}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="i-box-content">
@@ -77,7 +89,7 @@
         {% if sent_reminders %}
             <div class="i-box">
                 <div class="i-box-header">
-                    <div class="i-box-title">{%- trans %}Sent Reminders{% endtrans -%}</div>
+                    <div class="i-box-title">{%- trans %}Sent reminders{% endtrans -%}</div>
                 </div>
                 <div class="i-box-content">
                     {{ render_reminders(sent_reminders) }}
