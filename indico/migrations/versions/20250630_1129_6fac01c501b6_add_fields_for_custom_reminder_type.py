@@ -33,16 +33,12 @@ class _RenderMode(int, Enum):
 
 def upgrade():
     op.alter_column('reminders', 'message', type_=sa.Text(), schema='events')
-    op.add_column('reminders',
-                  sa.Column('render_mode', PyIntEnum(_RenderMode), nullable=False, server_default='3'),
+    op.add_column('reminders', sa.Column('render_mode', PyIntEnum(_RenderMode), nullable=False, server_default='3'),
                   schema='events')
     op.alter_column('reminders', 'render_mode', server_default=None, schema='events')
-    op.add_column('reminders',
-                  sa.Column('subject', sa.String(), nullable=False, server_default=''),
-                  schema='events')
+    op.add_column('reminders', sa.Column('subject', sa.String(), nullable=False, server_default=''), schema='events')
     op.alter_column('reminders', 'subject', server_default=None, schema='events')
-    op.add_column('reminders',
-                  sa.Column('reminder_type', PyIntEnum(_ReminderType), nullable=False, server_default='1'),
+    op.add_column('reminders', sa.Column('reminder_type', PyIntEnum(_ReminderType), nullable=False, server_default='1'),
                   schema='events')
     op.alter_column('reminders', 'reminder_type', server_default=None, schema='events')
 
