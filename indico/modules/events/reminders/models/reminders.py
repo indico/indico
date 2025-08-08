@@ -28,7 +28,6 @@ from indico.util.date_time import now_utc
 from indico.util.enum import IndicoIntEnum
 from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
-from indico.web.flask.templating import get_template_module
 
 
 class ReminderType(IndicoIntEnum):
@@ -339,15 +338,6 @@ class EventReminder(RenderModeMixin, db.Model):
         for param in values_from_signal(extra_params, as_list=True):
             email_params.update(param)
         return make_email(**email_params)
-
-    def _get_reminder_email_tpl(self):
-        with_agenda = self.include_summary
-        if self.event.type_ == EventType.lecture:
-            with_agenda = False
-        agenda = self.event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
-        return get_template_module('events/reminders/emails/event_reminder.txt', event=self.event,
-                                   url=self.event.short_external_url, note=self.note, with_agenda=with_agenda,
-                                   with_description=self.with_description, agenda=agenda)
 
     def send(self):
         """Send the reminder to its recipients."""
