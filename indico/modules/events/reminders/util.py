@@ -45,7 +45,7 @@ def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_
                                             url=event.short_external_url, note=message, with_agenda=with_agenda,
                                             with_description=with_description, agenda=agenda)
     else:
-        html_tpl = get_template_module('events/reminders/emails/custom_event_reminder.html',
-                                       url=event.short_external_url, subject=subject, message=message)
+        html_tpl = get_template_module('emails/custom.html',
+                                       url=event.short_external_url, subject=subject, body=message)
 
     return html_tpl, text_tpl
