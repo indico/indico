@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import flash, jsonify, redirect, render_template, request, session
+from markupsafe import escape
 from marshmallow import fields
 
 from indico.core.db import db
@@ -18,7 +19,7 @@ from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
-from indico.util.string import PlainText, RichMarkup, strip_tags
+from indico.util.string import PlainText, RichMarkup
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -153,7 +154,7 @@ class RHPreviewReminder(RHRemindersBase):
         with self.event.force_event_locale():
             html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, reminder_type, render_mode,
                                                                     include_summary, include_description,
-                                                                    strip_tags(subject), message)
+                                                                    escape(subject), message)
         email_tpl = html_email_tpl or text_email_tpl
         html = render_template('events/reminders/preview.html', render_mode=render_mode.name,
                                subject=email_tpl.get_subject(), body=email_tpl.get_body())

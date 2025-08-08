@@ -18,7 +18,7 @@ from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders.models.reminders import ReminderType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import natural_sort_key, strip_tags
+from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoRadioField, TimeDeltaField)
@@ -67,7 +67,7 @@ class ReminderForm(IndicoForm):
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
-    subject = StringField(_('Subject'), [DataRequired()], filters=[strip_tags])
+    subject = StringField(_('Subject'), [DataRequired()])
     message = TextAreaField(_('Note'), [NoRelativeURLs()],
                             widget=TinyMCEWidget(absolute_urls=True, height=300),
                             description=_('A custom message to include in the email.'))
