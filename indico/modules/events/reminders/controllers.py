@@ -144,7 +144,7 @@ class RHPreviewReminder(RHRemindersBase):
         'include_description': fields.Boolean(required=True),
         'subject': fields.String(required=True),
         'message': fields.String(required=True),
-    }, location='form')
+    })
     def _process(self, reminder_type, render_mode, include_summary, include_description, subject, message):
         if render_mode == RenderMode.plain_text:  # Legacy reminder (text/plain email only)
             message = PlainText(message)
