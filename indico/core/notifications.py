@@ -156,7 +156,8 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
     :param template: A template module containing ``get_subject`` and
                      ``get_body`` macros.
     :param html: ``True`` if the email body is HTML
-    :param alternatives: List of (content, mimetype) tuple of alternative representations of the message
+    :param alternatives: List of ``(content, mimetype)`` tuples of alternative
+                         representations of the message
     """
     from indico.core.emails import get_actual_sender_address
     if template is not None and (subject is not None or body is not None):
