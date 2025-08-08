@@ -20,8 +20,8 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key, strip_tags
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (EmailListField, HiddenEnumField, IndicoDateTimeField,
-                                     IndicoQuerySelectMultipleCheckboxField, IndicoRadioField, TimeDeltaField)
+from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
+                                     IndicoRadioField, TimeDeltaField)
 from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, NoRelativeURLs
 from indico.web.forms.widgets import TinyMCEWidget
@@ -36,8 +36,6 @@ class ReminderForm(IndicoForm):
     schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
     schedule_recipient_fields = recipient_fields + schedule_fields
 
-    reminder_type = HiddenEnumField(enum=ReminderType)
-    render_mode = HiddenEnumField(enum=RenderMode)
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
                                      choices=[('relative', _('Relative to the event start time')),
@@ -80,8 +78,10 @@ class ReminderForm(IndicoForm):
     attach_ical = BooleanField(_('Attach iCalendar file'),
                                description=_('Attach an iCalendar file to the event reminder.'))
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, reminder_type, render_mode, **kwargs):
+        self.event = event
+        self._reminder_type = reminder_type
+        self._render_mode = render_mode
         self.timezone = self.event.timezone
         super().__init__(*args, **kwargs)
         allowed_senders = self.event.get_allowed_sender_emails(include_noreply=True,
@@ -100,10 +100,10 @@ class ReminderForm(IndicoForm):
         else:
             del self.tags
             del self.all_tags
-        if self.reminder_type.data == ReminderType.standard:
+        if self._reminder_type == ReminderType.standard:
             del self.subject
             # Keep plain/text note editor due to backward compatibility
-            if self.render_mode.data == RenderMode.plain_text:
+            if self._render_mode == RenderMode.plain_text:
                 self.message.widget = TextArea()
 
         else:
@@ -150,3 +150,11 @@ class ReminderForm(IndicoForm):
     @generated_data
     def event_start_delta(self):
         return self.relative_delta.data if self.schedule_type.data == 'relative' else None
+
+    @generated_data
+    def reminder_type(self):
+        return self._reminder_type
+
+    @generated_data
+    def render_mode(self):
+        return self._render_mode
