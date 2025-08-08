@@ -1,0 +1,22 @@
+Please note that the event "Baking Cats" will start on 8 Aug 2025, 18:18 (UTC).
+
+You can access the full event here:
+http://localhost/e/nyan
+
+
+Note
+----
+[Nyan Nyan **Nyan!**][1]
+
+| Animal  | Cuteness  |
+|---------|-----------|
+| Kitten  | OVER 9000 |
+| Molerat | WTF       |
+
+
+
+   [1]: https://www.nyan.cat/
+
+--
+Indico :: Email Notifier
+http://localhost/e/nyan
