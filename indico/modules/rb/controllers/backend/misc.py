@@ -24,7 +24,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.schemas import EquipmentTypeSchema, SettingsSchema, map_areas_schema, rb_user_schema
-from indico.modules.rb.util import build_rooms_spritesheet
+from indico.modules.rb.util import build_rooms_spritesheet, rb_is_admin
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.util.string import sanitize_html
@@ -77,13 +77,13 @@ class RHUserInfo(RHRoomBookingBase):
         # we assume room booking users are always a restricted/trusted audience who should be
         # able to search for users. hence, we give them a search token straight away instead of
         # linking it to an explicit access check to a room.
-        # the only exception here is that if there are no rooms, then we don't issue a token to
-        # avoid giving users an easy way to get a token in case of a poorly configured indico
-        # instance that has room booking enabled but never configured (and thus likely neither
-        # any rooms nor an ACL on who can access the module)
+        # the only exception here is that if there are no rooms and the requesting user is not
+        # an admin, then we don't issue a token to avoid giving users an easy way to get a token
+        # in case of a poorly configured indico instance that has room booking enabled but never
+        # configured (and thus likely neither any rooms nor an ACL on who can access the module)
         data['search_token'] = (
             make_user_search_token()
-            if Room.query.filter(~Room.is_deleted).has_rows()
+            if rb_is_admin(session.user) or Room.query.filter(~Room.is_deleted).has_rows()
             else None
         )
         return jsonify(data)
