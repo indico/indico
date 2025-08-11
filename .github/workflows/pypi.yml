@@ -20,7 +20,7 @@ jobs:
     name: Build package 📦
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         name: Set up Python 🐍
         with:
@@ -63,7 +63,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         name: Download build artifacts 📦
       - name: Create draft release 🐙
         run: >-
@@ -87,7 +87,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
         uses: pypa/gh-action-pypi-publish@v1.12.4
