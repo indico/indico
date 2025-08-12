@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 import {Moment} from 'moment';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Divider, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -52,34 +52,18 @@ export default function Toolbar({
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
-  const maxDays = useSelector(selectors.getNavbarMaxDays);
-  const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   // Math.ceil and float number allows this to work for a difference of a day
-  // but less than 24h, also across multiple months.
+  // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
   const gradientWidth = 10;
   const dayWidth = 60;
 
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
-
-  const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
-    if (mouseDown && e.buttons !== 1) {
-      return;
-    }
-    if (typeof navigateTo === 'number') {
-      onNavigate(getDateFromIdx(navigateTo));
-    } else if (currentDayIdx < newOffset) {
-      onNavigate(getDateFromIdx(newOffset));
-    } else if (currentDayIdx >= newOffset + maxDays) {
-      onNavigate(getDateFromIdx(newOffset + maxDays));
-    }
-    dispatch(actions.scrollNavbar(newOffset));
-  };
 
   const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
     if (daysBarRef && daysBarRef.current) {
@@ -89,19 +73,26 @@ export default function Toolbar({
     }
   };
 
-  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => _ => {
+  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => () => {
     scrollToDay(num, scrollBehavior);
     onNavigate(getDateFromIdx(num));
   };
 
-  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => _ => {
+  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => () => {
     if (daysBarRef && daysBarRef.current) {
       const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
-      const dayDelta = daysPerPage * pageDelta;
-      const newDay =
-        Math.sign(pageDelta) === 1
-          ? Math.min(currentDayIdx + dayDelta, numDays - 1)
-          : Math.max(currentDayIdx + dayDelta, 0);
+      const directionSign = Math.sign(pageDelta);
+
+      // TODO: (Ajob) Evaluate if moving by one day on small events is the desired behavior,
+      //              as one could argue that it is unpredictable/inconsistent
+      let newDay = currentDayIdx + directionSign;
+      if (daysPerPage < numDays) {
+        const dayDelta = daysPerPage * pageDelta;
+        newDay =
+          directionSign === 1
+            ? Math.min(currentDayIdx + dayDelta, numDays - 1)
+            : Math.max(currentDayIdx + dayDelta, 0);
+      }
       scrollToDay(newDay, behavior);
       onNavigate(getDateFromIdx(newDay));
     }
@@ -231,8 +222,8 @@ export default function Toolbar({
           <div ref={daysBarRef} styleName="days">
             <div styleName="gradient" />
             {[...Array(numDays).keys()].map((n, i) => {
-              const d = getDateFromIdx(n + offset);
-              const isActive = n + offset === currentDayIdx;
+              const d = getDateFromIdx(n);
+              const isActive = n === currentDayIdx;
               const showMonth = i === 0 || d.date() === 1;
               return (
                 <Menu.Item
