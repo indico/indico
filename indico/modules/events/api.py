@@ -307,7 +307,7 @@ class SerializerBase:
             'title': block.full_title,
             'url': url_for('sessions.display_session', block.session, _external=True),
             'contributions': [self._serialize_contribution(c) for c in block.event.contributions
-                              if c.session_block == block],
+                              if c.session_block == block and c.can_access(self.user)],
             'note': build_note_api_data(block.note),
             'session': serialized_session,
             'room': block.get_room_name(full=False),
@@ -639,6 +639,8 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             data['contributions'] = []
             if allow_details:
                 for contribution in event.contributions:
+                    if not contribution.can_access(self.user):
+                        continue
                     include_subcontribs = self._detail_level == 'subcontributions'
                     serialized_contrib = self._serialize_contribution(contribution, include_subcontribs)
                     data['contributions'].append(serialized_contrib)
@@ -648,11 +650,13 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             if allow_details:
                 # Contributions without a session
                 for contribution in event.contributions:
-                    if not contribution.session:
+                    if not contribution.session and contribution.can_access(self.user):
                         serialized_contrib = self._serialize_contribution(contribution)
                         data['contributions'].append(serialized_contrib)
 
                 for session_ in event.sessions:
+                    if not session_.can_access(self.user):
+                        continue
                     data['sessions'].extend(self._build_session_api_data(session_))
         if self._occurrences:
             data['occurrences'] = self._serialize_event_occurrences(event, self._fromDT, self._toDT)
