@@ -170,7 +170,7 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
     entryData = {start_dt: entry.startDt};
   }
 
-  return ajaxAction(() => indicoAxios.patch(entryURL, snakifyKeys(entryData)), null, () => ({
+  return ajaxAction(() => indicoAxios.patch(entryURL, entryData), null, () => ({
     type: MOVE_ENTRY,
     date,
     entries,
