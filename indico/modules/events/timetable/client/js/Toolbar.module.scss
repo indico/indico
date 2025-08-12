@@ -7,14 +7,17 @@
 
 @use 'base/palette' as *;
 
-$highlight-color: #2e59d1ce;
+// Separate variables to allow customization.
+$primary-color: $dark-blue;
+$bg-color: $white;
+$toolbar-bg-color: $pastel-gray;
 
 .toolbar {
   position: sticky;
   top: 0;
   // padding-top: 1.5em;
   // margin-top: -1.5em;
-  background-color: $white;
+  background-color: $bg-color;
   z-index: 100;
 
   :global(.ui.menu) {
@@ -26,9 +29,9 @@ $highlight-color: #2e59d1ce;
 
     &.actions-bar {
       border-radius: 5px;
-      background: rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: rgba($toolbar-bg-color, 0.5);
+      border: 1px solid rgba(darken($toolbar-bg-color, 30%), 0.2);
+      box-shadow: 0 0 10px rgba($toolbar-bg-color, 0.1);
       padding: 1%;
     }
 
@@ -37,12 +40,15 @@ $highlight-color: #2e59d1ce;
 
       .days-wrapper {
         flex-shrink: 1;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         overflow-y: hidden;
         box-sizing: content-box;
         position: relative;
 
         .days {
-          width: 100%;
           display: flex;
           overflow-x: auto;
           box-sizing: content-box;
@@ -68,15 +74,16 @@ $highlight-color: #2e59d1ce;
 
             &:global(.active) {
               .day-number {
-                color: white;
-                background-color: $highlight-color;
+                color: $bg-color;
+                background-color: $primary-color;
               }
             }
 
             &:global(:not(.active)) {
               &:hover {
                 > .day-number {
-                  background-color: rgba(0, 0, 0, 0.1);
+                  background-color: rgba($black, 0.1);
+                  transition: 0.1s;
                 }
               }
 
@@ -86,10 +93,10 @@ $highlight-color: #2e59d1ce;
             }
 
             > .day-month {
-              color: white;
+              color: $bg-color;
               font-weight: bold;
               font-size: 0.8em;
-              background-color: rgba($highlight-color, 0.5);
+              background-color: rgba($primary-color, 0.5);
               border-radius: 3px;
               padding: 2px 8px;
               margin-bottom: 5px;
@@ -102,7 +109,6 @@ $highlight-color: #2e59d1ce;
             > .day-number {
               font-size: 1.2em;
               font-weight: bold;
-              transition: 0.1s;
               width: 40px;
               height: 40px;
               display: flex;
@@ -123,12 +129,12 @@ $highlight-color: #2e59d1ce;
             z-index: 1;
 
             &:first-child {
-              background: linear-gradient(90deg, white, transparent);
+              background: linear-gradient(90deg, $bg-color, transparent);
               left: 0;
             }
 
             &:last-child {
-              background: linear-gradient(-90deg, white, transparent);
+              background: linear-gradient(-90deg, $bg-color, transparent);
               right: 0;
             }
           }

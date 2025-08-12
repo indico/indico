@@ -52,13 +52,12 @@ export default function Toolbar({
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
-  const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   // Math.ceil and float number allows this to work for a difference of a day
-  // but less than 24h, also across multiple months.
+  // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
   const gradientWidth = 10;
@@ -74,19 +73,26 @@ export default function Toolbar({
     }
   };
 
-  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => _ => {
+  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => () => {
     scrollToDay(num, scrollBehavior);
     onNavigate(getDateFromIdx(num));
   };
 
-  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => _ => {
+  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => () => {
     if (daysBarRef && daysBarRef.current) {
       const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
-      const dayDelta = daysPerPage * pageDelta;
-      const newDay =
-        Math.sign(pageDelta) === 1
-          ? Math.min(currentDayIdx + dayDelta, numDays - 1)
-          : Math.max(currentDayIdx + dayDelta, 0);
+      const directionSign = Math.sign(pageDelta);
+
+      // TODO: (Ajob) Evaluate if moving by one day on small events is the desired behavior,
+      //              as one could argue that it is unpredictable/inconsistent
+      let newDay = currentDayIdx + directionSign;
+      if (daysPerPage < numDays) {
+        const dayDelta = daysPerPage * pageDelta;
+        newDay =
+          directionSign === 1
+            ? Math.min(currentDayIdx + dayDelta, numDays - 1)
+            : Math.max(currentDayIdx + dayDelta, 0);
+      }
       scrollToDay(newDay, behavior);
       onNavigate(getDateFromIdx(newDay));
     }
@@ -210,8 +216,8 @@ export default function Toolbar({
           <div ref={daysBarRef} styleName="days">
             <div styleName="gradient" />
             {[...Array(numDays).keys()].map((n, i) => {
-              const d = getDateFromIdx(n + offset);
-              const isActive = n + offset === currentDayIdx;
+              const d = getDateFromIdx(n);
+              const isActive = n === currentDayIdx;
               const showMonth = i === 0 || d.date() === 1;
               return (
                 <Menu.Item
