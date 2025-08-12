@@ -239,7 +239,7 @@ class RegistrationExceptionalModificationForm(IndicoForm):
 
 
 class InvitationFormBase(IndicoForm):
-    _invitation_fields = ('skip_moderation', 'skip_access_check')
+    _invitation_fields = ('skip_moderation', 'skip_access_check', 'allow_different_email')
     _email_fields = ('email_sender', 'email_subject', 'email_body')
     email_sender = SelectField(_('Sender'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
@@ -250,6 +250,9 @@ class InvitationFormBase(IndicoForm):
     skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
                                      description=_('If enabled, the user will be able to register even if the event '
                                                    'is access-restricted.'))
+    allow_different_email = BooleanField(_('Allow different email'), widget=SwitchWidget(),
+                                     description=_('If enabled, the user will be able to register with an email '
+                                                   'different than the email used in the invitation.'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
