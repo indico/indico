@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 // import {Checkbox} from 'semantic-ui-react';
 
@@ -15,20 +15,20 @@ import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {WeekTimetable} from './WeekTimetable';
-import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
 
 export default function Timetable() {
+  const dispatch = useDispatch();
   const entries = useSelector(selectors.getDayEntries);
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  const currentDay = useSelector(selectors.getCurrentDay);
 
-  const [date, setDate] = useState(eventStartDt);
-  const currentDateEntries = entries[date.format('YYYYMMDD')];
+  const currentDateEntries = entries[currentDay.format('YYYYMMDD')];
 
   const useWeekView = false;
 
@@ -63,13 +63,19 @@ export default function Timetable() {
   return (
     <div styleName="timetable">
       <GlobalEvents />
-      {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
-      {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
+      {!useWeekView && (
+        <Toolbar
+          date={currentDay}
+          onNavigate={d => {
+            dispatch(actions.setCurrentDay(d));
+          }}
+        />
+      )}
       <div styleName="content">
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
         {!useWeekView && (
           <DayTimetable
-            dt={date}
+            dt={currentDay}
             eventId={eventId}
             minHour={minHour}
             maxHour={maxHour}
