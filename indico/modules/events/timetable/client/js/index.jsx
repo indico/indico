@@ -40,7 +40,7 @@ import Timetable from './Timetable';
       const store = createReduxStore('timetable-management', reducers, initialData);
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
-      store.dispatch(setCurrentDay(initialData.staticData.startDt.format('YYYYMMDD')));
+      store.dispatch(setCurrentDay(initialData.staticData.startDt));
       ReactDOM.render(
         <Provider store={store}>
           <Timetable />
