@@ -272,7 +272,7 @@ pygments==2.18.0
     #   rich
 pynpm==0.2.0
     # via pywebpack
-pypdf==5.1.0
+pypdf==6.0.0
     # via -r requirements.in
 pyphen==0.17.0
     # via weasyprint
