@@ -162,13 +162,6 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
       entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   }
 
-  // let entryData;
-
-  // if (entry.type === EntryType.Contribution) {
-  //   entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
-  // } else {
-  // const entryData = {start_dt: entry.startDt};
-  // }
   const entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
 
   return ajaxAction(() => indicoAxios.patch(entryURL, entryData), null, () => ({
