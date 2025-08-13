@@ -66,40 +66,31 @@ export default function Toolbar({
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
   const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
-    if (daysBarRef && daysBarRef.current) {
-      const left =
-        dayIndex * dayWidth - (daysBarRef.current.clientWidth - gradientWidth) / 2 + dayWidth / 2;
-      daysBarRef.current.scrollTo({left, behavior});
-    }
+    const barWidth = daysBarRef.current.clientWidth - gradientWidth;
+    const left = dayIndex * dayWidth - barWidth / 2 + dayWidth / 2;
+    daysBarRef.current.scrollTo({left, behavior});
   };
 
-  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => () => {
-    scrollToDay(num, scrollBehavior);
-    onNavigate(getDateFromIdx(num));
+  const scrollByDay = (dayDelta: number, behavior: ScrollBehavior = 'smooth') => {
+    const directionSign = Math.sign(dayDelta);
+    const newDay =
+      directionSign === 1
+        ? Math.min(currentDayIdx + dayDelta, numDays - 1)
+        : Math.max(currentDayIdx + dayDelta, 0);
+    scrollToDay(newDay, behavior);
+    onNavigate(getDateFromIdx(newDay));
   };
 
-  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => () => {
-    if (daysBarRef && daysBarRef.current) {
-      const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
-      const directionSign = Math.sign(pageDelta);
-
-      // TODO: (Ajob) Evaluate if moving by one day on small events is the desired behavior,
-      //              as one could argue that it is unpredictable/inconsistent
-      let newDay = currentDayIdx + directionSign;
-      if (daysPerPage < numDays) {
-        const dayDelta = daysPerPage * pageDelta;
-        newDay =
-          directionSign === 1
-            ? Math.min(currentDayIdx + dayDelta, numDays - 1)
-            : Math.max(currentDayIdx + dayDelta, 0);
-      }
-      scrollToDay(newDay, behavior);
-      onNavigate(getDateFromIdx(newDay));
-    }
+  const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => {
+    const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
+    const dayDelta = daysPerPage * pageDelta;
+    scrollByDay(dayDelta, behavior);
   };
 
   useEffect(() => {
-    scrollToDay(currentDayIdx);
+    if (daysBarRef && daysBarRef.current) {
+      scrollToDay(currentDayIdx);
+    }
   }, [daysBarRef]);
 
   return (
@@ -199,16 +190,16 @@ export default function Toolbar({
       </Menu>
       <Menu tabular styleName="timetable-bar">
         <Menu.Item
-          onClick={navigateToDayNumber(0)}
+          onClick={() => scrollByPage(-1)}
           disabled={currentDayIdx === 0}
-          title={Translate.string('Go to start')}
+          title={Translate.string('Previous page')}
           icon="angle double left"
           styleName="action"
         />
         <Menu.Item
-          onClick={scrollByPage(-1)}
+          onClick={() => scrollByDay(-1)}
           disabled={currentDayIdx === 0}
-          title={Translate.string('Scroll left')}
+          title={Translate.string('Previous day')}
           icon="angle left"
           styleName="action"
         />
@@ -239,17 +230,17 @@ export default function Toolbar({
           </div>
         </Menu.Item>
         <Menu.Item
-          onClick={scrollByPage(1)}
+          onClick={() => scrollByDay(1)}
           disabled={currentDayIdx >= numDays}
-          title={Translate.string('Scroll right')}
+          title={Translate.string('Next day')}
           icon="angle right"
           position="right"
           styleName="action"
         />
         <Menu.Item
-          onClick={navigateToDayNumber(numDays - 1)}
+          onClick={() => scrollByPage(1)}
           disabled={currentDayIdx >= numDays - 1}
-          title={Translate.string('Go to end')}
+          title={Translate.string('Next page')}
           icon="angle double right"
           styleName="action"
         />
