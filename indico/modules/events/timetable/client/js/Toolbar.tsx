@@ -161,13 +161,7 @@ export default function Toolbar({
             ))}
           </Dropdown.Menu>
         </Dropdown>
-        <NewEntryDropdown
-          icon="add"
-          styleName="action"
-          direction="left"
-          title={Translate.string('Add new')}
-          item
-        />
+        <NewEntryDropdown icon="add" styleName="action" direction="left" item />
         <Menu.Item
           onClick={() => dispatch(actions.toggleExpand())}
           title={isExpanded ? Translate.string('Compress') : Translate.string('Expand')}
