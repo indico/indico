@@ -32,7 +32,7 @@ interface Entries {
 export interface ReduxState {
   entries: Entries;
   sessions: any[];
-  navigation: {numDays: number; offset: number};
+  navigation: {numDays: number; offset: number; currentDay: moment.Moment};
   display: {mode: string; showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
 }
@@ -407,12 +407,14 @@ export default {
         return state;
     }
   },
-  navigation: (state = {numDays: 2, offset: 0}, action) => {
+  navigation: (state = {numDays: 2, offset: 0, currentDay: null}, action) => {
     switch (action.type) {
       case actions.SCROLL_NAVBAR:
         return {...state, offset: action.offset};
       case actions.RESIZE_WINDOW:
-        return resizeWindow(state, action);
+        return {...resizeWindow(state, action), currentDay: state.currentDay};
+      case actions.SET_CURRENT_DAY:
+        return {...state, currentDay: action.day};
       default:
         return state;
     }
