@@ -8,10 +8,9 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import TimePicker from 'rc-time-picker';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-import {DatePicker} from 'indico/react/components';
+import {DatePicker, TimePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
@@ -60,14 +59,14 @@ export default function WTFDateTimeField({
   const [currentTimezone, setTimezone] = useState(timezone);
   const earliestMoment = earliest ? moment(earliest) : null;
   const latestMoment = latest ? moment(latest) : null;
-  const format = uses24HourFormat ? 'H:mm' : 'h:mm a';
-  const timePickerRef = useRef(null);
+  // const timePickerRef = useRef(null);
   const clearRef = useRef(null);
 
   const updateTime = useCallback(
     value => {
-      timeField.value = value ? value.format('HH:mm') : '';
-      setTime(value);
+      const momentValue = value ? toMoment(value, 'HH:mm', true) : null;
+      timeField.value = momentValue?.format('HH:mm') ?? '';
+      setTime(momentValue);
       triggerChange(timeId);
     },
     [timeField, timeId]
@@ -91,7 +90,7 @@ export default function WTFDateTimeField({
         dateField.value = '';
         pickerInput.setCustomValidity(Translate.string('The entered date is invalid.'));
         setDate(null);
-        timePickerRef.current.picker.required = false;
+        // timePickerRef.current.picker.required = false;
       } else {
         if (value && timeField.value === '') {
           updateTime(moment(defaultTime, 'HH:mm'));
@@ -104,7 +103,7 @@ export default function WTFDateTimeField({
         }
         pickerInput.setCustomValidity('');
         setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
-        timePickerRef.current.picker.required = !!value;
+        // timePickerRef.current.picker.required = !!value;
       }
       triggerChange(dateId);
     },
@@ -125,9 +124,9 @@ export default function WTFDateTimeField({
     };
   }, [timezoneField]);
 
-  useEffect(() => {
-    timePickerRef.current.picker.required = required;
-  }, [required]);
+  // useEffect(() => {
+  //   timePickerRef.current.picker.required = required;
+  // }, [required]);
 
   useEffect(() => {
     if (!linkedField) {
@@ -156,6 +155,7 @@ export default function WTFDateTimeField({
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
+  // TODO pass min/max time instaed once the time picker supports it
   const getDisabledHours = useCallback(() => {
     const hours = [];
     if ((earliestMoment || latestMoment) && !date) {
@@ -210,22 +210,18 @@ export default function WTFDateTimeField({
         disabled={disabled}
       />
       <TimePicker
-        showSecond={false}
-        value={time}
-        focusOnOpen
-        format={format}
+        value="13:37"
+        timeFormat={uses24HourFormat ? '24h' : '12h'}
         onChange={updateTime}
-        use12Hours={!uses24HourFormat}
-        allowEmpty={false}
-        placeholder="--:--"
-        disabledHours={getDisabledHours}
-        disabledMinutes={getDisabledMinutes}
+        // disabledHours={getDisabledHours}
+        // disabledMinutes={getDisabledMinutes}
         disabled={disabled}
-        ref={timePickerRef}
+        // ref={timePickerRef}
+        required={!!date || required}
         // keep the picker in the DOM tree of the surrounding element to avoid
         // e.g. qbubbles from closing when a picker is used inside one and the
         // user clicks something in the picker
-        getPopupContainer={node => node}
+        // getPopupContainer={node => node}
       />
       <i className="timezone" id={`${timeId}-timezone`} title={currentTimezone} />
       {(time || date) && allowClear && !disabled && (
