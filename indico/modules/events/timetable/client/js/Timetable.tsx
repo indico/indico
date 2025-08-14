@@ -46,7 +46,7 @@ export default function Timetable() {
   const maxHour = showAllTimeslots
     ? 24
     : Math.max(
-      eventEndDt.hour(),
+        eventEndDt.hour(),
         ...(useWeekView
           ? Object.values(entries)
               .flat()
@@ -57,10 +57,6 @@ export default function Timetable() {
                 .hour()
             ))
       );
-
-  useEffect(() => {
-    setCurrentDateLocalStorage(date, eventId);
-  }, [date]);
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>

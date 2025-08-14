@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .timetable {
   display: flex;
   flex-direction: column;
@@ -18,8 +20,8 @@
     overflow: hidden;
     padding: 10px 10px 0 10px;
     border-radius: 8px;
-    box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
-    background-color: white;
+    box-shadow: 0 0 80px rgba($black, 0.8);
+    background-color: $white;
   }
 
   & > .content {

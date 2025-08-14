@@ -59,6 +59,7 @@ export default function Toolbar({
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
+  const maxDays = currentDayIdx >= numDays - 1;
 
   const gradientWidth = 10;
   const dayWidth = 60;
@@ -71,14 +72,18 @@ export default function Toolbar({
     daysBarRef.current.scrollTo({left, behavior});
   };
 
+  const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => {
+    scrollToDay(num, scrollBehavior);
+    onNavigate(getDateFromIdx(num));
+  };
+
   const scrollByDay = (dayDelta: number, behavior: ScrollBehavior = 'smooth') => {
     const directionSign = Math.sign(dayDelta);
     const newDay =
       directionSign === 1
         ? Math.min(currentDayIdx + dayDelta, numDays - 1)
         : Math.max(currentDayIdx + dayDelta, 0);
-    scrollToDay(newDay, behavior);
-    onNavigate(getDateFromIdx(newDay));
+    navigateToDayNumber(newDay, behavior);
   };
 
   const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => {
@@ -117,15 +122,8 @@ export default function Toolbar({
         >
           <Icon.Group>
             <Icon name="file alternate outline" />
-            <Icon name={showUnscheduled ? 'eye slash' : 'eye'} corner="bottom right" />
             {!showUnscheduled && (
-              <Label
-                color={numUnscheduled ? 'red' : null}
-                size="mini"
-                content={numUnscheduled}
-                floating
-                circular
-              />
+              <Label color={'red'} size="mini" content={numUnscheduled} floating circular />
             )}
           </Icon.Group>
         </Menu.Item>
@@ -145,7 +143,7 @@ export default function Toolbar({
         />
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
-          icon="columns"
+          icon="object group"
           styleName="action"
           className="right"
           direction="left"
@@ -206,21 +204,18 @@ export default function Toolbar({
         <Menu.Item fitted styleName="days-wrapper">
           <div ref={daysBarRef} styleName="days">
             <div styleName="gradient" />
-            {[...Array(numDays).keys()].map((n, i) => {
+            {[...Array(numDays).keys()].map(n => {
               const d = getDateFromIdx(n);
               const isActive = n === currentDayIdx;
-              const showMonth = i === 0 || d.date() === 1;
               return (
                 <Menu.Item
                   fitted="horizontally"
                   key={n}
-                  onClick={() => onNavigate(d)}
+                  onClick={() => navigateToDayNumber(n)}
                   styleName="day"
                   active={isActive}
                 >
-                  <span styleName={`day-month ${showMonth ? '' : 'hidden'}`}>
-                    {d.format('MMM')}
-                  </span>
+                  <span styleName="day-month">{d.format('MMM')}</span>
                   <span styleName="day-number">{d.format('D')}</span>
                   <span styleName="day-name">{d.format('ddd')}</span>
                 </Menu.Item>
@@ -231,7 +226,7 @@ export default function Toolbar({
         </Menu.Item>
         <Menu.Item
           onClick={() => scrollByDay(1)}
-          disabled={currentDayIdx >= numDays}
+          disabled={maxDays}
           title={Translate.string('Next day')}
           icon="angle right"
           position="right"
@@ -239,7 +234,7 @@ export default function Toolbar({
         />
         <Menu.Item
           onClick={() => scrollByPage(1)}
-          disabled={currentDayIdx >= numDays - 1}
+          disabled={maxDays}
           title={Translate.string('Next page')}
           icon="angle double right"
           styleName="action"
