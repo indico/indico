@@ -13,6 +13,7 @@ import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create'
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import _ from 'lodash';
+import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
@@ -30,8 +31,8 @@ import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {EntryType, Session} from './types';
-import {mapTTDataToEntry} from './utils';
+import {Entry, EntryType, Session} from './types';
+import {mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
 
@@ -265,10 +266,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (data['start_dt']) {
+      const startDtMoment = moment(data['start_dt']);
       data['start_dt'] =
         activeType === EntryType.Contribution
-          ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
-          : entry.startDt.format();
+          ? startDtMoment.format('YYYY-MM-DDTHH:mm:ss')
+          : startDtMoment.format();
     }
 
     const submitData = snakifyKeys(data);
@@ -278,9 +280,14 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     const {data: resData} = await submitHandler(submitData);
-    resData['type'] = activeType;
+    resData.type = activeType;
 
     const resEntry = mapTTDataToEntry(resData);
+
+    if (resEntry.type === EntryType.SessionBlock) {
+      const deltaStartDt = moment(resEntry.startDt).diff(entry.startDt, 'minutes');
+      resEntry.children = shiftEntries(entry.children, deltaStartDt);
+    }
 
     if (isEditing) {
       dispatch(actions.updateEntry(activeType, resEntry));
@@ -315,6 +322,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       onClose={onClose}
       onSubmit={handleSubmit}
       initialValues={initialValues}
+      initialValuesEqual={_.isEqual}
       disabledUntilChange={false}
       keepDirtyOnReinitialize
       size="small"

@@ -161,3 +161,10 @@ export function useTraceUpdate(props) {
     prev.current = props;
   });
 }
+
+export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number): T[] {
+  return entries.map(child => ({
+    ...child,
+    startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
+  }));
+}
