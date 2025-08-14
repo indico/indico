@@ -141,7 +141,7 @@ function CalendarLegend({
       />
       <div styleName="toggle-container">
         <span onClick={selectAll} style={{cursor: 'pointer', marginRight: '8px'}}>
-          <Translate>Select all</Translate>
+          <Translate as="span">Select all</Translate>
         </span>
         {' | '}
         <span onClick={deselectAll} style={{cursor: 'pointer', marginLeft: '8px'}}>

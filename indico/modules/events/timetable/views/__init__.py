@@ -29,11 +29,22 @@ register_template_hook('week-meeting-body', inject_week_timetable)
 class WPManageTimetable(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/timetable/'
     sidemenu_option = 'timetable'
-    bundles = ('markdown.js', 'module_events.contributions.js')
+    bundles = (
+        'markdown.js',
+        'module_events.contributions.js',
+        'module_events.sessions.js',
+        'module_events.sessions.css',
+        'module_events.timetable.js',
+        'module_events.timetable.css'
+    )
 
     def __init__(self, rh, event_, **kwargs):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
         WPEventManagement.__init__(self, rh, event_, custom_links=custom_links, **kwargs)
+
+
+class WPManageTimetableOld(WPManageTimetable):
+    sidemenu_option = 'old-timetable'
 
 
 class WPDisplayTimetable(WPConferenceDisplayBase):
