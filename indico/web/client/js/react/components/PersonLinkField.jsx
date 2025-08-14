@@ -270,6 +270,29 @@ function PersonLinkField({
   const sectionKeys = new Set(sections.map(x => x.name));
   const othersCondition = p => !p.roles || !p.roles.find(r => sectionKeys.has(r));
 
+  const cleanupPersons = persons => {
+    return persons.map(p =>
+      _.pick(p, [
+        'title',
+        'name',
+        'firstName',
+        'lastName',
+        'affiliation',
+        'affiliationId',
+        'email',
+        'address',
+        'phone',
+        'roles',
+        'displayOrder',
+        'identifier',
+        'type',
+        'personId',
+        'avatarURL',
+        ..._.flatten(getPluginObjects('personLinkCustomFields')),
+      ])
+    );
+  };
+
   const onClose = () => {
     setSelected(null);
     setModalOpen('');
@@ -282,7 +305,7 @@ function PersonLinkField({
 
   const setAutoSort = sort => {
     _setAutoSort(sort);
-    onChange(_persons.map((x, i) => ({...x, displayOrder: sort ? 0 : i})));
+    onChange(cleanupPersons(_persons.map((x, i) => ({...x, displayOrder: sort ? 0 : i}))));
   };
 
   const formatName = ({firstName, lastName}) => {
@@ -321,7 +344,9 @@ function PersonLinkField({
       p.roles = roles.filter(x => x.default).map(x => x.name);
       hooks.forEach(f => f(p));
     });
-    onChange([...persons, ...values.filter(v => !existing.includes(v.email.toLowerCase()))]);
+    onChange(
+      cleanupPersons([...persons, ...values.filter(v => !existing.includes(v.email.toLowerCase()))])
+    );
   };
 
   const onSubmit = value => {
@@ -336,7 +361,7 @@ function PersonLinkField({
       delete value.affiliationData;
     }
     if (selected !== null) {
-      onChange(persons.map((v, idx) => (idx === selected ? value : v)));
+      onChange(cleanupPersons(persons.map((v, idx) => (idx === selected ? value : v))));
     } else {
       onAdd([value]);
     }
@@ -623,27 +648,7 @@ export function WTFPersonLinkField({
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
   const onChange = value => {
-    const picked = value.map(p =>
-      _.pick(p, [
-        'title',
-        'name',
-        'firstName',
-        'lastName',
-        'affiliation',
-        'affiliationId',
-        'email',
-        'address',
-        'phone',
-        'roles',
-        'displayOrder',
-        'identifier',
-        'type',
-        'personId',
-        'avatarURL',
-        ..._.flatten(getPluginObjects('personLinkCustomFields')),
-      ])
-    );
-    inputField.value = JSON.stringify(snakifyKeys(picked));
+    inputField.value = JSON.stringify(snakifyKeys(value));
     setPersons(value);
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
   };
