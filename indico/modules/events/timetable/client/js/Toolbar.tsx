@@ -8,9 +8,11 @@
 import {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Button, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+
+import PublicationButton from '../../../../events/contributions/client/js/PublicationButton';
 
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
@@ -58,7 +60,7 @@ export default function Toolbar({
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
-  const maxDays = currentDayIdx >= numDays - 1;
+  const reachedLastDay = currentDayIdx >= numDays;
 
   const gradientWidth = 10;
   const dayWidth = 60;
@@ -122,7 +124,7 @@ export default function Toolbar({
           <Icon.Group>
             <Icon name="file alternate outline" />
             {!showUnscheduled && (
-              <Label color={'red'} size="mini" content={numUnscheduled} floating circular />
+              <Label color="red" size="mini" content={numUnscheduled} floating circular />
             )}
           </Icon.Group>
         </Menu.Item>
@@ -140,6 +142,19 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
+        {/* Choose which button for draft mode */}
+        <Button
+          size="tiny"
+          icon="upload"
+          color="orange"
+          basic
+          content={Translate.string('Publish Contributions')}
+          title={Translate.string(
+            'While in draft mode, regular users cannot see the contributions and timetable.'
+          )}
+          className="right"
+        />
+        <PublicationButton eventId="13" />
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="object group"
@@ -168,61 +183,68 @@ export default function Toolbar({
           icon={isExpanded ? 'compress' : 'expand'}
           styleName="action"
         />
+        {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
       </Menu>
-      <Menu tabular styleName="timetable-bar">
-        <Menu.Item
-          onClick={() => scrollByPage(-1)}
-          disabled={currentDayIdx === 0}
-          title={Translate.string('Previous page')}
-          icon="angle double left"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={() => scrollByDay(-1)}
-          disabled={currentDayIdx === 0}
-          title={Translate.string('Previous day')}
-          icon="angle left"
-          styleName="action"
-        />
-        <Menu.Item fitted styleName="days-wrapper">
-          <div ref={daysBarRef} styleName="days">
-            <div styleName="gradient" />
-            {[...Array(numDays).keys()].map(n => {
-              const d = getDateFromIdx(n);
-              const isActive = n === currentDayIdx;
-              return (
-                <Menu.Item
-                  fitted="horizontally"
-                  key={n}
-                  onClick={() => navigateToDayNumber(n)}
-                  styleName="day"
-                  active={isActive}
-                >
-                  <span styleName="day-month">{d.format('MMM')}</span>
-                  <span styleName="day-number">{d.format('D')}</span>
-                  <span styleName="day-name">{d.format('ddd')}</span>
-                </Menu.Item>
-              );
-            })}
-            <div styleName="gradient" />
-          </div>
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => scrollByDay(1)}
-          disabled={maxDays}
-          title={Translate.string('Next day')}
-          icon="angle right"
-          position="right"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={() => scrollByPage(1)}
-          disabled={maxDays}
-          title={Translate.string('Next page')}
-          icon="angle double right"
-          styleName="action"
-        />
-      </Menu>
+      {numDays > 1 && (
+        <Menu tabular styleName="timetable-bar">
+          {numDays > 2 && (
+            <Menu.Item
+              onClick={() => scrollByPage(-1)}
+              disabled={currentDayIdx === 0}
+              title={Translate.string('Previous page')}
+              icon="angle double left"
+              styleName="action"
+            />
+          )}
+          <Menu.Item
+            onClick={() => scrollByDay(-1)}
+            disabled={currentDayIdx === 0}
+            title={Translate.string('Previous day')}
+            icon="angle left"
+            styleName="action"
+          />
+          <Menu.Item fitted styleName="days-wrapper">
+            <div ref={daysBarRef} styleName="days">
+              <div styleName="gradient" />
+              {[...Array(numDays).keys()].map(n => {
+                const d = getDateFromIdx(n);
+                const isActive = n === currentDayIdx;
+                return (
+                  <Menu.Item
+                    fitted="horizontally"
+                    key={n}
+                    onClick={() => navigateToDayNumber(n)}
+                    styleName="day"
+                    active={isActive}
+                  >
+                    <span styleName="day-month">{d.format('MMM')}</span>
+                    <span styleName="day-number">{d.format('D')}</span>
+                    <span styleName="day-name">{d.format('ddd')}</span>
+                  </Menu.Item>
+                );
+              })}
+              <div styleName="gradient" />
+            </div>
+          </Menu.Item>
+          <Menu.Item
+            onClick={() => scrollByDay(1)}
+            disabled={reachedLastDay}
+            title={Translate.string('Next day')}
+            icon="angle right"
+            position="right"
+            styleName="action"
+          />
+          {numDays > 2 && (
+            <Menu.Item
+              onClick={() => scrollByPage(1)}
+              disabled={reachedLastDay}
+              title={Translate.string('Next page')}
+              icon="angle double right"
+              styleName="action"
+            />
+          )}
+        </Menu>
+      )}
     </div>
   );
 }

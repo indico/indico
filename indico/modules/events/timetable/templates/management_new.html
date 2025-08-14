@@ -7,9 +7,9 @@
 
 {% block content %}
     {# TODO: (Ajob) Remake draft mode button in upper toolbar #}
-    {# {% if show_draft_warning %}
+    {% if show_draft_warning %}
         {{ render_draft_mode_warning(event) }}
-    {% endif %} #}
+    {% endif %}
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"
