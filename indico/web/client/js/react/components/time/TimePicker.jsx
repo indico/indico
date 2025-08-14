@@ -21,7 +21,6 @@ import {
   useSyncInputWithProp,
 } from './shared.js';
 
-import 'indico/custom_elements/ind_time_picker.js';
 import './time.module.scss';
 
 const getTimeClearedMessage = () => Translate.string('The time value was invalid and was cleared');
