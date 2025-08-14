@@ -8,13 +8,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
+
 import FieldsDemo from './FieldsDemo';
 
 (function(global) {
   global.setupFields = function setupFields() {
     const root = document.querySelector('#fields-container');
     if (root) {
-      ReactDOM.render(<FieldsDemo />, root);
+      ReactDOM.render(
+        <UserSearchTokenContext.Provider value={root.dataset.searchToken}>
+          <FieldsDemo />
+        </UserSearchTokenContext.Provider>,
+        root
+      );
     }
   };
 })(window);

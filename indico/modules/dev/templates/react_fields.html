@@ -5,8 +5,8 @@
 {% block title %}React Fields Demo{% endblock %}
 
 {% block content %}
-<div id="fields-container"></div>
-<script>
-    setupFields();
-</script>
+    <div id="fields-container" data-search-token="{{ make_user_search_token() }}"></div>
+    <script>
+        setupFields();
+    </script>
 {% endblock %}
