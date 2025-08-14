@@ -411,8 +411,6 @@ export default {
     switch (action.type) {
       case actions.SCROLL_NAVBAR:
         return {...state, offset: action.offset};
-      case actions.RESIZE_WINDOW:
-        return resizeWindow(state, action);
       case actions.EXPAND_TIMETABLE:
         return {...state, isExpanded: !state.isExpanded};
       default:

@@ -15,28 +15,23 @@ $toolbar-bg-color: $pastel-gray;
 .toolbar {
   position: sticky;
   top: 0;
-  // padding-top: 1.5em;
-  // margin-top: -1.5em;
   background-color: $bg-color;
   z-index: 100;
 
   :global(.ui.menu) {
-    margin-bottom: 0;
     height: 46px;
-    overflow-y: hidden;
     display: flex;
     align-items: center;
+    margin: 0;
 
     &.actions-bar {
-      border-radius: 5px;
-      background-color: rgba($toolbar-bg-color, 0.5);
-      border: 1px solid rgba(darken($toolbar-bg-color, 30%), 0.2);
-      box-shadow: 0 0 10px rgba($toolbar-bg-color, 0.1);
-      padding: 1%;
+      box-shadow: 0 10px 10px -10px rgba($pastel-gray, 0.8);
+      padding: 0;
     }
 
     &.timetable-bar {
       height: 100px;
+      overflow-y: hidden;
 
       .days-wrapper {
         flex-shrink: 1;
@@ -62,11 +57,12 @@ $toolbar-bg-color: $pastel-gray;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             align-content: center;
+            justify-content: center;
             border: 0;
             font-weight: normal;
             margin-bottom: 0;
+            background: none;
 
             &:not(:last-of-type) {
               margin-right: 20px;
@@ -77,6 +73,10 @@ $toolbar-bg-color: $pastel-gray;
                 color: $bg-color;
                 background-color: $primary-color;
               }
+
+              > .day-month {
+                visibility: visible;
+              }
             }
 
             &:global(:not(.active)) {
@@ -85,10 +85,6 @@ $toolbar-bg-color: $pastel-gray;
                   background-color: rgba($black, 0.1);
                   transition: 0.1s;
                 }
-              }
-
-              > .day-month.hidden {
-                visibility: hidden;
               }
             }
 
@@ -100,6 +96,7 @@ $toolbar-bg-color: $pastel-gray;
               border-radius: 3px;
               padding: 2px 8px;
               margin-bottom: 5px;
+              visibility: hidden;
             }
 
             > .day-name {
@@ -121,8 +118,8 @@ $toolbar-bg-color: $pastel-gray;
           .gradient {
             pointer-events: none;
             width: 15px;
-            height: 100px;
-            top: 0;
+            margin-top: 10px;
+            height: 88px;
             bottom: 0;
             flex-shrink: 0;
             position: sticky;

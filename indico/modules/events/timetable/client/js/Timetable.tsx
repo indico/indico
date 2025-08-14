@@ -16,7 +16,6 @@ import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {getCurrentDateLocalStorage, getDateKey, setCurrentDateLocalStorage} from './utils';
 import {WeekTimetable} from './WeekTimetable';
-import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -69,7 +68,6 @@ export default function Timetable() {
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
-      {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
       <div styleName="content">
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}

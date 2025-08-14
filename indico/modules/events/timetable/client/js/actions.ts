@@ -43,7 +43,6 @@ export const REDO_CHANGE = 'Redo change';
 export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const EXPAND_TIMETABLE = 'Expand Timetable';
-export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
@@ -244,10 +243,6 @@ export function dismissError() {
 
 export function scrollNavbar(offset) {
   return {type: SCROLL_NAVBAR, offset};
-}
-
-export function resizeWindow(newSize, dayIdx) {
-  return {type: RESIZE_WINDOW, newSize, dayIdx};
 }
 
 export function setDisplayMode(mode) {
