@@ -421,14 +421,12 @@ export default {
         return state;
     }
   },
-  display: (state = {mode: 'compact', showUnscheduled: false, showAllTimeslots: true}, action) => {
+  display: (state = {mode: 'compact', showUnscheduled: false}, action) => {
     switch (action.type) {
       case actions.SET_DISPLAY_MODE:
         return {...state, mode: action.mode};
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
-      case actions.TOGGLE_SHOW_ALL_TIMESLOTS:
-        return {...state, showAllTimeslots: !state.showAllTimeslots};
       default:
         return state;
     }

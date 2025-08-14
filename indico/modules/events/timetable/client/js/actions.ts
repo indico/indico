@@ -47,7 +47,6 @@ export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const EXPAND_TIMETABLE = 'Expand Timetable';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
-export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
 export const ADD_ENTRY = 'Add entry';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
@@ -272,10 +271,6 @@ export function setDisplayMode(mode) {
 
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
-}
-
-export function toggleShowAllTimeslots() {
-  return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
 }
 
 // TODO: (Ajob) Evaluate addEntry and editEntry vs createEntry and updateEntry,

@@ -53,7 +53,6 @@ export default function Toolbar({
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
   const displayMode = useSelector(selectors.getDisplayMode);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   // Math.ceil and float number allows this to work for a difference of a day
@@ -160,16 +159,6 @@ export default function Toolbar({
                 active={displayMode === name}
               />
             ))}
-            <Dropdown.Divider />
-            <Dropdown.Item
-              text={Translate.string('Show all timeslots')}
-              icon="clock outline"
-              onClick={e => {
-                e.stopPropagation();
-                dispatch(actions.toggleShowAllTimeslots());
-              }}
-              active={showAllTimeslots}
-            />
           </Dropdown.Menu>
         </Dropdown>
         <NewEntryDropdown

@@ -25,7 +25,8 @@ export default function Timetable() {
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  // TODO: (Ajob) Get rid of this after disabled areas are merged
+  const showAllTimeslots = true;
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDateEntries = entries[getDateKey(currentDate)];
