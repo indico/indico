@@ -9,12 +9,12 @@ import validateEmailURL from 'indico-url:events.check_email';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {Button, Icon, Label, List, Popup, Ref, Segment} from 'semantic-ui-react';
 
-import {UserSearch} from 'indico/react/components/principals/Search';
+import {UserSearch, UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FinalField} from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
@@ -262,6 +262,7 @@ function PersonLinkField({
   extraParams,
   searchToken,
 }) {
+  const searchTokenFromContext = useContext(UserSearchTokenContext);
   const favoriteUsersController = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
@@ -269,6 +270,7 @@ function PersonLinkField({
   const sections = roles.filter(x => x.section);
   const sectionKeys = new Set(sections.map(x => x.name));
   const othersCondition = p => !p.roles || !p.roles.find(r => sectionKeys.has(r));
+  searchToken ??= searchTokenFromContext;
 
   const cleanupPersons = persons => {
     return persons.map(p =>
