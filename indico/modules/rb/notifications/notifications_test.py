@@ -15,7 +15,7 @@ from flask import render_template
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, ReservationState
-from indico.testing.util import assert_email_snapshot
+from indico.testing.util import assert_email_snapshot, assert_string_snapshot
 from indico.web.flask.templating import get_template_module
 
 
@@ -141,4 +141,4 @@ def test_reservation_emails_plaintext(snapshot, snapshot_name, create_reservatio
     res.room.key_location = 'In a pocket dimension reachable via interpretative dance.'
     template = render_template(f'rb/emails/reservations/{snapshot_name}', reservation=res)
     snapshot.snapshot_dir = Path(__file__).parent.parent / 'templates/emails/reservations/tests'
-    snapshot.assert_match(template, snapshot_name)
+    assert_string_snapshot(snapshot, template, snapshot_name)

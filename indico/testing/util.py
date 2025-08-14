@@ -203,7 +203,7 @@ def assert_email_snapshot(snapshot, template, snapshot_filename, *, html=False):
     """
     body = template.get_body()
     if html:
-        # we add a trailing linebreak so make manually editing the snapshot easier
+        # we add a trailing linebreak to make manually editing the snapshot easier
         body = _strip_html_whitespace(body) + '\n'
     subject = template.get_subject()
     name, ext = os.path.splitext(snapshot_filename)
@@ -215,6 +215,19 @@ def assert_email_snapshot(snapshot, template, snapshot_filename, *, html=False):
     snapshot.assert_match(subject + '\n', snapshot_filename_subject)
 
 
+def assert_string_snapshot(snapshot, string, snapshot_filename):
+    """Assert that a string matches a snapshot.
+
+    This is intended for single-line strings which do not have their own trailing linebreak.
+
+    :param snapshot: The pytest snapshot fixture
+    :param obj: The string to compare
+    :param snapshot_filename: The filename for the snapshot
+    """
+    __tracebackhide__ = True
+    snapshot.assert_match(f'{string}\n', snapshot_filename)
+
+
 def assert_json_snapshot(snapshot, obj, snapshot_filename):
     """Assert that a json object matches a snapshot.
 
@@ -223,7 +236,7 @@ def assert_json_snapshot(snapshot, obj, snapshot_filename):
     :param snapshot_filename: The filename for the snapshot
     """
     __tracebackhide__ = True
-    snapshot.assert_match(json.dumps(obj, indent=2, sort_keys=True), snapshot_filename)
+    snapshot.assert_match(json.dumps(obj, indent=2, sort_keys=True) + '\n', snapshot_filename)
 
 
 def assert_yaml_snapshot(snapshot, obj, snapshot_filename, *, strip_dynamic_data=False):

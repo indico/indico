@@ -16,6 +16,7 @@ import pytest
 from indico.modules.designer import placeholders
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.registration.util import modify_registration
+from indico.testing.util import assert_string_snapshot
 
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures', 'indico.modules.designer.testing.fixtures')
@@ -107,7 +108,7 @@ def test_replace_text_placeholders(snapshot, dummy_event, dummy_reg, dummy_user)
         template = ph.replace(template, **kwargs)
 
     snapshot.snapshot_dir = Path(__file__).parent / 'tests'
-    snapshot.assert_match(template, 'test_replace_text_placeholders.txt')
+    assert_string_snapshot(snapshot, template, 'test_replace_text_placeholders.txt')
 
 
 @pytest.mark.usefixtures('request_context', 'dummy_event_logo')

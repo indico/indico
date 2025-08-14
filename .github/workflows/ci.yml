@@ -53,11 +53,18 @@ jobs:
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
 
+      - name: Install ripgrep
+        run: sudo apt-get install ripgrep
+
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
       # END common steps
 
+      - name: Check EOF linebreaks
+        run: ./bin/maintenance/check_eof_linebreaks.sh
+
       - name: Check import sorting
+        if: success() || failure()
         run: isort --diff --check-only indico/
 
       - name: Check backref comments
