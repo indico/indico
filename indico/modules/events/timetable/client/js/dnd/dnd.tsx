@@ -207,10 +207,12 @@ export function DnDProvider({
   children,
   onDrop,
   modifier = ({transform}) => transform,
+  limits,
 }: {
   children: React.ReactNode;
   onDrop: OnDrop;
   modifier?: Modifier;
+  limits?: [number, number];
 }) {
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
@@ -229,8 +231,8 @@ export function DnDProvider({
     draggables,
     enabled:
       // TODO: does not really work atm
-      state.current.activeDraggable === null ||
-      !state.current.activeDraggable.startsWith('unscheduled'),
+      state.current.activeDraggable !== null,
+    limits,
   });
 
   const registerDroppable = useCallback((id, node) => {
@@ -291,16 +293,17 @@ export function DnDProvider({
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
         }
+        const mousePosition = {
+          x: e.pageX + state.current.scrollPosition.x,
+          y: e.pageY + state.current.scrollPosition.y,
+        };
         setDraggableData(d =>
           setMousePosition(
             setTransform(
               d,
               state.current.activeDraggable,
               state.current.initialMousePosition,
-              {
-                x: e.pageX + state.current.scrollPosition.x,
-                y: e.pageY + state.current.scrollPosition.y,
-              },
+              mousePosition,
               modifier
             ),
             state.current.activeDraggable,
