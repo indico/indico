@@ -6,24 +6,12 @@
 # LICENSE file for more details.
 
 from flask import jsonify
-from sqlalchemy.orm import contains_eager
 
-from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.schemas import locations_schema
+from indico.modules.rb.util import get_locations_with_rooms
 
 
 class RHLocations(RHRoomBookingBase):
     def _process(self):
-        rooms_strategy = contains_eager('rooms')
-        rooms_strategy.noload('*')
-        rooms_strategy.joinedload('location').load_only('room_name_format')
-        locations = (Location.query
-                     .filter_by(is_deleted=False)
-                     .join(Room, (Location.id == Room.location_id) & ~Room.is_deleted)
-                     .options(rooms_strategy)
-                     .order_by(Location.name, db.func.indico.natsort(Room.full_name))
-                     .all())
-        return jsonify(locations_schema.dump(locations))
+        return jsonify(locations_schema.dump(get_locations_with_rooms()))
