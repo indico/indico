@@ -123,10 +123,6 @@ export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
 );
-export const showAllTimeslots = createSelector(
-  getDisplay,
-  display => display.showAllTimeslots
-);
 
 export const getModalType = createSelector(
   getOpenModal,
