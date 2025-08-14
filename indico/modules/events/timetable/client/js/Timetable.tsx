@@ -14,8 +14,8 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {getCurrentDateLocalStorage, getDateKey, setCurrentDateLocalStorage} from './utils';
 import {WeekTimetable} from './WeekTimetable';
-import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -25,10 +25,12 @@ export default function Timetable() {
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  // TODO: (Ajob) Get rid of this after disabled areas are merged
+  const showAllTimeslots = true;
+  const isExpanded = useSelector(selectors.getIsExpanded);
 
-  const [date, setDate] = useState(eventStartDt);
-  const currentDateEntries = entries[date.format('YYYYMMDD')];
+  const [date, setDate] = useState(getCurrentDateLocalStorage(eventId) || eventStartDt);
+  const currentDateEntries = entries[getDateKey(date)];
 
   const useWeekView = false;
 
@@ -48,7 +50,7 @@ export default function Timetable() {
   const maxHour = showAllTimeslots
     ? 24
     : Math.max(
-        eventEndDt.hour(),
+      eventEndDt.hour(),
         ...(useWeekView
           ? Object.values(entries)
               .flat()
@@ -60,10 +62,13 @@ export default function Timetable() {
             ))
       );
 
+  useEffect(() => {
+    setCurrentDateLocalStorage(date, eventId);
+  }, [date]);
+
   return (
-    <div styleName="timetable">
+    <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
-      {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
       <div styleName="content">
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}

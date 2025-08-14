@@ -10,8 +10,9 @@ import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {Entry, EntryType, Session, TopLevelEntry} from './types';
+import {Entry, EntryType, Session} from './types';
 
+export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
 
@@ -140,6 +141,24 @@ export function getEntryColor(
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
+}
+
+export function getDateKey(date: Moment) {
+  return date.format('YYYYMMDD');
+}
+
+export function setCurrentDateLocalStorage(date: Moment, eventId: number) {
+  const dtKeyObj = {currentDtKey: getDateKey(date)};
+
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  manageTimetableData[eventId] = {...(manageTimetableData[eventId] || {}), ...dtKeyObj};
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(manageTimetableData));
+}
+
+export function getCurrentDateLocalStorage(eventId: number) {
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  const dt = (manageTimetableData[eventId] || {}).currentDtKey;
+  return dt ? moment(dt, 'YYYYMMDD') : null;
 }
 
 /*

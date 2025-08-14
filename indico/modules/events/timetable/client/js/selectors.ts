@@ -115,15 +115,6 @@ export const getError = createSelector(
   entries => entries.error
 );
 
-export const getNavbarMaxDays = createSelector(
-  getNavigation,
-  navigation => navigation.numDays
-);
-export const getNavbarOffset = createSelector(
-  getNavigation,
-  navigation => navigation.offset
-);
-
 export const getDisplayMode = createSelector(
   getDisplay,
   display => display.mode
@@ -131,10 +122,6 @@ export const getDisplayMode = createSelector(
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
-);
-export const showAllTimeslots = createSelector(
-  getDisplay,
-  display => display.showAllTimeslots
 );
 
 export const getModalType = createSelector(
@@ -144,4 +131,10 @@ export const getModalType = createSelector(
 export const getModalEntry = createSelector(
   getOpenModal,
   openModal => openModal.entry
+);
+
+// Navigation state
+export const getIsExpanded = createSelector(
+  getNavigation,
+  navigation => navigation.isExpanded
 );

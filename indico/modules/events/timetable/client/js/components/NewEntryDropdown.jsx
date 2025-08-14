@@ -9,8 +9,6 @@ import React from 'react';
 import {useDispatch} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
-
 import * as actions from '../actions';
 import {entryTypes} from '../util';
 
@@ -20,7 +18,6 @@ export default function NewEntryDropdown(props) {
   return (
     <Dropdown {...props}>
       <Dropdown.Menu>
-        <Dropdown.Header content={Translate.string('Add new')} />
         {['block', 'contrib', 'break'].map(newType => {
           const {title, icon} = entryTypes[newType];
           const handleClick = () => dispatch(actions.addEntry(newType));
