@@ -15,7 +15,7 @@ import pytz
 from flask import current_app
 from PIL import Image
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.config import config
 from indico.core.db import db
@@ -394,3 +394,23 @@ def check_repeat_frequency(old_frequency, new_frequency):
         (old_frequency == RepeatFrequency.MONTH and new_frequency == RepeatFrequency.WEEK)
     ):
         raise ExpectedError(_('You cannot modify the repeat frequency of an existing booking.'))
+
+
+def get_locations_with_rooms():
+    """Get all non-empty locations with their rooms pre-loaded.
+
+    Locations are sorted alphabetically, rooms are sorted in natural order.
+    """
+    from indico.modules.rb.models.locations import Location
+    from indico.modules.rb.models.rooms import Room
+
+    rooms_strategy = contains_eager('rooms')
+    rooms_strategy.raiseload('*')
+    rooms_strategy.joinedload('location').load_only('room_name_format')
+    return (
+        Location.query.filter_by(is_deleted=False)
+        .join(Location.rooms)
+        .options(rooms_strategy)
+        .order_by(Location.name, db.func.indico.natsort(Room.full_name))
+        .all()
+    )
