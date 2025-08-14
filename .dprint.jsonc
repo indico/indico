@@ -1,0 +1,78 @@
+{
+  "typescript": {
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "useTabs": false,
+    "semiColons": "prefer",
+    "quoteStyle": "preferSingle",
+    "jsx.quoteStyle": "preferDouble",
+    "quoteProps": "consistent",
+    "newLineKind": "lf",
+    "useBraces": "always",
+    "bracePosition": "sameLineUnlessHanging",
+    "singleBodyPosition": "nextLine",
+    "nextControlFlowPosition": "sameLine",
+    "trailingCommas": "onlyMultiLine",
+    "operatorPosition": "sameLine",
+    "preferHanging": false,
+    "preferSingleLine": false, // check behavior
+    "arrowFunction.useParentheses": "preferNone",
+    "binaryExpression.linePerExpression": true, // check behavior
+    "jsx.bracketPosition": "nextLine",
+    "jsx.forceNewLinesSurroundingContent": false,
+    "jsx.multiLineParens": "prefer",
+    "memberExpression.linePerExpression": true, // check behavior
+    "typeLiteral.separatorKind": "semiColon", // check with team
+    "enumDeclaration.memberSpacing": "newLine",
+    "spaceAround": false,
+    "spaceSurroundingProperties": false,
+    "binaryExpression.spaceSurroundingBitwiseAndArithmeticOperator": true,
+    "commentLine.forceSpaceAfterSlashes": true,
+    "constructor.spaceBeforeParentheses": false,
+    "constructorType.spaceAfterNewKeyword": false,
+    "constructSignature.spaceAfterNewKeyword": false,
+    "doWhileStatement.spaceAfterWhileKeyword": true,
+    "exportDeclaration.spaceSurroundingNamedExports": false,
+    "forInStatement.spaceAfterForKeyword": true,
+    "forOfStatement.spaceAfterForKeyword": true,
+    "forStatement.spaceAfterForKeyword": true,
+    "forStatement.spaceAfterSemiColons": true,
+    "functionDeclaration.spaceBeforeParentheses": false,
+    "functionExpression.spaceBeforeParentheses": false,
+    "functionExpression.spaceAfterFunctionKeyword": false,
+    "getAccessor.spaceBeforeParentheses": false,
+    "ifStatement.spaceAfterIfKeyword": true,
+    "importDeclaration.spaceSurroundingNamedImports": false,
+    "jsxSelfClosingElement.spaceBeforeSlash": true,
+    "jsxExpressionContainer.spaceSurroundingExpression": false,
+    "method.spaceBeforeParentheses": false,
+    "setAccessor.spaceBeforeParentheses": false,
+    "taggedTemplate.spaceBeforeLiteral": false,
+    "typeAnnotation.spaceBeforeColon": false,
+    "typeAssertion.spaceBeforeExpression": true,
+    "whileStatement.spaceAfterWhileKeyword": true,
+    "module.sortImportDeclarations": "maintain", // check codebase for impact of `caseInsensitive`
+    "module.sortExportDeclarations": "maintain", // check codebase for impact of `caseInsensitive`
+    "exportDeclaration.sortNamedExports": "maintain", // check codebase for impact of `caseInsensitive`
+    "exportDeclaration.sortTypeOnlyExports": "none",
+    "importDeclaration.sortNamedImports": "maintain", // check codebase for impact of `caseInsensitive`
+    "importDeclaration.sortTypeOnlyImports": "none",
+    "ignoreNodeCommentText": "dprint-ignore",
+    "ignoreFileCommentText": "dprint-ignore-file",
+    "exportDeclaration.forceSingleLine": false,
+    "importDeclaration.forceSingleLine": false,
+    "exportDeclaration.forceMultiLine": "never",
+    "importDeclaration.forceMultiLine": "never",
+    // compat with our existing prettier style
+    "arguments.trailingCommas": "never",
+    "conditionalExpression.operatorPosition": "maintain",
+    "conditionalExpression.preferSingleLine": true,
+  },
+  "excludes": [
+    "**/node_modules",
+    "**/templates/assets/vars_*.js",
+  ],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.95.9.wasm",
+  ]
+}
