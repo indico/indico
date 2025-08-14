@@ -75,6 +75,8 @@ type(
 
     postDraw: function() {
       this.timetableDrawer.postDraw();
+      // (Ajob) This is a temporary fix to allow scrolling in legacy timetable
+      $('main.main').css('overflow', 'visible');
       //this.LookupTabWidget.prototype.postDraw.call(this);
     },
 
