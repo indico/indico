@@ -10,6 +10,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import createReduxStore from 'indico/utils/redux';
 
 import {setSessionData, setTimetableData} from './actions';
@@ -21,6 +22,7 @@ import {getCurrentDateLocalStorage} from './utils';
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
     if (root) {
+      const searchToken = root.dataset.searchToken;
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
@@ -50,7 +52,9 @@ import {getCurrentDateLocalStorage} from './utils';
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
         <Provider store={store}>
-          <Timetable />
+          <UserSearchTokenContext.Provider value={searchToken}>
+            <Timetable />
+          </UserSearchTokenContext.Provider>
         </Provider>,
         root
       );
