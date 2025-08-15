@@ -120,7 +120,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     // WARNING: The entry here would be the sessionBlock
     console.log(session, entry);
     // DONE: (Michel) Get default start time from the session block or the earliest possible start time within the session block
-    const newChildStartDt = moment(entry.startDt);
+    let newChildStartDt = moment(entry.startDt);
     if (entry.children.length > 0) {
       const childWithLatestEndTime = entry.children.reduce((latest, child) => {
         const childEndTime = moment(child.startDt).add(child.duration, 'minutes');
@@ -140,6 +140,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       actions.setDraftEntry({
         startDt: newChildStartDt,
         duration: newChildDuration,
+        parentId: entry.id,
       })
     );
     // TODO: Remove the possibility to create session blocks when opening the modal
