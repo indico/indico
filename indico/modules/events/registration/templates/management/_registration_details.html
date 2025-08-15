@@ -18,7 +18,7 @@
                 {% endif %}
             </div>
             {% if registration.state.name in ('unpaid', 'complete') %}
-                {{ _render_check_in(registration) }}
+                {{ _render_checks(registration) }}
             {% endif %}
             {{ template_hook('extra-registration-actions', registration=registration) }}
         </div>
@@ -240,8 +240,7 @@
     {% endblock %}
 {% endmacro %}
 
-
-{% macro _render_check_in(registration) %}
+{% macro _render_checks(registration) %}
     <div class="section">
         {% if registration.checked_in %}
             <div class="icon icon-location registration-checked-in"></div>
@@ -252,24 +251,44 @@
                 {% trans checked_in_dt=registration.checked_in_dt|format_date(timezone=registration.event.tzinfo) -%}
                     Checked in: {{ checked_in_dt }}
                 {%- endtrans %}
-                <span class="hide-if-locked">
-                    (<a href="#"
-                       title="{% trans %}Mark as not checked in{% endtrans %}"
-                       data-update="#registration-details"
-                       data-method="DELETE"
-                       data-href="{{ url_for('.registration_check_in', registration) }}"
-                       data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
-                       data-title="{% trans %}Reset check-in info{% endtrans %}">
-                       {%- trans %}reset{% endtrans -%}
-                    </a>)
-                </span>
+                <a data-href="{{ url_for('.registration_checks', registration) }}"
+                    data-ajax-dialog
+                    data-title="{% trans %}Registration checks{% endtrans %}">
+                    {% trans %}View past checks{% endtrans %}
+                </a>
+            </div>
+            {% set can_check_out_result = registration.can_perform_check(is_check_out=True) %}
+            <div class="toolbar hide-if-locked">
+                <div class="group">
+                    <button class="i-button"
+                            data-href="{{ url_for('.add_registration_check', registration, is_check_out=True) }}"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            {% if can_check_out_result['can_check'] %}
+                                data-title="{% trans %}Check-out{% endtrans %}"
+                            {% else %}
+                                disabled
+                                title="{{ can_check_out_result['reason'] }}"
+                            {% endif %}>
+                        {% trans %}Check-out{% endtrans %}
+                    </button>
+                </div>
             </div>
         {% else %}
             <div class="icon icon-location"></div>
             <div class="text">
-                <div class="label">
-                    {% trans %}Not checked in{% endtrans %}
-                </div>
+                {% if registration.checked_out %}
+                    <div class="label">
+                        {% trans %}Checked out{% endtrans %}
+                    </div>
+                    {% trans checked_out_dt=registration.checked_out_dt|format_date(timezone=registration.event.tzinfo) -%}
+                        Checked out: {{ checked_out_dt }}
+                    {%- endtrans %}
+                {% else %}
+                    <div class="label">
+                        {% trans %}Not checked in{% endtrans %}
+                    </div>
+                {% endif %}
                 {% if registration.registration_form.tickets_enabled %}
                     {% trans -%}
                         You can mark the registration as checked in manually here or with the Indico Check in app.
@@ -279,14 +298,30 @@
                         You can mark the registration as checked in manually.
                     {%- endtrans %}
                 {% endif %}
+                {% if registration.checks %}
+                    <a data-href="{{ url_for('.registration_checks', registration) }}"
+                       data-ajax-dialog
+                       data-title="{% trans %}Registration checks{% endtrans %}">
+                        {% trans %}View past checks{% endtrans %}
+                    </a>
+                {% endif %}
             </div>
+            {% set can_check_in_result = registration.can_perform_check() %}
             <div class="toolbar hide-if-locked">
-                <button class="i-button"
-                        data-update="#registration-details"
-                        data-method="PUT"
-                        data-href="{{ url_for('.registration_check_in', registration) }}">
-                    {% trans %}Check-in{% endtrans %}
-                </button>
+                <div class="group">
+                    <button class="i-button"
+                            data-href="{{ url_for('.add_registration_check', registration) }}"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            {% if can_check_in_result['can_check'] %}
+                                data-title="{% trans %}Check-in{% endtrans %}"
+                            {% else %}
+                                disabled
+                                title="{{ can_check_in_result['reason'] }}"
+                            {% endif %}>
+                        {% trans %}Check-in{% endtrans %}
+                    </button>
+                </div>
             </div>
         {% endif %}
     </div>
