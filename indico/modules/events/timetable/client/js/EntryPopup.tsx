@@ -31,6 +31,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
+import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {formatBlockTitle, getEntryColor, mapTTDataToEntry} from './utils';
@@ -68,6 +69,10 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+
+  const session = useSelector((state: ReduxState) =>
+    selectors.getSessionById(state, entry.sessionId)
+  );
 
   const _getFileCount = () => {
     const {attachments = {}} = entry;
@@ -107,6 +112,37 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     data['type'] = type;
     entry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(entry));
+  };
+
+  const onCreateChild = async (e: MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+    // WARNING: The entry here would be the sessionBlock
+    console.log(session, entry);
+    // DONE: (Michel) Get default start time from the session block or the earliest possible start time within the session block
+    const newChildStartDt = moment(entry.startDt);
+    if (entry.children.length > 0) {
+      const childWithLatestEndTime = entry.children.reduce((latest, child) => {
+        const childEndTime = moment(child.startDt).add(child.duration, 'minutes');
+        const latestEndTime = moment(latest.startDt).add(latest.duration, 'minutes');
+        return childEndTime.isAfter(latestEndTime) ? child : latest;
+      });
+      newChildStartDt = moment(childWithLatestEndTime.startDt).add(
+        childWithLatestEndTime.duration,
+        'minutes'
+      );
+    }
+    // DONE: (Michel) Get default duration from the session
+    const newChildDuration = session.defaultContributionDuration;
+    // TODO: (Michel) Get default location from the session block
+    // DONE: (Michel) Set draft entry to dummy contribution/ break with the default values gathered
+    dispatch(
+      actions.setDraftEntry({
+        startDt: newChildStartDt,
+        duration: newChildDuration,
+      })
+    );
+    // TODO: Remove the possibility to create session blocks when opening the modal
   };
 
   const onDelete = async (e: MouseEvent) => {
@@ -150,19 +186,26 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
                 <Button icon="trash" onClick={onDelete} />
               )}
               {type === EntryType.SessionBlock && (
-                <Dropdown button inline icon="ellipsis vertical">
-                  <DropdownMenu>
-                    <DropdownItem>
-                      {/* Implement session edit or redirect to page */}
-                      <Icon name="edit" />
-                      <Translate>Edit session</Translate>
-                    </DropdownItem>
-                    <DropdownItem>
-                      <Icon name="shield" />
-                      <Translate>Edit session protection</Translate>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
+                <>
+                  <Popup
+                    content={<Translate>Add new Contribution/Break</Translate>}
+                    size="mini"
+                    trigger={<Button icon="plus" onClick={onCreateChild} color="green" />}
+                  />
+                  <Dropdown button inline icon="ellipsis vertical">
+                    <DropdownMenu>
+                      <DropdownItem>
+                        {/* Implement session edit or redirect to page */}
+                        <Icon name="edit" />
+                        <Translate>Edit session</Translate>
+                      </DropdownItem>
+                      <DropdownItem>
+                        <Icon name="shield" />
+                        <Translate>Edit session protection</Translate>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </>
               )}
             </ButtonGroup>
             <ButtonGroup>
