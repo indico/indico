@@ -98,6 +98,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId} = entry;
+  const {parentId} = entry;
+  const isCreatingChild = !!parentId;
   const isEditing = !!objId;
   const personLinkFieldParams = {
     allowAuthors: true,
@@ -341,18 +343,20 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
               <Translate>Entry Type</Translate>
             </Header>
             <div>
-              {Object.keys(forms).map((key: EntryType) => (
-                <Button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    changeForm(key);
-                  }}
-                  color={activeType === key ? 'blue' : undefined}
-                >
-                  {typeLongNames[key]}
-                </Button>
-              ))}
+              {Object.keys(forms)
+                .filter(key => !(isCreatingChild && key === EntryType.SessionBlock))
+                .map((key: EntryType) => (
+                  <Button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      changeForm(key);
+                    }}
+                    color={activeType === key ? 'blue' : undefined}
+                  >
+                    {typeLongNames[key]}
+                  </Button>
+                ))}
             </div>
           </Segment>
           <Divider />
