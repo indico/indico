@@ -117,9 +117,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const onCreateChild = async (e: MouseEvent) => {
     e.stopPropagation();
     onClose();
-    // WARNING: The entry here would be the sessionBlock
-    console.log(session, entry);
-    // DONE: (Michel) Get default start time from the session block or the earliest possible start time within the session block
     let newChildStartDt = moment(entry.startDt);
     if (entry.children.length > 0) {
       const childWithLatestEndTime = entry.children.reduce((latest, child) => {
@@ -132,10 +129,8 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         'minutes'
       );
     }
-    // DONE: (Michel) Get default duration from the session
     const newChildDuration = session.defaultContributionDuration;
     // TODO: (Michel) Get default location from the session block
-    // DONE: (Michel) Set draft entry to dummy contribution/ break with the default values gathered
     dispatch(
       actions.setDraftEntry({
         startDt: newChildStartDt,
@@ -143,7 +138,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         parentId: entry.id,
       })
     );
-    // TODO: Remove the possibility to create session blocks when opening the modal
   };
 
   const onDelete = async (e: MouseEvent) => {
