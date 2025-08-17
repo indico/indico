@@ -98,9 +98,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId} = entry;
+  const isEditing = !!objId;
   const {parentId} = entry;
   const isCreatingChild = !!parentId;
-  const isEditing = !!objId;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -184,6 +184,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
+    data.session_block = parentId;
     data = _.pick(data, [
       'title',
       'description',
@@ -197,6 +198,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'keywords',
       'board_number',
       'code',
+      'session_block',
     ]);
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
