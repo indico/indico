@@ -28,11 +28,8 @@ export default function Timetable() {
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const currentDate = useSelector(selectors.getCurrentDate);
-
   const currentDateEntries = entries[getDateKey(currentDate)];
-
   const useWeekView = false;
-
   const minHour = showAllTimeslots
     ? 0
     : Math.max(
