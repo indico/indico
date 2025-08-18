@@ -7,7 +7,6 @@
 
 import publicationURL from 'indico-url:contributions.manage_publication';
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import {IButton} from 'indico/react/components';
@@ -16,7 +15,14 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import PublicationModal from './PublicationModal';
 
-export default function PublicationButton({eventId, onSuccess}) {
+interface PublicationButtonProps {
+  eventId: string;
+  onSuccess?: () => void;
+  useIButton?: boolean;
+  [key: string]: any;
+}
+
+export default function PublicationButton({eventId, onSuccess, ...rest}: PublicationButtonProps) {
   const url = publicationURL({event_id: eventId});
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -31,7 +37,7 @@ export default function PublicationButton({eventId, onSuccess}) {
   };
 
   const trigger = (
-    <IButton onClick={() => setModalOpen(true)}>
+    <IButton onClick={() => setModalOpen(true)} {...rest}>
       <Translate>Publish contributions</Translate>
     </IButton>
   );
@@ -46,8 +52,3 @@ export default function PublicationButton({eventId, onSuccess}) {
     />
   );
 }
-
-PublicationButton.propTypes = {
-  eventId: PropTypes.string.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-};

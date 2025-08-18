@@ -21,6 +21,7 @@ interface IButtonPropTypes {
   dropdown: boolean;
   borderless: boolean;
   style: object;
+  noStyle: boolean;
 }
 
 /** Legacy-style Indico UI Button */
@@ -36,10 +37,11 @@ export default function IButton({
   dropdown = false,
   borderless = false,
   style = {},
+  noStyle = false,
 }: IButtonPropTypes) {
   const finalClasses: Record<string, boolean> = {
     ...classes,
-    'i-button': true,
+    'i-button': !noStyle,
     disabled,
     highlight,
     borderless,

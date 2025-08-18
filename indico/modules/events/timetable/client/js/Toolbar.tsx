@@ -8,7 +8,7 @@
 import {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -19,6 +19,7 @@ import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
+import { useContextSelector } from 'use-context-selector/dist';
 
 const displayModes = [
   {
@@ -51,6 +52,7 @@ export default function Toolbar({
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
+  const isDraft = useSelector(selectors.getIsDraft);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
@@ -142,19 +144,20 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
-        {/* Choose which button for draft mode */}
-        <Button
-          size="tiny"
-          icon="upload"
-          color="orange"
-          basic
-          content={Translate.string('Publish Contributions')}
-          title={Translate.string(
-            'While in draft mode, regular users cannot see the contributions and timetable.'
-          )}
-          className="right"
-        />
-        <PublicationButton eventId="13" />
+        {isDraft && (
+          <div className="right">
+            <PublicationButton
+              eventId="13"
+              title={Translate.string(
+                'While in draft mode, regular users cannot see the contributions and timetable.'
+              )}
+              // TODO: (Ajob) This is a hack to enable semantic styling but we should actually rework
+              //              the entire draft warning and publish button to be semantic ui
+              classes={{button: true, ui: true, orange: true, basic: true, small: true}}
+              noStyle
+            />
+          </div>
+        )}
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="object group"

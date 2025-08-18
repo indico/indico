@@ -24,6 +24,7 @@ import {getCurrentDateLocalStorage} from './utils';
     if (root) {
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
+      const isDraft = JSON.parse(root.dataset.isDraft);
       const initialData = {
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
@@ -36,6 +37,7 @@ import {getCurrentDateLocalStorage} from './utils';
             `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
             eventInfo.endDate.tz
           ),
+          isDraft,
         },
       };
       const {startDt, eventId} = initialData.staticData;

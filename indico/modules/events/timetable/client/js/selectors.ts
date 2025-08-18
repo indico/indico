@@ -55,6 +55,10 @@ export const getEventNumDays = createSelector(
   getEventEndDt,
   (startDt, endDt) => endDt.diff(startDt, 'days') + 1
 );
+export const getIsDraft = createSelector(
+  getStaticData,
+  staticData => staticData.isDraft
+);
 
 export const getBlocks = createSelector(
   getEntries,
