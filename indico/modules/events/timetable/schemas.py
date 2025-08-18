@@ -25,7 +25,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
         rh_context = ('event',)
 
-    start_dt = fields.DateTime(required=True)
+    start_dt = EventTimezoneDateTimeField()
     location_data = fields.Nested(LocationDataSchema)
     conveners = fields.List(fields.Nested(
         _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
@@ -42,7 +42,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
 
     title = fields.String(required=True)
     description = fields.String()
-    start_dt = fields.DateTime(required=True)
+    start_dt = EventTimezoneDateTimeField()
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
