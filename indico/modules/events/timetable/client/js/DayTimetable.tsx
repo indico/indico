@@ -182,11 +182,8 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const newLayout = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    if (!newLayout) {
-      return;
-    }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
   function handleDropOnBlock(
@@ -196,11 +193,15 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     calendar: Over
   ) {
-    const newLayout = layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar);
-    if (!newLayout) {
-      return;
-    }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+      entries,
+      who,
+      over,
+      delta,
+      mouse,
+      calendar
+    );
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -454,7 +455,7 @@ function layoutAfterDropOnCalendar(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
     );
     oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
-    return [...otherEntries, ...oldGroup, ...group];
+    return [[...otherEntries, ...oldGroup, ...group], draftEntry];
   } else {
     // Drop from block to top level (== a break)
     const otherEntries = entries.filter(
@@ -467,7 +468,7 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return [...otherEntries, ...group, fromBlock];
+    return [[...otherEntries, ...group, fromBlock], draftEntry];
   }
 }
 
@@ -560,20 +561,29 @@ function layoutAfterDropOnBlock(
   const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
 
   if (!fromBlock) {
-    return layout([
-      ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
-      {...toBlock, children: [...otherChildren, ...group]},
-    ]);
+    return [
+      layout([
+        ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
+        {...toBlock, children: [...otherChildren, ...group]},
+      ]),
+      draftEntry,
+    ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
-    return layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]);
+    return [
+      layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
+      draftEntry,
+    ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
     const fromChildren = fromBlock.children.filter(e => e.id !== draftEntry.id);
-    return layout([
-      ...otherEntries,
-      {...fromBlock, children: fromChildren},
-      {...toBlock, children: [...otherChildren, ...group]},
-    ]);
+    return [
+      layout([
+        ...otherEntries,
+        {...fromBlock, children: fromChildren},
+        {...toBlock, children: [...otherChildren, ...group]},
+      ]),
+      draftEntry,
+    ];
   }
 }
