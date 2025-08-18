@@ -85,6 +85,8 @@ class SessionsField(RegistrationFormFieldBase):
         return [_check_number_of_sessions, _check_session_block_is_valid]
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
+        if not registration_data.data:
+            return '' if for_humans or for_search else []
         event = registration_data.registration.event
         # this is a bit ugly, but we need to use the user's timezone if it's in an end-user area,
         # while using the event's timezone if it's in a management area...
