@@ -103,6 +103,9 @@ overrides:
     rules:
       import/unambiguous: off
       '@typescript-eslint/no-unused-vars' : off
+  - files: ["*.ts"]
+    rules:
+      'lines-between-class-members': off
 
 globals:
   Indico: false
