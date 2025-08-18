@@ -19,7 +19,6 @@ import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
-import { useContextSelector } from 'use-context-selector/dist';
 
 const displayModes = [
   {
@@ -145,18 +144,21 @@ export default function Toolbar({
           styleName="action"
         />
         {isDraft && (
-          <div className="right">
-            <PublicationButton
-              eventId="13"
-              title={Translate.string(
-                'While in draft mode, regular users cannot see the contributions and timetable.'
-              )}
-              // TODO: (Ajob) This is a hack to enable semantic styling but we should actually rework
-              //              the entire draft warning and publish button to be semantic ui
-              classes={{button: true, ui: true, orange: true, basic: true, small: true}}
-              noStyle
-            />
-          </div>
+          <PublicationButton
+            eventId="13"
+            title={Translate.string('Publish timetable and contributions to regular users')}
+            // TODO: (Ajob) This is a hack to enable semantic styling but we should actually rework
+            //              the entire draft warning and publish button to be semantic ui
+            classes={{
+              button: true,
+              ui: true,
+              orange: true,
+              basic: true,
+              small: true,
+              right: true,
+            }}
+            noStyle
+          />
         )}
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
