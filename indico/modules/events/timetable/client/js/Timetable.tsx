@@ -14,6 +14,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {getDateKey} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
@@ -28,7 +29,7 @@ export default function Timetable() {
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const currentDate = useSelector(selectors.getCurrentDate);
 
-  const currentDateEntries = entries[currentDate.format('YYYYMMDD')];
+  const currentDateEntries = entries[getDateKey(currentDate)];
 
   const useWeekView = false;
 
