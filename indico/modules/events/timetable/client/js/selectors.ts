@@ -28,7 +28,7 @@ export const getNumUnscheduled = (state: ReduxState) =>
 // You should not use this selector directly, use makeIsSelectedSelector instead
 // to check if an entry is selected
 export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
-export const getCurrentDay = (state: ReduxState) => state.navigation.currentDay;
+export const getCurrentDate = (state: ReduxState) => state.navigation.currentDate;
 
 export const makeIsSelectedSelector = () =>
   createSelector(

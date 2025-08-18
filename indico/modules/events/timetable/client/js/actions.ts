@@ -25,11 +25,12 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
+import moment from 'moment';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
-export const SET_CURRENT_DAY = 'Set current day';
+export const SET_CURRENT_DATE = 'Set current date';
 export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
@@ -301,6 +302,6 @@ export function closeModal() {
   return {type: CLOSE_MODAL};
 }
 
-export function setCurrentDay(day: Moment) {
-  return {type: SET_CURRENT_DAY, day};
+export function setCurrentDate(date: Moment, eventId: number) {
+  return {type: SET_CURRENT_DATE, date, eventId};
 }

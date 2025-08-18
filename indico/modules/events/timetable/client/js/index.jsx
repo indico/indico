@@ -12,10 +12,11 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import {setCurrentDay, setSessionData, setTimetableData} from './actions';
+import {setCurrentDate, setSessionData, setTimetableData} from './actions';
 import reducers from './reducers';
 // import {timetableData as tData, eventInfo as eInfo} from './sample-data';
 import Timetable from './Timetable';
+import {getCurrentDateLocalStorage} from './utils';
 
 (function(global) {
   global.setupTimetable = function setupTimetable() {
@@ -36,11 +37,13 @@ import Timetable from './Timetable';
           ),
         },
       };
+      const {startDt, eventId} = initialData.staticData;
+      const currentDate = getCurrentDateLocalStorage(eventId) || startDt;
 
       const store = createReduxStore('timetable-management', reducers, initialData);
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
-      store.dispatch(setCurrentDay(initialData.staticData.startDt));
+      store.dispatch(setCurrentDate(currentDate, eventId));
       ReactDOM.render(
         <Provider store={store}>
           <Timetable />

@@ -26,9 +26,9 @@ export default function Timetable() {
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
-  const currentDay = useSelector(selectors.getCurrentDay);
+  const currentDate = useSelector(selectors.getCurrentDate);
 
-  const currentDateEntries = entries[currentDay.format('YYYYMMDD')];
+  const currentDateEntries = entries[currentDate.format('YYYYMMDD')];
 
   const useWeekView = false;
 
@@ -65,9 +65,9 @@ export default function Timetable() {
       <GlobalEvents />
       {!useWeekView && (
         <Toolbar
-          date={currentDay}
+          date={currentDate}
           onNavigate={d => {
-            dispatch(actions.setCurrentDay(d));
+            dispatch(actions.setCurrentDate(d, eventId));
           }}
         />
       )}
@@ -75,7 +75,7 @@ export default function Timetable() {
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
         {!useWeekView && (
           <DayTimetable
-            dt={currentDay}
+            dt={currentDate}
             eventId={eventId}
             minHour={minHour}
             maxHour={maxHour}

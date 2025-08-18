@@ -10,8 +10,10 @@ import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {Entry, EntryType, Session, TopLevelEntry} from './types';
+import {Entry, EntryType, Session} from './types';
 
+export const DATE_KEY_FORMAT = 'YYYYMMDD';
+export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
 
@@ -160,4 +162,23 @@ export function useTraceUpdate(props) {
     }
     prev.current = props;
   });
+}
+
+export function getDateKey(date: Moment) {
+  return date.format(DATE_KEY_FORMAT);
+}
+
+// Local storage utils
+export function setCurrentDateLocalStorage(date: Moment, eventId: number) {
+  const dtKeyObj = {currentDtKey: getDateKey(date)};
+
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  manageTimetableData[eventId] = {...(manageTimetableData[eventId] || {}), ...dtKeyObj};
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(manageTimetableData));
+}
+
+export function getCurrentDateLocalStorage(eventId: number) {
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  const dt = (manageTimetableData[eventId] || {}).currentDtKey;
+  return dt ? moment(dt, DATE_KEY_FORMAT) : null;
 }
