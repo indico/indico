@@ -10,7 +10,7 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -25,7 +25,6 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
-import moment from 'moment';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
