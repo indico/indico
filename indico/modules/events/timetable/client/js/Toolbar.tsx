@@ -188,6 +188,8 @@ export default function Toolbar({
           icon={isExpanded ? 'compress' : 'expand'}
           styleName="action"
         />
+        {/* TODO: (Ajob) The logic behind this component is broken.
+                         Evaluate necessity then remove or fix */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
       </Menu>
       {numDays > 1 && (
