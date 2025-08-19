@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 // import {Checkbox} from 'semantic-ui-react';
 
@@ -14,24 +14,22 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {getDateKey} from './utils';
 import {WeekTimetable} from './WeekTimetable';
-import WeekViewToolbar from './WeekViewToolbar';
 
 import './timetable.scss';
 import './Timetable.module.scss';
 
 export default function Timetable() {
+  const dispatch = useDispatch();
   const entries = useSelector(selectors.getDayEntries);
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
-
-  const [date, setDate] = useState(eventStartDt);
-  const currentDateEntries = entries[date.format('YYYYMMDD')];
-
+  const currentDate = useSelector(selectors.getCurrentDate);
+  const currentDateEntries = entries[getDateKey(currentDate)];
   const useWeekView = false;
-
   const minHour = showAllTimeslots
     ? 0
     : Math.max(
@@ -63,13 +61,19 @@ export default function Timetable() {
   return (
     <div styleName="timetable">
       <GlobalEvents />
-      {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
-      {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
+      {!useWeekView && (
+        <Toolbar
+          date={currentDate}
+          onNavigate={d => {
+            dispatch(actions.setCurrentDate(d, eventId));
+          }}
+        />
+      )}
       <div styleName="content">
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
         {!useWeekView && (
           <DayTimetable
-            dt={date}
+            dt={currentDate}
             eventId={eventId}
             minHour={minHour}
             maxHour={maxHour}
