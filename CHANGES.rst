@@ -28,6 +28,8 @@ Bugfixes
   screen widths (:issue:`7012`, :pr:`7013`)
 - Fix user search not working for admins in room booking module with no rooms defined
   (:issue:`7016`, :pr:`7017`, thanks :user:`behackl`)
+- Fix error when a custom multipass provider specified a maximum session duration
+  (:pr:`7030`)
 
 Accessibility
 ^^^^^^^^^^^^^

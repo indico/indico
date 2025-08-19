@@ -34,7 +34,9 @@ logger = Logger.get('auth')
 def process_identity(identity_info):
     logger.info('Received identity info: %s', identity_info)
 
-    if (multipass_data := identity_info.multipass_data) and (session_expiry := multipass_data.get('session_expiry')):
+    if (multipass_data := identity_info.multipass_data) and (
+        session_expiry := multipass_data.pop('session_expiry', None)
+    ):
         if not isinstance(session_expiry, datetime):
             raise ValueError('Session expiry must be a datetime object')
         session.hard_expiry = session_expiry
