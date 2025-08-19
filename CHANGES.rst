@@ -17,6 +17,8 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Allow specifying a maximum session lifetime via :data:`SESSION_MAX_LIFETIME`
   beyond which it cannot be refreshed by activity (:pr:`7030`)
+- Make displaying corresponding author email addresses in the Book of Abstracts
+  opt-in (:pr:`7002`, thanks :user:`adamjenkins`)
 
 Bugfixes
 ^^^^^^^^
