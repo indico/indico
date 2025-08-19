@@ -73,8 +73,9 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     return contrib
 
 
+@make_interceptable
 @no_autoflush
-def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields_data=None):
+def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields_data=None, *, _extra_log_fields=None):
     """Update a contribution.
 
     :param contrib: The `Contribution` to update
@@ -113,7 +114,8 @@ def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields
     if changes:
         signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
-        log_contribution_update(contrib, changes, visible_person_link_changes=visible_person_link_changes)
+        log_contribution_update(contrib, changes, _extra_log_fields,
+                                visible_person_link_changes=visible_person_link_changes)
     return rv
 
 
@@ -207,7 +209,7 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
     return contrib
 
 
-def log_contribution_update(contrib, changes, *, visible_person_link_changes=False):
+def log_contribution_update(contrib, changes, extra_log_fields=None, *, visible_person_link_changes=False):
     if not changes:
         return
 
@@ -249,6 +251,7 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
             'type': 'string',
             'convert': lambda changes: [x.name if x else None for x in changes]
         },
+        **(extra_log_fields or {})
     }
     changes = split_log_location_changes(changes)
     if not visible_person_link_changes:
