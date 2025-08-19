@@ -315,7 +315,7 @@ def _format_pretty_datetime(dt, locale, tzinfo, formats):
     return _format_datetime(dt, fmt, tzinfo, locale)
 
 
-def format_pretty_date(dt, locale=None, tzinfo=None, capitalize=True):
+def format_pretty_date(dt, locale=None, tzinfo=None, *, capitalize=True):
     """Format a date in a pretty way using relative units if possible.
 
     :param dt: a date or datetime object. if a date is provided, its
@@ -358,7 +358,7 @@ def format_pretty_date(dt, locale=None, tzinfo=None, capitalize=True):
     })
 
 
-def format_pretty_datetime(dt, locale=None, tzinfo=None, capitalize=True):
+def format_pretty_datetime(dt, locale=None, tzinfo=None, *, capitalize=True):
     """
     Format a datetime in a pretty way using relative units for the
     date if possible.
