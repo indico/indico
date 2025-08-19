@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment from 'moment';
+import {Moment} from 'moment';
 
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {resizeWindow, changeSessionColor, changeBreakColor} from './operations';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {DayEntries} from './types';
+import {setCurrentDateLocalStorage} from './utils';
 
 interface Change {
   change: any;
@@ -32,7 +33,7 @@ interface Entries {
 export interface ReduxState {
   entries: Entries;
   sessions: any[];
-  navigation: {numDays: number; offset: number};
+  navigation: {numDays: number; offset: number; currentDate: Moment};
   display: {mode: string; showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
 }
@@ -407,12 +408,15 @@ export default {
         return state;
     }
   },
-  navigation: (state = {numDays: 2, offset: 0}, action) => {
+  navigation: (state = {numDays: 2, offset: 0, currentDate: null}, action) => {
     switch (action.type) {
       case actions.SCROLL_NAVBAR:
         return {...state, offset: action.offset};
       case actions.RESIZE_WINDOW:
-        return resizeWindow(state, action);
+        return {...resizeWindow(state, action), currentDate: state.currentDate};
+      case actions.SET_CURRENT_DATE:
+        setCurrentDateLocalStorage(action.date, action.eventId);
+        return {...state, currentDate: action.date};
       default:
         return state;
     }
