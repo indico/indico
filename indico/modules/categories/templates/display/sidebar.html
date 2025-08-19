@@ -48,7 +48,7 @@
                         {{ news.title }}
                     </a>
                     <span class="timing">
-                        {% trans date=news.created_dt|format_pretty_date(tzinfo=tzinfo) -%}
+                        {% trans date=news.created_dt|format_pretty_date(tzinfo=tzinfo, capitalize=false) -%}
                             Posted {{ date }}
                         {%- endtrans %}
                     </span>
@@ -73,12 +73,12 @@
                     {% endblock %}
                     <span class="timing">
                         {% if happening_now(event) %}
-                            {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                ongoing until {{ time }}
+                            {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo, capitalize=false) -%}
+                                Ongoing until {{ time }}
                             {%- endtrans %}
                         {% else %}
-                            {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                starts {{ time }}
+                            {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo, capitalize=false) -%}
+                                Starts {{ time }}
                             {%- endtrans %}
                         {% endif %}
                     </span>
