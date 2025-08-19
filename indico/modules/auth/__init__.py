@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import redirect, request, session
 from flask_multipass import MultipassException
@@ -35,13 +35,7 @@ logger = Logger.get('auth')
 def process_identity(identity_info):
     logger.info('Received identity info: %s', identity_info)
 
-    if (multipass_data := identity_info.multipass_data) and (
-        session_expiry := multipass_data.pop('session_expiry', None)
-    ):
-        if not isinstance(session_expiry, datetime):
-            raise ValueError('Session expiry must be a datetime object')
-        session.hard_expiry = session_expiry
-    elif config.SESSION_MAX_LIFETIME:
+    if config.SESSION_MAX_LIFETIME:
         session.hard_expiry = now_utc() + timedelta(seconds=config.SESSION_MAX_LIFETIME)
 
     identity = Identity.query.filter_by(provider=identity_info.provider.name,

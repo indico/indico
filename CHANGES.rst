@@ -30,8 +30,6 @@ Bugfixes
   screen widths (:issue:`7012`, :pr:`7013`)
 - Fix user search not working for admins in room booking module with no rooms defined
   (:issue:`7016`, :pr:`7017`, thanks :user:`behackl`)
-- Fix error when a custom multipass provider specified a maximum session duration
-  (:pr:`7030`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -41,7 +39,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Remove broken support for custom multipass providers setting a maximum session
+  lifetime; use :data:`SESSION_MAX_LIFETIME` instead (:pr:`7030`)
 
 
 Version 3.3.7
