@@ -27,8 +27,7 @@
                         {{- event.get_label_markup() -}}
                     </h1>
                 </div>
-                <div class="event-actions">
-                    
+                <div class="event-actions">                  
                     {{ template_hook('event-manage-button', event=event) }}
                     <div class="event-manage-button">
                         {{ render_manage_button(event, 'EVENT', toggle_notes=false) }}
