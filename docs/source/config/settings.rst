@@ -787,6 +787,16 @@ Security
 
     Default: ``86400 * 31``
 
+.. data:: SESSION_MAX_LIFETIME
+
+    The duration (in seconds) after which a session always expires. If set to
+    ``None``, only the :data:`SESSION_LIFETIME` is used and the session can be
+    renewed indefinitely as long as there is activity before its expiry.
+    This setting is ignored if a custom Multipass provider specifies its own
+    maximum lifetime via the ``session_expiry`` entry in the ``multipass_data``.
+
+    Default: ``None``
+
 
 Storage
 -------

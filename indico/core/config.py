@@ -90,6 +90,7 @@ DEFAULTS = {
     'SENTRY_DSN': None,
     'SENTRY_LOGGING_LEVEL': 'WARNING',
     'SESSION_LIFETIME': 86400 * 31,
+    'SESSION_MAX_LIFETIME': None,
     'SIGNUP_CAPTCHA': True,
     'SIGNUP_RATE_LIMIT': '2 per hour; 5 per day',
     'SMTP_ALLOWED_SENDERS': set(),

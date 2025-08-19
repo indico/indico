@@ -94,7 +94,7 @@ class RHLogin(RH):
             single_auth_provider = multipass.single_auth_provider
             if single_auth_provider and single_auth_provider.is_external:
                 multipass.set_next_url()
-                return redirect(url_for('.login', provider=single_auth_provider.name))
+                return redirect(url_for('.login', provider=single_auth_provider.name, force=('1' if force else None)))
 
         # Save the 'next' url to go to after login
         multipass.set_next_url()
