@@ -170,10 +170,11 @@ export function getDateKey(date: Moment) {
 
 // Local storage utils
 export function setCurrentDateLocalStorage(date: Moment, eventId: number) {
-  const dtKeyObj = {currentDtKey: getDateKey(date)};
-
   const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
-  manageTimetableData[eventId] = {...(manageTimetableData[eventId] || {}), ...dtKeyObj};
+  manageTimetableData[eventId] = {
+    ...(manageTimetableData[eventId] || {}),
+    currentDtKey: getDateKey(date),
+  };
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(manageTimetableData));
 }
 
