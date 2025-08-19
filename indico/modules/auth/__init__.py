@@ -34,10 +34,6 @@ logger = Logger.get('auth')
 @multipass.identity_handler
 def process_identity(identity_info):
     logger.info('Received identity info: %s', identity_info)
-
-    if config.SESSION_MAX_LIFETIME:
-        session.hard_expiry = now_utc() + timedelta(seconds=config.SESSION_MAX_LIFETIME)
-
     identity = Identity.query.filter_by(provider=identity_info.provider.name,
                                         identifier=identity_info.identifier).first()
     if identity is None:
@@ -103,6 +99,8 @@ def login_user(user, identity=None, admin_impersonation=False):
     session.set_session_user(user)
     session.lang = user.settings.get('lang')
     if not admin_impersonation:
+        if config.SESSION_MAX_LIFETIME:
+            session.hard_expiry = now_utc() + timedelta(seconds=config.SESSION_MAX_LIFETIME)
         if identity:
             identity.register_login(request.remote_addr)
             session['login_identity'] = identity.id
