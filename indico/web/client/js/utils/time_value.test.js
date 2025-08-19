@@ -444,6 +444,14 @@ describe('Time', () => {
     expect(Time.fromString(timeString, '24h').toFormattedString(timeFormat)).toBe(expected);
   });
 
+  it('should return empty string when formatting invalid time', () => {
+    const invalidTime = Time.fromString('invalid', '24h');
+    expect(invalidTime.isValid).toBe(false);
+    expect(invalidTime.toFormattedString('12h')).toBe('');
+    expect(invalidTime.toFormattedString('24h')).toBe('');
+    expect(invalidTime.toFormattedString('any')).toBe('');
+  });
+
   it('should use automatic selection of time format by default', () => {
     const sample12hA = Time.fromString('12:01', '12h');
     const sampleAnyA = Time.fromString('12:01', 'any');
