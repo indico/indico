@@ -343,19 +343,19 @@ def format_pretty_date(dt, locale=None, tzinfo=None, *, capitalize=True):
         })
     else:
         return _format_pretty_datetime(dt, locale, tzinfo, {
-        # i18n: keep the single quotes around the string
-        'last_day': _("'yesterday'"),
-        # i18n: keep the single quotes around the string
-        'same_day': _("'today'"),
-        # i18n: keep the single quotes around the string
-        'next_day': _("'tomorrow'"),
-        # i18n: keep the single quotes around the string, and only translate the "Last".
-        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
-        'last_week': _("'last' EEEE"),
-        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
-        'next_week': _('EEEE'),
-        'other': '{date_fmt}'
-    })
+            # i18n: keep the single quotes around the string
+            'last_day': _("'yesterday'"),
+            # i18n: keep the single quotes around the string
+            'same_day': _("'today'"),
+            # i18n: keep the single quotes around the string
+            'next_day': _("'tomorrow'"),
+            # i18n: keep the single quotes around the string, and only translate the "Last".
+            # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
+            'last_week': _("'last' EEEE"),
+            # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
+            'next_week': _('EEEE'),
+            'other': '{date_fmt}'
+        })
 
 
 def format_pretty_datetime(dt, locale=None, tzinfo=None, *, capitalize=True):
