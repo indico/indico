@@ -75,7 +75,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
 
 @make_interceptable
 @no_autoflush
-def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields_data=None, _extra_log_fields=None):
+def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields_data=None, *, _extra_log_fields=None):
     """Update a contribution.
 
     :param contrib: The `Contribution` to update
