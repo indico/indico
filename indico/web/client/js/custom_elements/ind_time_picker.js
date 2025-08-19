@@ -86,6 +86,9 @@ CustomElementBase.defineWhenDomReady(
       });
 
       input.addEventListener('click', () => {
+        // Select all text when clicking on the input
+        selectInputText(0);
+
         // When user clicks the input while no candidates are matching the value,
         // ensure that all options are visible
         if (!listbox.querySelector('[role=option]:not([hidden])')) {
