@@ -207,7 +207,8 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
     return contrib
 
 
-def log_contribution_update(contrib, changes, *, visible_person_link_changes=False):
+@make_interceptable
+def log_contribution_update(contrib, changes, *, visible_person_link_changes=False, extra_log_fields=None):
     if not changes:
         return
 
@@ -249,6 +250,7 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
             'type': 'string',
             'convert': lambda changes: [x.name if x else None for x in changes]
         },
+        **(extra_log_fields or {})
     }
     changes = split_log_location_changes(changes)
     if not visible_person_link_changes:
