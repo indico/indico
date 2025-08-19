@@ -40,7 +40,6 @@
              {% endif %}
              data-modal-title="{{ title }}"
              data-title="{{ title }}"></div>
-    {{ template_hook('event-manage-dropdown-after-notes-compile', event=item) }}
     {%- elif opt == 'attachments_edit' -%}
         {% set attachment_item = item.session if item_type == 'SESSION_BLOCK' else item %}
         <a href="" class="js-material-editor"
@@ -104,6 +103,8 @@
            data-href="{{ url_for('contributions.manage_edit_subcontrib', item, standalone=true) }}">
             {%- trans -%}Edit subcontribution{%- endtrans -%}
         </a>
+    {%- elif opt == 'summarize' -%}
+    {{ template_hook('event-manage-dropdown-after-notes-compile', event=item) }}
     {%- else -%}
         ERROR: unknown option "{{ opt }}"
     {%- endif -%}
