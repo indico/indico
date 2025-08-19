@@ -94,7 +94,9 @@ class BOASettingsForm(IndicoForm):
     extra_text_end = IndicoMarkdownField(_('Additional text at end'), editor=True, mathjax=True)
     sort_by = IndicoEnumSelectField(_('Sort by'), [DataRequired()], enum=BOASortField, sorted=True)
     corresponding_author = IndicoEnumSelectField(_('Corresponding author'), [DataRequired()],
-                                                 enum=BOACorrespondingAuthorType, sorted=True)
+                                                 enum=BOACorrespondingAuthorType, sorted=True,
+                                                 description=_('Their email addresses will be published in the Book '
+                                                               'of Abstracts.'))
     show_abstract_ids = BooleanField(_('Show abstract IDs'), widget=SwitchWidget(),
                                      description=_('Show abstract IDs in the table of contents.'))
     min_lines_per_abstract = IntegerField(_('Minimum lines per abstract'),
