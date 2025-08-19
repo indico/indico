@@ -229,6 +229,9 @@ export class Time {
   }
 
   toFormattedString(timeFormat) {
+    if (!this.isValid) {
+      return '';
+    }
     return this.toLocaleString(this.constructor.TIME_FORMAT_LOCALE[timeFormat]);
   }
 
