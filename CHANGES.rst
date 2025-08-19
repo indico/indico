@@ -15,6 +15,8 @@ Improvements
 - Add support for custom event reminders with freely chosen subject and body, and
   allow rich-text for the custom message in standard reminders (:pr:`6989`, thanks
   :user:`tomako, unconventionaldotdev`)
+- Allow specifying a maximum session lifetime via :data:`SESSION_MAX_LIFETIME`
+  beyond which it cannot be refreshed by activity (:pr:`7030`)
 
 Bugfixes
 ^^^^^^^^

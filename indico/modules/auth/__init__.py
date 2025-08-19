@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import redirect, request, session
 from flask_multipass import MultipassException
@@ -22,6 +22,7 @@ from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
 from indico.modules.users.util import log_user_update
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -40,6 +41,8 @@ def process_identity(identity_info):
         if not isinstance(session_expiry, datetime):
             raise ValueError('Session expiry must be a datetime object')
         session.hard_expiry = session_expiry
+    elif config.SESSION_MAX_LIFETIME:
+        session.hard_expiry = now_utc() + timedelta(seconds=config.SESSION_MAX_LIFETIME)
 
     identity = Identity.query.filter_by(provider=identity_info.provider.name,
                                         identifier=identity_info.identifier).first()
