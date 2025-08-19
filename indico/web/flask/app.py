@@ -53,7 +53,8 @@ from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
                                          natsort, plusdelta, subclassof, underline)
-from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
+from indico.web.flask.util import (ListConverter, SignedValueConverter, XAccelMiddleware, discover_blueprints, url_for,
+                                   url_rule_to_js)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
@@ -332,6 +333,7 @@ def check_db():
 
 def extend_url_map(app):
     app.url_map.converters['list'] = ListConverter
+    app.url_map.converters['signed'] = SignedValueConverter
 
 
 def add_handlers(app):
