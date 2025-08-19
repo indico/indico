@@ -58,7 +58,9 @@ export default function Toolbar({
   const displayMode = useSelector(selectors.getDisplayMode);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const currentDayIdx = date.diff(eventStart, 'days');
+  // (Ajob) Math.ceil and float number allows this to work for a difference of a day
+  // but less than 24h, also across multiple months. Hence the 'true'.
+  const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
 
   const handleResize = useCallback(() => {
     dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
