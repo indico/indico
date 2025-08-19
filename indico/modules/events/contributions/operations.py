@@ -209,7 +209,7 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
     return contrib
 
 
-def log_contribution_update(contrib, changes, extra_log_fields, *, visible_person_link_changes=False):
+def log_contribution_update(contrib, changes, extra_log_fields=None, *, visible_person_link_changes=False):
     if not changes:
         return
 
