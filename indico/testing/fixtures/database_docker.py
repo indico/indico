@@ -28,8 +28,7 @@ DB_NAME = 'test'
 def create_container_low_level(
     api_client: docker.APIClient, container_name: str, socket_dir: str, data_dir: str
 ) -> str:
-    """
-    Create a PostgreSQL container using the low-level docker-py API.
+    """Create a PostgreSQL container using the low-level docker-py API.
 
     :param api_client: The low-level Docker API client.
     :param container_name: The name to assign to the new container.
@@ -66,8 +65,7 @@ def create_container_low_level(
 
 
 def exec_in_container(container: Container, cmd: list[str] | str):
-    """
-    Execute a command inside a Docker container.
+    """Execute a command inside a Docker container.
 
     :param container: The Docker container to run the command in.
     :param cmd: The command (and its arguments) to execute inside the container.
@@ -131,14 +129,12 @@ def kill_containers(containers: set[Container], warn: bool = False):
 
 @contextmanager
 def docker_postgresql() -> Iterator[str]:
-    """
-    Docker-based PostgreSQL server.
+    """Docker-based PostgreSQL server.
 
     This fixture runs a PostgreSQL server in a Docker container for tests.
 
-    :yields: A PostgreSQL connection URL pointing to the UNIX socket in a temporary directory.
     :raises ValueError: If ``INDICO_TEST_USE_DOCKER`` has an invalid scheme.
-    :raises RuntimeError: If the container or PostgreSQL does not become ready in time.
+    :raises RuntimeError: If the container or PostgreSQL do not become ready in time.
     """
     container_name = CONTAINER_NAME_TPL.format(pid=os.getpid())
     use_docker = os.environ.get('INDICO_TEST_USE_DOCKER', None)
@@ -197,7 +193,6 @@ def docker_postgresql() -> Iterator[str]:
             kill_containers({docker_client.containers.get(container_name)})
             zombies = find_zombie_containers(docker_client)
             kill_containers(zombies, warn=True)
-
         except NotFound:
             # not found, container was already removed (or never created)
             pass
