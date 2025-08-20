@@ -64,7 +64,7 @@ export default function PublicationStateSwitch({
       color={published ? 'green' : null}
       {...rest}
     >
-      {iconDisplay !== 'hide' && <Icon name={published ? 'lock' : 'lock open'} />}
+      {iconDisplay !== 'hide' && <Icon name={published ? 'lock open' : 'lock'} />}
       {iconDisplay !== 'only' &&
         (published ? <Translate>Published</Translate> : <Translate>Unpublished</Translate>)}
     </Button>

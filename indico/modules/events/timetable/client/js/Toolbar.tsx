@@ -58,7 +58,6 @@ export default function Toolbar({
   const displayMode = useSelector(selectors.getDisplayMode);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
-  const isDraft = useSelector(selectors.getIsDraft);
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
@@ -144,17 +143,17 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
-        <PublicationStateSwitch
-          eventId={eventId}
-          onSuccess={() => dispatch(actions.toggleDraft())}
-          className="right"
-          basic
-        />
+        <Menu.Item className="right" styleName="action">
+          <PublicationStateSwitch
+            eventId={eventId}
+            onSuccess={() => dispatch(actions.toggleDraft())}
+            basic
+          />
+        </Menu.Item>
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="object group"
           styleName="action"
-          className="right"
           direction="left"
           title={Translate.string('Display mode')}
           item
