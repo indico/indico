@@ -44,7 +44,8 @@ export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
 export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
-export const EXPAND_TIMETABLE = 'Expand Timetable';
+export const TOGGLE_EXPAND = 'Toggle expand';
+export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const ADD_ENTRY = 'Add entry';
@@ -171,7 +172,11 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
 }
 
 export function toggleExpand() {
-  return {type: EXPAND_TIMETABLE};
+  return {type: TOGGLE_EXPAND};
+}
+
+export function toggleDraft() {
+  return {type: TOGGLE_DRAFT};
 }
 
 export function resizeEntry(

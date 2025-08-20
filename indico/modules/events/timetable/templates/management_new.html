@@ -10,7 +10,6 @@
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"
-         data-is-draft="{{ show_draft_warning | tojson }}"
          data-custom-links="{{ custom_links | tojson | forceescape }}"></div>
     <script>
         setupTimetable();

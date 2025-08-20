@@ -33,7 +33,7 @@ interface Entries {
 export interface ReduxState {
   entries: Entries;
   sessions: any[];
-  navigation: {numDays: number; currentDate: Moment, isExpanded: Boolean};
+  navigation: {numDays: number; currentDate: Moment; isExpanded: boolean};
   display: {mode: string; showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
 }
@@ -408,15 +408,18 @@ export default {
         return state;
     }
   },
-  navigation: (state = {numDays: 2, isExpanded: false, currentDate: null}, action) => {
+  navigation: (state, action) => {
+    state = {isExpanded: false, ...state};
     switch (action.type) {
       case actions.SCROLL_NAVBAR:
         return {...state, offset: action.offset};
       case actions.SET_CURRENT_DATE:
         setCurrentDateLocalStorage(action.date, action.eventId);
         return {...state, currentDate: action.date};
-      case actions.EXPAND_TIMETABLE:
+      case actions.TOGGLE_EXPAND:
         return {...state, isExpanded: !state.isExpanded};
+      case actions.TOGGLE_DRAFT:
+        return {...state, isDraft: !state.isDraft};
       default:
         return state;
     }

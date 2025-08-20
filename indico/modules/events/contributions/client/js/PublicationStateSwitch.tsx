@@ -8,25 +8,37 @@
 import publicationURL from 'indico-url:contributions.manage_publication';
 
 import React, {useState} from 'react';
-import {Button} from 'semantic-ui-react';
+import {Button, Icon} from 'semantic-ui-react';
 
+import {useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import PublicationModal from './PublicationModal';
 
-interface PublicationButtonProps {
+interface PublicationStateSwitch {
   eventId: string;
+  iconDisplay?: 'show' | 'hide' | 'only';
   onSuccess?: () => void;
   [key: string]: any;
 }
 
-export default function PublicationButton({
+export default function PublicationStateSwitch({
   eventId,
+  iconDisplay = 'show',
   onSuccess = () => undefined,
-}: PublicationButtonProps) {
+  ...rest
+}: PublicationStateSwitch) {
   const url = publicationURL({event_id: eventId});
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [published, togglePublished, loading] = useTogglableValue(
+    publicationURL({event_id: eventId})
+  );
+
+  if (loading) {
+    return null;
+  }
 
   const onClick = async () => {
     try {
@@ -35,6 +47,7 @@ export default function PublicationButton({
       return handleAxiosError(error);
     }
 
+    togglePublished();
     onSuccess();
     setModalOpen(false);
   };
@@ -42,9 +55,18 @@ export default function PublicationButton({
   const trigger = (
     <Button
       onClick={() => setModalOpen(true)}
-      title={Translate.string('Publish timetable and contributions to regular users')}
+      title={
+        published
+          ? Translate.string('Unpublish timetable and contributions to regular users')
+          : Translate.string('Publish timetable and contributions to regular users')
+      }
+      icon={iconDisplay === 'only'}
+      color={published ? 'green' : null}
+      {...rest}
     >
-      <Translate>Publish contributions</Translate>
+      {iconDisplay !== 'hide' && <Icon name={published ? 'lock' : 'lock open'} />}
+      {iconDisplay !== 'only' &&
+        (published ? <Translate>Published</Translate> : <Translate>Unpublished</Translate>)}
     </Button>
   );
 
@@ -53,7 +75,7 @@ export default function PublicationButton({
       open={modalOpen}
       setModalOpen={setModalOpen}
       trigger={trigger}
-      published={false}
+      published={published}
       onClick={onClick}
     />
   );

@@ -12,7 +12,7 @@ import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import PublicationButton from '../../../../events/contributions/client/js/PublicationButton';
+import PublicationStateSwitch from '../../../contributions/client/js/PublicationStateSwitch';
 
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
@@ -48,16 +48,17 @@ export default function Toolbar({
   const dispatch = useDispatch();
   const ref = useRef(null);
   const daysBarRef = useRef<HTMLDivElement | null>(null);
+  const eventId = useSelector(selectors.getEventId);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
-  const isDraft = useSelector(selectors.getIsDraft);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
   const displayMode = useSelector(selectors.getDisplayMode);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
+  const isDraft = useSelector(selectors.getIsDraft);
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
@@ -143,23 +144,12 @@ export default function Toolbar({
           icon="redo"
           styleName="action"
         />
-        {isDraft && (
-          <PublicationButton
-            eventId="13"
-            title={Translate.string('Publish timetable and contributions to regular users')}
-            // TODO: (Ajob) This is a hack to enable semantic styling but we should actually rework
-            //              the entire draft warning and publish button to be semantic ui
-            classes={{
-              button: true,
-              ui: true,
-              orange: true,
-              basic: true,
-              small: true,
-              right: true,
-            }}
-            noStyle
-          />
-        )}
+        <PublicationStateSwitch
+          eventId={eventId}
+          onSuccess={() => dispatch(actions.toggleDraft())}
+          className="right"
+          basic
+        />
         <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="object group"
