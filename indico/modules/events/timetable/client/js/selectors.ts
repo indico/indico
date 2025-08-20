@@ -9,6 +9,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes, mergeChanges} from './util';
+import { getDateKey } from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -56,6 +57,11 @@ export const getEventNumDays = createSelector(
   (startDt, endDt) => endDt.diff(startDt, 'days') + 1
 );
 
+export const getCurrentDayEntries = createSelector(
+  getDayEntries,
+  getCurrentDate,
+  (entries, currentDate) => entries[getDateKey(currentDate)]
+);
 export const getBlocks = createSelector(
   getEntries,
   getSessions,

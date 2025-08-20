@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
@@ -15,10 +15,9 @@ import {Translate} from 'indico/react/i18n';
 import PublicationStateSwitch from '../../../contributions/client/js/PublicationStateSwitch';
 
 import * as actions from './actions';
-import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
-
 import './Toolbar.module.scss';
+import {GRID_SIZE_MINUTES} from './utils';
 
 const displayModes = [
   {
@@ -50,6 +49,7 @@ export default function Toolbar({
   const daysBarRef = useRef<HTMLDivElement | null>(null);
   const eventId = useSelector(selectors.getEventId);
   const eventStart = useSelector(selectors.getEventStartDt);
+  const eventEnd = useSelector(selectors.getEventEndDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
   const canUndo = useSelector(selectors.canUndo);
@@ -58,6 +58,8 @@ export default function Toolbar({
   const displayMode = useSelector(selectors.getDisplayMode);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
+  const currentDate = useSelector(selectors.getCurrentDate);
+  const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
@@ -150,7 +152,8 @@ export default function Toolbar({
             basic
           />
         </Menu.Item>
-        <Dropdown
+        {/* TODO: (Ajob) Reconsider this feature. Disabled until further notice */}
+        {/* <Dropdown
           // TODO: (Ajob) Very unclear if this is a dropdown based on icon
           icon="object group"
           styleName="action"
@@ -169,8 +172,28 @@ export default function Toolbar({
               />
             ))}
           </Dropdown.Menu>
-        </Dropdown>
-        <NewEntryDropdown icon="add" styleName="action" direction="left" item />
+        </Dropdown> */}
+        <Menu.Item
+          onClick={() => {
+            // TODO: (Ajob) Replace with real default duration
+            const defaultDuration = GRID_SIZE_MINUTES * 4;
+            const minDt =
+              currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day');
+            const maxDt = reachedLastDay
+              ? moment(eventEnd).subtract(defaultDuration, 'minutes')
+              : moment(currentDate)
+                  .endOf('day')
+                  .subtract(defaultDuration, 'minutes');
+            const currentDayEntryEndDts = currentDayEntries.map(e =>
+              e.startDt.add(e.duration, 'minutes')
+            );
+            const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
+            dispatch(actions.setDraftEntry({startDt: newDt, duration: defaultDuration}));
+          }}
+          title={Translate.string('Add new entry')}
+          icon="plus"
+          styleName="action"
+        />
         <Menu.Item
           onClick={() => dispatch(actions.toggleExpand())}
           title={isExpanded ? Translate.string('Compress') : Translate.string('Expand')}

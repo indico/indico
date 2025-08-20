@@ -436,8 +436,6 @@ export default {
   },
   openModal: (state = {type: null, entry: null}, action) => {
     switch (action.type) {
-      case actions.ADD_ENTRY:
-        return {type: action.entryType, entry: null};
       case actions.EDIT_ENTRY:
         return {type: action.entryType, entry: action.entry};
       case actions.CLOSE_MODAL:

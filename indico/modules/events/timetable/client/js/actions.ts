@@ -48,7 +48,6 @@ export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
-export const ADD_ENTRY = 'Add entry';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
@@ -277,14 +276,6 @@ export function setDisplayMode(mode) {
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
-
-// TODO: (Ajob) Evaluate addEntry and editEntry vs createEntry and updateEntry,
-//              the latter two were implemented later and might be duplicate
-
-export function addEntry(entryType) {
-  return {type: ADD_ENTRY, entryType};
-}
-
 export function createEntry(entryType, entry) {
   return {type: CREATE_ENTRY, entryType, entry};
 }
