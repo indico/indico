@@ -136,6 +136,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         startDt: newChildStartDt,
         duration: newChildDuration,
         parentId: parseInt(entry.id.replace(/\D/g, ''), 10),
+        sessionId: entry.sessionId,
       })
     );
   };

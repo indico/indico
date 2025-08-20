@@ -25,6 +25,8 @@ def _get_location_data(obj, *, management=False):
     data['room'] = obj.room_name
     data['inheritLoc'] = obj.inherit_location
     data['inheritRoom'] = obj.inherit_location
+    data['venueName'] = obj.venue_name
+
     if management:
         data['address'] = obj.address
     return data

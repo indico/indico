@@ -53,7 +53,8 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block')
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
+                  'session_block_id', 'session_id')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()

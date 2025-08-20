@@ -117,7 +117,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     keywords: entry.keywords || [],
     references: entry.references || [],
     // TODO: (Ajob) Clean up the location data
-    location_data: snakifyKeys(entry.location) || {inheriting: false},
+    location_data: snakifyKeys(entry.locationData) || {inheriting: false},
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
     start_dt: entry.startDt.format(),
@@ -184,7 +184,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
-    data.session_block = parentId;
+    data.session_block_id = parentId;
     data = _.pick(data, [
       'title',
       'description',
@@ -198,7 +198,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'keywords',
       'board_number',
       'code',
-      'session_block',
+      'session_block_id',
     ]);
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
