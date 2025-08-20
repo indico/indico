@@ -6,7 +6,6 @@
 {%- block title -%}{%- endblock -%}
 
 {% block content %}
-    {# TODO: (Ajob) Remake draft mode button in upper toolbar #}
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"
