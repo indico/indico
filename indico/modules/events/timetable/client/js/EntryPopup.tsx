@@ -130,7 +130,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       );
     }
     const newChildDuration = session.defaultContributionDuration;
-    // TODO: (Michel) Get default location from the session block
+    // TODO: (Michel) Disable time picker for any time after parent end time
     dispatch(
       actions.setDraftEntry({
         startDt: newChildStartDt,
