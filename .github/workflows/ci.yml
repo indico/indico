@@ -110,6 +110,10 @@ jobs:
         if: success() || failure()
         run: indico i18n check-html-tags
 
+      - name: Run dprint
+        if: success() || failure()
+        run: npx dprint check
+
       - name: Run eslint
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx
