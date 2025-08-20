@@ -72,7 +72,11 @@
     "**/node_modules",
     "**/templates/assets/vars_*.js",
   ],
+  "includes": [
+    "indico/**/*.{ts,tsx}",
+  ],
   "plugins": [
-    "https://plugins.dprint.dev/typescript-0.95.9.wasm",
+    // built from https://github.com/ThiefMaster/dprint-plugin-typescript/tree/jsx-ternary-improvements
+    "https://indico-static.web.cern.ch/dprint/dprint_plugin_typescript_20250820.wasm",
   ]
 }
