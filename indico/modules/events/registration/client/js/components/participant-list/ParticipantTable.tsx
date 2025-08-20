@@ -55,29 +55,27 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
       descending: null,
     };
 
-    const direction: sortDirectionType =
-      sortColumn === column ? directions[sortDirection] : 'ascending';
+    const direction: sortDirectionType = sortColumn === column
+      ? directions[sortDirection]
+      : 'ascending';
 
-    const sortedData =
-      direction === null
-        ? [...table.rows]
-        : [...sortedRows].sort((a, b) => {
-            const comparedVals = [a, b].map(el =>
-              typeof column === 'string' ? el[column] : el.columns[column].text
-            );
+    const sortedData = direction === null ? [...table.rows] : [...sortedRows].sort((a, b) => {
+      const comparedVals = [a, b].map(el =>
+        typeof column === 'string' ? el[column] : el.columns[column].text
+      );
 
-            let sortResult;
+      let sortResult;
 
-            if (comparedVals[0] === comparedVals[1]) {
-              return 0;
-            } else if (comparedVals.every(el => typeof el === 'boolean')) {
-              sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
-            } else {
-              sortResult = comparedVals[0].localeCompare(comparedVals[1]);
-            }
+      if (comparedVals[0] === comparedVals[1]) {
+        return 0;
+      } else if (comparedVals.every(el => typeof el === 'boolean')) {
+        sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
+      } else {
+        sortResult = comparedVals[0].localeCompare(comparedVals[1]);
+      }
 
-            return sortResult * (direction === 'ascending' ? 1 : -1);
-          });
+      return sortResult * (direction === 'ascending' ? 1 : -1);
+    });
 
     setSortColumn(column);
     setSortDirection(direction);
@@ -92,7 +90,9 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             <TableHeaderCell
               styleName="participant-table-row icon-cell"
               onClick={() => handleSort('checked_in')}
-              sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
+              sorted={
+                sortColumn === 'checked_in' ? sortDirection : undefined
+              }
               title={Translate.string('Check-in status')}
             >
               <Icon name="ticket" />
@@ -106,8 +106,12 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 styleName={`participant-table-row ${isSortable ? '' : 'unsortable'}`}
-                onClick={isSortable ? () => handleSort(i) : undefined}
-                sorted={isSortable && sortColumn === i ? sortDirection : undefined}
+                onClick={
+                  isSortable ? () => handleSort(i) : undefined
+                }
+                sorted={
+                  isSortable && sortColumn === i ? sortDirection : undefined
+                }
                 title={headerText}
               >
                 <p>{headerText}</p>
@@ -121,25 +125,31 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
           <TableRow key={row.id}>
             {table.show_checkin && (
               <TableCell textAlign="center">
-                {row.checked_in ? (
-                  <Icon name="check" color="green" />
-                ) : (
-                  <Icon name="close" color="red" />
-                )}
+                {
+                  row.checked_in ? (
+                    <Icon name="check" color="green" />
+                  ) : (
+                    <Icon name="close" color="red" />
+                  )
+                }
               </TableCell>
             )}
             {row.columns.map((col: TableColumnObj, i: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <TableCell key={i} title={col.text}>
-                {col.is_picture ? (
-                  col.text ? (
-                    <img src={col.text} alt="" styleName="cell-img" />
-                  ) : (
-                    <div styleName="cell-img" />
-                  )
-                ) : (
-                  col.text
-                )}
+                {
+                  col.is_picture ?
+                    (
+                      col.text ? (
+                        <img src={col.text} alt="" styleName="cell-img" />
+                      ) : (
+                        <div styleName="cell-img" />
+                      )
+                    ) :
+                    (
+                      col.text
+                    )
+                }
               </TableCell>
             ))}
           </TableRow>
@@ -157,11 +167,13 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     </Table>
   ) : (
     <Message>
-      {totalParticipantCount > 0 ? (
-        <ParticipantCountHidden count={hiddenParticipantsCount} />
-      ) : (
-        <Translate>No participants registered.</Translate>
-      )}
+      {
+        totalParticipantCount > 0 ? (
+          <ParticipantCountHidden count={hiddenParticipantsCount} />
+        ) : (
+          <Translate>No participants registered.</Translate>
+        )
+      }
     </Message>
   );
 }

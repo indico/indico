@@ -55,9 +55,7 @@ function ParticipantCounter({totalCount, hiddenCount}: ParticipantCounterProps) 
       content={<ParticipantCountHidden count={hiddenCount} />}
       trigger={participantCounterElement}
     />
-  ) : (
-    participantCounterElement
-  );
+  ) : participantCounterElement;
 }
 
 function ParticipantAccordionItem({
@@ -77,7 +75,9 @@ function ParticipantAccordionItem({
       {!noTitle && (
         <AccordionTitle
           active={isActive}
-          onClick={collapsible ? handleClick : undefined}
+          onClick={
+            collapsible ? handleClick : undefined
+          }
           styleName="accordion-title"
         >
           {collapsible && <Icon name="dropdown" />}
