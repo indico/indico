@@ -85,7 +85,20 @@ export default {
         const dayKey = moment(startDt).format('YYYYMMDD');
         const dayEntries = newEntries[dayKey];
 
-        newEntries[dayKey] = layout([...dayEntries, entry]);
+        if (entry.sessionBlockId) {
+          const newDayEntries = newEntries[dayKey].map(e => {
+            if (e.objId === entry.sessionBlockId && e.type === 'block') {
+              return {
+                ...e,
+                children: [...(e.children || []), entry],
+              };
+            }
+            return e;
+          });
+          newEntries[dayKey] = layout(newDayEntries);
+        } else {
+          newEntries[dayKey] = layout([...dayEntries, entry]);
+        }
 
         return {
           ...state,

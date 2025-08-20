@@ -24,6 +24,7 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
+import {getEntryColor} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -258,8 +259,16 @@ export function dismissError() {
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
-export function createEntry(entryType, entry) {
+function _createEntry(entryType, entry) {
   return {type: CREATE_ENTRY, entryType, entry};
+}
+
+export function createEntry(entryType, entry) {
+  return (dispatch, getState) => {
+    const color = getEntryColor(entry, getState().sessions);
+    const newEntry = {...entry, ...color};
+    dispatch(_createEntry(entryType, newEntry));
+  };
 }
 
 export function editEntry(entryType, entry) {
