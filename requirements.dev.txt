@@ -47,6 +47,8 @@ colorclass==2.2.2
     #   unbeheader
 coverage==7.6.9
     # via pytest-cov
+docker==7.1.0
+    # via -r requirements.dev.in
 docutils==0.21.2
     # via
     #   plantweb
@@ -164,6 +166,7 @@ redis==5.2.1
 requests==2.32.4
     # via
     #   -c requirements.txt
+    #   docker
     #   plantweb
     #   responses
     #   sphinx
@@ -242,6 +245,7 @@ unbeheader==1.4.0
 urllib3==2.5.0
     # via
     #   -c requirements.txt
+    #   docker
     #   requests
     #   responses
 uv==0.8.6

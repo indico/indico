@@ -1,5 +1,6 @@
 -c requirements.txt
 build
+docker
 flask-url-map-serializer
 freezegun
 hatchling
