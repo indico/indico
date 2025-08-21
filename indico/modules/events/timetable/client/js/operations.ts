@@ -39,16 +39,3 @@ export const changeSessionColor = (sessions, sessionId, color) => {
   const newSessions = new Map(sessions);
   return newSessions.set(sessionId, {...sessions.get(sessionId), color});
 };
-
-/**
- * Calculates the updates to the state of the navbar after a window resize event
- * @param {object} state State of the navbar
- * @param {object} action {newSize, dayIdx} New window size and selected day's index
- * @returns {object} {numDays, offset} Number of days that fit on the toolbar and offset necessary
- * to make the selected day visible
- */
-export const resizeWindow = ({offset}, {newSize, dayIdx}) => {
-  const numDays = Math.max(Math.floor((newSize - 340) / 110), 2);
-  const numDaysOutOfBounds = dayIdx - numDays - offset + 1;
-  return {numDays, offset: numDaysOutOfBounds > 0 ? offset + numDaysOutOfBounds : offset};
-};
