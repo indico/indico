@@ -146,3 +146,8 @@ export const getModalEntry = createSelector(
   getOpenModal,
   openModal => openModal.entry
 );
+
+export const getDefaultContribDurationMinutes = createSelector(
+  getStaticData,
+  staticData => staticData.defaultContribDurationMinutes
+);
