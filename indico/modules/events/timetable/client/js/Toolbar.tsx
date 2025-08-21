@@ -8,7 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -18,24 +18,6 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import './Toolbar.module.scss';
 import {GRID_SIZE_MINUTES} from './utils';
-
-const displayModes = [
-  {
-    name: 'compact',
-    title: Translate.string('Compact', 'timetable display mode'),
-    icon: 'minus square outline',
-  },
-  {
-    name: 'full',
-    title: Translate.string('Full', 'timetable display mode'),
-    icon: 'plus square outline',
-  },
-  {
-    name: 'blocks',
-    title: Translate.string('Blocks', 'timetable display mode'),
-    icon: 'block layout',
-  },
-];
 
 export default function Toolbar({
   date,
@@ -55,7 +37,6 @@ export default function Toolbar({
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const error = useSelector(selectors.getError);
-  const displayMode = useSelector(selectors.getDisplayMode);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
@@ -63,7 +44,7 @@ export default function Toolbar({
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
-  const reachedLastDay = currentDayIdx >= numDays;
+  const reachedLastDay = currentDayIdx >= numDays - 1;
 
   const gradientWidth = 10;
   const dayWidth = 60;
@@ -101,6 +82,8 @@ export default function Toolbar({
       scrollToDay(currentDayIdx);
     }
   }, [daysBarRef]);
+
+  console.log('reached last', numDays);
 
   return (
     <div styleName="toolbar" ref={ref}>
@@ -152,27 +135,6 @@ export default function Toolbar({
             basic
           />
         </Menu.Item>
-        {/* TODO: (Ajob) Reconsider this feature. Disabled until further notice */}
-        {/* <Dropdown
-          // TODO: (Ajob) Very unclear if this is a dropdown based on icon
-          icon="object group"
-          styleName="action"
-          direction="left"
-          title={Translate.string('Display mode')}
-          item
-        >
-          <Dropdown.Menu>
-            {displayModes.map(({name, title, icon}) => (
-              <Dropdown.Item
-                key={name}
-                text={title}
-                icon={icon}
-                onClick={() => dispatch(actions.setDisplayMode(name))}
-                active={displayMode === name}
-              />
-            ))}
-          </Dropdown.Menu>
-        </Dropdown> */}
         <Menu.Item
           onClick={() => {
             // TODO: (Ajob) Replace with real default duration

@@ -46,7 +46,6 @@ export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
-export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
@@ -267,10 +266,6 @@ export function dismissError() {
 
 export function scrollNavbar(offset) {
   return {type: SCROLL_NAVBAR, offset};
-}
-
-export function setDisplayMode(mode) {
-  return {type: SET_DISPLAY_MODE, mode};
 }
 
 export function toggleShowUnscheduled() {

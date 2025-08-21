@@ -34,7 +34,7 @@ export interface ReduxState {
   entries: Entries;
   sessions: any[];
   navigation: {numDays: number; currentDate: Moment; isExpanded: boolean};
-  display: {mode: string; showUnscheduled: boolean};
+  display: {showUnscheduled: boolean};
   openModal: {type: string | null; entry: any};
 }
 
@@ -424,10 +424,8 @@ export default {
         return state;
     }
   },
-  display: (state = {mode: 'compact', showUnscheduled: false}, action) => {
+  display: (state = {showUnscheduled: false}, action) => {
     switch (action.type) {
-      case actions.SET_DISPLAY_MODE:
-        return {...state, mode: action.mode};
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
       default:

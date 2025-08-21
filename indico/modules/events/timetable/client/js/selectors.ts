@@ -122,10 +122,6 @@ export const getError = createSelector(
   entries => entries.error
 );
 
-export const getDisplayMode = createSelector(
-  getDisplay,
-  display => display.mode
-);
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
