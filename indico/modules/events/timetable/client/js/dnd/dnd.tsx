@@ -207,12 +207,10 @@ export function DnDProvider({
   children,
   onDrop,
   modifier = ({transform}) => transform,
-  limits,
 }: {
   children: React.ReactNode;
   onDrop: OnDrop;
   modifier?: Modifier;
-  limits?: [number, number];
 }) {
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
@@ -231,8 +229,8 @@ export function DnDProvider({
     draggables,
     enabled:
       // TODO: does not really work atm
-      state.current.activeDraggable !== null,
-    limits,
+      state.current.activeDraggable === null ||
+      !state.current.activeDraggable.startsWith('unscheduled'),
   });
 
   const registerDroppable = useCallback((id, node) => {

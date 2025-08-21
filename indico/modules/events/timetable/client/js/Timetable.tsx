@@ -47,7 +47,7 @@ export default function Timetable() {
   const minScrollHour = !isSingleDayEvent ? minHourWithContent : 0;
   const minHour = !isSingleDayEvent ? 0 : minHourWithContent;
   const maxHour = !isSingleDayEvent
-    ? 24
+    ? 23
     : Math.max(
         eventEndDt.hour(),
         ...(useWeekView

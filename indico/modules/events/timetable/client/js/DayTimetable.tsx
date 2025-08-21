@@ -28,7 +28,7 @@ import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {getDateKey, GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+import {getDateKey, defaultContributionDuration, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -98,6 +98,7 @@ export function DayTimetable({
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
+  const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -246,9 +247,6 @@ export function DayTimetable({
   }
 
   function canInteractWithTimeline(y, offsets = [0, 0]) {
-    console.log('interact?');
-    console.log(y, pixelLimitsTotal);
-    console.log(y > pixelLimitsTotal[0] + offsets[0] && y < pixelLimitsTotal[1] - offsets[1]);
     return y > pixelLimitsTotal[0] + offsets[0] && y < pixelLimitsTotal[1] - offsets[1];
   }
 
@@ -270,15 +268,15 @@ export function DayTimetable({
       if (
         event.button !== 0 ||
         event.target !== calendarRef.current ||
-        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(GRID_SIZE_MINUTES)])
+        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(defaultContributionDuration)])
       ) {
         return;
       }
 
       const rect = calendarRef.current.getBoundingClientRect();
       const y = minutesToPixels(
-        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
-          GRID_SIZE_MINUTES
+        Math.round(pixelsToMinutes(event.clientY - rect.top) / defaultContributionDuration) *
+          defaultContributionDuration
       );
 
       let startDt = moment(dt)
@@ -294,7 +292,7 @@ export function DayTimetable({
       dispatch(
         actions.setDraftEntry({
           startDt,
-          duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
+          duration: defaultContributionDuration, // TODO: (Ajob) Replace with default duration
           y,
         })
       );
@@ -306,9 +304,9 @@ export function DayTimetable({
       }
       const rect = calendarRef.current.getBoundingClientRect();
       let draftDuration = Math.max(
-        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
-          GRID_SIZE_MINUTES,
-        GRID_SIZE_MINUTES // TODO: Replace with default duration
+        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / defaultContributionDuration) *
+          defaultContributionDuration,
+        defaultContributionDuration // TODO: Replace with default duration
       );
 
       const newEndDt = moment(draftEntry.startDt).add(draftDuration, 'minutes');
@@ -372,12 +370,8 @@ export function DayTimetable({
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
-  // TODO: (Ajob) The 10px margin impacts calculations and we need to pass it
-  //              here in the limits the offsetTop is different.
-  const dndLimits = pixelLimitsTotal;
-
   return (
-    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar} limits={dndLimits}>
+    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
       <UnscheduledContributions dt={dt} />
       <div ref={wrapperRef} className="wrapper">
         <div styleName="wrapper">
@@ -478,7 +472,7 @@ function layoutAfterDropOnCalendar(
   mouse: MousePosition
 ) {
   const {y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
+  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / defaultContributionDuration) * defaultContributionDuration;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined = entries.find(e => e.id === who);

@@ -11,7 +11,6 @@ import {getScrollParent} from './modifiers';
 import {Draggable, MousePosition} from './types';
 
 const SCROLL_MARGIN_PERCENT = 0.15;
-const SCROLL_MAX_OFFSET_PX = 200;
 const SCROLL_INTERVAL_MS = 5;
 const BASE_SPEED = 3;
 
@@ -21,12 +20,10 @@ export function useScrollIntent({
   state,
   draggables,
   enabled,
-  limits,
 }: {
   state: any;
   draggables: Record<string, Draggable>;
   enabled: boolean;
-  limits?: [number, number];
 }) {
   const scrollSpeed = useRef<{x: number; y: number}>({x: 0, y: 0});
   const intervalRef = useRef<Timeout | null>(null);
@@ -53,25 +50,11 @@ export function useScrollIntent({
       const draggable = draggables[state.current.activeDraggable];
       const scrollParent = getScrollParent(draggable.node.current);
 
-      // const dragRect = draggable.node.current.getBoundingClientRect();
-
       scrollSpeed.current = getScrollSpeed({x: event.clientX, y: event.clientY}, scrollParent);
-
-      const direction = Math.sign(scrollSpeed.current.y);
 
       if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
         if (intervalRef.current === null) {
           intervalRef.current = setInterval(() => {
-            const newTop = scrollSpeed.current.y + scrollParent.scrollTop;
-            const newBottom =
-              scrollSpeed.current.y + scrollParent.scrollTop + scrollParent.clientHeight;
-
-            if (direction === -1 && newTop + SCROLL_MAX_OFFSET_PX <= limits[0]) {
-              scrollSpeed.current.y = 0;
-            } else if (direction === 1 && newBottom - SCROLL_MAX_OFFSET_PX >= limits[1]) {
-              scrollSpeed.current.y = 0;
-            }
-
             if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
               scrollParent.scrollBy(scrollSpeed.current.x, scrollSpeed.current.y);
             }
@@ -87,15 +70,13 @@ export function useScrollIntent({
       window.removeEventListener('mousemove', handleMouseMove);
       clearInterval(id);
     };
-  }, [state, draggables, enabled, limits]);
+  }, [state, draggables, enabled]);
 }
 
 function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement) {
   const rect = scrollParent.getBoundingClientRect();
-  const mouseX = mouse.x - rect.left;
-  const mouseY = mouse.y - rect.top;
-  const mouseXPercent = Math.min(1, Math.max(0, mouseX / rect.width));
-  const mouseYPercent = Math.min(1, Math.max(0, mouseY / rect.height));
+  const mouseYPercent = Math.min(1, Math.max(0, (mouse.y - rect.top) / rect.height));
+  const mouseXPercent = Math.min(1, Math.max(0, (mouse.x - rect.left) / rect.width));
 
   let speedX = 0;
   let speedY = 0;
