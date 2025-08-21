@@ -18,14 +18,12 @@ import PublicationModal from './PublicationModal';
 
 interface PublicationStateSwitch {
   eventId: string;
-  iconDisplay?: 'show' | 'hide' | 'only';
   onSuccess?: () => void;
   [key: string]: any;
 }
 
 export default function PublicationStateSwitch({
   eventId,
-  iconDisplay = 'show',
   onSuccess = () => undefined,
   ...rest
 }: PublicationStateSwitch) {
@@ -57,16 +55,14 @@ export default function PublicationStateSwitch({
       onClick={() => setModalOpen(true)}
       title={
         published
-          ? Translate.string('Unpublish timetable and contributions to event participants')
-          : Translate.string('Publish timetable and contributions to event participants')
+          ? Translate.string('Unpublish timetable and contributions to regular users')
+          : Translate.string('Publish timetable and contributions to regular users')
       }
-      icon={iconDisplay === 'only'}
       color={published ? 'green' : null}
       {...rest}
     >
-      {iconDisplay !== 'hide' && <Icon name={published ? 'lock open' : 'lock'} />}
-      {iconDisplay !== 'only' &&
-        (published ? <Translate>Published</Translate> : <Translate>Unpublished</Translate>)}
+      <Icon name={published ? 'lock open' : 'lock'} />
+      {published ? <Translate>Published</Translate> : <Translate>Unpublished</Translate>}
     </Button>
   );
 
