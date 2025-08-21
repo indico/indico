@@ -9,6 +9,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes, mergeChanges} from './util';
+import {getDateKey} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -17,7 +18,6 @@ export const getDayEntries = (state: ReduxState) =>
 export const getSessions = state => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
-export const getOpenModal = state => state.openModal;
 export const getLatestChange = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx];
 
@@ -56,6 +56,11 @@ export const getEventNumDays = createSelector(
   (startDt, endDt) => endDt.diff(startDt, 'days') + 1
 );
 
+export const getCurrentDayEntries = createSelector(
+  getDayEntries,
+  getCurrentDate,
+  (entries, currentDate) => entries[getDateKey(currentDate)]
+);
 export const getBlocks = createSelector(
   getEntries,
   getSessions,
@@ -116,38 +121,22 @@ export const getError = createSelector(
   entries => entries.error
 );
 
-export const getNavbarMaxDays = createSelector(
-  getNavigation,
-  navigation => navigation.numDays
-);
-export const getNavbarOffset = createSelector(
-  getNavigation,
-  navigation => navigation.offset
-);
-
-export const getDisplayMode = createSelector(
-  getDisplay,
-  display => display.mode
-);
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
-);
-export const showAllTimeslots = createSelector(
-  getDisplay,
-  display => display.showAllTimeslots
-);
-
-export const getModalType = createSelector(
-  getOpenModal,
-  openModal => openModal.type
-);
-export const getModalEntry = createSelector(
-  getOpenModal,
-  openModal => openModal.entry
 );
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
   staticData => staticData.defaultContribDurationMinutes
+);
+
+// Navigation state
+export const getIsExpanded = createSelector(
+  getNavigation,
+  navigation => navigation.isExpanded
+);
+export const getIsDraft = createSelector(
+  getNavigation,
+  navigation => navigation.isDraft
 );
