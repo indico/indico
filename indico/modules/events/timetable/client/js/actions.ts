@@ -44,15 +44,12 @@ export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
 export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
-export const RESIZE_WINDOW = 'Resize window';
-export const SET_DISPLAY_MODE = 'Set display mode';
+export const TOGGLE_EXPAND = 'Toggle expand';
+export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
-export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
-export const ADD_ENTRY = 'Add entry';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
-export const CLOSE_MODAL = 'Close modal';
 
 interface SetDraftEntryAction {
   type: typeof SET_DRAFT_ENTRY;
@@ -171,6 +168,14 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
   }));
 }
 
+export function toggleExpand() {
+  return {type: TOGGLE_EXPAND};
+}
+
+export function toggleDraft() {
+  return {type: TOGGLE_DRAFT};
+}
+
 export function resizeEntry(
   date: string,
   id: string,
@@ -262,29 +267,9 @@ export function scrollNavbar(offset) {
   return {type: SCROLL_NAVBAR, offset};
 }
 
-export function resizeWindow(newSize, dayIdx) {
-  return {type: RESIZE_WINDOW, newSize, dayIdx};
-}
-
-export function setDisplayMode(mode) {
-  return {type: SET_DISPLAY_MODE, mode};
-}
-
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
-
-export function toggleShowAllTimeslots() {
-  return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
-}
-
-// TODO: (Ajob) Evaluate addEntry and editEntry vs createEntry and updateEntry,
-//              the latter two were implemented later and might be duplicate
-
-export function addEntry(entryType) {
-  return {type: ADD_ENTRY, entryType};
-}
-
 export function createEntry(entryType, entry) {
   return {type: CREATE_ENTRY, entryType, entry};
 }
@@ -295,10 +280,6 @@ export function editEntry(entryType, entry) {
 
 export function updateEntry(entryType, entry) {
   return {type: UPDATE_ENTRY, entryType, entry};
-}
-
-export function closeModal() {
-  return {type: CLOSE_MODAL};
 }
 
 export function setCurrentDate(date: Moment, eventId: number) {
