@@ -221,7 +221,6 @@ class RHTimetableBreak(RHManageEventBase):
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionSchema)
     def _process_POST(self, data):
-        print(data)
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
         # TODO: quick hack to get the person_link data in the right format
