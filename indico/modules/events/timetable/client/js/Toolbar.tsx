@@ -44,7 +44,7 @@ export default function Toolbar({
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
-  const currentDayIdxRef: Ref<number> = useRef(currentDayIdx);
+  const currentDayIdxRef = useRef<number>(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
 
   const gradientWidth = 10;
