@@ -7,7 +7,6 @@
 
 import publicationURL from 'indico-url:contributions.manage_publication';
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import {Checkbox} from 'indico/react/components';

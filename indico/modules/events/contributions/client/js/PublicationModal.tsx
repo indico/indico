@@ -41,10 +41,12 @@ export default function PublicationModal({
         <p>
           {published ? (
             <Translate>
-              The following menu items will not be accessible to event participants
+              The following menu items will not be accessible to event participants.
             </Translate>
           ) : (
-            <Translate>The following menu items will be accessible to event participants</Translate>
+            <Translate>
+              The following menu items will be accessible to event participants.
+            </Translate>
           )}
         </p>
         <Message warning>
