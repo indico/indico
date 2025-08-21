@@ -27,6 +27,7 @@ import {getCurrentDateLocalStorage} from './utils';
       const initialData = {
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
+          defaultContribDurationMinutes: eventInfo.defaultContribDurationMinutes,
           startDt: moment.tz(
             `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
             eventInfo.startDate.tz
