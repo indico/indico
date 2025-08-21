@@ -79,7 +79,12 @@ export default function Toolbar({
   };
 
   const addNewEntry = () => {
-    const minDt = currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day');
+    const minDt =
+      currentDayIdx === 0
+        ? moment(eventStart)
+        : moment(currentDate)
+            .startOf('day')
+            .hour(8);
     const maxDt = reachedLastDay
       ? moment(eventEnd).subtract(defaultContributionDuration, 'minutes')
       : moment(currentDate)
