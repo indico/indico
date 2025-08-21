@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useEffect, useRef} from 'react';
+import React, {Ref, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Label, Menu, Message} from 'semantic-ui-react';
 
@@ -17,7 +17,6 @@ import PublicationStateSwitch from '../../../contributions/client/js/Publication
 import * as actions from './actions';
 import * as selectors from './selectors';
 import './Toolbar.module.scss';
-import {GRID_SIZE_MINUTES} from './utils';
 
 export default function Toolbar({
   date,
@@ -45,6 +44,7 @@ export default function Toolbar({
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
+  const currentDayIdxRef: Ref<number> = useRef(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
 
   const gradientWidth = 10;
@@ -94,10 +94,8 @@ export default function Toolbar({
   };
 
   useEffect(() => {
-    if (daysBarRef && daysBarRef.current) {
-      scrollToDay(currentDayIdx);
-    }
-  }, [daysBarRef]);
+    scrollToDay(currentDayIdxRef.current);
+  }, [currentDayIdxRef]);
 
   return (
     <div styleName="toolbar" ref={ref}>
@@ -157,7 +155,7 @@ export default function Toolbar({
         />
         <Menu.Item
           onClick={() => dispatch(actions.toggleExpand())}
-          title={isExpanded ? Translate.string('Compress') : Translate.string('Expand')}
+          title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
           icon={isExpanded ? 'compress' : 'expand'}
           styleName="action"
         />
