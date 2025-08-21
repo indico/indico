@@ -8,7 +8,6 @@
 import moment from 'moment';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-// import {Checkbox} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
@@ -26,7 +25,9 @@ export default function Timetable() {
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  // TODO: (Ajob) Get rid of this after disabled areas are merged
+  const showAllTimeslots = true;
+  const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDateEntries = entries[getDateKey(currentDate)];
   const useWeekView = false;
@@ -59,7 +60,7 @@ export default function Timetable() {
       );
 
   return (
-    <div styleName="timetable">
+    <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
       {!useWeekView && (
         <Toolbar
