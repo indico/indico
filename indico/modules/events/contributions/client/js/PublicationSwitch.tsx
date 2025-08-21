@@ -16,7 +16,7 @@ import {Translate} from 'indico/react/i18n';
 
 import PublicationModal from './PublicationModal';
 
-export default function PublicationSwitch({eventId}) {
+export default function PublicationSwitch({eventId}: {eventId: string}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [published, togglePublished, loading, saving] = useTogglableValue(
@@ -34,6 +34,9 @@ export default function PublicationSwitch({eventId}) {
       onChange={() => setModalOpen(true)}
       checked={published}
       disabled={saving}
+      indeterminate={false}
+      className={null}
+      style={null}
     />
   );
 
@@ -50,7 +53,3 @@ export default function PublicationSwitch({eventId}) {
     />
   );
 }
-
-PublicationSwitch.propTypes = {
-  eventId: PropTypes.string.isRequired,
-};

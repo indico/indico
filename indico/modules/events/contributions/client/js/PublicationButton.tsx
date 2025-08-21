@@ -42,7 +42,7 @@ export default function PublicationButton({
   const trigger = (
     <Button
       onClick={() => setModalOpen(true)}
-      title={Translate.string('Publish timetable and contributions to regular users')}
+      title={Translate.string('Publish timetable and contributions to event participants')}
     >
       <Translate>Publish contributions</Translate>
     </Button>

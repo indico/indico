@@ -462,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <PublicationButton
           eventId={buttonContainer.dataset.eventId}
           onSuccess={() => warning.classList.add('hidden')}
-          useIButton
         />,
         buttonContainer
       );

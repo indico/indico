@@ -40,9 +40,11 @@ export default function PublicationModal({
         </Header>
         <p>
           {published ? (
-            <Translate>The following menu items will not be accessible to regular users</Translate>
+            <Translate>
+              The following menu items will not be accessible to event participants
+            </Translate>
           ) : (
-            <Translate>The following menu items will be accessible to regular users</Translate>
+            <Translate>The following menu items will be accessible to event participants</Translate>
           )}
         </p>
         <Message warning>

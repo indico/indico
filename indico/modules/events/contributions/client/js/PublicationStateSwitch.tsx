@@ -57,8 +57,8 @@ export default function PublicationStateSwitch({
       onClick={() => setModalOpen(true)}
       title={
         published
-          ? Translate.string('Unpublish timetable and contributions to regular users')
-          : Translate.string('Publish timetable and contributions to regular users')
+          ? Translate.string('Unpublish timetable and contributions to event participants')
+          : Translate.string('Publish timetable and contributions to event participants')
       }
       icon={iconDisplay === 'only'}
       color={published ? 'green' : null}
