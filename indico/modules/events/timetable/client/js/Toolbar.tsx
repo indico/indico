@@ -77,6 +77,23 @@ export default function Toolbar({
     scrollByDay(dayDelta, behavior);
   };
 
+  const addNewEntry = () => {
+    // TODO: (Ajob) Replace with real default duration
+    const defaultDuration = GRID_SIZE_MINUTES * 4;
+    const minDt = currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day');
+    const maxDt = reachedLastDay
+      ? moment(eventEnd).subtract(defaultDuration, 'minutes')
+      : moment(currentDate)
+          .endOf('day')
+          .subtract(19 * 60 + 59, 'seconds');
+    const currentDayEntryEndDts = currentDayEntries.map(e =>
+      moment(e.startDt).add(e.duration, 'minutes')
+    );
+    const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
+    const draftEntry = {startDt: newDt, duration: defaultDuration};
+    dispatch(actions.setDraftEntry(draftEntry));
+  };
+
   useEffect(() => {
     if (daysBarRef && daysBarRef.current) {
       scrollToDay(currentDayIdx);
@@ -134,22 +151,7 @@ export default function Toolbar({
           />
         </Menu.Item>
         <Menu.Item
-          onClick={() => {
-            // TODO: (Ajob) Replace with real default duration
-            const defaultDuration = GRID_SIZE_MINUTES * 4;
-            const minDt =
-              currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day');
-            const maxDt = reachedLastDay
-              ? moment(eventEnd).subtract(defaultDuration, 'minutes')
-              : moment(currentDate)
-                  .endOf('day')
-                  .subtract(defaultDuration, 'minutes');
-            const currentDayEntryEndDts = currentDayEntries.map(e =>
-              e.startDt.add(e.duration, 'minutes')
-            );
-            const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
-            dispatch(actions.setDraftEntry({startDt: newDt, duration: defaultDuration}));
-          }}
+          onClick={addNewEntry}
           title={Translate.string('Add new entry')}
           icon="plus"
           styleName="action"
