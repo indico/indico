@@ -56,7 +56,8 @@ export const getEventNumDays = createSelector(
   (startDt, endDt) => endDt.diff(startDt, 'days') + 1
 );
 export const getSessionById = createSelector(
-  [getSessions, (_state: ReduxState, id: number) => id],
+  getSessions,
+  (_state: ReduxState, id: number) => id,
   (sessions, id) => sessions[id]
 );
 
