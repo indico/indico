@@ -41,6 +41,7 @@ export default function Toolbar({
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
+  const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   // Math.ceil and float number allows this to work for a difference of a day
   // but less than 24h, also across multiple months. Hence the 'true'.
   const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
@@ -78,11 +79,9 @@ export default function Toolbar({
   };
 
   const addNewEntry = () => {
-    // TODO: (Ajob) Replace with real default duration
-    const defaultDuration = GRID_SIZE_MINUTES * 4;
     const minDt = currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day');
     const maxDt = reachedLastDay
-      ? moment(eventEnd).subtract(defaultDuration, 'minutes')
+      ? moment(eventEnd).subtract(defaultContributionDuration, 'minutes')
       : moment(currentDate)
           .endOf('day')
           .subtract(19 * 60 + 59, 'seconds');
@@ -90,7 +89,7 @@ export default function Toolbar({
       moment(e.startDt).add(e.duration, 'minutes')
     );
     const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
-    const draftEntry = {startDt: newDt, duration: defaultDuration};
+    const draftEntry = {startDt: newDt, duration: defaultContributionDuration};
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
