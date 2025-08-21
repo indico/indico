@@ -45,7 +45,6 @@ export default function PublicationModal({
             <Translate>The following menu items will be accessible to regular users</Translate>
           )}
         </p>
-        <Divider />
         <Message warning>
           <List bulleted>
             <List.Item>
