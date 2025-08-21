@@ -181,8 +181,21 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 class RHTimetableBreakCreate(RHManageEventBase):
     @use_rh_args(BreakSchema)
     def _process_POST(self, data: Break):
-        break_entry = create_break_entry(self.event, data, extend_parent=False)
+        session_block_id = data.pop('timetable_entry', {}).get('parent_id')
+        session_block = SessionBlock.get(session_block_id) if session_block_id else None
+        data['location_data'] = (
+            self._get_inherited_location(location_parent=session_block)
+            if data['location_data'].get('inheriting')
+            else data['location_data']
+        )
+        break_entry = create_break_entry(self.event, data, extend_parent=False, session_block=session_block)
         return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
+
+    def _get_inherited_location(self, **kwargs):
+        location_parent = kwargs.pop('location_parent', None)
+        inherited_location = location_parent.location_data if location_parent else self.event.location_data
+        inherited_location['inheriting'] = True
+        return inherited_location
 
 
 class RHTimetableBreak(RHManageEventBase):

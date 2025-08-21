@@ -184,7 +184,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               {type === EntryType.SessionBlock && (
                 <>
                   <Popup
-                    content={<Translate>Add new Contribution/Break</Translate>}
+                    content={<Translate>Add new child</Translate>}
                     size="mini"
                     trigger={<Button icon="plus" onClick={onCreateChild} color="green" />}
                   />

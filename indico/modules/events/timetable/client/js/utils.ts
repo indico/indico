@@ -128,7 +128,7 @@ export function getEntryColor(
   entry: Entry,
   sessions: Record<number, Session>
 ): {textColor: string; backgroundColor: string} {
-  if (entry.type === 'break' && !entry.parentId) {
+  if (entry.type === 'break' && !entry.sessionId) {
     return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
   }
   if (entry.type === 'contrib' && !entry.sessionId) {
@@ -140,7 +140,7 @@ export function getEntryColor(
 
   const session = sessions[entry.sessionId];
   console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
-  if (entry.type === 'contrib' && entry.sessionId) {
+  if (entry.sessionId) {
     return {
       textColor: session.textColor,
       backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
