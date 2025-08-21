@@ -28,7 +28,7 @@ import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+import {getDateKey, GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -104,9 +104,13 @@ export function DayTimetable({
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
   const startHourLimit =
-    eventStartDt.day() === dt.day() ? eventStartDt.hour() + eventStartDt.minutes() / 60 : minHour;
+    getDateKey(eventStartDt) === getDateKey(dt)
+      ? eventStartDt.hour() + eventStartDt.minutes() / 60
+      : minHour;
   const endHourLimit =
-    eventEndDt.day() === dt.day() ? eventEndDt.hour() + eventEndDt.minutes() / 60 : maxHour + 1;
+    getDateKey(eventEndDt) === getDateKey(dt)
+      ? eventEndDt.hour() + eventEndDt.minutes() / 60
+      : maxHour + 1;
   const limits: [number, number] = getTimelineLimits();
   const pixelLimitsTotal: [number, number] = getTimelinePixelLimits('total');
   const pixelLimitsDelta: [number, number] = getTimelinePixelLimits('delta');
