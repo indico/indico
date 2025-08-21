@@ -16,6 +16,7 @@ from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSche
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
@@ -33,11 +34,23 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
 
 
+def _get_break_session_block_id(entry):
+    if (parent_id := entry.timetable_entry.parent_id):
+        return TimetableEntry.get(parent_id).session_block_id
+    return None
+
+
+def _get_break_session_id(entry):
+    if (session_block_id := _get_break_session_block_id(entry)):
+        return SessionBlock.get(session_block_id).session_id
+    return None
+
+
 class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
         fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type',
-                  'parent_id')
+                  'parent_id', 'session_block_id', 'session_id')
         rh_context = ('event',)
 
     title = fields.String(required=True)
@@ -46,7 +59,9 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
-    parent_id = fields.Integer(dump_only=True, attribute='timetable_entry.parent_id')
+    parent_id = fields.Integer(attribute='timetable_entry.parent_id')
+    session_block_id = fields.Function(_get_break_session_block_id, dump_only=True)
+    session_id = fields.Function(_get_break_session_id, dump_only=True)
 
 
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
