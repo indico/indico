@@ -83,8 +83,6 @@ export default function Toolbar({
     }
   }, [daysBarRef]);
 
-  console.log('reached last', numDays);
-
   return (
     <div styleName="toolbar" ref={ref}>
       {error && (

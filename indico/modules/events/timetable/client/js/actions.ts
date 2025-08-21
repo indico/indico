@@ -50,7 +50,6 @@ export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
-export const CLOSE_MODAL = 'Close modal';
 
 interface SetDraftEntryAction {
   type: typeof SET_DRAFT_ENTRY;
@@ -281,10 +280,6 @@ export function editEntry(entryType, entry) {
 
 export function updateEntry(entryType, entry) {
   return {type: UPDATE_ENTRY, entryType, entry};
-}
-
-export function closeModal() {
-  return {type: CLOSE_MODAL};
 }
 
 export function setCurrentDate(date: Moment, eventId: number) {

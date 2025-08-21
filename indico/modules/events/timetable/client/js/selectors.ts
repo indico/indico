@@ -9,7 +9,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes, mergeChanges} from './util';
-import { getDateKey } from './utils';
+import {getDateKey} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -18,7 +18,6 @@ export const getDayEntries = (state: ReduxState) =>
 export const getSessions = state => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
-export const getOpenModal = state => state.openModal;
 export const getLatestChange = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx];
 
@@ -125,15 +124,6 @@ export const getError = createSelector(
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
-);
-
-export const getModalType = createSelector(
-  getOpenModal,
-  openModal => openModal.type
-);
-export const getModalEntry = createSelector(
-  getOpenModal,
-  openModal => openModal.entry
 );
 
 export const getDefaultContribDurationMinutes = createSelector(
