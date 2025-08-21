@@ -343,7 +343,7 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
 
 
 def serialize_event_info(event, *, management=False, user=None):
-    from indico.modules.events.contributions import Contribution
+    from indico.modules.events.contributions import Contribution, contribution_settings
     can_manage_event = event.can_manage(user)
     return {'_type': 'Conference',
             'id': str(event.id),
@@ -352,6 +352,7 @@ def serialize_event_info(event, *, management=False, user=None):
             'endDate': event.end_dt_local,
             'isConference': event.type_ == EventType.conference,
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
+            'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
             'contributions': [serialize_unscheduled_contribution(c, management=management,
                                                                  can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
