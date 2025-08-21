@@ -34,6 +34,10 @@ export function pixelsToMinutes(pixels: number) {
   return Math.round(pixels / 2);
 }
 
+export function isWithinLimits(limits: [number, number], y, offsets = [0, 0]) {
+  return y > limits[0] + offsets[0] && y < limits[1] - offsets[1];
+}
+
 export function minutesFromStartOfDay(dt: Moment) {
   return moment(dt).diff(moment(dt).startOf('day'), 'minutes');
 }

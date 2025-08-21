@@ -28,7 +28,7 @@ import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {getDateKey, defaultContributionDuration, minutesToPixels, pixelsToMinutes} from './utils';
+import {getDateKey, GRID_SIZE_MINUTES, isWithinLimits, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -47,8 +47,10 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (duration: number) =>
+      obj[e.id] = (duration: number) => {
+        console.log('too far', dt.add(duration, 'seconds'));
         dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+      };
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -99,6 +101,11 @@ export function DayTimetable({
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
+  const pixelLimitsTotal = useSelector(selectors.getCurrentPixelLimits);
+  const limits = useSelector(selectors.getCurrentLimits);
+
+  console.log('pixel limits', pixelLimitsTotal);
+  console.log('raw limits', limits);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -112,9 +119,8 @@ export function DayTimetable({
     getDateKey(eventEndDt) === getDateKey(dt)
       ? eventEndDt.hour() + eventEndDt.minutes() / 60
       : maxHour + 1;
-  const limits: [number, number] = getTimelineLimits();
-  const pixelLimitsTotal: [number, number] = getTimelinePixelLimits('total');
-  const pixelLimitsDelta: [number, number] = getTimelinePixelLimits('delta');
+  console.log('limits', limits);
+  const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
 
   function handleDragEnd(
     who: string,
@@ -230,24 +236,11 @@ export function DayTimetable({
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
   }
 
-  function getTimelineLimits(): [number, number] {
-    return [
-      ((startHourLimit - minHour) / (maxHour + 1 - minHour)) * 100,
-      (1 - (maxHour + 1 - endHourLimit) / (maxHour + 1 - minHour)) * 100,
-    ];
-  }
-
-  function getTimelinePixelLimits(offsetType: 'delta' | 'total' = 'total'): [number, number] {
+  function getTimelinePixelLimitsDelta(): [number, number] {
     return [
       minutesToPixels((startHourLimit - minHour) * 60),
-      offsetType === 'delta'
-        ? minutesToPixels((maxHour + 1 - endHourLimit) * 60)
-        : minutesToPixels((endHourLimit - minHour) * 60),
+      minutesToPixels((maxHour + 1 - endHourLimit) * 60),
     ];
-  }
-
-  function canInteractWithTimeline(y, offsets = [0, 0]) {
-    return y > pixelLimitsTotal[0] + offsets[0] && y < pixelLimitsTotal[1] - offsets[1];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -268,7 +261,10 @@ export function DayTimetable({
       if (
         event.button !== 0 ||
         event.target !== calendarRef.current ||
-        !canInteractWithTimeline(event.offsetY, [0, minutesToPixels(defaultContributionDuration)])
+        !isWithinLimits(pixelLimitsTotal, event.offsetY, [
+          0,
+          minutesToPixels(defaultContributionDuration),
+        ])
       ) {
         return;
       }
@@ -292,7 +288,7 @@ export function DayTimetable({
       dispatch(
         actions.setDraftEntry({
           startDt,
-          duration: defaultContributionDuration, // TODO: (Ajob) Replace with default duration
+          duration: defaultContributionDuration,
           y,
         })
       );
@@ -304,9 +300,9 @@ export function DayTimetable({
       }
       const rect = calendarRef.current.getBoundingClientRect();
       let draftDuration = Math.max(
-        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / defaultContributionDuration) *
-          defaultContributionDuration,
-        defaultContributionDuration // TODO: Replace with default duration
+        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES,
+        defaultContributionDuration
       );
 
       const newEndDt = moment(draftEntry.startDt).add(draftDuration, 'minutes');
@@ -361,12 +357,12 @@ export function DayTimetable({
   }, [pixelLimitsDelta]);
 
   const limitsGradientArg = [
-    'rgba(0, 0, 0, 0.05) 0%',
-    `rgba(0, 0, 0, 0.05) ${limits[0]}%`,
-    `transparent ${limits[0]}%`,
-    `transparent ${limits[1]}%`,
-    `rgba(0, 0, 0, 0.05) ${limits[1]}%`,
-    'rgba(0, 0, 0, 0.05) 100%',
+    'rgba(0, 0, 0, 0.05) 0',
+    `rgba(0, 0, 0, 0.05) ${pixelLimitsTotal[0]}px`,
+    `transparent ${pixelLimitsTotal[0]}px`,
+    `transparent ${pixelLimitsTotal[1]}px`,
+    `rgba(0, 0, 0, 0.05) ${pixelLimitsTotal[1]}px`,
+    'rgba(0, 0, 0, 0.05)',
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
@@ -472,7 +468,8 @@ function layoutAfterDropOnCalendar(
   mouse: MousePosition
 ) {
   const {y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / defaultContributionDuration) * defaultContributionDuration;
+  const deltaMinutes =
+    Math.ceil(pixelsToMinutes(y) / defaultContributionDuration) * defaultContributionDuration;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined = entries.find(e => e.id === who);

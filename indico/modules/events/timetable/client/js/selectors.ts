@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes} from './util';
-import {getDateKey} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -61,6 +62,33 @@ export const getSessionById = createSelector(
   (sessions, id) => sessions[id]
 );
 
+export const getCurrentPixelLimits = createSelector(
+  getCurrentDate,
+  getEventStartDt,
+  getEventEndDt,
+  (currentDate, startDt, endDt): [number, number] => {
+    const limits: [number, number] = [
+      minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes()),
+      minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes()),
+    ];
+
+    if (getDateKey(currentDate) !== getDateKey(startDt)) {
+      limits[0] = 0;
+    }
+    if (getDateKey(currentDate) !== getDateKey(endDt)) {
+      limits[1] = minutesToPixels(24 * 60);
+    }
+
+    return limits;
+  }
+);
+export const getCurrentLimits = createSelector(
+  getCurrentPixelLimits,
+  (limits): [number, number] => [
+    limits[0] / minutesToPixels(24 * 60),
+    limits[1] / minutesToPixels(24 * 60),
+  ]
+);
 export const getCurrentDayEntries = createSelector(
   getDayEntries,
   getCurrentDate,
