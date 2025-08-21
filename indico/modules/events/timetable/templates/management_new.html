@@ -2,14 +2,10 @@
 {% from 'events/timetable/_timetable.html' import render_timetable %}
 {% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
 
-{% block title %}
-    {%- trans %}Timetable{% endtrans -%}
-{% endblock %}
+{%- block banner -%}{%- endblock -%}
+{%- block title -%}{%- endblock -%}
 
 {% block content %}
-    {% if show_draft_warning %}
-        {{ render_draft_mode_warning(event) }}
-    {% endif %}
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"

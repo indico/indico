@@ -7,16 +7,137 @@
 
 @use 'base/palette' as *;
 
+// Separate variables to allow customization.
+$primary-color: $dark-blue;
+$bg-color: $white;
+$toolbar-bg-color: $pastel-gray;
+
 .toolbar {
   position: sticky;
   top: 0;
-  // padding-top: 1.5em;
-  // margin-top: -1.5em;
-  background-color: $white;
+  background-color: $bg-color;
   z-index: 100;
 
   :global(.ui.menu) {
-    margin-bottom: 0;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    margin: 0;
+
+    &.actions-bar {
+      box-shadow: 0 10px 10px -10px rgba($pastel-gray, 0.8);
+      padding: 0;
+    }
+
+    &.timetable-bar {
+      height: 100px;
+      overflow-y: hidden;
+
+      .days-wrapper {
+        flex-shrink: 1;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-y: hidden;
+        box-sizing: content-box;
+        position: relative;
+
+        .days {
+          display: flex;
+          overflow-x: auto;
+          box-sizing: content-box;
+          // gap: 40px;
+
+          // This padding in combination with fixed height
+          // and overflow-y hidden above,it hides the scrollbar
+          padding: 18px 0;
+
+          .day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+            border: 0;
+            font-weight: normal;
+            margin-bottom: 0;
+            background: none;
+
+            &:not(:last-of-type) {
+              margin-right: 20px;
+            }
+
+            &:global(.active) {
+              .day-number {
+                color: $bg-color;
+                background-color: $primary-color;
+              }
+
+              > .day-month {
+                visibility: visible;
+              }
+            }
+
+            &:global(:not(.active)) {
+              &:hover {
+                > .day-number {
+                  background-color: rgba($black, 0.1);
+                  transition: 0.1s;
+                }
+              }
+            }
+
+            > .day-month {
+              color: $bg-color;
+              font-weight: bold;
+              font-size: 0.8em;
+              background-color: rgba($primary-color, 0.5);
+              border-radius: 3px;
+              padding: 2px 8px;
+              margin-bottom: 5px;
+              visibility: hidden;
+            }
+
+            > .day-name {
+              color: #555;
+            }
+
+            > .day-number {
+              font-size: 1.2em;
+              font-weight: bold;
+              width: 40px;
+              height: 40px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 100%;
+            }
+          }
+
+          .gradient {
+            pointer-events: none;
+            width: 15px;
+            margin-top: 10px;
+            height: 88px;
+            bottom: 0;
+            flex-shrink: 0;
+            position: sticky;
+            z-index: 1;
+
+            &:first-child {
+              background: linear-gradient(90deg, $bg-color, transparent);
+              left: 0;
+            }
+
+            &:last-child {
+              background: linear-gradient(-90deg, $bg-color, transparent);
+              right: 0;
+            }
+          }
+        }
+      }
+    }
 
     .action {
       padding-left: 0.7em;

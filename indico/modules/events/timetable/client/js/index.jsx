@@ -12,9 +12,8 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import {setCurrentDate, setSessionData, setTimetableData} from './actions';
+import {setSessionData, setTimetableData} from './actions';
 import reducers from './reducers';
-// import {timetableData as tData, eventInfo as eInfo} from './sample-data';
 import Timetable from './Timetable';
 import {getCurrentDateLocalStorage} from './utils';
 
@@ -24,27 +23,31 @@ import {getCurrentDateLocalStorage} from './utils';
     if (root) {
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
+      const eventId = parseInt(eventInfo.id, 10);
+      const startDt = moment.tz(
+        `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
+        eventInfo.startDate.tz
+      );
+      const currentDate = getCurrentDateLocalStorage(eventId) || startDt;
       const initialData = {
         staticData: {
-          eventId: parseInt(eventInfo.id, 10),
-          defaultContribDurationMinutes: eventInfo.defaultContribDurationMinutes,
-          startDt: moment.tz(
-            `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
-            eventInfo.startDate.tz
-          ),
+          eventId,
+          startDt,
           endDt: moment.tz(
             `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
             eventInfo.endDate.tz
           ),
+          defaultContribDurationMinutes: eventInfo.defaultContribDurationMinutes,
+        },
+        navigation: {
+          isDraft: eventInfo.isDraft,
+          currentDate,
         },
       };
-      const {startDt, eventId} = initialData.staticData;
-      const currentDate = getCurrentDateLocalStorage(eventId) || startDt;
 
       const store = createReduxStore('timetable-management', reducers, initialData);
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
-      store.dispatch(setCurrentDate(currentDate, eventId));
       ReactDOM.render(
         <Provider store={store}>
           <Timetable />
