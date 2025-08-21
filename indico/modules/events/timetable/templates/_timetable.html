@@ -48,6 +48,12 @@
                 new BrowserHistoryBroker()
             ].concat(extraArgs);
 
+            // Ajob: I added this line to prevent draftmode warning from vanishing as we apply a
+            //       negative margin in timetable.css. This code will be removed at some point and
+            //       I prefer adding messy stuff here than the new timetable
+
+            $('.page-content').css('margin-top', '0');
+
             if (Object.getOwnPropertyNames(timetableArgs[1]).length > 0) {
                 var timetable = new (Function.prototype.bind.apply(timetableClass, timetableArgs));
                 $('#timetable').html(timetable.draw());
