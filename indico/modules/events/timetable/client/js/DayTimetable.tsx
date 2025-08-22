@@ -10,6 +10,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
+import {select} from 'indico/custom_elements/date_selection';
+
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
@@ -268,19 +270,15 @@ export function DayTimetable({
           defaultContributionDuration
       );
 
-      let startDt = moment(dt)
+      const startDt = moment(dt)
         .startOf('days')
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
 
-      if (startDt < dt) {
-        startDt = dt;
-      }
-
       setIsDragging(true);
       dispatch(
         actions.setDraftEntry({
-          startDt,
+          startDt: moment.min(startDt, dt),
           duration: defaultContributionDuration,
           y,
         })
@@ -461,8 +459,7 @@ function layoutAfterDropOnCalendar(
   mouse: MousePosition
 ) {
   const {y} = delta;
-  const deltaMinutes =
-    Math.ceil(pixelsToMinutes(y) / defaultContributionDuration) * defaultContributionDuration;
+  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined = entries.find(e => e.id === who);
