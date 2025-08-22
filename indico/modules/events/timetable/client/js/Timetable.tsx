@@ -37,15 +37,17 @@ export default function Timetable() {
   const maxHour = 23;
 
   const getScrollMoment = () => {
-    const minAllowedDate = moment.max(currentDate, eventStartDt);
-    const firstEntryDate = moment.min(currentDateEntries.map(e => e.startDt));
-    return moment(moment.max(minAllowedDate, firstEntryDate));
+    const scrollMoment = !currentDateEntries.length
+      ? moment.max(currentDate, eventStartDt)
+      : moment.min(currentDateEntries.map(e => e.startDt));
+
+    return moment(scrollMoment);
   };
 
   const getScrollOffset = () => {
     const scrollMoment = getScrollMoment();
     const scrollMinutes = scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes');
-    return minutesToPixels(Math.max(scrollMinutes, minScrollHour * 60));
+    return minutesToPixels(scrollMinutes);
   };
 
   return (
@@ -68,7 +70,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
-            scrollPosition={getScrollOffset()}
+            scrollPosition={Math.max(getScrollOffset(), HOUR_SIZE * minScrollHour)}
           />
         )}
       </div>
