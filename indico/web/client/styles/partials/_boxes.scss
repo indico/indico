@@ -224,6 +224,11 @@ $i-box-padding: 10px;
       @include i-box-title();
     }
 
+    // Reset default h4 styles when used as box title
+    h4.i-box-title {
+      margin: 0;
+    }
+
     .i-box-description {
       @include i-box-description();
     }

@@ -42,10 +42,10 @@ export default function FormSection({
       <div className="i-box-header">
         {sortHandle}
         <div styleName="header-wrapper">
-          <div className="i-box-title">
+          <h4 className="i-box-title">
             {isManagerOnly ? managerPopup : null}
             {title}
-          </div>
+          </h4>
           <div className="i-box-description">
             <Markdown targetBlank>{description}</Markdown>
           </div>

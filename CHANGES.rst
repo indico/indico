@@ -40,6 +40,8 @@ Accessibility
   list pages (:pr:`7038`, thanks :user:`foxbunny`)
 - Add accessible labels to extra slots dropdown fields in registration forms (:pr:`7039`,
   thanks :user:`foxbunny`)
+- Use proper semantic heading elements for registration form section titles (:pr:`7040`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
