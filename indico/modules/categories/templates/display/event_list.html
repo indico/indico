@@ -93,9 +93,9 @@
 
 {% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
     {% for month in events_by_month %}
-        <h4 class="{% if month.is_current %}current-month{% endif %}">
+        <h3 class="{% if month.is_current %}current-month{% endif %}">
             <span>{{ month.name }}</span>
-        </h4>
+        </h3>
         <ul>
             {% for event in month.events %}
                 {% set is_lecture = (event.type == 'lecture') %}
