@@ -110,11 +110,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         return;
       }
       if (over.length === 1) {
-        handleUnscheduledDrop(who, calendar, delta, mouse, offset);
+        return handleUnscheduledDrop(who, calendar, delta, mouse, offset);
       } else {
         const block = over.find(o => o.id !== 'calendar');
         if (block) {
-          handleUnscheduledDropOnBlock(who, block, delta, mouse, offset, calendar);
+          return handleUnscheduledDropOnBlock(who, block, delta, mouse, offset, calendar);
         }
       }
     }
@@ -125,11 +125,11 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     if (over.length === 1) {
-      handleDropOnCalendar(who, calendar, delta, mouse);
+      return handleDropOnCalendar(who, calendar, delta, mouse);
     } else {
       const block = over.find(o => o.id !== 'calendar');
       if (block) {
-        handleDropOnBlock(who, block, delta, mouse, calendar);
+        return handleDropOnBlock(who, block, delta, mouse, calendar);
       }
     }
   }
