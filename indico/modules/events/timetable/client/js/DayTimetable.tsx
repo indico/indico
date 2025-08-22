@@ -28,7 +28,13 @@ import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {getDateKey, GRID_SIZE_MINUTES, isWithinLimits, minutesToPixels, pixelsToMinutes} from './utils';
+import {
+  getDateKey,
+  GRID_SIZE_MINUTES,
+  isWithinLimits,
+  minutesToPixels,
+  pixelsToMinutes,
+} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -98,28 +104,19 @@ export function DayTimetable({
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const pixelLimitsTotal = useSelector(selectors.getCurrentPixelLimits);
-  const limits = useSelector(selectors.getCurrentLimits);
-
-  console.log('pixel limits', pixelLimitsTotal);
-  console.log('raw limits', limits);
+  const scrollPositionRef = useRef<number>(scrollPosition);
 
   const [isDragging, setIsDragging] = useState(false);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
-  const startHourLimit =
-    getDateKey(eventStartDt) === getDateKey(dt)
-      ? eventStartDt.hour() + eventStartDt.minutes() / 60
-      : minHour;
   const endHourLimit =
     getDateKey(eventEndDt) === getDateKey(dt)
       ? eventEndDt.hour() + eventEndDt.minutes() / 60
       : maxHour + 1;
-  console.log('limits', limits);
   const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
 
   function handleDragEnd(
@@ -237,10 +234,7 @@ export function DayTimetable({
   }
 
   function getTimelinePixelLimitsDelta(): [number, number] {
-    return [
-      minutesToPixels((startHourLimit - minHour) * 60),
-      minutesToPixels((maxHour + 1 - endHourLimit) * 60),
-    ];
+    return [pixelLimitsTotal[0], minutesToPixels((maxHour + 1 - endHourLimit) * 60)];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -345,10 +339,10 @@ export function DayTimetable({
   }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
   useEffect(() => {
-    if (wrapperRef.current && !wrapperRef.current.scrollTop) {
-      wrapperRef.current.scrollTop = scrollPosition;
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTop = scrollPositionRef.current;
     }
-  }, [scrollPosition]);
+  }, [wrapperRef, scrollPositionRef]);
 
   const restrictToCalendar = useMemo(() => {
     const restrictLimits = pixelLimitsDelta;
