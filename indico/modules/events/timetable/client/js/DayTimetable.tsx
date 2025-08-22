@@ -31,6 +31,7 @@ import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
+  DAY_SIZE,
   getDateKey,
   GRID_SIZE_MINUTES,
   isWithinLimits,
@@ -235,7 +236,7 @@ export function DayTimetable({
   }
 
   function getTimelinePixelLimitsDelta(): [number, number] {
-    return [pixelLimitsTotal[0], minutesToPixels((maxHour + 1 - endHourLimit) * 60)];
+    return [pixelLimitsTotal[0], DAY_SIZE - pixelLimitsTotal[1]];
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
