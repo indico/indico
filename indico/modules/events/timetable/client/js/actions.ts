@@ -330,7 +330,7 @@ class RequestQueue {
 
   async _processRequests() {
     this.working = true;
-    while (this.requests.length > 0) {
+    while (this.requests.length) {
       const requestFunc = this.requests.shift();
       try {
         await requestFunc();
