@@ -17,6 +17,8 @@ export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const HOUR_SIZE = minutesToPixels(60);
+export const DAY_SIZE = 24 * HOUR_SIZE;
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;

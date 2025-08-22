@@ -10,7 +10,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes} from './util';
-import {getDateKey, minutesToPixels} from './utils';
+import {DAY_SIZE, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -76,7 +76,7 @@ export const getCurrentPixelLimits = createSelector(
       limits[0] = 0;
     }
     if (getDateKey(currentDate) !== getDateKey(endDt)) {
-      limits[1] = minutesToPixels(24 * 60);
+      limits[1] = DAY_SIZE;
     }
 
     return limits;
@@ -84,10 +84,7 @@ export const getCurrentPixelLimits = createSelector(
 );
 export const getCurrentLimits = createSelector(
   getCurrentPixelLimits,
-  (limits): [number, number] => [
-    limits[0] / minutesToPixels(24 * 60),
-    limits[1] / minutesToPixels(24 * 60),
-  ]
+  (limits): [number, number] => [limits[0] / DAY_SIZE, limits[1] / DAY_SIZE]
 );
 export const getCurrentDayEntries = createSelector(
   getDayEntries,
