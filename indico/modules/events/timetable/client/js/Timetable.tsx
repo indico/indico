@@ -13,7 +13,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getDateKey, minutesToPixels} from './utils';
+import {getDateKey, HOUR_SIZE, minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
@@ -32,6 +32,7 @@ export default function Timetable() {
   //              when we implement a weekview. This is unlikely to be the
   //              current WeekView component, which does not use day timetables.
   const useWeekView = false;
+  const minScrollHour = 8;
   const minHour = 0;
   const maxHour = 23;
 
@@ -44,7 +45,7 @@ export default function Timetable() {
   const getScrollOffset = () => {
     const scrollMoment = getScrollMoment();
     const scrollMinutes = scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes');
-    return minutesToPixels(scrollMinutes);
+    return minutesToPixels(Math.max(scrollMinutes, minScrollHour * 60));
   };
 
   return (
