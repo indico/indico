@@ -271,7 +271,7 @@ export function DayTimetable({
       setIsDragging(true);
       dispatch(
         actions.setDraftEntry({
-          startDt: moment.min(startDt, dt),
+          startDt: moment.max(startDt, dt),
           duration: defaultContributionDuration,
           y,
         })
