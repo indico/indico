@@ -109,6 +109,7 @@ export function DayTimetable({
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const pixelLimitsTotal = useSelector(selectors.getCurrentPixelLimits);
   const scrollPositionRef = useRef<number>(scrollPosition);
+  const draftEntry = useSelector(selectors.getDraftEntry);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -233,8 +234,6 @@ export function DayTimetable({
   function getTimelinePixelLimitsDelta(): [number, number] {
     return [pixelLimitsTotal[0], DAY_SIZE - pixelLimitsTotal[1]];
   }
-
-  const draftEntry = useSelector(selectors.getDraftEntry);
 
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
