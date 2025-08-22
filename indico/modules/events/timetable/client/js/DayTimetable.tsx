@@ -10,7 +10,6 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
-import {select} from 'indico/custom_elements/date_selection';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
