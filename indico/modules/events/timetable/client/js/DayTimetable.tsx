@@ -14,7 +14,7 @@ import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
-import {createRestrictToCalendarWithLimits} from './dnd/modifiers';
+import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {
   computeYoffset,
@@ -344,7 +344,7 @@ export function DayTimetable({
   const restrictToCalendar = useMemo(() => {
     const restrictLimits = pixelLimitsDelta;
     restrictLimits[1] += TABLE_MARGIN_TOP;
-    return createRestrictToCalendarWithLimits(calendarRef, pixelLimitsDelta);
+    return createRestrictToCalendar(calendarRef, pixelLimitsDelta);
   }, [pixelLimitsDelta]);
 
   const limitsGradientArg = [
