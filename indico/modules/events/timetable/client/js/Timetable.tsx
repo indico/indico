@@ -50,6 +50,8 @@ export default function Timetable() {
     return minutesToPixels(scrollMinutes);
   };
 
+  const initialScrollPosition = Math.max(getScrollOffset(), HOUR_SIZE * minScrollHour);
+
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
@@ -70,7 +72,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
-            scrollPosition={Math.max(getScrollOffset(), HOUR_SIZE * minScrollHour)}
+            scrollPosition={initialScrollPosition}
           />
         )}
       </div>
