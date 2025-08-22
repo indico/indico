@@ -102,20 +102,18 @@ export function DayTimetable({
 }: DayTimetableProps) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
-  const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const eventEndDt = useSelector(selectors.getEventEndDt);
+  const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const pixelLimitsTotal = useSelector(selectors.getCurrentPixelLimits);
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
-
   const [isDragging, setIsDragging] = useState(false);
+  const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
-
-  const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
 
   function handleDragEnd(
     who: string,
