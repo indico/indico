@@ -246,14 +246,12 @@ export function DayTimetable({
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      if (
-        event.button !== 0 ||
-        event.target !== calendarRef.current ||
-        !isWithinLimits(pixelLimitsTotal, event.offsetY, [
-          0,
-          minutesToPixels(defaultContributionDuration),
-        ])
-      ) {
+      const isWithinLimitsWithOffset = !isWithinLimits(pixelLimitsTotal, event.offsetY, [
+        0,
+        minutesToPixels(defaultContributionDuration),
+      ]);
+
+      if (event.button !== 0 || event.target !== calendarRef.current || isWithinLimitsWithOffset) {
         return;
       }
 
@@ -283,22 +281,17 @@ export function DayTimetable({
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
-      let draftDuration = Math.max(
+      const currentDragDuration = Math.max(
         Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
         defaultContributionDuration
       );
+      const maxAllowedDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
+      const draftDuration = Math.min(currentDragDuration, maxAllowedDuration);
 
-      const newEndDt = moment(draftEntry.startDt).add(draftDuration, 'minutes');
-      if (newEndDt > eventEndDt) {
-        draftDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
+      if (draftEntry.duration !== draftDuration) {
+        dispatch(actions.setDraftEntry({...draftEntry, duration: draftDuration}));
       }
-
-      if (draftEntry.duration === draftDuration) {
-        return;
-      }
-
-      dispatch(actions.setDraftEntry({...draftEntry, duration: draftDuration}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
