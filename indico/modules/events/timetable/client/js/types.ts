@@ -89,11 +89,11 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
 }
 
 export interface ChildContribEntry extends ContribEntry {
-  parentId: number;
+  sessionBlockId: number;
 }
 
 export interface ChildBreakEntry extends BreakEntry {
-  parentId: number;
+  sessionBlockId: number;
 }
 
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
@@ -112,7 +112,7 @@ export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
 
 export function isChildEntry(entry: Entry): entry is ChildEntry {
-  return 'parentId' in entry;
+  return 'sessionBlockId' in entry;
 }
 
 // Request objects (lowercase)

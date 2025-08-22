@@ -99,8 +99,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   // not the unique ID generated for the timetable
   const {objId} = entry;
   const isEditing = !!objId;
-  const {parentId} = entry;
-  const isCreatingChild = !!parentId;
+  const {sessionBlockId} = entry;
+  const isCreatingChild = !!sessionBlockId;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -175,7 +175,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={undefined}
         initialValues={initialValues}
         extraOptions={extraOptions}
-        hasParent={entry.parentId !== undefined}
+        hasParent={'sessionBlockId' in entry}
       />
     ),
   };
@@ -184,7 +184,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
-    data.session_block_id = parentId;
+    data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',
@@ -224,7 +224,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   // TODO: Implement logic for breaks
   const _handleCreateBreak = async data => {
-    data.parent_id = parentId;
+    data.parent_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',

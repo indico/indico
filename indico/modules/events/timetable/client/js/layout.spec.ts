@@ -90,7 +90,7 @@ function contrib({
 
 function childContrib({
   id,
-  parentId,
+  sessionBlockId,
   title,
   time,
   duration,
@@ -98,14 +98,14 @@ function childContrib({
   maxColumn = 0,
 }: {
   id?: number;
-  parentId: number;
+  sessionBlockId: number;
   title?: string;
   time: string;
   duration: number;
   column?: number;
   maxColumn?: number;
 }): ChildContribEntry {
-  return {...contrib({id, title, time, duration, column, maxColumn}), parentId};
+  return {...contrib({id, title, time, duration, column, maxColumn}), sessionBlockId};
 }
 
 function break_({
@@ -142,18 +142,18 @@ function break_({
 
 function childBreak({
   id,
-  parentId,
+  sessionBlockId,
   title,
   time,
   duration,
 }: {
   id?: number;
-  parentId: number;
+  sessionBlockId: number;
   title?: string;
   time: string;
   duration: number;
 }): ChildBreakEntry {
-  return {...break_({id, title, time, duration}), parentId};
+  return {...break_({id, title, time, duration}), sessionBlockId};
 }
 
 function block({
@@ -547,15 +547,15 @@ describe('computeYOffset()', () => {
         id: 0,
         time: '10:00',
         duration: 60,
-        children: [childContrib({parentId: 0, time: '10:00', duration: 30})],
+        children: [childContrib({sessionBlockId: 0, time: '10:00', duration: 30})],
       }),
       block({
         id: 1,
         time: '11:00',
         duration: 60,
         children: [
-          childContrib({parentId: 1, time: '11:00', duration: 30}),
-          childContrib({parentId: 1, time: '11:30', duration: 30}),
+          childContrib({sessionBlockId: 1, time: '11:00', duration: 30}),
+          childContrib({sessionBlockId: 1, time: '11:30', duration: 30}),
         ],
       }),
     ];

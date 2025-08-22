@@ -61,7 +61,7 @@ interface ResizeEntryAction {
   date: string;
   id: string;
   duration: number;
-  parentId?: string;
+  sessionBlockId?: string;
 }
 
 interface MoveEntryAction {
@@ -180,9 +180,9 @@ export function resizeEntry(
   date: string,
   id: string,
   duration: number,
-  parentId?: string
+  sessionBlockId?: string
 ): ResizeEntryAction {
-  return {type: RESIZE_ENTRY, date, id, duration, parentId};
+  return {type: RESIZE_ENTRY, date, id, duration, sessionBlockId};
 }
 
 export function selectEntry(id: string): SelectEntryAction {

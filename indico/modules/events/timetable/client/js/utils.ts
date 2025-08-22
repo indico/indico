@@ -80,7 +80,6 @@ export const mapTTDataToEntry = (data): Entry => {
     code,
     keywords,
     sessionId,
-    parentId,
     sessionBlockId,
   } = camelizeKeys(data);
 
@@ -114,8 +113,8 @@ export const mapTTDataToEntry = (data): Entry => {
     sessionBlockId: sessionBlockId || null,
   };
 
-  if (parentId) {
-    mappedObj.parentId = parentId;
+  if (sessionBlockId) {
+    mappedObj.sessionBlockId = `s${sessionBlockId}`;
   }
 
   return mappedObj;
