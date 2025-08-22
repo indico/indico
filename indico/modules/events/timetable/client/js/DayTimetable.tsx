@@ -114,10 +114,6 @@ export function DayTimetable({
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
-  const endHourLimit =
-    getDateKey(eventEndDt) === getDateKey(dt)
-      ? eventEndDt.hour() + eventEndDt.minutes() / 60
-      : maxHour + 1;
   const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
 
   function handleDragEnd(
