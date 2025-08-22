@@ -135,7 +135,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       actions.setDraftEntry({
         startDt: newChildStartDt,
         duration: newChildDuration,
-        parentId: parseInt(entry.id.replace(/\D/g, ''), 10),
+        sessionBlockId: entry.objId,
         sessionId: entry.sessionId,
       })
     );

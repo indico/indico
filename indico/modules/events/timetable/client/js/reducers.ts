@@ -87,7 +87,7 @@ export default {
 
         if (entry.sessionBlockId) {
           const newDayEntries = newEntries[dayKey].map(e => {
-            if (e.objId === entry.sessionBlockId && e.type === 'block') {
+            if (e.id === entry.sessionBlockId && e.type === 'block') {
               return {
                 ...e,
                 children: [
@@ -154,18 +154,18 @@ export default {
         };
       }
       case actions.RESIZE_ENTRY: {
-        const {date, id, parentId, duration} = action;
+        const {date, id, sessionBlockId, duration} = action;
         let newDayEntries;
-        if (parentId !== undefined) {
+        if (sessionBlockId !== undefined) {
           const parent = state.changes[state.currentChangeIdx].entries[date].find(
-            e => e.id === parentId
+            e => e.id === sessionBlockId
           );
           if (!parent) {
             return state;
           }
           newDayEntries = layout(
             state.changes[state.currentChangeIdx].entries[date].map(entry => {
-              if (entry.type === 'block' && entry.id === parentId) {
+              if (entry.type === 'block' && entry.id === sessionBlockId) {
                 return {
                   ...entry,
                   children: entry.children.map(child => {
@@ -223,15 +223,15 @@ export default {
       // return {...state};
       case actions.DELETE_BREAK: {
         const {id} = action.entry;
-        if ('parentId' in action.entry) {
-          const parentId = action.entry.parentId;
+        if ('sessionBlockId' in action.entry) {
+          const sessionBlockId = action.entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
               Object.entries(state.changes[state.currentChangeIdx].entries).map(
                 ([day, dayEntries]) => [
                   day,
                   dayEntries.map(e => {
-                    if (e.type === 'block' && e.id === parentId) {
+                    if (e.type === 'block' && e.id === sessionBlockId) {
                       return {
                         ...e,
                         children: e.children.filter(child => child.id !== id),
@@ -338,15 +338,15 @@ export default {
       }
       case actions.UNSCHEDULE_ENTRY: {
         const {id} = action.entry;
-        if ('parentId' in action.entry) {
-          const parentId = action.entry.parentId;
+        if ('sessionBlockId' in action.entry) {
+          const sessionBlockId = action.entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
               Object.entries(state.changes[state.currentChangeIdx].entries).map(
                 ([day, dayEntries]) => [
                   day,
                   dayEntries.map(e => {
-                    if (e.type === 'block' && e.id === parentId) {
+                    if (e.type === 'block' && e.id === sessionBlockId) {
                       return {
                         ...e,
                         children: e.children.filter(child => child.id !== id),

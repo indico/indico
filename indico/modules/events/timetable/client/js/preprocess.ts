@@ -154,7 +154,7 @@ export function preprocessTimetableEntries(
             title: c.title,
             startDt: dateToMoment(c.startDate),
             duration: c.duration,
-            parentId: dayEntries[day].at(-1).id,
+            sessionBlockId: dayEntries[day].at(-1).id,
             x: 0,
             y: 0,
             locationData: {
