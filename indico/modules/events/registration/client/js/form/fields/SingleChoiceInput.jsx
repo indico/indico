@@ -69,25 +69,29 @@ function SingleChoiceDropdown({
       comboBoxExtraProps['aria-describedby'] = extraSlotsLabelId;
     }
     extraSlotsDropdown = (
-      <Select
-        id={id ? `${id}-extraslots` : ''}
-        options={options}
-        disabled={
-          disabled ||
-          isPaidChoiceLocked(selectedChoice) ||
-          (selectedChoice.placesLimit > 0 &&
-            (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) >=
-              selectedChoice.placesLimit)
-        }
-        value={String(selectedSeats)}
-        onChange={evt => {
-          const selectedSlots = Number(evt.target.value);
-          onChange({[selectedChoice.id]: selectedSlots});
-        }}
-        aria-label={Translate.string('Select extra slots')}
-        required
-        {...comboBoxExtraProps}
-      />
+      <label>
+        <span styleName="extra-slots-label">
+          <Translate>Extra slots</Translate>
+        </span>
+        <Select
+          id={id ? `${id}-extraslots` : ''}
+          options={options}
+          disabled={
+            disabled ||
+            isPaidChoiceLocked(selectedChoice) ||
+            (selectedChoice.placesLimit > 0 &&
+              (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) >=
+                selectedChoice.placesLimit)
+          }
+          value={String(selectedSeats)}
+          onChange={evt => {
+            const selectedSlots = Number(evt.target.value);
+            onChange({[selectedChoice.id]: selectedSlots});
+          }}
+          required
+          {...comboBoxExtraProps}
+        />
+      </label>
     );
   }
 
@@ -254,29 +258,34 @@ function SingleChoiceRadioGroup({
                 <>
                   <td>
                     {c.isEnabled && (
-                      <Select
-                        id={id ? `${id}-extraslot` : ''}
-                        selection
-                        styleName="dropdown"
-                        disabled={
-                          disabled ||
-                          isPaidChoiceLocked(c) ||
-                          (c.placesLimit > 0 &&
-                            (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
-                        }
-                        value={String(selectedSeats)}
-                        onChange={evt => onChange({[selectedChoice.id]: evt.target.value})}
-                        options={_.range(1, c.maxExtraSlots + 2).map(i => ({
-                          value: i,
-                          disabled:
-                            selectedChoice.placesLimit > 0 &&
-                            (placesUsed[selectedChoice.id] || 0) -
-                              (existingValue[selectedChoice.id] || 0) +
-                              i >
-                              selectedChoice.placesLimit,
-                        }))}
-                        required
-                      />
+                      <label>
+                        <span styleName="extra-slots-label">
+                          <Translate>Extra slots</Translate>
+                        </span>
+                        <Select
+                          id={id ? `${id}-extraslot` : ''}
+                          selection
+                          styleName="dropdown"
+                          disabled={
+                            disabled ||
+                            isPaidChoiceLocked(c) ||
+                            (c.placesLimit > 0 &&
+                              (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
+                          }
+                          value={String(selectedSeats)}
+                          onChange={evt => onChange({[selectedChoice.id]: evt.target.value})}
+                          options={_.range(1, c.maxExtraSlots + 2).map(i => ({
+                            value: i,
+                            disabled:
+                              selectedChoice.placesLimit > 0 &&
+                              (placesUsed[selectedChoice.id] || 0) -
+                                (existingValue[selectedChoice.id] || 0) +
+                                i >
+                                selectedChoice.placesLimit,
+                          }))}
+                          required
+                        />
+                      </label>
                     )}
                   </td>
                   <td>

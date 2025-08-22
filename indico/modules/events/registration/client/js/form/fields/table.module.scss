@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+
+.extra-slots-label {
+  @extend %visually-hidden;
+}
+
 table.choice-table {
   border-collapse: collapse;
 

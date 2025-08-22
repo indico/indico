@@ -38,6 +38,8 @@ Accessibility
 
 - Use proper heading hierarchy (H3 instead of H4) for date headings on category event
   list pages (:pr:`7038`, thanks :user:`foxbunny`)
+- Add accessible labels to extra slots dropdown fields in registration forms (:pr:`7039`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -124,27 +124,32 @@ function MultiChoiceInputComponent({
               {withExtraSlots && (
                 <td>
                   {choice.isEnabled && (
-                    <Select
-                      selection
-                      styleName="dropdown"
-                      disabled={
-                        disabled ||
-                        isPaidChoiceLocked(choice) ||
-                        (choice.placesLimit > 0 &&
-                          (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) >=
-                            choice.placesLimit)
-                      }
-                      value={String(value[choice.id] || 0)}
-                      onChange={makeHandleSlotsChange(choice)}
-                      options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
-                        value: i,
-                        disabled:
-                          choice.placesLimit > 0 &&
-                          (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) + i >
-                            choice.placesLimit,
-                      }))}
-                      required
-                    />
+                    <label>
+                      <span styleName="extra-slots-label">
+                        <Translate>Extra slots</Translate>
+                      </span>
+                      <Select
+                        selection
+                        styleName="dropdown"
+                        disabled={
+                          disabled ||
+                          isPaidChoiceLocked(choice) ||
+                          (choice.placesLimit > 0 &&
+                            (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) >=
+                              choice.placesLimit)
+                        }
+                        value={String(value[choice.id] || 0)}
+                        onChange={makeHandleSlotsChange(choice)}
+                        options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
+                          value: i,
+                          disabled:
+                            choice.placesLimit > 0 &&
+                            (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) + i >
+                              choice.placesLimit,
+                        }))}
+                        required
+                      />
+                    </label>
                   )}
                 </td>
               )}
