@@ -54,8 +54,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (duration: number) => {
-        console.log('too far', dt.add(duration, 'seconds'));
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+        dispatch(actions.resizeEntry(getDateKey(dt), e.id, duration));
       };
     }
     return obj;
@@ -65,7 +64,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (id: string) => (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), id, duration, e.id));
+        dispatch(actions.resizeEntry(getDateKey(dt), id, duration, e.id));
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -212,7 +211,7 @@ export function DayTimetable({
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
   }
 
   function handleDropOnBlock(
@@ -230,7 +229,7 @@ export function DayTimetable({
       mouse,
       calendar
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
   }
 
   function getTimelinePixelLimitsDelta(): [number, number] {
