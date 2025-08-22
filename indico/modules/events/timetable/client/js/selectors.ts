@@ -10,7 +10,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes, mergeChanges} from './util';
-import {getDateKey, minutesToPixels, pixelsToMinutes} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
