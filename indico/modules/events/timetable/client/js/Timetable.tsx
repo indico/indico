@@ -13,7 +13,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getDateKey, minutesToPixels, pixelsToMinutes} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
