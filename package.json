@@ -111,6 +111,7 @@
     "@babel/preset-react": "^7.17.12",
     "@babel/preset-typescript": "^7.24.7",
     "@babel/register": "^7.17.7",
+    "@biomejs/biome": "2.2.2",
     "@types/jest": "^29.5.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -174,6 +175,14 @@
     "webpack-cli": "^5.1.4",
     "webpack-manifest-plugin": "^5.0.0",
     "webpack-merge": "^5.8.0"
+  },
+  "overrides": {
+    "@biomejs/biome": {
+      "@biomejs/cli-darwin-arm64": "npm:@thiefmaster/biome-cli-darwin-arm64@2.2.2",
+      "@biomejs/cli-darwin-x64": "npm:@thiefmaster/biome-cli-darwin-x64@2.2.2",
+      "@biomejs/cli-linux-arm64": "npm:@thiefmaster/biome-cli-linux-arm64@2.2.2",
+      "@biomejs/cli-linux-x64": "npm:@thiefmaster/biome-cli-linux-x64@2.2.2"
+    }
   },
   "scripts": {
     "watch": "webpack --watch",
