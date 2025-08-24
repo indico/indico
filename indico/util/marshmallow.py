@@ -451,7 +451,12 @@ class EventTimezoneDateTimeField(fields.DateTime):
         if value is None:
             return None
         dt = super()._deserialize(value, attr, data, **kwargs)
-        return self.context['event'].tzinfo.localize(dt).astimezone(pytz.utc)
+        event_tz = self.context['event'].tzinfo
+        if dt.tzinfo is None:
+            localized = event_tz.localize(dt)
+        else:
+            localized = dt.astimezone(event_tz)
+        return localized.astimezone(pytz.utc)
 
 
 class FilesField(ModelList):
