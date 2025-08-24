@@ -110,6 +110,10 @@ jobs:
         if: success() || failure()
         run: indico i18n check-html-tags
 
+      - name: Run biome
+        if: success() || failure()
+        run: npx @biomejs/biome ci
+
       - name: Run eslint
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx
