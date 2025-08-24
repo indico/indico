@@ -91,10 +91,7 @@
         show: function() {
           var tip = $(this);
           _.defer(function() {
-            tip
-              .find('input:text')
-              .focus()
-              .select();
+            tip.find('input:text').focus().select();
           });
         },
       },

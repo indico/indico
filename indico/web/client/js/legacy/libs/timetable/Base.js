@@ -212,41 +212,33 @@ type(
       var self = this;
 
       self.timetableDrawer.setPrintableVersion(true);
-      var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(
-        value
-      ) {
-        return value;
-      });
+      var timetableElements = translate(
+        self.timetableDrawer.canvas.dom.childNodes,
+        function(value) {
+          return value;
+        }
+      );
 
       var goBackLink = $('<a/>')
         .prop('href', window.location.hash)
         .html($T('Go back'))
         .css('font-size', '17px');
-      var separator = $('<a/>')
-        .html(' | ')
-        .css('fontSize', '17px');
+      var separator = $('<a/>').html(' | ').css('fontSize', '17px');
       var printLink = $('<a/>')
         .prop('href', window.location.hash)
         .html($T('Print'))
         .css('font-size', '17px');
 
-      var links = $('<span/>')
-        .append(goBackLink, separator, printLink)
-        .css('float', 'right');
+      var links = $('<span/>').append(goBackLink, separator, printLink).css('float', 'right');
 
-      var header = $('<div/>')
-        .addClass('timetableHeader clearfix')
-        .append(links)
-        .css({
-          'padding': '0px 5px 5px 5px',
-          'border-bottom': '1px solid black',
-          'text-align': 'center',
-          'width': self.timetableDrawer.width,
-        });
+      var header = $('<div/>').addClass('timetableHeader clearfix').append(links).css({
+        padding: '0px 5px 5px 5px',
+        'border-bottom': '1px solid black',
+        'text-align': 'center',
+        width: self.timetableDrawer.width,
+      });
       header.append(
-        $('<span/>')
-          .append(self._titleTemplate(self.timetableDrawer.day))
-          .css('float', 'left')
+        $('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left')
       );
 
       goBackLink.click(function() {
@@ -259,7 +251,7 @@ type(
 
       var timetableDiv = $('<div/>')
         .append(timetableElements)
-        .css({'padding-top': '20px', 'position': 'relative'});
+        .css({'padding-top': '20px', position: 'relative'});
 
       $('body').html(header.add(timetableDiv));
       $('body').css('padding', '30px');
@@ -267,7 +259,9 @@ type(
 
     pdf: function() {
       if ($('html').data('static-site')) {
-        window.location = build_url(Indico.Urls.Timetable.default_pdf, {event_id: this.eventInfo.id});
+        window.location = build_url(Indico.Urls.Timetable.default_pdf, {
+          event_id: this.eventInfo.id,
+        });
       } else {
         ajaxDialog({
           url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
@@ -288,9 +282,7 @@ type(
           .addClass('timetableFullScreenHeader clearfix')
           .css('width', self.timetableDrawer.width);
         header.append(
-          $('<span/>')
-            .append(self._titleTemplate(self.timetableDrawer.day))
-            .css('float', 'left')
+          $('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left')
         );
 
         var timetableCanvas = $('#timetable_canvas');
@@ -1008,15 +1000,10 @@ type(
       var ul = $('<ul class="i-dropdown"/>');
 
       if (this._allowCreateHere('Session')) {
-        var sessionAdd = $('<a href="#"/>')
-          .text($T('Session block'))
-          .appendTo(ul)
-          .wrap('<li/>');
+        var sessionAdd = $('<a href="#"/>').text($T('Session block')).appendTo(ul).wrap('<li/>');
         sessionAdd.bind('menu_select', function() {
           if (keys(self.eventInfo.sessions).length === 0) {
-            $(this)
-              .closest('.group')
-              .dropdown('close');
+            $(this).closest('.group').dropdown('close');
             self.managementActions.addSession();
           } else {
             self._openSessionMenu($(this).parent(), ul);
@@ -1031,9 +1018,7 @@ type(
           .bind('menu_select', function() {
             self.managementActions.addContribution();
             // Dirty hack to avoid Chrome glitch
-            $(this)
-              .closest('.group')
-              .dropdown('close');
+            $(this).closest('.group').dropdown('close');
             return false;
           })
           .appendTo(ul)
@@ -1044,9 +1029,7 @@ type(
           .text($T('Break'))
           .bind('menu_select', function() {
             self.managementActions.addBreak();
-            $(this)
-              .closest('.group')
-              .dropdown('close');
+            $(this).closest('.group').dropdown('close');
             return false;
           })
           .appendTo(ul)
@@ -1132,11 +1115,7 @@ type(
 
       var tt_hour_tip = $('<div id="tt_hour_tip"/>')
         .hide()
-        .append(
-          $('<img/>')
-            .prop('src', imageSrc('tt_time'))
-            .prop('title', $T('Add one hour'))
-        );
+        .append($('<img/>').prop('src', imageSrc('tt_time')).prop('title', $T('Add one hour')));
       var tt_status_info = $('<div id="tt_status_info" />');
 
       this.menu.children('a').addClass('i-button');
@@ -1232,9 +1211,7 @@ type(
         self._legendPostDraw();
       });
 
-      return $('<div id="wholeLegend"/>')
-        .append(toggleLegendButton)
-        .append(this.legendItems);
+      return $('<div id="wholeLegend"/>').append(toggleLegendButton).append(this.legendItems);
     },
 
     _legendItemsContainer: function() {
@@ -1313,9 +1290,7 @@ type(
     // Used by the "...less"-button when you want to hide more elementsmaxLegendItemsShownInitially
     // Note, it does NOT HIDE ALL: depending on "maxLegendItemsShownInitially".
     _fadeHideLegendItems: function() {
-      $('.legendItem')
-        .slice(this._maxLegendItemsShownInitially)
-        .fadeOut();
+      $('.legendItem').slice(this._maxLegendItemsShownInitially).fadeOut();
     },
 
     /* This function is also called in "this.filterButton" in order

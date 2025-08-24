@@ -35,11 +35,8 @@ MenuItem.propTypes = {
   resetPageState: PropTypes.func.isRequired,
 };
 
-export default connect(
-  null,
-  dispatch => ({
-    resetPageState(namespace) {
-      dispatch(globalActions.resetPageState(namespace));
-    },
-  })
-)(MenuItem);
+export default connect(null, dispatch => ({
+  resetPageState(namespace) {
+    dispatch(globalActions.resetPageState(namespace));
+  },
+}))(MenuItem);

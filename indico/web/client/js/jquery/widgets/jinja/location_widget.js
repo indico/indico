@@ -175,15 +175,9 @@
       /* Always mark the first option as active in order for the keyboard inputs to work */
       var firstOption = resultHtmlList.find('li.typeahead__item').first();
       if (!firstOption.length) {
-        node
-          .parent()
-          .find('.just-use-option')
-          .addClass('active');
+        node.parent().find('.just-use-option').addClass('active');
       } else {
-        resultHtmlList
-          .find('li.typeahead__item')
-          .first()
-          .addClass('active');
+        resultHtmlList.find('li.typeahead__item').first().addClass('active');
       }
       return resultHtmlList;
     }
@@ -315,11 +309,7 @@
       minLength: 0,
       searchOnFocus: true,
       resultContainer:
-        '#' +
-        venueInput
-          .siblings('.typeahead__result')
-          .find('.results-list-container')
-          .attr('id'),
+        '#' + venueInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
       template: '<span id="location-venue-{{id}}">{{name}}</span>',
       // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
       // It has to return a truthy value
@@ -382,10 +372,7 @@
           validVenue = false;
         },
         onResult: function(node, query, result, resultCount) {
-          node
-            .parent()
-            .find('.just-use-option')
-            .toggleClass('active', !resultCount);
+          node.parent().find('.just-use-option').toggleClass('active', !resultCount);
         },
       },
     });
@@ -400,11 +387,7 @@
       cancelButton: false,
       maxItem: 0,
       resultContainer:
-        '#' +
-        roomInput
-          .siblings('.typeahead__result')
-          .find('.results-list-container')
-          .attr('id'),
+        '#' + roomInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
       template: '<span id="location-room-{{id}}">{{name}}</span>',
       // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
       // It has to return a truthy value
@@ -461,10 +444,7 @@
           validRoom = false;
         },
         onResult: function(node, query, result, resultCount) {
-          node
-            .parent()
-            .find('.just-use-option')
-            .toggleClass('active', !resultCount);
+          node.parent().find('.just-use-option').toggleClass('active', !resultCount);
         },
       },
     });
@@ -549,21 +529,13 @@
       .on('click', function() {
         /* Since focus remains on the field after selection, we need special handling for the click event in
             order to reopen the results list */
-        if (
-          !$(this)
-            .closest('.typeahead__container')
-            .hasClass('result')
-        ) {
-          $(this)
-            .trigger('focus.typeahead')
-            .trigger('input');
+        if (!$(this).closest('.typeahead__container').hasClass('result')) {
+          $(this).trigger('focus.typeahead').trigger('input');
         }
       });
 
     $('#' + options.fieldId + '-wrapper .toggle-results-list').on('click', function() {
-      var container = $(this)
-        .parent()
-        .parent();
+      var container = $(this).parent().parent();
       var input = container.find('.i-location-input-field').eq(0);
       input.trigger(
         container.hasClass('result') ? 'typeahead:close-results-list' : 'focus.typeahead'
@@ -577,11 +549,7 @@
 
     $('#' + options.fieldId + '-wrapper .keyword-highlighter').on('click', function() {
       /* Focus will trigger the results dropdown to open */
-      $(this)
-        .parent()
-        .find('.i-location-input-field')
-        .eq(0)
-        .trigger('focus.typeahead');
+      $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
     });
   };
 })(window);

@@ -26,7 +26,7 @@ window.setupDateWidget = function setupDateWidget(options) {
         notAfter: false,
       },
       disabledDays: null,
-      disabledDates: null
+      disabledDates: null,
     },
     options
   );

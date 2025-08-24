@@ -167,16 +167,10 @@
       .on('keypress', 'input', function(e) {
         if (e.keyCode === 13) {
           e.preventDefault();
-          $(this)
-            .closest('tr')
-            .find('.js-save-row')
-            .trigger('click');
+          $(this).closest('tr').find('.js-save-row').trigger('click');
         } else if (e.keyCode === 27) {
           e.preventDefault();
-          $(this)
-            .closest('tr')
-            .find('.js-cancel-edit')
-            .trigger('click');
+          $(this).closest('tr').find('.js-cancel-edit').trigger('click');
         }
       });
 
@@ -226,7 +220,7 @@
         }
       } else if (col.type === 'select') {
         var sel = $('<select>', {
-          'class': 'js-table-input',
+          class: 'js-table-input',
           'data-required': col.required,
         });
         sel.append($('<option>')); // Default empty option
@@ -251,23 +245,23 @@
         };
       } else if (col.type === 'number') {
         var numberInput = $('<input>', {
-          'type': 'number',
-          'class': 'js-table-input',
-          'value': item ? item[col.id] : '',
-          'placeholder': col.caption,
+          type: 'number',
+          class: 'js-table-input',
+          value: item ? item[col.id] : '',
+          placeholder: col.caption,
           'data-required': col.required,
-          'min': col.min,
-          'max': col.max,
-          'step': col.step ? col.step : 'any',
+          min: col.min,
+          max: col.max,
+          step: col.step ? col.step : 'any',
         });
         initNumberErrorMessage(numberInput, col.min, col.max);
         return {html: numberInput};
       } else if (col.type === 'textarea') {
         return {
           html: $('<textarea>', {
-            'class': 'js-table-input multiline',
-            'value': item ? item[col.id] : '',
-            'placeholder': col.caption,
+            class: 'js-table-input multiline',
+            value: item ? item[col.id] : '',
+            placeholder: col.caption,
             'data-required': col.required,
           }),
         };
@@ -275,10 +269,10 @@
         // Assuming the type is 'text'
         return {
           html: $('<input>', {
-            'type': 'text',
-            'class': 'js-table-input',
-            'value': item ? item[col.id] : '',
-            'placeholder': col.caption,
+            type: 'text',
+            class: 'js-table-input',
+            value: item ? item[col.id] : '',
+            placeholder: col.caption,
             'data-required': col.required,
           }),
         };

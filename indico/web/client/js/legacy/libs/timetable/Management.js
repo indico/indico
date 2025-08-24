@@ -63,7 +63,7 @@ type(
       var selected = false;
 
       var id = Html.em(
-        {'data-id': elem.get('friendly_id'), 'style': {paddingLeft: '5px', fontSize: '0.9em'}},
+        {'data-id': elem.get('friendly_id'), style: {paddingLeft: '5px', fontSize: '0.9em'}},
         elem.get('friendly_id')
       );
       return Html.div({}, id, ' - ', elem.get('title') + (speakers ? ' (' + speakers + ')' : ''));
@@ -102,13 +102,7 @@ type(
 
       // Reselect items
       each(self.domList, function(listItem) {
-        if (
-          selected.indexOf(
-            $(listItem.dom)
-              .find('em')
-              .data('id') + ''
-          ) > -1
-        ) {
+        if (selected.indexOf($(listItem.dom).find('em').data('id') + '') > -1) {
           listItem.eventObservers.click();
         }
       });

@@ -52,18 +52,12 @@ import {$T} from '../../utils/i18n';
   function setupSelectAllNone() {
     $('body').on('click', '[data-select-all]', function() {
       var selector = $(this).data('select-all');
-      $(selector)
-        .filter(':not(:checked)')
-        .prop('checked', true)
-        .trigger('change');
+      $(selector).filter(':not(:checked)').prop('checked', true).trigger('change');
     });
 
     $('body').on('click', '[data-select-none]', function() {
       var selector = $(this).data('select-none');
-      $(selector)
-        .filter(':checked')
-        .prop('checked', false)
-        .trigger('change');
+      $(selector).filter(':checked').prop('checked', false).trigger('change');
     });
   }
 
@@ -117,7 +111,7 @@ import {$T} from '../../utils/i18n';
       'a[data-content][data-ajax-dialog]',
       'button[data-callback]',
       'input:button[data-callback]',
-      'a[data-callback]'
+      'a[data-callback]',
     ];
     $('body').on('click', selectors.join(', '), function(e) {
       e.preventDefault();
@@ -161,8 +155,8 @@ import {$T} from '../../utils/i18n';
           var closeButton = $this.data('close-button');
           let title = $this.data('title');
           if (!title && title !== undefined) {
-          // if `data-title` is present without a value, fall back to the title attr
-          title = $this.attr('title') || $this.data('qtip-oldtitle');
+            // if `data-title` is present without a value, fall back to the title attr
+            title = $this.attr('title') || $this.data('qtip-oldtitle');
           }
           ajaxDialog({
             trigger: $this,

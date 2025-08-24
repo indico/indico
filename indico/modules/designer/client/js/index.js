@@ -110,7 +110,7 @@ import {$T} from 'indico/utils/i18n';
     if (overflowType === 'wrap') {
       return {
         'white-space': 'normal',
-        'overflow': 'visible',
+        overflow: 'visible',
       };
     } else if (overflowType === 'resize') {
       return {
@@ -166,8 +166,8 @@ import {$T} from 'indico/utils/i18n';
           this.type === 'fixed'
             ? this.text
             : this.type === 'fixed_image' && this.image_id
-            ? ''
-            : itemTitles[this.type]
+              ? ''
+              : itemTitles[this.type]
         );
       return html;
     }.bind(item);
@@ -397,9 +397,9 @@ import {$T} from 'indico/utils/i18n';
           .attr('id', 'rulerv' + i)
           .css({
             'line-height': pixelsPerCm / 2.0 + 'px',
-            'height': pixelsPerCm + 'px',
-            'left': 0,
-            'top': i * pixelsPerCm + 'px',
+            height: pixelsPerCm + 'px',
+            left: 0,
+            top: i * pixelsPerCm + 'px',
           })
           .html(i + 1)
           .appendTo(vRuler);
@@ -538,7 +538,7 @@ import {$T} from 'indico/utils/i18n';
           normalizeZIndex();
         }
       },
-    }[direction]());
+    })[direction]();
   }
 
   function itemsOverlap(item1, item2) {
@@ -643,7 +643,7 @@ import {$T} from 'indico/utils/i18n';
           selectedItem.width = selectedItem.height;
         }
       },
-    }[attribute]());
+    })[attribute]();
 
     const parentDiv = div.parent('.ui-draggable');
     div.replaceWith(selectedItem.toHTML());
@@ -839,10 +839,7 @@ import {$T} from 'indico/utils/i18n';
     $imageElement.appendTo($div);
     const $imageFile = $('#imageFile');
     $imageFile.val('');
-    $imageFile
-      .next('label')
-      .addClass('i-button')
-      .text($T.gettext('Choose a file'));
+    $imageFile.next('label').addClass('i-button').text($T.gettext('Choose a file'));
     $('.js-upload-img').prop('disabled', $imageFile.val());
     $('.js-remove-img').prop('disabled', !lastSelectedItem.image_id);
   }
@@ -995,27 +992,17 @@ import {$T} from 'indico/utils/i18n';
       $('#bg-form input[type="file"]').on('change', function() {
         var $this = $(this);
         if (this.files) {
-          $this
-            .next('label')
-            .removeClass('i-button')
-            .text(this.files[0].name);
+          $this.next('label').removeClass('i-button').text(this.files[0].name);
         }
-        $('.js-upload-bg')
-          .prop('disabled', !$this.val())
-          .toggleClass('highlight', !!$this.val());
+        $('.js-upload-bg').prop('disabled', !$this.val()).toggleClass('highlight', !!$this.val());
       });
 
       $('#img-form input[type="file"]').on('change', function() {
         var $this = $(this);
         if (this.files) {
-          $this
-            .next('label')
-            .removeClass('i-button')
-            .text(this.files[0].name);
+          $this.next('label').removeClass('i-button').text(this.files[0].name);
         }
-        $('.js-upload-img')
-          .prop('disabled', !$this.val())
-          .toggleClass('highlight', !!$this.val());
+        $('.js-upload-img').prop('disabled', !$this.val()).toggleClass('highlight', !!$this.val());
       });
 
       // select and inline edit
@@ -1148,12 +1135,8 @@ import {$T} from 'indico/utils/i18n';
         var $selectedOption = $(this).find('option:selected');
 
         if ($selectedOption.val() !== 'custom') {
-          $('.template-width')
-            .val($selectedOption.data('width'))
-            .change();
-          $('.template-height')
-            .val($selectedOption.data('height'))
-            .change();
+          $('.template-width').val($selectedOption.data('width')).change();
+          $('.template-height').val($selectedOption.data('height')).change();
           changeTemplateSize(template, backsideTemplate);
         }
         $('.js-template-dimension').prop('disabled', $selectedOption.val() !== 'custom');
@@ -1191,10 +1174,7 @@ import {$T} from 'indico/utils/i18n';
           $templateSideBackground.remove();
           $templateSide.append($('<img>', {class: 'background'}));
           $backgroundFile.val('');
-          $backgroundFile
-            .next('label')
-            .addClass('i-button')
-            .text($T.gettext('Choose a file'));
+          $backgroundFile.next('label').addClass('i-button').text($T.gettext('Choose a file'));
         }
         $('.js-upload-bg').prop('disabled', !$backgroundFile.val());
         $('.js-remove-bg').prop('disabled', !template.background_url);
@@ -1301,9 +1281,7 @@ import {$T} from 'indico/utils/i18n';
       templateDimensions = new Dimensions(template.data.width, template.data.height);
       $('.js-template-name').val(template.title);
       $('.js-is-clonable').prop('checked', template.is_clonable);
-      $('.template-container')
-        .width(templateDimensions.width)
-        .height(templateDimensions.height);
+      $('.template-container').width(templateDimensions.width).height(templateDimensions.height);
     } else {
       templateDimensions = new Dimensions(config.tpl_size[0], config.tpl_size[1]);
     }

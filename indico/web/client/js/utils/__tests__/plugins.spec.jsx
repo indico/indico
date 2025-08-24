@@ -39,7 +39,10 @@ describe('Plugin object registry', () => {
     registerPluginObject(plugin, 'foo', 1);
     registerPluginObject(plugin, 'foo', 2);
     expect(getPluginObjects('foo')).toEqual([1, 2]);
-    expect(getPluginObjects('foo', true)).toEqual([{plugin, object: 1}, {plugin, object: 2}]);
+    expect(getPluginObjects('foo', true)).toEqual([
+      {plugin, object: 1},
+      {plugin, object: 2},
+    ]);
   });
 });
 

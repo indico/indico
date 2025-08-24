@@ -28,7 +28,7 @@ export default function ComboBox({options, value, onChange, ...inputProps}) {
         autoComplete="off"
       />
       <ul role="listbox">
-        {options.map(function(option) {
+        {options.map(option => {
           if (typeof option === 'string') {
             option = {
               value: option,

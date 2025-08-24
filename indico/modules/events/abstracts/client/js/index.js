@@ -36,9 +36,7 @@ import './boa';
   };
 
   global.setupAbstractEmailTemplatesPage = function setupAbstractEmailTemplatesPage() {
-    $('.js-edit-tpl-dropdown')
-      .parent()
-      .dropdown();
+    $('.js-edit-tpl-dropdown').parent().dropdown();
     $('.email-templates > ul').sortable({
       axis: 'y',
       containment: 'parent',
@@ -84,9 +82,7 @@ import './boa';
 
     $('#email-template-manager .ui-i-box-sortable-handle').on('mousedown', function() {
       $('.email-preview').hide();
-      $('.email-preview-btn')
-        .text($T.gettext('Show preview'))
-        .data('visible', false);
+      $('.email-preview-btn').text($T.gettext('Show preview')).data('visible', false);
     });
 
     $('.js-toggle-stop-on-match').on('click', function(evt) {

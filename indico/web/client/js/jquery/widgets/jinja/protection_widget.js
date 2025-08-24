@@ -48,10 +48,7 @@ import _ from 'lodash';
             data: {mode: $this.val()},
             error: handleAjaxError,
             success(data) {
-              $this
-                .closest('form')
-                .find('.inheriting-acl-message')
-                .html(data.html);
+              $this.closest('form').find('.inheriting-acl-message').html(data.html);
             },
           });
         }

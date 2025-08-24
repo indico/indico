@@ -53,10 +53,7 @@ import 'dropzone/dist/dropzone.css';
           if (file.content_type.match(/image\/.*/) && file.url) {
             $dz.find('.dz-image > img').attr('src', file.url);
             $dz.find('.dz-image > img').attr('width', '120px');
-            $dz
-              .find('.dz-preview')
-              .removeClass('dz-file-preview')
-              .addClass('dz-image-preview');
+            $dz.find('.dz-preview').removeClass('dz-file-preview').addClass('dz-image-preview');
           }
         }
 

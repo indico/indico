@@ -18,10 +18,7 @@ const timeToSeconds = time => {
   return time.hours() * 3600 + time.minutes() * 60;
 };
 
-const secondsToTime = seconds =>
-  moment()
-    .startOf('day')
-    .seconds(seconds);
+const secondsToTime = seconds => moment().startOf('day').seconds(seconds);
 
 export default function WTFDurationField({timeId, required, disabled}) {
   const timeField = useMemo(() => document.getElementById(timeId), [timeId]);

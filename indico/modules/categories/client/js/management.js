@@ -131,11 +131,7 @@ import {natSortCompare} from 'indico/utils/sort';
 
     function restoreCategoryOrder(order) {
       $.each(order, function(index, id) {
-        $tbody
-          .find(`[data-category-id=${id}]`)
-          .not('.js-move-category')
-          .detach()
-          .appendTo($tbody);
+        $tbody.find(`[data-category-id=${id}]`).not('.js-move-category').detach().appendTo($tbody);
       });
     }
 
@@ -413,10 +409,7 @@ import {natSortCompare} from 'indico/utils/sort';
   function setupRolesToggle() {
     const $roles = $('#event-roles');
     $roles.on('click', '.toggle-members', function() {
-      const $row = $(this)
-        .closest('tr')
-        .next('tr')
-        .find('.slide');
+      const $row = $(this).closest('tr').next('tr').find('.slide');
       $row.css('max-height', `${$row[0].scrollHeight}px`);
       $row.toggleClass('open close');
     });

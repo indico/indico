@@ -59,7 +59,11 @@ export const getPriceFormatter = createSelector(
 /** Get a sorted list of enabled top-level sections. */
 const getSections = createSelector(
   getFlatSections,
-  sections => _.sortBy(Object.values(sections).filter(s => s.enabled), ['position', 'id'])
+  sections =>
+    _.sortBy(
+      Object.values(sections).filter(s => s.enabled),
+      ['position', 'id']
+    )
 );
 
 /** Get a mapping from section IDs to sorted item lists. */

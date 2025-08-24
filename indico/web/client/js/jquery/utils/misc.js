@@ -127,9 +127,7 @@ import Palette from '../../utils/palette';
     }
 
     box = $('<div class="corner-message">').prependTo(container);
-    $('<div class="corner-message-text">')
-      .text(options.message)
-      .appendTo(box);
+    $('<div class="corner-message-text">').text(options.message).appendTo(box);
 
     if (options.class) {
       box.addClass(options.class);
@@ -149,20 +147,14 @@ import Palette from '../../utils/palette';
         if (options.actionCallback) {
           var promise = options.actionCallback() || $.Deferred();
 
-          box
-            .addClass('progress')
-            .find('.corner-message-text')
-            .text(options.progressMessage);
+          box.addClass('progress').find('.corner-message-text').text(options.progressMessage);
           text.remove();
 
           promise
             .then(
               function() {
                 box.find('.corner-message-text').text(options.feedbackMessage);
-                box
-                  .removeClass(options.class)
-                  .addClass('success')
-                  .removeClass('progress');
+                box.removeClass(options.class).addClass('success').removeClass('progress');
               },
               function() {
                 box.text($T.gettext('Operation failed!'));

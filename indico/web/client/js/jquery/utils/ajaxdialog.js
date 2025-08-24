@@ -181,9 +181,9 @@
           var text = options.closeButton === true ? $T.gettext('Close') : options.closeButton;
           this.contentContainer.append(
             $('<button>', {
-              'class': 'i-button big right',
-              'type': 'button',
-              'text': text,
+              class: 'i-button big right',
+              type: 'button',
+              text: text,
               'data-button-back': '',
             })
           );

@@ -30,11 +30,11 @@ const ALLOWED_TAGS = [
 const ALLOWED_ATTRIBUTES = {
   '*': ['style'],
   // bleach.ALLOWED_ATTRIBUTES
-  'a': ['href', 'title'],
-  'abbr': ['title'],
-  'acronym': ['title'],
+  a: ['href', 'title'],
+  abbr: ['title'],
+  acronym: ['title'],
   // BLEACH_ALLOWED_ATTRIBUTES
-  'img': ['src', 'alt', 'style'],
+  img: ['src', 'alt', 'style'],
 };
 
 // prettier-ignore

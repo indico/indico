@@ -20,12 +20,6 @@
       "axios/unsafe/*": ["./node_modules/axios/lib/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "indico/web/static/dist",
-    "indico/htdocs"
-  ],
-  "include": [
-    "indico/**/js"
-  ]
+  "exclude": ["node_modules", "indico/web/static/dist", "indico/htdocs"],
+  "include": ["indico/**/js"]
 }

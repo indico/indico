@@ -9,12 +9,12 @@
 /* global handleAjaxError:false, ajaxDialog:false, alertPopup:false, $T:false */
 
 (function(global) {
-  $(document).ready(function() {
+  $(document).ready(() => {
     setupRegistrationFormScheduleDialogs();
     setupRegistrationFormSummaryPage();
   });
 
-  $(window).scroll(function() {
+  $(window).scroll(() => {
     IndicoUI.Effect.followScroll();
   });
 
@@ -34,7 +34,7 @@
   }
 
   function setupRegistrationFormSummaryPage() {
-    $('.js-check-conditions').on('click', function(e) {
+    $('.js-check-conditions').on('click', e => {
       const conditions = $('#conditions-accepted');
       if (conditions.length && !conditions.prop('checked')) {
         const msg =
@@ -44,7 +44,7 @@
       }
     });
 
-    $('.js-highlight-payment').on('click', function() {
+    $('.js-highlight-payment').on('click', () => {
       $('#payment-summary').effect('highlight', 800);
     });
   }

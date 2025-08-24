@@ -114,14 +114,8 @@ export default class DailyTimelineContent extends React.Component {
   }
 
   renderTimelineRow({availability, label, verboseLabel, room}, key, hasActions, rowStyle = null) {
-    const {
-      minHour,
-      maxHour,
-      onClickCandidate,
-      onClickReservation,
-      longLabel,
-      gutterAllowed,
-    } = this.props;
+    const {minHour, maxHour, onClickCandidate, onClickReservation, longLabel, gutterAllowed} =
+      this.props;
 
     const hasConflicts = !_.isEmpty(availability.conflicts);
     const {ItemClass, itemProps} = this.getEditableItem(room);

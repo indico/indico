@@ -217,8 +217,8 @@ export default function RegistrationFormSubmission() {
                 isUpdateMode
                   ? Translate.string('Modify')
                   : isModerated
-                  ? Translate.string('Apply', 'Registration')
-                  : Translate.string('Register')
+                    ? Translate.string('Apply', 'Registration')
+                    : Translate.string('Register')
               }
               style={{
                 marginTop: 20,

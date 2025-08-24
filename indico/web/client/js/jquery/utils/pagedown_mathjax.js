@@ -9,7 +9,10 @@
 /* global Markdown:false, MathJax:false, PageDownMathJax:false */
 
 (function() {
-  var DELIMITERS = [['$', '$'], ['$$', '$$']];
+  var DELIMITERS = [
+    ['$', '$'],
+    ['$$', '$$'],
+  ];
 
   window.PageDownMathJax = function() {
     var $preview = null; // the preview container

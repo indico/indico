@@ -25,10 +25,7 @@
           .siblings('.i-radio')
           .find('.i-linking-dropdown select')
           .prop('disabled', true);
-        $this
-          .siblings('.i-linking-dropdown')
-          .find('select')
-          .prop('disabled', false);
+        $this.siblings('.i-linking-dropdown').find('select').prop('disabled', false);
       }
     }
 

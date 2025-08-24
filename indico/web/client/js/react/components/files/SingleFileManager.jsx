@@ -134,7 +134,7 @@ const SingleFileManager = ({
     onFileDialogCancel: markTouched,
     onDrop: markTouched,
     onDropAccepted,
-    disabled: disabled || (isUploading || uploadFailed),
+    disabled: disabled || isUploading || uploadFailed,
     accept: validExtensions ? validExtensions.map(ext => `.${ext}`) : null,
     multiple: false,
     noClick: true,

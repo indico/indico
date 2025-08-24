@@ -62,10 +62,7 @@ export default class RecurrenceForm extends FilterFormComponent {
 
   preselectWeekdayToday() {
     const {weekdays, type, interval} = this.state;
-    const today = moment()
-      .locale('en')
-      .format('ddd')
-      .toLocaleLowerCase();
+    const today = moment().locale('en').format('ddd').toLocaleLowerCase();
 
     if (interval !== 'week') {
       // If the interval is not 'week', clear weekdays

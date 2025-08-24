@@ -223,15 +223,12 @@ class RowActionsDropdown extends React.Component {
   }
 }
 
-export default connect(
-  null,
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
-        fetchBookingDetails: bookingsActions.fetchBookingDetails,
-      },
-      dispatch
-    ),
-  })
-)(RowActionsDropdown);
+export default connect(null, dispatch => ({
+  actions: bindActionCreators(
+    {
+      changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
+      fetchBookingDetails: bookingsActions.fetchBookingDetails,
+    },
+    dispatch
+  ),
+}))(RowActionsDropdown);

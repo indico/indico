@@ -30,9 +30,7 @@
       } else {
         $("#page_layout option[value='foldable']").prop('disabled', true);
         if ($('#page_layout :selected').val() === 'foldable') {
-          $('#page_layout :selected')
-            .next()
-            .prop('selected', true);
+          $('#page_layout :selected').next().prop('selected', true);
         }
       }
     }

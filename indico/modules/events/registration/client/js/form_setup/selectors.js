@@ -15,7 +15,11 @@ export const isUILocked = state => state.uiLocked;
 /** Get a sorted list of disabled sections. */
 export const getDisabledSections = createSelector(
   getFlatSections,
-  sections => _.sortBy(Object.values(sections).filter(s => !s.enabled), ['position', 'id'])
+  sections =>
+    _.sortBy(
+      Object.values(sections).filter(s => !s.enabled),
+      ['position', 'id']
+    )
 );
 
 /** Get a section by its ID. */

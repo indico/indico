@@ -36,20 +36,20 @@ class LogEntry extends React.PureComponent {
       switch (entry.payload.state) {
         case 'pending':
           return {
-            'className': 'log-icon semantic-text warning',
-            'title': Translate.string('This email is pending and will be sent soon.'),
+            className: 'log-icon semantic-text warning',
+            title: Translate.string('This email is pending and will be sent soon.'),
             'data-qtip-style': 'warning',
           };
         case 'sent':
           return {
-            'className': 'log-icon semantic-text success',
-            'title': Translate.string('This email has been sent.'),
+            className: 'log-icon semantic-text success',
+            title: Translate.string('This email has been sent.'),
             'data-qtip-style': 'success',
           };
         case 'failed':
           return {
-            'className': 'log-icon semantic-text error',
-            'title': Translate.string('Sending this email failed.'),
+            className: 'log-icon semantic-text error',
+            title: Translate.string('Sending this email failed.'),
             'data-qtip-style': 'danger',
           };
       }

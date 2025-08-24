@@ -50,7 +50,7 @@ function ReviewingQuestion({question: {id, isRequired, fieldType, fieldData}}) {
 
   if (fieldType === 'text') {
     const Component = fieldData.multiline ? FinalTextArea : FinalInput;
-    const props = {'data-max-words': fieldData.maxWords, 'maxLength': fieldData.maxLength};
+    const props = {'data-max-words': fieldData.maxWords, maxLength: fieldData.maxLength};
     return <Component name={fieldName} required={isRequired} {...props} />;
   } else if (fieldType === 'bool') {
     return (

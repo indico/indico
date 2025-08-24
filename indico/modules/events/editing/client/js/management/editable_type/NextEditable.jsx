@@ -91,12 +91,13 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       {
         key: 'session',
         text: Translate.string('Session'),
-        options: _.uniqBy(editables?.map(e => e.contributionSession).filter(x => x), 'id').map(
-          session => ({
-            value: `${session.id}`,
-            text: session.code ? `${session.code} - ${session.title}` : session.title,
-          })
-        ),
+        options: _.uniqBy(
+          editables?.map(e => e.contributionSession).filter(x => x),
+          'id'
+        ).map(session => ({
+          value: `${session.id}`,
+          text: session.code ? `${session.code} - ${session.title}` : session.title,
+        })),
         isMatch: (editable, selectedOptions) =>
           editable.contributionSession &&
           selectedOptions.includes(`${editable.contributionSession.id}`),

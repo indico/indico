@@ -353,16 +353,12 @@ import {Translate} from 'indico/react/i18n';
     extraCheckCallback
   ) {
     function _update(force) {
-      const $checkboxes = $(checkboxContainer)
-        .find(checkboxSelector)
-        .filter(':checked');
+      const $checkboxes = $(checkboxContainer).find(checkboxSelector).filter(':checked');
       let checked = force || !!$checkboxes.length;
       if (extraCheckCallback && extraCheckCallback($checkboxes) === false) {
         checked = false;
       }
-      $(buttonSelector)
-        .prop('disabled', !checked)
-        .toggleClass('disabled', !checked);
+      $(buttonSelector).prop('disabled', !checked).toggleClass('disabled', !checked);
     }
 
     $(checkboxContainer)
@@ -482,10 +478,7 @@ import {Translate} from 'indico/react/i18n';
     }
 
     function _setAllSelected(selected) {
-      container
-        .find(options.allSelectedSelector)
-        .prop('checked', selected)
-        .trigger('change');
+      container.find(options.allSelectedSelector).prop('checked', selected).trigger('change');
     }
 
     return {

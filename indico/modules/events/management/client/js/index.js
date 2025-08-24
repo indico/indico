@@ -212,9 +212,7 @@ import {SeriesManagement} from './SeriesManagement';
       '.js-event-person-list .js-requires-selected-row'
     );
     if ($('.js-event-person-list').closest('.ui-dialog').length) {
-      $('.js-event-person-list [data-toggle=dropdown]')
-        .closest('.toolbar')
-        .dropdown();
+      $('.js-event-person-list [data-toggle=dropdown]').closest('.toolbar').dropdown();
     }
     $('.js-event-person-list [data-filter]').on('click', refreshPersonFilters);
 
@@ -394,9 +392,7 @@ import {SeriesManagement} from './SeriesManagement';
 
   global.handleSelectedRowHighlight = function handleSelectedRowHighlight(trigger) {
     const $obj = $('table.i-table input.select-row').on('change', function() {
-      $(this)
-        .closest('tr')
-        .toggleClass('selected', this.checked);
+      $(this).closest('tr').toggleClass('selected', this.checked);
     });
 
     if (trigger) {

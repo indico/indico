@@ -32,14 +32,8 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
   }
 
   renderTimelineRow({availability, room, label, verboseLabel}, key, hasActions, rowStyle = null) {
-    const {
-      minHour,
-      maxHour,
-      longLabel,
-      onClickReservation,
-      onClickCandidate,
-      gutterAllowed,
-    } = this.props;
+    const {minHour, maxHour, longLabel, onClickReservation, onClickCandidate, gutterAllowed} =
+      this.props;
     const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
     const {ItemClass, itemProps} = this.getEditableItem(room);
     const rowLabelProps = {

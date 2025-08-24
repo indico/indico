@@ -115,7 +115,7 @@ import setupReactPaperTimeline from './setup';
           if ($this.is('.js-count-label')) {
             const list = $('<ul>', {class: 'qbubble-item-list'});
             const items = Object.values($this.data('items'));
-            $.each(items, function(i, val) {
+            $.each(items, (i, val) => {
               const item = $('<li>');
               item.append(
                 $('<a>', {text: val[0], href: val[1]})

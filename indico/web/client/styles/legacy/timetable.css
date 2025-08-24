@@ -99,12 +99,24 @@ div.timetableContribution {
   background: rgb(250, 250, 250);
   color: rgb(50, 50, 50);
   text-shadow: 0 0 2px rgb(255, 255, 255);
-  -moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
-    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
-  -webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
-    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
-  box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 0.4em rgb(200, 200, 200),
-    0 0.1em 0 rgb(130, 130, 130), 0 0.11em 0 rgba(0, 0, 0, 0.4), 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+  -moz-box-shadow:
+    inset 0 0 1px rgb(255, 255, 255),
+    inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130),
+    0 0.11em 0 rgba(0, 0, 0, 0.4),
+    0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+  -webkit-box-shadow:
+    inset 0 0 1px rgb(255, 255, 255),
+    inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130),
+    0 0.11em 0 rgba(0, 0, 0, 0.4),
+    0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 0 1px rgb(255, 255, 255),
+    inset 0 0 0.4em rgb(200, 200, 200),
+    0 0.1em 0 rgb(130, 130, 130),
+    0 0.11em 0 rgba(0, 0, 0, 0.4),
+    0 0.1em 0.11em rgba(0, 0, 0, 0.9);
 }
 
 div.ui-draggable.timetableBlock:hover {

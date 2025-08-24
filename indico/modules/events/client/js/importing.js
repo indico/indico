@@ -65,10 +65,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
             $eventDetails.show();
             $nextButton.prop('disabled', false);
           } else {
-            $cloneErrors
-              .show()
-              .find('.message-text')
-              .html(errorToHTML(data.error.message));
+            $cloneErrors.show().find('.message-text').html(errorToHTML(data.error.message));
             $eventDetails.hide();
             $nextButton.prop('disabled', true);
           }

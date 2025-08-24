@@ -70,7 +70,13 @@ export function uploadFiles({
 }) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
-  dispatch(actions.startUploads(fileTypeId, acceptedFiles.map(({file}) => file), tmpFileIds));
+  dispatch(
+    actions.startUploads(
+      fileTypeId,
+      acceptedFiles.map(({file}) => file),
+      tmpFileIds
+    )
+  );
 
   return Promise.all(
     _.zip(acceptedFiles, tmpFileIds).map(async ([{file, replaceFileId}, tmpFileId]) => {

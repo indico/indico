@@ -490,7 +490,9 @@ div.invalid {
   background: #fff;
   padding: 0;
   z-index: 1;
-  box-shadow: inset 0 0 25px #e8e8e8, 0 0 2px rgba(220, 220, 200, 0.4);
+  box-shadow:
+    inset 0 0 25px #e8e8e8,
+    0 0 2px rgba(220, 220, 200, 0.4);
 }
 
 .ui-list-menu-level > li:hover {

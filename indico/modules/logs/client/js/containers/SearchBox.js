@@ -19,7 +19,4 @@ const mapDispatchToProps = dispatch => ({
   }, 250),
 });
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(SearchBox);
+export default connect(null, mapDispatchToProps)(SearchBox);

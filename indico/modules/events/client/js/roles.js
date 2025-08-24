@@ -13,10 +13,7 @@ import {showUserSearch} from 'indico/react/components/principals/imperative';
   function setupToggle() {
     const $roles = $('#event-roles');
     $roles.on('click', '.toggle-members', function() {
-      const $row = $(this)
-        .closest('tr')
-        .next('tr')
-        .find('.slide');
+      const $row = $(this).closest('tr').next('tr').find('.slide');
       $row.css('max-height', `${$row[0].scrollHeight}px`);
       $row.toggleClass('open close');
     });

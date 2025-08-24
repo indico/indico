@@ -113,10 +113,7 @@ $(document).ready(function() {
                 if (qtipHTML) {
                   return qtipHTML.html();
                 } else {
-                  return title
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
+                  return title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 }
               },
             },
@@ -185,11 +182,9 @@ $(document).ready(function() {
 
   function initDropdowns($container) {
     $container.find('.js-dropdown').each(function() {
-      $(this)
-        .parent()
-        .dropdown({
-          selector: '.js-dropdown',
-        });
+      $(this).parent().dropdown({
+        selector: '.js-dropdown',
+      });
     });
   }
 

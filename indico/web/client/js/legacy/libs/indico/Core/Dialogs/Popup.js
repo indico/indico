@@ -28,16 +28,11 @@ type(
       if (popupStyle === undefined) {
         popupStyle = customStyle;
       }
-      this.contentContainer = $('<div class="exclusivePopup"/>')
-        .css(popupStyle)
-        .append(content);
+      this.contentContainer = $('<div class="exclusivePopup"/>').css(popupStyle).append(content);
 
       this.showCloseButton = !!this.title;
       this._makeCanvas();
-      this.canvas
-        .empty()
-        .css(customStyle)
-        .append(this.contentContainer);
+      this.canvas.empty().css(customStyle).append(this.contentContainer);
       this.dialogElement.css(customStyle);
     },
 
@@ -230,11 +225,7 @@ type(
           padding: '10px',
           textAlign: 'center',
         })
-        .append(
-          $('<div/>')
-            .css('textAlign', 'left')
-            .html(this.content)
-        );
+        .append($('<div/>').css('textAlign', 'left').html(this.content));
       return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
     },
 
@@ -314,7 +305,6 @@ type(
     });
   }
 );
-
 
 /**
  * Utility function to display a three buttons popup.

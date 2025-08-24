@@ -644,24 +644,18 @@ export function FinalSubmitButton({
   children,
   extraSubscription,
 }) {
-  const {
-    validating,
-    hasValidationErrors,
-    pristine,
-    submitting,
-    submitError,
-    submitSucceeded,
-  } = useFormState({
-    subscription: {
-      validating: true,
-      hasValidationErrors: true,
-      pristine: true,
-      submitting: true,
-      submitError: true,
-      submitSucceeded: true,
-      ...extraSubscription,
-    },
-  });
+  const {validating, hasValidationErrors, pristine, submitting, submitError, submitSucceeded} =
+    useFormState({
+      subscription: {
+        validating: true,
+        hasValidationErrors: true,
+        pristine: true,
+        submitting: true,
+        submitError: true,
+        submitSucceeded: true,
+        ...extraSubscription,
+      },
+    });
   const disabled =
     validating ||
     (disabledIfInvalid && hasValidationErrors) ||

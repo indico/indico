@@ -296,7 +296,7 @@ const PictureManager = ({
     onFileDialogCancel: markTouched,
     onDrop: markTouched,
     onDropAccepted,
-    disabled: disabled || (isUploading || failed || isCapturing || isEditing),
+    disabled: disabled || isUploading || failed || isCapturing || isEditing,
     accept: ['.png', '.jpg', '.jpeg', '.gif', '.webp'],
     multiple: false,
     noClick: true,

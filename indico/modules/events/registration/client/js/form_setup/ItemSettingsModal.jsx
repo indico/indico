@@ -41,9 +41,11 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   const editing = id !== null;
   const staticData = useSelector(getStaticData);
   const dataRetentionRange = useSelector(getDataRetentionRange);
-  const {inputType: existingInputType, fieldIsRequired, ...itemData} = useSelector(state =>
-    editing ? getItemById(state, id) : EMPTY_DATA
-  );
+  const {
+    inputType: existingInputType,
+    fieldIsRequired,
+    ...itemData
+  } = useSelector(state => (editing ? getItemById(state, id) : EMPTY_DATA));
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();
   const isUnsupportedField = !(inputType in fieldRegistry);

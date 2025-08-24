@@ -189,18 +189,19 @@ export default function ListFilter({
               trigger={<Dropdown.Item text={filterText} icon="plus" />}
             >
               <Dropdown.Menu>
-                {_.sortBy(options.filter(o => !o.exclusive), 'text').map(
-                  ({value: option, text, color}) => (
-                    <Dropdown.Item
-                      key={option}
-                      value={option}
-                      text={text}
-                      label={getLabelOpts(color)}
-                      active={option in (filters[key] || {})}
-                      onClick={(e, {value}) => toggleFilter(key, value)}
-                    />
-                  )
-                )}
+                {_.sortBy(
+                  options.filter(o => !o.exclusive),
+                  'text'
+                ).map(({value: option, text, color}) => (
+                  <Dropdown.Item
+                    key={option}
+                    value={option}
+                    text={text}
+                    label={getLabelOpts(color)}
+                    active={option in (filters[key] || {})}
+                    onClick={(e, {value}) => toggleFilter(key, value)}
+                  />
+                ))}
                 {!!options.find(o => o.exclusive) && !!options.find(o => !o.exclusive) && (
                   <Dropdown.Divider />
                 )}

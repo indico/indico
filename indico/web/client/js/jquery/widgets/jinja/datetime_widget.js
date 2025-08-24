@@ -31,7 +31,7 @@ window.setupDateTimeWidget = function setupDateTimeWidget(options) {
         notAfter: false,
       },
       disabledDays: null,
-      disabledDates: null
+      disabledDates: null,
     },
     options
   );

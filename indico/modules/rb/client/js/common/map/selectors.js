@@ -27,13 +27,17 @@ export const isMapVisible = createSelector(
   (mapEnabled, areasFetching, mapAreas) => mapEnabled && (areasFetching || !!mapAreas.length)
 );
 
-export const makeGetMapData = namespace => ({[namespace]: stateSlice}) => ({
-  bounds: stateSlice.map.bounds,
-  search: stateSlice.map.search,
-  filterBounds: stateSlice.filters.bounds,
-});
+export const makeGetMapData =
+  namespace =>
+  ({[namespace]: stateSlice}) => ({
+    bounds: stateSlice.map.bounds,
+    search: stateSlice.map.search,
+    filterBounds: stateSlice.filters.bounds,
+  });
 
-export const makeIsMapSearchEnabled = namespace => ({[namespace]: stateSlice}) =>
-  stateSlice.map.search;
+export const makeIsMapSearchEnabled =
+  namespace =>
+  ({[namespace]: stateSlice}) =>
+    stateSlice.map.search;
 
 export const getHoveredRoom = ({map}) => map.ui.hoveredRoom;

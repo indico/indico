@@ -53,7 +53,7 @@ export default function Favorite({type, id, favorited, setFavText, deleteFavText
   return fav ? (
     <IButton
       icon="star"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, 'subtle': true} : {}}
+      classes={type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}}
       style={type === 'event' ? {color: Palette.indicoBlue} : {}}
       highlight
       title={deleteFavText}
@@ -62,7 +62,7 @@ export default function Favorite({type, id, favorited, setFavText, deleteFavText
   ) : (
     <IButton
       icon="star-empty"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, 'subtle': true} : {}}
+      classes={type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}}
       title={setFavText}
       onClick={() => putFavorite(id)}
     />

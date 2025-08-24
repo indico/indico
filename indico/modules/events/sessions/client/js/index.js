@@ -105,9 +105,7 @@ import './session_display';
       const $this = $(this);
 
       if (!$this.hasClass('disabled')) {
-        $('#sessions-wrapper form')
-          .attr('action', $this.data('href'))
-          .submit();
+        $('#sessions-wrapper form').attr('action', $this.data('href')).submit();
       }
     });
   };

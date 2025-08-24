@@ -399,4 +399,3 @@ bind.internal.sequence = function(target, list, template) {
   }
   return null;
 };
-

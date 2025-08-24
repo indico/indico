@@ -53,14 +53,8 @@ export default class DailyAvailability extends React.Component {
     const {start_time: startT, end_time: endT, weekday} = bookableHour;
     const key = nanoid();
     const weekdayOptions = moment.weekdays(true).map(wd => ({
-      value: moment()
-        .day(wd)
-        .locale('en')
-        .format('ddd')
-        .toLowerCase(),
-      text: moment()
-        .isoWeekday(wd)
-        .format('ddd'),
+      value: moment().day(wd).locale('en').format('ddd').toLowerCase(),
+      text: moment().isoWeekday(wd).format('ddd'),
     }));
 
     return (

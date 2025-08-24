@@ -50,12 +50,12 @@ const convert = version => {
 };
 
 const mapped = {
-  'Chrome': convert(browsers.chrome),
-  'Edge': convert(browsers.edge),
-  'Safari': convert(browsers.safari),
+  Chrome: convert(browsers.chrome),
+  Edge: convert(browsers.edge),
+  Safari: convert(browsers.safari),
   'Mobile Safari': convert(browsers.ios_saf),
-  'Firefox': convert(browsers.firefox),
-  'IE': false,
+  Firefox: convert(browsers.firefox),
+  IE: false,
 };
 
 module.exports = mapped;

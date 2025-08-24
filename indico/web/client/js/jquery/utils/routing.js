@@ -153,10 +153,7 @@
         if (url.indexOf('static/') === 0) {
           url = url.substring(7);
         }
-        url = url
-          .replace(/^\/+/, '')
-          .replace(/\/$/, '')
-          .replace(/\//g, '--');
+        url = url.replace(/^\/+/, '').replace(/\/$/, '').replace(/\//g, '--');
         if (!url.match(/.*\.([^\/]+)$/)) {
           url += '.html';
         }

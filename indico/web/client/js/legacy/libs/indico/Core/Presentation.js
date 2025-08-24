@@ -61,10 +61,7 @@ function createObject(clazz, args) {
 
 function escapeHTML(html) {
   // from Prototype
-  return html
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 var SortCriteria = {
@@ -78,8 +75,8 @@ var SortCriteria = {
       return parseInt(e1, 10) == parseInt(e2, 10)
         ? 0
         : parseInt(e1, 10) < parseInt(e2, 10)
-        ? -1
-        : 1;
+          ? -1
+          : 1;
     }
   },
 };

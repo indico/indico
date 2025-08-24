@@ -176,10 +176,7 @@ export function serializeDateTimeRange(startDt, endDt) {
  * @returns {String} - The 3-letter weekday (mon, tue, ...)
  */
 export function getWeekday(date = undefined) {
-  return moment(date)
-    .locale('en')
-    .format('ddd')
-    .toLocaleLowerCase();
+  return moment(date).locale('en').format('ddd').toLocaleLowerCase();
 }
 
 export function getToday() {

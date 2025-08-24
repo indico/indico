@@ -192,7 +192,7 @@ import Palette from '../../utils/palette';
       _.each(path, function(category, idx) {
         const $item = $('<li>');
         const $segment = $(tag, {
-          'text': category.title,
+          text: category.title,
           'data-category-id': category.id,
         }).toggleClass('js-go-to', clickable);
         if (idx === 0) {
@@ -270,8 +270,8 @@ import Palette from '../../utils/palette';
       const self = this;
       const $buttonWrapper = $('<div>', {class: 'button-wrapper'});
       const $button = $('<span>', {
-        'class': 'action-button js-action',
-        'text': self.options.actionButtonText,
+        class: 'action-button js-action',
+        text: self.options.actionButtonText,
         'data-category-id': category.id,
       });
       $buttonWrapper.append($('<div>').append($button));
@@ -284,8 +284,8 @@ import Palette from '../../utils/palette';
       if (!forSubcategory && category.parent_path && category.parent_path.length) {
         const parent = _.last(category.parent_path);
         const $arrowUp = $('<a>', {
-          'class': 'icon-arrow-up navigate-up js-navigate-up',
-          'title': $T.gettext('Go to parent: {0}'.format(parent.title)),
+          class: 'icon-arrow-up navigate-up js-navigate-up',
+          title: $T.gettext('Go to parent: {0}'.format(parent.title)),
           'data-parent-id': parent.id,
         });
         $buttonWrapper.append($arrowUp);
@@ -314,10 +314,7 @@ import Palette from '../../utils/palette';
           class: 'stats-separator',
           text: ' | ',
         });
-        $info
-          .append($categories)
-          .append($separator)
-          .append($events);
+        $info.append($categories).append($separator).append($events);
         $buttonWrapper.append($info);
       }
 
@@ -484,10 +481,7 @@ import Palette from '../../utils/palette';
         text: $T.gettext('Clear search'),
       });
       self.$categoryResultsInfo.empty();
-      self.$categoryResultsInfo
-        .append($stats)
-        .append($clear)
-        .show();
+      self.$categoryResultsInfo.append($stats).append($clear).show();
     },
 
     _postRenderList() {
@@ -721,22 +715,14 @@ import Palette from '../../utils/palette';
         category,
         true
       );
-      const canActOnCategoriesWithoutEventCreationRights = self._canActOnCategoriesWithoutEventCreationRights(
-        category,
-        true
-      );
-      const canActOnCategoriesWithoutCategoryManagementRights = self._canActOnCategoriesWithoutCategoryManagementRights(
-        category,
-        true
-      );
-      const canActOnCategoriesWithoutEventProposalRights = self._canActOnCategoriesWithoutEventProposalRights(
-        category,
-        true
-      );
-      const canActOnCategoriesWithoutEventProposalOrCreationRights = self._canActOnCategoriesWithoutEventProposalOrCreationRights(
-        category,
-        true
-      );
+      const canActOnCategoriesWithoutEventCreationRights =
+        self._canActOnCategoriesWithoutEventCreationRights(category, true);
+      const canActOnCategoriesWithoutCategoryManagementRights =
+        self._canActOnCategoriesWithoutCategoryManagementRights(category, true);
+      const canActOnCategoriesWithoutEventProposalRights =
+        self._canActOnCategoriesWithoutEventProposalRights(category, true);
+      const canActOnCategoriesWithoutEventProposalOrCreationRights =
+        self._canActOnCategoriesWithoutEventProposalOrCreationRights(category, true);
 
       if (!canActOnCategories.allowed) {
         result = canActOnCategories;

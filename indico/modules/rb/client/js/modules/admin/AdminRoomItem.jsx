@@ -69,10 +69,7 @@ AdminRoomItem.propTypes = {
   fetchRooms: PropTypes.func.isRequired,
 };
 
-export default connect(
-  null,
-  {
-    deleteRoom: adminActions.deleteRoom,
-    fetchRooms: adminActions.fetchRooms,
-  }
-)(AdminRoomItem);
+export default connect(null, {
+  deleteRoom: adminActions.deleteRoom,
+  fetchRooms: adminActions.fetchRooms,
+})(AdminRoomItem);

@@ -1,14 +1,14 @@
 {
-    "problemMatcher": [
-      {
-        "owner": "react-jsx-i18n",
-        "pattern": [
-          {
-            "regexp": "^([^:\\n']+): (.+)$",
-            "file": 1,
-            "message": 2
-          }
-        ]
-      }
-    ]
-  }
+  "problemMatcher": [
+    {
+      "owner": "react-jsx-i18n",
+      "pattern": [
+        {
+          "regexp": "^([^:\\n']+): (.+)$",
+          "file": 1,
+          "message": 2
+        }
+      ]
+    }
+  ]
+}

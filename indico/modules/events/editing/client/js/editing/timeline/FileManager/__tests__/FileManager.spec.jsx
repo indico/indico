@@ -130,7 +130,7 @@ function getDropzoneForFileType(wrapper, id) {
 
 async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
   const uuid = await simulateFileUpload(dropzone, name, type);
-  expect(onChange).toHaveBeenCalledWith({'2': [uuid]});
+  expect(onChange).toHaveBeenCalledWith({2: [uuid]});
   if (deletedFile) {
     const deleteUrl = `flask://files.delete_file/uuid=${deletedFile}`;
     expect(mockAxios.delete).toHaveBeenCalledWith(deleteUrl);
@@ -249,7 +249,7 @@ describe('File manager', () => {
       mockAxios.mockResponseFor(`flask://files.delete_file/uuid=${uuid}`, undefined);
     });
     expect(mockAxios.delete).toHaveBeenCalledWith(`flask://files.delete_file/uuid=${uuid}`);
-    expect(onChange).toHaveBeenCalledWith({'2': ['file1']});
+    expect(onChange).toHaveBeenCalledWith({2: ['file1']});
   });
 
   it('modifies an existing file', async () => {
@@ -304,7 +304,7 @@ describe('File manager', () => {
       expect.objectContaining({type: actions.MARK_MODIFIED})
     );
 
-    expect(onChange).toHaveBeenCalledWith({'1': ['file1'], '2': ['newfile2'], '3': ['file3']});
+    expect(onChange).toHaveBeenCalledWith({1: ['file1'], 2: ['newfile2'], 3: ['file3']});
 
     wrapper.update();
 
@@ -353,13 +353,7 @@ describe('File manager', () => {
 
     const fileEntry = getFileEntryForFileType(wrapper, 2);
     expect(fileEntry.exists()).toEqual(false);
-    expect(
-      wrapper
-        .find('FileType')
-        .find('Uploads')
-        .find('.error')
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find('FileType').find('Uploads').find('.error').exists()).toEqual(true);
 
     axiosUtils.handleAxiosError.mockRestore();
   });

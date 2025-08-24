@@ -1,17 +1,17 @@
 {
-    "problemMatcher": [
-      {
-        "owner": "stylelint",
-        "pattern": [
-          {
-            "regexp": "^([^:]+):(\\d+):(\\d+): (.+ \\([^)]+\\)) \\[(error|warning)\\]$",
-            "file": 1,
-            "line": 2,
-            "column": 3,
-            "message": 4,
-            "severity": 5
-          }
-        ]
-      }
-    ]
-  }
+  "problemMatcher": [
+    {
+      "owner": "stylelint",
+      "pattern": [
+        {
+          "regexp": "^([^:]+):(\\d+):(\\d+): (.+ \\([^)]+\\)) \\[(error|warning)\\]$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4,
+          "severity": 5
+        }
+      ]
+    }
+  ]
+}

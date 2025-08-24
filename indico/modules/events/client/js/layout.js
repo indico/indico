@@ -102,11 +102,7 @@
 
           // add empty class to sender list of children if the last entry was moved out
           if (!_sender.children().length) {
-            _sender
-              .addClass('empty')
-              .closest('.menu-entry')
-              .parent()
-              .addClass('nestable');
+            _sender.addClass('empty').closest('.menu-entry').parent().addClass('nestable');
           }
         }
         _sender = null;
@@ -130,10 +126,7 @@
         evt.stopPropagation();
         const data = {};
 
-        const position = ui.item
-          .prev()
-          .children('.menu-entry')
-          .data('position');
+        const position = ui.item.prev().children('.menu-entry').data('position');
         if (position !== null) {
           data.position = position;
         }
@@ -165,9 +158,7 @@
         title: $T.gettext('Menu Entry Settings'),
         onClose(data) {
           if (data) {
-            $(this.trigger)
-              .closest('.menu-entry')
-              .replaceWith(data.entry);
+            $(this.trigger).closest('.menu-entry').replaceWith(data.entry);
           }
         },
       });
@@ -205,9 +196,7 @@
         error: handleAjaxError,
         success(data) {
           const isDefault = data.is_default;
-          $('.menu-entry .default')
-            .removeClass('default')
-            .addClass('not-default');
+          $('.menu-entry .default').removeClass('default').addClass('not-default');
           $this.toggleClass('default', isDefault).toggleClass('not-default', !isDefault);
         },
       });

@@ -151,10 +151,14 @@ export function createEquipmentType(data) {
 }
 
 export function deleteFeature(id) {
-  return ajaxAction(() => indicoAxios.delete(featuresURL({feature_id: id})), null, () => ({
-    type: FEATURE_DELETED,
-    id,
-  }));
+  return ajaxAction(
+    () => indicoAxios.delete(featuresURL({feature_id: id})),
+    null,
+    () => ({
+      type: FEATURE_DELETED,
+      id,
+    })
+  );
 }
 
 export function updateFeature(id, data) {
@@ -170,10 +174,14 @@ export function createFeature(data) {
 }
 
 export function deleteAttribute(id) {
-  return ajaxAction(() => indicoAxios.delete(attributesURL({attribute_id: id})), null, () => ({
-    type: ATTRIBUTE_DELETED,
-    id,
-  }));
+  return ajaxAction(
+    () => indicoAxios.delete(attributesURL({attribute_id: id})),
+    null,
+    () => ({
+      type: ATTRIBUTE_DELETED,
+      id,
+    })
+  );
 }
 
 export function updateAttribute(id, data) {
@@ -189,10 +197,14 @@ export function createAttribute(data) {
 }
 
 export function deleteLocation(id) {
-  return ajaxAction(() => indicoAxios.delete(locationsURL({location_id: id})), null, () => ({
-    type: LOCATION_DELETED,
-    id,
-  }));
+  return ajaxAction(
+    () => indicoAxios.delete(locationsURL({location_id: id})),
+    null,
+    () => ({
+      type: LOCATION_DELETED,
+      id,
+    })
+  );
 }
 
 export function updateLocation(id, data) {
@@ -213,8 +225,12 @@ export function createLocation(data) {
 }
 
 export function deleteRoom(id) {
-  return ajaxAction(() => indicoAxios.delete(roomURL({room_id: id})), null, () => ({
-    type: ROOM_DELETED,
-    id,
-  }));
+  return ajaxAction(
+    () => indicoAxios.delete(roomURL({room_id: id})),
+    null,
+    () => ({
+      type: ROOM_DELETED,
+      id,
+    })
+  );
 }

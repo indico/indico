@@ -54,18 +54,11 @@ import {$T} from '../../utils/i18n';
       _.defer(function() {
         function handleInput() {
           var $this = $(this);
-          var textTyped = $this
-            .val()
-            .trim()
-            .toLowerCase();
+          var textTyped = $this.val().trim().toLowerCase();
           var dropdownContainer = $this.closest('.dropdown-container');
           dropdownContainer.find('.dropdown-item').each(function() {
             var $item = $(this);
-            var found =
-              $item
-                .data('filter')
-                .toLowerCase()
-                .indexOf(textTyped) !== -1;
+            var found = $item.data('filter').toLowerCase().indexOf(textTyped) !== -1;
             $item.toggle(found);
           });
         }
@@ -225,11 +218,7 @@ import {$T} from '../../utils/i18n';
 
     _deselectItem: function(item) {
       this.selectedItem = null;
-      item
-        .css('background', '')
-        .removeClass('active')
-        .find('.item-title')
-        .css('color', '');
+      item.css('background', '').removeClass('active').find('.item-title').css('color', '');
       this._sortItems(item.closest('.dropdown-items-container'));
     },
 

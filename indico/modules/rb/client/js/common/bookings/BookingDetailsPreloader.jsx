@@ -50,13 +50,11 @@ BookingDetailsPreloader.defaultProps = {
   cancelDate: null,
 };
 
-export default connect(
-  null,
-  dispatch =>
-    bindActionCreators(
-      {
-        fetchDetails: bookingsActions.fetchBookingDetails,
-      },
-      dispatch
-    )
+export default connect(null, dispatch =>
+  bindActionCreators(
+    {
+      fetchDetails: bookingsActions.fetchBookingDetails,
+    },
+    dispatch
+  )
 )(BookingDetailsPreloader);

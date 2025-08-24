@@ -82,14 +82,11 @@ class UpcomingBookings extends React.PureComponent {
   }
 }
 
-export default connect(
-  null,
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        openBookingDetails: bookingActions.openBookingDetails,
-      },
-      dispatch
-    ),
-  })
-)(UpcomingBookings);
+export default connect(null, dispatch => ({
+  actions: bindActionCreators(
+    {
+      openBookingDetails: bookingActions.openBookingDetails,
+    },
+    dispatch
+  ),
+}))(UpcomingBookings);

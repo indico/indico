@@ -177,7 +177,12 @@ function SeriesManagementModal({currentEventId, categoryId, series, timezone, on
           <>
             <FinalField
               name="events"
-              isEqual={(a, b) => _.isEqual((a || []).map(e => e.id), (b || []).map(e => e.id))}
+              isEqual={(a, b) =>
+                _.isEqual(
+                  (a || []).map(e => e.id),
+                  (b || []).map(e => e.id)
+                )
+              }
               validate={val => {
                 if (!val.length) {
                   return Translate.string('A series needs to contain at least one event.');
@@ -481,10 +486,10 @@ function SeriesEvents({
           isSearching
             ? Translate.string('Searching...')
             : denialReason !== null
-            ? denialReason
-            : searchQuery
-            ? Translate.string('No results found.')
-            : Translate.string('Enter search term')
+              ? denialReason
+              : searchQuery
+                ? Translate.string('No results found.')
+                : Translate.string('Enter search term')
         }
       />
       {divider}

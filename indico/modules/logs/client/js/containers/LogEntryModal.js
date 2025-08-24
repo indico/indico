@@ -31,7 +31,4 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LogEntryModal);
+export default connect(mapStateToProps, mapDispatchToProps)(LogEntryModal);

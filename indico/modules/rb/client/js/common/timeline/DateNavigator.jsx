@@ -226,10 +226,7 @@ export default class DateNavigator extends React.Component {
             {mode === 'months' && this.selectedDate.format('MMMM YYYY')}
             {mode === 'weeks' &&
               Translate.string('Week of {date}', {
-                date: this.selectedDate
-                  .clone()
-                  .startOf('week')
-                  .format('MMM Do YYYY'),
+                date: this.selectedDate.clone().startOf('week').format('MMM Do YYYY'),
               })}
           </Button>
         }

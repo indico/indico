@@ -24,13 +24,9 @@
       "indico/modules/events/*": ["./indico/modules/events/client/js/*"],
       "indico/*": ["./indico/web/client/js/*"],
       "axios/unsafe/*": ["./node_modules/axios/lib/*"],
-      "*": ["./node_modules/*"],
+      "*": ["./node_modules/*"]
     },
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": [
-    "indico/**/client/**/*",
-    "indico/web/client/js/types",
-    "indico/global.d.ts"
-  ],
+  "include": ["indico/**/client/**/*", "indico/web/client/js/types", "indico/global.d.ts"]
 }

@@ -321,10 +321,7 @@ type(
   {
     _addTab: function(label, content, data) {
       var id = _.uniqueId('x-tab-');
-      $(content)
-        .css('display', '')
-        .find('script')
-        .remove();
+      $(content).css('display', '').find('script').remove();
       var container = $('<div/>', {id: id})
         .data(data || {})
         .html(content);
@@ -454,12 +451,10 @@ type(
 
       self.scrollOffset = 0; // how many tabs did the user scroll to the right
       // Create buttons to scroll left/right
-      self.scrollButtons = $('<div/>')
-        .disableSelection()
-        .css({
-          position: 'relative',
-          zIndex: 100,
-        });
+      self.scrollButtons = $('<div/>').disableSelection().css({
+        position: 'relative',
+        zIndex: 100,
+      });
       $('<span/>')
         .disableSelection()
         .attr('title', $T('Previous tab'))
@@ -528,10 +523,7 @@ type(
         .eq(0)
         .toggleClass('ui-state-disabled', this.scrollOffset == 0);
       // no next allowed if last element is visible
-      this.scrollButtons
-        .children()
-        .eq(1)
-        .toggleClass('ui-state-disabled', lastElementShown);
+      this.scrollButtons.children().eq(1).toggleClass('ui-state-disabled', lastElementShown);
     },
     scrollToTab: function(idx, fuzzy) {
       var self = this;
@@ -552,12 +544,7 @@ type(
         var origIdx = idx;
         while (idx >= 0) {
           self.scrollToTab(idx - 1); // try scrolling left 1 tab
-          if (
-            nav
-              .find(' > li')
-              .eq(origIdx)
-              .is(':hidden')
-          ) {
+          if (nav.find(' > li').eq(origIdx).is(':hidden')) {
             // if our tab is now hidden, scroll one tab forward again and stop
             self.scrollToTab(idx);
             return;
@@ -571,10 +558,7 @@ type(
       // Here we perform the actual "scrolling" (which is actually just hiding the "scrolled out" tabs)
       self.scrollOffset = idx;
       // show all tabs and then hide those before the visible ones
-      $('.ui-tabs-nav:first > li', self.widget)
-        .show()
-        .slice(0, self.scrollOffset)
-        .hide();
+      $('.ui-tabs-nav:first > li', self.widget).show().slice(0, self.scrollOffset).hide();
       // hide the tabs after the visible ones (to ensure we don't get a "half" tab)
       var nav = $('.ui-tabs-nav:first', self.widget);
       var visibleTabs = 0;
@@ -1173,9 +1157,7 @@ type(
         styles.width = pixels(width);
       }
 
-      $(this.canvas.dom)
-        .css(styles)
-        .html(content.dom);
+      $(this.canvas.dom).css(styles).html(content.dom);
 
       IndicoUI.assignLayerLevel(this.canvas);
 

@@ -185,9 +185,7 @@ var IndicoUtil = {
 
     // we'll add a function that removes the coloring first of all
     oList.push(function() {
-      $(component.dom)
-        .removeClass('hasError')
-        .qtip('destroy');
+      $(component.dom).removeClass('hasError').qtip('destroy');
     });
 
     $(component.dom).qtip({

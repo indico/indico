@@ -13,17 +13,11 @@
       // ignore if it comes from inside the action panel
       return;
     }
-    $(this)
-      .toggleClass('collapsed')
-      .next('.sub-tree')
-      .find('td > div')
-      .slideToggle(150);
+    $(this).toggleClass('collapsed').next('.sub-tree').find('td > div').slideToggle(150);
   }
 
   $(document).ready(function() {
-    $('.attachments > .i-dropdown')
-      .parent()
-      .dropdown();
+    $('.attachments > .i-dropdown').parent().dropdown();
     if (!$('html').data('static-site')) {
       setupAttachmentPreview();
     }

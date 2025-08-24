@@ -95,4 +95,3 @@ type(
     this.set = templatedSetter(splitter(options), value.set);
   }
 );
-

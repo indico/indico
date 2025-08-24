@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <IButton
           icon="calendar"
           dropdown
-          classes={{'height-full': true, 'text-color': true, 'subtle': true, ...classes}}
+          classes={{'height-full': true, 'text-color': true, subtle: true, ...classes}}
           title={Translate.string('Export')}
         />
       )}

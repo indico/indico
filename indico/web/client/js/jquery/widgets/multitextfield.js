@@ -83,30 +83,12 @@
         // Enter
         if (e.type == 'keyup' && e.which == 13) {
           $(this).blur();
-          $(this)
-            .parent()
-            .next()
-            .find('input')
-            .focus();
+          $(this).parent().next().find('input').focus();
         }
 
-        if (
-          self.valueField &&
-          $(this)
-            .val()
-            .trim()
-        ) {
-          var oldDataItem =
-            self.data[
-              $(this)
-                .parent()
-                .index()
-            ];
-          self.data[
-            $(this)
-              .parent()
-              .index()
-          ] = self._updateDataItem($(this).val(), oldDataItem);
+        if (self.valueField && $(this).val().trim()) {
+          var oldDataItem = self.data[$(this).parent().index()];
+          self.data[$(this).parent().index()] = self._updateDataItem($(this).val(), oldDataItem);
           self._updateValueField(self.data);
         }
 

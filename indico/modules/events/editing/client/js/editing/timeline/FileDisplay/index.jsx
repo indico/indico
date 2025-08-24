@@ -81,7 +81,7 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
     <div
       styleName={toClasses({
         'file-display-wrapper': true,
-        'outdated': outdated && files.length > 0,
+        outdated: outdated && files.length > 0,
       })}
     >
       {files.length !== 0 && (

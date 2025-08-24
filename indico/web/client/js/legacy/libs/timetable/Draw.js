@@ -50,9 +50,7 @@ type(
 
       each(attachments.files, function(attachment) {
         var resource_html = $('<li/>').append(
-          $('<a/>')
-            .attr('href', attachment.download_url)
-            .text(attachment.title)
+          $('<a/>').attr('href', attachment.download_url).text(attachment.title)
         );
         root.append(resource_html);
       });
@@ -61,9 +59,7 @@ type(
         var resources = $('<ul class="resource_list"/>');
         each(folder.attachments, function(attachment) {
           var resource_html = $('<li/>').append(
-            $('<a/>')
-              .attr('href', attachment.download_url)
-              .text(attachment.title)
+            $('<a/>').attr('href', attachment.download_url).text(attachment.title)
           );
           resources.append(resource_html);
         });
@@ -196,10 +192,7 @@ type(
         var addComma = false;
         if (
           this.eventData.room &&
-          this.timetable
-            .getTimetableDrawer()
-            .layoutChooser.get()
-            .shouldShowRoom()
+          this.timetable.getTimetableDrawer().layoutChooser.get().shouldShowRoom()
         ) {
           this.locationDiv.append(this.eventData.room);
           addComma = true;
@@ -281,13 +274,13 @@ type(
       };
 
       $(this.block.dom).css({
-        'position': 'absolute',
-        'top': pixels(this.topPos),
-        'height': pixels(this.height),
+        position: 'absolute',
+        top: pixels(this.topPos),
+        height: pixels(this.height),
         'background-color': this.eventData.color,
-        'color': this.eventData.textColor,
-        'left': pixels(this.leftPos),
-        'width': pixels(this.width - 3),
+        color: this.eventData.textColor,
+        left: pixels(this.leftPos),
+        width: pixels(this.width - 3),
         'border-bottom-style': this.blockData.unfinished ? 'dashed' : '',
       });
 
@@ -340,7 +333,8 @@ type(
 
     postDraw: function(hook) {
       const parentDivHeight = this.div.dom.parentNode.offsetHeight;
-      const contentHeight = () => Array.from(this.div.dom.childNodes).reduce((acc, x) => acc + x.offsetHeight, 0);
+      const contentHeight = () =>
+        Array.from(this.div.dom.childNodes).reduce((acc, x) => acc + x.offsetHeight, 0);
 
       // If nothing has been drawn do nothing
       if (!parentDivHeight) {
@@ -887,7 +881,6 @@ type(
     this._postDraw = TimetableBlockManagementMixin.prototype._postDraw;
   }
 );
-
 
 type(
   'TimetableDrawer',

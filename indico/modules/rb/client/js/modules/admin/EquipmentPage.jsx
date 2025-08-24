@@ -45,15 +45,12 @@ class EquipmentPage extends React.PureComponent {
   }
 }
 
-export default connect(
-  null,
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
-        fetchFeatures: adminActions.fetchFeatures,
-      },
-      dispatch
-    ),
-  })
-)(EquipmentPage);
+export default connect(null, dispatch => ({
+  actions: bindActionCreators(
+    {
+      fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
+      fetchFeatures: adminActions.fetchFeatures,
+    },
+    dispatch
+  ),
+}))(EquipmentPage);

@@ -26,7 +26,4 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ErrorDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorDialog);

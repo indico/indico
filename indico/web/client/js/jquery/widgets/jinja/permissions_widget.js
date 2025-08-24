@@ -67,8 +67,8 @@ import Palette from 'indico/utils/palette';
     },
     _renderEventRoleLabel(principal) {
       const $text = $('<span>', {
-        'class': 'text-normal entry-label',
-        'text': principal.name,
+        class: 'text-normal entry-label',
+        text: principal.name,
         'data-tooltip-text': principal.name,
       });
       const $code = this._renderRoleCode(principal.code, principal.color);
@@ -80,7 +80,7 @@ import Palette from 'indico/utils/palette';
       const $code = this._renderRoleCode(principal.code, principal.color);
       const tooltip = `${text} (${extraText})`;
       const textDiv = $('<div>', {
-        'class': 'text-normal entry-label',
+        class: 'text-normal entry-label',
         'data-tooltip-text': tooltip,
       });
       textDiv.append($('<span>', {text}));
@@ -112,7 +112,7 @@ import Palette from 'indico/utils/palette';
       const text = principal.name;
       const tooltip = extraText ? `${text} (${extraText})` : text;
       const textDiv = $('<div>', {
-        'class': 'text-normal entry-label',
+        class: 'text-normal entry-label',
         'data-tooltip-text': tooltip,
       });
       textDiv.append($('<span>', {text}));
@@ -180,11 +180,11 @@ import Palette from 'indico/utils/palette';
         });
       } else {
         return $('<button>', {
-          'type': 'button',
-          'class': 'i-button text-color borderless icon-only icon-edit',
+          type: 'button',
+          class: 'i-button text-color borderless icon-only icon-edit',
           'data-href': build_url(Indico.Urls.PermissionsDialog, {type: this.options.objectType}),
           'data-title': $T.gettext('Assign Permissions'),
-          'title': $T.gettext('Assign Permissions'),
+          title: $T.gettext('Assign Permissions'),
           'data-method': 'POST',
           'data-ajax-dialog': '',
           'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions}),
@@ -194,9 +194,9 @@ import Palette from 'indico/utils/palette';
     _renderDeleteBtn(principal) {
       const self = this;
       return $('<button>', {
-        'type': 'button',
-        'title': $T.gettext("Delete entry '{0}'").format(principal.name || principal.id),
-        'class': 'i-button text-color borderless icon-only icon-remove',
+        type: 'button',
+        title: $T.gettext("Delete entry '{0}'").format(principal.name || principal.id),
+        class: 'i-button text-color borderless icon-only icon-remove',
         'data-principal': JSON.stringify(principal),
       }).on('click', function() {
         const $this = $(this);
@@ -259,9 +259,7 @@ import Palette from 'indico/utils/palette';
           .join(', ');
         const $user = $('<strong />', {text: name});
         const $permissions = `: ${permissionList}`;
-        const $entry = $('<li>')
-          .append($user)
-          .append($permissions);
+        const $entry = $('<li>').append($user).append($permissions);
         $list.append($entry);
       });
       return $list;
@@ -295,7 +293,7 @@ import Palette from 'indico/utils/palette';
     _renderDropdownItem(principal, getText) {
       const self = this;
       const $dropdownItem = $('<li>', {
-        'class': 'entry-item',
+        class: 'entry-item',
         'data-principal': JSON.stringify(principal),
       });
       const $itemContent = $('<a>');

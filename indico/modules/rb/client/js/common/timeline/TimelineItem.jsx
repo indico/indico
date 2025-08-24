@@ -456,14 +456,11 @@ class TimelineItem extends React.Component {
   }
 }
 
-export default connect(
-  null,
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        openBookingDetails: bookingId => openModal('booking-details', bookingId, null, true),
-      },
-      dispatch
-    ),
-  })
-)(Overridable.component('TimelineItem', TimelineItem));
+export default connect(null, dispatch => ({
+  actions: bindActionCreators(
+    {
+      openBookingDetails: bookingId => openModal('booking-details', bookingId, null, true),
+    },
+    dispatch
+  ),
+}))(Overridable.component('TimelineItem', TimelineItem));

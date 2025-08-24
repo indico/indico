@@ -338,7 +338,12 @@ function PersonLinkField({
                 label={plural || label}
                 persons={filtered}
                 defaultRoles={roles}
-                onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === filtered[idx]), scope)}
+                onEdit={(idx, scope) =>
+                  onEdit(
+                    persons.findIndex(p => p === filtered[idx]),
+                    scope
+                  )
+                }
                 onChange={values =>
                   onChange(persons.filter(p => !filterCondition(p)).concat(values))
                 }
@@ -354,7 +359,12 @@ function PersonLinkField({
               label={sections.length > 0 ? Translate.string('Others') : undefined}
               persons={others}
               defaultRoles={roles}
-              onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === others[idx]), scope)}
+              onEdit={(idx, scope) =>
+                onEdit(
+                  persons.findIndex(p => p === others[idx]),
+                  scope
+                )
+              }
               onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
               canEdit={customPersonsMode === 'always'}
               extraParams={extraParams}

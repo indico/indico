@@ -198,7 +198,8 @@ class CalendarListView extends React.Component {
           header={Translate.string('Link event')}
           open={
             linkingConfirm &&
-            (linkingConfirm.reservationId === reservation.id && linkingConfirm.day === day)
+            linkingConfirm.reservationId === reservation.id &&
+            linkingConfirm.day === day
           }
           content={Translate.string('Are you sure you want to link this event?')}
           closeOnDimmerClick

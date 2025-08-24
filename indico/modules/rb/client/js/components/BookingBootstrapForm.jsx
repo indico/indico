@@ -66,12 +66,8 @@ class BookingBootstrapForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const startTime = moment()
-      .startOf('hour')
-      .add(1, 'h');
-    const endTime = moment()
-      .startOf('hour')
-      .add(2, 'h');
+    const startTime = moment().startOf('hour').add(1, 'h');
+    const endTime = moment().startOf('hour').add(2, 'h');
     const startsNextDay = startTime > moment().endOf('day');
 
     const {defaults} = props;
@@ -253,10 +249,7 @@ class BookingBootstrapForm extends React.Component {
 
   preselectWeekday = () => {
     const {recurrence} = this.state;
-    const weekdayToday = moment()
-      .locale('en')
-      .format('ddd')
-      .toLocaleLowerCase();
+    const weekdayToday = moment().locale('en').format('ddd').toLocaleLowerCase();
 
     if (recurrence.weekdays.includes(weekdayToday)) {
       return;

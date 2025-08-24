@@ -320,9 +320,7 @@ type('DraggableBlockMixin', [], {
         ui.helper.animate({width: newWidth});
         ui.helper.height(newHeight);
 
-        $(this)
-          .data('ui-draggable')
-          ._setContainment(newWidth, newHeight);
+        $(this).data('ui-draggable')._setContainment(newWidth, newHeight);
 
         self._initializeTooltip();
 
@@ -483,21 +481,22 @@ type(
         tolerance: 'touch',
         accept: '.ui-draggable.timetableBlock',
         over: function(event, ui) {
-          $('#timetable').on(thisDragSpaceName, '.ui-draggable.timetableBlock', function(
-            event,
-            ui
-          ) {
-            if (element.droppable('option', 'disabled')) {
-              return;
+          $('#timetable').on(
+            thisDragSpaceName,
+            '.ui-draggable.timetableBlock',
+            function(event, ui) {
+              if (element.droppable('option', 'disabled')) {
+                return;
+              }
+              var gridTime = self._updateTime(ui.helper, 'drag');
+              //null means that the drag is not allowed
+              if (gridTime == null) {
+                return;
+              }
+              hour = gridTime[0];
+              minute = gridTime[1];
             }
-            var gridTime = self._updateTime(ui.helper, 'drag');
-            //null means that the drag is not allowed
-            if (gridTime == null) {
-              return;
-            }
-            hour = gridTime[0];
-            minute = gridTime[1];
-          });
+          );
         },
         out: function(event, ui) {
           $('#timetable').off(thisDragSpaceName, '.ui-draggable.timetableBlock');
@@ -582,9 +581,7 @@ type('DroppableBlockMixin', [], {
 
           ui.draggable.data('ui-draggable')._setContainment(newWidth, newHeight);
 
-          $('.timetableBlock.ui-droppable')
-            .not(this)
-            .super_droppable('disable');
+          $('.timetableBlock.ui-droppable').not(this).super_droppable('disable');
           $('.hourLine.ui-droppable').droppable('disable');
           $('#dragTip').hide();
           inside = true;
@@ -595,9 +592,7 @@ type('DroppableBlockMixin', [], {
               .appendTo('body')
               .fadeIn();
           } else {
-            $('#tt_bottom_move')
-              .stop(true)
-              .fadeTo(500, 1);
+            $('#tt_bottom_move').stop(true).fadeTo(500, 1);
           }
         }
       },
@@ -611,9 +606,7 @@ type('DroppableBlockMixin', [], {
         ui.draggable.height(ui.draggable.data('draggingHeight'));
 
         $('#dragTip').show();
-        $('.timetableBlock.ui-droppable')
-          .not(this)
-          .super_droppable('enable');
+        $('.timetableBlock.ui-droppable').not(this).super_droppable('enable');
         $('.hourLine.ui-droppable').droppable('enable');
 
         removeBottomMove();

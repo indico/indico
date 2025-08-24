@@ -227,7 +227,10 @@ function EditableListDisplay({
       {
         key: 'session',
         text: Translate.string('Session'),
-        options: _.uniqBy(contribList.map(c => c.session).filter(x => x), 'id').map(session => ({
+        options: _.uniqBy(
+          contribList.map(c => c.session).filter(x => x),
+          'id'
+        ).map(session => ({
           value: `${session.id}`,
           text: session.code ? `${session.code} - ${session.title}` : session.title,
         })),

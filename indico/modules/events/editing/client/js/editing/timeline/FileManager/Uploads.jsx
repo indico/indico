@@ -18,24 +18,33 @@ export default function Uploads({uploads}) {
   const uploadList = _.sortBy(Object.entries(uploads), x => x[0]);
   return (
     <div styleName="uploading-file-list">
-      {uploadList.map(([key, {file: {name}, percent, failed}]) => (
-        <Popup
-          key={key}
-          on="hover"
-          disabled={!failed}
-          position="right center"
-          content={Translate.string('An error occurred while uploading this file')}
-          trigger={
-            <Message styleName="uploading-file-row" negative={failed}>
-              <Icon loading={!failed} name={failed ? 'exclamation' : 'spinner'} />
-              <span styleName="file-state" className={failed ? 'error' : 'uploading'}>
-                {name}
-              </span>
-              {!failed && <Progress percent={percent} attached="bottom" color="blue" />}
-            </Message>
-          }
-        />
-      ))}
+      {uploadList.map(
+        ([
+          key,
+          {
+            file: {name},
+            percent,
+            failed,
+          },
+        ]) => (
+          <Popup
+            key={key}
+            on="hover"
+            disabled={!failed}
+            position="right center"
+            content={Translate.string('An error occurred while uploading this file')}
+            trigger={
+              <Message styleName="uploading-file-row" negative={failed}>
+                <Icon loading={!failed} name={failed ? 'exclamation' : 'spinner'} />
+                <span styleName="file-state" className={failed ? 'error' : 'uploading'}>
+                  {name}
+                </span>
+                {!failed && <Progress percent={percent} attached="bottom" color="blue" />}
+              </Message>
+            }
+          />
+        )
+      )}
     </div>
   );
 }

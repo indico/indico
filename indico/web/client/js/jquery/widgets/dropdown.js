@@ -28,10 +28,7 @@
       ul.find('ul').hide();
       elem.data('on', false);
       elem.parent().removeClass('selected');
-      elem
-        .siblings('ul')
-        .find('a')
-        .data('on', false);
+      elem.siblings('ul').find('a').data('on', false);
     },
 
     _close_all: function(effect) {

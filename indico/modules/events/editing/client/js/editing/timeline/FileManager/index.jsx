@@ -289,11 +289,10 @@ export default function FileManager({
   uploadableFiles,
 }) {
   const lastPristineRef = useRef(pristine);
-  const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files, uploadableFiles), [
-    fileTypes,
-    files,
-    uploadableFiles,
-  ]);
+  const _fileTypes = useMemo(
+    () => mapFileTypes(fileTypes, files, uploadableFiles),
+    [fileTypes, files, uploadableFiles]
+  );
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
     uploads: {},

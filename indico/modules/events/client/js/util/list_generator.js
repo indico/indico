@@ -36,9 +36,7 @@
 
   global.handleRowSelection = function(trigger) {
     const $obj = $('table.i-table input.select-row').on('change', function() {
-      $(this)
-        .closest('tr')
-        .toggleClass('selected', this.checked);
+      $(this).closest('tr').toggleClass('selected', this.checked);
       $('.js-requires-selected-row').toggleClass(
         'disabled',
         !$('.list input:checkbox:checked').length
@@ -132,9 +130,7 @@
     }
 
     $('.js-reset-btn').on('click', function() {
-      $('.list-filter input:checkbox:checked')
-        .prop('checked', false)
-        .trigger('change');
+      $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
       $('.js-clear-filters-message').show({
         done() {
           const $this = $(this);
@@ -183,15 +179,11 @@
     $('.list .toolbar').dropdown();
 
     $('#select-all').on('click', function() {
-      $('table.i-table input.select-row')
-        .prop('checked', true)
-        .trigger('change');
+      $('table.i-table input.select-row').prop('checked', true).trigger('change');
     });
 
     $('#select-none').on('click', function() {
-      $('table.i-table input.select-row')
-        .prop('checked', false)
-        .trigger('change');
+      $('table.i-table input.select-row').prop('checked', false).trigger('change');
     });
 
     $('.change-columns-width').on('click', function() {
@@ -203,9 +195,7 @@
       e.preventDefault();
       const $this = $(this);
       if (!$this.hasClass('disabled')) {
-        $('.list form')
-          .attr('action', $this.data('href'))
-          .submit();
+        $('.list form').attr('action', $this.data('href')).submit();
       }
     });
 

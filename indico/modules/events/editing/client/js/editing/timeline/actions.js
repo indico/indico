@@ -38,39 +38,65 @@ export function useUpdatedTimeline() {
 }
 
 export function reviewEditable(revision, formData) {
-  return submitFormAction(() => indicoAxios.post(revision.reviewURL, formData), null, () =>
-    loadTimeline()
+  return submitFormAction(
+    () => indicoAxios.post(revision.reviewURL, formData),
+    null,
+    () => loadTimeline()
   );
 }
 
 export function confirmEditableChanges(revision, formData) {
-  return submitFormAction(() => indicoAxios.post(revision.confirmURL, formData), null, () =>
-    loadTimeline()
+  return submitFormAction(
+    () => indicoAxios.post(revision.confirmURL, formData),
+    null,
+    () => loadTimeline()
   );
 }
 
 export function modifyReviewComment(revision, formData) {
-  return submitFormAction(() => indicoAxios.patch(revision.reviewURL, formData), null, () =>
-    loadTimeline()
+  return submitFormAction(
+    () => indicoAxios.patch(revision.reviewURL, formData),
+    null,
+    () => loadTimeline()
   );
 }
 
 export function createRevisionComment(url, formData) {
-  return submitFormAction(() => indicoAxios.post(url, formData), null, () => loadTimeline());
+  return submitFormAction(
+    () => indicoAxios.post(url, formData),
+    null,
+    () => loadTimeline()
+  );
 }
 
 export function modifyRevisionComment(modifyURL, data) {
-  return ajaxAction(() => indicoAxios.patch(modifyURL, data), null, () => loadTimeline());
+  return ajaxAction(
+    () => indicoAxios.patch(modifyURL, data),
+    null,
+    () => loadTimeline()
+  );
 }
 
 export function deleteRevisionComment(url) {
-  return ajaxAction(() => indicoAxios.delete(url), null, () => loadTimeline());
+  return ajaxAction(
+    () => indicoAxios.delete(url),
+    null,
+    () => loadTimeline()
+  );
 }
 
 export function createRevision(url, files) {
-  return ajaxAction(() => indicoAxios.post(url, files), null, () => loadTimeline());
+  return ajaxAction(
+    () => indicoAxios.post(url, files),
+    null,
+    () => loadTimeline()
+  );
 }
 
 export function resetReviews(url) {
-  return ajaxAction(() => indicoAxios.delete(url), null, () => loadTimeline());
+  return ajaxAction(
+    () => indicoAxios.delete(url),
+    null,
+    () => loadTimeline()
+  );
 }

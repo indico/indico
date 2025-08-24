@@ -180,10 +180,10 @@ export default function FormItem({
     <div
       data-html-name={htmlName}
       styleName={`form-item ${toClasses({
-        'disabled': !isEnabled || paidItemLocked,
+        disabled: !isEnabled || paidItemLocked,
         'purged-disabled': showPurged,
         'paid-disabled': !showPurged && paidItemLocked,
-        'editable': setupMode,
+        editable: setupMode,
         'management-hidden': !show,
       })}`}
     >

@@ -14,14 +14,8 @@ import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
 export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
   const WEEKDAYS = moment.weekdays(true).map(wd => ({
-    value: moment()
-      .day(wd)
-      .locale('en')
-      .format('ddd')
-      .toLowerCase(),
-    text: moment()
-      .isoWeekday(wd)
-      .format('ddd'),
+    value: moment().day(wd).locale('en').format('ddd').toLowerCase(),
+    text: moment().isoWeekday(wd).format('ddd'),
   }));
 
   const handleDayClick = day => {

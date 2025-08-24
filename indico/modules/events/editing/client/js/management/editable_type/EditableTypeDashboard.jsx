@@ -45,19 +45,11 @@ export default function EditableTypeDashboard() {
   const [editorManagerVisible, setEditorManagerVisible] = useState(false);
   const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
 
-  const [
-    selfAssignEnabled,
-    toggleSelfAssign,
-    selfAssignLoading,
-    selfAssignSaving,
-  ] = useTogglableValue(selfAssignURL({event_id: eventId, type}));
+  const [selfAssignEnabled, toggleSelfAssign, selfAssignLoading, selfAssignSaving] =
+    useTogglableValue(selfAssignURL({event_id: eventId, type}));
 
-  const [
-    anonymousTeamEnabled,
-    toggleAnonymousTeam,
-    anonymousTeamLoading,
-    anonymousTeamSaving,
-  ] = useTogglableValue(anonymousTeamURL({event_id: eventId, type}));
+  const [anonymousTeamEnabled, toggleAnonymousTeam, anonymousTeamLoading, anonymousTeamSaving] =
+    useTogglableValue(anonymousTeamURL({event_id: eventId, type}));
 
   const [submissionEnabled, toggleSubmission, submissionLoading] = useTogglableValue(
     enableSubmissionURL({event_id: eventId, type})

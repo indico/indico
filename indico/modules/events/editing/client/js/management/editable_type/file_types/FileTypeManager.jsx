@@ -59,10 +59,12 @@ StatusIcon.propTypes = {
 
 export default function FileTypeManager({eventId, editableType}) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
-  const {data, loading: isLoadingFileTypes, reFetch, lastData} = useIndicoAxios(
-    fileTypesURL({event_id: eventId, type: editableType}),
-    {camelize: true}
-  );
+  const {
+    data,
+    loading: isLoadingFileTypes,
+    reFetch,
+    lastData,
+  } = useIndicoAxios(fileTypesURL({event_id: eventId, type: editableType}), {camelize: true});
 
   const createFileType = async formData => {
     try {

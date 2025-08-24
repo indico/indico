@@ -48,17 +48,11 @@ import {$T} from 'indico/utils/i18n';
     setupToggleEventListButton($pastEvents, onTogglePastEvents);
 
     if (showFutureEvents && !isFlat) {
-      $futureEvents
-        .find('.js-toggle-list')
-        .first()
-        .trigger('click', true);
+      $futureEvents.find('.js-toggle-list').first().trigger('click', true);
     }
 
     if (showPastEvents && !isFlat) {
-      $pastEvents
-        .find('.js-toggle-list')
-        .first()
-        .trigger('click', true);
+      $pastEvents.find('.js-toggle-list').first().trigger('click', true);
     }
 
     function onToggleFutureEvents(shown) {

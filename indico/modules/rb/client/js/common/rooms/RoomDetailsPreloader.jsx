@@ -37,13 +37,11 @@ RoomDetailsPreloader.propTypes = {
   children: PropTypes.func.isRequired,
 };
 
-export default connect(
-  null,
-  dispatch =>
-    bindActionCreators(
-      {
-        fetchDetails: roomsActions.fetchDetails,
-      },
-      dispatch
-    )
+export default connect(null, dispatch =>
+  bindActionCreators(
+    {
+      fetchDetails: roomsActions.fetchDetails,
+    },
+    dispatch
+  )
 )(RoomDetailsPreloader);

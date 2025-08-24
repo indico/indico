@@ -45,10 +45,12 @@ function tagsReducer(state, action) {
 
 export default function TagManager({eventId}) {
   const [state, dispatch] = useReducer(tagsReducer, initialState);
-  const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios(
-    tagsURL({event_id: eventId}),
-    {camelize: true}
-  );
+  const {
+    data,
+    loading: isLoadingTags,
+    reFetch,
+    lastData,
+  } = useIndicoAxios(tagsURL({event_id: eventId}), {camelize: true});
 
   const createTag = async formData => {
     try {

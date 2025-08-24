@@ -122,7 +122,7 @@ export default function DateInput({
 }) {
   const friendlyDateFormat = dateFormat.replace(
     /%([HMdmY])/g,
-    (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
+    (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'})[c]
   );
   const validateDateTime = dateTime => {
     if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
@@ -247,7 +247,7 @@ export function DateSettings() {
     value: opt,
     text: opt.replace(
       /%([HMdmY])/g,
-      (match, c) => ({H: 'hh', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
+      (match, c) => ({H: 'hh', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'})[c]
     ),
   }));
   const timeOptions = [

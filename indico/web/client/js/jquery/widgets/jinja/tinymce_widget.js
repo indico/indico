@@ -29,6 +29,8 @@ import {getConfig} from 'indico/tinymce';
       // closed and then reopened) won't do anything
       tinymce.remove(old);
     }
-    tinymce.init(getConfig(field, {disabled, images, imageUploadURL, forceAbsoluteURLs, height, contentCSS}));
+    tinymce.init(
+      getConfig(field, {disabled, images, imageUploadURL, forceAbsoluteURLs, height, contentCSS})
+    );
   };
 })(window);

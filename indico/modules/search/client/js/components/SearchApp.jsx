@@ -298,7 +298,11 @@ export default function SearchApp({category, eventId, isAdmin}) {
       ];
   // Defaults to the first tab loading or with results
   const menuItem =
-    activeMenuItem || Math.max(0, searchMap.findIndex(x => x[1].loading || x[1].total));
+    activeMenuItem ||
+    Math.max(
+      0,
+      searchMap.findIndex(x => x[1].loading || x[1].total)
+    );
   const [, results, setPage, Component] = searchMap[menuItem];
   const isAnyLoading = searchMap.some(x => x[1].loading);
 

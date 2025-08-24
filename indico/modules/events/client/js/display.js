@@ -115,9 +115,7 @@ import './favorite';
     $('.event-service-row-toggle').on('click', function(e) {
       e.preventDefault();
       const toggler = $(this);
-      const togglerButton = $(this)
-        .parent()
-        .siblings('.trigger');
+      const togglerButton = $(this).parent().siblings('.trigger');
       toggler
         .parent()
         .siblings('.event-service-details')

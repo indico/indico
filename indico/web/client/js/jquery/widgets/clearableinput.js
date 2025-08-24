@@ -58,10 +58,7 @@
 
     _clear: function() {
       var self = this;
-      self.element
-        .val(self.options.emptyvalue)
-        .trigger('propertychange')
-        .trigger('change');
+      self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
       self._refreshClearIcon();
       self.options.onClear.call(self.element);
       if (self.options.focusOnClear) {

@@ -63,11 +63,7 @@ import {$T} from '../../utils/i18n';
                     if (data) {
                       api.set(
                         'content.text',
-                        ajaxifyForm(
-                          $(data.html)
-                            .find('form')
-                            .addBack('form')
-                        )
+                        ajaxifyForm($(data.html).find('form').addBack('form'))
                       );
                       if (data.js) {
                         $('body').append(data.js);

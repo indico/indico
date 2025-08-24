@@ -197,7 +197,4 @@ RoomPhoto.defaultProps = {
   hasPhoto: false,
 };
 
-export default connect(
-  null,
-  {setRoomsSpriteToken: configActions.setRoomsSpriteToken}
-)(RoomPhoto);
+export default connect(null, {setRoomsSpriteToken: configActions.setRoomsSpriteToken})(RoomPhoto);

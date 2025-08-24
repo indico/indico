@@ -70,10 +70,7 @@
             $eventCount.data('event-dates', data.dates);
             $lastDay.toggle(data.last_day_of_month);
           } else {
-            $cloneErrors
-              .show()
-              .find('.message-text')
-              .html(errorToHTML(data.error.message));
+            $cloneErrors.show().find('.message-text').html(errorToHTML(data.error.message));
             $eventCount.hide();
           }
         },

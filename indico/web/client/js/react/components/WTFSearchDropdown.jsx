@@ -110,11 +110,11 @@ export function SearchDropdown({
       }
 
       const opts = data.map(item => ({
-        'key': item[valueField],
-        'value': item[valueField],
-        'text': item[labelField],
+        key: item[valueField],
+        value: item[valueField],
+        text: item[labelField],
         // extra values passed to <Dropdown.Item>
-        'search': item[searchField].toLowerCase(),
+        search: item[searchField].toLowerCase(),
         'friendly-id': item.friendly_id,
       }));
       return naturalSort(opts);
@@ -224,9 +224,7 @@ export function SearchDropdown({
   };
 
   const searchDisabledMessage =
-    minTriggerLength === 0 ? (
-      undefined
-    ) : allowById ? (
+    minTriggerLength === 0 ? undefined : allowById ? (
       <PluralTranslate count={minTriggerLength}>
         <Singular>
           Search requires at least <Param name="count" value={minTriggerLength} /> character or an

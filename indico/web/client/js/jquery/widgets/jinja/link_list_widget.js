@@ -12,8 +12,5 @@ import {WTFLinkListField} from 'indico/react/components';
 
 window.setupLinkListWidget = function setupLinkListWidget({fieldId}) {
   const wrapperId = `${fieldId}-wrapper`;
-  ReactDOM.render(
-    <WTFLinkListField fieldId={fieldId} />,
-    document.getElementById(wrapperId)
-  );
+  ReactDOM.render(<WTFLinkListField fieldId={fieldId} />, document.getElementById(wrapperId));
 };
