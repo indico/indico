@@ -41,6 +41,7 @@ settings:
     version: detect
 
 rules:
+  prettier/prettier: off
   curly:
     - error
     - all

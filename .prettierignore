@@ -1,5 +1,2 @@
-# Not actually JavaScript
-indico/web/templates/assets
-
-# Generated content
-indico/web/static/dist/
+# We no longer use prettier
+*
