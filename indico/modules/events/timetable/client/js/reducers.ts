@@ -12,7 +12,7 @@ import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {changeSessionColor, changeBreakColor} from './operations';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries} from './types';
+import {DayEntries, EntryType} from './types';
 import {setCurrentDateLocalStorage} from './utils';
 
 interface Change {
@@ -89,7 +89,7 @@ export default {
 
         if (entry.sessionBlockId) {
           const newDayEntries = newEntries[dayKey].map(e => {
-            if (e.id === entry.sessionBlockId && e.type === 'block') {
+            if (e.id === entry.sessionBlockId && e.type === EntryType.SessionBlock) {
               return {
                 ...e,
                 children: [
@@ -167,7 +167,7 @@ export default {
           }
           newDayEntries = layout(
             state.changes[state.currentChangeIdx].entries[date].map(entry => {
-              if (entry.type === 'block' && entry.id === sessionBlockId) {
+              if (entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) {
                 return {
                   ...entry,
                   children: entry.children.map(child => {
@@ -233,7 +233,7 @@ export default {
                 ([day, dayEntries]) => [
                   day,
                   dayEntries.map(e => {
-                    if (e.type === 'block' && e.id === sessionBlockId) {
+                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
                       return {
                         ...e,
                         children: e.children.filter(child => child.id !== id),
@@ -348,7 +348,7 @@ export default {
                 ([day, dayEntries]) => [
                   day,
                   dayEntries.map(e => {
-                    if (e.type === 'block' && e.id === sessionBlockId) {
+                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
                       return {
                         ...e,
                         children: e.children.filter(child => child.id !== id),
