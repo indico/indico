@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global handleAjaxError, enableIfChecked, handleRowSelection, setupSearchBox, ajaxDialog,
+          reloadManagementAttachmentInfoColumn */
+
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
 import 'indico/modules/events/util/types_dialog';
 
 import './session_display';

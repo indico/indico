@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* eslint-disable max-len */
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   /**

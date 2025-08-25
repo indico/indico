@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global ajaxDialog, build_url, confirmPrompt, handleAjaxError, handleFlashes, alertPopup */
+
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
+
 (function(global) {
   const HISTORY_API_SUPPORTED = !!history.pushState;
 
@@ -35,8 +41,8 @@
     });
   });
 
-  global.setupAttachmentPreview = function setupAttachmentPreview() {
-    const attachment = $('.js-preview-dialog');
+  function setupAttachmentPreview() {
+    const previewDialog = $('.js-preview-dialog');
     const pageURL = location.href.replace(/#.*$/, '');
 
     // Previewer not supported on mobile browsers
@@ -61,8 +67,8 @@
       })
       .triggerHandler('hashchange', [true]);
 
-    attachment.on('click', function(e) {
-      if (e.which != 1 || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) {
+    previewDialog.on('click', function(e) {
+      if (e.which !== 1 || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) {
         // ignore middle clicks and modifier-clicks - people should be able to open
         // an attachment in a new tab/window skipping the previewer, even if they use
         // a weird mouse with less than three buttons.
@@ -142,10 +148,10 @@
         onLoadError(xhr) {
           const hash = location.hash;
           clearHash();
-          if (xhr.status == 404) {
+          if (xhr.status === 404) {
             alertPopup($T.gettext('This file no longer exists. Please reload the page.'));
             return false;
-          } else if (xhr.status != 403) {
+          } else if (xhr.status !== 403) {
             return;
           }
           if (Indico.User && Indico.User.id !== undefined) {
@@ -160,7 +166,7 @@
         },
       });
     }
-  };
+  }
 
   global.setupAttachmentTreeView = function setupAttachmentTreeView() {
     $('.attachments-box').on('click', '.tree .expandable', toggleFolder);
@@ -214,12 +220,7 @@
       });
   };
 
-  global.openAttachmentManager = function openAttachmentManager(
-    itemLocator,
-    title,
-    reloadOnChange,
-    trigger
-  ) {
+  function openAttachmentManager(itemLocator, title, reloadOnChange, trigger) {
     reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
     ajaxDialog({
       trigger,
@@ -235,7 +236,7 @@
         }
       },
     });
-  };
+  }
 
   global.reloadManagementAttachmentInfoColumn = function reloadManagementAttachmentInfoColumn(
     itemLocator,

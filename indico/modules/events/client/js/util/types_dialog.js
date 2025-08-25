@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+/* global handleAjaxError */
+
 (function(global) {
   global.setupTypesDialog = function setupTypesDialog() {
     const $manageTypes = $('.manage-types');

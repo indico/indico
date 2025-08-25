@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupSearchBox:false, handleRowSelection:false, setupTableSorter:false, handleAjaxError:false */
+/* eslint-disable import/unambiguous */
+/* global setupSearchBox, handleRowSelection, setupTableSorter, handleAjaxError */
 
 (function(global) {
   function colorizeFilter(filter) {

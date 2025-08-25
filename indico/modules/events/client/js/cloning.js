@@ -5,6 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+import moment from 'moment';
+
+import {$T} from 'indico/utils/i18n';
+
 (function(global) {
   global.setupCloneDialog = function setupCloneDialog() {
     const $formContainer = $('#event-clone-form-container');

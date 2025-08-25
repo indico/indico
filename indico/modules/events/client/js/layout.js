@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global handleAjaxError, ajaxDialog, initMenuSortable */
+
+import {$T} from 'indico/utils/i18n';
+
 (function(global) {
   global.initMenuSortable = function initMenuSortable() {
     // ui.sender seems broken (returns null) so we keep track of the sortable who sent the item manually...
