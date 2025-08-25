@@ -13,6 +13,14 @@ import * as positioning from 'indico/utils/positioning';
 
 import './ind_select.scss';
 
+function getOptionLabelText($option) {
+  return (
+    $option.querySelector('[data-label]')?.textContent ??
+    $option.getAttribute('aria-label') ??
+    $option.textContent
+  );
+}
+
 CustomElementBase.define(
   'ind-select',
   class extends CustomElementBase {
@@ -42,6 +50,14 @@ CustomElementBase.define(
 
     set required(isRequired) {
       this.toggleAttribute('required', isRequired);
+    }
+
+    filterByKeyword(option, keyword) {
+      const label = getOptionLabelText(option).toLowerCase();
+      return {
+        exact: label === keyword,
+        partial: _.deburr(label).includes(_.deburr(keyword)),
+      };
     }
 
     setup() {
@@ -222,26 +238,32 @@ CustomElementBase.define(
       }
 
       function applyFilter(keyword) {
-        let selectableOption;
-        let numMatches = 0;
-        for (const option of optionList) {
-          if (!keyword) {
+        if (!keyword) {
+          noOptionFoundMessage.hidden = true;
+          for (const option of optionList) {
             option.hidden = false;
-            numMatches++;
-          } else {
-            const label = getOptionLabelText(option).toLowerCase();
-            option.hidden = !_.deburr(label).includes(_.deburr(keyword));
-            numMatches += Number(!option.hidden);
-            if (label === keyword && !option.hasAttribute('aria-disabled')) {
+            noOptionFoundMessage.hidden = true;
+          }
+        } else {
+          let selectableOption;
+          let numMatches = 0;
+
+          for (const option of optionList) {
+            const match = indSelect.filterByKeyword(option, keyword);
+            option.hidden = !match.partial && !match.exact;
+            numMatches += Number(Boolean(match.partial));
+            if (match.exact && !option.hasAttribute('aria-disabled')) {
               selectableOption = option;
             }
           }
+
+          if (selectableOption) {
+            selectOption(selectableOption);
+            dispatchChange();
+          }
+
+          noOptionFoundMessage.hidden = !!numMatches;
         }
-        if (selectableOption) {
-          selectOption(selectableOption);
-          dispatchChange();
-        }
-        noOptionFoundMessage.hidden = !!numMatches;
       }
 
       function selectNextOption() {
@@ -316,14 +338,6 @@ CustomElementBase.define(
       // Should always be called after user-initiated change in value
       function dispatchChange() {
         indSelect.dispatchEvent(new Event('change', {bubbles: true}));
-      }
-
-      function getOptionLabelText($option) {
-        return (
-          $option.querySelector('[data-label]')?.textContent ??
-          $option.getAttribute('aria-label') ??
-          $option.textContent
-        );
       }
     }
 
