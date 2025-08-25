@@ -96,9 +96,10 @@ overrides:
       - 'plugin:@typescript-eslint/stylistic'
       - 'plugin:import/typescript'
     rules:
-      # https://stackoverflow.com/questions/63961803/eslint-says-all-enums-in-typescript-app-are-already-declared-in-the-upper-scope
+      # https://stackoverflow.com/q/63961803
       no-shadow: off
-      '@typescript-eslint/no-shadow': 'warn'
+      '@typescript-eslint/no-shadow': warn
+      '@typescript-eslint/no-explicit-any': warn
   - files: ["*.d.ts"]
     rules:
       import/unambiguous: off
