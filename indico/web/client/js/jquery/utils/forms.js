@@ -5,16 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
+/* global countWords, initForms, showFormErrors, toggleAclField, cornerMessage */
 
-// eslint-disable-next-line import/unambiguous
+import _ from 'lodash';
 
 import {Translate} from 'indico/react/i18n';
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   function validatePasswordConfirmation(passwordField, confirmField) {
     if ('setCustomValidity' in confirmField[0]) {
-      passwordField.add(confirmField).on('change input', function() {
+      passwordField.add(confirmField).on('change input', () => {
         if (passwordField.val() !== confirmField.val()) {
           confirmField[0].setCustomValidity($T('The passwords do not match.'));
         } else {
@@ -25,13 +26,13 @@ import {Translate} from 'indico/react/i18n';
   }
 
   function hideFieldUnless(field, conditionField, requiredValues, checkedOnly) {
-    conditionField.on('change', function() {
+    conditionField.on('change', () => {
       const value = checkedOnly
         ? conditionField.filter(':checked').val() || false
         : conditionField.val();
       const active = !!(
         (!requiredValues.length && value) ||
-        (requiredValues.length && _.contains(requiredValues, value))
+        (requiredValues.length && requiredValues.includes(value))
       );
       field.closest('.form-group').toggle(active);
       let realField = field.is(':input') ? field : field.find(':input');
@@ -58,7 +59,7 @@ import {Translate} from 'indico/react/i18n';
     const minWords = $field.data('min-words');
     const maxWords = $field.data('max-words');
 
-    $field.on('change input', function() {
+    $field.on('change input', () => {
       let msg = '';
       const charCount = $field.val().trim().length;
       const wordCount = countWords($field.val());
@@ -133,7 +134,7 @@ import {Translate} from 'indico/react/i18n';
   }
 
   function hideSaveCornerMessage($cornerMessage) {
-    $cornerMessage.fadeOut(300, function() {
+    $cornerMessage.fadeOut(300, () => {
       $cornerMessage.remove();
     });
   }
@@ -189,7 +190,7 @@ import {Translate} from 'indico/react/i18n';
         }
         _resetData();
 
-        $this.on('indico:fieldsSaved', function() {
+        $this.on('indico:fieldsSaved', () => {
           _resetData();
           $this.find('[data-disabled-until-change]').prop('disabled', true);
         });
@@ -229,7 +230,7 @@ import {Translate} from 'indico/react/i18n';
       .off('scroll.initForms')
       .on(
         'scroll.initForms',
-        _.debounce(function() {
+        _.debounce(() => {
           const $form = forms.find('[data-save-reminder]').closest('form');
           if ($form.length) {
             const $cornerMessage = $('.save-corner-message');
@@ -302,7 +303,7 @@ import {Translate} from 'indico/react/i18n';
         }
       }
     });
-    _.defer(function() {
+    _.defer(() => {
       protectionField.triggerHandler('change');
       if (folderField) {
         folderField.triggerHandler('change');
@@ -333,7 +334,7 @@ import {Translate} from 'indico/react/i18n';
         inheritedProtection.toggle(!protectionField.prop('checked'));
       }
     });
-    _.defer(function() {
+    _.defer(() => {
       folderField.triggerHandler('change');
     });
   };
@@ -365,7 +366,7 @@ import {Translate} from 'indico/react/i18n';
       .on('change', checkboxSelector, function() {
         _update(this.checked);
       })
-      .on('indico:syncEnableIfChecked', function() {
+      .on('indico:syncEnableIfChecked', () => {
         _update();
       });
 
@@ -510,9 +511,9 @@ import {Translate} from 'indico/react/i18n';
 
   global.setDropzoneFiles = function setDropzoneFiles($field, files) {
     const dropzone = $field.closest('form')[0].dropzone;
-    _.defer(function() {
-      files.forEach(function(file) {
-        DROPZONE_FILE_KEYS.forEach(function(key) {
+    _.defer(() => {
+      files.forEach(file => {
+        DROPZONE_FILE_KEYS.forEach(key => {
           delete file[key];
         });
         dropzone.addFile(file);
@@ -520,10 +521,10 @@ import {Translate} from 'indico/react/i18n';
     });
   };
 
-  $(document).ready(function() {
+  $(document).ready(() => {
     initForms($('form'));
 
-    $('body').on('indico:htmlUpdated', function(evt) {
+    $('body').on('indico:htmlUpdated', evt => {
       const $target = $(evt.target);
       const $forms = $target.find('form');
       if ($forms.length) {

@@ -22,8 +22,8 @@ import 'jquery-typeahead/src/jquery.typeahead.css';
       options
     );
 
-    var field = $('#' + options.fieldId);
-    var params = {
+    const field = $(`#${options.fieldId}`);
+    const params = {
       hint: true,
       cancelButton: false,
       mustSelectItem: true,

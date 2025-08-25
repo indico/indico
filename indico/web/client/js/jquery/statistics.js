@@ -9,9 +9,11 @@
 
 import './compat/jqplot';
 
+import _ from 'lodash';
+
 (function setupStatistics(global) {
   global.processJqPlotOptions = function processJqPlotOptions(options) {
-    var jqPlotDefaultOptions = {
+    const jqPlotDefaultOptions = {
       animate: !$.jqplot.use_excanvas,
       animateReplot: !$.jqplot.use_excanvas,
       axesDefaults: {
@@ -60,14 +62,14 @@ import './compat/jqplot';
     return $.extend(true, {}, jqPlotDefaultOptions, options);
   };
 
-  $(document).ready(function() {
+  $(document).ready(() => {
     $('.i-progress > .i-progress-bar').width(function getProgress() {
       return $(this).data('progress');
     });
     // Animate numerical values in badges
     $('.i-badge .i-badge-value[data-value]').each(function loadValue() {
-      var $this = $(this);
-      var val = $this.data('value');
+      const $this = $(this);
+      const val = $this.data('value');
       if (!_.isNumber(val) || val === 0) {
         $this.text(val);
         return;
@@ -77,7 +79,7 @@ import './compat/jqplot';
         {
           duration: 1000,
           easing: 'swing',
-          step: function() {
+          step() {
             $this.text(Math.ceil(this.Counter));
           },
         }

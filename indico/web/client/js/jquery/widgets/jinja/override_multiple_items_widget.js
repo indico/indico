@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function(global) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function(global) {
   global.setupOverrideMultipleItemsWidget = function setupOverrideMultipleItemsWidget(options) {
     options = $.extend(
       true,
@@ -17,12 +17,12 @@
       options
     );
 
-    var widget = $('#' + options.fieldId + '-widget');
-    var field = $('#' + options.fieldId);
-    var data = JSON.parse(field.val());
+    const widget = $(`#${options.fieldId}-widget`);
+    const field = $(`#${options.fieldId}`);
+    const data = JSON.parse(field.val());
 
     widget.on('input change', 'input', function() {
-      var $this = $(this);
+      const $this = $(this);
       if (data[$this.data('key')] === undefined) {
         data[$this.data('key')] = {};
       }
@@ -31,8 +31,8 @@
     });
 
     widget.find('input').each(function() {
-      var $this = $(this);
-      var rowData = data[$this.data('key')] || {};
+      const $this = $(this);
+      const rowData = data[$this.data('key')] || {};
       $this.val(rowData[$this.data('field')] || '');
     });
 

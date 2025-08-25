@@ -5,9 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($) {
-  'use strict';
+/* global confirmPrompt, handleAjaxError, handleFlashes */
+/* eslint-disable import/unambiguous */
 
+import _ from 'lodash';
+
+(function($) {
   /*
    * This provides an untility for checkboxes (usually switch widgets) which immediately
    * save the state using an AJAX request. The checkbox is disabled during the AJAX request
@@ -31,7 +34,7 @@
     );
 
     function getOption(opt, ctx) {
-      var value = options[opt];
+      const value = options[opt];
       if (_.isFunction(value)) {
         return value.call(ctx);
       } else {
@@ -41,15 +44,15 @@
 
     return this.on('click', function(e) {
       e.preventDefault();
-      var self = this;
-      var $this = $(this);
-      var checked = this.checked;
-      var message = checked ? $this.data('confirmEnable') : $this.data('confirmDisable');
-      var deferred = message ? confirmPrompt(message) : $.Deferred().resolve();
-      deferred.then(function() {
+      const self = this;
+      const $this = $(this);
+      const checked = this.checked;
+      const message = checked ? $this.data('confirmEnable') : $this.data('confirmDisable');
+      const deferred = message ? confirmPrompt(message) : $.Deferred().resolve();
+      deferred.then(() => {
         // update check state and prevent changes until the request finished
         $this.prop('checked', checked).prop('disabled', true);
-        var data = options.sendData
+        const data = options.sendData
           ? {
               enabled: checked ? '1' : '0',
             }
@@ -58,15 +61,15 @@
           url: getOption('href', self) || $this.data('href'),
           method: getOption('method', self) || $this.data('method') || 'POST',
           dataType: 'json',
-          data: data,
-          complete: function() {
+          data,
+          complete() {
             $this.prop('disabled', false);
           },
-          error: function(data) {
+          error(data) {
             handleAjaxError(data);
             $this.prop('checked', !checked);
           },
-          success: function(data) {
+          success(data) {
             $this
               .prop('checked', data.enabled)
               .trigger('ajaxCheckbox:changed', [data.enabled, data]);

@@ -10,8 +10,8 @@ import 'jquery.typewatch';
 (function($) {
   $.widget('indico.realtimefilter', {
     options: {
-      callback: function() {},
-      validation: function() {
+      callback() {},
+      validation() {
         return true;
       },
       clearable: true,
@@ -21,13 +21,13 @@ import 'jquery.typewatch';
       wait: 250,
     },
 
-    _create: function() {
-      var self = this;
-      var element = self.element;
-      var opt = self.options;
+    _create() {
+      const self = this;
+      const element = self.element;
+      const opt = self.options;
 
       element.typeWatch({
-        callback: function() {
+        callback() {
           self._callback();
         },
         wait: opt.wait,
@@ -37,14 +37,14 @@ import 'jquery.typewatch';
 
       if (opt.clearable) {
         element.clearableinput({
-          onClear: function() {
+          onClear() {
             self._callback();
           },
           emptyvalue: opt.emptyvalue,
         });
       }
 
-      element.on('cut paste', function() {
+      element.on('cut paste', () => {
         self._delayedCallback();
       });
 
@@ -55,7 +55,7 @@ import 'jquery.typewatch';
       });
 
       if (opt.disableenter) {
-        element.on('keydown', function(e) {
+        element.on('keydown', e => {
           if (e.key === 'Enter') {
             e.preventDefault();
           }
@@ -63,10 +63,10 @@ import 'jquery.typewatch';
       }
     },
 
-    _callback: function() {
-      var self = this;
-      var element = self.element;
-      var opt = self.options;
+    _callback() {
+      const self = this;
+      const element = self.element;
+      const opt = self.options;
 
       if (opt.validation(element)) {
         element.removeClass(opt.invalidclass);
@@ -76,21 +76,21 @@ import 'jquery.typewatch';
       }
     },
 
-    _delayedCallback: function() {
-      var self = this;
+    _delayedCallback() {
+      const self = this;
 
-      setTimeout(function() {
+      setTimeout(() => {
         self._callback();
       }, self.options.wait);
     },
 
-    clear: function() {
-      var self = this;
+    clear() {
+      const self = this;
       self.setValue('');
     },
 
-    setValue: function(value) {
-      var self = this;
+    setValue(value) {
+      const self = this;
       if (self.options.clearable) {
         self.element.clearableinput('setValue', value);
       } else {
@@ -100,8 +100,8 @@ import 'jquery.typewatch';
       self.element.trigger('input');
     },
 
-    update: function(delayed) {
-      var self = this;
+    update(delayed) {
+      const self = this;
 
       if (delayed) {
         self._delayedCallback();
@@ -110,8 +110,8 @@ import 'jquery.typewatch';
       }
     },
 
-    validate: function() {
-      var self = this;
+    validate() {
+      const self = this;
       return self.options.validation(self.element);
     },
   });

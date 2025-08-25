@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($, global) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function($, global) {
   $.fn.stickyTooltip = function(category, content) {
     return this.qtip({
       content: {
@@ -21,7 +21,7 @@
         event: 'click unfocus',
       },
       style: {
-        classes: 'qtip-' + category,
+        classes: `qtip-${category}`,
       },
       show: {
         when: false,

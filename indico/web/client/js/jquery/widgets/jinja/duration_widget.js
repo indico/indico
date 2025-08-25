@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFDurationField} from 'indico/react/components';
 
 window.setupDurationWidget = function setupDurationWidget({fieldId, required, disabled}) {

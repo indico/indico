@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global countWords:false */
+import {$T} from 'indico/utils/i18n';
+
+/* global countWords */
 
 (function(global) {
   function getLimitClass(remaining, max) {
@@ -19,11 +21,11 @@
   }
 
   function updateLimits($field, options) {
-    var $maxLengthInfo = $('#{0}-max-length-info'.format(options.fieldId));
-    var value = $field.val().trim();
+    const $maxLengthInfo = $('#{0}-max-length-info'.format(options.fieldId));
+    const value = $field.val().trim();
     $maxLengthInfo.empty();
     if (options.maxLength) {
-      var charsLeft = options.maxLength - value.length;
+      const charsLeft = options.maxLength - value.length;
       $('<span>', {
         html: $T
           .ngettext('<strong>1</strong> char left', '<strong>{0}</strong> chars left', charsLeft)
@@ -32,8 +34,8 @@
       }).appendTo($maxLengthInfo);
     }
     if (options.maxWords) {
-      var wordCount = countWords(value);
-      var wordsLeft = options.maxWords - wordCount;
+      const wordCount = countWords(value);
+      const wordsLeft = options.maxWords - wordCount;
       $('<span>', {
         html: $T
           .ngettext('<strong>1</strong> word left', '<strong>{0}</strong> words left', wordsLeft)
@@ -44,11 +46,11 @@
   }
 
   function setupHelpTooltips($field) {
-    var $container = $field.closest('[data-field-id]');
-    ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(function(name) {
-      var content = $container.find('.{0}-text'.format(name));
+    const $container = $field.closest('[data-field-id]');
+    ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(name => {
+      const content = $container.find('.{0}-text'.format(name));
       $container
-        .find('.' + name)
+        .find(`.${name}`)
         .qtip({
           content: content.html(),
           hide: {
@@ -61,7 +63,7 @@
             classes: 'informational markdown-help-qtip',
           },
         })
-        .on('click', function(evt) {
+        .on('click', evt => {
           evt.preventDefault();
         });
     });
@@ -80,7 +82,7 @@
     );
 
     if (options.useMarkdownEditor) {
-      var $field = $('#' + options.fieldId);
+      const $field = $(`#${options.fieldId}`);
       $field.pagedown();
 
       if (options.maxLength || options.maxWords) {
@@ -91,10 +93,10 @@
       }
 
       $field
-        .on('focusin', function() {
+        .on('focusin', () => {
           $field.parent().addClass('focused');
         })
-        .on('focusout', function() {
+        .on('focusout', () => {
           $field.parent().removeClass('focused');
         });
 

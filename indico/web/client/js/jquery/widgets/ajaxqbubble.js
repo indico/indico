@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showFormErrors:false, initForms:false */
+/* global showFormErrors, initForms, handleAjaxError */
+
+import _ from 'lodash';
 
 import {$T} from '../../utils/i18n';
 
@@ -29,25 +31,25 @@ import {$T} from '../../utils/i18n';
       qtipConstructor: null,
     },
 
-    _create: function() {
-      var self = this;
-      var qBubbleOptions = _.pick(self.options, 'qBubbleOptions').qBubbleOptions;
-      var ajaxOptions = _.omit(self.options, 'qBubbleOptions');
-      var returnData = null;
+    _create() {
+      const self = this;
+      const qBubbleOptions = _.pick(self.options, 'qBubbleOptions').qBubbleOptions;
+      const ajaxOptions = _.omit(self.options, 'qBubbleOptions');
+      let returnData = null;
 
-      var options = $.extend(true, {}, qBubbleOptions, {
+      const options = $.extend(true, {}, qBubbleOptions, {
         events: {
-          show: function(evt, api) {
+          show(evt, api) {
             $.ajax(
               $.extend(true, {}, ajaxOptions, {
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
-                success: function(data, _, xhr) {
+                success(data, __, xhr) {
                   if ($.isFunction(ajaxOptions.success)) {
                     ajaxOptions.success.call(self.element, data);
                   }
 
-                  var loadedURL = xhr.getResponseHeader('X-Indico-URL');
+                  let loadedURL = xhr.getResponseHeader('X-Indico-URL');
                   if (loadedURL) {
                     // in case of a redirect we need to update the url used to submit the ajaxified
                     // form. otherwise url normalization might fail during the POST requests.
@@ -73,25 +75,25 @@ import {$T} from '../../utils/i18n';
 
                   function ajaxifyForm($form) {
                     initForms($form);
-                    var killProgress;
+                    let killProgress;
                     return $form.ajaxForm({
                       url: $form.attr('action') || loadedURL,
                       method: 'POST',
                       error: handleAjaxError,
-                      beforeSubmit: function() {
+                      beforeSubmit() {
                         killProgress = IndicoUI.Dialogs.Util.progress();
                       },
-                      complete: function() {
+                      complete() {
                         killProgress();
                       },
-                      success: function(data) {
+                      success(data) {
                         if (data.success) {
                           self.element.next('.label').text(data.new_value);
                           returnData = data;
                           api.hide(true);
                         } else {
                           updateContent(data);
-                          showFormErrors($('#qtip-' + api.id + '-content'));
+                          showFormErrors($(`#qtip-${api.id}-content`));
                         }
                       },
                     });
@@ -105,8 +107,8 @@ import {$T} from '../../utils/i18n';
               qBubbleOptions.events.show(evt, api);
             }
           },
-          hide: function(evt, api) {
-            var originalEvent = evt.originalEvent;
+          hide(evt, api) {
+            const originalEvent = evt.originalEvent;
 
             if (self.options.onClose) {
               self.options.onClose(returnData);
@@ -123,7 +125,7 @@ import {$T} from '../../utils/i18n';
             }
             return true;
           },
-          hidden: function(evt, api) {
+          hidden(evt, api) {
             api.get('content.text').remove();
             if (qBubbleOptions.events && qBubbleOptions.events.hidden) {
               qBubbleOptions.events.hidden(evt, api);

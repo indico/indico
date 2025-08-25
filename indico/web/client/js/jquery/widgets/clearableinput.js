@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function($) {
   $.widget('indico.clearableinput', {
     options: {
       alwaysClearable: false,
@@ -16,29 +16,29 @@
       emptyvalue: '',
       focusOnClear: true,
       focusOnStart: false,
-      onClear: function() {},
-      onInput: function() {},
+      onClear() {},
+      onInput() {},
     },
 
-    _create: function() {
-      var self = this;
+    _create() {
+      const self = this;
 
       self.buttonBox = $('<span>').addClass('button-box');
       self.clearIcon = $('<a>')
         .addClass('i-link danger icon-close')
-        .click(function(evt) {
+        .click(evt => {
           self._clear();
           evt.stopPropagation();
         });
 
-      var wrapper = $('<span>').addClass(self.options.clearClass);
+      const wrapper = $('<span>').addClass(self.options.clearClass);
       self.element
         .addClass('clearabletext')
         .wrap(wrapper)
-        .on('input', function() {
+        .on('input', () => {
           self._handleInput();
         })
-        .on('keyup', function(e) {
+        .on('keyup', e => {
           if (self.options.clearOnEscape) {
             if (e.key === 'Escape') {
               self.element.val('value');
@@ -56,8 +56,8 @@
       }
     },
 
-    _clear: function() {
-      var self = this;
+    _clear() {
+      const self = this;
       self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
       self._refreshClearIcon();
       self.options.onClear.call(self.element);
@@ -68,14 +68,14 @@
       }
     },
 
-    _handleInput: function() {
-      var self = this;
+    _handleInput() {
+      const self = this;
       self.options.onInput.call(self.element);
       self._refreshClearIcon();
     },
 
-    _refreshClearIcon: function() {
-      var self = this;
+    _refreshClearIcon() {
+      const self = this;
       if (self.element.val() === self.options.emptyvalue && !self.options.alwaysClearable) {
         self.clearIcon.css('visibility', 'hidden');
       } else {
@@ -83,12 +83,12 @@
       }
     },
 
-    initSize: function(fontSize, lineHeight) {
-      var self = this;
+    initSize(fontSize, lineHeight) {
+      const self = this;
       if (self.size === undefined) {
         self.size = {
-          fontSize: fontSize,
-          lineHeight: lineHeight,
+          fontSize,
+          lineHeight,
         };
       }
       self.clearIcon.css('font-size', self.size.fontSize);
@@ -96,19 +96,19 @@
       self.element.css('min-height', self.size.lineHeight);
     },
 
-    setEmptyValue: function(value) {
-      var self = this;
+    setEmptyValue(value) {
+      const self = this;
       self.options.emptyvalue = value;
     },
 
-    setValue: function(value) {
-      var self = this;
+    setValue(value) {
+      const self = this;
       self.element.val(value);
       self._refreshClearIcon();
     },
 
-    setIconsVisibility: function(visibility) {
-      var self = this;
+    setIconsVisibility(visibility) {
+      const self = this;
       self.clearIcon.css('visibility', visibility);
     },
   });

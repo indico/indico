@@ -40,8 +40,7 @@ $.tablesorter.defaults.sortReset = true;
 
 $.ajaxSetup({
   traditional: true,
-  beforeSend: function(xhr, settings) {
-    'use strict';
+  beforeSend(xhr, settings) {
     if (!/^https?:.*/.test(settings.url)) {
       // Add CSRF token to local requests
       xhr.setRequestHeader('X-CSRF-Token', $('#csrf-token').attr('content'));

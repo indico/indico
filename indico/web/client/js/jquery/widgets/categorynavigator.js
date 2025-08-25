@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* eslint-disable max-len */
-/* global _ */
+/* global _, build_url, handleAjaxError, ajaxDialog, confirmPrompt */
 
 import {$T} from '../../utils/i18n';
 import Palette from '../../utils/palette';
@@ -176,11 +176,11 @@ import Palette from '../../utils/palette';
         const parentId = $(this).data('parentId');
         self.goToCategory(parentId);
       });
-      self.element.on('click', '.js-search', function() {
+      self.element.on('click', '.js-search', () => {
         self.$searchInput.focus();
         self.$searchInput.effect('highlight', {color: Palette.highlight});
       });
-      self.element.on('click', '.js-clear-search', function() {
+      self.element.on('click', '.js-clear-search', () => {
         self._clearSearch();
       });
     },
@@ -189,7 +189,7 @@ import Palette from '../../utils/palette';
       const $breadcrumbs = $('<ul>', {class: 'breadcrumbs'});
       const tag = clickable ? '<a>' : '<span>';
 
-      _.each(path, function(category, idx) {
+      _.each(path, (category, idx) => {
         const $item = $('<li>');
         const $segment = $(tag, {
           text: category.title,
@@ -226,8 +226,9 @@ import Palette from '../../utils/palette';
         })
       );
 
+      let $breadcrumbs;
       if (withBreadcrumbs && category.parent_path.length) {
-        var $breadcrumbs = self._buildBreadcrumbs(category.parent_path, clickableBreadcrumbs);
+        $breadcrumbs = self._buildBreadcrumbs(category.parent_path, clickableBreadcrumbs);
         $categoryTitle.append($breadcrumbs);
       }
 
@@ -243,7 +244,7 @@ import Palette from '../../utils/palette';
         const $protection = $('<div>', {class: 'protection-wrapper'}).append($protectionIcon);
         $categoryTitle.before($protection);
       } else if (category.is_protected) {
-        $breadcrumbs.before($protectionIcon);
+        $breadcrumbs?.before($protectionIcon);
       }
 
       return $category;
@@ -420,7 +421,7 @@ import Palette from '../../utils/palette';
 
     _renderCategoryTree(subcategories, category) {
       const self = this;
-      _.each(subcategories, function(subcategory) {
+      _.each(subcategories, subcategory => {
         self.$categoryTree.append(self._buildSubcategory(subcategory));
       });
       if (!subcategories.length) {
@@ -434,7 +435,7 @@ import Palette from '../../utils/palette';
       self.$category.hide();
       self.$categoryResultsList.empty();
       self._toggleSearchResultsView(true);
-      _.each(categories, function(category) {
+      _.each(categories, category => {
         const $result = self._buildSubcategory(category, true);
         if (category.is_favorite) {
           $result.find('.icon-wrapper').append(
@@ -530,7 +531,7 @@ import Palette from '../../utils/palette';
 
       function resolve() {
         const subcategories = [];
-        _.each(self._subcategories[id], function(scId) {
+        _.each(self._subcategories[id], scId => {
           subcategories.push(self._categories[scId]);
         });
         dfd.resolve(subcategories, self._categories[id]);
@@ -606,13 +607,11 @@ import Palette from '../../utils/palette';
         dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify({
-          exclude: _.map(_.keys(self._subcategories), function(n) {
-            return +n;
-          }),
+          exclude: Object.keys(self._subcategories).map(n => +n),
         }),
         success(data) {
           if (data) {
-            _.each(data.categories, function(category) {
+            data.categories.forEach(category => {
               self._fillCache(category);
             });
           }
@@ -625,14 +624,14 @@ import Palette from '../../utils/palette';
 
       function fillCache(data) {
         self._searchResultData[query] = data;
-        _.each(data.categories, self._fillSingleCategoryCache.bind(self));
+        data.categories.forEach(self._fillSingleCategoryCache.bind(self));
       }
 
       self._currentSearchRequest = $.ajax({
         url: build_url(Indico.Urls.Categories.search),
         data: {q: query},
         beforeSend() {
-          if (self._currentSearchRequest != null) {
+          if (self._currentSearchRequest !== null) {
             self._currentSearchRequest.abort();
           }
           self._toggleLoading(true);
@@ -671,7 +670,7 @@ import Palette from '../../utils/palette';
     _clearSearch() {
       const self = this;
 
-      if (self._currentSearchRequest != null) {
+      if (self._currentSearchRequest !== null) {
         self._currentSearchRequest.abort();
       }
       self.$category.show();
@@ -690,7 +689,7 @@ import Palette from '../../utils/palette';
           res = $.Deferred().resolve();
         }
 
-        res.then(function() {
+        res.then(() => {
           if (self.dialog) {
             self.dialog.close();
           }
@@ -804,7 +803,7 @@ import Palette from '../../utils/palette';
         const ids = categoriesDescendingFrom.ids;
         for (const i in pathIds) {
           id = pathIds[i];
-          if (_.contains(ids, id)) {
+          if (ids.includes(id)) {
             result.allowed = false;
             result.message = categoriesDescendingFrom.message.format(self._categories[id].title);
             break;
@@ -821,13 +820,13 @@ import Palette from '../../utils/palette';
       const categories = self.options.actionOn.categories;
 
       if (categories.disabled) {
-        if (_.contains(categories.ids, category.id)) {
+        if (categories.ids.includes(category.id)) {
           result.allowed = false;
           result.message = categories.message;
         } else {
           for (const i in categories.groups) {
             const group = categories.groups[i];
-            if (_.contains(group.ids, category.id)) {
+            if (group.ids.includes(category.id)) {
               result.allowed = false;
               result.message = group.message;
               break;
@@ -893,10 +892,9 @@ import Palette from '../../utils/palette';
 
       self._toggleTreeView(false);
       self._toggleSearchResultsView(false);
-      self._getSearchResults(query).then(function(data, query) {
-        // eslint-disable-line no-shadow
+      self._getSearchResults(query).then((data, q) => {
         self._renderSearchResultInfo(data.categories.length, data.total_count);
-        self._renderSearchResults(data.categories, query);
+        self._renderSearchResults(data.categories, q);
       });
     },
   });

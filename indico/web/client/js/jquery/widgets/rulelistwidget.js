@@ -5,12 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
+
 (function($) {
   function _listValue(option) {
     if (option === '') {
       return [];
     } else {
-      var parsedValue = parseInt(option, 10);
+      const parsedValue = parseInt(option, 10);
       return [isNaN(parsedValue) ? option : parsedValue];
     }
   }
@@ -36,14 +40,14 @@
       conditionTypes: [], // condition types, in order
     },
 
-    _renderRuleCondition: function(ruleContext, condition) {
-      var self = this;
+    _renderRuleCondition(ruleContext, condition) {
+      const self = this;
 
-      var $select = $('<select>')
+      const $select = $('<select>')
         .append(
-          _.map(condition.options, function(elem) {
-            var optionTitle = elem[1];
-            var id = elem[0];
+          condition.options.map(elem => {
+            const optionTitle = elem[1];
+            const id = elem[0];
             return $('<option>', {
               value: id,
             }).text(optionTitle);
@@ -55,7 +59,7 @@
         });
 
       if (condition.required) {
-        var $opt = $('<option>', {
+        const $opt = $('<option>', {
           value: '',
           text: $T.gettext('Select an option'),
         });
@@ -63,7 +67,7 @@
         $opt.prop('disabled', true);
       }
 
-      var $html = $('<div>', {
+      const $html = $('<div>', {
         class: 'rule-condition',
       }).attr('data-condition', condition.value);
 
@@ -73,16 +77,16 @@
       return $html.append($select);
     },
 
-    _optionSelected: function(ruleContext, condition, newOption) {
+    _optionSelected(ruleContext, condition, newOption) {
       ruleContext.rule[condition.value] = _listValue(newOption);
       this._checkConditionIncompatibility(ruleContext);
       this.element.trigger('change');
     },
 
-    _onChange: function() {
+    _onChange() {
       // Simplify rule data by removing "field: any"
-      this.ruleData.forEach(function(rule) {
-        _.keys(rule).forEach(function(k) {
+      this.ruleData.forEach(rule => {
+        Object.keys(rule).forEach(k => {
           if (_.isEqual(rule[k], ['*'])) {
             delete rule[k];
           }
@@ -92,22 +96,22 @@
       this.element.val(JSON.stringify(this.ruleData));
     },
 
-    _checkConditionIncompatibility: function(ruleContext) {
+    _checkConditionIncompatibility(ruleContext) {
       ruleContext.$element.find('.rule-condition').show();
 
-      this.conditionSpec.forEach(function(condition) {
-        var $condition = _findConditionByName(ruleContext, condition.value);
-        var newOption = $condition.find('select').val();
+      this.conditionSpec.forEach(condition => {
+        const $condition = _findConditionByName(ruleContext, condition.value);
+        const newOption = $condition.find('select').val();
 
         if (condition.compatibleWith) {
-          var compatibleConditions = condition.compatibleWith[newOption];
+          const compatibleConditions = condition.compatibleWith[newOption];
           ruleContext.$element.find('.rule-condition').each(function() {
-            var $this = $(this);
-            var conditionName = $this.data('condition');
+            const $this = $(this);
+            const conditionName = $this.data('condition');
             if (this === $condition.get(0)) {
               return;
             }
-            if (_.contains(compatibleConditions, conditionName)) {
+            if (compatibleConditions?.includes(conditionName)) {
               $this.show();
             } else {
               $this.hide();
@@ -118,10 +122,10 @@
       });
     },
 
-    _setConditionOption: function(ruleContext, conditionName, value) {
-      var $condition = _findConditionByName(ruleContext, conditionName);
-      var $select = $condition.find('select');
-      var isRequired = this.options.conditionChoices[conditionName].required;
+    _setConditionOption(ruleContext, conditionName, value) {
+      const $condition = _findConditionByName(ruleContext, conditionName);
+      const $select = $condition.find('select');
+      const isRequired = this.options.conditionChoices[conditionName].required;
 
       if (!isRequired && value === undefined) {
         // if the condition is not required, we can set a default (normally 'any')
@@ -133,31 +137,29 @@
       }
     },
 
-    _checkPlaceholder: function() {
-      var $placeholder = this.options.containerElement.find('.no-rules-placeholder');
+    _checkPlaceholder() {
+      const $placeholder = this.options.containerElement.find('.no-rules-placeholder');
       $placeholder.toggle(!this.ruleData.length);
     },
 
-    _addRule: function($ruleList, rule) {
-      var self = this;
-      var ruleContext = {
+    _addRule($ruleList, rule) {
+      const self = this;
+      const ruleContext = {
         $element: $('<li>', {class: 'rule'}),
-        rule: rule,
+        rule,
       };
-      var $removeButton = $('<a>', {class: 'i-link icon-remove rule-remove-button'});
+      const $removeButton = $('<a>', {class: 'i-link icon-remove rule-remove-button'});
 
       ruleContext.$element
         .append(
-          _.map(this.conditionSpec, function(condition) {
-            return self._renderRuleCondition(ruleContext, condition);
-          }),
+          this.conditionSpec.map(condition => self._renderRuleCondition(ruleContext, condition)),
           $removeButton
         )
         .appendTo($ruleList);
 
       ruleContext.$element.data('ruleContext', ruleContext);
 
-      this.conditionSpec.forEach(function(condition) {
+      this.conditionSpec.forEach(condition => {
         self._setConditionOption(ruleContext, condition.value, rule[condition.value]);
       });
       this._checkConditionIncompatibility(ruleContext);
@@ -165,46 +167,46 @@
       this.element.trigger('change');
     },
 
-    _removeRule: function($elem) {
-      var rule = $elem.data('ruleContext').rule;
+    _removeRule($elem) {
+      const rule = $elem.data('ruleContext').rule;
       this.ruleData = _.without(this.ruleData, _.find(this.ruleData, _.partial(_.isEqual, rule)));
       $elem.remove();
       this._checkPlaceholder();
       this.element.trigger('change');
     },
 
-    _addNewRule: function($ruleList) {
-      var newRule = {};
+    _addNewRule($ruleList) {
+      const newRule = {};
       this.ruleData.push(newRule);
       this._addRule($ruleList, newRule);
     },
 
-    _create: function() {
-      var self = this;
-      var $container = this.options.containerElement;
-      var $addNewRuleButton = $container.find('.js-add-new-rule');
-      var $ruleList = this.options.containerElement.find('.rule-list');
+    _create() {
+      const self = this;
+      const $container = this.options.containerElement;
+      const $addNewRuleButton = $container.find('.js-add-new-rule');
+      const $ruleList = this.options.containerElement.find('.rule-list');
 
       this.ruleData = JSON.parse(this.element.val());
 
-      this.conditionSpec = _.map(this.options.conditionTypes, function(type) {
-        var item = self.options.conditionChoices[type];
+      this.conditionSpec = this.options.conditionTypes.map(type => {
+        const item = self.options.conditionChoices[type];
         item['value'] = type;
         return item;
       });
 
-      $addNewRuleButton.on('click', function(e) {
+      $addNewRuleButton.on('click', e => {
         self._addNewRule($ruleList);
         e.preventDefault();
       });
 
       $container.on('click', '.rule-remove-button', function() {
-        var $elem = $(this).closest('.rule');
+        const $elem = $(this).closest('.rule');
         self._removeRule($elem);
       });
 
       // Initialize widget using rule data from field
-      this.ruleData.forEach(function(rule) {
+      this.ruleData.forEach(rule => {
         self._addRule($ruleList, rule);
       });
 

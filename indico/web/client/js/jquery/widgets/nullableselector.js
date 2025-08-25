@@ -5,18 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function($) {
   $.widget('indico.nullableselector', {
     options: {
       nullvalue: '__None',
     },
 
-    _create: function() {
-      var self = this;
-      var element = self.element;
-      var opt = self.options;
+    _create() {
+      const self = this;
+      const element = self.element;
+      const opt = self.options;
 
       element.toggleClass('no-value', element.val() === opt.nullvalue);
       element.on('change', function() {

@@ -61,7 +61,7 @@ import _ from 'lodash';
       }
     });
 
-    _.defer(function() {
+    _.defer(() => {
       if (!options.isUnlistedEvent) {
         inputs.trigger('change');
       }

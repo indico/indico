@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function($) {
   $.widget('indico.palettepicker', {
     options: {
       availableColors: [],
@@ -17,29 +17,29 @@
       qtipConstructor: null,
     },
 
-    _create: function() {
-      var self = this;
-      var element = this.element;
-      var paletteTable = $('<table>', {class: 'palette-picker'});
-      var availableColors = this.options.availableColors;
-      var tr = this._createTableRow();
+    _create() {
+      const self = this;
+      const element = this.element;
+      const paletteTable = $('<table>', {class: 'palette-picker'});
+      const availableColors = this.options.availableColors;
+      let tr = this._createTableRow();
 
       self._paletteTable = paletteTable;
 
-      $.each(availableColors, function(index, color) {
-        var td = $('<td>', {
+      $.each(availableColors, (index, color) => {
+        const td = $('<td>', {
           class: 'palette-color',
-          data: {color: color},
+          data: {color},
         });
 
-        var colorBox = $('<div>', {
-          css: {background: '#' + color.background},
+        const colorBox = $('<div>', {
+          css: {background: `#${color.background}`},
           class: 'background-box',
         });
 
         colorBox.append(
           $('<div>', {
-            css: {background: '#' + color.text},
+            css: {background: `#${color.text}`},
             class: 'text-box',
           })
         );
@@ -58,11 +58,11 @@
       }
 
       paletteTable.on('click', '.palette-color', function() {
-        var $this = $(this);
-        var color = $this.data('color');
-        var backgroundColor = '#' + color.background;
-        var textColor = '#' + color.text;
-        var styleObject = element[0].style;
+        const $this = $(this);
+        const color = $this.data('color');
+        const backgroundColor = `#${color.background}`;
+        const textColor = `#${color.text}`;
+        const styleObject = element[0].style;
 
         self.options.selectedColor = color;
         self._updateSelection();
@@ -77,7 +77,7 @@
         element.qtip('hide');
       });
 
-      var qtipOptions = {
+      const qtipOptions = {
         prerender: false,
         overwrite: false,
         suppress: false,
@@ -114,15 +114,15 @@
       }
     },
 
-    _createTableRow: function() {
+    _createTableRow() {
       return $('<tr>', {height: 13});
     },
 
-    _updateSelection: function() {
-      var selectedColor = this.options.selectedColor;
+    _updateSelection() {
+      const selectedColor = this.options.selectedColor;
       this._paletteTable.find('.palette-color').each(function() {
-        var $this = $(this);
-        var color = $this.data('color');
+        const $this = $(this);
+        const color = $this.data('color');
         if (
           selectedColor !== null &&
           color.background === selectedColor.background &&

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFButtonsBooleanField} from 'indico/react/components';
 
 window.setupButtonsBooleanWidget = function setupButtonsBooleanWidget({

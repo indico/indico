@@ -5,10 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global repositionTooltips:False */
+/* global repositionTooltips */
+
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
-  'use strict';
+  function move(array, fromIndex, toIndex) {
+    array.splice(toIndex, 0, array.splice(fromIndex, 1)[0]);
+    return array;
+  }
 
   global.setupMultipleItemsWidget = function setupMultipleItemsWidget(options) {
     options = $.extend(
@@ -23,38 +28,38 @@
       options
     );
 
-    var widget = $('#' + options.fieldId + '-widget');
-    var widgetBody = widget.children('table').children('tbody');
-    var field = $('#' + options.fieldId);
-    var data = JSON.parse(field.val());
-    var addButton = $('#' + options.fieldId + '-add-button');
-    var deleteButton = $('<a>', {
+    const widget = $(`#${options.fieldId}-widget`);
+    const widgetBody = widget.children('table').children('tbody');
+    const field = $(`#${options.fieldId}`);
+    const data = JSON.parse(field.val());
+    const addButton = $(`#${options.fieldId}-add-button`);
+    const deleteButton = $('<a>', {
       class: 'action-icon icon-remove js-remove-row',
       href: '#',
       title: $T('Delete'),
     });
-    var saveButton = $('<a>', {
+    const saveButton = $('<a>', {
       class: 'action-icon icon-floppy js-save-row',
       href: '#',
       title: $T('Save'),
     });
-    var editButton = $('<a>', {
+    const editButton = $('<a>', {
       class: 'action-icon icon-edit js-edit-row',
       href: '#',
       title: $T('Edit'),
     });
-    var cancelButton = $('<a>', {
+    const cancelButton = $('<a>', {
       class: 'action-icon icon-close js-cancel-edit',
       href: '#',
       title: $T('Cancel'),
     });
-    var initialIndex;
+    let initialIndex;
 
     if (!data.length) {
       createRow();
     }
 
-    data.forEach(function(item) {
+    data.forEach(item => {
       createRow(item);
     });
 
@@ -71,19 +76,19 @@
         tolerance: 'pointer',
         forceHelperSize: true,
         forcePlaceholderSize: true,
-        helper: function(e, item) {
-          var originals = item.children();
-          var helper = item.clone();
+        helper(e, item) {
+          const originals = item.children();
+          const helper = item.clone();
           helper.children().each(function(i) {
             $(this).width(originals.eq(i).width());
           });
           return helper;
         },
-        start: function(e, ui) {
+        start(e, ui) {
           initialIndex = ui.item.index();
         },
-        update: function(e, ui) {
-          _.move(data, initialIndex, ui.item.index());
+        update(e, ui) {
+          move(data, initialIndex, ui.item.index());
           updateField();
         },
       });
@@ -96,16 +101,16 @@
       })
       .on('click', '.js-save-row', function(e) {
         e.preventDefault();
-        var row = $(this).closest('tr');
-        var item = {};
-        var requiredFieldIsEmpty = false;
-        var invalidNumber = false;
+        const row = $(this).closest('tr');
+        const item = {};
+        let requiredFieldIsEmpty = false;
+        let invalidNumber = false;
         if (options.uuidField && row.data('uuid')) {
           item[options.uuidField] = row.data('uuid');
         }
-        options.columns.forEach(function(col, i) {
-          var inputField = row.find('.js-table-input').eq(i);
-          var value = inputField.val().trim();
+        options.columns.forEach((col, i) => {
+          const inputField = row.find('.js-table-input').eq(i);
+          let value = inputField.val().trim();
           if (!value && inputField.data('required')) {
             requiredFieldIsEmpty = true;
             inputField.addClass('hasError');
@@ -146,13 +151,13 @@
           updateRow(row, false, false);
         }
       })
-      .on('click', '.js-add-row', function(e) {
+      .on('click', '.js-add-row', e => {
         e.preventDefault();
         createRow();
       })
       .on('click', '.js-cancel-edit', function(e) {
         e.preventDefault();
-        var row = $(this).closest('tr');
+        const row = $(this).closest('tr');
         if (!row.data('hasItem')) {
           removeRow(row);
         } else {
@@ -161,7 +166,7 @@
       })
       .on('click', '.js-edit-row', function(e) {
         e.preventDefault();
-        var row = $(this).closest('tr');
+        const row = $(this).closest('tr');
         updateRow(row, true, false);
       })
       .on('keypress', 'input', function(e) {
@@ -186,7 +191,7 @@
         })
         .each(function() {
           // fix the iwdth to avoid ugly changes during sorting
-          var $this = $(this);
+          const $this = $(this);
           $this.width($this.width());
         });
     }
@@ -219,12 +224,12 @@
           return {text: item[col.id]};
         }
       } else if (col.type === 'select') {
-        var sel = $('<select>', {
+        const sel = $('<select>', {
           class: 'js-table-input',
           'data-required': col.required,
         });
         sel.append($('<option>')); // Default empty option
-        for (var choiceID in options.columnChoices[col.id]) {
+        for (const choiceID in options.columnChoices[col.id]) {
           sel.append(
             $('<option>', {
               value: choiceID,
@@ -244,7 +249,7 @@
           }),
         };
       } else if (col.type === 'number') {
-        var numberInput = $('<input>', {
+        const numberInput = $('<input>', {
           type: 'number',
           class: 'js-table-input',
           value: item ? item[col.id] : '',
@@ -285,7 +290,7 @@
           classes: 'qtip-danger',
         },
         content: {
-          text: function() {
+          text() {
             if (min && max) {
               return $T.gettext('Must be between {0} and {1}').format(min, max);
             } else if (min) {
@@ -327,7 +332,7 @@
     }
 
     function createRow(item) {
-      var row = $('<tr>');
+      const row = $('<tr>');
       initRequiredErrorMessage(row);
       row.data('hasItem', !!item);
       if (options.uuidField && item) {
@@ -336,8 +341,8 @@
       if (options.sortable) {
         $('<td>', {class: 'sort-handle'}).appendTo(row);
       }
-      options.columns.forEach(function(col) {
-        var column = $('<td>', makeColData(item, col));
+      options.columns.forEach(col => {
+        const column = $('<td>', makeColData(item, col));
         if (col.type === 'textarea') {
           column.addClass('multiline');
         }
@@ -355,7 +360,7 @@
 
     function updateRow(row, editMode, moveTooltips) {
       row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
-        var column = $('<td>', makeColData(data[row.index()], options.columns[i], editMode));
+        const column = $('<td>', makeColData(data[row.index()], options.columns[i], editMode));
         if (options.columns[i].type === 'textarea') {
           column.addClass('multiline');
         }

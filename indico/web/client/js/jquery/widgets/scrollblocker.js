@@ -5,25 +5,27 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function($) {
   $.widget('indico.scrollblocker', {
     options: {
       overflowType: 'scroll',
     },
 
-    _create: function() {
-      var element = this.element;
-      var options = this.options;
+    _create() {
+      const element = this.element;
+      const options = this.options;
 
-      $('body').on('mousewheel wheel', function(e) {
-        var blocker = $(e.target)
+      $('body').on('mousewheel wheel', e => {
+        const blocker = $(e.target)
           .parentsUntil(element.parent())
           .filter(function() {
             return $(this).hasCSS('overflow-y', options.overflowType);
           });
 
         if (blocker.length > 0) {
-          var wheelup = (e.originalEvent.wheelDelta || -e.originalEvent.deltaY) / 120 > 0;
+          const wheelup = (e.originalEvent.wheelDelta || -e.originalEvent.deltaY) / 120 > 0;
 
           if (blocker.scrollTop() === 0 && wheelup) {
             return false;

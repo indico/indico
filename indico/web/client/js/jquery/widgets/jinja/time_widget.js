@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFTimeField} from 'indico/react/components';
 import {localeUses24HourTime} from 'indico/utils/date';
 

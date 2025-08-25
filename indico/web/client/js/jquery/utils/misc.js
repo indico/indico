@@ -5,15 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false */
+/* global ConfirmPopup, SpecialRemovePopup, AlertPopup, handleFlashes, cornerMessage */
+
+import {$T} from 'indico/utils/i18n';
 
 import Palette from '../../utils/palette';
 
 (function(global) {
   global.confirmPrompt = function confirmPrompt(message, title) {
-    var dfd = $.Deferred();
+    const dfd = $.Deferred();
     message = $('<div>', {width: 400, text: message});
-    new ConfirmPopup(title || $T('Please confirm'), message, function(confirmed) {
+    new ConfirmPopup(title || $T('Please confirm'), message, confirmed => {
       if (confirmed) {
         dfd.resolve();
       } else {
@@ -24,12 +26,12 @@ import Palette from '../../utils/palette';
   };
 
   global.choiceConfirmPrompt = function choiceConfirmPrompt(message, title, choice1, choice2) {
-    var dfd = $.Deferred();
+    const dfd = $.Deferred();
     message = $('<div>', {width: 400, html: message});
     new SpecialRemovePopup(
       title || $T('Please confirm'),
       message,
-      function(action) {
+      action => {
         if (action === 0) {
           dfd.reject();
         } else {
@@ -43,15 +45,15 @@ import Palette from '../../utils/palette';
   };
 
   global.alertPopup = function alertPopup(message, title) {
-    var dfd = $.Deferred();
-    new AlertPopup(title, message, function() {
+    const dfd = $.Deferred();
+    new AlertPopup(title, message, () => {
       dfd.resolve();
     }).open();
     return dfd;
   };
 
   global.handleFlashes = function handleFlashes(data, clear, element) {
-    var container;
+    let container;
     if (!element || !element.length) {
       container = $('#flashed-messages');
     } else if (element.hasClass('flashed-messages')) {
@@ -69,7 +71,7 @@ import Palette from '../../utils/palette';
       container.empty();
     }
     if (data.flashed_messages) {
-      var flashed = $(data.flashed_messages.trim()).children();
+      const flashed = $(data.flashed_messages.trim()).children();
       container.append(flashed);
     }
   };
@@ -79,7 +81,7 @@ import Palette from '../../utils/palette';
       handleFlashes(data);
     }
     if (data && data.notifications) {
-      _.each(data.notifications, function(notification) {
+      data.notifications.forEach(notification => {
         cornerMessage({
           message: notification,
           duration: 10000,
@@ -109,18 +111,18 @@ import Palette from '../../utils/palette';
       options
     );
 
-    var box;
+    let box = null;
 
     function _disappear(when) {
-      return setTimeout(function() {
-        box.fadeOut(function() {
+      return setTimeout(() => {
+        box.fadeOut(() => {
           box.remove();
         });
       }, when);
     }
 
-    var container = $('#corner-message-container');
-    var disappearHandler = options.duration ? _disappear(options.duration) : null;
+    let container = $('#corner-message-container');
+    const disappearHandler = options.duration ? _disappear(options.duration) : null;
 
     if (!container.length) {
       container = $('<div id="corner-message-container">').appendTo('body');
@@ -134,34 +136,34 @@ import Palette from '../../utils/palette';
     }
 
     if (options.actionLabel) {
-      var text = $('<a class="corner-message-action" href="#">')
+      const text = $('<a class="corner-message-action" href="#">')
         .text(options.actionLabel)
         .appendTo(box);
 
-      text.on('click', function(evt) {
+      text.on('click', evt => {
         evt.preventDefault();
 
         if (disappearHandler) {
           clearTimeout(disappearHandler);
         }
         if (options.actionCallback) {
-          var promise = options.actionCallback() || $.Deferred();
+          const promise = options.actionCallback() || $.Deferred();
 
           box.addClass('progress').find('.corner-message-text').text(options.progressMessage);
           text.remove();
 
           promise
             .then(
-              function() {
+              () => {
                 box.find('.corner-message-text').text(options.feedbackMessage);
                 box.removeClass(options.class).addClass('success').removeClass('progress');
               },
-              function() {
+              () => {
                 box.text($T.gettext('Operation failed!'));
                 box.removeClass('progress success warning highlight').addClass('error');
               }
             )
-            .always(function() {
+            .always(() => {
               if (options.feedbackDuration) {
                 _disappear(options.feedbackDuration);
               }
@@ -174,7 +176,7 @@ import Palette from '../../utils/palette';
   };
 
   global.uniqueId = function uniqueId() {
-    return '' + Math.round(new Date().getTime() + Math.random() * 100);
+    return `${Math.round(new Date().getTime() + Math.random() * 100)}`;
   };
 
   global.countWords = function countWords(value) {
@@ -183,9 +185,9 @@ import Palette from '../../utils/palette';
   };
 
   function _doUpdateHtml(target, html, replace, highlight) {
-    var $target = $(target);
+    let $target = $(target);
     if (replace) {
-      var $html = $($.parseHTML(html, document, true));
+      const $html = $($.parseHTML(html, document, true));
       $target.replaceWith($html);
       $target = $html;
     } else {
@@ -199,9 +201,9 @@ import Palette from '../../utils/palette';
 
   global.updateHtml = function updateHtml(target, data, replace, highlight) {
     if ($.isPlainObject(target)) {
-      for (var key in target) {
+      for (const key in target) {
         if (!(key in data)) {
-          console.error('Invalid key: ' + key); // eslint-disable-line no-console
+          console.error(`Invalid key: ${key}`); // eslint-disable-line no-console
         } else {
           _doUpdateHtml(target[key], data[key], replace, highlight);
         }

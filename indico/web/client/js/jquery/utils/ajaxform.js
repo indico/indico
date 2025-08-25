@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showFormErrors:false, initForms:false, confirmPrompt:false, updateHtml:false */
-/* global getDropzoneFiles:false, setDropzoneFiles:false */
+/* global showFormErrors, initForms, confirmPrompt, updateHtml, getDropzoneFiles, setDropzoneFiles,
+          handleAjaxError, handleFlashes */
+
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
-  'use strict';
-
   global.inlineAjaxForm = function inlineAjaxForm(options) {
     options = $.extend(
       true,
@@ -66,24 +68,24 @@
       options
     );
 
-    var formUrl = options.load ? options.load.url : location.href;
-    var formContainer = $(options.formContainer);
-    var formVisible = false;
-    var oldContent = null;
-    var savedFiles = {};
-    var context = options.context ? $(options.context) : null;
+    let formUrl = options.load ? options.load.url : location.href;
+    const formContainer = $(options.formContainer);
+    let formVisible = false;
+    let oldContent = null;
+    let savedFiles = {};
+    const context = options.context ? $(options.context) : null;
 
-    function triggerEvent(name) {
+    function triggerEvent(name, ...args) {
       if (!context) {
         return false;
       }
-      var evt = $.Event(name);
-      context.trigger(evt, [].slice.call(arguments, 1));
+      const evt = $.Event(name);
+      context.trigger(evt, args);
       return evt.isDefaultPrevented();
     }
 
     function updateFormUrl(xhr) {
-      var loadedUrl = xhr.getResponseHeader('X-Indico-URL');
+      const loadedUrl = xhr.getResponseHeader('X-Indico-URL');
       if (loadedUrl) {
         // in case of a redirect we need to update the url used to submit
         // the ajaxified form.  otherwise url normalization might fail during
@@ -104,12 +106,12 @@
         cache: false,
         dataType: 'json',
         complete: IndicoUI.Dialogs.Util.progress(),
-        error: function(xhr) {
+        error(xhr) {
           if (!triggerEvent('ajaxForm:loadError', xhr)) {
             handleAjaxError(xhr);
           }
         },
-        success: function(data, _, xhr) {
+        success(data, __, xhr) {
           updateFormUrl(xhr);
           showForm(data);
         },
@@ -117,7 +119,7 @@
     }
 
     function showForm(data) {
-      var triggerShow = false;
+      let triggerShow = false;
       if (!formVisible) {
         oldContent = formContainer.contents().detach();
         formVisible = true;
@@ -127,9 +129,9 @@
         }
       }
       formContainer.html(data.html);
-      formContainer.find(options.closeSelector).on('click', function(evt) {
+      formContainer.find(options.closeSelector).on('click', evt => {
         evt.preventDefault();
-        var msg;
+        let msg;
         if (options.confirmCloseUnsaved && (msg = onBeforeUnload()) !== undefined) {
           confirmPrompt(msg, $T.gettext('Unsaved changes')).then(hideForm);
         } else {
@@ -148,7 +150,7 @@
           });
         }
       }
-      _.defer(function() {
+      _.defer(() => {
         formContainer.focusFirstField();
       });
     }
@@ -167,22 +169,22 @@
     }
 
     function _bindEvents($form) {
-      var killProgress;
+      let killProgress;
 
       $form
-        .on('ajaxForm:beforeSubmit', function() {
+        .on('ajaxForm:beforeSubmit', () => {
           killProgress = IndicoUI.Dialogs.Util.progress();
           // save files from dropzone fields so we can re-populate in case of failure
           $.extend(savedFiles, getDropzoneFiles($form));
         })
-        .on('ajaxForm:error', function(evt, xhr) {
+        .on('ajaxForm:error', (evt, xhr) => {
           if (killProgress) {
             killProgress();
           }
           evt.preventDefault();
           handleAjaxError(xhr);
         })
-        .on('ajaxForm:success', function(evt, data) {
+        .on('ajaxForm:success', (evt, data) => {
           if (killProgress) {
             killProgress();
           }
@@ -190,7 +192,7 @@
           if (data.success) {
             savedFiles = {};
             hideForm();
-            var updateOpts = options.update;
+            const updateOpts = options.update;
             if (updateOpts) {
               updateHtml(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
             } else if (data.redirect) {
@@ -203,9 +205,9 @@
           } else if (data.html) {
             showForm(data);
             // restore files in dropzone fields
-            $form.ready(function() {
-              $.each(savedFiles, function(id, files) {
-                setDropzoneFiles($('#' + id), files);
+            $form.ready(() => {
+              $.each(savedFiles, (id, files) => {
+                setDropzoneFiles($(`#${id}`), files);
               });
               savedFiles = {};
             });
@@ -214,13 +216,13 @@
     }
 
     function ajaxifyForms(noInit) {
-      var forms = formContainer.find('form');
+      const forms = formContainer.find('form');
       if (!noInit) {
         showFormErrors(formContainer);
         initForms(forms);
       }
       forms.each(function() {
-        var $this = $(this);
+        const $this = $(this);
         _bindEvents($this);
         $this.ajaxForm(_getAjaxFormArgs($this));
       });
@@ -230,29 +232,29 @@
       return {
         url: $form.attr('action') || formUrl,
         dataType: 'json',
-        beforeSubmit: function() {
+        beforeSubmit() {
           if ($form.data('dropzoneField') && $form.get(0).dropzone.files.length !== 0) {
             // Dropzone takes care of the form submission
             return false;
           }
-          var evt = $.Event('ajaxForm:validateBeforeSubmit');
+          const evt = $.Event('ajaxForm:validateBeforeSubmit');
           $form.trigger(evt);
           if (evt.isDefaultPrevented()) {
             return false;
           }
           $form.trigger('ajaxForm:beforeSubmit');
         },
-        error: function(xhr) {
+        error(xhr) {
           $form.trigger('ajaxForm:error', [xhr]);
         },
-        success: function(data) {
+        success(data) {
           $form.trigger('ajaxForm:success', [data]);
         },
       };
     }
 
     function hasChangedFields() {
-      var forms = formContainer.find('form');
+      const forms = formContainer.find('form');
       return (
         !!forms.length &&
         !!forms.filter(function() {
@@ -268,29 +270,29 @@
     }
 
     if (context) {
-      context.on('ajaxForm:externalShow', function() {
+      context.on('ajaxForm:externalShow', () => {
         if (options.confirmCloseUnsaved) {
           $(window).on('beforeunload', onBeforeUnload);
         }
       });
-      context.on('ajaxForm:externalHide', function(evt, deferred) {
-        var msg;
+      context.on('ajaxForm:externalHide', (evt, deferred) => {
+        let msg;
         if (!options.confirmCloseUnsaved) {
           deferred.resolve();
         } else if ((msg = onBeforeUnload()) === undefined) {
           deferred.resolve();
         } else {
           confirmPrompt(msg, $T.gettext('Unsaved changes')).then(
-            function() {
+            () => {
               deferred.resolve();
             },
-            function() {
+            () => {
               deferred.reject();
             }
           );
         }
         if (options.confirmCloseUnsaved) {
-          deferred.then(function() {
+          deferred.then(() => {
             $(window).off('beforeunload', onBeforeUnload);
           });
         }
@@ -304,7 +306,7 @@
       }
       ajaxifyForms(true);
     } else if (options.trigger) {
-      options.trigger.on('click', function(evt) {
+      options.trigger.on('click', evt => {
         evt.preventDefault();
         loadForm();
       });

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import showReactErrorDialog from 'indico/react/errors';
+import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   global.handleAjaxError = function handleAjaxError(data) {

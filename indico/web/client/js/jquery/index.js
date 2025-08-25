@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global _, moment */
+
 import './compat/jquery-ui';
 
 import 'jquery-colorbox';
@@ -69,12 +71,13 @@ if (process.env.NODE_ENV !== 'development') {
 $.migrateMute = true;
 // explicit tracebacks are not needed
 $.migrateTrace = false;
+// eslint-disable-next-line import/no-commonjs
 require('jquery-migrate');
 
 // These global definitions are needed so that
 // legacy code can access them globally
 Object.assign(window, {
-  _,
+  _, // FYI: this is underscore, not lodash
   moment,
   $T,
   i18n: defaultI18n,

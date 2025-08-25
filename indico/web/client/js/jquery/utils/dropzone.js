@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* eslint no-shadow: ['warn', {allow: ['file']}] */
+/* global handleFlashes, handleAjaxError */
 
 import Dropzone from 'dropzone';
+import _ from 'lodash';
+
 import 'dropzone/dist/dropzone.css';
 
 (function(global) {
@@ -18,22 +20,22 @@ import 'dropzone/dist/dropzone.css';
   let handlerSkipped = false;
 
   global.setupDropzone = function(element) {
-    var $dz = $(element);
-    var $form = $dz.closest('form');
-    var $flashArea = $form.find('.flashed-messages');
-    var options = {
+    const $dz = $(element);
+    const $form = $dz.closest('form');
+    const $flashArea = $form.find('.flashed-messages');
+    const options = {
       timeout: 0,
-      clickable: element + ' .dropzone-inner',
-      previewsContainer: element + ' .dropzone-previews',
+      clickable: `${element} .dropzone-inner`,
+      previewsContainer: `${element} .dropzone-previews`,
       autoProcessQueue: false,
 
-      init: function() {
-        var $button = $form.find('input[type="submit"], .js-dropzone-upload');
-        var self = this;
-        var files = $dz.data('value');
+      init() {
+        const $button = $form.find('input[type="submit"], .js-dropzone-upload');
+        const self = this;
+        const files = $dz.data('value');
 
         function addFile(file) {
-          var existingFile = {
+          const existingFile = {
             name: file.filename,
             id: file.id,
             size: file.size,
@@ -45,7 +47,7 @@ import 'dropzone/dist/dropzone.css';
           self.files.push(existingFile);
 
           /* Disable opening the upload dialog when clicking on the file's preview element */
-          $dz.find('.dz-preview').on('click', function(e) {
+          $dz.find('.dz-preview').on('click', e => {
             e.stopPropagation();
           });
 
@@ -76,11 +78,11 @@ import 'dropzone/dist/dropzone.css';
         });
 
         $form.on('submit', function(e) {
-          var evt = $.Event('ajaxForm:validateBeforeSubmit');
+          const evt = $.Event('ajaxForm:validateBeforeSubmit');
           $(this).trigger(evt);
           if (!evt.isDefaultPrevented()) {
             $button.prop('disabled', true);
-            $.each(self.getRejectedFiles(), function(index, file) {
+            $.each(self.getRejectedFiles(), (index, file) => {
               self.removeFile(file);
             });
             if (self.getQueuedFiles().length) {
@@ -93,7 +95,7 @@ import 'dropzone/dist/dropzone.css';
           handlerSkipped = false;
         });
 
-        self.on('addedfile', function(file) {
+        self.on('addedfile', file => {
           if (!options.uploadMultiple && self.files.length > 1) {
             self.removeFile(self.files[0]);
           }
@@ -106,12 +108,12 @@ import 'dropzone/dist/dropzone.css';
 
           $dz.find('.dz-message').hide();
           $dz.find('.dz-progress').hide();
-          $(file.previewElement).on('click', function(e) {
+          $(file.previewElement).on('click', e => {
             e.stopPropagation();
           });
         });
 
-        self.on('removedfile', function(file) {
+        self.on('removedfile', file => {
           $button.prop('disabled', false);
           if (self.files.length === 0) {
             // force change in form, so that we can process the 'change' event
@@ -121,18 +123,18 @@ import 'dropzone/dist/dropzone.css';
           }
 
           if (options.editable) {
-            var $field = $form.find('.deleted-files');
-            var deletedFiles = JSON.parse($field.val());
+            const $field = $form.find('.deleted-files');
+            const deletedFiles = JSON.parse($field.val());
             deletedFiles.push(file.id);
             $field.val(JSON.stringify(deletedFiles));
           }
         });
 
-        self.on(options.uploadMultiple ? 'sendingmultiple' : 'sending', function() {
+        self.on(options.uploadMultiple ? 'sendingmultiple' : 'sending', () => {
           $form.trigger('ajaxForm:beforeSubmit');
         });
 
-        self.on(options.uploadMultiple ? 'successmultiple' : 'success', function(e, response) {
+        self.on(options.uploadMultiple ? 'successmultiple' : 'success', (e, response) => {
           if (options.handleFlashes) {
             handleFlashes(response, true, $flashArea);
           }
@@ -143,9 +145,9 @@ import 'dropzone/dist/dropzone.css';
           $form.trigger('ajaxForm:success', [response]);
         });
 
-        self.on('error', function(e, msg, xhr) {
+        self.on('error', (e, msg, xhr) => {
           if (xhr) {
-            var evt = $.Event('ajaxForm:error');
+            const evt = $.Event('ajaxForm:error');
             $form.trigger(evt, [xhr]);
             if (!evt.isDefaultPrevented()) {
               handleAjaxError(xhr);
@@ -156,7 +158,7 @@ import 'dropzone/dist/dropzone.css';
     };
 
     _.extend(options, $dz.data('options'));
-    var param = options.paramName;
+    const param = options.paramName;
     options.paramName = function() {
       return param;
     };

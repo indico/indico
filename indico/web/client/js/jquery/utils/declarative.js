@@ -6,12 +6,13 @@
 // LICENSE file for more details.
 
 /* eslint-disable max-len */
-/* global inlineAjaxForm:false, updateHtml:false */
+/* global inlineAjaxForm, updateHtml, confirmPrompt, ajaxDialog, handleFlashes, handleAjaxError,
+          build_url */
 
 import {$T} from '../../utils/i18n';
 
 (function(global) {
-  $(document).ready(function() {
+  $(document).ready(() => {
     setupActionLinks();
     setupAjaxForms();
     setupConfirmPopup();
@@ -51,12 +52,12 @@ import {$T} from '../../utils/i18n';
 
   function setupSelectAllNone() {
     $('body').on('click', '[data-select-all]', function() {
-      var selector = $(this).data('select-all');
+      const selector = $(this).data('select-all');
       $(selector).filter(':not(:checked)').prop('checked', true).trigger('change');
     });
 
     $('body').on('click', '[data-select-none]', function() {
-      var selector = $(this).data('select-none');
+      const selector = $(this).data('select-none');
       $(selector).filter(':checked').prop('checked', false).trigger('change');
     });
   }
@@ -66,10 +67,10 @@ import {$T} from '../../utils/i18n';
       'click',
       '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href]):not(a[data-ajax-dialog][data-href])',
       function() {
-        var $this = $(this);
+        const $this = $(this);
 
         function performAction() {
-          var evt = $.Event('indico:confirmed');
+          const evt = $.Event('indico:confirmed');
           $this.trigger(evt);
 
           // Handle custom code
@@ -84,7 +85,7 @@ import {$T} from '../../utils/i18n';
           }
         }
 
-        var evtBefore = $.Event('indico:beforeConfirmed');
+        const evtBefore = $.Event('indico:beforeConfirmed');
         $this.trigger(evtBefore);
 
         if (evtBefore.isDefaultPrevented()) {
@@ -99,7 +100,7 @@ import {$T} from '../../utils/i18n';
   }
 
   function setupActionLinks() {
-    var selectors = [
+    const selectors = [
       'button[data-href][data-method]',
       'input:button[data-href][data-method]',
       'a[data-href][data-method]',
@@ -115,23 +116,23 @@ import {$T} from '../../utils/i18n';
     ];
     $('body').on('click', selectors.join(', '), function(e) {
       e.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       if ($this.hasClass('disabled')) {
         return;
       }
-      var url = $this.data('href');
-      var callback = $this.data('callback');
-      var method = ($this.data('method') || 'GET').toUpperCase();
-      var params = $this.data('params') || {};
-      var paramsSelector = $this.data('params-selector');
-      var update = $this.data('update');
-      var ajax = $this.data('ajax') !== undefined;
-      var replaceUpdate = $this.data('replace-update') !== undefined;
-      var highlightUpdate = $this.data('highlight-update') !== undefined;
-      var dialog = $this.data('ajax-dialog') !== undefined;
-      var reload = $this.data('reload-after');
-      var redirect = $this.data('redirect-after');
-      var content = $this.data('content');
+      const url = $this.data('href');
+      const callback = $this.data('callback');
+      const method = ($this.data('method') || 'GET').toUpperCase();
+      let params = $this.data('params') || {};
+      const paramsSelector = $this.data('params-selector');
+      const update = $this.data('update');
+      const ajax = $this.data('ajax') !== undefined;
+      const replaceUpdate = $this.data('replace-update') !== undefined;
+      const highlightUpdate = $this.data('highlight-update') !== undefined;
+      const dialog = $this.data('ajax-dialog') !== undefined;
+      const reload = $this.data('reload-after');
+      const redirect = $this.data('redirect-after');
+      const content = $this.data('content');
 
       if (!$.isPlainObject(params)) {
         throw new Error('Invalid params. Must be valid JSON if set.');
@@ -142,7 +143,7 @@ import {$T} from '../../utils/i18n';
       }
 
       function execute() {
-        var evt = $.Event('indico:confirmed');
+        const evt = $.Event('indico:confirmed');
         $this.trigger(evt);
 
         // Handle custom code
@@ -152,7 +153,7 @@ import {$T} from '../../utils/i18n';
 
         // Handle AJAX dialog
         if (dialog) {
-          var closeButton = $this.data('close-button');
+          const closeButton = $this.data('close-button');
           let title = $this.data('title');
           if (!title && title !== undefined) {
             // if `data-title` is present without a value, fall back to the title attr
@@ -160,8 +161,8 @@ import {$T} from '../../utils/i18n';
           }
           ajaxDialog({
             trigger: $this,
-            url: url,
-            method: method,
+            url,
+            method,
             data: params,
             content: $(content).html(),
             title,
@@ -173,7 +174,7 @@ import {$T} from '../../utils/i18n';
             onOpen: ({dialogElement}) => {
               dialogElement.trigger('indico:dialogOpen');
             },
-            onClose: function(data, customData) {
+            onClose(data, customData) {
               if (data) {
                 handleFlashes(data, true, $this);
                 if (update) {
@@ -197,13 +198,13 @@ import {$T} from '../../utils/i18n';
         // Handle html update or reload
         if (ajax || update || reload !== undefined || redirect !== undefined) {
           $.ajax({
-            method: method,
-            url: url,
+            method,
+            url,
             data: params,
             error: handleAjaxError,
             complete: IndicoUI.Dialogs.Util.progress(),
-            success: function(data) {
-              var successEvt = $.Event('declarative:success');
+            success(data) {
+              const successEvt = $.Event('declarative:success');
               $this.trigger(successEvt, [data]);
               if (successEvt.isDefaultPrevented()) {
                 return;
@@ -237,9 +238,9 @@ import {$T} from '../../utils/i18n';
         if (method === 'GET') {
           location.href = build_url(url, params);
         } else if (method === 'POST') {
-          var form = $('<form>', {
+          const form = $('<form>', {
             action: url,
-            method: method,
+            method,
           });
           form.append(
             $('<input>', {
@@ -248,15 +249,15 @@ import {$T} from '../../utils/i18n';
               value: $('#csrf-token').attr('content'),
             })
           );
-          $.each(params, function(key, value) {
-            form.append($('<input>', {type: 'hidden', name: key, value: value}));
+          $.each(params, (key, value) => {
+            form.append($('<input>', {type: 'hidden', name: key, value}));
           });
           form.appendTo('body').submit();
         }
       }
 
-      var promptMsg = $this.data('confirm');
-      var confirmed;
+      const promptMsg = $this.data('confirm');
+      let confirmed;
       if (!promptMsg) {
         confirmed = $.Deferred().resolve();
       } else {
@@ -268,7 +269,7 @@ import {$T} from '../../utils/i18n';
 
   function setupAjaxForms() {
     function _getOptions($elem, extra) {
-      var updateOpts = $elem.data('update');
+      const updateOpts = $elem.data('update');
       return $.extend(
         {
           context: $elem,
@@ -288,7 +289,7 @@ import {$T} from '../../utils/i18n';
 
     function _handleClick(evt) {
       evt.preventDefault();
-      var $this = $(this);
+      const $this = $(this);
       if ($this.hasClass('disabled')) {
         return;
       }
@@ -318,17 +319,17 @@ import {$T} from '../../utils/i18n';
       }
 
       $this
-        .on('ajaxForm:show', function() {
+        .on('ajaxForm:show', () => {
           toggleDisabled(true);
         })
-        .on('ajaxForm:hide', function() {
+        .on('ajaxForm:hide', () => {
           toggleDisabled(false);
         });
     }
 
     function _handleHtmlUpdate($elem) {
       $elem.find('form[data-ajax-form]').each(function() {
-        var $this = $(this);
+        const $this = $(this);
         inlineAjaxForm(
           _getOptions($this, {
             load: null,
@@ -339,14 +340,14 @@ import {$T} from '../../utils/i18n';
     }
 
     $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', _handleClick);
-    $('body').on('indico:htmlUpdated', function(evt) {
+    $('body').on('indico:htmlUpdated', evt => {
       _handleHtmlUpdate($(evt.target));
     });
     _handleHtmlUpdate($('body'));
   }
 
   function setupMathJax() {
-    var $elems = $('.js-mathjax');
+    const $elems = $('.js-mathjax');
     if ($elems.length) {
       $elems.mathJax();
     }
@@ -378,14 +379,14 @@ import {$T} from '../../utils/i18n';
   function setupToggleLinks() {
     $('body').on('click', '[data-toggle]:not([data-toggle=dropdown])', function(evt) {
       evt.preventDefault();
-      var $elem = $(this);
-      var accordion = $elem.data('accordion');
-      var toggleClass = $elem.data('toggle-class');
-      var isVisible = $elem.hasClass('js-details-visible');
+      const $elem = $(this);
+      const accordion = $elem.data('accordion');
+      const toggleClass = $elem.data('toggle-class');
+      const isVisible = $elem.hasClass('js-details-visible');
 
       function toggleDetails($trigger) {
-        var $target = $($trigger.data('toggle'));
-        var wasVisible = $trigger.hasClass('js-details-visible');
+        const $target = $($trigger.data('toggle'));
+        const wasVisible = $trigger.hasClass('js-details-visible');
         $target.slideToggle('fast');
         $trigger.toggleClass('js-details-visible');
         if (toggleClass) {

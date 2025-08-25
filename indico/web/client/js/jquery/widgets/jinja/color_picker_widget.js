@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function(global) {
   global.setupColorPickerWidget = function setupColorPickerWidget(options) {
     options = $.extend(
@@ -16,8 +18,8 @@
       options
     );
 
-    var $formField = $('#' + options.fieldId);
-    var $colorField = $formField.closest('.i-color-field');
+    const $formField = $(`#${options.fieldId}`);
+    const $colorField = $formField.closest('.i-color-field');
 
     $colorField.indicoColorpicker();
     if (options.showField) {

@@ -5,7 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {$T} from 'indico/utils/i18n';
+
 (function($) {
+  function move(array, fromIndex, toIndex) {
+    array.splice(toIndex, 0, array.splice(fromIndex, 1)[0]);
+    return array;
+  }
+
   $.widget('indico.multitextfield', {
     options: {
       fieldsCaption: 'field',
@@ -16,7 +23,7 @@
       fieldName: undefined, // String used as a key to an input field value
     },
 
-    _create: function() {
+    _create() {
       this.info = [];
       this.valueField = this.options.valueField;
       this.fieldName = this.options.fieldName;
@@ -31,14 +38,14 @@
       this._drawList();
     },
 
-    destroy: function() {
+    destroy() {
       this.element.off('focusout click keyup propertychange paste');
       this.element.removeClass('multi-text-fields');
       this.list.remove();
     },
 
-    _createList: function() {
-      var self = this;
+    _createList() {
+      const self = this;
       self.list = $('<ul></ul>');
       self.element.append(self.list);
 
@@ -51,14 +58,14 @@
           handle: '.handle',
           items: 'li:not(:last-child)',
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start(e, ui) {
             self.start_index = ui.item.index();
             ui.item.find('input').blur();
           },
-          update: function(e, ui) {
-            _.move(self.info, self.start_index, ui.item.index());
+          update(e, ui) {
+            move(self.info, self.start_index, ui.item.index());
             if (self.valueField) {
-              _.move(self.data, self.start_index, ui.item.index());
+              move(self.data, self.start_index, ui.item.index());
               self._updateValueField(self.data);
             }
           },
@@ -66,8 +73,8 @@
       }
     },
 
-    _handleEvents: function() {
-      var self = this;
+    _handleEvents() {
+      const self = this;
 
       self.element.on('focusout', 'input', function() {
         self._updateField(this);
@@ -81,13 +88,13 @@
 
       self.element.on('keyup propertychange paste input', 'input', function(e) {
         // Enter
-        if (e.type == 'keyup' && e.which == 13) {
+        if (e.type === 'keyup' && e.which === 13) {
           $(this).blur();
           $(this).parent().next().find('input').focus();
         }
 
         if (self.valueField && $(this).val().trim()) {
-          var oldDataItem = self.data[$(this).parent().index()];
+          const oldDataItem = self.data[$(this).parent().index()];
           self.data[$(this).parent().index()] = self._updateDataItem($(this).val(), oldDataItem);
           self._updateValueField(self.data);
         }
@@ -101,9 +108,9 @@
 
       self.element.on('keydown', 'input', function(e) {
         // ESC
-        if (e.which == 27) {
+        if (e.which === 27) {
           e.stopPropagation();
-          var value = self._getField($(this).data('id')).value;
+          const value = self._getField($(this).data('id')).value;
           $(this).val(value);
           $(this).blur();
           $(this).trigger('propertychange');
@@ -111,16 +118,16 @@
       });
     },
 
-    _drawList: function() {
-      var i = 0;
-      var self = this;
-      var list = self.list;
+    _drawList() {
+      let i = 0;
+      const self = this;
+      const list = self.list;
 
       self._reinitList();
 
       if (self.valueField) {
         for (i = 0; i < self.data.length; ++i) {
-          var obj = {id: i, value: self.data[i][self.fieldName], required: true};
+          const obj = {id: i, value: self.data[i][self.fieldName], required: true};
           list.append(self._item(obj));
           self.info[i] = obj;
         }
@@ -133,7 +140,7 @@
       self._drawNewItem();
     },
 
-    _reinitList: function() {
+    _reinitList() {
       this.next_id = -1;
       this.new_item = undefined;
 
@@ -142,7 +149,7 @@
       });
     },
 
-    _drawNewItem: function() {
+    _drawNewItem() {
       if (this.new_item === undefined || this.new_item.find('input').val() !== '') {
         this.new_item = this._item(this._addNewFieldInfo());
         this.list.append(this.new_item);
@@ -151,8 +158,8 @@
       }
     },
 
-    _deleteNewItem: function(item) {
-      if (item.next()[0] == this.new_item[0]) {
+    _deleteNewItem(item) {
+      if (item.next()[0] === this.new_item[0]) {
         if (this.valueField) {
           this.data.splice(item.index(), 1);
           this._updateValueField(this.data);
@@ -165,14 +172,14 @@
       }
     },
 
-    _deleteItem: function(item) {
-      if (item[0] != this.new_item[0]) {
+    _deleteItem(item) {
+      if (item[0] !== this.new_item[0]) {
         if (this.valueField) {
           this.data.splice(item.index(), 1);
           this._updateValueField(this.data);
         }
-        var id = item.find('input').data('id');
-        var index = this._getFieldIndex(id);
+        const id = item.find('input').data('id');
+        const index = this._getFieldIndex(id);
         this.info.splice(index, 1);
         this._removeFieldFromPM(item.find('input'));
         item.remove();
@@ -180,21 +187,21 @@
       }
     },
 
-    _addNewFieldInfo: function() {
-      var id = this._nextId();
-      var field = {id: id, value: ''};
+    _addNewFieldInfo() {
+      const id = this._nextId();
+      const field = {id, value: ''};
       this.info.push(field);
       return field;
     },
 
-    _deleteNewFieldInfo: function() {
+    _deleteNewFieldInfo() {
       this._prevId();
       this.info.pop();
     },
 
-    _getField: function(id) {
-      for (var i = 0; i < this.info.length; ++i) {
-        if (this.info[i]['id'] == id) {
+    _getField(id) {
+      for (let i = 0; i < this.info.length; ++i) {
+        if (this.info[i]['id'] === id) {
           return this.info[i];
         }
       }
@@ -202,9 +209,9 @@
       return undefined;
     },
 
-    _getFieldIndex: function(id) {
-      for (var i = 0; i < this.info.length; ++i) {
-        if (this.info[i]['id'] == id) {
+    _getFieldIndex(id) {
+      for (let i = 0; i < this.info.length; ++i) {
+        if (this.info[i]['id'] === id) {
           return i;
         }
       }
@@ -212,43 +219,43 @@
       return undefined;
     },
 
-    _addFieldToPM: function(input) {
+    _addFieldToPM(input) {
       if (this.options.parameterManager !== undefined) {
-        var parameterType = this.options.parameterType;
+        const parameterType = this.options.parameterType;
         this.options.parameterManager.remove(input);
         this.options.parameterManager.add(input, parameterType, false);
       }
     },
 
-    _removeFieldFromPM: function(input) {
+    _removeFieldFromPM(input) {
       if (this.options.parameterManager !== undefined) {
         this.options.parameterManager.remove(input);
       }
     },
 
-    _item: function(field) {
+    _item(field) {
       field = field || this._addNewFieldInfo();
 
-      var id = field['id'];
-      var value = field['value'];
-      var placeholder = field.required
+      const id = field['id'];
+      const value = field['value'];
+      const placeholder = field.required
         ? ''
         : $T.gettext('Type to add {0}').format(this.options.fieldsCaption);
 
-      var item = $('<li></li>');
+      const item = $('<li></li>');
 
       if (this.options.sortable) {
         item.append($("<span class='handle'></span>"));
       }
 
-      var newInput = $('<input>', {
+      const newInput = $('<input>', {
         type: 'text',
         required: field.required,
         data: {
-          id: id,
+          id,
         },
-        value: value,
-        placeholder: placeholder,
+        value,
+        placeholder,
       });
 
       this._validateValue(newInput);
@@ -277,10 +284,10 @@
       return item;
     },
 
-    _updateField: function(input) {
+    _updateField(input) {
       input = $(input);
       if (input.val() === '' && !input.prop('required')) {
-        var item = input.closest('li');
+        const item = input.closest('li');
         this._deleteItem(item);
       } else {
         this._getField(input.data('id'))['value'] = input.val();
@@ -288,15 +295,15 @@
       }
     },
 
-    _nextId: function() {
+    _nextId() {
       return this.next_id--;
     },
 
-    _prevId: function() {
+    _prevId() {
       return this.next_id === 0 ? this.next_id : this.next_id++;
     },
 
-    _scrollFix: function() {
+    _scrollFix() {
       if (this.element[0].clientHeight + 1 < this.element[0].scrollHeight) {
         this.element.find('input').addClass('width-scrolling');
       } else {
@@ -304,21 +311,21 @@
       }
     },
 
-    getInfo: function() {
+    getInfo() {
       return this.info.slice().splice(0, this.info.length - 1);
     },
 
-    setInfo: function(info) {
+    setInfo(info) {
       this.info = info;
       this._drawList();
     },
 
-    _updateValueField: function(newData) {
+    _updateValueField(newData) {
       this.field.val(JSON.stringify(newData)).trigger('change');
       this.data = newData;
     },
 
-    _updateDataItem: function(value, oldDataItem) {
+    _updateDataItem(value, oldDataItem) {
       if (!oldDataItem) {
         oldDataItem = {};
       }
@@ -326,9 +333,9 @@
       return oldDataItem;
     },
 
-    _validateValue: function(field) {
+    _validateValue(field) {
       if ('setCustomValidity' in field[0]) {
-        field.on('change input', function() {
+        field.on('change input', () => {
           if (!field.val() || field.val().trim()) {
             field[0].setCustomValidity('');
           } else {

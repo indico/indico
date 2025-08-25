@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function($) {
   $.widget('indico.indicoColorpicker', {
-    updateWidget: function() {
+    updateWidget() {
       this.$preview.toggleClass('no-value', !this.$colorInput.val().length);
       const val = this.$colorInput.val();
       if (!val) {
@@ -15,7 +17,7 @@
       }
     },
 
-    _create: function() {
+    _create() {
       let oldValue;
       const $element = this.element;
       const $preview = (this.$preview = $element.find('.color-preview'));

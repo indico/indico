@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function($) {
   $.widget('indico.dropdown', {
     options: {
@@ -18,8 +20,8 @@
       always_listen: false, // if set to true, will trigger 'menu_select' event even when there is a valid href
     },
 
-    _close: function(elem, effect) {
-      var ul = elem.next('ul');
+    _close(elem, effect) {
+      const ul = elem.next('ul');
 
       elem.removeClass('open');
       elem.removeData('no-qtip');
@@ -31,18 +33,18 @@
       elem.siblings('ul').find('a').data('on', false);
     },
 
-    _close_all: function(effect) {
-      var self = this;
+    _close_all(effect) {
+      const self = this;
 
       this.element.find('a, button').each(function() {
         self._close($(this), effect);
       });
     },
 
-    _open: function(elem) {
-      var self = this;
-      var sibl = elem.next('ul.i-dropdown');
-      var positionReference = this.options.relative_to || elem;
+    _open(elem) {
+      const self = this;
+      const sibl = elem.next('ul.i-dropdown');
+      const positionReference = this.options.relative_to || elem;
 
       elem.addClass('open');
       elem.data('no-qtip', true).trigger('indico:closeAutoTooltip');
@@ -67,18 +69,18 @@
       });
     },
 
-    _menuize: function(elem) {
-      var self = this;
+    _menuize(elem) {
+      const self = this;
 
       elem.find(this.options.selector).each(function() {
-        var $this = $(this);
+        const $this = $(this);
         if (
           !$this.attr('href') ||
           $this.attr('href') === '#' ||
           $this.data('ignore-href') !== undefined ||
           self.options.always_listen
         ) {
-          $this.on('click', function(e) {
+          $this.on('click', e => {
             if ($this.data('toggle') === 'dropdown') {
               if ($this.data('on')) {
                 self._close($this);
@@ -88,7 +90,7 @@
               e.preventDefault();
               e.stopPropagation();
             } else {
-              var result = $this.triggerHandler('menu_select', self.element);
+              const result = $this.triggerHandler('menu_select', self.element);
               if (!result) {
                 self._close_all();
               }
@@ -99,19 +101,19 @@
       });
 
       elem.find('ul.i-dropdown > li > a').each(function() {
-        var $this = $(this);
+        const $this = $(this);
         if (
           !$this.attr('href') ||
           $this.attr('href') === '#' ||
           $this.data('ignore-href') !== undefined ||
           self.options.always_listen
         ) {
-          $this.on('click', function(e) {
+          $this.on('click', e => {
             e.preventDefault();
             if ($this.hasClass('disabled')) {
               return;
             }
-            var result = $this.triggerHandler('menu_select', self.element);
+            const result = $this.triggerHandler('menu_select', self.element);
             if (!result) {
               self._close_all();
             }
@@ -120,15 +122,15 @@
       });
 
       elem.find('ul.i-dropdown > li.toggle').each(function() {
-        var li = $(this);
-        var link = $('<a>', {
+        const li = $(this);
+        const link = $('<a>', {
           href: '#',
           text: li.text(),
-          class: 'icon-checkmark ' + (li.data('state') ? '' : 'inactive'),
-          click: function(e) {
+          class: `icon-checkmark ${li.data('state') ? '' : 'inactive'}`,
+          click(e) {
             e.preventDefault();
-            var $this = $(this);
-            var newState = !li.data('state');
+            const $this = $(this);
+            const newState = !li.data('state');
             $this.toggleClass('inactive', !newState);
             li.data('state', newState);
             li.triggerHandler('menu_toggle', [newState]);
@@ -138,10 +140,10 @@
       });
     },
 
-    _create: function() {
-      var self = this;
+    _create() {
+      const self = this;
       this._menuize(this.element);
-      $(document).on('click', function(e) {
+      $(document).on('click', e => {
         // click outside? close menus.
         if ($(self.element).has(e.target).length === 0) {
           self._close_all();
@@ -149,20 +151,20 @@
       });
     },
 
-    _effect: function(st, elem, effect) {
-      var func = effect === undefined ? this.options['effect_' + st] : effect;
+    _effect(st, elem, effect) {
+      const func = effect === undefined ? this.options[`effect_${st}`] : effect;
 
       if (func === null) {
         // no pretty effects
         elem.hide();
-      } else if (typeof func == 'function') {
+      } else if (typeof func === 'function') {
         func.call(elem, this);
       } else {
-        elem[func].call(elem, this.options['time_' + st]);
+        elem[func].call(elem, this.options[`time_${st}`]);
       }
     },
 
-    close: function() {
+    close() {
       this._close_all(null);
     },
   });

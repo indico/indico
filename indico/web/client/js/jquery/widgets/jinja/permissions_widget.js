@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global build_url, confirmPrompt */
+
+import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -12,6 +15,7 @@ import {GroupSearch, UserSearch} from 'indico/react/components/principals/Search
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {$T} from 'indico/utils/i18n';
 import Palette from 'indico/utils/palette';
 
 (function($) {
@@ -129,8 +133,8 @@ import Palette from 'indico/utils/palette';
       const $permissionsList = $('<ul>').appendTo($permissions);
       // When full access is enabled, always show read access
       if (
-        _.contains(permissions, FULL_ACCESS_PERMISSIONS) &&
-        !_.contains(permissions, READ_ACCESS_PERMISSIONS)
+        permissions.includes(FULL_ACCESS_PERMISSIONS) &&
+        !permissions.includes(READ_ACCESS_PERMISSIONS)
       ) {
         permissions.push(READ_ACCESS_PERMISSIONS);
         if (principal._type !== 'DefaultEntry' && principal._type !== 'AdditionalUsers') {
@@ -141,7 +145,7 @@ import Palette from 'indico/utils/palette';
         const permissionInfo = this.options.permissionsInfo[item];
         const applyOpacity =
           item === READ_ACCESS_PERMISSIONS &&
-          _.contains(permissions, FULL_ACCESS_PERMISSIONS) &&
+          permissions.includes(FULL_ACCESS_PERMISSIONS) &&
           principal._type !== 'DefaultEntry';
         const cssClasses =
           (applyOpacity ? 'disabled ' : '') +

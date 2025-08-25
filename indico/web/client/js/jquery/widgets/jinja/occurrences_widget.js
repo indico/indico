@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import ReactDOM from 'react-dom';
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {WTFOccurrencesField} from 'indico/react/components';
 import {localeUses24HourTime} from 'indico/utils/date';
 

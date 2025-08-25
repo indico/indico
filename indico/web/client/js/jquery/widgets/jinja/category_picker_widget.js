@@ -62,7 +62,7 @@
       updateWarningVisibility(category);
     });
 
-    $dialogTrigger.on('click', function(evt) {
+    $dialogTrigger.on('click', evt => {
       evt.preventDefault();
       $('<div>').categorynavigator({
         category: navigatorCategory,

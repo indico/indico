@@ -6,14 +6,14 @@
 // LICENSE file for more details.
 
 // Global scripts that should be executed on all pages
-/* global showFormErrors:false */
-/* eslint-disable max-len */
-/* eslint-disable import/unambiguous */
+/* global showFormErrors, build_url, ajaxDialog */
 
-$(document).ready(function() {
+import {$T} from 'indico/utils/i18n';
+
+$(document).ready(() => {
   $('.main-breadcrumb a[href="#"]')
     .css({cursor: 'default', outline: 'none'})
-    .on('click', function(e) {
+    .on('click', e => {
       e.preventDefault();
     });
 
@@ -41,12 +41,12 @@ $(document).ready(function() {
     'mouseenter',
     '[title]:not([data-no-qtip]):not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
     function(evt) {
-      var $target = $(this);
-      var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
-      var extraOpts = $(this).data('qtip-opts') || {};
-      var qtipClass = $(this).data('qtip-style');
-      var qtipHTMLContainer = $(this).data('qtip-html');
-      var qtipHTML =
+      const $target = $(this);
+      const title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
+      const extraOpts = $(this).data('qtip-opts') || {};
+      const qtipClass = $(this).data('qtip-style');
+      const qtipHTMLContainer = $(this).data('qtip-html');
+      const qtipHTML =
         qtipHTMLContainer && qtipHTMLContainer.length ? $(this).next(qtipHTMLContainer) : null;
 
       // qtip not applied if it's empty, the element is disabled or it's inside a SemanticUI widget
@@ -65,8 +65,8 @@ $(document).ready(function() {
       $target.attr('data-qtip-oldtitle', title);
       $target.removeAttr('title');
 
-      var position = $(this).data('qtip-position');
-      var positionOptions;
+      const position = $(this).data('qtip-position');
+      let positionOptions;
       if (position === 'left') {
         positionOptions = {
           my: 'right center',
@@ -90,7 +90,7 @@ $(document).ready(function() {
       }
 
       /* Attach the qTip to a new element to avoid side-effects on all elements with "title" attributes. */
-      var qtip = $('<span>').qtip(
+      const qtip = $('<span>').qtip(
         $.extend(
           true,
           {},
@@ -109,7 +109,7 @@ $(document).ready(function() {
             },
 
             content: {
-              text: function() {
+              text() {
                 if (qtipHTML) {
                   return qtipHTML.html();
                 } else {
@@ -119,18 +119,18 @@ $(document).ready(function() {
             },
 
             events: {
-              show: function(event) {
+              show(event) {
                 if ($(event.originalEvent.target).hasClass('open')) {
                   event.preventDefault();
                 }
               },
 
-              hide: function() {
+              hide() {
                 $(this).qtip('destroy');
               },
 
-              render: function(event, api) {
-                $target.on('DOMNodeRemovedFromDocument remove', function() {
+              render(event, api) {
+                $target.on('DOMNodeRemovedFromDocument remove', () => {
                   api.destroy();
                 });
               },
@@ -142,7 +142,7 @@ $(document).ready(function() {
             },
 
             style: {
-              classes: qtipClass ? 'qtip-' + qtipClass : null,
+              classes: qtipClass ? `qtip-${qtipClass}` : null,
             },
           },
           extraOpts
@@ -150,7 +150,7 @@ $(document).ready(function() {
         evt
       );
 
-      $target.on('indico:closeAutoTooltip', function() {
+      $target.on('indico:closeAutoTooltip', () => {
         qtip.qtip('hide');
       });
     }
@@ -168,13 +168,13 @@ $(document).ready(function() {
   });
 
   // Prevent # in the URL when clicking disabled links
-  $('body').on('click', 'a.disabled', function(evt) {
+  $('body').on('click', 'a.disabled', evt => {
     evt.preventDefault();
   });
 
   $('.contextHelp[data-src]').qtip({
     content: {
-      text: function() {
+      text() {
         return $($(this).data('src')).removeClass('tip');
       },
     },
@@ -188,7 +188,7 @@ $(document).ready(function() {
     });
   }
 
-  $('body').on('indico:htmlUpdated', function(evt) {
+  $('body').on('indico:htmlUpdated', evt => {
     initDropdowns($(evt.target));
   });
   initDropdowns($('body'));
@@ -209,12 +209,12 @@ $(document).ready(function() {
   // the focus trap (focusin event bound on document) from ever receiving the
   // event in case the z-index of the focused event is higher than the dialog's.
   function getMaxZ(elem) {
-    var maxZ = 0;
+    let maxZ = 0;
     elem
       .parents()
       .addBack()
       .each(function() {
-        var z = +$(this).css('zIndex');
+        const z = +$(this).css('zIndex');
         if (!isNaN(z)) {
           maxZ = Math.max(z, maxZ);
         }
@@ -222,7 +222,7 @@ $(document).ready(function() {
     return maxZ;
   }
 
-  $('body').on('focusin', function(e) {
+  $('body').on('focusin', e => {
     if (!$.ui.dialog.overlayInstances) {
       return;
     }

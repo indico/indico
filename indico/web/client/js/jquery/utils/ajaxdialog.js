@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ExclusivePopup:false, showFormErrors:false, initForms:false */
-/* eslint-disable max-len */
+/* global ExclusivePopup, showFormErrors, initForms, confirmPrompt, getDropzoneFiles,
+   setDropzoneFiles, handleAjaxError, handleFlashes */
+
+import _ from 'lodash';
+
+import {$T} from 'indico/utils/i18n';
 
 (function(global, $) {
-  'use strict';
-
   // Ajaxifies a link to open the target page (which needs to be using jsonify_template or
   // WPJinjaMixin.render_template) in a  modal dialog. Any forms on the page are ajaxified and should be using
   // redirect_or_jsonify() (when used with WPJinjaMixin) or jsonify_data (when used with jsonify_template)
@@ -18,15 +20,15 @@
   // The link target MUST point to a page which is also valid when loaded directly in the browser since the
   // link could still be opened in a new tab manually. If you don't have a non-AJAX version, place the url in
   // data-href.
-  $.fn.ajaxDialog = function jqAjaxDialog(options) {
+  $.fn.ajaxDialog = function ajaxDialog(options) {
     return this.on('click', function(e) {
       e.preventDefault();
       if ($(this).hasClass('disabled')) {
         return;
       }
-      var href = $(this).attr('href');
+      let href = $(this).attr('href');
       if (href === undefined || href === '#') {
-        var dataHref = $(this).data('href');
+        const dataHref = $(this).data('href');
         href = dataHref ? dataHref : href;
       }
       ajaxDialog(
@@ -67,7 +69,7 @@
         onLoadError: null, // callback to invoke when loading the dialog fails.  receives the jqxhr object as an
         // argument.  if the function returns false, the default error handler is not invoked.
         onError: null, // callback to invoke after triggering ajaxDialog:close event
-        getExtraData: function() {}, // callback to add data to the form. receives the <form> element as `this`
+        getExtraData() {}, // callback to add data to the form. receives the <form> element as `this`
         confirmCloseUnsaved: false, // ask the user to confirm closing the dialog with unsaved changes
         dialogClasses: '', // extra classes to add to the dialog canvas
         hidePageHeader: false, // if the default page header (title/subtitle/description) should be hidden
@@ -76,14 +78,14 @@
       options
     );
 
-    var confirmCloseMessage = $T(
+    const confirmCloseMessage = $T(
       'You have unsaved changes. Do you really want to close the dialog without saving?'
     );
-    var popup = null;
-    var customData = null;
-    var oldOnBeforeUnload = null;
-    var ignoreOnBeforeUnload = false;
-    var savedFiles = {};
+    let popup = null;
+    let customData = null;
+    let oldOnBeforeUnload = null;
+    let ignoreOnBeforeUnload = false;
+    let savedFiles = {};
 
     loadDialog();
 
@@ -98,13 +100,13 @@
         data: $.isFunction(options.data) ? options.data() : options.data,
         cache: false, // IE caches GET AJAX requests. WTF.
         complete: IndicoUI.Dialogs.Util.progress(),
-        error: function(xhr) {
-          var handled = false;
+        error(xhr) {
+          let handled = false;
           if (options.onLoadError && options.onLoadError(xhr) === false) {
             handled = true;
           }
           if (options.trigger) {
-            var evt = $.Event('ajaxDialog:loadError');
+            const evt = $.Event('ajaxDialog:loadError');
             $(options.trigger).trigger(evt, [xhr]);
             if (evt.isDefaultPrevented()) {
               handled = true;
@@ -114,11 +116,11 @@
             handleAjaxError(xhr);
           }
         },
-        success: function(data, _, xhr) {
+        success(data, __, xhr) {
           if (handleAjaxError(data)) {
             return;
           }
-          var loadedURL = xhr.getResponseHeader('X-Indico-URL');
+          const loadedURL = xhr.getResponseHeader('X-Indico-URL');
           if (loadedURL) {
             // in case of a redirect we need to update the url used to submit the ajaxified
             // form. otherwise url normalization might fail during the POST requests.
@@ -135,7 +137,7 @@
     }
 
     function hasChangedFields() {
-      var forms = popup.contentContainer.find('form');
+      const forms = popup.contentContainer.find('form');
       return (
         forms.length &&
         !!forms.filter(function() {
@@ -156,7 +158,7 @@
       }
       popup = new ExclusivePopup(
         $.isFunction(options.title) ? options.title.call(options.trigger) : options.title,
-        function() {
+        () => {
           closeDialog(null);
           return false;
         },
@@ -178,12 +180,12 @@
           );
         }
         if (options.closeButton !== undefined && options.closeButton !== false) {
-          var text = options.closeButton === true ? $T.gettext('Close') : options.closeButton;
+          const text = options.closeButton === true ? $T.gettext('Close') : options.closeButton;
           this.contentContainer.append(
             $('<button>', {
               class: 'i-button big right',
               type: 'button',
-              text: text,
+              text,
               'data-button-back': '',
             })
           );
@@ -192,25 +194,25 @@
 
       popup.postDraw = function() {
         ajaxifyForms();
-        popup.canvas.on('ajaxDialog:setData', function(e, data) {
+        popup.canvas.on('ajaxDialog:setData', (e, data) => {
           customData = data;
         });
-        popup.canvas.on('ajaxDialog:close', function(e, data, submitted) {
+        popup.canvas.on('ajaxDialog:close', (e, data, submitted) => {
           closeDialog(data, submitted);
         });
-        popup.canvas.on('ajaxDialog:reload', function() {
+        popup.canvas.on('ajaxDialog:reload', () => {
           loadDialog();
         });
         injectJS(dialogData.js);
         _onOpen();
-        _.defer(function() {
+        _.defer(() => {
           popup.canvas.focusFirstField();
         });
 
         return true;
       };
 
-      var dialogClasses = _.union(['dialog-window', options.dialogClasses]);
+      const dialogClasses = _.union(['dialog-window', options.dialogClasses]);
       if (options.hidePageHeader) {
         dialogClasses.push('no-page-header');
       }
@@ -229,11 +231,11 @@
     }
 
     function closeDialog(callbackData, submitted) {
-      var confirmDeferred =
+      const confirmDeferred =
         submitted || !options.confirmCloseUnsaved ? $.Deferred().resolve() : confirmClose();
-      confirmDeferred.done(function() {
+      confirmDeferred.done(() => {
         ignoreOnBeforeUnload = true;
-        var onCloseResult = _onClose(callbackData);
+        let onCloseResult = _onClose(callbackData);
         if (onCloseResult === false) {
           ignoreOnBeforeUnload = false;
           return;
@@ -241,13 +243,13 @@
           onCloseResult = $.Deferred().resolve();
         }
         onCloseResult.then(
-          function() {
+          () => {
             _doCloseDialog();
             if (options.trigger) {
               $(options.trigger).trigger('ajaxDialog:closed', [callbackData, customData]);
             }
           },
-          function() {
+          () => {
             ignoreOnBeforeUnload = false;
           }
         );
@@ -283,22 +285,22 @@
     }
 
     function ajaxifyForms() {
-      var killProgress = null;
-      popup.contentContainer.on('click', options.backSelector, function(e) {
+      let killProgress = null;
+      popup.contentContainer.on('click', options.backSelector, e => {
         e.preventDefault();
         closeDialog();
       });
-      var forms = popup.contentContainer.find('form');
+      const forms = popup.contentContainer.find('form');
       showFormErrors(popup.resultContainer);
       initForms(forms);
       forms.filter(':not([data-no-ajax])').each(function() {
-        var $this = $(this);
+        const $this = $(this);
         $this
-          .on('ajaxForm:beforeSubmit', function() {
+          .on('ajaxForm:beforeSubmit', () => {
             killProgress = IndicoUI.Dialogs.Util.progress();
             $.extend(savedFiles, getDropzoneFiles($this));
           })
-          .on('ajaxForm:error', function(e, xhr) {
+          .on('ajaxForm:error', (e, xhr) => {
             if (killProgress) {
               killProgress();
             }
@@ -309,7 +311,7 @@
               handleAjaxError(xhr);
             }
           })
-          .on('ajaxForm:success', function(e, data) {
+          .on('ajaxForm:success', (e, data) => {
             if (killProgress) {
               killProgress();
             }
@@ -330,9 +332,9 @@
               }
             } else if (data.html) {
               popup.contentContainer.html(data.html);
-              $this.ready(function() {
-                $.each(savedFiles, function(id, files) {
-                  setDropzoneFiles($('#' + id), files);
+              $this.ready(() => {
+                $.each(savedFiles, (id, files) => {
+                  setDropzoneFiles($(`#${id}`), files);
                 });
                 savedFiles = {};
               });
@@ -342,23 +344,23 @@
           });
         // We often use forms with an empty action; those need to go to
         // their page and not the page that loaded the dialog!
-        var action = $this.attr('action') || options.url;
+        const action = $this.attr('action') || options.url;
         $this.ajaxForm({
           url: action,
           dataType: 'json',
           data: options.getExtraData.call(this, options.trigger),
-          beforeSubmit: function() {
-            var evt = $.Event('ajaxForm:validateBeforeSubmit');
+          beforeSubmit() {
+            const evt = $.Event('ajaxForm:validateBeforeSubmit');
             $this.trigger(evt);
             if (evt.isDefaultPrevented()) {
               return false;
             }
             $this.trigger('ajaxForm:beforeSubmit');
           },
-          error: function(xhr) {
+          error(xhr) {
             $this.trigger('ajaxForm:error', [xhr]);
           },
-          success: function(data) {
+          success(data) {
             $this.trigger('ajaxForm:success', [data]);
           },
         });

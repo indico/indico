@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-(function($) {
-  'use strict';
+/* eslint-disable import/unambiguous */
 
+(function($) {
   $.widget('indico.paperemailsettingswidget', {
     options: {
       containerElement: null,
@@ -19,32 +19,32 @@
       singleRecipientOptions: ['notify_judge_on_review', 'notify_author_on_judgment'],
     },
 
-    _initCheckboxes: function(data) {
-      var self = this;
-      var elementID = self.element.prop('id');
-      var multipleRecipientOptions = self.options.multipleRecipientOptions;
-      var singleRecipientOptions = self.options.singleRecipientOptions;
+    _initCheckboxes(data) {
+      const self = this;
+      const elementID = self.element.prop('id');
+      const multipleRecipientOptions = self.options.multipleRecipientOptions;
+      const singleRecipientOptions = self.options.singleRecipientOptions;
 
-      multipleRecipientOptions.forEach(function(condition) {
-        data[condition].forEach(function(role) {
+      multipleRecipientOptions.forEach(condition => {
+        data[condition].forEach(role => {
           $('#{0}-{1}-{2}'.format(elementID, condition, role)).prop('checked', true);
         });
       });
-      singleRecipientOptions.forEach(function(condition) {
+      singleRecipientOptions.forEach(condition => {
         $('#{0}-{1}'.format(elementID, condition)).prop('checked', data[condition]);
       });
     },
 
-    _create: function() {
-      var self = this;
-      var element = self.element;
-      var $container = self.options.containerElement;
-      var hiddenData = element.val() ? JSON.parse(element.val()) : {};
+    _create() {
+      const self = this;
+      const element = self.element;
+      const $container = self.options.containerElement;
+      const hiddenData = element.val() ? JSON.parse(element.val()) : {};
 
       self._initCheckboxes(hiddenData);
 
       $container.find('.multiple-recipients input').on('change', function() {
-        var setting = hiddenData[this.name];
+        const setting = hiddenData[this.name];
         if (this.checked) {
           setting.push(this.value);
         } else {

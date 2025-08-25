@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function($) {
   $.widget('indico.qbubble', {
     defaultQtipOptions: {
@@ -27,50 +29,50 @@
       },
     },
 
-    _create: function() {
-      var self = this;
-      var classes = self.options.style ? self.options.style.classes : '';
+    _create() {
+      const self = this;
+      const classes = self.options.style ? self.options.style.classes : '';
 
       self.element.qtip(
         $.extend(true, {}, self.defaultQtipOptions, self.options, {
-          style: {classes: 'qbubble ' + classes},
+          style: {classes: `qbubble ${classes}`},
         })
       );
 
       this._on({
-        click: function(evt) {
+        click(evt) {
           evt.preventDefault();
         },
       });
     },
 
-    api: function() {
-      var self = this;
+    api() {
+      const self = this;
       return self.element.qtip('api');
     },
 
-    destroy: function() {
-      var self = this;
+    destroy() {
+      const self = this;
       self.element.qtip('destroy');
     },
 
-    hide: function() {
-      var self = this;
+    hide() {
+      const self = this;
       self.element.qtip('hide');
     },
 
-    option: function(entry, value) {
-      var self = this;
+    option(entry, value) {
+      const self = this;
       self.element.qtip('option', entry, value);
     },
 
-    createNested: function(elem, nestedQtipOptions) {
-      var self = this;
-      var originalHideCallback = nestedQtipOptions.events && nestedQtipOptions.events.hide;
-      var originalShowCallback = nestedQtipOptions.events && nestedQtipOptions.events.show;
+    createNested(elem, nestedQtipOptions) {
+      const self = this;
+      const originalHideCallback = nestedQtipOptions.events && nestedQtipOptions.events.hide;
+      const originalShowCallback = nestedQtipOptions.events && nestedQtipOptions.events.show;
       $.extend(true, nestedQtipOptions, {
         events: {
-          show: function(evt, api) {
+          show(evt, api) {
             if (originalShowCallback) {
               originalShowCallback(evt, api);
             }
@@ -79,7 +81,7 @@
               self.element.qtip('disable');
             }
           },
-          hide: function(evt, api) {
+          hide(evt, api) {
             if (originalHideCallback) {
               originalHideCallback(evt, api);
             }

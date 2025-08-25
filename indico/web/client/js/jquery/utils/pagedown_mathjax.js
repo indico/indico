@@ -9,22 +9,22 @@
 /* global Markdown:false, MathJax:false, PageDownMathJax:false */
 
 (function() {
-  var DELIMITERS = [
+  const DELIMITERS = [
     ['$', '$'],
     ['$$', '$$'],
   ];
 
   window.PageDownMathJax = function() {
-    var $preview = null; // the preview container
+    let $preview = null; // the preview container
 
-    var blocks, start, end, last, braces; // used in searching for math
-    var math; // stores math until markdone is done
+    let blocks, start, end, last, braces; // used in searching for math
+    let math; // stores math until markdone is done
 
     //
     // The pattern for math delimiters and special symbols
     // needed for searching for math in the page.
     //
-    var SPLIT = /(\$\$?|\\(?:begin|end)\{[a-z]*\*?\}|\\[\\{}$]|[{}]|(?:\n\s*)+|@@\d+@@)/i;
+    const SPLIT = /(\$\$?|\\(?:begin|end)\{[a-z]*\*?\}|\\[\\{}$]|[{}]|(?:\n\s*)+|@@\d+@@)/i;
 
     /*
      *  The math is in blocks i through j, so
@@ -35,7 +35,7 @@
      * math, then push the math string onto the storage array.
      */
     function processMath(i, j) {
-      var block = blocks
+      const block = blocks
         .slice(i, j + 1)
         .join('')
         .replace(/&/g, '&amp;') // use HTML entity for &
@@ -45,7 +45,7 @@
         blocks[j] = '';
         j--;
       }
-      blocks[i] = '@@' + math.length + '@@';
+      blocks[i] = `@@${math.length}@@`;
       math.push(block);
       start = end = last = null;
     }
@@ -62,14 +62,14 @@
       math = []; // stores math strings for latter
 
       blocks = text.replace(/\r\n?/g, '\n').split(SPLIT);
-      for (var i = 1, m = blocks.length; i < m; i += 2) {
-        var block = blocks[i];
+      for (let i = 1, m = blocks.length; i < m; i += 2) {
+        const block = blocks[i];
         if (block.charAt(0) === '@') {
           //
           // Things that look like our math markers will get
           // stored and then retrieved along with the math.
           //
-          blocks[i] = '@@' + math.length + '@@';
+          blocks[i] = `@@${math.length}@@`;
           math.push(block);
         } else if (start) {
           //
@@ -106,7 +106,7 @@
             braces = 0;
           } else if (block.substr(1, 5) === 'begin') {
             start = i;
-            end = '\\end' + block.substr(6);
+            end = `\\end${block.substr(6)}`;
             braces = 0;
           }
         }
@@ -122,7 +122,7 @@
     // and clear the math array (no need to keep it around).
     //
     function replaceMath(text) {
-      text = text.replace(/@@(\d+)@@/g, function(match, n) {
+      text = text.replace(/@@(\d+)@@/g, (match, n) => {
         return math[n];
       });
       math = null;
@@ -154,13 +154,13 @@
     }
 
     function createPreview(elem, editorObject) {
-      var converterObject = editorObject.getConverter();
+      const converterObject = editorObject.getConverter();
       converterObject.hooks.chain('preConversion', removeMath);
       converterObject.hooks.chain('postConversion', replaceMath);
 
       function preview() {
-        updateMJ(elem, function() {
-          var new_height = $preview.outerHeight(),
+        updateMJ(elem, () => {
+          const new_height = $preview.outerHeight(),
             $wrapper = $preview.closest('.md-preview-wrapper'),
             is_empty = $preview.is(':empty');
 
@@ -180,21 +180,21 @@
     }
 
     function createEditor(elem) {
-      var $container = $(elem).closest('[data-field-id]');
+      const $container = $(elem).closest('[data-field-id]');
       $preview = $container.find('.wmd-preview');
 
-      var fieldId = $container.data('fieldId'),
+      const fieldId = $container.data('fieldId'),
         converter = Markdown.getSanitizingConverter();
 
-      converter.hooks.chain('preBlockGamut', function block_handler(text, rbg) {
-        return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function(whole, inner) {
-          return '<blockquote>' + rbg(inner) + '</blockquote>\n';
+      converter.hooks.chain('preBlockGamut', (text, rbg) => {
+        return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, (whole, inner) => {
+          return `<blockquote>${rbg(inner)}</blockquote>\n`;
         });
       });
 
-      var editor = new Markdown.Editor(converter, '-f_' + fieldId, {
+      const editor = new Markdown.Editor(converter, `-f_${fieldId}`, {
         helpButton: {
-          handler: function() {
+          handler() {
             return false;
           },
         },
@@ -213,12 +213,13 @@
     }
 
     return {
-      mathJax: mathJax,
-      createEditor: createEditor,
+      mathJax,
+      createEditor,
     };
   };
 
-  var pd = PageDownMathJax();
+  // eslint-disable-next-line new-cap
+  const pd = PageDownMathJax();
 
   window.mathJax = pd.mathJax.bind(pd);
 
@@ -231,12 +232,13 @@
 
   $.fn.pagedown = function() {
     function _pagedown(elem) {
+      // eslint-disable-next-line new-cap
       const pd_context = PageDownMathJax();
       elem.data('pagedown', pd_context);
       pd_context.createEditor(elem.get(0));
     }
 
-    $(this).each(function(i, elem) {
+    $(this).each((i, elem) => {
       _pagedown($(elem));
     });
   };

@@ -5,29 +5,31 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+
 (function(global) {
   // rule-based url building is based on werkzeug.contrib.jsrouting
 
-  function BuildError(message) {
-    var argString;
-    if (arguments.length > 1) {
-      argString = JSON.stringify(Array.prototype.slice.call(arguments, 1));
+  function BuildError(message, ...rest) {
+    let argString;
+    if (rest.length) {
+      argString = JSON.stringify(rest);
       argString = argString.substring(1, argString.length - 1);
     }
     this.name = 'BuildError';
-    this.message = message + (argString ? ': ' + argString : '');
+    this.message = message + (argString ? `: ${argString}` : '');
     // remove the following when http://code.google.com/p/chromium/issues/detail?id=228909 is fixed
-    var err = new Error(this.message);
+    const err = new Error(this.message);
     err.name = this.name;
     return err;
   }
   BuildError.prototype = new Error();
   BuildError.prototype.constructor = BuildError;
 
-  var converterFuncs = {
+  const converterFuncs = {
     // Put any converter functions for custom URL converters here. The key is the converter's python class name.
     // If there is no function, encodeURIComponent is used - so there's no need to put default converters here!
-    ListConverter: function(value) {
+    ListConverter(value) {
       if (_.isArray(value)) {
         value = value.join('-');
       }
@@ -37,24 +39,23 @@
 
   function splitObj(obj) {
     // Splits an object into keys and values (and the object itself for convenience)
-    var names = [];
-    var values = [];
-    for (var name in obj) {
+    const names = [];
+    const values = [];
+    for (const name in obj) {
       names.push(name);
       values.push(obj[name]);
     }
-    return {names: names, values: values, original: obj};
+    return {names, values, original: obj};
   }
 
   function suitable(rule, args) {
     // Checks if a rule is suitable for the given arguments
-    var defaultArgs = splitObj(rule.defaults || {});
-    var diffArgNames = _.difference(rule.args, defaultArgs.names);
-    var i;
+    const defaultArgs = splitObj(rule.defaults || {});
+    const diffArgNames = _.difference(rule.args, defaultArgs.names);
 
     // If a rule arg that has no default value is missing, the rule is not suitable
-    for (i = 0; i < diffArgNames.length; i++) {
-      if (!~_.indexOf(args.names, diffArgNames[i])) {
+    for (let i = 0; i < diffArgNames.length; i++) {
+      if (!args.names.includes(diffArgNames[i])) {
         return false;
       }
     }
@@ -64,9 +65,9 @@
         return true;
       }
       // If a default argument is provided with a different value, the rule is not suitable
-      for (i = 0; i < defaultArgs.names.length; i++) {
-        var key = defaultArgs.names[i];
-        var value = defaultArgs.values[i];
+      for (let i = 0; i < defaultArgs.names.length; i++) {
+        const key = defaultArgs.names[i];
+        const value = defaultArgs.values[i];
         if (value !== args.original[key]) {
           return false;
         }
@@ -77,13 +78,13 @@
   }
 
   function build(rule, args) {
-    var tmp = [];
-    var processed = rule.args.slice();
-    for (var i = 0; i < rule.trace.length; i++) {
-      var part = rule.trace[i];
+    let tmp = [];
+    const processed = rule.args.slice();
+    for (let i = 0; i < rule.trace.length; i++) {
+      const part = rule.trace[i];
       if (part.is_dynamic) {
-        var converter = converterFuncs[rule.converters[part.data]] || encodeURIComponent;
-        var value = converter(args.original[part.data]);
+        const converter = converterFuncs[rule.converters[part.data]] || encodeURIComponent;
+        const value = converter(args.original[part.data]);
         if (value === null) {
           return null;
         }
@@ -94,23 +95,23 @@
       }
     }
     tmp = tmp.join('');
-    var pipe = tmp.indexOf('|');
+    const pipe = tmp.indexOf('|');
     // if we had subdomain routes, the subdomain would come before the pipe
-    var url = tmp.substring(pipe + 1);
-    var unprocessed = _.difference(args.names, processed);
-    return {url: url, unprocessed: unprocessed};
+    const url = tmp.substring(pipe + 1);
+    const unprocessed = _.difference(args.names, processed);
+    return {url, unprocessed};
   }
 
   function fixParams(params) {
-    var cleanParams = {};
-    for (var key in params) {
-      var value = params[key];
+    const cleanParams = {};
+    for (const key in params) {
+      let value = params[key];
       if (value === '') {
         continue;
       }
       if (value === undefined || value === null) {
         // convert them to a string
-        value = '' + value;
+        value = `${value}`;
       }
       if (!_.isObject(value) || _.isArray(value)) {
         cleanParams[key] = value;
@@ -119,9 +120,9 @@
     return cleanParams;
   }
 
+  // eslint-disable-next-line camelcase
   function build_url(template, params, fragment) {
-    // eslint-disable-line camelcase
-    var qsParams, url;
+    let qsParams, url;
 
     params = fixParams(params);
 
@@ -129,11 +130,11 @@
       url = template;
       qsParams = params || {};
     } else if (template.type === 'flask_rules') {
-      var args = splitObj(params || {});
-      for (var i = 0; i < template.rules.length; i++) {
-        var rule = template.rules[i];
+      const args = splitObj(params || {});
+      for (let i = 0; i < template.rules.length; i++) {
+        const rule = template.rules[i];
         if (suitable(rule, args)) {
-          var res = build(rule, args);
+          const res = build(rule, args);
           if (res === null) {
             continue;
           }
@@ -154,7 +155,7 @@
           url = url.substring(7);
         }
         url = url.replace(/^\/+/, '').replace(/\/$/, '').replace(/\//g, '--');
-        if (!url.match(/.*\.([^\/]+)$/)) {
+        if (!url.match(/.*\.([^/]+)$/)) {
           url += '.html';
         }
       } else {
@@ -165,12 +166,12 @@
     }
 
     if (!$('html').data('static-site')) {
-      var qs = $.param(qsParams, true);
+      const qs = $.param(qsParams, true);
       if (qs) {
-        url += (~url.indexOf('?') ? '&' : '?') + qs;
+        url += (url.includes('?') ? '&' : '?') + qs;
       }
       if (fragment) {
-        url += '#' + fragment.replace(/^#/, '');
+        url += `#${fragment.replace(/^#/, '')}`;
       }
     }
     return url;
