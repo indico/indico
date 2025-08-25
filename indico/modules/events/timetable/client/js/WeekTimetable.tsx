@@ -212,7 +212,10 @@ function layoutAfterDropOnDay(
   }
 
   const toEntries = entries[over.id];
-  const groupIds = getGroup(entry, toEntries.filter(e => e.id !== entry.id));
+  const groupIds = getGroup(
+    entry,
+    toEntries.filter(e => e.id !== entry.id)
+  );
   let group = toEntries.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, entry, mousePosition);
 
@@ -220,10 +223,16 @@ function layoutAfterDropOnDay(
   const newLayout = layout([...otherEntries, ...group]);
 
   if (fromDay === over.id) {
-    return [{layout: newLayout, dt: fromDay}, {layout: newLayout, dt: fromDay}];
+    return [
+      {layout: newLayout, dt: fromDay},
+      {layout: newLayout, dt: fromDay},
+    ];
   } else {
     const fromEntries = entries[fromDay].filter(e => e.id !== entry.id);
     const newFromLayout = layout(fromEntries);
-    return [{layout: newFromLayout, dt: fromDay}, {layout: newLayout, dt: over.id}];
+    return [
+      {layout: newFromLayout, dt: fromDay},
+      {layout: newLayout, dt: over.id},
+    ];
   }
 }
