@@ -223,7 +223,7 @@ export default {
       // return {...state};
       case actions.DELETE_BREAK: {
         const {id} = action.entry;
-        if ('sessionBlockId' in action.entry) {
+        if (action.entry.sessionBlockId) {
           const sessionBlockId = action.entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
@@ -338,7 +338,7 @@ export default {
       }
       case actions.UNSCHEDULE_ENTRY: {
         const {id} = action.entry;
-        if ('sessionBlockId' in action.entry) {
+        if (action.entry.sessionBlockId) {
           const sessionBlockId = action.entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
