@@ -443,13 +443,19 @@ function layoutAfterDropOnCalendar(
   }
 
   // Find all the entries that are linked to the new entry and recompute their layout
-  const groupIds = getGroup(draftEntry, entries.filter(e => e.id !== draftEntry.id));
+  const groupIds = getGroup(
+    draftEntry,
+    entries.filter(e => e.id !== draftEntry.id)
+  );
   let group = entries.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, draftEntry, mousePosition);
 
   if (!fromBlock) {
     // Drop from top level to top level
-    const oldGroupIds = getGroup(fromEntry, entries.filter(e => e.id !== fromEntry.id));
+    const oldGroupIds = getGroup(
+      fromEntry,
+      entries.filter(e => e.id !== fromEntry.id)
+    );
     let oldGroup = entries.filter(e => oldGroupIds.has(e.id) && !groupIds.has(e.id));
     const otherEntries = entries.filter(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
@@ -554,7 +560,10 @@ function layoutAfterDropOnBlock(
     );
   }
 
-  const groupIds = getGroup(draftEntry, toBlock.children.filter(e => e.id !== draftEntry.id));
+  const groupIds = getGroup(
+    draftEntry,
+    toBlock.children.filter(e => e.id !== draftEntry.id)
+  );
   let group = toBlock.children.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, draftEntry, mousePosition);
 

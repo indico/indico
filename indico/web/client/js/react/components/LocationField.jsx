@@ -106,7 +106,10 @@ export default function LocationField({
     });
   };
 
-  const makeOnChange = key => (_, {value: fieldValue}) => onChange({...value, [key]: fieldValue});
+  const makeOnChange =
+    key =>
+    (_, {value: fieldValue}) =>
+      onChange({...value, [key]: fieldValue});
 
   return (
     <>
