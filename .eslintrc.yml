@@ -6,7 +6,6 @@ env:
 
 plugins:
   - react-hooks
-  - prettier
   - jest
   - '@typescript-eslint'
 
@@ -15,7 +14,7 @@ extends:
   - 'indico/babel'
   - 'indico/react'
   - 'indico/react-hooks'
-  - 'indico/prettier'
+  - 'indico/no-prettier'
 
 settings:
   # we don't use the webpack resolver because it is SLOW (~1s),
@@ -75,6 +74,7 @@ rules:
     - error
     - event
   react/require-default-props: off
+  prefer-arrow-callback: error
 
 overrides:
   - files:

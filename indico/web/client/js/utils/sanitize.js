@@ -14,7 +14,7 @@ import _sanitizeHtml from 'sanitize-html';
 // It is the same configuration that is used by bleach on the server-side (except for the legacy attributes).
 // See 'indico/util/string.py'
 
-// prettier-ignore
+// biome-ignore format: keep block compact
 const ALLOWED_TAGS = [
   // bleach.ALLOWED_TAGS
   'a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
@@ -37,7 +37,7 @@ const ALLOWED_ATTRIBUTES = {
   img: ['src', 'alt', 'style'],
 };
 
-// prettier-ignore
+// biome-ignore format: keep block compact
 const ALLOWED_STYLES = [
   'background-color', 'border-top-color', 'border-top-style', 'border-top-width', 'border-top', 'border-right-color',
   'border-right-style', 'border-right-width', 'border-right', 'border-bottom-color', 'border-bottom-style',
