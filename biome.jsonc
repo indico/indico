@@ -40,10 +40,16 @@
     "includes": [
       "{bin,indico,webpack}/**/*.{js,jsx,mjs,ts,tsx}",
       "indico/**/*.{css,scss}",
+      "{.github,indico}/**/*.json",
+      "*.json",
+      // Test snapshots
+      "!indico/**/tests/*.json",
       // Not actually JavaScript
       "!indico/web/templates/assets",
       // Generated content
-      "!indico/web/static/dist"
+      "!indico/web/static/dist",
+      "!indico/translations",
+      "!indico/web/static/fonts/icomoon/selection.json"
     ]
   }
 }
