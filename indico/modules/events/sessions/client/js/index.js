@@ -76,13 +76,13 @@ import './session_display';
     handleRowSelection(false);
     const applySearchFilters = setupSearchBox(filterConfig);
 
-    $('#sessions .toolbar').on('click', '.disabled', function(evt) {
+    $('#sessions .toolbar').on('click', '.disabled', evt => {
       evt.preventDefault();
       evt.stopPropagation();
     });
 
     $('#sessions-wrapper')
-      .on('indico:htmlUpdated', function() {
+      .on('indico:htmlUpdated', () => {
         setupTableSorter();
         setupPalettePickers();
         handleRowSelection(true);
@@ -95,7 +95,7 @@ import './session_display';
           url: $this.data('href'),
         });
       })
-      .on('attachments:updated', function(evt) {
+      .on('attachments:updated', evt => {
         const target = $(evt.target);
         reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       });
@@ -144,7 +144,7 @@ import './session_display';
           const $this = $(this);
           const postData = {type_id: newType ? newType.id : null};
 
-          return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+          return patchObject($this.data('href'), $this.data('method'), postData).then(() => {
             const label = newType ? newType.title : $T.gettext('No type');
             $this.find('.label').text(label);
           });

@@ -15,11 +15,11 @@ export const defaultI18n = new Jed({
 
 export const $T = _.bind(defaultI18n.gettext, defaultI18n);
 
-['gettext', 'ngettext', 'pgettext', 'npgettext', 'translate'].forEach(function(name) {
+['gettext', 'ngettext', 'pgettext', 'npgettext', 'translate'].forEach(name => {
   $T[name] = _.bind(defaultI18n[name], defaultI18n);
 });
 
-$T.domain = _.memoize(function(domain) {
+$T.domain = _.memoize(domain => {
   return new Jed({
     locale_data: global.TRANSLATIONS,
     domain,

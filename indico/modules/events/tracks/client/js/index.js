@@ -45,7 +45,7 @@
           const $this = $(this);
           if ($this.height() > heightLimit) {
             $this.addClass('track-content-collapsed track-content-collapsible');
-            $this.on('click', function() {
+            $this.on('click', () => {
               $this.toggleClass('track-content-collapsed');
             });
           }

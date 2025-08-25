@@ -90,7 +90,7 @@ import {natSortCompare} from 'indico/utils/sort';
       });
     });
 
-    enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {
+    enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, $checkboxes => {
       return $checkboxes.filter(':not([data-is-empty=true])').length === 0;
     });
     $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
@@ -130,7 +130,7 @@ import {natSortCompare} from 'indico/utils/sort';
     }
 
     function restoreCategoryOrder(order) {
-      $.each(order, function(index, id) {
+      $.each(order, (index, id) => {
         $tbody.find(`[data-category-id=${id}]`).not('.js-move-category').detach().appendTo($tbody);
       });
     }
@@ -146,7 +146,7 @@ import {natSortCompare} from 'indico/utils/sort';
     function sortCategories(sortOrder) {
       $tbody
         .find(categoryRowSelector)
-        .sort(function(a, b) {
+        .sort((a, b) => {
           [a, b] = [$(a), $(b)];
           return (
             sortOrder *

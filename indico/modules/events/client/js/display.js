@@ -81,7 +81,7 @@ import './favorite';
       return false;
     });
 
-    $(document).ready(function() {
+    $(document).ready(() => {
       $('h1, .item-description, .timetable-title').mathJax();
     });
   }
@@ -101,7 +101,7 @@ import './favorite';
     }
   }
 
-  $(document).ready(function() {
+  $(document).ready(() => {
     $('.event-service-row > .trigger').on('click', function() {
       const toggler = $(this);
       toggler.siblings('.event-service-details').slideToggle({
@@ -134,7 +134,7 @@ import './favorite';
     );
     const initialHeight = $('.participant-list-wrapper').height();
 
-    $('.participant-list-wrapper.transparent-overlay').on('click', function() {
+    $('.participant-list-wrapper.transparent-overlay').on('click', () => {
       const toggler = $('.participant-list-wrapper > .trigger');
       const participantList = toggler.siblings('.participant-list');
       const wrapper = participantList.parent();

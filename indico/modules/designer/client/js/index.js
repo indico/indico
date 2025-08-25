@@ -415,7 +415,7 @@ import {$T} from 'indico/utils/i18n';
   // If there are already some items being displayed, it does not erase them
   function displayItems(isBackside) {
     var itemsList = isBackside ? backsideItems : items;
-    $.each(itemsList, function(i, item) {
+    $.each(itemsList, (i, item) => {
       var newDiv = createDiv(item, isBackside);
       newDiv.css({
         left: zoom(item.x) + 'px',
@@ -684,7 +684,7 @@ import {$T} from 'indico/utils/i18n';
         width: templateDimensions.realWidth,
         height: templateDimensions.realHeight,
         background_position: $('input[name=bg-position]:checked').val(),
-        items: _.values(items).map(function(item) {
+        items: _.values(items).map(item => {
           var itemCopy = $.extend(true, {}, item);
           itemCopy.font_size = unzoomFont(item.font_size);
           return item;
@@ -704,7 +704,7 @@ import {$T} from 'indico/utils/i18n';
         )
       : $.Deferred().resolve();
 
-    confirmed.then(function() {
+    confirmed.then(() => {
       $.ajax({
         url: location.pathname,
         data: JSON.stringify(templateData),
@@ -864,7 +864,7 @@ import {$T} from 'indico/utils/i18n';
 
   function displayTemplate(template, isBackside) {
     if (template.data) {
-      template.data.items.forEach(function(item) {
+      template.data.items.forEach(item => {
         createItemFromObject(item, isBackside);
       });
       displayItems(isBackside);
@@ -986,7 +986,7 @@ import {$T} from 'indico/utils/i18n';
     images = {...template.images, ...backsideTemplate.images};
 
     // Item class
-    $(document).ready(function() {
+    $(document).ready(() => {
       var removeBackgroundQtip = $('.js-remove-bg').qtip();
 
       $('#bg-form input[type="file"]').on('change', function() {
@@ -1014,13 +1014,13 @@ import {$T} from 'indico/utils/i18n';
           inlineEditItem($(this));
         });
 
-      $('.js-upload-bg').click(function() {
+      $('.js-upload-bg').click(() => {
         $('.js-toggle-side.front').click();
         $('#bg-form').submit();
         return false;
       });
 
-      $('.js-upload-img').click(function() {
+      $('.js-upload-img').click(() => {
         lastSelectedItem = getSelectedItemData();
         if (lastSelectedItem.type === 'fixed_image') {
           $('#img-form').submit();
@@ -1074,13 +1074,13 @@ import {$T} from 'indico/utils/i18n';
         template.data.background_position = newPosition;
       });
 
-      $('.js-remove-bg').click(function(e) {
+      $('.js-remove-bg').click(e => {
         e.preventDefault();
         removeBackgroundQtip.qtip('api').toggle();
         removeBackground(template);
       });
 
-      $('.js-remove-img').click(function(e) {
+      $('.js-remove-img').click(e => {
         e.preventDefault();
         const selectedItem = getSelectedItemData();
         if (selectedItem.type === 'fixed_image') {
@@ -1099,35 +1099,35 @@ import {$T} from 'indico/utils/i18n';
         setSelectedItemAttribute(attr, config);
       });
 
-      $('.insert-element-btn').click(function(e) {
+      $('.insert-element-btn').click(e => {
         e.preventDefault();
         $('.js-toggle-side.front').click();
         insertElement();
       });
 
-      $('.js-remove-element').click(function(e) {
+      $('.js-remove-element').click(e => {
         e.preventDefault();
         removeSelectedElement();
       });
 
-      $('.js-save-template').click(function(e) {
+      $('.js-save-template').click(e => {
         e.preventDefault();
         save(template);
       });
 
-      $('.template-width, .template-height').on('input', function() {
+      $('.template-width, .template-height').on('input', () => {
         changeTemplateSize(template, backsideTemplate);
       });
 
-      $('.js-element-width').on('keyup click', function() {
+      $('.js-element-width').on('keyup click', () => {
         setSelectedItemAttribute('width', config);
       });
 
-      $('.js-element-height').on('keyup click', function() {
+      $('.js-element-height').on('keyup click', () => {
         setSelectedItemAttribute('height', config);
       });
 
-      $('#fixed-text-field').on('keyup', function() {
+      $('#fixed-text-field').on('keyup', () => {
         setSelectedItemAttribute('text', config);
       });
 
@@ -1165,7 +1165,7 @@ import {$T} from 'indico/utils/i18n';
         $('.template-side.active').trigger('indico:backgroundChanged');
       });
 
-      $('.template-side').on('indico:backgroundChanged', function() {
+      $('.template-side').on('indico:backgroundChanged', () => {
         var $backgroundFile = $('#backgroundFile');
         var $templateSide = $('.template-side.front');
         var $templateSideBackground = $templateSide.find('.background-image');
@@ -1184,7 +1184,7 @@ import {$T} from 'indico/utils/i18n';
 
       $('.template-side.front').trigger('indico:backgroundChanged');
 
-      $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
+      $('.template-side.back').on('indico:backsideUpdated', (evt, data) => {
         backsideTemplateID = data.backside_template_id;
         Object.assign(images, data.template.images);
         clearBacksideTemplate(backsideTemplate);
@@ -1196,7 +1196,7 @@ import {$T} from 'indico/utils/i18n';
         $('.backside-template-title, .js-front-affected-title').text(data.template.title);
       });
 
-      $('.js-remove-backside').on('click', function() {
+      $('.js-remove-backside').on('click', () => {
         backsideTemplateID = null;
         clearBacksideTemplate(backsideTemplate);
         if (removeBackSide) {
@@ -1205,7 +1205,7 @@ import {$T} from 'indico/utils/i18n';
         toggleBacksidePlaceholder(true);
       });
 
-      $('.js-change-orientation').on('click', function() {
+      $('.js-change-orientation').on('click', () => {
         var $width = $('.template-width');
         var $height = $('.template-height');
         var widthValue = $width.val();

@@ -29,7 +29,7 @@ import './boa';
       placeholder: '#filter-placeholder',
     };
     const applySearchFilters = setupListGenerator(filterConfig);
-    abstractListContainer.on('indico:htmlUpdated', function() {
+    abstractListContainer.on('indico:htmlUpdated', () => {
       abstractListContainer.find('.js-mathjax').mathJax();
       _.defer(applySearchFilters);
     });
@@ -80,7 +80,7 @@ import './boa';
       }
     });
 
-    $('#email-template-manager .ui-i-box-sortable-handle').on('mousedown', function() {
+    $('#email-template-manager .ui-i-box-sortable-handle').on('mousedown', () => {
       $('.email-preview').hide();
       $('.email-preview-btn').text($T.gettext('Show preview')).data('visible', false);
     });
@@ -119,7 +119,7 @@ import './boa';
 
     // show the form after login when using the submit button as a guest
     if (location.hash === '#submit-abstract') {
-      $(document).ready(function() {
+      $(document).ready(() => {
         $('.js-show-abstract-form').trigger('click');
       });
     }

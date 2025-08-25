@@ -54,7 +54,7 @@
       .change();
     $pageSize
       .add($pageOrientation)
-      .on('change', function() {
+      .on('change', () => {
         toggleFoldableOption(
           templates[parseInt($template.val(), 10)],
           $pageSize.val(),

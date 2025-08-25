@@ -169,51 +169,47 @@ document.addEventListener('DOMContentLoaded', () => {
           const styleObject = $this[0].style;
           const postData = {session_id: newSession ? newSession.id : null};
 
-          return patchObject($this.data('href'), $this.data('method'), postData).then(
-            function(data) {
-              const label = newSession ? newSession.title : $T.gettext('No session');
-              $this.find('.label').text(label);
+          return patchObject($this.data('href'), $this.data('method'), postData).then(data => {
+            const label = newSession ? newSession.title : $T.gettext('No session');
+            $this.find('.label').text(label);
 
-              if (!newSession) {
-                styleObject.removeProperty('color');
-                styleObject.removeProperty('background');
-              } else {
-                styleObject.setProperty('color', `#${newSession.colors.text}`, 'important');
-                styleObject.setProperty(
-                  'background',
-                  `#${newSession.colors.background}`,
-                  'important'
-                );
-              }
-
-              if (data.unscheduled) {
-                const row = $this.closest('tr');
-                const startDateCol = row.find('td.start-date > .vertical-aligner');
-                const oldLabelHtml = startDateCol.children().detach();
-
-                startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
-                /* eslint-disable max-len */
-                showUndoWarning(
-                  $T
-                    .gettext("'{0}' has been unscheduled due to the session change.")
-                    .format(row.data('title')),
-                  $T.gettext('Undo successful! Timetable entry and session have been restored.'),
-                  function() {
-                    return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(
-                      function(data) {
-                        oldLabelHtml
-                          .filter('.label')
-                          // eslint-disable-next-line prefer-template
-                          .text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
-                        startDateCol.html(oldLabelHtml);
-                        $this.itempicker('selectItem', oldSession ? oldSession.id : null);
-                      }
-                    );
-                  }
-                );
-              }
+            if (!newSession) {
+              styleObject.removeProperty('color');
+              styleObject.removeProperty('background');
+            } else {
+              styleObject.setProperty('color', `#${newSession.colors.text}`, 'important');
+              styleObject.setProperty(
+                'background',
+                `#${newSession.colors.background}`,
+                'important'
+              );
             }
-          );
+
+            if (data.unscheduled) {
+              const row = $this.closest('tr');
+              const startDateCol = row.find('td.start-date > .vertical-aligner');
+              const oldLabelHtml = startDateCol.children().detach();
+
+              startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
+              /* eslint-disable max-len */
+              showUndoWarning(
+                $T
+                  .gettext("'{0}' has been unscheduled due to the session change.")
+                  .format(row.data('title')),
+                $T.gettext('Undo successful! Timetable entry and session have been restored.'),
+                () => {
+                  return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(data => {
+                    oldLabelHtml
+                      .filter('.label')
+                      // eslint-disable-next-line prefer-template
+                      .text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                    startDateCol.html(oldLabelHtml);
+                    $this.itempicker('selectItem', oldSession ? oldSession.id : null);
+                  });
+                }
+              );
+            }
+          });
         },
       });
     });
@@ -255,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const $this = $(this);
           const postData = {track_id: newTrack ? newTrack.id : null};
 
-          return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+          return patchObject($this.data('href'), $this.data('method'), postData).then(() => {
             const label = newTrack ? newTrack.title : $T.gettext('No track');
             $this.find('.label').text(label);
           });
@@ -323,13 +319,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const applySearchFilters = setupListGenerator(filterConfig);
 
     $('#contribution-list')
-      .on('indico:htmlUpdated', function() {
+      .on('indico:htmlUpdated', () => {
         setupTableSorter('#contribution-list .tablesorter');
         setupStartDateQBubbles();
         setupDurationQBubbles();
         _.defer(applySearchFilters);
       })
-      .on('attachments:updated', function(evt) {
+      .on('attachments:updated', evt => {
         const target = $(evt.target);
         reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
       });

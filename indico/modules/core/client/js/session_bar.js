@@ -88,7 +88,7 @@
   function setupUserSettings() {
     const link = $('#user-settings-link');
 
-    $('#user-settings-widget a:not([data-toggle=dropdown])').on('click', function() {
+    $('#user-settings-widget a:not([data-toggle=dropdown])').on('click', () => {
       link.qtip('hide');
     });
 
@@ -123,7 +123,7 @@
     });
   }
 
-  $(document).ready(function() {
+  $(document).ready(() => {
     setupProtection();
     setupTimezone();
     setupUserSettings();

@@ -21,10 +21,10 @@
         return error;
       } else {
         return $('<div>').append(
-          error.map(function(item) {
+          error.map(item => {
             const label = $('<strong>').append(item[0]);
             const items = $('<ul>').append(
-              item[1].map(function(message) {
+              item[1].map(message => {
                 return $('<li>').text(message);
               })
             );
@@ -34,7 +34,7 @@
       }
     }
 
-    const updateCount = _.debounce(function(force) {
+    const updateCount = _.debounce(force => {
       const $cloneButton = $('.clone-action-button');
       const serializedForm = $.param($form.serializeArray(), true);
 
@@ -79,7 +79,7 @@
 
     if (step === 4) {
       $form.on('change', 'select, input', _.partial(updateCount, false));
-      $form.on('keyup', 'input', function(e) {
+      $form.on('keyup', 'input', e => {
         e.preventDefault();
         updateCount(false);
       });
@@ -97,12 +97,12 @@
 
         if ($this.prop('checked')) {
           if (dependencies.requires) {
-            dependencies.requires.forEach(function(optionName) {
+            dependencies.requires.forEach(optionName => {
               $field.find('[value={0}]:not(:disabled)'.format(optionName)).prop('checked', true);
             });
           }
         } else if (dependencies.required_by) {
-          dependencies.required_by.forEach(function(optionName) {
+          dependencies.required_by.forEach(optionName => {
             $field.find('[value={0}]'.format(optionName)).prop('checked', false);
           });
         }
@@ -123,7 +123,7 @@
       },
       content() {
         const $ul = $('<ul>');
-        const events = $eventCount.data('event-dates').map(function(item) {
+        const events = $eventCount.data('event-dates').map(item => {
           return $('<li>').text(moment(item.date).format('ddd L'));
         });
         $ul.append(events.slice(0, 20));

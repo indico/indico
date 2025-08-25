@@ -51,7 +51,7 @@ import Palette from 'indico/utils/palette';
           }
         }
       })
-      .on('focus', '.new-comment textarea', function() {
+      .on('focus', '.new-comment textarea', () => {
         const $box = $('#review-timeline-input');
         const $commentForm = $box.find('form');
         $box.find('.review-trigger').hide('blind', {direction: 'left'}, 'fast');
@@ -59,18 +59,18 @@ import Palette from 'indico/utils/palette';
         $commentForm.removeClass('unfocused');
         $commentForm.trigger('ajaxForm:externalShow');
       })
-      .on('click', '.new-comment .js-new-cancel', function(evt) {
+      .on('click', '.new-comment .js-new-cancel', evt => {
         evt.preventDefault();
         const $box = $('#review-timeline-input');
         const $commentForm = $box.find('form');
         const $reviewTrigger = $box.find('.review-trigger');
         const deferred = $.Deferred();
         $commentForm.trigger('ajaxForm:externalHide', [deferred]);
-        deferred.then(function() {
+        deferred.then(() => {
           $commentForm[0].reset();
           $commentForm.trigger('change');
           $commentForm.addClass('unfocused');
-          $commentForm.find('.form-group ~ .form-group').hide('fast', function() {
+          $commentForm.find('.form-group ~ .form-group').hide('fast', () => {
             $reviewTrigger.show('blind', {direction: 'left'}, 'fast');
           });
         });
@@ -94,7 +94,7 @@ import Palette from 'indico/utils/palette';
             $reviewBox.find('.ratings-details').slideToggle('fast');
           } else {
             $reviewBox.addClass('header-only-transition');
-            $reviewBox.find('.ratings-details').slideToggle('fast', function() {
+            $reviewBox.find('.ratings-details').slideToggle('fast', () => {
               $reviewBox.removeClass('header-only-transition');
               $reviewBox.addClass('header-only');
             });

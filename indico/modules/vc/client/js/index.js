@@ -40,7 +40,7 @@ import {$T} from 'indico/utils/i18n';
           'Since it is only used in this event, it will be deleted from the server, too!'
         )}`;
         msg += $this.data('extraMsg');
-        confirmPrompt(msg, title).then(function() {
+        confirmPrompt(msg, title).then(() => {
           execute($this.data('href'));
         });
       } else {
@@ -55,7 +55,7 @@ import {$T} from 'indico/utils/i18n';
           )
           .format($this.data('numEvents'));
         msg += $this.data('extraMsg');
-        choiceConfirmPrompt(msg, title, $t('Detach'), $t('Delete')).then(function(choice) {
+        choiceConfirmPrompt(msg, title, $t('Detach'), $t('Delete')).then(choice => {
           const url = build_url($this.data('href'), {delete_all: choice === 2 ? '1' : ''});
           execute(url);
         });

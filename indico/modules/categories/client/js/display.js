@@ -93,7 +93,7 @@ import {$T} from 'indico/utils/i18n';
       }
       displaySpinner(false);
 
-      $wrapper.find('.js-toggle-list').on('click', function(evt, triggeredAutomatically) {
+      $wrapper.find('.js-toggle-list').on('click', (evt, triggeredAutomatically) => {
         evt.preventDefault();
         let visible;
         if ($content.is(':empty')) {

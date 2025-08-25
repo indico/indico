@@ -24,10 +24,10 @@ import {serializeDateTimeRange} from 'indico/utils/date';
         return error;
       } else {
         return $('<div>').append(
-          error.map(function(item) {
+          error.map(item => {
             const label = $('<strong>').append(item[0]);
             const items = $('<ul>').append(
-              item[1].map(function(message) {
+              item[1].map(message => {
                 return $('<li>').text(message);
               })
             );
@@ -37,7 +37,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
       }
     }
 
-    const updateEventDetails = _.debounce(function(force) {
+    const updateEventDetails = _.debounce(force => {
       const serializedForm = $.param($form.serializeArray(), true);
 
       // make sure the form was actually changed
@@ -76,7 +76,7 @@ import {serializeDateTimeRange} from 'indico/utils/date';
     if (step === 1) {
       $nextButton.prop('disabled', true);
       $form.on('change', 'input', _.partial(updateEventDetails, false));
-      $form.on('keyup', 'input', function(e) {
+      $form.on('keyup', 'input', e => {
         e.preventDefault();
         updateEventDetails(false);
       });
@@ -90,12 +90,12 @@ import {serializeDateTimeRange} from 'indico/utils/date';
 
         if ($this.prop('checked')) {
           if (dependencies.requires) {
-            dependencies.requires.forEach(function(optionName) {
+            dependencies.requires.forEach(optionName => {
               $field.find('[value={0}]:not(:disabled)'.format(optionName)).prop('checked', true);
             });
           }
         } else if (dependencies.required_by) {
-          dependencies.required_by.forEach(function(optionName) {
+          dependencies.required_by.forEach(optionName => {
             $field.find('[value={0}]'.format(optionName)).prop('checked', false);
           });
         }

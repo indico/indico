@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 // eslint-disable-next-line import/unambiguous
-$(document).ready(function() {
+$(document).ready(() => {
   // Header shrinking function
-  $(window).scroll(function() {
+  $(window).scroll(() => {
     if (
       $(window).scrollTop() >= $('.bootstrap-header').outerHeight() / 2 &&
       !$('.bootstrap-header').hasClass('mini')

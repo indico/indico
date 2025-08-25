@@ -77,7 +77,7 @@
       const isOnlyFilter = !!$filter.find('[data-only-filter]').length;
       $filter.dropdown({selector: "a[data-toggle='dropdown']", relative_to: $filter});
       if (!hasColumnSelector || isOnlyFilter) {
-        $filter.find('.title-wrapper').on('click', function(evt) {
+        $filter.find('.title-wrapper').on('click', evt => {
           $filter.find("a[data-toggle='dropdown']").trigger('click');
           evt.stopPropagation();
         });
@@ -129,12 +129,12 @@
       });
     }
 
-    $('.js-reset-btn').on('click', function() {
+    $('.js-reset-btn').on('click', () => {
       $('.list-filter input:checkbox:checked').prop('checked', false).trigger('change');
       $('.js-clear-filters-message').show({
         done() {
           const $this = $(this);
-          setTimeout(function() {
+          setTimeout(() => {
             $this.slideUp();
           }, 4000);
         },
@@ -153,11 +153,11 @@
       }
     });
 
-    $('#list-filter-select-all').on('click', function() {
+    $('#list-filter-select-all').on('click', () => {
       $('.list-filter-dialog .visibility:not(.enabled)').trigger('click');
     });
 
-    $('#list-filter-select-none').on('click', function() {
+    $('#list-filter-select-none').on('click', () => {
       $('.list-filter-dialog .visibility.enabled').trigger('click');
     });
   };
@@ -171,22 +171,22 @@
     handleRowSelection(true);
     setupTableSorter();
 
-    $('.list').on('indico:htmlUpdated', function() {
+    $('.list').on('indico:htmlUpdated', () => {
       handleRowSelection(true);
       setupTableSorter();
     });
 
     $('.list .toolbar').dropdown();
 
-    $('#select-all').on('click', function() {
+    $('#select-all').on('click', () => {
       $('table.i-table input.select-row').prop('checked', true).trigger('change');
     });
 
-    $('#select-none').on('click', function() {
+    $('#select-none').on('click', () => {
       $('table.i-table input.select-row').prop('checked', false).trigger('change');
     });
 
-    $('.change-columns-width').on('click', function() {
+    $('.change-columns-width').on('click', () => {
       $('.js-list-table-wrapper').toggleClass('scrollable');
       $('.change-columns-width').toggleClass('active');
     });
@@ -199,7 +199,7 @@
       }
     });
 
-    $('.list .toolbar').on('click', '.disabled', function(e) {
+    $('.list .toolbar').on('click', '.disabled', e => {
       e.preventDefault();
       e.stopPropagation();
     });

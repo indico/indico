@@ -23,7 +23,7 @@
       },
     });
 
-    $('.js-new-type').on('ajaxDialog:closed', function(evt, data) {
+    $('.js-new-type').on('ajaxDialog:closed', (evt, data) => {
       evt.preventDefault();
       if (data) {
         const $lastRow = $('.manage-types table tr:last');
