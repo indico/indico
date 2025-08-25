@@ -214,9 +214,7 @@ export function getParallelEntries(entry: TopLevelEntry, entries: TopLevelEntry[
 export function computeYoffset(entries: TopLevelEntry[], startHour: number): TopLevelEntry[] {
   return entries.map(entry => {
     const offsetMinutes = moment(entry.startDt).diff(
-      moment(entry.startDt)
-        .startOf('day')
-        .add(startHour, 'hours'),
+      moment(entry.startDt).startOf('day').add(startHour, 'hours'),
       'minutes'
     );
     if (entry.type !== 'block') {
@@ -358,9 +356,7 @@ export function layoutAfterUnscheduledDropOnBlock(
     ...entry,
     startDt,
     y: minutesToPixels(
-      moment(startDt)
-        .add(deltaMinutes, 'minutes')
-        .diff(moment(toBlock.startDt), 'minutes')
+      moment(startDt).add(deltaMinutes, 'minutes').diff(moment(toBlock.startDt), 'minutes')
     ),
     parentId: toBlock.id,
   };
@@ -385,7 +381,10 @@ export function layoutAfterUnscheduledDropOnBlock(
     );
   }
 
-  const groupIds = getGroup(draftEntry, toBlock.children.filter(e => e.id !== draftEntry.id));
+  const groupIds = getGroup(
+    draftEntry,
+    toBlock.children.filter(e => e.id !== draftEntry.id)
+  );
   let group = toBlock.children.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, draftEntry, mousePositionX);
 

@@ -52,11 +52,7 @@ export default function Timetable() {
           ? Object.values(entries)
               .flat()
               .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e =>
-              moment(e.startDt)
-                .add(e.duration, 'minutes')
-                .hour()
-            ))
+          : currentDateEntries.map(e => moment(e.startDt).add(e.duration, 'minutes').hour()))
       );
 
   return (
