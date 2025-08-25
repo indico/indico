@@ -41,9 +41,8 @@ def _get_break_session_block_id(entry):
 
 
 def _get_break_session_id(entry):
-    if (session_block_id := _get_break_session_block_id(entry)):
-        return SessionBlock.get(session_block_id).session_id
-    return None
+    if entry.timetable_entry.parent:
+        return entry.timetable_entry.parent.session_block.session_id
 
 
 class BreakSchema(mm.SQLAlchemyAutoSchema):
