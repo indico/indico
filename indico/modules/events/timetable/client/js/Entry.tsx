@@ -25,7 +25,12 @@ interface DraggableEntryProps {
 
 export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({
+  const {
+    listeners: _listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
     id: `${id}`,
   });
   const isSelected = useSelector((state: ReduxState) =>

@@ -37,20 +37,11 @@ export function DraggableUnscheduledContributionEntry({
   const droppableData = useDroppableData({id: 'calendar'});
 
   const draggableId = `unscheduled-${id}`;
-  const {
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-    rect,
-    initialScroll,
-    mouse,
-    offset,
-    ref,
-  } = useDraggable({
-    id: draggableId,
-    fixed: true,
-  });
+  const {listeners, setNodeRef, transform, isDragging, rect, initialScroll, mouse, offset, ref} =
+    useDraggable({
+      id: draggableId,
+      fixed: true,
+    });
 
   let timeRange = `${duration} minutes`;
   if (transform && droppableData && ref.current) {
@@ -59,9 +50,7 @@ export function DraggableUnscheduledContributionEntry({
       const mousePositionY = mouse.y - r.top - window.scrollY;
 
       const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
-      const startDt = moment(dt)
-        .startOf('day')
-        .add(start, 'minutes');
+      const startDt = moment(dt).startOf('day').add(start, 'minutes');
       const newEnd = moment(startDt).add(duration, 'minutes');
       timeRange = formatTimeRange('en', startDt, newEnd); // TODO: use current locale
     }

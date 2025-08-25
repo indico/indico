@@ -393,10 +393,7 @@ TimePickerComponent.propTypes = {
 function DurationComponent({value, onChange, max, ...rest}) {
   return (
     <TimePickerComponent
-      value={moment()
-        .startOf('day')
-        .seconds(value)
-        .toISOString()}
+      value={moment().startOf('day').seconds(value).toISOString()}
       onChange={v => onChange(moment(v).diff(moment().startOf('day'), 'seconds'))}
       disabledHours={max ? () => [...Array(24).keys()].filter(h => h > max / (60 * 60)) : undefined}
       disabledMinutes={
@@ -793,10 +790,7 @@ FinalTimePicker.propTypes = {
 
 FinalTimePicker.defaultProps = {
   label: null,
-  defaultValue: moment()
-    .startOf('day')
-    .minutes(20)
-    .toISOString(),
+  defaultValue: moment().startOf('day').minutes(20).toISOString(),
 };
 
 export function FinalDuration({name, label, defaultValue, ...rest}) {
@@ -842,10 +836,7 @@ FinalDateTimePicker.propTypes = {
 
 FinalDateTimePicker.defaultProps = {
   label: null,
-  defaultValue: moment()
-    .startOf('day')
-    .minutes(20)
-    .toISOString(),
+  defaultValue: moment().startOf('day').minutes(20).toISOString(),
 };
 
 /**
