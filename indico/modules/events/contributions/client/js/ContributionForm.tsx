@@ -35,7 +35,6 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 import {toMoment} from 'indico/utils/date';
 
-
 interface CustomField {
   id: number;
   fieldType: string;
@@ -131,9 +130,7 @@ export function ContributionFormFields({
     }
   );
 
-
-
-  const {minStartDt, maxEndDt} = extraOptions;  
+  const {minStartDt, maxEndDt} = extraOptions;
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
@@ -146,8 +143,11 @@ export function ContributionFormFields({
                 name="start_dt"
                 label={Translate.string('Start date')}
                 sessionBlock={sessionBlock}
-                minStartDt={minStartDt || sessionBlock && toMoment(sessionBlock.startDt)}
-                maxEndDt={maxEndDt || sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
+                minStartDt={minStartDt || (sessionBlock && toMoment(sessionBlock.startDt))}
+                maxEndDt={
+                  maxEndDt ||
+                  (sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second'))
+                }
                 required
               />
             )}
@@ -231,9 +231,10 @@ export function ContributionForm({
         invalid,
         detail,
         ...personLinkData
-      }) => snakifyKeys({
-        ...personLinkData,
-      })
+      }) =>
+        snakifyKeys({
+          ...personLinkData,
+        })
     );
     formData = {
       ...formData,
@@ -262,12 +263,22 @@ export function ContributionForm({
       size="small"
       {...rest}
     >
-      <ContributionFormFields {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}} />
+      <ContributionFormFields
+        {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}}
+      />
     </FinalModalForm>
   );
 }
 
-export function ContributionEditForm({eventId, contribId, onClose}: {eventId: number; contribId: number; onClose: () => void}) {
+export function ContributionEditForm({
+  eventId,
+  contribId,
+  onClose,
+}: {
+  eventId: number;
+  contribId: number;
+  onClose: () => void;
+}) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
     {camelize: true}
@@ -398,7 +409,13 @@ export function ContributionCreateForm({
   );
 }
 
-export function EditContributionButton({eventId, contribId, eventTitle, triggerSelector, ...rest}: {
+export function EditContributionButton({
+  eventId,
+  contribId,
+  eventTitle,
+  triggerSelector,
+  ...rest
+}: {
   eventId: number;
   contribId: number;
   eventTitle: string;
@@ -435,7 +452,11 @@ export function EditContributionButton({eventId, contribId, eventTitle, triggerS
   );
 }
 
-export function CreateContributionButton({eventId, triggerSelector, ...rest}: {
+export function CreateContributionButton({
+  eventId,
+  triggerSelector,
+  ...rest
+}: {
   eventId: number;
   triggerSelector?: string;
 }) {

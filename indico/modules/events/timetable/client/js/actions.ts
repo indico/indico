@@ -288,8 +288,8 @@ export function setCurrentDate(date: Moment, eventId: number) {
  * Manages a queue of requests to be processed in order.
  * This ensures all timetable requests are handled sequentially.
  */
- // TODO(tomas): On error, we just call `handleAxiosError` for now.
- // In the future, we might consider some undo mechanism.
+// TODO(tomas): On error, we just call `handleAxiosError` for now.
+// In the future, we might consider some undo mechanism.
 class RequestQueue {
   requests: (() => Promise<object>)[];
   working: boolean;
