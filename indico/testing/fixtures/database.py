@@ -19,26 +19,13 @@ from sqlalchemy.engine import Engine
 
 from indico.core.db import db as db_
 from indico.core.db.sqlalchemy.util.management import create_all_tables, delete_all_tables
+from indico.testing.fixtures.database_docker import docker_postgresql
 from indico.util.process import silent_check_call
 from indico.web.flask.app import configure_db
 
 
-@pytest.fixture(scope='session')
-def postgresql():
-    """Provide a clean temporary PostgreSQL server/database.
-
-    If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
-    will do nothing and simply return the connection string from that variable.
-    If set to an empty string, tests relying on the database will be skipped.
-    """
-    # Use existing database
-    if 'INDICO_TEST_DATABASE_URI' in os.environ:
-        dsn = os.environ['INDICO_TEST_DATABASE_URI']
-        if not dsn:
-            pytest.skip('Database explicitly disabled')
-        yield dsn
-        return
-
+@contextmanager
+def local_postgresql():
     db_name = 'test'
 
     # Ensure we have initdb and a recent enough postgres version
@@ -54,6 +41,10 @@ def postgresql():
     temp_dir = tempfile.mkdtemp(prefix='indicotestpg.')
     postgres_args = f'-h "" -k "{temp_dir}"'
     try:
+        # remove PG* variables from environment, as they may cause the following commands to fail
+        for env_var in ('PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT', 'PGDATABASE'):
+            os.environ.pop(env_var, None)
+
         silent_check_call(['initdb', '--encoding', 'UTF8', temp_dir])
         silent_check_call(['pg_ctl', '-D', temp_dir, '-w', '-o', postgres_args, 'start'])
         silent_check_call(['createdb', '-h', temp_dir, db_name])
@@ -78,6 +69,31 @@ def postgresql():
             pytest.skip(f'Could not stop/kill postgresql: {e}')
     finally:
         shutil.rmtree(temp_dir)
+
+
+@pytest.fixture(scope='session')
+def postgresql():
+    """Provide a clean temporary PostgreSQL server/database.
+
+    If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
+    will do nothing and simply return the connection string from that variable.
+    If set to an empty string, tests relying on the database will be skipped.
+    """
+    # Use existing database
+    if 'INDICO_TEST_DATABASE_URI' in os.environ:
+        dsn = os.environ['INDICO_TEST_DATABASE_URI']
+        if not dsn:
+            pytest.skip('Database explicitly disabled')
+        yield dsn
+        return
+
+    if 'INDICO_TEST_USE_DOCKER' in os.environ:
+        postgres_impl = docker_postgresql
+    else:
+        postgres_impl = local_postgresql
+
+    with postgres_impl() as dsn:
+        yield dsn
 
 
 @pytest.fixture(scope='session')
