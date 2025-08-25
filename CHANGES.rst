@@ -48,6 +48,7 @@ Internal Changes
 
 - Remove broken support for custom multipass providers setting a maximum session
   lifetime; use :data:`SESSION_MAX_LIFETIME` instead (:pr:`7030`)
+- Use `Biome <https://biomejs.dev/>`__ to format JS/JSX, TS/TSX, JSON and CSS (:pr:`7042`)
 
 
 Version 3.3.7
