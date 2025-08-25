@@ -100,18 +100,29 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
 
 /**
  * Restrict the dragged node to be contained within the calendar if it's
- * already scheduled.
+ * already scheduled. Allows pixel limits to be set.
  * @param containerRef React ref to the container element
+ * @param limits Pixel limits on both sides of the y-axis
  * @returns A new Transform object
  */
-export const createRestrictToCalendar = (containerRef): Modifier => ({
-  draggingNodeRect,
-  transform,
-  id,
-}) => {
-  if (id.startsWith('unscheduled-')) {
-    // return createRestrictToElement(unscheduledRef)({draggingNodeRect, transform, id});
+export const createRestrictToCalendar = (
+  containerRef,
+  limits: [number, number] = [0, 0]
+): Modifier => ({id, draggingNodeRect, transform}) => {
+  if (id.startsWith('unscheduled')) {
     return transform;
   }
-  return createRestrictToElement(containerRef)({draggingNodeRect, transform, id});
+
+  let rect = containerRef.current.getBoundingClientRect();
+  const scroll = getTotalScroll(containerRef.current);
+  rect = {
+    top: rect.top + scroll.top + limits[0],
+    left: rect.left + scroll.left,
+    bottom: rect.bottom + scroll.top - limits[1],
+    right: rect.right + scroll.left,
+    width: rect.width,
+    height: rect.height - limits[0] - limits[1],
+  };
+
+  return restrictToBoundingRect(transform, draggingNodeRect, rect);
 };
