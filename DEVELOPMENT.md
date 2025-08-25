@@ -68,10 +68,6 @@ to be problematic. Here's a list to save some time during the next updates:
   version is not straightforward either. It's best to leave those packages alone until we either drop webpack or
   look into webpack's [asset modules](https://webpack.js.org/guides/asset-modules/) feature.
 - `dropzone` is still on a stable release, the new version is still in beta so not worth considering.
-- `prettier`, `eslint-plugin-prettier` and `stylelint-prettier` cannot be updated for now due to prettier 1.19
-  introducing a very shitty heuristic for function composition detection (compared to a simple list of function
-  names that are doing function composition), so updating would mess up the formatting of our `createSelector` calls
-  in a way that's much less readable than what we have right now. Check prettier/prettier#6921 for updates on this.
 - `history`, `react-router` and `react-router-dom` have some major changes e.g. regarding navigation blocking. It
   looks like they finally added `unstable_useBlocker()` to block navigation though. In the Room Booking module we
   are using `connected-react-router` though, which is dead, and not compatible with react-router 6 so it would need
@@ -88,4 +84,4 @@ to be problematic. Here's a list to save some time during the next updates:
 - `react-leaflet`, `react-leaflet-draw` and `react-leaflet-markercluster` are stuck because react-leaflet v3 decided to
   adept some dumb "ethical" license (PaulLeCam/react-leaflet#698) which is not considered a proper Open Source license.
 - `react-markdown`, `react-redux`, `redux`, `redux-thunk` and `reselect` are stuck because react-redux now requires react 18, but react-dates does not support this.
-- `stylelint`, `stylelint-config-recommended-scss` and `stylelint-scss` had a common major version bump, possibly breaking compatibility with `stylelint-prettier` (which we cannot upgrade atm). Should be tested to confirm whether that's indeed the case, but for now it's easier to simply stick with the old version.
+- `stylelint`, `stylelint-config-recommended-scss` and `stylelint-scss` had a common major version bump, possibly breaking compatibility with `stylelint-prettier` (which we no longer use). Should be tested to confirm whether that's indeed the case, but for now it's easier to simply stick with the old version.
