@@ -24,6 +24,7 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
+import {getEntryColor} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -60,7 +61,7 @@ interface ResizeEntryAction {
   date: string;
   id: string;
   duration: number;
-  parentId?: string;
+  sessionBlockId?: string;
 }
 
 interface MoveEntryAction {
@@ -179,9 +180,9 @@ export function resizeEntry(
   date: string,
   id: string,
   duration: number,
-  parentId?: string
+  sessionBlockId?: string
 ): ResizeEntryAction {
-  return {type: RESIZE_ENTRY, date, id, duration, parentId};
+  return {type: RESIZE_ENTRY, date, id, duration, sessionBlockId};
 }
 
 export function selectEntry(id: string): SelectEntryAction {
@@ -268,8 +269,16 @@ export function scrollNavbar(offset) {
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
-export function createEntry(entryType, entry) {
+function _createEntry(entryType, entry) {
   return {type: CREATE_ENTRY, entryType, entry};
+}
+
+export function createEntry(entryType, entry) {
+  return (dispatch, getState) => {
+    const color = getEntryColor(entry, getState().sessions);
+    const newEntry = {...entry, ...color};
+    dispatch(_createEntry(entryType, newEntry));
+  };
 }
 
 export function editEntry(entryType, entry) {

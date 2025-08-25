@@ -362,7 +362,7 @@ export function layoutAfterUnscheduledDropOnBlock(
         .add(deltaMinutes, 'minutes')
         .diff(moment(toBlock.startDt), 'minutes')
     ),
-    parentId: toBlock.id,
+    sessionBlockId: toBlock.id,
   };
 
   // TODO
