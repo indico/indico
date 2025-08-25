@@ -252,6 +252,18 @@
                                 {{ render_attachment_info(contrib) }}
                                 <td class="i-table actions-column hide-if-locked">
                                     <div class="group right entry-action-buttons vertical-aligner">
+                                        <a href="#" id="contrib-{{ contrib.id }}-edit-trigger"
+                                           class="icon-edit i-link highlight"
+                                           title="{% trans %}NEW Edit contribution{% endtrans %}"></a>
+                                        <div
+                                            id="contrib-{{ contrib.id }}-edit"
+                                            data-event-id="{{ event.id }}"
+                                            data-contrib-id="{{ contrib.id }}"
+                                            data-event-title="{{ event.title }}">
+                                        </div>
+                                        <script>
+                                            setupContributionForm('#contrib-{{ contrib.id }}-edit', '#contrib-{{ contrib.id }}-edit-trigger');
+                                        </script>
                                         <a href="#" class="icon-edit i-link highlight js-dialog-action"
                                            data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                            data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"

@@ -10,8 +10,10 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.modules.events import Event
+from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.persons.util import check_person_link_email
-from indico.modules.events.util import get_object_from_args
+from indico.modules.events.schemas import ReferenceTypeSchema
+from indico.modules.events.util import get_all_reference_types, get_object_from_args, get_person_link_field_params
 from indico.util.marshmallow import LowercaseString, ModelField
 from indico.web.args import use_kwargs
 from indico.web.rh import RH, RHProtected
@@ -64,3 +66,15 @@ class RHEventCheckEmail(RHProtected):
     }, location='query')
     def _process(self, email):
         return jsonify(check_person_link_email(self.event, email))
+
+
+class RHAPIReferenceTypes(RH):
+    """List all reference types."""
+
+    def _process(self):
+        return ReferenceTypeSchema(many=True).jsonify(get_all_reference_types())
+
+
+class RHAPIPersonLinkFieldParams(RHEventBase):
+    def _process_GET(self):
+        return jsonify(get_person_link_field_params(self.event))
