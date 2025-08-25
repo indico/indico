@@ -124,7 +124,7 @@ export default {
             })
           );
         }
-        // TODO: (Ajob) make sure to edit entry first
+
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
