@@ -100,7 +100,7 @@ def find_zombie_containers(docker_client: docker.DockerClient) -> set[Container]
     return zombies
 
 
-def kill_containers(containers: set[Container], warn: bool = False):
+def kill_containers(containers: set[Container], *, warn: bool = False):
     """Kill and remove the specified Docker containers.
 
     This function stops and removes each container in the provided set. If a container is already stopped or removed,
