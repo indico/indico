@@ -31,9 +31,15 @@
       "jsxEverywhere": true
     }
   },
+  "css": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
   "files": {
     "includes": [
       "{bin,indico,webpack}/**/*.{js,jsx,mjs,ts,tsx}",
+      "indico/**/*.{css,scss}",
       // Not actually JavaScript
       "!indico/web/templates/assets",
       // Generated content

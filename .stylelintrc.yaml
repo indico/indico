@@ -1,5 +1,4 @@
 extends:
-  - stylelint-prettier/recommended
   - stylelint-config-recommended
   - stylelint-config-recommended-scss
   - stylelint-stylistic/config
