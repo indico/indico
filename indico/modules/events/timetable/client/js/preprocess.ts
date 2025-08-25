@@ -65,7 +65,7 @@ export function preprocessSessionData(
     Object.entries(data).map(([, s]) => [
       s.id,
       {
-        ..._.pick(s, ['id', 'title', 'isPoster', 'defaultContributionDuration']), // TODO: (Duarte) get other attrs
+        ..._.pick(s, ['id', 'title', 'isPoster', 'defaultContribDurationMinutes']), // TODO: (Duarte) get other attrs
         textColor: s.textColor,
         backgroundColor: s.color,
       },
