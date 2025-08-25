@@ -118,11 +118,10 @@ export default {
           entry,
           entryType,
           entry: {startDt},
+          currentDay,
         } = action;
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
-        const currentDayKey = Object.keys(newEntries).find(key =>
-          newEntries[key].some(e => e.id === entry.id && entry.type === entryType)
-        );
+        const currentDayKey = currentDay;
         const dayEntries = [...newEntries[currentDayKey]];
         const newDayKey = moment(startDt).format('YYYYMMDD');
 

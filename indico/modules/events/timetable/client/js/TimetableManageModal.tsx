@@ -32,7 +32,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {Entry, EntryType, Session} from './types';
-import {mapTTDataToEntry, shiftEntries} from './utils';
+import {DATE_KEY_FORMAT, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
 
@@ -136,6 +136,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const sessions = useSelector(selectors.getSessions);
+  const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
 
   const sessionValues: Session[] = Object.values(sessions);
 
@@ -296,7 +297,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (isEditing) {
-      dispatch(actions.updateEntry(activeType, resEntry));
+      dispatch(actions.updateEntry(activeType, resEntry, currentDay));
     } else {
       dispatch(actions.createEntry(activeType, resEntry));
     }
