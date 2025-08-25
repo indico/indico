@@ -74,6 +74,7 @@ rules:
     - error
     - event
   react/require-default-props: off
+  prefer-arrow-callback: error
 
 overrides:
   - files:
