@@ -90,14 +90,7 @@ export default {
             if (e.id === entry.sessionBlockId && e.type === EntryType.SessionBlock) {
               return {
                 ...e,
-                children: [
-                  ...(e.children || []).map(child =>
-                    child.id === entry.id
-                      ? {...child, locationData: {...child.locationData, ...entry.locationData}}
-                      : child
-                  ),
-                  entry,
-                ],
+                children: [...e.children, entry],
               };
             }
             return e;
