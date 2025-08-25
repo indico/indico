@@ -39,34 +39,33 @@ function restrictToBoundingRect(transform: Transform, rect: Rect, boundingRect: 
  * @param containerRef React ref to the container element
  * @returns A new Transform object
  */
-export const createRestrictToElement = (containerRef): Modifier => ({
-  draggingNodeRect,
-  transform,
-}) => {
-  if (!draggingNodeRect || !containerRef.current) {
-    return transform;
-  }
+export const createRestrictToElement =
+  (containerRef): Modifier =>
+  ({draggingNodeRect, transform}) => {
+    if (!draggingNodeRect || !containerRef.current) {
+      return transform;
+    }
 
-  let rect = containerRef.current.getBoundingClientRect();
-  const scroll = getTotalScroll(containerRef.current);
-  rect = {
-    // top: rect.top,
-    // left: rect.left,
-    // bottom: rect.bottom,
-    // right: rect.right,
-    // top: rect.top + scrollParent.scrollTop,
-    // left: rect.left + scrollParent.scrollLeft,
-    // bottom: rect.bottom + scrollParent.scrollTop,
-    // right: rect.right + scrollParent.scrollLeft,
-    top: rect.top + scroll.top,
-    left: rect.left + scroll.left,
-    bottom: rect.bottom + scroll.top,
-    right: rect.right + scroll.left,
-    width: rect.width,
-    height: rect.height,
+    let rect = containerRef.current.getBoundingClientRect();
+    const scroll = getTotalScroll(containerRef.current);
+    rect = {
+      // top: rect.top,
+      // left: rect.left,
+      // bottom: rect.bottom,
+      // right: rect.right,
+      // top: rect.top + scrollParent.scrollTop,
+      // left: rect.left + scrollParent.scrollLeft,
+      // bottom: rect.bottom + scrollParent.scrollTop,
+      // right: rect.right + scrollParent.scrollLeft,
+      top: rect.top + scroll.top,
+      left: rect.left + scroll.left,
+      bottom: rect.bottom + scroll.top,
+      right: rect.right + scroll.left,
+      width: rect.width,
+      height: rect.height,
+    };
+    return restrictToBoundingRect(transform, draggingNodeRect, rect);
   };
-  return restrictToBoundingRect(transform, draggingNodeRect, rect);
-};
 
 export function getScrollParent(element: HTMLElement): HTMLElement {
   const overflowRegex = /(auto|scroll)/;
@@ -104,14 +103,12 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
  * @param containerRef React ref to the container element
  * @returns A new Transform object
  */
-export const createRestrictToCalendar = (containerRef): Modifier => ({
-  draggingNodeRect,
-  transform,
-  id,
-}) => {
-  if (id.startsWith('unscheduled-')) {
-    // return createRestrictToElement(unscheduledRef)({draggingNodeRect, transform, id});
-    return transform;
-  }
-  return createRestrictToElement(containerRef)({draggingNodeRect, transform, id});
-};
+export const createRestrictToCalendar =
+  (containerRef): Modifier =>
+  ({draggingNodeRect, transform, id}) => {
+    if (id.startsWith('unscheduled-')) {
+      // return createRestrictToElement(unscheduledRef)({draggingNodeRect, transform, id});
+      return transform;
+    }
+    return createRestrictToElement(containerRef)({draggingNodeRect, transform, id});
+  };
