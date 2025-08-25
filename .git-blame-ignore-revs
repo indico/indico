@@ -40,3 +40,5 @@ eb297f074901e1f54d86dca72ea23cc1a856bff2
 34e8fc840e05b1bd5aab8487df9b300b7dbf0156
 # 2025 - Fix eslint issues in files not covered by CI
 b19a12ad9aca622682e5eb5c8079e11b56e6f1bb
+# 2025 - Fix eslint issues in legacy jquery code
+143dc04c9f10017a8e8eaeed709c87036bc43f39
