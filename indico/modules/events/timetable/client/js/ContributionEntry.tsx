@@ -89,10 +89,10 @@ export default function ContributionEntry({
     backgroundColor: backgroundColor
       ? backgroundColor
       : sessionData
-      ? isChild
-        ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-        : sessionData.backgroundColor
-      : '#5b1aff',
+        ? isChild
+          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
+          : sessionData.backgroundColor
+        : '#5b1aff',
     color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
   };
 
@@ -104,9 +104,7 @@ export default function ContributionEntry({
   // shift children startDt by deltaMinutes
   const children = _children.map(child => ({
     ...child,
-    startDt: moment(child.startDt)
-      .add(deltaMinutes, 'minutes')
-      .format(),
+    startDt: moment(child.startDt).add(deltaMinutes, 'minutes').format(),
   }));
 
   // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);

@@ -308,9 +308,8 @@ function PersonLinkField({
       : `${formattedFirstName} ${formattedLastName}`;
   };
 
-  const persons = (autoSort
-    ? _persons.slice().sort((a, b) => a.name.localeCompare(b.name))
-    : _persons
+  const persons = (
+    autoSort ? _persons.slice().sort((a, b) => a.name.localeCompare(b.name)) : _persons
   ).map(p => ({name: formatName(p), ...p}));
   const others = persons.filter(othersCondition);
 
