@@ -116,17 +116,7 @@ jobs:
 
       - name: Run eslint
         if: success() || failure()
-        run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx
-             indico/modules/rb/
-             indico/modules/logs/
-             indico/modules/events/editing/
-             indico/modules/events/client/js/reviewing/
-             indico/modules/events/papers/client/js/
-             indico/modules/events/registration/client/js/
-             indico/web/client/js/react/
-             indico/modules/users/
-             indico/modules/search/
-             indico/modules/receipts/
+        run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx indico/
 
       - name: Run stylelint for all files
         if: github.event_name == 'push' && (success() || failure())
