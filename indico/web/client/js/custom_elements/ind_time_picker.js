@@ -67,7 +67,7 @@ CustomElementBase.defineWhenDomReady(
         }
       }
 
-      toggleClearButton();
+      toggleClearButton(!!input.value, true); // Pass skipFocus=true during initialization
 
       // Event handlers
 
@@ -213,12 +213,12 @@ CustomElementBase.defineWhenDomReady(
 
       // Functions
 
-      function toggleClearButton(show = !!input.value) {
+      function toggleClearButton(show = !!input.value, skipFocus = false) {
         if (!clearButton) {
           return;
         }
         clearButton.hidden = !show;
-        if (!show) {
+        if (!show && !skipFocus) {
           input.focus();
         }
       }
