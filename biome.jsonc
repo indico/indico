@@ -47,6 +47,9 @@
       // Not actually JavaScript
       "!indico/web/templates/assets",
       // Generated content
+      "!package-lock.json",
+      "!webpack-build-config.json",
+      "!url_map.json",
       "!indico/web/static/dist",
       "!indico/translations",
       "!indico/web/static/fonts/icomoon/selection.json"
