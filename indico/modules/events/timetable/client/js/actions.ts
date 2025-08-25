@@ -12,8 +12,7 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
 
-import {indicoAxios} from 'indico/utils/axios';
-import {ajaxAction} from 'indico/utils/redux';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {
   TopLevelEntry,
@@ -161,11 +160,11 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
 
   const entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
 
-  return ajaxAction(() => indicoAxios.patch(entryURL, entryData), null, () => ({
+  return synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
     type: MOVE_ENTRY,
     date,
     entries,
-  }));
+  });
 }
 
 export function toggleExpand() {
@@ -196,20 +195,20 @@ export function deselectEntry(): DeselectEntryAction {
 // TODO: (Marina) Look into ThunkActions for typing
 export function deleteBreak(entry, eventId) {
   const entryURL = breakURL({event_id: eventId, break_id: entry.objId});
-  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: DELETE_BREAK,
     entryURL,
     entry,
-  }));
+  });
 }
 
 export function deleteBlock(entry, eventId) {
   const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: DELETE_BLOCK,
     entryURL,
     entry,
-  }));
+  });
 }
 
 export function scheduleEntry(
@@ -223,28 +222,27 @@ export function scheduleEntry(
   const scheduleURL = scheduleContribURL(
     blockId ? {event_id: eventId, block_id: blockId} : {event_id: eventId}
   );
-  return ajaxAction(
+  return synchronizedAjaxAction(
     () =>
       indicoAxios.post(scheduleURL, {
         contribs: [{contrib_id: contribId, start_dt: startDt.toISOString()}],
       }),
-    null,
-    () => ({
+    {
       type: SCHEDULE_ENTRY,
       date: startDt.format('YYYYMMDD'),
       entries,
       unscheduled,
-    })
+    }
   );
 }
 
 export function unscheduleEntry(entry, eventId) {
   const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-  return ajaxAction(() => indicoAxios.delete(entryURL), null, () => ({
+  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: UNSCHEDULE_ENTRY,
     entryURL,
     entry,
-  }));
+  });
 }
 
 export function changeColor(sessionId, color) {
@@ -284,4 +282,59 @@ export function updateEntry(entryType, entry) {
 
 export function setCurrentDate(date: Moment, eventId: number) {
   return {type: SET_CURRENT_DATE, date, eventId};
+}
+
+/**
+ * Manages a queue of requests to be processed in order.
+ * This ensures all timetable requests are handled sequentially.
+ */
+ // TODO(tomas): On error, we just call `handleAxiosError` for now.
+ // In the future, we might consider some undo mechanism.
+class RequestQueue {
+  requests: (() => Promise<object>)[];
+  working: boolean;
+
+  constructor() {
+    this.requests = [];
+    this.working = false;
+  }
+
+  submitRequest(request) {
+    this.requests.push(request);
+    if (!this.working) {
+      this._processRequests().catch(error => {
+        console.error('Error processing request queue:', error);
+      });
+    }
+  }
+
+  async _processRequests() {
+    this.working = true;
+    while (this.requests.length) {
+      const requestFunc = this.requests.shift();
+      try {
+        await requestFunc();
+      } catch (error) {
+        handleAxiosError(error, true);
+      }
+    }
+    this.working = false;
+  }
+}
+
+const requestQueue = new RequestQueue();
+
+/**
+ * Dispatch an action immediately and submit the fetch request to the queue.
+ *
+ * @param requestFunc Function that does the AJAX request (typically an indicoAxios call).
+ * @param action Action to dispatch immediately before the request.
+ */
+export function synchronizedAjaxAction(requestFunc: () => Promise<object>, action?: object) {
+  return dispatch => {
+    if (action) {
+      dispatch(action);
+    }
+    requestQueue.submitRequest(requestFunc);
+  };
 }
