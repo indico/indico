@@ -1,0 +1,30 @@
+# 2019 - Reformat JS code with prettier
+053095ac7f3531ea4d4ccf21c760a574f4027d9d
+# 2019 - Run prettier on webpack configs as well
+09ab43606311c09051f8199edd4ba8a743b6a980
+# 2019 - Reformat Default.css
+edf32aac7a251de39f5d613ceb888a8021a730e8
+# 2020 - Autofix stylelint issues (and use 2-space indent)
+bc76b31163dda0ec17c6620a12085f418a029d3a
+# 2020 - Autofix stylelint issues (and use 2-space indent) in CSS
+0a2cd8284a07d13b44311fb13ac747362819ab4c
+# 2020 - Autofix more issues
+6b2ae0523832a712fa0249cfa8260a688fe9ff30
+# 2020 - Re-order imports
+692e520e8ab1f6a6ac4d4aae7a61ff98511d7492
+# 2020 - Re-order imports (the ones missed last time)
+2d5417cd5fe390447d942477d68a1438703a1371
+# 2020 - Run modernize on codebas
+2264276c41364883fec0c3c8f27b9ddd6a0211cc
+# 2020 - Run isort on codebase
+2436c1bb289e6f6a7ecfca85a25e79d4787338c7
+# 2020 - Run pyupgrade on codebase
+9b7464935b4971ba1d1afc9556d4952cd4f335a4
+# 2020 - Fix empty lines after file headers
+38365f46aa2cb9a634c85cb5ac9b3813ea550c14
+# 2020 - Format VC JS with eslint
+271115c83b8ad8c87a9f67bf4c2212e33f07348e
+# 2021 - Run `eslint --fix` on all JS
+51b2de1850acc5e8877f105bf3e689d679dd7161
+# 2021 - Use single quotes
+22e60a91c03f8d2cc2437ee6654cba0afd4e267e

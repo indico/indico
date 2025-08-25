@@ -2,6 +2,11 @@ Tips for developers
 -------------------
 It's dangerous to go alone. Take these tips in case you need to fit Indico to your particular needs.
 
+## Hiding noisy reformat commits from `git blame`
+Run `git config --global blame.ignoreRevsFile .git-blame-ignore-revs` to make git ignore those commits.
+When you run a code formatter on the codebase, make sure to add the new commit there as well. Note that it
+has to be the full commit hash, using a shorthash will break `git blame`.
+
 ## Initializing the database
 Use `indico db prepare` to create your tables based on the SQLAlchemy models and set the migration status to the most
 recent alembic revision.
