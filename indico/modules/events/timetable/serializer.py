@@ -377,5 +377,5 @@ def serialize_session(sess):
         'textColor': '#' + sess.colors.text,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
-        'defaultContributionDuration': sess.default_contribution_duration.total_seconds() / 60
+        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60
     }

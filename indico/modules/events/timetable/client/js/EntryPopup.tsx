@@ -129,7 +129,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         'minutes'
       );
     }
-    const newChildDuration = session.defaultContributionDuration;
+    const newChildDuration = session.defaultContribDurationMinutes;
     // TODO: (Michel) Disable time picker for any time after parent end time
     dispatch(
       actions.setDraftEntry({
