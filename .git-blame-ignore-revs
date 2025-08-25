@@ -10,6 +10,8 @@ bc76b31163dda0ec17c6620a12085f418a029d3a
 0a2cd8284a07d13b44311fb13ac747362819ab4c
 # 2020 - Autofix more issues
 6b2ae0523832a712fa0249cfa8260a688fe9ff30
+# 2020 - Fix eslint warnings
+fe0ef2323a4660d9c486c0ff4c6c6b9eacb3dad8
 # 2020 - Re-order imports
 692e520e8ab1f6a6ac4d4aae7a61ff98511d7492
 # 2020 - Re-order imports (the ones missed last time)
@@ -22,6 +24,10 @@ bc76b31163dda0ec17c6620a12085f418a029d3a
 9b7464935b4971ba1d1afc9556d4952cd4f335a4
 # 2020 - Fix empty lines after file headers
 38365f46aa2cb9a634c85cb5ac9b3813ea550c14
+# 2020 - Format category widgets with eslint
+eb297f074901e1f54d86dca72ea23cc1a856bff2
+# 2020 - Format management widgets with eslint
+98c83f0d4bd9e8edb1288dce6398b5a532714871
 # 2020 - Format VC JS with eslint
 271115c83b8ad8c87a9f67bf4c2212e33f07348e
 # 2021 - Run `eslint --fix` on all JS
