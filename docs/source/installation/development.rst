@@ -326,3 +326,75 @@ The Indico dev server should be run with the ``--proxy`` option::
     indico run -h 127.0.0.1 -p 8000 -q --enable-evalex --url https://acme.example.org --proxy
 
 You can then start nginx and access ``https://acme.example.org`` directly.
+
+
+Running the Unit Tests
+----------------------
+
+Indico comes with a comprehensive suite of unit tests. To run them, you will need to have PostgreSQL available. By default,
+the tests expect a local server, but you can also use the a Docker-backed setup for a more standalone and isolated environment.
+
+**Running tests with the default setup**
+
+To run all tests, simply execute:
+
+.. code-block:: shell
+
+    pytest
+
+You can also run a subset of tests by specifying the path or test name:
+
+.. code-block:: shell
+
+    pytest path/to/test_file.py
+    pytest -k test_some_function
+
+**Using the Docker-backed PostgreSQL for tests**
+
+Indico provides a Docker-based PostgreSQL fixture for running tests without requiring a local PostgreSQL installation. To enable this,
+set the ``INDICO_TEST_USE_DOCKER`` environment variable (to `yes`, `true` or `1`) before running the tests:
+
+.. code-block:: shell
+
+    INDICO_TEST_USE_DOCKER=1 pytest
+
+This will automatically start a temporary PostgreSQL server in a Docker container for the duration of the test run. The container and
+its data will be cleaned up automatically afterwards.
+
+If you want to use a custom Docker daemon (for example, if Docker is not running on the default socket), you can set
+``INDICO_TEST_USE_DOCKER`` to the Docker API URL, such as ``unix:///var/run/docker.sock`` or ``tcp://127.0.0.1:2375``.
+
+**Notes:**
+
+- Make sure Docker is installed and running on your system, and that your user has permission to access the Docker socket (you may need to be in the `docker` group);
+- The first time you run the tests with Docker, the required PostgreSQL image will be pulled, which may take a few minutes.
+
+
+**Using Podman instead of Docker**
+
+If you prefer to use Podman as a drop-in replacement for Docker, you can do so with Indico's Docker-backed PostgreSQL fixture. Podman is
+compatible with the Docker API, but you need to ensure that the Podman socket is available and that your user has permission to access it.
+
+To use Podman for running the tests, set the ``INDICO_TEST_USE_DOCKER`` environment variable to the Podman socket URL. For example:
+
+.. code-block:: shell
+
+    INDICO_TEST_USE_DOCKER=unix:///run/user/$(id -u)/podman/podman.sock pytest
+
+Make sure the Podman socket is running. You can start it with:
+
+.. code-block:: shell
+
+    systemctl --user start podman.socket
+
+Or, if you are not using systemd user services, you can run:
+
+.. code-block:: shell
+
+    podman system service --time=0 unix:///run/user/$(id -u)/podman/podman.sock
+
+**Notes:**
+
+- The first test run may take longer as Podman will pull the required PostgreSQL image;
+- Ensure your user has permission to access the Podman socket;
+- The rest of the test setup and cleanup works the same as with Docker.
