@@ -8,11 +8,13 @@
 // Note that this regex allows times without the meridiem portion. The rest of the
 // code relies on knowing that we're parsing the 12-hour format time. Don't use this
 // pattern to test *if* the time is in 12-hour format.
-const LAX_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)?$/i;
+const LAX_T12H_PATTERN =
+  /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)?$/i;
 
 // This is a strict 12h pattern that requires the meridiem part. It can be tested
 // to see whether the string is a 12h time of day string.
-const STRICT_T12H_PATTERN = /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)$/i;
+const STRICT_T12H_PATTERN =
+  /^(?<hours>0[1-9]|1[0-2]|[1-9])(?: *:? *(?<minutes>[0-5]?\d))? *(?<meridiem>[ap](?: ?m|\. ?m\.)?)$/i;
 
 // Matches zero-padded and non-zero-padded hours and minutes with or without ':'.
 const T24H_PATTERN = /^([01]\d|2[0-3]|\d)(?: *[:.h]? *([0-5]?\d))?$/i;
@@ -94,7 +96,7 @@ function parseAny(timeOfDayString) {
 const parsers = {
   '24h': parse24h,
   '12h': parse12h,
-  'any': parseAny,
+  any: parseAny,
 };
 
 /**
@@ -112,7 +114,7 @@ export class Time {
   static TIME_FORMAT_LOCALE = {
     '12h': 'en-US',
     '24h': 'de',
-    'any': 'de',
+    any: 'de',
   };
 
   static fromHour(hour, minute) {
