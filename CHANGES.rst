@@ -49,7 +49,7 @@ Internal Changes
 - Remove broken support for custom multipass providers setting a maximum session
   lifetime; use :data:`SESSION_MAX_LIFETIME` instead (:pr:`7030`)
 - Use `Biome <https://biomejs.dev/>`__ to format JS/JSX, TS/TSX, JSON and CSS (:pr:`7042`)
-- Add the env var `INDICO_TEST_USE_DOCKER`, which allows for tests to be run on
+- Add the env var ``INDICO_TEST_USE_DOCKER``, which allows for tests to be run on
   a PostgreSQL server running in a container
 
 
