@@ -7,12 +7,11 @@
 
 import createDecorator from 'final-form-calculate';
 import PropTypes from 'prop-types';
-import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {Form, Input} from 'semantic-ui-react';
 
-import {DatePicker} from 'indico/react/components';
+import {DatePicker, TimePicker} from 'indico/react/components';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
@@ -33,15 +32,16 @@ export function DateInputComponent({
   maxDate,
 }) {
   const dateValue = value.split('T')[0];
-  const timeValue = value.includes('T') ? value.split('T')[1] : '';
+  // Time value uses the HH:MM portion, ignoring the seconds
+  const timeValue = value.split('T')[1]?.slice(0, 5) || '';
 
   const handleDateChange = newDate => {
     const dateString = newDate || '';
-    const timeString = timeFormat ? timeValue : '00:00:00';
-    onChange(dateString ? `${dateString}T${timeString}` : '');
+    const timeString = timeFormat ? timeValue : '00:00';
+    onChange(dateString ? `${dateString}T${timeString}:00` : '');
   };
   const handleTimeChange = newTime =>
-    onChange(newTime ? `${dateValue}T${newTime.format('HH:mm:00')}` : dateValue);
+    onChange(newTime ? `${dateValue}T${newTime || '00:00'}:00` : dateValue);
 
   return (
     <Form.Group styleName="date-field">
@@ -67,14 +67,9 @@ export function DateInputComponent({
             name="time"
             disabled={disabled}
             required={required}
-            showSecond={false}
-            value={toMoment(timeValue, 'HH:mm:ss', true)}
-            focusOnOpen
+            timeFormat={timeFormat}
+            value={timeValue}
             onChange={handleTimeChange}
-            use12Hours={timeFormat === '12h'}
-            allowEmpty={false}
-            placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
-            getPopupContainer={node => node}
           />
         </Form.Field>
       )}

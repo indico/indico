@@ -42,6 +42,8 @@ Accessibility
   thanks :user:`foxbunny`)
 - Use proper semantic heading elements for registration form section titles (:pr:`7040`,
   thanks :user:`foxbunny`)
+- New time picker with improved accessibility and usability (:pr:`6930`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
