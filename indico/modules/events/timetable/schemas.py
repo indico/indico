@@ -33,11 +33,16 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
 
 
+def _get_break_session_id(entry):
+    if entry.timetable_entry.parent:
+        return entry.timetable_entry.parent.session_block.session_id
+
+
 class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
         fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type',
-                  'parent_id')
+                  'parent_id', 'session_block_id', 'session_id')
         rh_context = ('event',)
 
     title = fields.String(required=True)
@@ -46,14 +51,17 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
-    parent_id = fields.Integer(dump_only=True, attribute='timetable_entry.parent_id')
+    parent_id = fields.Integer(attribute='timetable_entry.parent_id')
+    session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id')
+    session_id = fields.Function(_get_break_session_id, dump_only=True)
 
 
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block')
+                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
+                  'session_block_id', 'session_id')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()

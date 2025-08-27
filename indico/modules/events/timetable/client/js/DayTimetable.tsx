@@ -432,7 +432,7 @@ function layoutAfterDropOnCalendar(
   };
 
   if (isChildEntry(draftEntry)) {
-    delete draftEntry.parentId;
+    delete draftEntry.sessionBlockId;
   }
 
   if (draftEntry.type === EntryType.SessionBlock) {
@@ -542,7 +542,7 @@ function layoutAfterDropOnBlock(
         .add(deltaMinutes, 'minutes')
         .diff(moment(toBlock.startDt), 'minutes')
     ),
-    parentId: toBlock.id,
+    sessionBlockId: toBlock.id,
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
