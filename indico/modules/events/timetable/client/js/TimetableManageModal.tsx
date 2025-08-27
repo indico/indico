@@ -20,7 +20,7 @@ import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
@@ -200,7 +200,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'code',
       'session_block_id',
     ]);
-    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
+    try {
+      return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
+    } catch (error) {
+      handleAxiosError(error, true);
+    }
   };
 
   const _handleCreateSessionBlock = async data => {
