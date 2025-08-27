@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {Ref, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Label, Menu, Message} from 'semantic-ui-react';
 
