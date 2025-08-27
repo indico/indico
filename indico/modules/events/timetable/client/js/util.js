@@ -309,7 +309,3 @@ export const updateState = (
   });
   return changeMap.length > 0 ? addNewChange(newState, Object.fromEntries(changeMap)) : state;
 };
-
-// TODO remove
-// eslint-disable-next-line no-alert
-export const handleUnimplemented = () => alert('desole, ça marche pas encore :(');
