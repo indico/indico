@@ -53,6 +53,9 @@ export default function Toolbar({
   const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
 
   const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
+    if (!daysBarRef.current) {
+      return;
+    }
     const barWidth = daysBarRef.current.clientWidth - gradientWidth;
     const left = dayIndex * dayWidth - barWidth / 2 + dayWidth / 2;
     daysBarRef.current.scrollTo({left, behavior});
