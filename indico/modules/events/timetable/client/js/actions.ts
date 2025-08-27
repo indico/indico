@@ -38,11 +38,9 @@ export const DELETE_BREAK = 'Delete break';
 export const DELETE_BLOCK = 'Delete block';
 export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
-export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
 export const DISMISS_ERROR = 'Dismiss error';
-export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
@@ -245,10 +243,6 @@ export function unscheduleEntry(entry, eventId) {
   });
 }
 
-export function changeColor(sessionId, color) {
-  return {type: CHANGE_COLOR, sessionId, color};
-}
-
 export function undoChange() {
   return {type: UNDO_CHANGE};
 }
@@ -259,10 +253,6 @@ export function redoChange() {
 
 export function dismissError() {
   return {type: DISMISS_ERROR};
-}
-
-export function scrollNavbar(offset) {
-  return {type: SCROLL_NAVBAR, offset};
 }
 
 export function toggleShowUnscheduled() {

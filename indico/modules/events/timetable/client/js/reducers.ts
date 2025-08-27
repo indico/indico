@@ -5,12 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import {Moment} from 'moment';
 
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
-import {changeSessionColor, changeBreakColor} from './operations';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {DayEntries} from './types';
 import {setCurrentDateLocalStorage} from './utils';
@@ -374,8 +372,6 @@ export default {
           };
         }
       }
-      case actions.CHANGE_COLOR:
-        return action.sessionId ? state : {...state, ...changeBreakColor(state, action.color)};
       case actions.UNDO_CHANGE:
         return {
           ...state,
@@ -401,8 +397,6 @@ export default {
           ...Object.fromEntries(Object.entries(state)),
           [action.data.id]: {...action.data, isPoster: false},
         });
-      case actions.CHANGE_COLOR:
-        return action.sessionId ? changeSessionColor(state, action.sessionId, action.color) : state;
       default:
         return state;
     }
@@ -410,8 +404,6 @@ export default {
   navigation: (state, action) => {
     state = {isExpanded: false, ...state};
     switch (action.type) {
-      case actions.SCROLL_NAVBAR:
-        return {...state, offset: action.offset};
       case actions.SET_CURRENT_DATE:
         setCurrentDateLocalStorage(action.date, action.eventId);
         return {...state, currentDate: action.date};
