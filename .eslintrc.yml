@@ -100,6 +100,7 @@ overrides:
       no-shadow: off
       '@typescript-eslint/no-shadow': warn
       '@typescript-eslint/no-explicit-any': warn
+      '@typescript-eslint/no-unused-vars': ["error", { "ignoreRestSiblings": true }]
   - files: ["*.d.ts"]
     rules:
       import/unambiguous: off
