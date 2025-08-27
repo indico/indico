@@ -98,6 +98,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   return entry;
 }
 
-export function DraggableBlockEntry({id, ...rest}) {
+export function DraggableBlockEntry({id, ...rest}: DraggableEntryProps) {
   return <DraggableEntry id={id} {...rest} />;
 }

@@ -141,6 +141,7 @@ export default function SessionEditForm({
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 
@@ -201,6 +202,7 @@ export function SessionCreateForm({eventId, eventType, onClose}: SessionCreateFo
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 

@@ -49,11 +49,13 @@ export default function ContributionEntry({
   column,
   maxColumn,
   setDuration: _setDuration,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
   parentEndDt,
   // TODO: (Ajob) Taken from BlockEntry. Re-evaluate
   isChild = false,
   children: _children = [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
   renderChildren = true,
 }: DraggableEntryProps) {
