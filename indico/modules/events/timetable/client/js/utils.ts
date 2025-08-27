@@ -10,6 +10,7 @@ import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {Entry, EntryType, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
@@ -79,7 +80,7 @@ export const mapTTDataToEntry = (data): Entry => {
     code,
     keywords,
     sessionId,
-    parentId,
+    sessionBlockId,
   } = camelizeKeys(data);
 
   const mappedObj = {
@@ -94,7 +95,12 @@ export const mapTTDataToEntry = (data): Entry => {
     y: 0,
     personLinks: personLinks || conveners || [],
     boardNumber,
-    locationData,
+    locationData: {
+      address: locationData.address,
+      room: locationData.roomName,
+      inheriting: locationData.inheriting,
+      venueName: locationData.venueName,
+    },
     code,
     keywords,
     column: 0,
@@ -104,10 +110,11 @@ export const mapTTDataToEntry = (data): Entry => {
     textColor: colors ? colors.text : '',
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
+    sessionBlockId: sessionBlockId || null,
   };
 
-  if (parentId) {
-    mappedObj.parentId = parentId;
+  if (sessionBlockId) {
+    mappedObj.sessionBlockId = `s${sessionBlockId}`;
   }
 
   return mappedObj;
@@ -120,10 +127,9 @@ export function getEntryColor(
   entry: Entry,
   sessions: Record<number, Session>
 ): {textColor: string; backgroundColor: string} {
-  if (entry.type === 'break') {
+  if (entry.type === 'break' && !entry.sessionId) {
     return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
   }
-
   if (entry.type === 'contrib' && !entry.sessionId) {
     return {
       textColor: DEFAULT_CONTRIB_TEXT_COLOR,
@@ -133,6 +139,12 @@ export function getEntryColor(
 
   const session = sessions[entry.sessionId];
   console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
+  if (entry.sessionId) {
+    return {
+      textColor: session.textColor,
+      backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
+    };
+  }
 
   return {
     textColor: session.textColor,
