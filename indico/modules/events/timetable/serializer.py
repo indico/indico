@@ -25,6 +25,8 @@ def _get_location_data(obj, *, management=False):
     data['room'] = obj.room_name
     data['inheritLoc'] = obj.inherit_location
     data['inheritRoom'] = obj.inherit_location
+    data['venueName'] = obj.venue_name
+
     if management:
         data['address'] = obj.address
     return data
@@ -374,5 +376,6 @@ def serialize_session(sess):
         'roomFullname': sess.room_name,
         'textColor': '#' + sess.colors.text,
         'title': sess.title,
-        'url': url_for('sessions.display_session', sess)
+        'url': url_for('sessions.display_session', sess),
+        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60
     }
