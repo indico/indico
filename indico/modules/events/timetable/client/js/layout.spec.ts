@@ -15,14 +15,7 @@ import {
   getWidthAndOffset,
   layoutGroupAfterMove,
 } from './layout';
-import {
-  BlockEntry,
-  BreakEntry,
-  ChildBreakEntry,
-  ChildContribEntry,
-  ChildEntry,
-  ContribEntry,
-} from './types';
+import {BlockEntry, ChildContribEntry, ChildEntry, ContribEntry} from './types';
 
 function makeCounter() {
   let id = 0;
@@ -106,54 +99,6 @@ function childContrib({
   maxColumn?: number;
 }): ChildContribEntry {
   return {...contrib({id, title, time, duration, column, maxColumn}), parentId};
-}
-
-function break_({
-  id,
-  title,
-  time,
-  duration,
-  column = 0,
-  maxColumn = 0,
-}: {
-  id?: number;
-  title?: string;
-  time: string;
-  duration: number;
-  column?: number;
-  maxColumn?: number;
-}): BreakEntry {
-  if (id === undefined) {
-    id = nextId();
-  }
-  if (title === undefined) {
-    title = `Break ${id}`;
-  }
-  return {
-    id,
-    title,
-    type: 'break',
-    duration,
-    textColor: 'black',
-    backgroundColor: 'white',
-    ...scheduleMixin({time, column, maxColumn}),
-  };
-}
-
-function childBreak({
-  id,
-  parentId,
-  title,
-  time,
-  duration,
-}: {
-  id?: number;
-  parentId: number;
-  title?: string;
-  time: string;
-  duration: number;
-}): ChildBreakEntry {
-  return {...break_({id, title, time, duration}), parentId};
 }
 
 function block({
