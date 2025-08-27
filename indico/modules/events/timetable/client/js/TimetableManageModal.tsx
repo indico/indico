@@ -20,7 +20,7 @@ import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
@@ -99,6 +99,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   // not the unique ID generated for the timetable
   const {objId} = entry;
   const isEditing = !!objId;
+  const {sessionBlockId} = entry;
+  const isCreatingChild = !!sessionBlockId;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -115,7 +117,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     keywords: entry.keywords || [],
     references: entry.references || [],
     // TODO: (Ajob) Clean up the location data
-    location_data: snakifyKeys(entry.location) || {inheriting: false},
+    location_data: snakifyKeys(entry.locationData) || {inheriting: false},
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
     start_dt: entry.startDt.format(),
@@ -173,7 +175,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={undefined}
         initialValues={initialValues}
         extraOptions={extraOptions}
-        hasParent={entry.parentId !== undefined}
+        hasParent={'sessionBlockId' in entry}
       />
     ),
   };
@@ -182,6 +184,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _handleCreateContribution = async data => {
+    data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',
@@ -195,8 +198,13 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'keywords',
       'board_number',
       'code',
+      'session_block_id',
     ]);
-    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
+    try {
+      return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
+    } catch (error) {
+      handleAxiosError(error, true);
+    }
   };
 
   const _handleCreateSessionBlock = async data => {
@@ -220,6 +228,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   // TODO: Implement logic for breaks
   const _handleCreateBreak = async data => {
+    data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',
@@ -229,6 +238,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'inheriting',
       'start_dt',
       'colors',
+      'session_block_id',
     ]);
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
@@ -265,10 +275,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (data['start_dt']) {
-      data['start_dt'] =
-        activeType === EntryType.Contribution
-          ? entry.startDt.format('YYYY-MM-DDTHH:mm:ss')
-          : entry.startDt.format();
+      data['start_dt'] = entry.startDt.format('YYYY-MM-DDTHH:mm:ss');
     }
 
     const submitData = snakifyKeys(data);
@@ -341,18 +348,20 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
               <Translate>Entry Type</Translate>
             </Header>
             <div>
-              {Object.keys(forms).map((key: EntryType) => (
-                <Button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    changeForm(key);
-                  }}
-                  color={activeType === key ? 'blue' : undefined}
-                >
-                  {typeLongNames[key]}
-                </Button>
-              ))}
+              {Object.keys(forms)
+                .filter(key => !(isCreatingChild && key === EntryType.SessionBlock))
+                .map((key: EntryType) => (
+                  <Button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      changeForm(key);
+                    }}
+                    color={activeType === key ? 'blue' : undefined}
+                  >
+                    {typeLongNames[key]}
+                  </Button>
+                ))}
             </div>
           </Segment>
           <Divider />
