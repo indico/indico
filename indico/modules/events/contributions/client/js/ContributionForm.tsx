@@ -48,7 +48,6 @@ interface CustomField {
 }
 
 interface ContributionFormProps {
-  eventId: number;
   personLinkFieldParams?: Record<string, any>;
   locationParent?: Record<string, any>;
   customFields: CustomField[];
@@ -105,8 +104,8 @@ export function ContributionFormFields({
             />
           );
         }
-      } else if (fieldType === 'single_choice') {
-        const options = fieldData.options!.map(opt => ({
+      } else if (fieldType === 'single_choice' && fieldData.options) {
+        const options = fieldData.options.map(opt => ({
           key: opt.id,
           text: opt.option,
           value: opt.id,
@@ -201,7 +200,6 @@ export function ContributionFormFields({
 }
 
 export function ContributionForm({
-  eventId,
   personLinkFieldParams = {},
   locationParent = {},
   customFields = [],
@@ -301,6 +299,7 @@ export function ContributionEditForm({
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 
@@ -367,6 +366,7 @@ export function ContributionCreateForm({
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 
