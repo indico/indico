@@ -55,6 +55,7 @@ def _ensure_consistency(contrib):
 
 
 @make_interceptable
+@no_autoflush
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
     user = session.user if session else None
     start_dt = contrib_data.pop('start_dt', None)
