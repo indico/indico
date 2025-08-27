@@ -65,7 +65,7 @@ export function preprocessSessionData(
     Object.entries(data).map(([, s]) => [
       s.id,
       {
-        ..._.pick(s, ['id', 'title', 'isPoster']), // TODO: (Duarte) get other attrs
+        ..._.pick(s, ['id', 'title', 'isPoster', 'defaultContribDurationMinutes']), // TODO: (Duarte) get other attrs
         textColor: s.textColor,
         backgroundColor: s.color,
       },
@@ -154,7 +154,7 @@ export function preprocessTimetableEntries(
             title: c.title,
             startDt: dateToMoment(c.startDate),
             duration: c.duration,
-            parentId: dayEntries[day].at(-1).id,
+            sessionBlockId: dayEntries[day].at(-1).id,
             x: 0,
             y: 0,
             locationData: {
