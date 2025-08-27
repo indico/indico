@@ -358,7 +358,7 @@ export function layoutAfterUnscheduledDropOnBlock(
     y: minutesToPixels(
       moment(startDt).add(deltaMinutes, 'minutes').diff(moment(toBlock.startDt), 'minutes')
     ),
-    parentId: toBlock.id,
+    sessionBlockId: toBlock.id,
   };
 
   // TODO
