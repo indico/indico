@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
 
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
