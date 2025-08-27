@@ -8,7 +8,7 @@
 import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
-import {appendSessionAttributes, mergeChanges} from './util';
+import {appendSessionAttributes} from './util';
 import {getDateKey} from './utils';
 
 export const getStaticData = state => state.staticData;
@@ -61,35 +61,13 @@ export const getCurrentDayEntries = createSelector(
   getCurrentDate,
   (entries, currentDate) => entries[getDateKey(currentDate)]
 );
-export const getBlocks = createSelector(
-  getEntries,
-  getSessions,
-  (entries, sessions) => appendSessionAttributes(entries.blocks, sessions)
-);
-export const getChildren = createSelector(
-  getEntries,
-  getSessions,
-  (entries, sessions) => appendSessionAttributes(entries.children, sessions)
-);
 
-export const getVisibleChildren = createSelector(
-  getChildren,
-  children => children.filter(c => !c.isPoster)
-);
 export const getUnscheduled = createSelector(
   getLatestChange,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
-// export const getNumUnscheduled = createSelector(
-//   getUnscheduled,
-//   unscheduled => unscheduled.length
-// );
-export const getVisibleEntries = createSelector(
-  getBlocks,
-  getVisibleChildren,
-  (blocks, children) => [...blocks, ...children]
-);
+
 export const getSelectedEntry = createSelector(
   getDayEntries,
   getSelectedId,
@@ -110,11 +88,6 @@ export const canUndo = createSelector(
 export const canRedo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx < entries.changes.length - 1
-);
-export const getMergedChanges = createSelector(
-  getEntries,
-  getSessions,
-  (entries, sessions) => mergeChanges(entries, sessions)
 );
 export const getError = createSelector(
   getEntries,
