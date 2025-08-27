@@ -31,6 +31,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
+import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {formatBlockTitle, getEntryColor, mapTTDataToEntry} from './utils';
@@ -68,6 +69,10 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+
+  const session = useSelector((state: ReduxState) =>
+    selectors.getSessionById(state, entry.sessionId)
+  );
 
   const _getFileCount = () => {
     const {attachments = {}} = entry;
@@ -107,6 +112,33 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     data['type'] = type;
     entry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(entry));
+  };
+
+  const onCreateChild = async (e: MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+    let newChildStartDt = moment(entry.startDt);
+    if (entry.children.length > 0) {
+      const childWithLatestEndTime = entry.children.reduce((latest, child) => {
+        const childEndTime = moment(child.startDt).add(child.duration, 'minutes');
+        const latestEndTime = moment(latest.startDt).add(latest.duration, 'minutes');
+        return childEndTime.isAfter(latestEndTime) ? child : latest;
+      });
+      newChildStartDt = moment(childWithLatestEndTime.startDt).add(
+        childWithLatestEndTime.duration,
+        'minutes'
+      );
+    }
+    const newChildDuration = session.defaultContribDurationMinutes;
+    // TODO: (Michel) Disable time picker for any time after parent end time
+    dispatch(
+      actions.setDraftEntry({
+        startDt: newChildStartDt,
+        duration: newChildDuration,
+        sessionBlockId: entry.objId,
+        sessionId: entry.sessionId,
+      })
+    );
   };
 
   const onDelete = async (e: MouseEvent) => {
@@ -150,19 +182,26 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
                 <Button icon="trash" onClick={onDelete} />
               )}
               {type === EntryType.SessionBlock && (
-                <Dropdown button inline icon="ellipsis vertical">
-                  <DropdownMenu>
-                    <DropdownItem>
-                      {/* Implement session edit or redirect to page */}
-                      <Icon name="edit" />
-                      <Translate>Edit session</Translate>
-                    </DropdownItem>
-                    <DropdownItem>
-                      <Icon name="shield" />
-                      <Translate>Edit session protection</Translate>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
+                <>
+                  <Popup
+                    content={<Translate>Add new child</Translate>}
+                    size="mini"
+                    trigger={<Button icon="plus" onClick={onCreateChild} color="green" />}
+                  />
+                  <Dropdown button inline icon="ellipsis vertical">
+                    <DropdownMenu>
+                      <DropdownItem>
+                        {/* Implement session edit or redirect to page */}
+                        <Icon name="edit" />
+                        <Translate>Edit session</Translate>
+                      </DropdownItem>
+                      <DropdownItem>
+                        <Icon name="shield" />
+                        <Translate>Edit session protection</Translate>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </>
               )}
             </ButtonGroup>
             <ButtonGroup>

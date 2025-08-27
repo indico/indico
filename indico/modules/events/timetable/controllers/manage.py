@@ -181,8 +181,21 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 class RHTimetableBreakCreate(RHManageEventBase):
     @use_rh_args(BreakSchema)
     def _process_POST(self, data: Break):
-        break_entry = create_break_entry(self.event, data, extend_parent=False)
+        session_block_id = data.pop('timetable_entry', {}).get('parent', {}).get('session_block_id')
+        session_block = SessionBlock.get(session_block_id) if session_block_id else None
+        data['location_data'] = (
+            self._get_inherited_location(location_parent=session_block)
+            if data['location_data'].get('inheriting')
+            else data['location_data']
+        )
+        break_entry = create_break_entry(self.event, data, extend_parent=False, session_block=session_block)
         return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
+
+    def _get_inherited_location(self, **kwargs):
+        location_parent = kwargs.pop('location_parent', None)
+        inherited_location = location_parent.location_data if location_parent else self.event.location_data
+        inherited_location['inheriting'] = True
+        return inherited_location
 
 
 class RHTimetableBreak(RHManageEventBase):
@@ -212,8 +225,13 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
             data['references'] = self._get_references(references)
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-
-        contrib = create_contribution(self.event, data)
+        session_block = SessionBlock.get(data['session_block_id']) if data.get('session_block_id') else None
+        data['location_data'] = (
+            self._get_inherited_location(location_parent=session_block)
+            if data['location_data'].get('inheriting')
+            else data['location_data']
+        )
+        contrib = create_contribution(self.event, data, session_block=session_block, extend_parent=True)
         return ContributionSchema(context={'event': self.event}).jsonify(contrib)
 
     @no_autoflush
@@ -226,6 +244,12 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
             references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
                                                     value=entry['value']))
         return references
+
+    def _get_inherited_location(self, **kwargs):
+        location_parent = kwargs.pop('location_parent', None)
+        inherited_location = location_parent.location_data if location_parent else self.event.location_data
+        inherited_location['inheriting'] = True
+        return inherited_location
 
 
 class RHTimetableContribution(RHManageContributionBase):
