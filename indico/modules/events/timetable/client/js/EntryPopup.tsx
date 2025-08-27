@@ -109,9 +109,15 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     data['type'] = type;
     
     const draftEntry = mapTTDataToEntry(data);
+
+    if ('room' in draftEntry.locationData) {
+      draftEntry.locationData.roomName = draftEntry.locationData.room;
+      delete draftEntry.locationData.room;
+    }
     if (entry.type === EntryType.SessionBlock) {
       draftEntry.children = entry.children;
     }
+
     dispatch(actions.setDraftEntry(draftEntry));
     onClose();
   };

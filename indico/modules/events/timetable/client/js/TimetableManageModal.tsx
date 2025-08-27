@@ -277,7 +277,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (data['start_dt']) {
-      data['start_dt'] = entry.startDt.format('YYYY-MM-DDTHH:mm:ss');
+      data['start_dt'] = moment(data['start_dt']).format('YYYY-MM-DDTHH:mm:ss');
     }
 
     const submitData = snakifyKeys(data);
