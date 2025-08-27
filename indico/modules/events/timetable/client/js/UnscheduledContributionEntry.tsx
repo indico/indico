@@ -10,9 +10,9 @@ import React from 'react';
 import {createPortal} from 'react-dom';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {EntryTitle} from './ContributionEntry';
 import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
+import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 

@@ -7,8 +7,8 @@
 
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
+import breakEditURL from 'indico-url:timetable.tt_break_rest';
 
-import _ from 'lodash';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
@@ -22,8 +22,9 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
+import {LocationParentObj} from './types';
+
 interface BreakFormProps {
-  eventId: number;
   locationParent?: Record<string, any>;
   onSubmit: (formData: any) => void;
   initialValues: Record<string, any>;
@@ -32,7 +33,6 @@ interface BreakFormProps {
 }
 
 interface BreakFormFieldsProps {
-  eventId: number;
   locationParent?: LocationParentObj;
   initialValues: Record<string, any>;
   extraOptions?: Record<string, any>;
@@ -41,7 +41,14 @@ interface BreakFormFieldsProps {
 }
 
 export function BreakFormFields({
-  locationParent = {inheriting: false},
+  locationParent = {
+    inheriting: false,
+    venue: '',
+    room: '',
+    venue_name: '',
+    room_name: '',
+    address: '',
+  },
   initialValues = {},
   extraOptions = {},
   hasParent = false,
@@ -83,7 +90,6 @@ export function BreakFormFields({
 }
 
 export function BreakForm({
-  eventId,
   locationParent = {},
   onSubmit,
   initialValues = {},
@@ -127,7 +133,7 @@ export function BreakEditForm({
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentURL({event_id: eventId, break_id: breakId})
   );
-  const breakURL = breakURL(snakifyKeys({eventId, breakId}));
+  const breakURL = breakEditURL(snakifyKeys({eventId, breakId}));
   const {data: breakData, loading: breakLoading} = useIndicoAxios(breakURL);
 
   const handleSubmit = async (formData: any) => {
@@ -138,6 +144,7 @@ export function BreakEditForm({
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 
@@ -177,6 +184,7 @@ export function BreakCreateForm({
     }
     location.reload();
     // never finish submitting to avoid fields being re-enabled
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await new Promise(() => {});
   };
 
@@ -209,13 +217,11 @@ export function BreakCreateForm({
 export function EditBreakButton({
   eventId,
   breakId,
-  eventTitle,
   triggerSelector,
   ...rest
 }: {
   eventId: number;
   breakId: number;
-  eventTitle: string;
   triggerSelector?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -237,14 +243,7 @@ export function EditBreakButton({
           <Translate>Edit break</Translate>
         </Button>
       )}
-      {open && (
-        <BreakEditForm
-          eventId={eventId}
-          breakId={breakId}
-          eventTitle={eventTitle}
-          onClose={() => setOpen(false)}
-        />
-      )}
+      {open && <BreakEditForm eventId={eventId} breakId={breakId} onClose={() => setOpen(false)} />}
     </>
   );
 }
