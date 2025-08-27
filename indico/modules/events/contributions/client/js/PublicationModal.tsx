@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {Header, Modal, Button, List, Message, Divider} from 'semantic-ui-react';
+import {Header, Modal, Button, List, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
