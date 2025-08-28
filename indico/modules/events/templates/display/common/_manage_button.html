@@ -104,7 +104,7 @@
             {%- trans -%}Edit subcontribution{%- endtrans -%}
         </a>
     {%- elif opt == 'summarize' -%}
-        {{ template_hook('event-manage-dropdown-after-notes-compile', event=item) }}
+        {{ template_hook('event-manage-dropdown-notes-summarize', event=item) }}
     {%- else -%}
         ERROR: unknown option "{{ opt }}"
     {%- endif -%}
