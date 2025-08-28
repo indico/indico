@@ -17,6 +17,7 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import ImportInvitationsForm, InvitationFormExisting, InvitationFormNew
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
+from indico.modules.events.registration.schemas import RegistrationInvitationSchema
 from indico.modules.events.registration.util import create_invitation, import_invitations_from_csv
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import ngettext
@@ -32,12 +33,6 @@ def _has_pending_invitations(invitations):
     return any(invitation.state == InvitationState.pending for invitation in invitations)
 
 
-def _query_pending_invitations(regform):
-    return (RegistrationInvitation.query.with_parent(regform)
-            .filter(RegistrationInvitation.state == InvitationState.pending)
-            .all())
-
-
 def _query_invitation_list(regform):
     return (RegistrationInvitation.query
             .with_parent(regform)
@@ -48,16 +43,11 @@ def _query_invitation_list(regform):
             .all())
 
 
-def _render_invitation_list(invitations):
-    tpl = get_template_module('events/registration/management/_invitation_list.html')
-    return tpl.render_invitation_list(invitations)
-
-
 def _get_invitation_data(regform):
     invitations = _query_invitation_list(regform)
     return {
-        'invitation_list': _render_invitation_list(invitations),
-        'has_pending_invitations': _has_pending_invitations(invitations)
+        'has_pending_invitations': _has_pending_invitations(invitations),
+        'invitation_list': RegistrationInvitationSchema(many=True).dump(invitations),
     }
 
 
@@ -67,7 +57,8 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
     def _process(self):
         invitations = _query_invitation_list(self.regform)
         return WPManageRegistration.render_template('management/regform_invitations.html', self.event,
-                                                    regform=self.regform, invitations=invitations,
+                                                    regform=self.regform,
+                                                    invitations_list=RegistrationInvitationSchema(many=True).dump(invitations),
                                                     has_pending_invitations=_has_pending_invitations(invitations))
 
 
@@ -95,7 +86,22 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
 
 
-class RHRegistrationFormRemindersSend(RHManageRegFormBase):
+class RHPendingInvitationsBase(RHManageRegFormBase):
+    """Mixin for RHs that work on pending invitations."""
+
+    @use_kwargs({
+        'invitation_ids': fields.List(fields.Int(), load_default=None),
+    })
+    def _process_args(self, invitation_ids):
+        RHManageRegFormBase._process_args(self)
+        query = (RegistrationInvitation.query.with_parent(self.regform)
+                 .filter(RegistrationInvitation.state == InvitationState.pending))
+        if invitation_ids is not None:
+            query = query.filter(RegistrationInvitation.id.in_(invitation_ids))
+        self.invitations = query.all()
+
+
+class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
     """Send a reminder to pending invitees."""
 
     @use_kwargs({
@@ -108,8 +114,7 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
-        invitations = _query_pending_invitations(self.regform)
-        for invitation in invitations:
+        for invitation in self.invitations:
             email_body = replace_placeholders('registration-invitation-reminder-email', body, event=self.event,
                                               invitation=invitation)
             email_subject = replace_placeholders('registration-invitation-reminder-email', subject,
@@ -121,10 +126,10 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
                 email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Registration')
-        return jsonify(count=len(invitations))
+        return jsonify(count=len(self.invitations))
 
 
-class RHRegistrationFormRemindersMetadata(RHManageRegFormBase):
+class RHRegistrationFormRemindersMetadata(RHPendingInvitationsBase):
     """Get the metadata for registration reminder emails."""
 
     def _process(self):
@@ -133,8 +138,7 @@ class RHRegistrationFormRemindersMetadata(RHManageRegFormBase):
             body = tpl.get_html_body()
             subject = tpl.get_subject()
         placeholders = get_sorted_placeholders('registration-invitation-reminder-email')
-        invitations = _query_pending_invitations(self.regform)
-        recipients = sorted(invitation.email for invitation in invitations)
+        recipients = sorted(invitation.email for invitation in self.invitations)
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),
             'recipients': recipients,
@@ -144,7 +148,7 @@ class RHRegistrationFormRemindersMetadata(RHManageRegFormBase):
         })
 
 
-class RHRegistrationFormRemindersPreview(RHManageRegFormBase):
+class RHRegistrationFormRemindersPreview(RHPendingInvitationsBase):
     """Preview a registration reminder email."""
 
     @use_kwargs({
@@ -152,13 +156,12 @@ class RHRegistrationFormRemindersPreview(RHManageRegFormBase):
         'subject': fields.String(required=True, validate=validate.Length(max=200)),
     })
     def _process(self, body, subject):
-        invitations = _query_pending_invitations(self.regform)
-        if not invitations:
+        if not self.invitations:
             raise BadRequest('No pending invitations')
         email_body = replace_placeholders('registration-invitation-reminder-email', body, event=self.event,
-                                          invitation=invitations[0])
+                                          invitation=self.invitations[0])
         email_subject = replace_placeholders('registration-invitation-reminder-email', subject, event=self.event,
-                                             invitation=invitations[0])
+                                             invitation=self.invitations[0])
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
                                   email_body=email_body)
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())

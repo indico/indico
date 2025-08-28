@@ -19,6 +19,8 @@ Improvements
   beyond which it cannot be refreshed by activity (:pr:`7030`)
 - Make displaying corresponding author email addresses in the Book of Abstracts
   opt-in (:pr:`7002`, thanks :user:`adamjenkins`)
+- Allow selecting which invitees to remind on the invitations list (:issue:`6804`,
+  :pr:`6918`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

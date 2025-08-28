@@ -12,11 +12,15 @@ import emailSendURL from 'indico-url:event_registration.api_invitations_reminder
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import {Translate} from 'indico/react/i18n';
-
 import EmailPendingInvitations from './EmailPendingInvitations';
 
-export default function EmailPendingInvitationsButton({eventId, regformId, hasPendingInvitations}) {
+export default function EmailPendingInvitationsButton({
+  eventId,
+  regformId,
+  selectedInvitations,
+  label,
+  disabled,
+}) {
   const [open, setOpen] = useState(false);
   const metadataURL = emailMetadataURL({event_id: eventId, reg_form_id: regformId});
   const previewURL = emailPreviewURL({event_id: eventId, reg_form_id: regformId});
@@ -27,16 +31,17 @@ export default function EmailPendingInvitationsButton({eventId, regformId, hasPe
       <button
         type="button"
         className="i-button icon-mail"
-        disabled={!hasPendingInvitations}
+        disabled={disabled}
         onClick={() => setOpen(true)}
       >
-        <Translate>Send reminders</Translate>
+        {label}
       </button>
       {open && (
         <EmailPendingInvitations
           metadataURL={metadataURL}
           previewURL={previewURL}
           sendURL={sendURL}
+          selectedInvitations={selectedInvitations}
           onClose={() => setOpen(false)}
         />
       )}
@@ -47,5 +52,11 @@ export default function EmailPendingInvitationsButton({eventId, regformId, hasPe
 EmailPendingInvitationsButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   regformId: PropTypes.number.isRequired,
-  hasPendingInvitations: PropTypes.bool.isRequired,
+  selectedInvitations: PropTypes.arrayOf(PropTypes.number),
+  label: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+};
+
+EmailPendingInvitationsButton.defaultProps = {
+  selectedInvitations: null,
 };

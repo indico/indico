@@ -14,10 +14,12 @@ from webargs import fields
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
 from indico.util.string import natural_sort_key
+from indico.web.flask.util import url_for
 
 
 class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):
@@ -39,6 +41,21 @@ class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
         if many:
             data = sorted(data, key=lambda tag: natural_sort_key(tag['title']))
         return data
+
+
+class RegistrationInvitationSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = RegistrationInvitation
+        fields = ('id', 'state', 'first_name', 'last_name', 'email', 'affiliation', 'registration_details_url',
+                  'decline_url', 'delete_url')
+
+    registration_details_url = fields.Function(
+        lambda invitation: (
+            url_for('.registration_details', invitation.registration) if invitation.registration else None
+        )
+    )
+    decline_url = fields.Function(lambda invitation: url_for('.manager_decline_invitation', invitation))
+    delete_url = fields.Function(lambda invitation: url_for('.delete_invitation', invitation))
 
 
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
