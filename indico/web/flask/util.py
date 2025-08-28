@@ -22,6 +22,7 @@ from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, Unicode
 from indico.core.config import config
 from indico.util.caching import memoize
 from indico.util.locators import get_locator
+from indico.util.string import is_legacy_id
 from indico.web.util import jsonify_data
 
 
@@ -110,6 +111,8 @@ def redirect_view(endpoint, code=302):
 
 def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_conv=None):
     def _redirect(**view_args):
+        from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+
         # In case of POST we can't safely redirect since the method would switch to GET
         # and thus the request would most likely fail.
         if view_func and request.method == 'POST':
@@ -122,6 +125,12 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
                 value = view_args.pop(oldkey, None)
                 if newkey is not None:
                     view_args[newkey] = value
+        if (legacy_event_id := view_args.get('event_id')) is not None and is_legacy_id(legacy_event_id):
+            # Resolve legacy event IDs here, because when building the URL there's a good chance that
+            # the `event_id` URL segment is a number and not a string, so building the URL would fail
+            # in case of IDs like `a000001`, or point to the wrong event in case of leading zeroes.
+            mapping = LegacyEventMapping.query.filter_by(legacy_event_id=legacy_event_id).first_or_404()
+            view_args['event_id'] = mapping.event_id
         try:
             target = _url_for('{}.{}'.format(getattr(blueprint, 'name', blueprint), endpoint), **view_args)
         except (BuildError, ValueError):

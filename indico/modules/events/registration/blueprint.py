@@ -289,4 +289,4 @@ _compat_bp.add_url_rule('/registration/', 'registration', compat_registration)
 _compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_registration)
 _compat_bp.add_url_rule('/registration/registrants', 'registrants', make_compat_redirect_func(_bp, 'participant_list'))
 _compat_bp.add_url_rule('!/confRegistrantsDisplay.py/list', 'registrants_modpython',
-                        make_compat_redirect_func(_bp, 'participant_list'))
+                        make_compat_redirect_func(_bp, 'participant_list', view_args_conv={'confId': 'event_id'}))
