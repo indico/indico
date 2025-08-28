@@ -268,8 +268,8 @@ export function createEntry(entryType, entry) {
   return (dispatch, getState) => {
     const sessions = getState().sessions;
     const color = getEntryColor(entry, sessions);
-    const sessionTitle = {sessionTitle: getSessionTitle(entry, sessions)};
-    const newEntry = {...entry, ...color, ...sessionTitle};
+    const sessionTitle = sessions[entry.sessionId]?.title || '';
+    const newEntry = {...entry, ...color, sessionTitle};
     dispatch(_createEntry(entryType, newEntry));
   };
 }
