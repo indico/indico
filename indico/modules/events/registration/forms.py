@@ -250,9 +250,8 @@ class InvitationFormBase(IndicoForm):
     skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
                                      description=_('If enabled, the user will be able to register even if the event '
                                                    'is access-restricted.'))
-    lock_email = BooleanField(_('Restrict to email address'), widget=SwitchWidget(),
-                              description=_('If enabled, only the owner of the email address will be able to '
-                                            'register.'))
+    lock_email = BooleanField(_('Lock email address'), widget=SwitchWidget(),
+                              description=_('If enabled, the email address cannot be changed during registration.'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
