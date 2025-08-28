@@ -46,6 +46,7 @@ def _query_invitation_list(regform):
 def _get_invitation_data(regform):
     invitations = _query_invitation_list(regform)
     return {
+        'has_pending_invitations': _has_pending_invitations(invitations),
         'invitation_list': RegistrationInvitationSchema(many=True).dump(invitations),
     }
 
