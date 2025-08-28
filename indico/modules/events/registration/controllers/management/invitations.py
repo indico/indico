@@ -89,13 +89,13 @@ class RHPendingInvitationsBase(RHManageRegFormBase):
     """Mixin for RHs that work on pending invitations."""
 
     @use_kwargs({
-        'invitation_ids': fields.List(fields.Int(), load_default=lambda: []),
+        'invitation_ids': fields.List(fields.Int(), load_default=None),
     })
     def _process_args(self, invitation_ids):
         RHManageRegFormBase._process_args(self)
         query = (RegistrationInvitation.query.with_parent(self.regform)
                  .filter(RegistrationInvitation.state == InvitationState.pending))
-        if invitation_ids:
+        if invitation_ids is not None:
             query = query.filter(RegistrationInvitation.id.in_(invitation_ids))
         self.invitations = query.all()
 

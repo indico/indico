@@ -58,5 +58,5 @@ EmailPendingInvitationsButton.propTypes = {
 };
 
 EmailPendingInvitationsButton.defaultProps = {
-  selectedInvitations: [],
+  selectedInvitations: null,
 };
