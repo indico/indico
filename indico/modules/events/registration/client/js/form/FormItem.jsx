@@ -15,7 +15,12 @@ import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Markdown, toClasses} from 'indico/react/util';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
-import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
+import {
+  getLockEmail,
+  getManagement,
+  getUpdateMode,
+  isPaidItemLocked,
+} from '../form_submission/selectors';
 
 import {getFieldRegistry} from './fields/registry';
 import {isItemHidden} from './selectors';
@@ -89,6 +94,7 @@ export default function FormItem({
   isEnabled,
   isRequired,
   isPurged,
+  fieldIsPersonalData,
   lockedReason,
   sortHandle,
   setupMode,
@@ -102,14 +108,20 @@ export default function FormItem({
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, id));
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
+  const lockEmail = useSelector(getLockEmail);
   const form = useForm();
 
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
-  const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
+  const inputProps = {title, description, isEnabled, fieldId: id, fieldIsPersonalData, ...rest};
   const showPurged = !setupMode && isPurged;
-  const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
+  const disabled =
+    !isEnabled ||
+    showPurged ||
+    !!lockedReason ||
+    (paidItemLocked && !isManagement) ||
+    (lockEmail && fieldIsPersonalData && htmlName === 'email');
 
   const fieldOptions = {
     id,
