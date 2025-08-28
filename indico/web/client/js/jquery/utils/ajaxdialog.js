@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* global ExclusivePopup, showFormErrors, initForms, confirmPrompt, getDropzoneFiles,
-   setDropzoneFiles, handleAjaxError, handleFlashes */
+   setDropzoneFiles, handleAjaxError, handleFlashes, ajaxDialog */
 
 import _ from 'lodash';
 
@@ -20,7 +20,9 @@ import {$T} from 'indico/utils/i18n';
   // The link target MUST point to a page which is also valid when loaded directly in the browser since the
   // link could still be opened in a new tab manually. If you don't have a non-AJAX version, place the url in
   // data-href.
-  $.fn.ajaxDialog = function ajaxDialog(options) {
+  // eslint-disable-next-line func-name-matching
+  $.fn.ajaxDialog = function jqAjaxDialog(options) {
+    console.log(this);
     return this.on('click', function(e) {
       e.preventDefault();
       if ($(this).hasClass('disabled')) {
