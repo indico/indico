@@ -291,12 +291,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     const resEntry = mapTTDataToEntry(resData);
 
-    if (resEntry.type === EntryType.SessionBlock) {
-      const deltaStartDt = moment(resEntry.startDt).diff(entry.startDt, 'minutes');
-      resEntry.children = shiftEntries(entry.children, deltaStartDt);
-    }
-
     if (isEditing) {
+      if (resEntry.type === EntryType.SessionBlock) {
+        const deltaStartDt = moment(resEntry.startDt).diff(entry.startDt, 'minutes');
+        resEntry.children = shiftEntries(entry.children, deltaStartDt);
+      }
       dispatch(actions.updateEntry(activeType, resEntry, currentDay));
     } else {
       dispatch(actions.createEntry(activeType, resEntry));
