@@ -154,8 +154,8 @@ export default function InvitationList({
   invitations: Invitation[];
 }) {
   const [_selectedInvitations, setSelectedInvitations] = useState<number[]>([]);
-  const invitationsById = new Set(invitations.map(inv => inv.id));
-  const selectedInvitations = _selectedInvitations.filter(inv => invitationsById.has(inv));
+  const invitationIds = new Set(invitations.map(inv => inv.id));
+  const selectedInvitations = _selectedInvitations.filter(inv => invitationIds.has(inv));
   const pendingInvitations = invitations.filter(i => i.state === 'pending');
   const acceptedInvitations = invitations.filter(i => i.state === 'accepted');
   const declinedInvitations = invitations.filter(i => i.state === 'declined');
