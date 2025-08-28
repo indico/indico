@@ -31,7 +31,7 @@ import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {Entry, EntryType, Session} from './types';
+import {EntryType, Session} from './types';
 import {DATE_KEY_FORMAT, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
