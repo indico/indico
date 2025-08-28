@@ -35,6 +35,7 @@ export interface LocationData {
   address: string;
   venueName: string;
   room: string;
+  roomName: string;
   inheriting?: boolean;
 }
 
