@@ -50,8 +50,9 @@ class RegistrationInvitationSchema(mm.SQLAlchemyAutoSchema):
                   'decline_url', 'delete_url')
 
     registration_details_url = fields.Function(
-        lambda invitation: url_for('.registration_details', invitation.registration)
-                           if invitation.registration else None
+        lambda invitation: (
+            url_for('.registration_details', invitation.registration) if invitation.registration else None
+        )
     )
     decline_url = fields.Function(lambda invitation: url_for('.manager_decline_invitation', invitation))
     delete_url = fields.Function(lambda invitation: url_for('.delete_invitation', invitation))
