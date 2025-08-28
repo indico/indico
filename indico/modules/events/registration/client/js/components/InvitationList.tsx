@@ -128,7 +128,7 @@ function InvitationsBlock({
   return (
     <>
       <div className="titled-rule">{title}</div>
-      <table className={toClasses({'invitation-table': true, 'selectable': !!onChange})}>
+      <table className={toClasses({'invitation-table': true, selectable: !!onChange})}>
         <tbody>
           {invitations.map(invitation => (
             <InvitationRow
@@ -169,7 +169,7 @@ export default function InvitationList({
       className={toClasses({
         'i-box': true,
         'invitation-list': true,
-        'titled': pendingInvitations.length === 0,
+        titled: pendingInvitations.length === 0,
       })}
     >
       {pendingInvitations.length > 0 && (
