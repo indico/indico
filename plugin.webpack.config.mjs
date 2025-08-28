@@ -38,6 +38,17 @@ function generateModuleAliases() {
       alias: dirName,
       onlyModule: false,
     };
+  }).sort((a, b) => {
+    // Sort by specificity to ensure that child modules are matched first.
+    // For example, `indico/modules/events/registration` should come before `indico/modules/events`.
+    const aParts = a.name.split('/').length;
+    const bParts = b.name.split('/').length;
+
+    if (aParts !== bParts) {
+      // more parts == more specific => should come first
+      return bParts - aParts;
+    }
+    return a.name.localeCompare(b.name);
   });
 }
 
