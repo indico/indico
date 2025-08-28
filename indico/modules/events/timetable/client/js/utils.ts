@@ -139,7 +139,7 @@ export function getEntryColor(
 
   const session = sessions[entry.sessionId];
   console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
-  if (entry.sessionId) {
+  if (entry.sessionId && entry.type !== 'block') {
     return {
       textColor: session.textColor,
       backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
@@ -201,4 +201,10 @@ export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number
     ...child,
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
+}
+
+export function getSessionTitle(entry: Entry, sessions: Record<number, Session>): string {
+  const sessionId = entry.sessionId
+  const sessionTitle = sessionId ? sessions[sessionId].title : '';
+  return sessionTitle;
 }
