@@ -204,7 +204,7 @@ export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number
 }
 
 export function getSessionTitle(entry: Entry, sessions: Record<number, Session>): string {
-  const sessionId = entry.sessionId
+  const sessionId = entry.sessionId;
   const sessionTitle = sessionId ? sessions[sessionId].title : '';
   return sessionTitle;
 }

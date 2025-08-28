@@ -266,7 +266,7 @@ function _createEntry(entryType, entry) {
 
 export function createEntry(entryType, entry) {
   return (dispatch, getState) => {
-    const sessions = getState().sessions
+    const sessions = getState().sessions;
     const color = getEntryColor(entry, sessions);
     const sessionTitle = {sessionTitle: getSessionTitle(entry, sessions)};
     const newEntry = {...entry, ...color, ...sessionTitle};
