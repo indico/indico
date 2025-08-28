@@ -72,4 +72,5 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
