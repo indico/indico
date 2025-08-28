@@ -1,7 +1,7 @@
 """Add lock_email to invitations
 
 Revision ID: 869fb2760b41
-Revises: b4ee48f3052c
+Revises: 6fac01c501b6
 Create Date: 2025-07-09 09:45:37.624332
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '869fb2760b41'
-down_revision = 'b4ee48f3052c'
+down_revision = '6fac01c501b6'
 branch_labels = None
 depends_on = None
 
