@@ -408,8 +408,11 @@ def create_registration(regform, data, invitation=None, management=False, notify
         can_modify = management or not form_item.parent.is_manager_only
         if (invitation and invitation.lock_email and form_item.type == RegistrationFormItemType.field_pd and
                 form_item.personal_data_type == PersonalDataType.email):
-            can_modify = False
-        value = data.get(form_item.html_field_name, default) if can_modify else default
+            value = invitation.email
+        elif can_modify:
+            value = data.get(form_item.html_field_name, default)
+        else:
+            value = default
         if value is NotImplemented:  # un-modifiable field w/ no default value
             continue
         data_entry = RegistrationData()
