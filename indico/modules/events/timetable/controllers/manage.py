@@ -231,7 +231,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
             if data['location_data'].get('inheriting')
             else data['location_data']
         )
-        contrib = create_contribution(self.event, data, session_block=session_block, extend_parent=True)
+        contrib = create_contribution(self.event, data, session_block=session_block)
         return ContributionSchema(context={'event': self.event}).jsonify(contrib)
 
     @no_autoflush
