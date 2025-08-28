@@ -127,10 +127,10 @@ export function getEntryColor(
   entry: Entry,
   sessions: Record<number, Session>
 ): {textColor: string; backgroundColor: string} {
-  if (entry.type === 'break' && !entry.sessionId) {
+  if (entry.type === EntryType.Break && !entry.sessionId) {
     return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
   }
-  if (entry.type === 'contrib' && !entry.sessionId) {
+  if (entry.type === EntryType.Contribution && !entry.sessionId) {
     return {
       textColor: DEFAULT_CONTRIB_TEXT_COLOR,
       backgroundColor: DEFAULT_CONTRIB_BACKGROUND_COLOR,
@@ -139,7 +139,7 @@ export function getEntryColor(
 
   const session = sessions[entry.sessionId];
   console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
-  if (entry.sessionId) {
+  if (entry.sessionId && entry.type !== EntryType.SessionBlock) {
     return {
       textColor: session.textColor,
       backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
