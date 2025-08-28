@@ -62,6 +62,19 @@
                             data-ajax-dialog>
                         {% trans %}Add new session{% endtrans %}
                     </button>
+                    <button id="add-new-session-trigger"
+                            class="i-button highlight icon-plus"
+                            data-title="{% trans %}Add new session{% endtrans %}">
+                        {% trans %}Add new session (React){% endtrans %}
+                    </button>
+                    <div
+                        id="session-create-form"
+                        data-event-id="{{ event.id }}"
+                        data-event-type="{{ event.type }}">
+                    </div>
+                    <script>
+                        setupSessionCreateForm('#session-create-form', '#add-new-session-trigger');
+                    </script>
                 </div>
                 <div class="group hide-if-locked">
                     <a id="remove-selected-sessions"
