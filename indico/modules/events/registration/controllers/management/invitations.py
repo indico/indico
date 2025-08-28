@@ -131,10 +131,7 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
 class RHRegistrationFormRemindersMetadata(RHPendingInvitationsBase):
     """Get the metadata for registration reminder emails."""
 
-    @use_kwargs({
-        'invitation_ids': fields.List(fields.Int(), load_default=lambda: []),
-    })
-    def _process(self, invitation_ids):
+    def _process(self):
         with self.event.force_event_locale():
             tpl = get_template_module('events/registration/emails/registration_reminder_default.html', event=self.event)
             body = tpl.get_html_body()
