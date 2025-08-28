@@ -100,6 +100,7 @@ interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
   entryType: string;
   entry: TopLevelEntry;
+  currentDay: string;
 }
 
 interface DeleteBreakAction {
@@ -275,8 +276,8 @@ export function editEntry(entryType, entry) {
   return {type: EDIT_ENTRY, entryType, entry};
 }
 
-export function updateEntry(entryType, entry) {
-  return {type: UPDATE_ENTRY, entryType, entry};
+export function updateEntry(entryType, entry, currentDay) {
+  return {type: UPDATE_ENTRY, entryType, entry, currentDay};
 }
 
 export function setCurrentDate(date: Moment, eventId: number) {
