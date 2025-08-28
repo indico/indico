@@ -24,7 +24,7 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
-import {getEntryColor, getSessionTitle} from './utils';
+import {getEntryColor} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
