@@ -31,8 +31,8 @@ import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
-  getDateKey,
   GRID_SIZE_MINUTES,
+  getDateKey,
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
@@ -44,7 +44,7 @@ interface DayTimetableProps {
   minHour: number;
   maxHour: number;
   entries: TopLevelEntry[];
-  scrollPosition?: number;
+  scrollPosition: number;
 }
 
 const TABLE_MARGIN_TOP = 10;
@@ -55,9 +55,8 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (duration: number) => {
+      obj[e.id] = (duration: number) =>
         dispatch(actions.resizeEntry(getDateKey(dt), e.id, duration));
-      };
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -111,7 +110,7 @@ export function DayTimetable({
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
   const [isDragging, setIsDragging] = useState(false);
-  const pixelLimitsDelta: [number, number] = getTimelinePixelLimitsDelta();
+  const pixelLimitsDelta: [number, number] = [pixelLimitsTotal[0], DAY_SIZE - pixelLimitsTotal[1]];
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -227,10 +226,6 @@ export function DayTimetable({
       calendar
     );
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
-  }
-
-  function getTimelinePixelLimitsDelta(): [number, number] {
-    return [pixelLimitsTotal[0], DAY_SIZE - pixelLimitsTotal[1]];
   }
 
   useEffect(() => {
