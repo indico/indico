@@ -132,7 +132,7 @@ export function getEntryColor(
   sessions: Record<number, Session>
 ): {textColor: string; backgroundColor: string} {
   if (entry.type === EntryType.Break && !entry.sessionId) {
-    return {textColor: entry.textColor || DEFAULT_BREAK_TEXT_COLOR, backgroundColor: entry.backgroundColor || DEFAULT_BREAK_BACKGROUND_COLOR};
+    return {textColor: entry.textColor ||DEFAULT_BREAK_TEXT_COLOR, backgroundColor: entry.backgroundColor || DEFAULT_BREAK_BACKGROUND_COLOR};
   }
   if (entry.type === EntryType.Contribution && !entry.sessionId) {
     return {
