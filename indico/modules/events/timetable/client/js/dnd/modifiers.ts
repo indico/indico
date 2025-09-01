@@ -112,15 +112,15 @@ export const createRestrictToCalendar =
       return transform;
     }
 
-    let rect = containerRef.current.getBoundingClientRect();
+    const boundingRect = containerRef.current.getBoundingClientRect();
     const scroll = getTotalScroll(containerRef.current);
-    rect = {
-      top: rect.top + scroll.top + limits[0],
-      left: rect.left + scroll.left,
-      bottom: rect.bottom + scroll.top - limits[1],
-      right: rect.right + scroll.left,
-      width: rect.width,
-      height: rect.height - limits[0] - limits[1],
+    const rect = {
+      top: boundingRect.top + scroll.top + limits[0],
+      left: boundingRect.left + scroll.left,
+      bottom: boundingRect.bottom + scroll.top - limits[1],
+      right: boundingRect.right + scroll.left,
+      width: boundingRect.width,
+      height: boundingRect.height - limits[0] - limits[1],
     };
 
     return restrictToBoundingRect(transform, draggingNodeRect, rect);
