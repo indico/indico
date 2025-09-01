@@ -219,7 +219,6 @@ export function setDraftEntry(data): SetDraftEntryAction {
 
 function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
   let entryURL: string;
-
   switch (entry.type) {
     case EntryType.Break:
       entryURL = breakURL({event_id: eventId, break_id: entry.objId});

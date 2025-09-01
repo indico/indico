@@ -474,7 +474,7 @@ function layoutAfterDropOnCalendar(
     }
 
     fromEntry = fromBlock.children.find(c => c.id === who);
-    if (!fromEntry || fromEntry.type !== EntryType.Break) {
+    if (!fromEntry) {
       return;
     }
   }
@@ -584,16 +584,7 @@ function layoutAfterDropOnBlock(
     return;
   }
 
-  if (fromEntry.type === EntryType.Contribution) {
-    if (!fromEntry.sessionId) {
-      // Allow top level contributions being dropped on blocks to be treated as if they
-      // were dropped directly on the calendar instead
-      return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
-    }
-    if (fromEntry.sessionId !== toBlock.sessionId) {
-      return; // contributions cannot be moved to blocks of different sessions
-    }
-  } else if (fromEntry.type === EntryType.SessionBlock) {
+  if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
@@ -654,12 +645,14 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
     return [
       layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
       draftEntry,
+      toBlock.objId,
     ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
@@ -671,6 +664,7 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   }
 }
