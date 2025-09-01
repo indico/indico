@@ -183,7 +183,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), null));
   }
 
   function handleDropOnBlock(
@@ -193,7 +193,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry, parentId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
@@ -201,7 +201,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       mouse,
       calendar
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), parentId));
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -412,13 +412,9 @@ function layoutAfterDropOnCalendar(
     }
 
     fromEntry = fromBlock.children.find(c => c.id === who);
-    if (!fromEntry || fromEntry.type !== EntryType.Break) {
+    if (!fromEntry) {
       return;
     }
-  }
-
-  if (fromEntry.type === EntryType.Contribution && fromEntry.sessionId) {
-    return; // contributions with sessions assigned cannot be scheduled at the top level
   }
 
   const draftEntry = {
@@ -429,6 +425,8 @@ function layoutAfterDropOnCalendar(
         .add(deltaMinutes, 'minutes')
         .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
+    sessionId: null,
+    sessionBlockId: null,
   };
 
   if (isChildEntry(draftEntry)) {
@@ -515,16 +513,7 @@ function layoutAfterDropOnBlock(
     return;
   }
 
-  if (fromEntry.type === EntryType.Contribution) {
-    if (!fromEntry.sessionId) {
-      // Allow top level contributions being dropped on blocks to be treated as if they
-      // were dropped directly on the calendar instead
-      return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
-    }
-    if (fromEntry.sessionId !== toBlock.sessionId) {
-      return; // contributions cannot be moved to blocks of different sessions
-    }
-  } else if (fromEntry.type === EntryType.SessionBlock) {
+  if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
@@ -543,6 +532,7 @@ function layoutAfterDropOnBlock(
         .diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    sessionId: toBlock.sessionId,
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
@@ -576,12 +566,14 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
     return [
       layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
       draftEntry,
+      toBlock.objId,
     ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
@@ -593,6 +585,7 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   }
 }

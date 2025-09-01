@@ -144,9 +144,8 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
+function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, parentId?) {
   let entryURL: string;
-
   switch (entry.type) {
     case EntryType.Break:
       entryURL = breakURL({event_id: eventId, break_id: entry.objId});
@@ -158,13 +157,26 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
       entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   }
 
-  const entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
+  const entryData = {
+    start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
+    parent_id: parentId,
+  };
 
   return synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
     type: MOVE_ENTRY,
     date,
     entries,
   });
+}
+
+export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, parentId?) {
+  return (dispatch, getState) => {
+    const sessions = getState().sessions;
+    const color = getEntryColor(entry, sessions);
+    const sessionTitle = sessions[entry.sessionId]?.title || '';
+    const newEntry = {...entry, ...color, sessionTitle};
+    dispatch(_moveEntry(newEntry, eventId, entries, date, parentId));
+  };
 }
 
 export function toggleExpand() {
