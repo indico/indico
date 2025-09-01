@@ -277,6 +277,8 @@ export function DayTimetable({
     }
 
     function onMouseMove(event: MouseEvent) {
+      const minDurationMinutes = 10;
+
       if (!isDragging || !draftEntry) {
         return;
       }
@@ -284,7 +286,7 @@ export function DayTimetable({
       const currentDragDuration = Math.max(
         Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
-        defaultContributionDuration
+        minDurationMinutes
       );
       const maxAllowedDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
       const draftDuration = Math.min(currentDragDuration, maxAllowedDuration);
