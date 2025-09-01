@@ -147,10 +147,6 @@ class LogEntryBase(db.Model):
         )
 
     @property
-    def logged_date(self):
-        return self.logged_dt.astimezone(self.event.tzinfo).date()
-
-    @property
     def renderer(self):
         from indico.modules.logs.util import get_log_renderers
         return get_log_renderers().get(self.type)
