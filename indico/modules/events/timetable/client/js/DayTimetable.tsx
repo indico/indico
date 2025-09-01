@@ -257,8 +257,8 @@ export function DayTimetable({
 
       const rect = calendarRef.current.getBoundingClientRect();
       const y = minutesToPixels(
-        Math.round(pixelsToMinutes(event.clientY - rect.top) / defaultContributionDuration) *
-          defaultContributionDuration
+        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES
       );
 
       const startDt = moment(dt)
@@ -548,7 +548,7 @@ function layoutAfterDropOnBlock(
     .find(entry => !!entry.children.find(c => c.id === who));
 
   const {y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
+  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined;
