@@ -428,7 +428,7 @@ def is_legacy_id(id_):
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, int) and (not id_.isdigit() or str(int(id_)) != id_)
+    return isinstance(id_, str) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):
