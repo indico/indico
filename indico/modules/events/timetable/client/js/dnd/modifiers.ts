@@ -100,7 +100,7 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
 /**
  * Restrict the dragged node to be contained within the calendar if it's
  * already scheduled. By default this takes into account the entire area of
- * the calendar, but can be limited to a specific region. 
+ * the calendar, but can be limited to a specific region.
  * @param containerRef React ref to the container element
  * @param limits Pixel limits on both sides of the y-axis
  * @returns A new Transform object
