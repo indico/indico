@@ -131,9 +131,9 @@ export default {
         } else {
           newEntries[newDayKey] = layout(
             newEntries[newDayKey].map(e => {
-              if (entry.sessionBlockId === e.id && e.type === EntryType.SessionBlock) {
+              if (entry.sessionBlockId === e.id) {
                 e.children = e.children.map(child => {
-                  return child.id === entry.id && child.type === entryType ? entry : child;
+                  return child.id === entry.id ? entry : child;
                 });
               }
               return e.id === entry.id && e.type === entryType ? entry : e;
