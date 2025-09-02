@@ -138,7 +138,7 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
 @cors
 @oauth_scope('registrants')
 class RHCheckinAPIRegistrationCustomQRCode(RH):
-    """Get indico style ticket details for a specific registration from a custom plugin QR Code."""
+    """Get Indico-style ticket details for a specific registration from a custom plugin QR code."""
 
     @use_kwargs({
         'data': fields.String(required=True),
