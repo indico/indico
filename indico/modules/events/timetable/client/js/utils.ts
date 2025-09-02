@@ -106,6 +106,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     code,
     keywords,
     sessionId,
+    sessionTitle = '',
     sessionBlockId,
     sessionTitle,
   } = data;
@@ -137,6 +138,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     sessionBlockId: sessionBlockId || null,
     sessionTitle: sessionTitle || '',
     colors: mapTTEntryColor(data, sessions),
+    sessionTitle: sessionTitle,
   };
 
   if (sessionBlockId) {
