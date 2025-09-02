@@ -81,6 +81,7 @@ export const mapTTDataToEntry = (data): Entry => {
     keywords,
     sessionId,
     sessionBlockId,
+    sessionTitle,
   } = camelizeKeys(data);
 
   const mappedObj = {
@@ -111,6 +112,7 @@ export const mapTTDataToEntry = (data): Entry => {
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
+    sessionTitle: sessionTitle || '',
   };
 
   if (sessionBlockId) {
