@@ -1,0 +1,123 @@
+:global(.ui.popup).wrapper {
+  min-width: 400px;
+  box-shadow: none;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  animation: 0.1s ease-in-out 1 transitionPopup;
+  padding: 20px;
+  text-align: left;
+
+  > .header-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    > .header-wrapper-content {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      > :global(.label) {
+        margin-bottom: 10px;
+      }
+
+      > :global(.header) {
+        margin: 0;
+        display: flex;
+        gap: 10px;
+
+        .header-accent {
+          margin-top: 1px;
+          align-self: center;
+          width: 6px;
+          height: calc(100% - 0.4em);
+          border-radius: 3px;
+        }
+
+        > :global(.icon) {
+          font-size: 1em;
+          line-height: 1em;
+          padding: 5px;
+          margin-right: 0;
+        }
+      }
+    }
+
+    > :global(.ui.basic.button).close {
+      box-shadow: none;
+      height: 0;
+      margin: 0 0 0 10px;
+      padding: 3px 0;
+      border: none;
+      font-size: 1.2em;
+    }
+  }
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@keyframes transitionPopup {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+:global(.ui.popup > .content).main {
+  padding: 0;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+
+  .main-list {
+    display: flex;
+    flex-direction: column;
+
+    > :global(.item) {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0 0 0;
+
+      > :global(.icon) {
+        min-width: 18px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+      }
+
+      &:first-child {
+        margin: 0;
+      }
+
+      :global(.ui.list) {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: 0;
+        padding: 0;
+
+        > :global(.item) {
+          padding: 0;
+        }
+
+        &.inline {
+          flex-wrap: wrap;
+          flex-direction: row;
+        }
+      }
+    }
+  }
+}

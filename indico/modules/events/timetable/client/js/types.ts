@@ -44,9 +44,11 @@ export interface LocationData {
   inheriting?: boolean;
 }
 
-export interface Attachments {
-  files: object[];
-  folders: object[];
+export interface Attachment {
+  type: 'attachment' | 'folder';
+  downloadURL: string;
+  id: number;
+  title: string;
 }
 
 export interface Session {
@@ -79,7 +81,7 @@ export interface ScheduledMixin {
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
-  attachments: Attachments;
+  attachments: Attachment[];
   sessionId?: number;
 }
 
@@ -110,7 +112,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionTitle: string;
   children: ChildEntry[];
   personLinks: PersonLink[];
-  attachments: Attachments;
+  attachments: Attachment[];
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
