@@ -21,6 +21,8 @@ Improvements
   opt-in (:pr:`7002`, thanks :user:`adamjenkins`)
 - Allow selecting which invitees to remind on the invitations list (:issue:`6804`,
   :pr:`6918`, thanks :user:`duartegalvao, unconventionaldotdev`)
+- Add option in the invitation form to lock registrations to the specified email address
+  (:issue:`6803`, :pr:`6972`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

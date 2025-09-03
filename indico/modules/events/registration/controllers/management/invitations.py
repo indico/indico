@@ -73,11 +73,13 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         form = form_cls(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_access_check = form.skip_access_check.data
+        lock_email = form.lock_email.data
         if form.validate_on_submit():
             email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             for user in form.users.data:
                 create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
-                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check)
+                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check,
+                                  lock_email=lock_email)
             num = len(form.users.data)
             flash(ngettext('The invitation has been sent.',
                            '{n} invitations have been sent.',
@@ -187,6 +189,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
             skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
             skip_access_check = form.skip_access_check.data
             skip_existing = form.skip_existing.data
+            lock_email = form.lock_email.data
             delimiter = form.delimiter.data.delimiter
             email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
@@ -195,6 +198,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
                                                                skip_moderation=skip_moderation,
                                                                skip_access_check=skip_access_check,
                                                                skip_existing=skip_existing,
+                                                               lock_email=lock_email,
                                                                delimiter=delimiter)
             sent = len(invitations)
             flash(self._format_flash_message(sent, skipped), 'success' if sent > 0 else 'warning')
