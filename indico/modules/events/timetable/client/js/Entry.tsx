@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, SemanticICONS} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -39,9 +39,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
     setNodeRef,
     transform,
     isDragging,
-  } = useDraggable({
-    id: `${id}`,
-  });
+  } = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -93,20 +91,17 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
     />
   );
 
-  if (isSelected && !isDragging) {
-    return (
-      <EntryPopup
-        trigger={entry}
-        onClose={() => {
-          dispatch(actions.deselectEntry());
-        }}
-        // @ts-expect-error The popup will be rewritten soon so let's just ignore this for now
-        entry={{id, ...rest}}
-      />
-    );
-  }
-
-  return entry;
+  return (
+    <EntryPopup
+      trigger={entry}
+      open={isSelected}
+      onClose={() => {
+        dispatch(actions.deselectEntry());
+      }}
+      // @ts-expect-error The popup will be rewritten soon so let's just ignore this for now
+      entry={{id, ...rest}}
+    />
+  );
 }
 
 interface DraggableBlockEntryProps extends BlockEntry {
@@ -324,11 +319,7 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-  const iconName = {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
-  }[type] as SemanticICONS;
+  const iconName = getIconByEntryType(type);
 
   const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 

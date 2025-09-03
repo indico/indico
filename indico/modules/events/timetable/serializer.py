@@ -240,24 +240,21 @@ class TimetableSerializer:
     def _get_attachment_data(self, obj):
         def serialize_attachment(attachment):
             return {'id': attachment.id,
-                    '_type': 'Attachment',
-                    '_fossil': 'attachment',
+                    'type': 'attachment',
                     'title': attachment.title,
                     'download_url': attachment.download_url}
 
         def serialize_folder(folder):
             return {'id': folder.id,
-                    '_type': 'AttachmentFolder',
-                    '_fossil': 'folder',
+                    'type': 'folder',
                     'title': folder.title,
                     'attachments': list(map(serialize_attachment, folder.attachments))}
 
-        data = {'files': [], 'folders': []}
         items = obj.attached_items
-        data['files'] = list(map(serialize_attachment, items.get('files', [])))
-        data['folders'] = list(map(serialize_folder, items.get('folders', [])))
+        files = list(map(serialize_attachment, items.get('files', [])))
+        folders = list(map(serialize_folder, items.get('folders', [])))
 
-        return data
+        return files + folders
 
     def _get_date_data(self, entry):
         if self.management:
