@@ -141,16 +141,16 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     <>
       <div styleName="header-wrapper">
         <div styleName="header-wrapper-content">
-          <Header as="h5">
-            {/* <Icon style={{backgroundColor, color: textColor}} name={getIconByEntryType(type)}/> */}
-            <div styleName="header-accent" style={{...colors}} />
-            {title}
-          </Header>
           {session && (
-            <Label size="tiny" style={{...colors}}>
+            <Label circular styleName="session" size="tiny" style={{...colors}}>
               <Translate>{session.title}</Translate>
             </Label>
           )}
+          <Header as="h5">
+            {/* <Icon style={{...colors}} name={getIconByEntryType(type)}/> */}
+            {!session && <div styleName="header-accent" style={{...colors}} />}
+            {title}
+          </Header>
         </div>
         <Button
           basic
