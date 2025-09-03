@@ -32,53 +32,55 @@ main.main {
 
         & > div.layout-side-menu {
           min-height: unset;
-          background: transparent !important;
-          // Necessary to make margin-top: -60px predictable for timetable container
-          height: 60px;
-        }
 
-        & > div.layout-side-menu:last-child {
-          flex-grow: 1;
+          &:first-child {
+            background: transparent !important;
+          }
 
-          & > div.content-column {
-            height: 100%;
+          &:last-child {
+            height: 0;
+            flex-grow: 1;
 
-            & > div.management-page {
+            & > div.content-column {
               height: 100%;
-              display: flex;
-              flex-direction: column;
 
-              & > header {
-                margin-bottom: 0;
-              }
-
-              & > div.page-content {
-                flex-grow: 1;
+              & > div.management-page {
+                height: 100%;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden;
-                // Not exactly -60px because side button also has 5px margin
-                margin-top: -55px;
 
-                & > #timetable-container {
-                  height: 100%;
-                  overflow-y: auto;
-                  flex-grow: 0;
+                & > header {
+                  margin-bottom: 0;
+                }
 
-                  & > div {
+                & > div.page-content {
+                  flex-grow: 1;
+                  display: flex;
+                  flex-direction: column;
+                  overflow: hidden;
+                  // Not exactly -60px because side button also has 5px margin
+                  margin-top: -55px;
+
+                  & > #timetable-container {
                     height: 100%;
+                    overflow-y: auto;
+                    flex-grow: 0;
 
-                    & > div:last-child {
+                    & > div {
                       height: 100%;
-                      width: 100%;
-                      flex-grow: 1;
-                      overflow: hidden;
 
-                      & > div.wrapper {
+                      & > div:last-child {
+                        height: 100%;
                         width: 100%;
-                        overflow-y: scroll;
-                        // extra space for the scrollbar
-                        padding-right: 10px;
+                        flex-grow: 1;
+                        overflow: hidden;
+
+                        & > div.wrapper {
+                          width: 100%;
+                          overflow-y: scroll;
+                          // extra space for the scrollbar
+                          padding-right: 10px;
+                        }
                       }
                     }
                   }
