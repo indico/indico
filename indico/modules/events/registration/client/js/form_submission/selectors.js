@@ -41,13 +41,13 @@ export const getManagement = createSelector(
 /** Indicates whether this registration has already been paid */
 export const getPaid = createSelector(
   getStaticData,
-  staticData => staticData.paid
+  staticData => staticData.paid || false
 );
 
 /** Indicates whether the registration must be bound to a specific email */
 export const getLockEmail = createSelector(
   getStaticData,
-  staticData => staticData.lockEmail
+  staticData => staticData.lockEmail || false
 );
 
 /** Indicates the registration form's publishing to other participants mode */
