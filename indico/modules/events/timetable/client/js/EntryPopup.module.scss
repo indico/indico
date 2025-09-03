@@ -16,8 +16,13 @@
       flex-direction: column;
       gap: 5px;
 
-      > :global(.label) {
-        margin-bottom: 10px;
+      > :global(.label).session {
+        // margin-bottom: 10px;
+        opacity: 0.8;
+        align-self: flex-start;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        min-width: unset;
       }
 
       > :global(.header) {
