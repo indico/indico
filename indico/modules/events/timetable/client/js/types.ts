@@ -46,16 +46,16 @@ export interface LocationData {
   roomName: string;
   inheriting?: boolean;
 }
-
 export interface LocationParent {
   location_data: LocationParent;
   type: string;
   title: string;
 }
-
-export interface Attachments {
-  files: object[];
-  folders: object[];
+export interface Attachment {
+  type: 'attachment' | 'folder';
+  downloadURL: string;
+  id: number;
+  title: string;
 }
 
 export interface Session {
@@ -76,7 +76,7 @@ export interface BaseEntry {
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
-  attachments?: Attachments;
+  attachments?: Attachment[];
   personLinks: PersonLink[];
 }
 
@@ -90,6 +90,7 @@ export interface ScheduledMixin {
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
+  attachments: Attachment[];
   sessionId?: number;
 }
 
@@ -119,6 +120,8 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionId: number;
   sessionTitle: string;
   children: ChildEntry[];
+  personLinks: PersonLink[];
+  attachments: Attachment[];
   childLocationParent: LocationParent;
 }
 
