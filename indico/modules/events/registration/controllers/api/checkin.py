@@ -20,7 +20,7 @@ from indico.modules.events.registration.schemas import (CheckinEventSchema, Chec
                                                         CheckinRegistrationSchema)
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
 from indico.web.args import use_kwargs
-from indico.web.rh import RH, cors, json_errors, oauth_scope
+from indico.web.rh import cors, json_errors, oauth_scope
 
 
 @json_errors
@@ -134,26 +134,27 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
         return CheckinRegistrationSchema().jsonify(self.registration)
 
 
-@json_errors
-@cors
-@oauth_scope('registrants')
-class RHCheckinAPIRegistrationCustomQRCode(RH):
+class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
     """Get Indico-style ticket details for a specific registration from a custom plugin QR code."""
 
     @use_kwargs({
         'data': fields.String(required=True),
         'qr_name': fields.String(required=True),
     }, location='json')
-    def _process_POST(self, data, qr_name):
+    def _process_args(self, data, qr_name):
         try:
-            custom_qr_code_handler = get_custom_ticket_qr_code_handlers()[qr_name]
+            self.qr_handler = get_custom_ticket_qr_code_handlers()[qr_name]
         except KeyError:
             raise BadRequest('Unknown code')
-        if not (reg := custom_qr_code_handler.lookup_registration(data)):
+        if not (reg := self.qr_handler.lookup_registration(data)):
             raise NotFound('No registration found')
+        self.event = reg.event
+        self.registration = reg
+
+    def _process_POST(self):
         url = config.BASE_URL.removeprefix('https://')
         qr_code_version = 2
         result = {
-            'i': [qr_code_version, url, _base64_encode_uuid(reg.ticket_uuid)]
+            'i': [qr_code_version, url, _base64_encode_uuid(self.registration.ticket_uuid)]
         }
         return jsonify(result)
