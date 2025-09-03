@@ -58,6 +58,8 @@ ind-time-picker {
     min-width: var(--anchor-width);
     max-height: min(75vh, 16em);
     overflow-y: auto;
+    overflow-x: hidden; // Fallback for older browsers
+    overflow-x: clip; // Prevent horizontal scrollbar in Firefox/macOS
     margin: 0;
 
     &:not(#bump-specificity) {
