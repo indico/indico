@@ -12,6 +12,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {Entry, EntryType, Session} from './types';
+import { SemanticICONS } from 'semantic-ui-react';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -152,6 +153,14 @@ export function getEntryColor(
     textColor: session.textColor,
     backgroundColor: session.backgroundColor,
   };
+}
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
 }
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {

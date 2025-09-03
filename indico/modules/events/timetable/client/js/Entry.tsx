@@ -20,13 +20,13 @@ import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
 import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
+import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle, getIconByEntryType} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
-  id: number;
+  id: string;
   isChild?: boolean;
   [key: string]: any;
 }
@@ -38,9 +38,7 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
     setNodeRef,
     transform,
     isDragging,
-  } = useDraggable({
-    id: `${id}`,
-  });
+  } = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -91,19 +89,16 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
     />
   );
 
-  if (isSelected && !isDragging) {
-    return (
-      <EntryPopup
-        trigger={entry}
-        onClose={() => {
-          dispatch(actions.deselectEntry());
-        }}
-        entry={{id, ...rest}}
-      />
-    );
-  }
-
-  return entry;
+  return (
+    <EntryPopup
+      trigger={entry}
+      open={isSelected}
+      onClose={() => {
+        dispatch(actions.deselectEntry());
+      }}
+      entry={{id, ...rest}}
+    />
+  );
 }
 
 export function DraggableBlockEntry({id, ...rest}: DraggableEntryProps) {
@@ -319,11 +314,7 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-  const iconName = {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
-  }[type] as SemanticICONS;
+  const iconName = getIconByEntryType(type);
 
   const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 
