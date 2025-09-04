@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Participant List</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0.75in 1in 1in 1in;
+        }
+
+        body {
+            font-family: 'Times', serif;
+            font-size: 8pt;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 0.5cm;
+            padding-bottom: 0.2cm;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 30pt;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1;
+            text-align: center;
+        }
+
+        .header .date {
+            font-size: 10pt;
+            text-align: right;
+            margin-top: 0.3cm;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .sub-title {
+            text-align: center;
+            font-size: 12pt;
+            font-weight: bold;
+            font-family: 'Sans', sans-serif;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+        }
+
+        th {
+            font-weight: bold;
+            vertical-align: middle;
+            padding: 8px 4px;
+            border-bottom: 1px solid black;
+            font-size: 8pt;
+        }
+
+        td {
+            text-align: left;
+            vertical-align: middle;
+            padding: 4px 4px;
+            border: none;
+            font-size: 8pt;
+            line-height: 1.2;
+        }
+
+        tbody tr {
+            border-bottom: 0.5px solid #ddd;
+        }
+
+        tr {
+            height: 20px;
+        }
+
+        .no-participants {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{% if event %}{{ event.title }}{% else %}mmm{% endif %}</h1>
+        <div class="date">{{ generation_date }}</div>
+    </div>
+
+    <div class="sub-title">List of registrants</div>
+
+    <table>
+        <thead>
+            <tr>
+                {% for header in headers %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="{{ headers|length }}" class="no-participants">
+                    There are no participants to display.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
