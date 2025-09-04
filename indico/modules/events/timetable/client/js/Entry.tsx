@@ -133,6 +133,7 @@ interface _EntryProps {
 
 type DraggableContribEntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -150,11 +151,12 @@ export default function ContributionEntry({
   isDragging,
   column,
   maxColumn,
-  parent,
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
+  parent,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
