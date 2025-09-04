@@ -38,9 +38,9 @@ class UserInfoHook(HTTPAPIHook):
 
         if not user:
             raise HTTPAPIError('You need to be logged in', 403)
-        user = User.get(self._user_id, is_deleted=False)
-        if not user:
+        target_user = User.get(self._user_id, is_deleted=False)
+        if not target_user:
             raise HTTPAPIError('Requested user not found', 404)
-        if not user.can_be_modified(user):
+        if not target_user.can_be_modified(user):
             raise HTTPAPIError('You do not have access to that info', 403)
-        return [UserSchema().dump(user)]
+        return [UserSchema().dump(target_user)]
