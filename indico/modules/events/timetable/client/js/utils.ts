@@ -12,11 +12,16 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {Colors, Entry, EntryType, Session} from './types';
+import { SemanticICONS } from 'semantic-ui-react';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
+export const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
+export const DEFAULT_BREAK_TEXT_COLOR = '#000000de';
+export const DEFAULT_BREAK_BACKGROUND_COLOR = '#cce2ff';
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -145,6 +150,14 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
 
   return mappedObj;
 };
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
+}
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;

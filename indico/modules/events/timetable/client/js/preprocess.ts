@@ -130,12 +130,13 @@ export function preprocessTimetableEntries(
         personLinks,
         boardNumber,
         code,
+        attachments,
         locationData: {
           address,
           room,
           venueName,
         },
-        attachments,
+        color,
       });
 
       if (entry.sessionId) {

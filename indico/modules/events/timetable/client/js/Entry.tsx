@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, SemanticICONS} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {useDraggable, useDroppable} from './dnd';
@@ -119,7 +119,6 @@ export default function ContributionEntry({
   title,
   blockRef,
   sessionTitle,
-  colors,
   selected,
   y,
   listeners,
@@ -133,7 +132,7 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  parent,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -143,10 +142,8 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
