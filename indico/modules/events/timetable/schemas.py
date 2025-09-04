@@ -54,7 +54,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
     parent_id = fields.Integer(allow_none=True, attribute='timetable_entry.parent_id')
-    session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id')
+    session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id', allow_none=True)
     session_id = fields.Function(_get_break_session_id, dump_only=True)
 
 
@@ -77,3 +77,4 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
     parent_id = fields.Integer(allow_none=True, load_only=True)
+    session_block_id = fields.Integer(allow_none=True, load_only=True)

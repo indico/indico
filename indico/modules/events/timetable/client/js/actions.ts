@@ -66,6 +66,7 @@ interface MoveEntryAction {
   type: typeof MOVE_ENTRY;
   date: string;
   entries: TopLevelEntry[];
+  entry: TopLevelEntry;
 }
 
 interface SelectEntryAction {
@@ -144,7 +145,7 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, parentId?) {
+function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
   let entryURL: string;
   switch (entry.type) {
     case EntryType.Break:
@@ -159,7 +160,7 @@ function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, pare
 
   const entryData = {
     start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
-    parent_id: parentId,
+    session_block_id: sessionBlockId,
   };
 
   return synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
@@ -169,13 +170,13 @@ function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, pare
   });
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, parentId?) {
+export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
   return (dispatch, getState) => {
     const sessions = getState().sessions;
     const color = getEntryColor(entry, sessions);
     const sessionTitle = sessions[entry.sessionId]?.title || '';
     const newEntry = {...entry, ...color, sessionTitle};
-    dispatch(_moveEntry(newEntry, eventId, entries, date, parentId));
+    dispatch(_moveEntry(newEntry, eventId, entries, date, sessionBlockId));
   };
 }
 

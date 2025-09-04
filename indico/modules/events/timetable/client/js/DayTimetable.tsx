@@ -26,9 +26,9 @@ import {
 } from './layout';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType, Session} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+import {getEntryColor, GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -85,6 +85,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+  const sessions = useSelector(selectors.getSessions);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -182,7 +183,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
+    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse, sessions);
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), null));
   }
 
@@ -193,15 +194,16 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry, parentId] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry, sessionBlockId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
       delta,
       mouse,
-      calendar
+      calendar,
+      sessions
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), parentId));
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), sessionBlockId));
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -392,7 +394,8 @@ function layoutAfterDropOnCalendar(
   who: string,
   over: Over,
   delta: Transform,
-  mouse: MousePosition
+  mouse: MousePosition,
+  sessions: Record<number, Session>
 ) {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
@@ -417,6 +420,12 @@ function layoutAfterDropOnCalendar(
     }
   }
 
+  const entryColor = {...fromEntry, sessionId: null} as Entry;
+  delete (entryColor as any).textColor;
+  delete (entryColor as any).backgroundColor;
+
+  const {textColor, backgroundColor} = getEntryColor(entryColor, sessions);
+
   const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
@@ -427,6 +436,8 @@ function layoutAfterDropOnCalendar(
     ),
     sessionId: null,
     sessionBlockId: null,
+    textColor,
+    backgroundColor,
   };
 
   if (isChildEntry(draftEntry)) {
@@ -482,7 +493,8 @@ function layoutAfterDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  calendar: Over
+  calendar: Over,
+  sessions: Record<number, Session>
 ) {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -523,6 +535,12 @@ function layoutAfterDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
+  const {textColor, backgroundColor} = getEntryColor(
+    {...fromEntry, sessionId: toBlock.sessionId},
+    sessions
+  );
+
+
   const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
@@ -533,6 +551,8 @@ function layoutAfterDropOnBlock(
     ),
     sessionBlockId: toBlock.id,
     sessionId: toBlock.sessionId,
+    textColor,
+    backgroundColor,
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
