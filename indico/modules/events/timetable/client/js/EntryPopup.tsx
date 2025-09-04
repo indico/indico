@@ -35,7 +35,7 @@ import {formatTimeRange} from './i18n';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
-import {getEntryColor, getIconByEntryType, mapTTDataToEntry} from './utils';
+import {getEntryColor, mapTTDataToEntry} from './utils';
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
@@ -145,10 +145,10 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               <Translate>{session.title}</Translate>
             </Label>
           )}
-          <Header as="h5">
+          <Header as="h5" color={!title ? "grey" : null}>
             {/* <Icon style={{backgroundColor, color: textColor}} name={getIconByEntryType(type)}/> */}
             {!session && <div styleName="header-accent" style={{backgroundColor, color: textColor}} />}
-            {title}
+            {title || Translate.string('No title')}
           </Header>
         </div>
         <Button
@@ -201,7 +201,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
                   }[a.type];
 
                   return (
-                    <List.Item>
+                    <List.Item key={a.id}>
                       <Label
                         style={{fontWeight: 'normal'}}
                         basic
