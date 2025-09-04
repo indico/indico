@@ -51,6 +51,7 @@ export function useScrollIntent({
       const scrollParent = getScrollParent(draggable.node.current);
 
       scrollSpeed.current = getScrollSpeed({x: event.clientX, y: event.clientY}, scrollParent);
+
       if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
         if (intervalRef.current === null) {
           intervalRef.current = setInterval(() => {
