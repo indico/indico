@@ -29,7 +29,7 @@ import {
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType, Session} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
@@ -116,6 +116,8 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
+  const sessions = useSelector(selectors.getSessions);
+
   const [isDragging, setIsDragging] = useState(false);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
@@ -223,13 +225,14 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry, sessionBlockId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
       delta,
       mouse,
-      calendar
+      calendar,
+      sessions
     );
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
   }
@@ -450,7 +453,8 @@ function layoutAfterDropOnCalendar(
   who: string,
   over: Over,
   delta: Transform,
-  mouse: MousePosition
+  mouse: MousePosition,
+  sessions?: Record<number, Session>
 ): [TopLevelEntry[], Entry] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
@@ -475,9 +479,11 @@ function layoutAfterDropOnCalendar(
     }
   }
 
-  if (fromEntry.type === EntryType.Contribution && fromEntry.sessionId) {
-    return; // contributions with sessions assigned cannot be scheduled at the top level
-  }
+  const entryColor = {...fromEntry, sessionId: null} as Entry;
+  delete (entryColor as any).textColor;
+  delete (entryColor as any).backgroundColor;
+
+  const {textColor, backgroundColor} = getEntryColor(entryColor, sessions);
 
   const draftEntry = {
     ...fromEntry,
@@ -487,6 +493,10 @@ function layoutAfterDropOnCalendar(
         .add(deltaMinutes, 'minutes')
         .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
+    sessionId: null,
+    sessionBlockId: null,
+    textColor,
+    backgroundColor,
   };
 
   if (isChildEntry(draftEntry)) {
@@ -542,7 +552,8 @@ function layoutAfterDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  calendar: Over
+  calendar: Over,
+  sessions: Record<number, Session>
 ): [TopLevelEntry[], Entry] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -592,6 +603,12 @@ function layoutAfterDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
+  const {textColor, backgroundColor} = getEntryColor(
+    {...fromEntry, sessionId: toBlock.sessionId},
+    sessions
+  );
+
+
   const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
@@ -601,6 +618,9 @@ function layoutAfterDropOnBlock(
         .diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    sessionId: toBlock.sessionId,
+    textColor,
+    backgroundColor,
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
