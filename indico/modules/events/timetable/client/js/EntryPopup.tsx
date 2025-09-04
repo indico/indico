@@ -146,10 +146,10 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               <Translate>{session.title}</Translate>
             </Label>
           )}
-          <Header as="h5">
+          <Header as="h5" color={!title ? "grey" : null}>
             {/* <Icon style={{...colors}} name={getIconByEntryType(type)}/> */}
             {!session && <div styleName="header-accent" style={{...colors}} />}
-            {title}
+            {title || Translate.string('No title')}
           </Header>
         </div>
         <Button
@@ -202,7 +202,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
                   }[a.type];
 
                   return (
-                    <List.Item>
+                    <List.Item key={a.id}>
                       <Label
                         style={{fontWeight: 'normal'}}
                         basic
