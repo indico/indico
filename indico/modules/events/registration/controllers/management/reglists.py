@@ -17,16 +17,16 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
+from weasyprint import HTML
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.cache import make_scoped_cache
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError
 from indico.core.notifications import make_email, send_email
-from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
+from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -57,13 +57,13 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
                                                      import_registrations_from_csv, load_registration_schema,
-                                                     make_registration_schema)
+                                                     make_registration_schema, prepare_participant_list_data)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.util.date_time import format_currency, now_utc, relativedelta
+from indico.util.date_time import format_currency, format_date, now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -455,16 +455,23 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style."""
 
     def _process(self):
-        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
-                                   static_items=self.export_config['static_item_ids'])
-        try:
-            data = pdf.getPDFBin()
-        except Exception:
-            if config.DEBUG:
-                raise
-            raise NoReportError(_('Text too large to generate a PDF with table style. '
-                                  'Please try again generating with book style.'))
-        return send_file('RegistrantsList.pdf', BytesIO(data), 'application/pdf')
+        headers, rows = prepare_participant_list_data(
+            reglist=self.registrations,
+            display=self.export_config['regform_items'],
+            static_items=self.export_config['static_item_ids'],
+        )
+
+        generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
+        template_path = 'events/registration/management/participant_list_pdf.html'
+        html_source = render_template(
+            template_path, event=self.event, headers=headers, rows=rows, generation_date=generation_date
+        )
+
+        html = HTML(string=html_source)
+        pdf_buffer = BytesIO()
+        html.write_pdf(pdf_buffer)
+        pdf_buffer.seek(0)
+        return send_file('RegistrantsList.pdf', pdf_buffer, 'application/pdf')
 
 
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
