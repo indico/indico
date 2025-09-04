@@ -183,7 +183,14 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse, sessions);
+    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(
+      entries,
+      who,
+      over,
+      delta,
+      mouse,
+      sessions
+    );
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), null));
   }
 
@@ -203,7 +210,9 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       calendar,
       sessions
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), sessionBlockId));
+    dispatch(
+      actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), sessionBlockId)
+    );
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -539,7 +548,6 @@ function layoutAfterDropOnBlock(
     {...fromEntry, sessionId: toBlock.sessionId},
     sessions
   );
-
 
   const draftEntry = {
     ...fromEntry,
