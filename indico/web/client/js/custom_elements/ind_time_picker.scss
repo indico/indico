@@ -106,6 +106,12 @@ ind-time-picker {
     &:not([aria-selected='true']):hover {
       background: var(--control-clickable-surface-focus-color);
     }
+
+    @supports (-moz-appearance:none) { // targets Firefox
+      time {
+        padding-right: 0.5em;
+      }
+    }
   }
 
   [aria-selected='true'] {
