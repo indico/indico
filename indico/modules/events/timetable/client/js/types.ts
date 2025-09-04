@@ -105,25 +105,29 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
   backgroundColor: string;
 }
 
-export interface ChildContribEntry extends ContribEntry {
-  sessionBlockId: string;
-}
-
-export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: string;
-}
-
-export type ChildEntry = ChildContribEntry | ChildBreakEntry;
-
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.SessionBlock;
   sessionId: number;
   sessionTitle: string;
+  // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
   personLinks: PersonLink[];
   attachments: Attachment[];
   childLocationParent: LocationParent;
+  colors?: Colors;
 }
+
+export interface ChildContribEntry extends ContribEntry {
+  sessionBlockId: string;
+  parent?: Partial<BlockEntry>;
+}
+
+export interface ChildBreakEntry extends BreakEntry {
+  sessionBlockId: string;
+  parent?: Partial<BlockEntry>;
+}
+
+export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;

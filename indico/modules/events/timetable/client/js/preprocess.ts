@@ -11,7 +11,7 @@ import moment from 'moment';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {
-  Attachments,
+  Attachment,
   ChildEntry,
   Colors,
   DayEntries,
@@ -48,7 +48,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
-  attachments?: Attachments;
+  attachments?: Attachment[];
   locationData: LocationData;
 }
 
@@ -140,6 +140,7 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
+          const childColors = ENTRY_COLORS_BY_BACKGROUND[c.color];
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,
