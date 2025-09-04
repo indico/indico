@@ -119,10 +119,7 @@ export default function ContributionEntry({
   duration: _duration,
   title,
   blockRef,
-  sessionId,
   sessionTitle,
-  textColor,
-  backgroundColor,
   selected,
   y,
   listeners,
@@ -136,7 +133,9 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  parent,
+  backgroundColor,
+  textColor,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -146,7 +145,6 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
 
   let style: Record<string, string | number | undefined> = transform
@@ -168,15 +166,8 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
-    // TODO: (Ajob) Very ugly triple ternary. Make prettier
-    backgroundColor: backgroundColor
-      ? backgroundColor
-      : sessionData
-        ? parent
-          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-          : sessionData.backgroundColor
-        : '#5b1aff',
-    color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
+    backgroundColor: colors?.backgroundColor ?? backgroundColor,
+    color: colors?.textColor ?? textColor,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));

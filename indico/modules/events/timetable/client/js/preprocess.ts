@@ -20,6 +20,7 @@ import {
   UnscheduledContrib,
 } from './types';
 import { ENTRY_COLORS_BY_BACKGROUND } from './colors';
+import { DEFAULT_BREAK_BACKGROUND_COLOR, DEFAULT_BREAK_TEXT_COLOR, DEFAULT_CONTRIB_BACKGROUND_COLOR, DEFAULT_CONTRIB_TEXT_COLOR } from './utils';
 
 interface SchemaDate {
   date: string;
@@ -130,12 +131,13 @@ export function preprocessTimetableEntries(
         personLinks,
         boardNumber,
         code,
+        attachments,
         locationData: {
           address,
           room,
           venueName,
         },
-        attachments,
+        color,
       });
 
       if (entry.sessionId) {
@@ -145,15 +147,22 @@ export function preprocessTimetableEntries(
       let colors;
       if (color && textColor) {
         colors = {
-          textColor,
+          textColor: textColor,
           backgroundColor: color,
         };
         dayEntries[day].at(-1).colors = colors;
       }
 
-      if (type === EntryType.Break) {
-        dayEntries[day].at(-1).backgroundColor = entry.color;
-        dayEntries[day].at(-1).textColor = entry.textColor;
+      if (type === EntryType.Contribution) {
+        colors = {
+          backgroundColor: entry.color ?? DEFAULT_CONTRIB_BACKGROUND_COLOR,
+          textColor: entry.textColor ?? DEFAULT_CONTRIB_TEXT_COLOR,
+        }
+      } else if (type === EntryType.Break) {
+        colors = {
+          backgroundColor: entry.color ?? DEFAULT_BREAK_BACKGROUND_COLOR,
+          textColor: entry.textColor ?? DEFAULT_BREAK_TEXT_COLOR,
+        }
       } else if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
@@ -203,6 +212,10 @@ export function preprocessTimetableEntries(
         });
         dayEntries[day].at(-1).children = children;
       }
+
+      dayEntries[day].at(-1).colors = colors;
+      dayEntries[day].at(-1).textColor = colors.textColor;
+      dayEntries[day].at(-1).color = colors.backgroundColor;
     }
   }
 
