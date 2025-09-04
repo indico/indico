@@ -39,8 +39,7 @@ import {mapTTDataToEntry} from './utils';
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title, attachments = [], sessionTitle, colors} = entry;
-  const sessions = useSelector(selectors.getSessions);
+  const {type, title, attachments = [], parent: entryParent, colors = {}} = entry;
   const session = useSelector((state: ReduxState) =>
     selectors.getSessionById(state, entry.sessionId)
   );
@@ -78,7 +77,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     const draftEntry = mapTTDataToEntry(data, {[session.id]: session});
 
     if ('room' in draftEntry.locationData) {
-      draftEntry.locationData.roomName = draftEntry.locationData.room;
       delete draftEntry.locationData.room;
     }
     if (entry.type === EntryType.SessionBlock) {
@@ -139,15 +137,28 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     <>
       <div styleName="header-wrapper">
         <div styleName="header-wrapper-content">
-          {session && (
-            <Label circular styleName="session" size="tiny" style={{...colors}}>
+          {entryParent && session && (
+            <Label
+              circular
+              title={Translate.string('Session title')}
+              styleName="session"
+              size="tiny"
+              style={{...entryParent.colors}}
+            >
               <Translate>{session.title}</Translate>
             </Label>
           )}
-          <Header as="h5" color={!title ? "grey" : null}>
+          <Header as="h5" color={!title ? 'grey' : null}>
             {/* <Icon style={{...colors}} name={getIconByEntryType(type)}/> */}
-            {!session && <div styleName="header-accent" style={{...colors}} />}
-            {title || Translate.string('No title')}
+            <span>
+              <Label
+                circular
+                size="tiny"
+                styleName="header-accent"
+                style={{...colors}}
+              />
+              <span>{title || Translate.string('No title')}</span>
+            </span>
           </Header>
         </div>
         <Button
@@ -166,22 +177,30 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
             <Icon name="clock outline" />
             {formatTimeRange('en', startTime, endTime)}
           </List.Item>
+          {entryParent?.title && (
+            <List.Item title={Translate.string('Parent block title')}>
+              <Icon name="calendar alternate outline" />
+              <Label circular basic styleName="session" size="tiny">
+                {entryParent.title}
+              </Label>
+            </List.Item>
+          )}
           {locationArray.length ? (
-            <List.Item style={{display: 'flex'}}>
+            <List.Item title={Translate.string('Location')} style={{display: 'flex'}}>
               <Icon name="map outline" />
               <p>{locationArray.join(', ')}</p>
             </List.Item>
           ) : null}
           {presenters?.length ? (
-            <List.Item>
+            <List.Item title={Translate.string('Presenters')}>
               <Icon name="user outline" />
-              <List>
+              <List styleName="inline">
                 {presenters.map(p => {
                   return (
                     <List.Item key={p.email}>
                       <Label image>
                         <img src={p.avatarURL} />
-                        {p.name}
+                        <span>{p.name}</span>
                       </Label>
                     </List.Item>
                   );
@@ -272,11 +291,10 @@ export function EntryPopup({
       trigger={trigger}
       on="click"
       open={open}
-      position="top center"
+      position="top left"
       onClose={onClose}
       basic
       hideOnScroll
-      wide
       styleName="wrapper"
     >
       <EntryPopupContent entry={entry} onClose={onClose} />

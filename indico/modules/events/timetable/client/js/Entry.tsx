@@ -25,7 +25,7 @@ import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
-  id: number;
+  id: string;
   [key: string]: any;
 }
 
@@ -110,6 +110,7 @@ interface _DraggableEntryProps {
 
 type DraggableContribEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -130,7 +131,9 @@ export default function ContributionEntry({
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
+  parent,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
