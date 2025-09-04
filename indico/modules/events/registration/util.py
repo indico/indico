@@ -53,7 +53,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.signals import make_interceptable, values_from_signal
+from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 from indico.web.args import parser
@@ -1148,3 +1148,23 @@ def load_registration_schema(regform, schema_cls, *, registration=None, partial_
     #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
     schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
     return parser.parse(schema)
+
+
+def get_custom_ticket_qr_code_handlers():
+    """Get a dict containing custom ticket QR code handlers."""
+    return named_objects_from_signal(signals.event.registration.custom_ticket_qr_code_handler.send())
+
+
+class CustomTicketCode:
+    """Base class for custom ticket codes."""
+
+    #: unique name of the code - must be all-lowercase
+    name = None
+    #: Regex used by the checkin app to match all ticket codes that should be handled by this class.
+    #: This regex will be used in JavaScript code, so make sure to not use anything Python-specific.
+    regex = None
+
+    @classmethod
+    def lookup_registration(cls, data: str) -> Registration | None:
+        """Lookup a registration based on custom ticket code data."""
+        raise NotImplementedError
