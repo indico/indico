@@ -7,6 +7,7 @@
 
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
+import { SemanticICONS } from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -150,6 +151,14 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
 
   return mappedObj;
 };
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
+}
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;

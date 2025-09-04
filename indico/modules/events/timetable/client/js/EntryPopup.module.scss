@@ -70,13 +70,13 @@
     padding-right: 8px !important;
     min-width: unset;
   }
-}
 
-.actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  :global(.content).actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+  }
 }
 
 @keyframes transitionPopup {
