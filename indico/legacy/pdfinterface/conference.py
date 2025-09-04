@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-# ruff: noqa: N802, N803, N806, E741
+# ruff: noqa: N802, N803, N806
 
 import re
 
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
-from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.enums import TA_JUSTIFY, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm, inch
 from reportlab.platypus import Table, TableStyle

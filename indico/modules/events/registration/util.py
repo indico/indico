@@ -52,7 +52,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import format_datetime, format_date, now_utc
+from indico.util.date_time import format_date, format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
