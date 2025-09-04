@@ -142,7 +142,6 @@ export default function ContributionEntry({
   title,
   blockRef,
   sessionTitle,
-  colors,
   selected,
   y,
   listeners,
@@ -156,7 +155,7 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  parent,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
@@ -166,10 +165,8 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,

@@ -40,6 +40,19 @@ import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {mapTTDataToEntry} from './utils';
 
+function ActionPopup({content, trigger, ...rest}) {
+  return (
+    <Popup
+      inverted
+      size="mini"
+      position="bottom center"
+      content={content}
+      trigger={trigger}
+      {...rest}
+    />
+  );
+}
+
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
   const {type, title, attachments = [], parent: entryParent, colors = {}} = entry;
@@ -152,7 +165,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
             </Label>
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
-            {/* <Icon style={{...colors}} name={getIconByEntryType(type)}/> */}
             <span>
               <Label
                 circular
@@ -238,39 +250,40 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
           ) : null}
         </List>
       </Card.Content>
-      <Card.Content textAlign="right">
-        <Button basic icon="edit" onClick={onEdit} />
+      <Card.Content styleName="actions" textAlign="right">
+        <ActionPopup
+          content={Translate.string('Edit')}
+          trigger={<Button basic icon="edit" onClick={onEdit} />}
+        />
         {type === EntryType.Contribution ? (
-          <Popup
+          <ActionPopup
             content={<Translate>Unschedule contribution</Translate>}
-            inverted
-            size="mini"
-            position="bottom center"
             trigger={<Button basic icon="calendar times" onClick={onDelete} />}
           />
         ) : (
-          <Button icon="trash" onClick={onDelete} />
+          <ActionPopup
+            content={Translate.string('Delete')}
+            trigger={
+              <Button basic title={Translate.string('Delete')} icon="trash" onClick={onDelete} />
+            }
+          />
         )}
         {type === EntryType.SessionBlock && (
           <>
-            <Popup
+            <ActionPopup
               content={<Translate>Add new child</Translate>}
-              size="mini"
-              trigger={<Button icon="plus" onClick={onCreateChild} color="green" />}
+              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
             />
-            <Dropdown button inline icon="ellipsis vertical">
-              <DropdownMenu>
-                <DropdownItem>
-                  {/* Implement session edit or redirect to page */}
-                  <Icon name="edit" />
-                  <Translate>Edit session</Translate>
-                </DropdownItem>
-                <DropdownItem>
-                  <Icon name="shield" />
-                  <Translate>Edit session protection</Translate>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session</Translate>}
+              trigger={<Button basic icon="calendar alternate outline" />}
+            />
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session protection</Translate>}
+              trigger={<Button basic icon="shield" />}
+            />
           </>
         )}
       </Card.Content>
