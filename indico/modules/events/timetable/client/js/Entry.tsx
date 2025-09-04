@@ -27,11 +27,10 @@ import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
   id: string;
-  isChild?: boolean;
   [key: string]: any;
 }
 
-export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {
     listeners: _listeners,
@@ -80,7 +79,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   const entry = (
     <ContributionEntry
       id={id}
-      isChild={isChild}
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
@@ -113,6 +111,7 @@ interface _DraggableEntryProps {
 
 type DraggableContribEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -135,9 +134,9 @@ export default function ContributionEntry({
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  // TODO: (Ajob) Taken from BlockEntry. Re-evaluate
-  isChild = false,
+  parent,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -148,10 +147,8 @@ export default function ContributionEntry({
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
   const sessionData = useSelector(state => state.sessions[sessionId]);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
@@ -175,7 +172,7 @@ export default function ContributionEntry({
     backgroundColor: backgroundColor
       ? backgroundColor
       : sessionData
-        ? isChild
+        ? parent
           ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
           : sessionData.backgroundColor
         : '#5b1aff',
@@ -282,7 +279,6 @@ export default function ContributionEntry({
                     parentEndDt={moment(startDt)
                       .add(deltaMinutes + duration, 'minutes')
                       .format()}
-                    isChild
                     {...child}
                   />
                 ))

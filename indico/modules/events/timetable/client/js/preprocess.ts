@@ -11,7 +11,7 @@ import moment from 'moment';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {
-  Attachments,
+  Attachment,
   ChildEntry,
   DayEntries,
   EntryType,
@@ -19,6 +19,7 @@ import {
   Session,
   UnscheduledContrib,
 } from './types';
+import { ENTRY_COLORS_BY_BACKGROUND } from './colors';
 
 interface SchemaDate {
   date: string;
@@ -46,7 +47,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
-  attachments?: Attachments;
+  attachments?: Attachment[];
   address?: string;
   venueName?: string;
   room?: string;
@@ -108,6 +109,8 @@ export function preprocessTimetableEntries(
         id,
         objId,
         attachments,
+        color,
+        textColor,
       } = entry;
 
       dayEntries[day].push({
@@ -139,6 +142,15 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionId = entry.sessionId;
       }
 
+      let colors;
+      if (color && textColor) {
+        colors = {
+          textColor,
+          backgroundColor: color,
+        };
+        dayEntries[day].at(-1).colors = colors;
+      }
+
       if (type === EntryType.Break) {
         dayEntries[day].at(-1).backgroundColor = entry.color;
         dayEntries[day].at(-1).textColor = entry.textColor;
@@ -146,6 +158,7 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
+          const childColors = ENTRY_COLORS_BY_BACKGROUND[c.color];
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,
@@ -165,6 +178,16 @@ export function preprocessTimetableEntries(
             width: 0,
             column: 0,
             maxColumn: 0,
+            colors: {
+              textColor: childColors.textColor,
+              backgroundColor: childColors.childColor,
+            },
+            parent: {
+              colors,
+              id,
+              objId,
+              title,
+            },
           };
 
           if (childType === EntryType.Contribution) {

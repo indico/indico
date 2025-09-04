@@ -11,7 +11,7 @@ import {useEffect, useRef} from 'react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Entry, EntryType, Session} from './types';
+import {Colors, Entry, EntryType, Session} from './types';
 import { SemanticICONS } from 'semantic-ui-react';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
@@ -99,7 +99,7 @@ export const mapTTDataToEntry = (data): Entry => {
     boardNumber,
     locationData: {
       address: locationData.address,
-      room: locationData.roomName,
+      room: locationData.room,
       inheriting: locationData.inheriting,
       venueName: locationData.venueName,
     },
@@ -129,7 +129,7 @@ const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
 export function getEntryColor(
   entry: Entry,
   sessions: Record<number, Session>
-): {textColor: string; backgroundColor: string} {
+): Colors {
   if (entry.type === EntryType.Break && !entry.sessionId) {
     return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
   }

@@ -31,11 +31,15 @@ export interface PersonLink {
   roles: PersonLinkRole[];
 }
 
+export interface Colors {
+  textColor: string;
+  backgroundColor: string
+};
+
 export interface LocationData {
   address: string;
   venueName: string;
   room: string;
-  roomName: string;
   inheriting?: boolean;
 }
 
@@ -93,10 +97,12 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
 
 export interface ChildContribEntry extends ContribEntry {
   sessionBlockId: number;
+  parent?: Partial<BlockEntry>;
 }
 
 export interface ChildBreakEntry extends BreakEntry {
   sessionBlockId: number;
+  parent?: Partial<BlockEntry>;
 }
 
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
@@ -108,6 +114,8 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   children: ChildEntry[];
   personLinks: PersonLink[];
   attachments: Attachment[];
+  colors?: Colors;
+  locationData?: LocationData;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
