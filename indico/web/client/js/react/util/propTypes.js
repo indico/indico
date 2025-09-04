@@ -13,3 +13,35 @@ import PropTypes from 'prop-types';
 export default {
   i18n: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
+
+/**
+ * Select list and ComboBox option prop type
+ */
+export const optionPropType = PropTypes.shape({
+  value: PropTypes.any,
+  label: PropTypes.any,
+  disabled: PropTypes.bool,
+}).isRequired;
+
+export function momentObject(props, propName, componentName) {
+  const value = props[propName];
+  if (value === null) {
+    return null;
+  }
+  if (typeof value === 'object' && typeof value.format === 'function') {
+    return null;
+  }
+  return new Error(
+    `Invalid prop \`${propName}\` of type \`${typeof value}\` supplied to \`${componentName}\`, expected Moment object.`
+  );
+}
+
+momentObject.isRequired = function(props, propName, componentName) {
+  const value = props[propName];
+  if (value === null) {
+    return new Error(
+      `The prop \`${propName}\` is marked as required in \`${componentName}\`, but its value is \`${value}\`.`
+    );
+  }
+  return momentObject(props, propName, componentName);
+};

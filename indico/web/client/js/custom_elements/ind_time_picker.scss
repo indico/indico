@@ -9,7 +9,7 @@
 @use 'partials/icons';
 @use 'partials/sui_debt';
 
-ind-combo-box {
+ind-time-picker {
   display: inline-block;
   position: relative;
 
@@ -21,7 +21,7 @@ ind-combo-box {
 
   &[clearable] input[role='combobox'] {
     @include sui_debt.field_override() {
-      padding-right: 4.5em;
+      padding-right: 3.8em;
     }
   }
 
@@ -55,9 +55,16 @@ ind-combo-box {
   [role='listbox'][data-position-check] {
     @extend %popup-positioned-target;
     z-index: 10;
-    min-width: 100%;
+    min-width: var(--anchor-width);
     max-height: min(75vh, 16em);
     overflow-y: auto;
+    overflow-x: hidden; // Fallback for older browsers
+    overflow-x: clip; // Prevent horizontal scrollbar in Firefox/macOS
+    margin: 0;
+
+    &:not(#bump-specificity) {
+      padding: 0;
+    }
 
     @include sui_debt.input-border();
     @include sui_debt.input-background();
@@ -85,6 +92,7 @@ ind-combo-box {
     @include sui_debt.input-padding();
     list-style: none;
     color: var(--text-color);
+    padding: 1em;
 
     &:not([aria-selected='true']) {
       cursor: pointer;
@@ -97,6 +105,12 @@ ind-combo-box {
 
     &:not([aria-selected='true']):hover {
       background: var(--control-clickable-surface-focus-color);
+    }
+
+    @supports (-moz-appearance:none) { // targets Firefox
+      time {
+        padding-right: 0.5em;
+      }
     }
   }
 

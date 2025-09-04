@@ -397,7 +397,7 @@ class BookingBootstrapForm extends React.Component {
               startTime={startTime}
               endTime={endTime}
               onChange={this.updateTimes}
-              minTime={minTime}
+              minTime={minTime ? toMoment(minTime, 'HH:mm') : null}
             />
           </Form.Group>
         )}
