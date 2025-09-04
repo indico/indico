@@ -19,6 +19,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
+from indico.util.marshmallow import not_empty
 from indico.web.args import use_kwargs
 from indico.web.rh import cors, json_errors, oauth_scope
 
@@ -138,15 +139,15 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
     """Get Indico-style ticket details for a specific registration from a custom plugin QR code."""
 
     @use_kwargs({
-        'data': fields.String(required=True),
-        'qr_name': fields.String(required=True),
+        'data': fields.String(required=True, validate=not_empty),
+        'qr_name': fields.String(required=True, validate=not_empty),
     }, location='json')
     def _process_args(self, data, qr_name):
         try:
-            self.qr_handler = get_custom_ticket_qr_code_handlers()[qr_name]
+            qr_handler = get_custom_ticket_qr_code_handlers()[qr_name]
         except KeyError:
             raise BadRequest('Unknown code')
-        if not (reg := self.qr_handler.lookup_registration(data)):
+        if not (reg := qr_handler.lookup_registration(data)):
             raise NotFound('No registration found')
         self.event = reg.event
         self.registration = reg
