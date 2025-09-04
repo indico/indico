@@ -5,12 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes} from './util';
 import {DAY_SIZE, getDateKey, minutesToPixels} from './utils';
+import { isSameDate } from 'indico/utils/date';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -37,20 +38,11 @@ export const makeIsSelectedSelector = () =>
     (selectedId, id) => selectedId === id
   );
 
-export const getEventId = createSelector(
-  getStaticData,
-  staticData => {
-    return staticData.eventId;
-  }
-);
-export const getEventStartDt = createSelector(
-  getStaticData,
-  staticData => staticData.startDt
-);
-export const getEventEndDt = createSelector(
-  getStaticData,
-  staticData => staticData.endDt
-);
+export const getEventId = createSelector(getStaticData, staticData => {
+  return staticData.eventId;
+});
+export const getEventStartDt = createSelector(getStaticData, staticData => staticData.startDt);
+export const getEventEndDt = createSelector(getStaticData, staticData => staticData.endDt);
 export const getEventNumDays = createSelector(
   getEventStartDt,
   getEventEndDt,
@@ -62,29 +54,25 @@ export const getSessionById = createSelector(
   (sessions, id) => sessions[id]
 );
 
-export const getCurrentPixelLimits = createSelector(
+export const getCurrentLimits = createSelector(
   getCurrentDate,
   getEventStartDt,
   getEventEndDt,
-  (currentDate, startDt, endDt): [number, number] => {
+  (currentDate: Moment, startDt: Moment, endDt: Moment): [number, number] => {
     const limits: [number, number] = [
       minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes()),
       minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes()),
     ];
 
-    if (getDateKey(currentDate) !== getDateKey(startDt)) {
+    if (startDt.isSame(currentDate, 'day')) {
       limits[0] = 0;
     }
-    if (getDateKey(currentDate) !== getDateKey(endDt)) {
+    if (endDt.isSame(currentDate, 'day')) {
       limits[1] = DAY_SIZE;
     }
 
     return limits;
   }
-);
-export const getCurrentLimits = createSelector(
-  getCurrentPixelLimits,
-  (limits): [number, number] => [limits[0] / DAY_SIZE, limits[1] / DAY_SIZE]
 );
 export const getCurrentDayEntries = createSelector(
   getDayEntries,
@@ -92,42 +80,24 @@ export const getCurrentDayEntries = createSelector(
   (entries, currentDate) => entries[getDateKey(currentDate)]
 );
 
-export const getUnscheduled = createSelector(
-  getLatestChange,
-  getSessions,
-  (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
+export const getUnscheduled = createSelector(getLatestChange, getSessions, (entries, sessions) =>
+  appendSessionAttributes(entries.unscheduled, sessions)
 );
 
-export const getSelectedEntry = createSelector(
-  getDayEntries,
-  getSelectedId,
-  (entries, id) => {
-    entries = Object.values(entries).flatMap(x => x);
-    entries = entries.flatMap(e => (e.type === 'block' ? [e, ...e.children] : [e]));
-    return entries.find(e => e.id === id);
-  }
-);
-export const getDraftEntry = createSelector(
-  getEntries,
-  entries => entries.draftEntry
-);
-export const canUndo = createSelector(
-  getEntries,
-  entries => entries.currentChangeIdx > 0
-);
+export const getSelectedEntry = createSelector(getDayEntries, getSelectedId, (entries, id) => {
+  entries = Object.values(entries).flatMap(x => x);
+  entries = entries.flatMap(e => (e.type === 'block' ? [e, ...e.children] : [e]));
+  return entries.find(e => e.id === id);
+});
+export const getDraftEntry = createSelector(getEntries, entries => entries.draftEntry);
+export const canUndo = createSelector(getEntries, entries => entries.currentChangeIdx > 0);
 export const canRedo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx < entries.changes.length - 1
 );
-export const getError = createSelector(
-  getEntries,
-  entries => entries.error
-);
+export const getError = createSelector(getEntries, entries => entries.error);
 
-export const showUnscheduled = createSelector(
-  getDisplay,
-  display => display.showUnscheduled
-);
+export const showUnscheduled = createSelector(getDisplay, display => display.showUnscheduled);
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
@@ -135,11 +105,5 @@ export const getDefaultContribDurationMinutes = createSelector(
 );
 
 // Navigation state
-export const getIsExpanded = createSelector(
-  getNavigation,
-  navigation => navigation.isExpanded
-);
-export const getIsDraft = createSelector(
-  getNavigation,
-  navigation => navigation.isDraft
-);
+export const getIsExpanded = createSelector(getNavigation, navigation => navigation.isExpanded);
+export const getIsDraft = createSelector(getNavigation, navigation => navigation.isDraft);

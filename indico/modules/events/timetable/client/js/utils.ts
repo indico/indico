@@ -36,7 +36,11 @@ export function pixelsToMinutes(pixels: number) {
   return Math.round(pixels / 2);
 }
 
-export function isWithinLimits(limits: [number, number], y, offsets = [0, 0]) {
+export function isWithinLimits(
+  limits: [number, number],
+  y: number,
+  offsets = [0, 0]
+) {
   return y > limits[0] + offsets[0] && y < limits[1] - offsets[1];
 }
 

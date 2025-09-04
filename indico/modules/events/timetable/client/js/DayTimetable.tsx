@@ -106,11 +106,11 @@ export function DayTimetable({
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
-  const pixelLimitsTotal = useSelector(selectors.getCurrentPixelLimits);
+  const limits = useSelector(selectors.getCurrentLimits);
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
   const [isDragging, setIsDragging] = useState(false);
-  const pixelLimitsDelta: [number, number] = [pixelLimitsTotal[0], DAY_SIZE - pixelLimitsTotal[1]];
+  const limitsDelta: [number, number] = [limits[0], DAY_SIZE - limits[1]];
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -241,7 +241,7 @@ export function DayTimetable({
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      const isWithinLimitsWithOffset = !isWithinLimits(pixelLimitsTotal, event.offsetY, [
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY, [
         0,
         minutesToPixels(defaultContributionDuration),
       ]);
@@ -325,17 +325,17 @@ export function DayTimetable({
   }, [wrapperRef, scrollPositionRef]);
 
   const restrictToCalendar = useMemo(() => {
-    const restrictLimits = pixelLimitsDelta;
+    const restrictLimits = limitsDelta;
     restrictLimits[1] += TABLE_MARGIN_TOP;
-    return createRestrictToCalendar(calendarRef, pixelLimitsDelta);
-  }, [pixelLimitsDelta]);
+    return createRestrictToCalendar(calendarRef, limitsDelta);
+  }, [limitsDelta]);
 
   const limitsGradientArg = [
     'rgba(0, 0, 0, 0.05) 0',
-    `rgba(0, 0, 0, 0.05) ${pixelLimitsTotal[0]}px`,
-    `transparent ${pixelLimitsTotal[0]}px`,
-    `transparent ${pixelLimitsTotal[1]}px`,
-    `rgba(0, 0, 0, 0.05) ${pixelLimitsTotal[1]}px`,
+    `rgba(0, 0, 0, 0.05) ${limits[0]}px`,
+    `transparent ${limits[0]}px`,
+    `transparent ${limits[1]}px`,
+    `rgba(0, 0, 0, 0.05) ${limits[1]}px`,
     'rgba(0, 0, 0, 0.05)',
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
