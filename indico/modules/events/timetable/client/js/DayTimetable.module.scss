@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .wrapper {
   position: relative;
   display: flex;
@@ -61,7 +63,6 @@
 }
 
 .entry {
-  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border-radius: 8px;
   position: relative;
@@ -71,6 +72,15 @@
   border: none;
   padding: 0;
   outline: none;
+
+  &.draft {
+    color: $white;
+    text-shadow: 0 0 5px rgba($dark-teal, 0.5);
+    background: rgba($teal, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba($white, 0.2);
+  }
 }
 
 .drag-handle {

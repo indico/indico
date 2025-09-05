@@ -302,7 +302,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
-                <div style={{opacity: 0.5, pointerEvents: 'none'}}>
+                <div style={{pointerEvents: 'none'}}>
                   <DraggableEntry
                     id="draft"
                     width="100%"
