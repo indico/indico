@@ -22,7 +22,8 @@ from indico.util.marshmallow import EventTimezoneDateTimeField
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id',
+                  'session_title')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
@@ -31,6 +32,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
         _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
     ), attribute='person_links')
     duration = fields.TimeDelta(required=True)
+    session_title = fields.String(attribute='session.title', dump_only=True)
 
 
 def _get_break_session_id(entry):
@@ -51,8 +53,8 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
     colors = fields.Nested(SessionColorSchema)
-    parent_id = fields.Integer(attribute='timetable_entry.parent_id')
-    session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id')
+    parent_id = fields.Integer(allow_none=True, attribute='timetable_entry.parent_id')
+    session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id', allow_none=True)
     session_id = fields.Function(_get_break_session_id, dump_only=True)
 
 
@@ -61,7 +63,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
                   'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
-                  'session_block_id', 'session_id')
+                  'session_block_id', 'session_id', 'parent_id')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
@@ -74,3 +76,5 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
+    parent_id = fields.Integer(allow_none=True, load_only=True)
+    session_block_id = fields.Integer(allow_none=True, load_only=True)

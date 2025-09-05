@@ -81,6 +81,7 @@ export const mapTTDataToEntry = (data): Entry => {
     keywords,
     sessionId,
     sessionBlockId,
+    sessionTitle,
   } = camelizeKeys(data);
 
   const mappedObj = {
@@ -111,6 +112,7 @@ export const mapTTDataToEntry = (data): Entry => {
     backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
+    sessionTitle: sessionTitle || '',
   };
 
   if (sessionBlockId) {
@@ -122,13 +124,18 @@ export const mapTTDataToEntry = (data): Entry => {
 
 const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
 const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
+const DEFAULT_BREAK_BACKGROUND_COLOR = '#90c0f0';
+const DEFAULT_BREAK_TEXT_COLOR = '#000000';
 
 export function getEntryColor(
   entry: Entry,
   sessions: Record<number, Session>
 ): {textColor: string; backgroundColor: string} {
   if (entry.type === EntryType.Break && !entry.sessionId) {
-    return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
+    return {
+      textColor: entry.textColor || DEFAULT_BREAK_TEXT_COLOR,
+      backgroundColor: entry.backgroundColor || DEFAULT_BREAK_BACKGROUND_COLOR,
+    };
   }
   if (entry.type === EntryType.Contribution && !entry.sessionId) {
     return {

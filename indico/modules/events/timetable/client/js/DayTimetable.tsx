@@ -26,9 +26,9 @@ import {
 } from './layout';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType, Session} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+import {getEntryColor, GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 interface DayTimetableProps {
   dt: Moment;
@@ -85,6 +85,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+  const sessions = useSelector(selectors.getSessions);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -182,8 +183,15 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(
+      entries,
+      who,
+      over,
+      delta,
+      mouse,
+      sessions
+    );
+    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), null));
   }
 
   function handleDropOnBlock(
@@ -193,15 +201,18 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry, sessionBlockId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
       delta,
       mouse,
-      calendar
+      calendar,
+      sessions
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD')));
+    dispatch(
+      actions.moveEntry(movedEntry, eventId, newLayout, dt.format('YYYYMMDD'), sessionBlockId)
+    );
   }
 
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -392,7 +403,8 @@ function layoutAfterDropOnCalendar(
   who: string,
   over: Over,
   delta: Transform,
-  mouse: MousePosition
+  mouse: MousePosition,
+  sessions: Record<number, Session>
 ) {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
@@ -412,14 +424,16 @@ function layoutAfterDropOnCalendar(
     }
 
     fromEntry = fromBlock.children.find(c => c.id === who);
-    if (!fromEntry || fromEntry.type !== EntryType.Break) {
+    if (!fromEntry) {
       return;
     }
   }
 
-  if (fromEntry.type === EntryType.Contribution && fromEntry.sessionId) {
-    return; // contributions with sessions assigned cannot be scheduled at the top level
-  }
+  const entryColor = {...fromEntry, sessionId: null} as Entry;
+  delete (entryColor as any).textColor;
+  delete (entryColor as any).backgroundColor;
+
+  const {textColor, backgroundColor} = getEntryColor(entryColor, sessions);
 
   const draftEntry = {
     ...fromEntry,
@@ -429,6 +443,10 @@ function layoutAfterDropOnCalendar(
         .add(deltaMinutes, 'minutes')
         .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
+    sessionId: null,
+    sessionBlockId: null,
+    textColor,
+    backgroundColor,
   };
 
   if (isChildEntry(draftEntry)) {
@@ -484,7 +502,8 @@ function layoutAfterDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  calendar: Over
+  calendar: Over,
+  sessions: Record<number, Session>
 ) {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -515,16 +534,7 @@ function layoutAfterDropOnBlock(
     return;
   }
 
-  if (fromEntry.type === EntryType.Contribution) {
-    if (!fromEntry.sessionId) {
-      // Allow top level contributions being dropped on blocks to be treated as if they
-      // were dropped directly on the calendar instead
-      return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
-    }
-    if (fromEntry.sessionId !== toBlock.sessionId) {
-      return; // contributions cannot be moved to blocks of different sessions
-    }
-  } else if (fromEntry.type === EntryType.SessionBlock) {
+  if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
@@ -533,6 +543,11 @@ function layoutAfterDropOnBlock(
   if (fromEntry.duration > toBlock.duration) {
     return; // TODO: auto-resize the block?
   }
+
+  const {textColor, backgroundColor} = getEntryColor(
+    {...fromEntry, sessionId: toBlock.sessionId},
+    sessions
+  );
 
   const draftEntry = {
     ...fromEntry,
@@ -543,6 +558,9 @@ function layoutAfterDropOnBlock(
         .diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    sessionId: toBlock.sessionId,
+    textColor,
+    backgroundColor,
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
@@ -576,12 +594,14 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
     return [
       layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
       draftEntry,
+      toBlock.objId,
     ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
@@ -593,6 +613,7 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   }
 }
