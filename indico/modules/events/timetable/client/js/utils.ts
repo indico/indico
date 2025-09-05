@@ -10,8 +10,8 @@ import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Entry, EntryType, Session} from './types';
+import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {Colors, Entry, EntryType, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -53,6 +53,37 @@ function gcd(a: number, b: number) {
   return a;
 }
 
+export function getDefaultColorByType(type: EntryType) {
+  return {
+    [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
+    [EntryType.Break]: DEFAULT_BREAK_COLORS,
+    // TODO: (Ajob) Remove this one because it is temporary for debugging
+    [EntryType.SessionBlock]: {color: '#FF0000', backgroundColor: '#FFFFFF'},
+  }[type]
+}
+
+export function mapTTEntryColor(
+  dbEntry,
+  sessions: Record<number, Session> = {}
+): Colors {
+  const {sessionId, type, colors} = dbEntry;
+  const fallbackColor = colors
+    ? {color: colors.text, backgroundColor: colors.background}
+    : getDefaultColorByType(dbEntry.type);
+
+  if (type === EntryType.SessionBlock) {
+    return sessions[sessionId].colors ?? fallbackColor;
+  }
+
+  if (sessionId) {
+    const session = sessions[sessionId];
+    console.assert(session, `Session ${dbEntry.sessionId} not found for entry ${dbEntry.id}`);
+    return ENTRY_COLORS_BY_BACKGROUND[session.colors.backgroundColor];
+  }
+
+  return fallbackColor;
+}
+
 export const getEntryUniqueId = (entry): string => {
   switch (entry.type) {
     case EntryType.SessionBlock:
@@ -64,7 +95,8 @@ export const getEntryUniqueId = (entry): string => {
   }
 };
 
-export const mapTTDataToEntry = (data): Entry => {
+export const mapTTDataToEntry = (data, sessions): Entry => {
+  data = camelizeKeys(data);
   const {
     type,
     startDt,
@@ -74,14 +106,13 @@ export const mapTTDataToEntry = (data): Entry => {
     description,
     conveners,
     personLinks,
-    colors,
     boardNumber,
     locationData,
     code,
     keywords,
     sessionId,
     sessionBlockId,
-  } = camelizeKeys(data);
+  } = data;
 
   const mappedObj = {
     id: getEntryUniqueId(data),
@@ -106,12 +137,10 @@ export const mapTTDataToEntry = (data): Entry => {
     column: 0,
     maxColumn: 0,
     children: [],
-    colors,
-    textColor: colors ? colors.text : '',
-    backgroundColor: colors ? colors.background : '',
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
   };
+  mappedObj.colors = mapTTEntryColor(data, sessions);
 
   if (sessionBlockId) {
     mappedObj.sessionBlockId = `s${sessionBlockId}`;

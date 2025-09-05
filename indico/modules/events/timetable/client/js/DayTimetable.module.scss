@@ -61,7 +61,7 @@
 }
 
 .entry {
-  // background-color: #5b1aff;
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border-radius: 8px;
   position: relative;
@@ -71,14 +71,6 @@
   border: none;
   padding: 0;
   outline: none;
-
-  &.block {
-    // background-color: rgb(4, 115, 134);
-  }
-
-  &.break {
-    // background-color: #f09000;
-  }
 }
 
 .drag-handle {

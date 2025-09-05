@@ -64,6 +64,7 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  colors?: Colors;
   locationData?: LocationData;
 }
 
@@ -90,7 +91,6 @@ export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  colors: Colors;
   backgroundColor: string;
 }
 
