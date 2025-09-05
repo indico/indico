@@ -200,8 +200,6 @@ class TimetableSerializer:
         data = {}
         data.update(self._get_entry_data(entry))
         if contribution.session:
-            print('we goin here')
-            print(contribution.session)
             data.update(get_color_data(contribution.session))
         data.update(self._get_location_data(contribution))
         data.update({'entryType': 'Contribution',
