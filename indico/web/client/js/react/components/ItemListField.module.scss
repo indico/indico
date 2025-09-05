@@ -10,14 +10,14 @@
 @use 'base/borders' as *;
 @use 'base/utilities' as *;
 
-.choices-table-wrapper {
+.items-table-wrapper {
   max-height: 40vh;
   overflow-y: auto;
 }
 
-.choices-table {
+.items-table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
   margin-bottom: 1em;
   padding-bottom: 25px;
 
@@ -38,9 +38,14 @@
 
   thead {
     th {
-      @include border-bottom();
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: white;
+      border-bottom: 1px solid $default-border-color;
       padding-bottom: 4px;
       vertical-align: top;
+      text-align: left;
     }
 
     td {
@@ -55,6 +60,14 @@
   td,
   th {
     padding: 4px 4px;
+  }
+
+  // Auto-size last column
+  // https://stackoverflow.com/a/10853277
+  td:last-child,
+  th:last-child {
+    width: 1px;
+    white-space: nowrap;
   }
 
   tr {
