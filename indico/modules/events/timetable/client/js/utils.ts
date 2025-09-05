@@ -139,8 +139,8 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     children: [],
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
+    colors: mapTTEntryColor(data, sessions),
   };
-  mappedObj.colors = mapTTEntryColor(data, sessions);
 
   if (sessionBlockId) {
     mappedObj.sessionBlockId = `s${sessionBlockId}`;
