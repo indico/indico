@@ -5,6 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+export const DEFAULT_CONTRIB_COLORS = {
+  color: '#ffffff',
+  backgroundColor: '#5b1aff',
+}
+
+export const DEFAULT_BREAK_COLORS = {
+  color: '#000000de',
+  backgroundColor: '#cce2ff',
+}
+
 export const ENTRY_COLORS = [
   // childColor is baed on the backgroundColor of the parent
   // If the parent textColor is dark, the childColor is lighter than the parent backgroundColor

@@ -31,6 +31,11 @@ export interface PersonLink {
   roles: PersonLinkRole[];
 }
 
+export interface Colors {
+  color: string;
+  backgroundColor;
+}
+
 export interface LocationData {
   address: string;
   venueName: string;
