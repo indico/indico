@@ -120,38 +120,6 @@ export const mapTTDataToEntry = (data): Entry => {
   return mappedObj;
 };
 
-const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
-const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
-
-export function getEntryColor(
-  entry: Entry,
-  sessions: Record<number, Session>
-): {textColor: string; backgroundColor: string} {
-  if (entry.type === EntryType.Break && !entry.sessionId) {
-    return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
-  }
-  if (entry.type === EntryType.Contribution && !entry.sessionId) {
-    return {
-      textColor: DEFAULT_CONTRIB_TEXT_COLOR,
-      backgroundColor: DEFAULT_CONTRIB_BACKGROUND_COLOR,
-    };
-  }
-
-  const session = sessions[entry.sessionId];
-  console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
-  if (entry.sessionId && entry.type !== EntryType.SessionBlock) {
-    return {
-      textColor: session.colors.color,
-      backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
-    };
-  }
-
-  return {
-    textColor: session.colors.color,
-    backgroundColor: session.backgroundColor,
-  };
-}
-
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
 }
