@@ -11,7 +11,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
@@ -127,8 +126,7 @@ export default function ContributionEntry({
   blockRef,
   sessionId,
   sessionTitle,
-  textColor,
-  backgroundColor,
+  colors,
   selected,
   y,
   listeners,
@@ -176,15 +174,7 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
-    // TODO: (Ajob) Very ugly triple ternary. Make prettier
-    backgroundColor: backgroundColor
-      ? backgroundColor
-      : sessionData
-        ? isChild
-          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-          : sessionData.backgroundColor
-        : '#5b1aff',
-    color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
+    ...colors,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
