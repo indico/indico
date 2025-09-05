@@ -11,12 +11,17 @@ import {useEffect, useRef} from 'react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Entry, EntryType, Session} from './types';
+import {Colors, Entry, EntryType, Session} from './types';
+import { SemanticICONS } from 'semantic-ui-react';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
+export const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
+export const DEFAULT_BREAK_TEXT_COLOR = '#000000de';
+export const DEFAULT_BREAK_BACKGROUND_COLOR = '#cce2ff';
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -81,6 +86,7 @@ export const mapTTDataToEntry = (data): Entry => {
     keywords,
     sessionId,
     sessionBlockId,
+    sessionTitle,
   } = camelizeKeys(data);
 
   const mappedObj = {
@@ -97,7 +103,7 @@ export const mapTTDataToEntry = (data): Entry => {
     boardNumber,
     locationData: {
       address: locationData.address,
-      room: locationData.roomName,
+      room: locationData.room,
       inheriting: locationData.inheriting,
       venueName: locationData.venueName,
     },
@@ -107,10 +113,11 @@ export const mapTTDataToEntry = (data): Entry => {
     maxColumn: 0,
     children: [],
     colors,
-    textColor: colors ? colors.text : '',
-    backgroundColor: colors ? colors.background : '',
+    textColor: colors ? colors.text ?? textColor : '',
+    backgroundColor: colors ? colors.background ?? backgroundColor : '',
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
+    sessionTitle: sessionTitle || '',
   };
 
   if (sessionBlockId) {
@@ -120,15 +127,12 @@ export const mapTTDataToEntry = (data): Entry => {
   return mappedObj;
 };
 
-const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
-const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
-
-export function getEntryColor(
-  entry: Entry,
-  sessions: Record<number, Session>
-): {textColor: string; backgroundColor: string} {
+export function getEntryColor(entry: Entry, sessions: Record<number, Session>): Colors {
   if (entry.type === EntryType.Break && !entry.sessionId) {
-    return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
+    return {
+      textColor: entry.textColor ?? DEFAULT_BREAK_TEXT_COLOR,
+      backgroundColor: entry.backgroundColor ?? DEFAULT_BREAK_BACKGROUND_COLOR,
+    };
   }
   if (entry.type === EntryType.Contribution && !entry.sessionId) {
     return {
@@ -150,6 +154,14 @@ export function getEntryColor(
     textColor: session.textColor,
     backgroundColor: session.backgroundColor,
   };
+}
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
 }
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {

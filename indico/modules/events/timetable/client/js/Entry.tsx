@@ -20,27 +20,24 @@ import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
 import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
+import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle, getIconByEntryType} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
-  id: number;
-  isChild?: boolean;
+  id: string;
   [key: string]: any;
 }
 
-export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {
     listeners: _listeners,
     setNodeRef,
     transform,
     isDragging,
-  } = useDraggable({
-    id: `${id}`,
-  });
+  } = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -82,7 +79,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   const entry = (
     <ContributionEntry
       id={id}
-      isChild={isChild}
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
@@ -91,19 +87,16 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
     />
   );
 
-  if (isSelected && !isDragging) {
-    return (
-      <EntryPopup
-        trigger={entry}
-        onClose={() => {
-          dispatch(actions.deselectEntry());
-        }}
-        entry={{id, ...rest}}
-      />
-    );
-  }
-
-  return entry;
+  return (
+    <EntryPopup
+      trigger={entry}
+      open={isSelected}
+      onClose={() => {
+        dispatch(actions.deselectEntry());
+      }}
+      entry={{id, ...rest}}
+    />
+  );
 }
 
 export function DraggableBlockEntry({id, ...rest}: DraggableEntryProps) {
@@ -118,6 +111,7 @@ interface _DraggableEntryProps {
 
 type DraggableContribEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -125,10 +119,7 @@ export default function ContributionEntry({
   duration: _duration,
   title,
   blockRef,
-  sessionId,
   sessionTitle,
-  textColor,
-  backgroundColor,
   selected,
   y,
   listeners,
@@ -140,9 +131,11 @@ export default function ContributionEntry({
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  // TODO: (Ajob) Taken from BlockEntry. Re-evaluate
-  isChild = false,
+  backgroundColor,
+  textColor,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -152,11 +145,8 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
@@ -176,15 +166,8 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
-    // TODO: (Ajob) Very ugly triple ternary. Make prettier
-    backgroundColor: backgroundColor
-      ? backgroundColor
-      : sessionData
-        ? isChild
-          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-          : sessionData.backgroundColor
-        : '#5b1aff',
-    color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
+    backgroundColor: colors?.backgroundColor ?? backgroundColor,
+    color: colors?.textColor ?? textColor,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
@@ -241,7 +224,7 @@ export default function ContributionEntry({
   return (
     <div
       role="button"
-      styleName={`entry ${type === 'break' ? 'break' : ''} ${renderChildren ? '' : 'simple'}`}
+      styleName={`entry ${renderChildren ? '' : 'simple'}`}
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
@@ -287,7 +270,6 @@ export default function ContributionEntry({
                     parentEndDt={moment(startDt)
                       .add(deltaMinutes + duration, 'minutes')
                       .format()}
-                    isChild
                     {...child}
                   />
                 ))
@@ -319,11 +301,7 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-  const iconName = {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
-  }[type] as SemanticICONS;
+  const iconName = getIconByEntryType(type);
 
   const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 

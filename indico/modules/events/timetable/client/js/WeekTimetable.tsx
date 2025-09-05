@@ -149,7 +149,7 @@ function DnDDay({dt, children}: {dt: string; children: React.ReactNode}) {
   });
 
   return (
-    <div ref={setNodeRef} styleName="calendar day">
+    <div ref={setNodeRef} styleName="calendar">
       {children}
     </div>
   );

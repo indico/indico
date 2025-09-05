@@ -31,17 +31,23 @@ export interface PersonLink {
   roles: PersonLinkRole[];
 }
 
+export interface Colors {
+  textColor: string;
+  backgroundColor: string
+};
+
 export interface LocationData {
   address: string;
   venueName: string;
   room: string;
-  roomName: string;
   inheriting?: boolean;
 }
 
-export interface Attachments {
-  files: object[];
-  folders: object[];
+export interface Attachment {
+  type: 'attachment' | 'folder';
+  downloadURL: string;
+  id: number;
+  title: string;
 }
 
 export interface Session {
@@ -73,7 +79,7 @@ export interface ScheduledMixin {
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
-  attachments: Attachments;
+  attachments: Attachment[];
   sessionId?: number;
 }
 
@@ -91,10 +97,12 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
 
 export interface ChildContribEntry extends ContribEntry {
   sessionBlockId: number;
+  parent?: Partial<BlockEntry>;
 }
 
 export interface ChildBreakEntry extends BreakEntry {
   sessionBlockId: number;
+  parent?: Partial<BlockEntry>;
 }
 
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
@@ -105,7 +113,9 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionTitle: string;
   children: ChildEntry[];
   personLinks: PersonLink[];
-  attachments: Attachments;
+  attachments: Attachment[];
+  colors?: Colors;
+  locationData?: LocationData;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
