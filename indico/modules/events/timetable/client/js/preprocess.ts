@@ -20,7 +20,7 @@ import {
   Session,
   UnscheduledContrib,
 } from './types';
-import { DEFAULT_BREAK_COLORS,  DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND } from './colors';
+import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
 
 interface SchemaDate {
   date: string;
@@ -97,7 +97,7 @@ export function preprocessTimetableEntries(
       const type = entryTypeMapping[_id[0]];
       // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
       const entry: any = data[day][_id];
-      let defaultColor = {
+      let defaultColors = {
         [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
         [EntryType.Break]: DEFAULT_BREAK_COLORS,
       }[type];
@@ -115,7 +115,7 @@ export function preprocessTimetableEntries(
         id,
         objId,
         attachments,
-        colors = defaultColor,
+        colors = defaultColors,
       } = entry;
 
       dayEntries[day].push({
@@ -147,15 +147,11 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionId = entry.sessionId;
       }
 
-      if (colors) {
-        dayEntries[day].at(-1).colors = colors;
-      }
-
       if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
-          const childColors = ENTRY_COLORS_BY_BACKGROUND[c.colors.backgroundColor];
+          const childColors = ENTRY_COLORS_BY_BACKGROUND[entry.colors.backgroundColor];
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,
@@ -176,7 +172,7 @@ export function preprocessTimetableEntries(
             column: 0,
             maxColumn: 0,
             colors: {
-              textColor: childColors.textColor,
+              color: childColors.textColor,
               backgroundColor: childColors.childColor,
             },
             parent: {
@@ -202,8 +198,6 @@ export function preprocessTimetableEntries(
       }
 
       dayEntries[day].at(-1).colors = colors;
-      dayEntries[day].at(-1).textColor = colors.color;
-      dayEntries[day].at(-1).color = colors.backgroundColor;
     }
   }
 
