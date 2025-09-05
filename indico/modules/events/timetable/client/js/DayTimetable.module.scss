@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .wrapper {
   position: relative;
   display: flex;
@@ -56,9 +58,10 @@
 }
 
 .entry {
-  // background-color: #5b1aff;
+  // TODO: (Ajob) Replace in colors-related PR with glass mode maybe?
+  background-color: #5b1aff99;
   color: white;
-  border-radius: 8px;
+  border-radius: 6px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -66,14 +69,6 @@
   border: none;
   padding: 0;
   outline: none;
-
-  &.block {
-    // background-color: rgb(4, 115, 134);
-  }
-
-  &.break {
-    // background-color: #f09000;
-  }
 }
 
 .drag-handle {
