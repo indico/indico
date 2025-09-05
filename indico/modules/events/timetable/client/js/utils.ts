@@ -141,13 +141,13 @@ export function getEntryColor(
   console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
   if (entry.sessionId && entry.type !== EntryType.SessionBlock) {
     return {
-      textColor: session.textColor,
+      textColor: session.colors.color,
       backgroundColor: ENTRY_COLORS_BY_BACKGROUND[session.backgroundColor].childColor,
     };
   }
 
   return {
-    textColor: session.textColor,
+    textColor: session.colors.color,
     backgroundColor: session.backgroundColor,
   };
 }

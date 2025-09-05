@@ -13,9 +13,9 @@ import _ from 'lodash';
  * @param {Map} sessions Sessions map
  * @returns {array} Entries array with color attribute
  */
-export const appendSessionAttributes = (entries, sessions) =>
-  entries.map(e =>
+export const appendSessionAttributes = (entries, sessions) => {
+  return entries.map(e =>
     e.sessionId
-      ? {...e, ..._.pick(sessions[e.sessionId], ['backgroundColor', 'textColor', 'isPoster'])}
+      ? {...e, ..._.pick(sessions[e.sessionId], ['colors', 'isPoster'])}
       : e
-  );
+  )};

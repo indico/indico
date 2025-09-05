@@ -32,7 +32,6 @@ interface SchemaEntry {
   id: string;
   objId: number;
   title: string;
-  textColor?: string;
   colors?: Colors;
   slotTitle?: string;
 }
@@ -67,9 +66,8 @@ export function preprocessSessionData(
     Object.entries(data).map(([, s]) => [
       s.id,
       {
-        ..._.pick(s, ['id', 'title', 'isPoster', 'defaultContribDurationMinutes']), // TODO: (Duarte) get other attrs
-        textColor: s.colors.color,
-        backgroundColor: s.colors.backgroundColor,
+        // TODO: (Duarte) get other attrs
+        ..._.pick(s, ['id', 'title', 'colors', 'isPoster', 'defaultContribDurationMinutes']),
       },
     ])
   );
@@ -151,7 +149,6 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
-          const childColors = ENTRY_COLORS_BY_BACKGROUND[entry.colors.backgroundColor];
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,
@@ -171,10 +168,7 @@ export function preprocessTimetableEntries(
             width: 0,
             column: 0,
             maxColumn: 0,
-            colors: {
-              color: childColors.textColor,
-              backgroundColor: childColors.childColor,
-            },
+            colors: ENTRY_COLORS_BY_BACKGROUND[entry.colors.backgroundColor],
             parent: {
               colors,
               id,

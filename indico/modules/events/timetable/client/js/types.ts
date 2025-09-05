@@ -53,7 +53,7 @@ export interface Session {
   id?: number;
   title: string;
   isPoster: boolean;
-  textColor: string;
+  colors: Colors
   backgroundColor: string;
 }
 
@@ -90,7 +90,7 @@ export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  textColor: string;
+  colors: Colors;
   backgroundColor: string;
 }
 
