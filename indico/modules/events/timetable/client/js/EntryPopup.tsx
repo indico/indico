@@ -188,14 +188,14 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
       </div>
       <Card.Content styleName="main">
         <List styleName="main-list">
-          <List.Item>
+          <List.Item title={Translate.string('Date and time')}>
             <Icon name="clock outline" />
             {formatTimeRange('en', startTime, endTime)}
           </List.Item>
           {entryParent?.title && (
-            <List.Item title={Translate.string('Parent block title')}>
+            <List.Item title={Translate.string('Session block title')}>
               <Icon name="calendar alternate outline" />
-              <Label circular basic styleName="session" size="tiny">
+              <Label circular basic styleName="session">
                 {entryParent.title}
               </Label>
             </List.Item>
@@ -224,7 +224,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
             </List.Item>
           ) : null}
           {attachments.length ? (
-            <List.Item>
+            <List.Item title={Translate.string('Attachments')}>
               <Icon name="copy outline" />
               <List styleName="inline">
                 {attachments.map(a => {
@@ -251,6 +251,24 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         </List>
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
+        {type === EntryType.SessionBlock && (
+          <>
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session protection</Translate>}
+              trigger={<Button disabled basic icon="shield" />}
+            />
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session</Translate>}
+              trigger={<Button disabled basic icon="calendar alternate outline" />}
+            />
+            <ActionPopup
+              content={<Translate>Add new child</Translate>}
+              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
+            />
+          </>
+        )}
         <ActionPopup
           content={Translate.string('Edit')}
           trigger={<Button basic icon="edit" onClick={onEdit} />}
@@ -267,24 +285,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               <Button basic title={Translate.string('Delete')} icon="trash" onClick={onDelete} />
             }
           />
-        )}
-        {type === EntryType.SessionBlock && (
-          <>
-            <ActionPopup
-              content={<Translate>Add new child</Translate>}
-              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
-            />
-            {/* TODO: (Ajob) Evaluate this feature */}
-            <ActionPopup
-              content={<Translate>Edit session</Translate>}
-              trigger={<Button basic icon="calendar alternate outline" />}
-            />
-            {/* TODO: (Ajob) Evaluate this feature */}
-            <ActionPopup
-              content={<Translate>Edit session protection</Translate>}
-              trigger={<Button basic icon="shield" />}
-            />
-          </>
         )}
       </Card.Content>
     </>
