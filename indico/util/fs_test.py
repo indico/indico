@@ -33,8 +33,8 @@ def test_secure_client_filename(filename, expected):
     ('foo.txt', '', 'foo.txt'),
     ('foo.txt', 'example.zip', 'foo.txt'),
     ('../../../etc/passwd', '', 'etc_passwd'),
-    ('m\xf6p.txt', '', 'moep.txt'),
-    ('/m\xf6p.txt', '', 'moep.txt'),
+    ('m\xf6p.txt', '', 'mop.txt'),
+    ('/m\xf6p.txt', '', 'mop.txt'),
     (r'spacy   \filename', '', 'spacy_filename'),
     ('.filename', '', 'filename'),
     ('filename.', '', 'filename'),
@@ -43,13 +43,13 @@ def test_secure_client_filename(filename, expected):
     ('   ', '', 'fallback'),
     ('foo.', '', 'foo'),
     ('foo', '.txt', 'foo'),
-    ('\u4e17', '', 'fallback'),
-    ('\u4e17.txt', '', 'fallback.txt'),
-    ('\u4e17.txt', '.zip', 'fallback.txt'),
-    ('\u4e17.\u4e17', '', 'fallback'),
-    ('\u4e17.', '.txt', 'fallback.txt'),
-    ('\u4e17.\u4e17', '.txt', 'fallback.txt'),
-    ('.\u4e17', '.txt', 'fallback'),
+    ('\u4e17', '', 'Shi'),
+    ('\u4e17.txt', '', 'Shi.txt'),
+    ('\u4e17.txt', '.zip', 'Shi.txt'),
+    ('\u4e17.\u4e17', '', 'Shi.Shi'),
+    ('\u4e17.', '.txt', 'Shi.txt'),
+    ('\u4e17.\u4e17', '.txt', 'Shi.Shi'),
+    ('.\u4e17', '.txt', 'Shi'),
 ))
 def test_secure_filename(filename, fallback_ext, expected):
     assert secure_filename(filename, f'fallback{fallback_ext}') == expected
@@ -58,8 +58,8 @@ def test_secure_filename(filename, fallback_ext, expected):
 @pytest.mark.parametrize(('filename', 'expected'), (
     ('foo', 'foo'),
     ('foo.', 'foo'),
-    ('\u4e17', ''),
-    ('\u4e17.', ''),
+    ('\u4e17', 'Shi'),
+    ('\u4e17.', 'Shi'),
 ))
 def test_secure_filename_empty_fallback(filename, expected):
     assert secure_filename(filename, '') == expected
