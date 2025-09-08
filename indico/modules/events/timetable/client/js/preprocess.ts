@@ -130,6 +130,7 @@ export function preprocessTimetableEntries(
         locationData,
         childLocationParent,
         attachments,
+        colors,
       });
 
       if (entry.sessionId) {
