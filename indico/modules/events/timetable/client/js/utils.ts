@@ -57,8 +57,6 @@ export function getDefaultColorByType(type: EntryType) {
   return {
     [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
     [EntryType.Break]: DEFAULT_BREAK_COLORS,
-    // TODO: (Ajob) Remove this one because it is temporary for debugging
-    [EntryType.SessionBlock]: {color: '#FF0000', backgroundColor: '#FFFFFF'},
   }[type]
 }
 

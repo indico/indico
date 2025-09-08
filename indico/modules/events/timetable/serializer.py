@@ -188,7 +188,7 @@ class TimetableSerializer:
                      'entries': entries,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'friendlyId': block.session.friendly_id
+                     'friendlyId': block.session.friendly_id,
                      **get_color_data(block.session)})
         return data
 
@@ -243,7 +243,7 @@ class TimetableSerializer:
                      'sessionCode': block.session.code if block else None,
                     #  'sessionSlotId': block.id if block else None,
                     #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
-                     'title': break_.title
+                     'title': break_.title,
                      **get_color_data(break_)})
         return data
 
