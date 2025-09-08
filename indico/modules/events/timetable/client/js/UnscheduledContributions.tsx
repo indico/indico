@@ -24,8 +24,7 @@ function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[
           id={contrib.id}
           title={contrib.title}
           duration={contrib.duration}
-          color={contrib.backgroundColor}
-          textColor={contrib.textColor}
+          colors={contrib.colors}
         />
       ))}
     </div>
@@ -121,9 +120,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                     <span
                       style={{
                         borderRadius: '50%',
-                        backgroundColor: session.backgroundColor,
                         width: '1em',
                         height: '1em',
+                        ...session.colors,
                       }}
                     />
                   </span>
