@@ -136,7 +136,7 @@ export function preprocessTimetableEntries(
           room,
           venueName,
         },
-        color,
+        colors,
       });
 
       if (entry.sessionId) {

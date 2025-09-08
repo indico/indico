@@ -19,7 +19,14 @@ import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
 import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle, getIconByEntryType} from './utils';
+import {
+  minutesToPixels,
+  pixelsToMinutes,
+  snapPixels,
+  snapMinutes,
+  formatBlockTitle,
+  getIconByEntryType,
+} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
@@ -31,12 +38,7 @@ interface DraggableEntryProps {
 
 export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {
-    listeners: _listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({id});
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
