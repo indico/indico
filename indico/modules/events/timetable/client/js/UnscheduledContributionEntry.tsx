@@ -13,11 +13,11 @@ import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
+import {Colors} from './types';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 import './ContributionEntry.module.scss';
 import './UnscheduledContributionEntry.module.scss';
-import { Colors } from './types';
 
 export function DraggableUnscheduledContributionEntry({
   id,
@@ -128,6 +128,7 @@ export function UnscheduledContributionEntry({
   timeRange: string;
   duration: number;
   colors?: Colors;
+  isDragging?: boolean;
 }) {
   const style = {
     border: '2px solid transparent',

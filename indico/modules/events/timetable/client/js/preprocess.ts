@@ -20,8 +20,8 @@ import {
   Session,
   UnscheduledContrib,
 } from './types';
-import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import { getDefaultColorByType } from './utils';
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {getDefaultColorByType} from './utils';
 
 interface SchemaDate {
   date: string;
@@ -96,7 +96,6 @@ export function preprocessTimetableEntries(
       const type = entryTypeMapping[_id[0]];
       // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
       const entry: any = data[day][_id];
-      let defaultColors = getDefaultColorByType(type);
 
       const {
         duration,
@@ -111,7 +110,7 @@ export function preprocessTimetableEntries(
         id,
         objId,
         attachments,
-        colors = defaultColors,
+        colors = getDefaultColorByType(type),
       } = entry;
 
       dayEntries[day].push({
