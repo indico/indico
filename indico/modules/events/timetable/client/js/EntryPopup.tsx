@@ -19,14 +19,12 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
   Button,
   Card,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
   Icon,
   List,
   Popup,
   Label,
   Header,
+  PopupProps,
 } from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -40,7 +38,7 @@ import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {mapTTDataToEntry} from './utils';
 
-function ActionPopup({content, trigger, ...rest}) {
+function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
     <Popup
       inverted
