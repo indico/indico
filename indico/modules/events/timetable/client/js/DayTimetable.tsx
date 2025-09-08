@@ -302,15 +302,13 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
-                <div style={{pointerEvents: 'none'}}>
-                  <DraggableEntry
-                    id="draft"
-                    width="100%"
-                    title="New entry"
-                    maxColumn={0}
-                    {...draftEntry}
-                  />
-                </div>
+                <DraggableEntry
+                  id="draft"
+                  width="100%"
+                  title="New entry"
+                  maxColumn={0}
+                  {...draftEntry}
+                />
               )}
               {!isDragging && draftEntry && (
                 <TimetableManageModal

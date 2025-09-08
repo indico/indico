@@ -74,8 +74,9 @@
   outline: none;
 
   &.draft {
+    pointer-events: none;
     color: $white;
-    text-shadow: 0 0 5px rgba($dark-teal, 0.5);
+    text-shadow: 0 0 5px rgba($dark-teal, 0.25);
     background: rgba($teal, 0.8);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
