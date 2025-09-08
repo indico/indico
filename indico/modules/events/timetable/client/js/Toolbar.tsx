@@ -99,7 +99,7 @@ export default function Toolbar({
 
   useEffect(() => {
     scrollToDay(currentDayIdxRef.current);
-  }, [currentDayIdxRef, daysBarRef.current]);
+  }, [currentDayIdxRef]);
 
   return (
     <div styleName="toolbar" ref={ref}>

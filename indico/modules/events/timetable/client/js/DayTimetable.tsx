@@ -322,7 +322,7 @@ export function DayTimetable({
     if (wrapperRef.current) {
       wrapperRef.current.scrollTop = scrollPositionRef.current;
     }
-  }, [wrapperRef, scrollPositionRef]);
+  }, [wrapperRef]);
 
   const restrictToCalendar = useMemo(() => {
     const restrictLimits = limitsDelta;
