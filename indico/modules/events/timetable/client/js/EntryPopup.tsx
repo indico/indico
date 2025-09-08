@@ -16,16 +16,7 @@ import './EntryPopup.module.scss';
 import moment from 'moment';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  Button,
-  Card,
-  Icon,
-  List,
-  Popup,
-  Label,
-  Header,
-  PopupProps,
-} from 'semantic-ui-react';
+import {Button, Card, Icon, List, Popup, Label, Header, PopupProps} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import './Entry.module.scss';
