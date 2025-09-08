@@ -57,7 +57,7 @@ export function getDefaultColorByType(type: EntryType) {
   return {
     [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
     [EntryType.Break]: DEFAULT_BREAK_COLORS,
-  }[type]
+  }[type];
 }
 
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
