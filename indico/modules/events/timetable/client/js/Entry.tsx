@@ -26,11 +26,10 @@ import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
   id: number;
-  isChild?: boolean;
   [key: string]: any;
 }
 
-export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {
     listeners: _listeners,
@@ -81,7 +80,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   const entry = (
     <ContributionEntry
       id={id}
-      isChild={isChild}
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
@@ -139,8 +137,6 @@ export default function ContributionEntry({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
   parentEndDt,
-  // TODO: (Ajob) Taken from BlockEntry. Re-evaluate
-  isChild = false,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -150,7 +146,6 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({
     id: `${id}`,
     // disabled: true,
@@ -277,7 +272,6 @@ export default function ContributionEntry({
                     parentEndDt={moment(startDt)
                       .add(deltaMinutes + duration, 'minutes')
                       .format()}
-                    isChild
                     {...child}
                   />
                 ))
