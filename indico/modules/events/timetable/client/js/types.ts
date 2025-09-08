@@ -31,6 +31,11 @@ export interface PersonLink {
   roles: PersonLinkRole[];
 }
 
+export interface Colors {
+  color: string;
+  backgroundColor;
+}
+
 export interface LocationData {
   address: string;
   venueName: string;
@@ -48,7 +53,7 @@ export interface Session {
   id?: number;
   title: string;
   isPoster: boolean;
-  textColor: string;
+  colors: Colors;
   backgroundColor: string;
 }
 
@@ -59,6 +64,7 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  colors?: Colors;
   locationData?: LocationData;
 }
 
@@ -85,7 +91,6 @@ export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  textColor: string;
   backgroundColor: string;
 }
 
