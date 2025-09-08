@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import omit from 'lodash/omit';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
@@ -51,11 +51,10 @@ export function PictureArea({
   // Delete the `role` and `tabIndex` props as the drag area nests
   // interactive elements. Nesting interactive elements within other
   // interactive elements is illegal.
-  const dragAreaProps = getRootProps();
-  const dragAreaPropsWithoutRole = omit(dragAreaProps, ['role', 'tabIndex']);
+  const dragAreaProps = _.omit(getRootProps(), ['role', 'tabIndex']);
 
   return (
-    <div {...dragAreaPropsWithoutRole} styleName="dropzone-area">
+    <div {...dragAreaProps} styleName="dropzone-area">
       <input {...getInputProps()} />
       <Segment textAlign="center" placeholder>
         {picture && picture.imageSrc && isEditActive && <PictureCropper />}

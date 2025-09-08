@@ -48,7 +48,7 @@ Accessibility
   thanks :user:`foxbunny`)
 - Use proper semantic heading elements for registration form section titles (:pr:`7040`,
   thanks :user:`foxbunny`)
-- Improve screen reder support for the initial picture control screen (:pr:`7064`,
+- Improve screen reader support in the registration form picture field (:pr:`7064`,
   thanks :user:`foxbunny`)
 
 Internal Changes
