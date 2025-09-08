@@ -52,11 +52,19 @@
     cursor: cell;
   }
 
-  .back {
+  .back-button {
     position: absolute;
     top: 25px;
-    cursor: pointer;
     left: 30px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid #4183c4;
+      outline-offset: 2px;
+    }
   }
 
   .cropper-inner-div {

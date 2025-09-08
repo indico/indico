@@ -51,6 +51,17 @@ export function PictureWebcam({
               mirrored
             />
           </div>
+          <button
+            styleName="back-button"
+            type="button"
+            onClick={evt => {
+              evt.stopPropagation(); // avoid opening the cropper
+              backAction();
+            }}
+            aria-label={Translate.string('Cancel')}
+          >
+            <Icon name="arrow left" color="grey" size="large" />
+          </button>
           <div styleName="capture-controls">
             <button styleName="trigger" type="button" onClick={onCapture}>
               {/* i18n: Capture an image with a webcam */}
@@ -58,16 +69,6 @@ export function PictureWebcam({
             </button>
             <Translate as="p">Or click anywhere on the image to take a picture</Translate>
           </div>
-          <Icon
-            styleName="back"
-            name="arrow left"
-            color="grey"
-            size="large"
-            onClick={evt => {
-              evt.stopPropagation(); // avoid opening the cropper
-              backAction();
-            }}
-          />
         </div>
       </div>
     </>
