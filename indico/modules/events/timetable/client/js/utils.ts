@@ -7,21 +7,17 @@
 
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
+import {SemanticICONS} from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {Colors, Entry, EntryType, Session} from './types';
-import {SemanticICONS} from 'semantic-ui-react';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
-export const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
-export const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
-export const DEFAULT_BREAK_TEXT_COLOR = '#000000de';
-export const DEFAULT_BREAK_BACKGROUND_COLOR = '#cce2ff';
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -129,7 +125,8 @@ export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry
     boardNumber,
     locationData: {
       address: locationData.address,
-      room: locationData.room,
+      // TODO: (Ajob) Evaluate with Michel this inconsistency
+      room: locationData.roomName,
       inheriting: locationData.inheriting,
       venueName: locationData.venueName,
     },

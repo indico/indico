@@ -96,7 +96,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch = useDispatch();
-  const dayEntries = useSelector(selectors.getCurrentDayEntries)
+  const dayEntries = useSelector(selectors.getCurrentDayEntries);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId, sessionBlockId} = entry;
