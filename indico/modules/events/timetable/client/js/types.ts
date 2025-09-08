@@ -99,6 +99,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.SessionBlock;
   sessionId: number;
   sessionTitle: string;
+  // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
   personLinks: PersonLink[];
   attachments: Attachment[];
@@ -106,16 +107,13 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   locationData?: LocationData;
 }
 
-export interface ChildContribEntry extends ContribEntry {
+export interface ChildBaseEntry {
   sessionBlockId: number;
   parent?: Partial<BlockEntry>;
 }
 
-export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: number;
-  parent?: Partial<BlockEntry>;
-}
-
+export type ChildContribEntry = ContribEntry | ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry | ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
