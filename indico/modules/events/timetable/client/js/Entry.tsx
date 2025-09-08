@@ -19,8 +19,15 @@ import {getWidthAndOffset} from './layout';
 import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ContribEntry, EntryType, BlockEntry, ScheduledMixin, BaseEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
+import {ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {
+  minutesToPixels,
+  pixelsToMinutes,
+  snapPixels,
+  snapMinutes,
+  formatBlockTitle,
+  getIconByEntryType,
+} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
@@ -34,12 +41,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {
-    listeners: _listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({id});
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );

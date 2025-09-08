@@ -166,12 +166,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
-              <Label
-                circular
-                size="tiny"
-                styleName="header-accent"
-                style={{...colors}}
-              />
+              <Label circular size="tiny" styleName="header-accent" style={{...colors}} />
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
