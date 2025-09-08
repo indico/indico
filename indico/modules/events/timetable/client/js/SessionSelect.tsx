@@ -28,11 +28,11 @@ interface SessionSelectProps {
 const processSessions = (sessions: Session[]) => {
   return sessions.length
     ? sessions.flatMap((session: Session): SessionOption[] => {
-        const {backgroundColor: background, textColor: text} = session;
+        const {colors} = session;
         return [
           {
             key: `session:${session.id}`,
-            text: <Label style={{background, color: text}}>{session.title}</Label>,
+            text: <Label style={colors}>{session.title}</Label>,
             value: session.id,
           },
         ];

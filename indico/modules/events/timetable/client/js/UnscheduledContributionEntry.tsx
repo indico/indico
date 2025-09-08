@@ -9,11 +9,11 @@ import moment, {Moment} from 'moment';
 import React from 'react';
 import {createPortal} from 'react-dom';
 
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
+import {Colors} from './types';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 import './ContributionEntry.module.scss';
@@ -24,15 +24,13 @@ export function DraggableUnscheduledContributionEntry({
   dt,
   title,
   duration,
-  color,
-  textColor,
+  colors,
 }: {
   id: number;
   dt: Moment;
   title: string;
   duration: number;
-  color?: string;
-  textColor?: string;
+  colors?: Colors;
 }) {
   const droppableData = useDroppableData({id: 'calendar'});
 
@@ -58,8 +56,7 @@ export function DraggableUnscheduledContributionEntry({
 
   let style = {
     fontSize: 15,
-    backgroundColor: color ? ENTRY_COLORS_BY_BACKGROUND[color].childColor : '#5b1aff',
-    color: textColor ? textColor : undefined,
+    ...colors,
   };
 
   if (transform) {
@@ -83,8 +80,7 @@ export function DraggableUnscheduledContributionEntry({
           title={title}
           timeRange={timeRange}
           duration={duration}
-          color={color}
-          textColor={textColor}
+          colors={colors}
           isDragging={isDragging}
         />
       </div>,
@@ -114,8 +110,7 @@ export function DraggableUnscheduledContributionEntry({
         title={title}
         timeRange={`${duration} minutes`}
         duration={duration}
-        color={color}
-        textColor={textColor}
+        colors={colors}
         isDragging={isDragging}
       />
     </div>
@@ -126,21 +121,18 @@ export function UnscheduledContributionEntry({
   title,
   timeRange,
   duration,
-  color,
-  textColor,
+  colors,
   isDragging,
 }: {
   title: string;
   timeRange: string;
   duration: number;
-  color?: string;
-  textColor?: string;
-  isDragging: boolean;
+  colors?: Colors;
+  isDragging?: boolean;
 }) {
   const style = {
     border: '2px solid transparent',
-    backgroundColor: color ? ENTRY_COLORS_BY_BACKGROUND[color].childColor : '#5b1aff',
-    color: textColor ? textColor : undefined,
+    ...colors,
     fontSize: 15,
     borderRadius: 8,
     cursor: isDragging ? 'grabbing' : 'grab',

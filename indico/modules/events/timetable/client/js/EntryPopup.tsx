@@ -34,7 +34,7 @@ import {formatTimeRange} from './i18n';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
-import {formatBlockTitle, getEntryColor, mapTTDataToEntry} from './utils';
+import {formatBlockTitle, mapTTDataToEntry} from './utils';
 
 function ColoredDot({color}: {color: string}) {
   return (
@@ -63,10 +63,13 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title, sessionTitle} = entry;
-  const sessions = useSelector(selectors.getSessions);
+  const {
+    type,
+    title,
+    sessionTitle,
+    colors: {backgroundColor},
+  } = entry;
   const eventId = useSelector(selectors.getEventId);
-  const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
 
@@ -108,7 +111,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapTTDataToEntry(data);
+    const draftEntry = mapTTDataToEntry(data, {[session.id]: session});
 
     if ('room' in draftEntry.locationData) {
       draftEntry.locationData.roomName = draftEntry.locationData.room;
