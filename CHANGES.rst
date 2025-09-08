@@ -38,6 +38,8 @@ Bugfixes
   screen widths (:issue:`7012`, :pr:`7013`)
 - Fix user search not working for admins in room booking module with no rooms defined
   (:issue:`7016`, :pr:`7017`, thanks :user:`behackl`)
+- Fix author contribution list not showing any other contributions (:issue:`7025`,
+  :pr:`7049`, thanks :user:`diksharai9`)
 
 Accessibility
 ^^^^^^^^^^^^^
