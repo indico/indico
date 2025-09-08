@@ -63,7 +63,12 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title, sessionTitle, colors: {backgroundColor}} = entry;
+  const {
+    type,
+    title,
+    sessionTitle,
+    colors: {backgroundColor},
+  } = entry;
   const eventId = useSelector(selectors.getEventId);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
