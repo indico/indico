@@ -44,7 +44,7 @@ function ActionPopup({content, trigger, ...rest}: PopupProps) {
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title, attachments = [], parent: entryParent, colors = {}} = entry;
+  const {type, title, attachments, parent: entryParent, colors} = entry;
   const session = useSelector((state: ReduxState) =>
     selectors.getSessionById(state, entry.sessionId)
   );
@@ -184,30 +184,28 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               </Label>
             </List.Item>
           )}
-          {locationArray.length ? (
+          {locationArray?.length > 0 && (
             <List.Item title={Translate.string('Location')} style={{display: 'flex'}}>
               <Icon name="map outline" />
               <p>{locationArray.join(', ')}</p>
             </List.Item>
-          ) : null}
-          {presenters?.length ? (
+          )}
+          {presenters?.length > 0 && (
             <List.Item title={Translate.string('Presenters')}>
               <Icon name="user outline" />
               <List styleName="inline">
-                {presenters.map(p => {
-                  return (
-                    <List.Item key={p.email}>
-                      <Label image>
-                        <img src={p.avatarURL} />
-                        <span>{p.name}</span>
-                      </Label>
-                    </List.Item>
-                  );
-                })}
+                {presenters.map(p => (
+                  <List.Item key={p.email}>
+                    <Label image>
+                      <img src={p.avatarURL} />
+                      <span>{p.name}</span>
+                    </Label>
+                  </List.Item>
+                ))}
               </List>
             </List.Item>
-          ) : null}
-          {attachments.length ? (
+          )}
+          {attachments?.length > 0 && (
             <List.Item title={Translate.string('Attachments')}>
               <Icon name="copy outline" />
               <List styleName="inline">
@@ -231,7 +229,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
                 })}
               </List>
             </List.Item>
-          ) : null}
+          )}
         </List>
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
