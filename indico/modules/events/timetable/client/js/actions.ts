@@ -24,7 +24,6 @@ import {
   UnscheduledContrib,
   EntryType,
 } from './types';
-import {getEntryColor} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -267,7 +266,7 @@ function _createEntry(entryType, entry) {
 export function createEntry(entryType, entry) {
   return (dispatch, getState) => {
     const sessions = getState().sessions;
-    const color = getEntryColor(entry, sessions);
+    const color = entry.colors;
     const sessionTitle = sessions[entry.sessionId]?.title || '';
     const newEntry = {...entry, ...color, sessionTitle};
     dispatch(_createEntry(entryType, newEntry));
