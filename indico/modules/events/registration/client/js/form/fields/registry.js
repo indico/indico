@@ -229,6 +229,7 @@ const fieldRegistry = {
     inputComponent: PictureInput,
     icon: 'image',
     settingsComponent: PictureSettings,
+    renderAsFieldset: true,
   },
   sessions: {
     title: Translate.string('Timetable Sessions'),
