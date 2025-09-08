@@ -122,7 +122,6 @@ export default function ContributionEntry({
   duration: _duration,
   title,
   blockRef,
-  sessionId,
   sessionTitle,
   colors,
   selected,
