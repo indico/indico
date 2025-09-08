@@ -5,8 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@keyframes transitionPopup {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 :global(.ui.popup).wrapper {
-  // min-width: 400px;
   box-shadow: none;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.16);
@@ -16,11 +27,11 @@
   text-align: left;
   max-width: 400px;
 
-  > .header-wrapper {
+  >.header-wrapper {
     display: flex;
     justify-content: space-between;
 
-    > .header-wrapper-content {
+    >.header-wrapper-content {
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -31,7 +42,7 @@
         flex-direction: column;
         gap: 10px;
 
-        > span {
+        >span {
           display: flex;
           align-items: center;
 
@@ -44,7 +55,7 @@
             max-width: 4px;
           }
 
-          > span {
+          >span {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -72,7 +83,6 @@
   }
 
   :global(.label).session {
-    // opacity: 0.8;
     align-self: flex-start;
     padding-left: 8px !important;
     padding-right: 8px !important;
@@ -84,18 +94,6 @@
     display: flex;
     justify-content: flex-end;
     gap: 5px;
-  }
-}
-
-@keyframes transitionPopup {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
