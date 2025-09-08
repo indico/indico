@@ -55,11 +55,15 @@
 .calendar {
   position: relative;
   width: 100%;
+
+  &.day:not(:last-child) {
+    border-right: 1px solid #d4d4d5;
+  }
 }
 
 .entry {
   color: white;
-  border-radius: 6px;
+  border-radius: 8px;
   position: relative;
   display: flex;
   flex-direction: column;
