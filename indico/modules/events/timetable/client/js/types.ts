@@ -53,7 +53,7 @@ export interface Session {
   id?: number;
   title: string;
   isPoster: boolean;
-  colors: Colors
+  colors: Colors;
   backgroundColor: string;
 }
 

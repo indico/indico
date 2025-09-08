@@ -15,7 +15,6 @@ import _ from 'lodash';
  */
 export const appendSessionAttributes = (entries, sessions) => {
   return entries.map(e =>
-    e.sessionId
-      ? {...e, ..._.pick(sessions[e.sessionId], ['colors', 'isPoster'])}
-      : e
-  )};
+    e.sessionId ? {...e, ..._.pick(sessions[e.sessionId], ['colors', 'isPoster'])} : e
+  );
+};

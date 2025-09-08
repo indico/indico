@@ -62,10 +62,7 @@ export function getDefaultColorByType(type: EntryType) {
   }[type]
 }
 
-export function mapTTEntryColor(
-  dbEntry,
-  sessions: Record<number, Session> = {}
-): Colors {
+export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
   const fallbackColor = colors
     ? {color: colors.text, backgroundColor: colors.background}

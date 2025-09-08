@@ -122,7 +122,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                         borderRadius: '50%',
                         width: '1em',
                         height: '1em',
-                        ...session.colors
+                        ...session.colors,
                       }}
                     />
                   </span>
