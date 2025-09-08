@@ -10,15 +10,18 @@ import moment from 'moment';
 
 import {camelizeKeys} from 'indico/utils/case';
 
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {
   Attachments,
   ChildEntry,
+  Colors,
   DayEntries,
   EntryType,
   PersonLink,
   Session,
   UnscheduledContrib,
 } from './types';
+import {getDefaultColorByType} from './utils';
 
 interface SchemaDate {
   date: string;
@@ -30,8 +33,7 @@ interface SchemaEntry {
   id: string;
   objId: number;
   title: string;
-  textColor?: string;
-  color?: string;
+  colors?: Colors;
   slotTitle?: string;
 }
 
@@ -65,9 +67,8 @@ export function preprocessSessionData(
     Object.entries(data).map(([, s]) => [
       s.id,
       {
-        ..._.pick(s, ['id', 'title', 'isPoster', 'defaultContribDurationMinutes']), // TODO: (Duarte) get other attrs
-        textColor: s.textColor,
-        backgroundColor: s.color,
+        // TODO: (Duarte) get other attrs
+        ..._.pick(s, ['id', 'title', 'colors', 'isPoster', 'defaultContribDurationMinutes']),
       },
     ])
   );
@@ -95,6 +96,7 @@ export function preprocessTimetableEntries(
       const type = entryTypeMapping[_id[0]];
       // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
       const entry: any = data[day][_id];
+
       const {
         duration,
         description = '',
@@ -108,6 +110,7 @@ export function preprocessTimetableEntries(
         id,
         objId,
         attachments,
+        colors = getDefaultColorByType(type),
       } = entry;
 
       dayEntries[day].push({
@@ -139,10 +142,7 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionId = entry.sessionId;
       }
 
-      if (type === EntryType.Break) {
-        dayEntries[day].at(-1).backgroundColor = entry.color;
-        dayEntries[day].at(-1).textColor = entry.textColor;
-      } else if (type === EntryType.SessionBlock) {
+      if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
@@ -165,6 +165,13 @@ export function preprocessTimetableEntries(
             width: 0,
             column: 0,
             maxColumn: 0,
+            colors: ENTRY_COLORS_BY_BACKGROUND[entry.colors.backgroundColor],
+            parent: {
+              colors,
+              id,
+              objId,
+              title,
+            },
           };
 
           if (childType === EntryType.Contribution) {
@@ -180,6 +187,8 @@ export function preprocessTimetableEntries(
         });
         dayEntries[day].at(-1).children = children;
       }
+
+      dayEntries[day].at(-1).colors = colors;
     }
   }
 

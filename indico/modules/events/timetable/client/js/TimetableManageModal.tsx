@@ -289,7 +289,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     const {data: resData} = await submitHandler(submitData);
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData);
+    const resEntry = mapTTDataToEntry(resData, sessions);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {
