@@ -44,8 +44,8 @@ def get_unique_key(entry):
 def get_color_data(obj):
     return {
         'colors': {
-            'backgroundColor': '#' + obj.background_color,
-            'color': '#' + obj.text_color
+            'backgroundColor': f'#{obj.background_color}',
+            'color': f'#{obj.text_color}',
         }
     }
 
@@ -173,7 +173,6 @@ class TimetableSerializer:
             entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
         data.update(self._get_location_data(block))
-        data.update(get_color_data(block.session))
         data.update({'entryType': 'Session',
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
@@ -189,7 +188,8 @@ class TimetableSerializer:
                      'entries': entries,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'friendlyId': block.session.friendly_id})
+                     'friendlyId': block.session.friendly_id
+                     **get_color_data(block.session)})
         return data
 
     def serialize_contribution_entry(self, entry):
@@ -234,7 +234,6 @@ class TimetableSerializer:
         data = {}
         data.update(self._get_entry_data(entry))
         data.update(self._get_location_data(break_))
-        data.update(get_color_data(break_))
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
@@ -244,7 +243,8 @@ class TimetableSerializer:
                      'sessionCode': block.session.code if block else None,
                     #  'sessionSlotId': block.id if block else None,
                     #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
-                     'title': break_.title})
+                     'title': break_.title
+                     **get_color_data(break_)})
         return data
 
     def _get_attachment_data(self, obj):
@@ -368,7 +368,7 @@ def serialize_event_info(event, *, management=False, user=None):
 
 def serialize_session(sess):
     """Return data for a single session."""
-    data = {
+    return {
         '_type': 'Session',
         'address': sess.address,
         'description': sess.description,
@@ -379,8 +379,6 @@ def serialize_session(sess):
         'roomFullname': sess.room_name,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
-        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60
+        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60,
+        **get_color_data(sess),
     }
-    data.update(get_color_data(sess))
-
-    return data
