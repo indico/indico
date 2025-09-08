@@ -141,7 +141,6 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
         const children = Object.values(entry.entries).map((c: SchemaBlock) => {
-          const childColors = ENTRY_COLORS_BY_BACKGROUND[c.color];
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,

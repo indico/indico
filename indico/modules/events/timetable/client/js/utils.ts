@@ -7,7 +7,7 @@
 
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
-import { SemanticICONS } from 'semantic-ui-react';
+import {SemanticICONS} from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
