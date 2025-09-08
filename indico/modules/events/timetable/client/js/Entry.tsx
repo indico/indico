@@ -11,7 +11,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
@@ -27,11 +26,10 @@ import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
   id: number;
-  isChild?: boolean;
   [key: string]: any;
 }
 
-export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {
     listeners: _listeners,
@@ -82,7 +80,6 @@ export function DraggableEntry({id, isChild = false, ...rest}: DraggableEntryPro
   const entry = (
     <ContributionEntry
       id={id}
-      isChild={isChild}
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
@@ -125,10 +122,8 @@ export default function ContributionEntry({
   duration: _duration,
   title,
   blockRef,
-  sessionId,
   sessionTitle,
-  textColor,
-  backgroundColor,
+  colors,
   selected,
   y,
   listeners,
@@ -141,8 +136,6 @@ export default function ContributionEntry({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
   parentEndDt,
-  // TODO: (Ajob) Taken from BlockEntry. Re-evaluate
-  isChild = false,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -152,7 +145,6 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({
     id: `${id}`,
     // disabled: true,
@@ -176,15 +168,7 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
-    // TODO: (Ajob) Very ugly triple ternary. Make prettier
-    backgroundColor: backgroundColor
-      ? backgroundColor
-      : sessionData
-        ? isChild
-          ? ENTRY_COLORS_BY_BACKGROUND[sessionData.backgroundColor].childColor
-          : sessionData.backgroundColor
-        : '#5b1aff',
-    color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
+    ...colors,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
@@ -241,7 +225,7 @@ export default function ContributionEntry({
   return (
     <div
       role="button"
-      styleName={`entry ${type === 'break' ? 'break' : ''} ${renderChildren ? '' : 'simple'}`}
+      styleName={`entry ${id === 'draft' ? 'draft' : ''} ${renderChildren ? '' : 'simple'}`}
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
@@ -287,7 +271,6 @@ export default function ContributionEntry({
                     parentEndDt={moment(startDt)
                       .add(deltaMinutes + duration, 'minutes')
                       .format()}
-                    isChild
                     {...child}
                   />
                 ))

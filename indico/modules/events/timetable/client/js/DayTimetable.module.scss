@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .wrapper {
   position: relative;
   display: flex;
@@ -61,7 +63,6 @@
 }
 
 .entry {
-  // background-color: #5b1aff;
   color: white;
   border-radius: 8px;
   position: relative;
@@ -72,12 +73,14 @@
   padding: 0;
   outline: none;
 
-  &.block {
-    // background-color: rgb(4, 115, 134);
-  }
-
-  &.break {
-    // background-color: #f09000;
+  &.draft {
+    pointer-events: none;
+    color: $white;
+    text-shadow: 0 0 5px rgba($dark-teal, 0.25);
+    background: rgba($teal, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba($white, 0.2);
   }
 }
 

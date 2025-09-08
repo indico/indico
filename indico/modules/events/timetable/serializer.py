@@ -19,6 +19,37 @@ from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 
 
+def get_obj_id(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return entry.session_block.id
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return entry.contribution.id
+    elif entry.type == TimetableEntryType.BREAK:
+        return entry.break_.id
+    else:
+        raise ValueError
+
+
+def get_unique_key(entry):
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return f's{entry.session_block.id}'
+    elif entry.type == TimetableEntryType.CONTRIBUTION:
+        return f'c{entry.contribution.id}'
+    elif entry.type == TimetableEntryType.BREAK:
+        return f'b{entry.break_.id}'
+    else:
+        raise ValueError
+
+
+def get_color_data(obj):
+    return {
+        'colors': {
+            'backgroundColor': f'#{obj.background_color}',
+            'color': f'#{obj.text_color}',
+        }
+    }
+
+
 def _get_location_data(obj, *, management=False):
     data = {}
     data['location'] = obj.venue_name
@@ -141,7 +172,6 @@ class TimetableSerializer:
         else:
             entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
-        data.update(self._get_color_data(block.session))
         data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
                      'sessionId': block.session_id,
@@ -158,7 +188,8 @@ class TimetableSerializer:
                      'entries': entries,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'friendlyId': block.session.friendly_id})
+                     'friendlyId': block.session.friendly_id,
+                     **get_color_data(block.session)})
         return data
 
     def serialize_contribution_entry(self, entry):
@@ -169,7 +200,7 @@ class TimetableSerializer:
         data = {}
         data.update(self._get_entry_data(entry))
         if contribution.session:
-            data.update(self._get_color_data(contribution.session))
+            data.update(get_color_data(contribution.session))
         data.update(self._get_location_data(contribution))
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
@@ -202,7 +233,6 @@ class TimetableSerializer:
         break_ = entry.break_
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update(self._get_color_data(break_))
         data.update(self._get_location_data(break_))
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
@@ -213,7 +243,8 @@ class TimetableSerializer:
                      'sessionCode': block.session.code if block else None,
                     #  'sessionSlotId': block.id if block else None,
                     #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
-                     'title': break_.title})
+                     'title': break_.title,
+                     **get_color_data(break_)})
         return data
 
     def _get_attachment_data(self, obj):
@@ -237,10 +268,6 @@ class TimetableSerializer:
         data['folders'] = list(map(serialize_folder, items.get('folders', [])))
 
         return data
-
-    def _get_color_data(self, obj):
-        return {'color': '#' + obj.background_color,
-                'textColor': '#' + obj.text_color}
 
     def _get_date_data(self, entry):
         if self.management:
@@ -286,28 +313,6 @@ def serialize_contribution(contribution):
             'title': contribution.title}
 
 
-def get_obj_id(entry):
-    if entry.type == TimetableEntryType.SESSION_BLOCK:
-        return entry.session_block.id
-    elif entry.type == TimetableEntryType.CONTRIBUTION:
-        return entry.contribution.id
-    elif entry.type == TimetableEntryType.BREAK:
-        return entry.break_.id
-    else:
-        raise ValueError
-
-
-def get_unique_key(entry):
-    if entry.type == TimetableEntryType.SESSION_BLOCK:
-        return f's{entry.session_block.id}'
-    elif entry.type == TimetableEntryType.CONTRIBUTION:
-        return f'c{entry.contribution.id}'
-    elif entry.type == TimetableEntryType.BREAK:
-        return f'b{entry.break_.id}'
-    else:
-        raise ValueError
-
-
 # Event related functions:
 
 # TODO: This is only temporary to get unscheduled contributions working
@@ -318,8 +323,7 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
         'objId': contribution.id
     }
     if contribution.session:
-        data.update({'color': '#' + contribution.session.background_color,
-                     'textColor': '#' + contribution.session.text_color})
+        data.update(get_color_data(contribution.session))
     data.update({'entryType': 'Contribution',
                  '_type': 'ContribSchEntry',
                  '_fossil': 'contribSchEntryDisplay',
@@ -367,15 +371,14 @@ def serialize_session(sess):
     return {
         '_type': 'Session',
         'address': sess.address,
-        'color': '#' + sess.colors.background,
         'description': sess.description,
         'id': sess.id,
         'isPoster': sess.is_poster,
         'location': sess.venue_name,
         'room': sess.room_name,
         'roomFullname': sess.room_name,
-        'textColor': '#' + sess.colors.text,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
-        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60
+        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60,
+        **get_color_data(sess),
     }
