@@ -43,13 +43,13 @@ jobs:
         with:
           # prefer head commit over merge commit in case of PRs
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         name: Setup Node
         with:
           node-version: ${{ env.NODE_VERSION }}
