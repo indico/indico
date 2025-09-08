@@ -117,16 +117,13 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   colors?: Colors;
 }
 
-export interface ChildContribEntry extends ContribEntry {
+export interface ChildBaseEntry {
   sessionBlockId: string;
   parent?: Partial<BlockEntry>;
 }
 
-export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: string;
-  parent?: Partial<BlockEntry>;
-}
-
+export type ChildContribEntry = ContribEntry | ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry | ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
