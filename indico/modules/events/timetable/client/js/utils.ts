@@ -112,7 +112,7 @@ export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry
   } = data;
 
   const mappedObj = {
-    id: getEntryUniqueId(data.type, data.id),
+    id: getEntryUniqueId(type, id),
     objId: id,
     type,
     title,
@@ -125,7 +125,6 @@ export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry
     boardNumber,
     locationData: {
       address: locationData.address,
-      // TODO: (Ajob) Evaluate with Michel this inconsistency
       room: locationData.roomName,
       inheriting: locationData.inheriting,
       venueName: locationData.venueName,
@@ -139,14 +138,16 @@ export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry
     sessionBlockId: sessionBlockId || null,
     sessionTitle: sessionTitle || '',
     colors: mapTTEntryColor(data, sessions),
-    parent: parent
-      ? {
-          id: parent.id,
-          objId: parent.objId,
-          colors: parent.colors,
-          title: parent.title,
-        }
-      : null,
+    ...(sessionId && {sessionId}),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
+    }),
+    ...(parent && {
+      id: parent.id,
+      objId: parent.objId,
+      colors: parent.colors,
+      title: parent.title,
+    }),
   };
 
   return mappedObj;
