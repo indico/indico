@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{%- trans %}Participant List{% endtrans -%}</title>
-
-    <link rel="stylesheet" href="participants_table.css">
 </head>
 
 <body>
@@ -30,12 +28,6 @@
                 {% for cell in row %}
                     <td>{{ cell }}</td>
                 {% endfor %}
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="{{ headers|length }}" class="no-participants">
-                    There are no participants to display.
-                </td>
             </tr>
             {% endfor %}
         </tbody>

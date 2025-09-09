@@ -17,7 +17,6 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
-from weasyprint import HTML
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -59,6 +58,7 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      import_registrations_from_csv, load_registration_schema,
                                                      make_registration_schema, prepare_participant_list_data)
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.events.timetable.util import create_pdf
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
@@ -460,18 +460,14 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
             display=self.export_config['regform_items'],
             static_items=self.export_config['static_item_ids'],
         )
-
+        css = render_template('events/registration/pdf/participants_table.css')
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
         template_path = 'events/registration/pdf/participants_table.html'
-        html_source = render_template(
+        html = render_template(
             template_path, event=self.event, headers=headers, rows=rows, generation_date=generation_date
         )
-
-        html = HTML(string=html_source)
-        pdf_buffer = BytesIO()
-        html.write_pdf(pdf_buffer)
-        pdf_buffer.seek(0)
-        return send_file('RegistrantsList.pdf', pdf_buffer, 'application/pdf')
+        pdf = create_pdf(html, css, self.event)
+        return send_file('RegistrantsList.pdf', pdf, 'application/pdf')
 
 
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):

@@ -51,7 +51,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import format_date, format_datetime, now_utc
+from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
@@ -1181,50 +1181,22 @@ def prepare_participant_list_data(reglist, display, static_items):
     }
 
     headers = ['ID', 'Name']
-
-    dynamic_form_items = []
-    accommodation_col_counter = 0
-
-    for item in display:
-        if item.input_type == 'accommodation':
-            accommodation_col_counter += 1
-            headers.append(item.title)
-            headers.append('Arrival date')
-            headers.append('Departure date')
-        else:
-            headers.append(item.title)
-
-        dynamic_form_items.append(item)
-
+    headers.extend(item.title for item in display)
     headers.extend(column_names[item_id] for item_id in static_items if item_id in column_names)
 
     rows = []
     for registration in reglist:
         row = [f'#{registration.friendly_id}', registration.display_full_name]
         reg_data_by_field = registration.data_by_field
-        for item in dynamic_form_items:
+        for item in display:
             reg_data = reg_data_by_field.get(item.id)
-            friendly_data = reg_data.friendly_data if reg_data else None
-
-            if item.input_type == 'accommodation':
-                if friendly_data:
-                    row.append(friendly_data.get('choice', ''))
-                    row.append(format_date(friendly_data.get('arrival_date', '')))
-                    row.append(format_date(friendly_data('departure_date', '')))
-                else:
-                    row.extend(['', '', ''])
-            elif item.input_type == 'multi_choice':
-                multi_choice_data = ', '.join(friendly_data) if friendly_data else ''
-                row.append(multi_choice_data)
-            elif item.input_type == 'sessions':
-                sessions_data = '; '.join(friendly_data) if friendly_data else ''
-                row.append(sessions_data)
-            else:
-                cell_data = str(friendly_data) if friendly_data is not None else ''
-                row.append(cell_data)
+            cell_data = '-'
+            if reg_data:
+                cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
+            row.append(cell_data)
 
         for item_id in static_items:
-            cell_data = ''
+            cell_data = '-'
             if item_id == 'reg_date':
                 cell_data = format_datetime(registration.submitted_dt)
             elif item_id == 'state':
@@ -1239,7 +1211,7 @@ def prepare_participant_list_data(reglist, display, static_items):
             elif item_id == 'tags_present':
                 if registration.tags:
                     cell_data = ', '.join(sorted(t.title for t in registration.tags))
-            row.append(cell_data or '')
+            row.append(cell_data or '-')
 
         rows.append(row)
 
