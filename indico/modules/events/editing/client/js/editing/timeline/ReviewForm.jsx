@@ -77,8 +77,6 @@ export default function ReviewForm() {
 
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
-  // TODO: (Michel) After the state for isOutDated changes and the component is
-  // rerendered we lose the comment value. We should find a way to keep it.
   const [commentValue, setCommentValue] = useState('');
   const [syncComment, setSyncComment] = useState(false);
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
