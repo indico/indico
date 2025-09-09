@@ -67,7 +67,7 @@ export const getCurrentLimits = createSelector(
   getEventStartDt,
   getEventEndDt,
   (currentDate: Moment, startDt: Moment, endDt: Moment): [number, number] => {
-    const limits: [number, number] = [0, DAY_SIZE]
+    const limits: [number, number] = [0, DAY_SIZE];
 
     if (startDt.isSame(currentDate, 'day')) {
       limits[0] = minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes());
