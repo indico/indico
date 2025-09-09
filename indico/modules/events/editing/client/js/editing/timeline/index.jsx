@@ -19,6 +19,8 @@ import * as selectors from './selectors';
 import SubmitRevision from './SubmitRevision';
 import TimelineItem from './TimelineItem';
 
+import './editingTimeline.scss';
+
 const POLLING_SECONDS = 10;
 
 export default function Timeline() {
@@ -61,21 +63,23 @@ export default function Timeline() {
   return (
     <>
       {isOutdated && (
-        <Message
-          warning
-          header={Translate.string('This timeline has been updated')}
-          content={
-            <Translate>
-              <Param
-                name="link"
-                wrapper={<a onClick={() => dispatch(actions.useUpdatedTimeline())} />}
-              >
-                Click here to refresh
-              </Param>{' '}
-              and see the most recent version.
-            </Translate>
-          }
-        />
+        <div className="sticky-message">
+          <Message
+            warning
+            header={Translate.string('This timeline has been updated')}
+            content={
+              <Translate>
+                <Param
+                  name="link"
+                  wrapper={<a onClick={() => dispatch(actions.useUpdatedTimeline())} />}
+                >
+                  Click here to refresh
+                </Param>{' '}
+                and see the most recent version.
+              </Translate>
+            }
+          />
+        </div>
       )}
       <TimelineHeader
         contribution={details.contribution}
