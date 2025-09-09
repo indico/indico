@@ -8,10 +8,10 @@
 import submitRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Field, Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Form} from 'semantic-ui-react';
+import {Dropdown, Form, Popup} from 'semantic-ui-react';
 
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
@@ -29,15 +29,7 @@ import JudgmentBoxHeader from './judgment/JudgmentBoxHeader';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
 import FinalTagInput from './judgment/TagInput';
 import UpdateFilesBox from './judgment/UpdateFilesBox';
-import {
-  getLastRevision,
-  canJudgeLastRevision,
-  getDetails,
-  getStaticData,
-  canReviewLastRevision,
-  getLastRevisionWithFiles,
-  getNonSystemTags,
-} from './selectors';
+import * as selectors from './selectors';
 
 import './ReviewForm.module.scss';
 
@@ -68,15 +60,18 @@ const judgmentOptions = [
   },
 ];
 
+let savedComment = null;
+
 export default function ReviewForm() {
   const dispatch = useDispatch();
-  const lastRevision = useSelector(getLastRevision);
-  const lastRevisionWithFiles = useSelector(getLastRevisionWithFiles);
-  const canJudge = useSelector(canJudgeLastRevision);
-  const canReview = useSelector(canReviewLastRevision);
-  const {canPerformSubmitterActions, contribution, editor} = useSelector(getDetails);
-  const {eventId, editableType, fileTypes} = useSelector(getStaticData);
-  const tagOptions = useSelector(getNonSystemTags);
+  const lastRevision = useSelector(selectors.getLastRevision);
+  const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
+  const canJudge = useSelector(selectors.canJudgeLastRevision);
+  const canReview = useSelector(selectors.canReviewLastRevision);
+  const {canPerformSubmitterActions, contribution, editor} = useSelector(selectors.getDetails);
+  const {eventId, editableType, fileTypes} = useSelector(selectors.getStaticData);
+  const tagOptions = useSelector(selectors.getNonSystemTags);
+  const isOutdated = useSelector(selectors.isTimelineOutdated);
   const currentUser = {
     fullName: Indico.User.fullName,
     avatarURL: Indico.User.avatarURL,
@@ -93,6 +88,7 @@ export default function ReviewForm() {
     if (rv.error) {
       return rv.error;
     }
+    localStorage.removeItem('editingCommentDraft');
     setTimeout(() => form.reset(), 0);
   };
 
@@ -107,58 +103,82 @@ export default function ReviewForm() {
       formData
     );
 
+  useEffect(() => {
+    if (savedComment !== null) {
+      setCommentValue(savedComment);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOutdated) {
+      savedComment = commentValue;
+    }
+    if (savedComment !== null && savedComment === commentValue) {
+      setSyncComment(true);
+    }
+  }, [isOutdated, commentValue]);
+
   const judgmentForm = (
-    <div className="flexrow f-a-center" styleName="judgment-form">
-      <CommentForm
-        onSubmit={createComment}
-        commentValue={commentValue}
-        onCommentChange={setCommentValue}
-        syncComment={syncComment}
-        setSyncComment={setSyncComment}
-      />
-      {canPerformSubmitterActions && canReview && !editor && (
-        <>
-          <span className="comment-or-review">
-            <Translate>or</Translate>
-          </span>
-          <EditableSubmissionButton
-            eventId={eventId}
-            contributionId={contribution.id}
-            contributionCode={contribution.code}
-            fileTypes={{[editableType]: fileTypes}}
-            uploadableFiles={lastRevisionWithFiles.files}
-            text={Translate.string('Submit files')}
-            onSubmit={handleSubmission}
+    <Popup
+      trigger={
+        <div className="flexrow f-a-center" styleName="judgment-form">
+          <CommentForm
+            onSubmit={createComment}
+            commentValue={commentValue}
+            onCommentChange={setCommentValue}
+            syncComment={syncComment}
+            setSyncComment={setSyncComment}
+            disabled={isOutdated}
+            expanded={isOutdated}
           />
-        </>
-      )}
-      {canJudge && (
-        <div className="flexcol align-strech">
-          <div className="review-trigger flexrow">
-            <span className="comment-or-review">
-              <Translate>or</Translate>
-            </span>
-            <Dropdown
-              className="judgment-btn"
-              text={Translate.string('Judge', 'Judge editable (verb)')}
-              direction="left"
-              button
-              floating
-            >
-              <Dropdown.Menu>
-                <JudgmentDropdownItems
-                  options={judgmentOptions}
-                  setJudgmentType={type => {
-                    setSyncComment(true);
-                    setJudgmentType(type);
-                  }}
-                />
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
+          {canPerformSubmitterActions && canReview && !editor && (
+            <>
+              <span className="comment-or-review">
+                <Translate>or</Translate>
+              </span>
+              <EditableSubmissionButton
+                eventId={eventId}
+                contributionId={contribution.id}
+                contributionCode={contribution.code}
+                fileTypes={{[editableType]: fileTypes}}
+                uploadableFiles={lastRevisionWithFiles.files}
+                text={Translate.string('Submit files')}
+                onSubmit={handleSubmission}
+              />
+            </>
+          )}
+          {canJudge && (
+            <div className="flexcol align-strech">
+              <div className="review-trigger flexrow">
+                <span className="comment-or-review">
+                  <Translate>or</Translate>
+                </span>
+                <Dropdown
+                  className="judgment-btn"
+                  text={Translate.string('Judge', 'Judge editable (verb)')}
+                  direction="left"
+                  disabled={isOutdated}
+                  button
+                  floating
+                >
+                  <Dropdown.Menu>
+                    <JudgmentDropdownItems
+                      options={judgmentOptions}
+                      setJudgmentType={type => {
+                        setSyncComment(true);
+                        setJudgmentType(type);
+                      }}
+                    />
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      }
+      content={Translate.string('This timeline is outdated. Please refresh the page.')}
+      disabled={!isOutdated}
+    />
   );
 
   const handleReview = async formData => {
@@ -257,9 +277,20 @@ export default function ReviewForm() {
                   </Field>
                   <FinalTagInput name="tags" options={tagOptions} />
                   <div styleName="judgment-submit-button">
-                    <FinalSubmitButton
-                      label={Translate.string('Judge', 'Judge editable (verb)')}
-                      disabledUntilChange={judgmentType !== EditingReviewAction.accept}
+                    <Popup
+                      trigger={
+                        <div>
+                          <FinalSubmitButton
+                            label={Translate.string('Judge', 'Judge editable (verb)')}
+                            disabledUntilChange={judgmentType !== EditingReviewAction.accept}
+                            disabled={isOutdated}
+                          />
+                        </div>
+                      }
+                      content={Translate.string(
+                        'This timeline is outdated. Please refresh the page.'
+                      )}
+                      disabled={!isOutdated}
                       // XXX: For some reason the button does not properly update with the correct
                       // `dirty` state after setting the `comment` value programmatically, but by
                       // also subscribing to `touched` we avoid this bug.

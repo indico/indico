@@ -28,6 +28,7 @@ export default function CommentForm({
   onCommentChange,
   syncComment,
   setSyncComment,
+  disabled,
 }) {
   const {canCreateInternalComments} = useSelector(getDetails);
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
@@ -88,6 +89,7 @@ export default function CommentForm({
                 <Form.Group styleName="submit-buttons" inline>
                   <FinalSubmitButton
                     label={Translate.string('Comment', 'Leave a comment (verb)')}
+                    disabled={disabled}
                   />
                   <Button
                     disabled={fprops.submitting}
@@ -121,6 +123,7 @@ CommentForm.propTypes = {
   commentValue: PropTypes.string,
   syncComment: PropTypes.bool,
   setSyncComment: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 CommentForm.defaultProps = {
