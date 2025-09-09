@@ -63,7 +63,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     return obj;
   }, [entries, dispatch, dt]);
 
-  const setChildDurations = useMemo(() => {
+   const setChildDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (id: string) => (duration: number) =>

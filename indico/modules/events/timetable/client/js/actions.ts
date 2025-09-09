@@ -190,13 +190,33 @@ export function toggleDraft() {
   return {type: TOGGLE_DRAFT};
 }
 
-export function resizeEntry(
-  date: string,
-  id: string,
-  duration: number,
-  sessionBlockId?: string
-): ResizeEntryAction {
-  return {type: RESIZE_ENTRY, date, id, duration, sessionBlockId};
+export function resizeEntry(entry, eventId, duration, date) {
+  let entryURL: string;
+
+  switch (entry.type) {
+    case EntryType.Break:
+      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
+      break;
+    case EntryType.SessionBlock:
+      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+      break;
+    default:
+      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+  }
+
+  const entryData = {duration: duration * 60};
+
+  return synchronizedAjaxAction(
+    () => indicoAxios.patch(entryURL, entryData),
+    () => ({
+      type: RESIZE_ENTRY,
+      date,
+      id: entry.id,
+      duration,
+      parentId: entry.sessionBlockId ?? entry,
+      entryData,
+    })
+  );
 }
 
 export function selectEntry(id: string): SelectEntryAction {
