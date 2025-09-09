@@ -8,7 +8,7 @@
 import submitRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Field, Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Form, Popup} from 'semantic-ui-react';
@@ -101,6 +101,12 @@ export default function ReviewForm() {
       }),
       formData
     );
+
+  useEffect(() => {
+    if (isOutdated) {
+      setSyncComment(true);
+    }
+  }, [isOutdated]);
 
   const judgmentForm = (
     <Popup
