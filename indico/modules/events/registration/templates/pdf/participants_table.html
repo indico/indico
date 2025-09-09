@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{%- trans %}Participant List{% endtrans -%}</title>
+
+    <link rel="stylesheet" href="participants_table.css">
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{ event.title }}</h1>
+        <div class="date">{{ generation_date }}</div>
+    </div>
+
+    <div class="sub-title">List of registrants</div>
+
+    <table>
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for cell in row %}
+                    <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="{{ headers|length }}" class="no-participants">
+                    There are no participants to display.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
