@@ -222,7 +222,9 @@ def test_html_to_plaintext(input, output):
     ('Name|Colour\n---|---\nLancelot|Blue',
      '<table>\n<thead>\n<tr>\n<th>Name</th>\n<th>Colour</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Lancelot</td>\n'
      '<td>Blue</td>\n</tr>\n</tbody>\n</table>'),
-    ('**$2 * 2 * 2 > 7$**', '<p><strong>$2 * 2 * 2 > 7$</strong></p>'),
+    ('**$2 * 2 * 2 > 7$**', '<p><strong>$2 * 2 * 2 &gt; 7$</strong></p>'),
+    ('$a<b \\& b>c$', '<p>$a&lt;b \\&amp; b&gt;c$</p>'),
+    ('$<a_{b}>$', '<p>$&lt;a_{b}&gt;$</p>'),
     ('Escaping works just fine! $ *a* $', '<p>Escaping works just fine! $ *a* $</p>'),
     ('![Just a cat](http://myserver.example.com/cat.png)', '<p><img alt="Just a cat" '
      'src="http://myserver.example.com/cat.png"></p>'),
