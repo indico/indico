@@ -462,7 +462,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
         )
 
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
-        template_path = 'events/registration/management/participant_list_pdf.html'
+        template_path = 'events/registration/pdf/participants_table.html'
         html_source = render_template(
             template_path, event=self.event, headers=headers, rows=rows, generation_date=generation_date
         )

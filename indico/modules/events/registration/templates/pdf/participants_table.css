@@ -1,0 +1,95 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2025 CERN
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see the
+ * LICENSE file for more details.
+ */
+
+@page {
+  size: A4 landscape;
+  margin: 0.75in 1in 1in 1in;
+}
+
+body {
+  font-family: 'Times', serif;
+  font-size: 8pt;
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 0.5cm;
+  padding-bottom: 0.2cm;
+  position: relative;
+}
+
+.header h1 {
+  font-size: 30pt;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+}
+
+.header .date {
+  font-size: 10pt;
+  text-align: right;
+  margin-top: 0.3cm;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.sub-title {
+  text-align: center;
+  font-size: 12pt;
+  font-weight: bold;
+  font-family: 'Sans', sans-serif;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  table-layout: fixed;
+}
+
+th {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 8px 4px;
+  border-bottom: 1px solid black;
+  font-size: 8pt;
+  overflow-wrap: break-word;
+}
+
+td {
+  overflow-wrap: break-word;
+  text-align: left;
+  vertical-align: middle;
+  padding: 4px 4px;
+  border: none;
+  font-size: 8pt;
+  line-height: 1.2;
+}
+
+tbody tr {
+  border-bottom: 0.5px solid #ddd;
+}
+
+tr {
+  height: 20px;
+}
+
+.no-participants {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
+}

@@ -27,7 +27,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import IndicoSchema
-from indico.legacy.pdfinterface.base import escape
 from indico.modules.core.captcha import CaptchaField
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
@@ -1173,12 +1172,12 @@ class CustomTicketCode:
 
 def prepare_participant_list_data(reglist, display, static_items):
     column_names = {
-        'reg_date': 'Registration Date',
-        'state': 'Registration State',
-        'price': 'Price',
-        'checked_in': 'Checked in',
-        'checked_in_date': 'Check-in Date',
-        'tags_present': 'Tags',
+        'reg_date': _('Registration Date'),
+        'state': _('Registration State'),
+        'price': _('Price'),
+        'checked_in': _('Checked in'),
+        'checked_in_date': _('Check-in Date'),
+        'tags_present': _('Tags'),
     }
 
     headers = ['ID', 'Name']
@@ -1209,20 +1208,20 @@ def prepare_participant_list_data(reglist, display, static_items):
 
             if item.input_type == 'accommodation':
                 if friendly_data:
-                    row.append(escape(friendly_data.get('choice', '')))
+                    row.append(friendly_data.get('choice', ''))
                     row.append(format_date(friendly_data.get('arrival_date', '')))
                     row.append(format_date(friendly_data('departure_date', '')))
                 else:
                     row.extend(['', '', ''])
             elif item.input_type == 'multi_choice':
                 multi_choice_data = ', '.join(friendly_data) if friendly_data else ''
-                row.append(escape(multi_choice_data))
+                row.append(multi_choice_data)
             elif item.input_type == 'sessions':
                 sessions_data = '; '.join(friendly_data) if friendly_data else ''
-                row.append(escape(sessions_data))
+                row.append(sessions_data)
             else:
                 cell_data = str(friendly_data) if friendly_data is not None else ''
-                row.append(escape(cell_data))
+                row.append(cell_data)
 
         for item_id in static_items:
             cell_data = ''
@@ -1240,7 +1239,6 @@ def prepare_participant_list_data(reglist, display, static_items):
             elif item_id == 'tags_present':
                 if registration.tags:
                     cell_data = ', '.join(sorted(t.title for t in registration.tags))
-                    cell_data = escape(cell_data)
             row.append(cell_data or '')
 
         rows.append(row)
