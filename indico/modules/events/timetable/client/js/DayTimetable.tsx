@@ -38,23 +38,33 @@ interface DayTimetableProps {
   entries: TopLevelEntry[];
 }
 
-function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
+function TopLevelEntries({
+  dt,
+  entries,
+  eventId,
+}: {
+  dt: Moment;
+  entries: TopLevelEntry[];
+  eventId: number;
+}) {
   const dispatch = useDispatch();
 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+        dispatch(actions.resizeEntry(e, eventId, duration, dt.format('YYYYMMDD')));
     }
     return obj;
-  }, [entries, dispatch, dt]);
+  }, [entries, dispatch, dt, eventId]);
 
   const setChildDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (id: string) => (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), id, duration, e.id));
+      obj[e.id] = (childId: string) => (duration: number) => {
+        const child = e.children.find(c => c.id === childId);
+        dispatch(actions.resizeEntry(child, eventId, duration, dt.format('YYYYMMDD')));
+      };
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -65,7 +75,6 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
         entry.type === EntryType.SessionBlock ? (
           <DraggableBlockEntry
             key={entry.id}
-            // setDuration={setDuration}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
@@ -300,7 +309,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
           <DnDCalendar>
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
-              <MemoizedTopLevelEntries dt={dt} entries={entries} />
+              <MemoizedTopLevelEntries dt={dt} entries={entries} eventId={eventId} />
               {draftEntry && (
                 <DraggableEntry
                   id="draft"
