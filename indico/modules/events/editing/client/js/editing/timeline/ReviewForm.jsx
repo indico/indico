@@ -110,6 +110,7 @@ export default function ReviewForm() {
             onCommentChange={setCommentValue}
             syncComment={syncComment}
             setSyncComment={setSyncComment}
+            disabled={isOutdated}
           />
           {canPerformSubmitterActions && canReview && !editor && (
             <>
