@@ -178,14 +178,11 @@ export function resizeEntry(entry, eventId, duration, date) {
   let entryURL: string;
 
   switch (entry.type) {
-    case 'break':
+    case EntryType.Break:
       entryURL = breakURL({event_id: eventId, break_id: entry.objId});
       break;
-    case 'block':
+    case EntryType.SessionBlock:
       entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-      break;
-    case 'contrib':
-      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
       break;
     default:
       entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
@@ -193,13 +190,17 @@ export function resizeEntry(entry, eventId, duration, date) {
 
   const entryData = {duration: duration * 60};
 
-  return ajaxAction(() => indicoAxios.patch(entryURL, snakifyKeys(entryData)), null, () => ({
-    type: RESIZE_ENTRY,
-    date,
-    id: entry.id,
-    duration,
-    parentId: entry.parentId ?? entry,
-  }));
+  return synchronizedAjaxAction(
+    () => indicoAxios.patch(entryURL, entryData),
+    () => ({
+      type: RESIZE_ENTRY,
+      date,
+      id: entry.id,
+      duration,
+      parentId: entry.sessionBlockId ?? entry,
+      entryData,
+    })
+  );
 }
 
 export function selectEntry(id: string): SelectEntryAction {

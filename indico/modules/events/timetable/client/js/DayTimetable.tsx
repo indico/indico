@@ -58,12 +58,13 @@ function TopLevelEntries({
     return obj;
   }, [entries, dispatch, dt, eventId]);
 
-  const setChildDurations = useMemo(() => {
+   const setChildDurations = useMemo(() => {
     const obj = {};
-
     for (const e of entries) {
-      obj[e.id] = (objId = e.objId) => (duration: number) =>
-        dispatch(actions.resizeEntry(objId, eventId, duration, dt.format('YYYYMMDD')));
+      obj[e.id] = (childId: string) => (duration: number) => {
+        const child = e.children.find(c => c.id === childId);
+        dispatch(actions.resizeEntry(child, eventId, duration, dt.format('YYYYMMDD')));
+      };
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -74,7 +75,6 @@ function TopLevelEntries({
         entry.type === EntryType.SessionBlock ? (
           <DraggableBlockEntry
             key={entry.id}
-            // setDuration={setDuration}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
