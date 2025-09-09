@@ -88,6 +88,7 @@ export default function ReviewForm() {
     if (rv.error) {
       return rv.error;
     }
+    localStorage.removeItem('editingCommentDraft');
     setTimeout(() => form.reset(), 0);
   };
 
@@ -103,10 +104,16 @@ export default function ReviewForm() {
     );
 
   useEffect(() => {
-    if (isOutdated) {
-      setSyncComment(true);
+    const savedComment = localStorage.getItem('editingCommentDraft');
+    if (savedComment !== null) {
+      setCommentValue(savedComment);
     }
-  }, [isOutdated]);
+  }, []);
+
+  useEffect(() => {
+    setSyncComment(true);
+    localStorage.setItem('editingCommentDraft', commentValue);
+  }, [isOutdated, commentValue]);
 
   const judgmentForm = (
     <Popup
