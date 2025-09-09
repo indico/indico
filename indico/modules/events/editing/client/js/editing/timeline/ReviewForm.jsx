@@ -60,6 +60,8 @@ const judgmentOptions = [
   },
 ];
 
+let savedComment = null;
+
 export default function ReviewForm() {
   const dispatch = useDispatch();
   const lastRevision = useSelector(selectors.getLastRevision);
@@ -102,15 +104,18 @@ export default function ReviewForm() {
     );
 
   useEffect(() => {
-    const savedComment = localStorage.getItem('editingCommentDraft');
     if (savedComment !== null) {
       setCommentValue(savedComment);
     }
   }, []);
 
   useEffect(() => {
-    setSyncComment(true);
-    localStorage.setItem('editingCommentDraft', commentValue);
+    if (isOutdated) {
+      savedComment = commentValue;
+    }
+    if (savedComment !== null && savedComment === commentValue) {
+      setSyncComment(true);
+    }
   }, [isOutdated, commentValue]);
 
   const judgmentForm = (
