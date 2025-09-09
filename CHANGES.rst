@@ -40,6 +40,8 @@ Bugfixes
   (:issue:`7016`, :pr:`7017`, thanks :user:`behackl`)
 - Fix author contribution list not showing any other contributions (:issue:`7025`,
   :pr:`7049`, thanks :user:`diksharai9`)
+- Fix some LaTeX strings being rendered incorrectly and/or breaking the timetable
+  PDF generation (:pr:`7068`)
 
 Accessibility
 ^^^^^^^^^^^^^
