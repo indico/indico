@@ -67,16 +67,14 @@ export const getCurrentLimits = createSelector(
   getEventStartDt,
   getEventEndDt,
   (currentDate: Moment, startDt: Moment, endDt: Moment): [number, number] => {
-    const limits: [number, number] = [
-      minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes()),
-      minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes()),
-    ];
+    const limits: [number, number] = [0, DAY_SIZE]
 
     if (startDt.isSame(currentDate, 'day')) {
-      limits[0] = 0;
+      limits[0] = minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes());
     }
+
     if (endDt.isSame(currentDate, 'day')) {
-      limits[1] = DAY_SIZE;
+      limits[1] = minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes());
     }
 
     return limits;

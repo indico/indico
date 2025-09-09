@@ -13,7 +13,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getDateKey, HOUR_SIZE, minutesToPixels} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
@@ -36,21 +36,21 @@ export default function Timetable() {
   const minHour = 0;
   const maxHour = 23;
 
-  const getScrollMoment = () => {
+  const _getScrollMoment = () => {
     const scrollMoment = !currentDateEntries.length
-      ? moment.max(currentDate, eventStartDt)
+      ? moment.max(currentDate.hours(minScrollHour), eventStartDt)
       : moment.min(currentDateEntries.map(e => e.startDt));
 
     return moment(scrollMoment);
   };
 
-  const getScrollOffset = () => {
-    const scrollMoment = getScrollMoment();
+  const _getScrollOffset = () => {
+    const scrollMoment = _getScrollMoment();
     const scrollMinutes = scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes');
     return minutesToPixels(scrollMinutes);
   };
 
-  const initialScrollPosition = Math.max(getScrollOffset(), HOUR_SIZE * minScrollHour);
+  const initialScrollPosition = _getScrollOffset();
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
