@@ -107,6 +107,7 @@ export function DayTimetable({
   const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const limits = useSelector(selectors.getCurrentLimits);
+  const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
   const [isDragging, setIsDragging] = useState(false);
@@ -327,10 +328,10 @@ export function DayTimetable({
   }, [wrapperRef]);
 
   const restrictToCalendar = useMemo(() => {
-    const limitsDelta: [number, number] = [limits[0], DAY_SIZE - limits[1]];
+    const limitsDelta: [number, number] = [limitTop, DAY_SIZE - limitBottom];
     limitsDelta[1] += TABLE_MARGIN_TOP;
     return createRestrictToCalendar(calendarRef, limitsDelta);
-  }, [limits]);
+  }, [limitTop, limitBottom]);
 
   const limitsGradientArg = [
     'rgba(0, 0, 0, 0.05) 0',
