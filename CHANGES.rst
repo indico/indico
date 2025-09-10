@@ -25,6 +25,7 @@ Improvements
   (:issue:`6803`, :pr:`6972`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add plugin support for scanning custom QR codes in the Check-in app (:pr:`6954`,
   thanks :user:`SegiNyn`)
+- Add new tags column to the Editable list (:issue:`6614`, :pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
