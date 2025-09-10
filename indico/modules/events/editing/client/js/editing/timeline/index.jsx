@@ -19,7 +19,7 @@ import * as selectors from './selectors';
 import SubmitRevision from './SubmitRevision';
 import TimelineItem from './TimelineItem';
 
-import './editingTimeline.scss';
+import './editingTimeline.module.scss';
 
 const POLLING_SECONDS = 10;
 
@@ -63,7 +63,7 @@ export default function Timeline() {
   return (
     <>
       {isOutdated && (
-        <div className="sticky-message">
+        <div styleName="sticky-message">
           <Message
             warning
             header={Translate.string('This timeline has been updated')}
