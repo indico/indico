@@ -324,7 +324,7 @@ function EditableListDisplay({
 
   const tagsExist = sortedList.some(x => x.editable?.tags?.length > 0);
   if (tagsExist) {
-    columnHeaders.push(['tags', Translate.string('Tags'), 135]);
+    columnHeaders.push(['tags', Translate.string('Tags'), 135, {disableSort: true}]);
   }
 
   const programCodeKey = contribution => contribution.code;
