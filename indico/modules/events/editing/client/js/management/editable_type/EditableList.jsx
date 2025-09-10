@@ -459,7 +459,7 @@ function EditableListDisplay({
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
     const labelTags = (
-      <div style={{display: 'flex', flexWrap: 'nowrap'}}>
+      <div className="editable-list-tag-labels">
         {tags.map(t => (
           <Label key={t.code} size="small" color={t.color}>
             {t.code}
@@ -512,14 +512,14 @@ function EditableListDisplay({
       }
       return (
         <Popup
-          position="top center"
+          position="left center"
           on="hover"
           content={labels}
           trigger={
             <div styleName="rowcolumn-tooltip" role="gridcell">
               {colors}
               {row.editable.tags.length > 5 ? (
-                <div className="more-tags-indicator">
+                <div styleName="more-tags-indicator">
                   <Icon name="plus circle" color="grey" />
                 </div>
               ) : null}

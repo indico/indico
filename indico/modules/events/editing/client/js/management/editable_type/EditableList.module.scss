@@ -100,7 +100,7 @@ $border: 1px solid $pastel-gray;
     fill: currentColor;
   }
 
-  :global(.more-tags-indicator) {
+  .more-tags-indicator {
     position: absolute;
     right: 0;
     top: 48%;
@@ -111,4 +111,12 @@ $border: 1px solid $pastel-gray;
     padding-bottom: 0.9em;
     cursor: pointer;
   }
+}
+
+:global(.editable-list-tag-labels) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  row-gap: 0.5em;
 }
