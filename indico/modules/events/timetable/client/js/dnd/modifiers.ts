@@ -46,9 +46,9 @@ export const createRestrictToElement =
       return transform;
     }
 
-    let rect = containerRef.current.getBoundingClientRect();
+    const boundingRect = containerRef.current.getBoundingClientRect();
     const scroll = getTotalScroll(containerRef.current);
-    rect = {
+    const rect = {
       // top: rect.top,
       // left: rect.left,
       // bottom: rect.bottom,
@@ -57,12 +57,12 @@ export const createRestrictToElement =
       // left: rect.left + scrollParent.scrollLeft,
       // bottom: rect.bottom + scrollParent.scrollTop,
       // right: rect.right + scrollParent.scrollLeft,
-      top: rect.top + scroll.top,
-      left: rect.left + scroll.left,
-      bottom: rect.bottom + scroll.top,
-      right: rect.right + scroll.left,
-      width: rect.width,
-      height: rect.height,
+      top: boundingRect.top + scroll.top,
+      left: boundingRect.left + scroll.left,
+      bottom: boundingRect.bottom + scroll.top,
+      right: boundingRect.right + scroll.left,
+      width: boundingRect.width,
+      height: boundingRect.height,
     };
     return restrictToBoundingRect(transform, draggingNodeRect, rect);
   };
@@ -99,16 +99,29 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
 
 /**
  * Restrict the dragged node to be contained within the calendar if it's
- * already scheduled.
+ * already scheduled. By default this takes into account the entire area of
+ * the calendar, but can be limited to a specific region.
  * @param containerRef React ref to the container element
+ * @param limits Pixel limits on both sides of the y-axis
  * @returns A new Transform object
  */
 export const createRestrictToCalendar =
-  (containerRef): Modifier =>
-  ({draggingNodeRect, transform, id}) => {
-    if (id.startsWith('unscheduled-')) {
-      // return createRestrictToElement(unscheduledRef)({draggingNodeRect, transform, id});
+  (containerRef, limits: [number, number] = [0, 0]): Modifier =>
+  ({id, draggingNodeRect, transform}) => {
+    if (id.startsWith('unscheduled')) {
       return transform;
     }
-    return createRestrictToElement(containerRef)({draggingNodeRect, transform, id});
+
+    const boundingRect = containerRef.current.getBoundingClientRect();
+    const scroll = getTotalScroll(containerRef.current);
+    const rect = {
+      top: boundingRect.top + scroll.top + limits[0],
+      left: boundingRect.left + scroll.left,
+      bottom: boundingRect.bottom + scroll.top - limits[1],
+      right: boundingRect.right + scroll.left,
+      width: boundingRect.width,
+      height: boundingRect.height - limits[0] - limits[1],
+    };
+
+    return restrictToBoundingRect(transform, draggingNodeRect, rect);
   };
