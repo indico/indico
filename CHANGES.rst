@@ -25,6 +25,7 @@ Improvements
   (:issue:`6803`, :pr:`6972`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add plugin support for scanning custom QR codes in the Check-in app (:pr:`6954`,
   thanks :user:`SegiNyn`)
+- Add new tags column to the Editable list (:issue:`6614`, :pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
@@ -250,8 +251,6 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Add a log for user actions, similar to that in events and categories (:pr:`6779`, :pr:`6813`,
   thanks :user:`tomako`)
-- Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732`)
-- Add a new column in the editable list for the contribution tags (:pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
