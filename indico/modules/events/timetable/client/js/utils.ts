@@ -16,7 +16,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, Session, TopLevelEntry} from './types';
+import {BlockEntry, Colors, Entry, EntryType, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
