@@ -418,9 +418,11 @@ export default function SingleChoiceInput({
       return;
     }
   }
+  const fieldKey = choices.map(c => c.id).join(',');
 
   return (
     <FinalField
+      key={fieldKey}
       id={htmlId}
       name={htmlName}
       component={SingleChoiceInputComponent}
