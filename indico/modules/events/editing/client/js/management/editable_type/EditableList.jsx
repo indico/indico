@@ -513,25 +513,24 @@ function EditableListDisplay({
       );
     } else if (row.editable?.tags) {
       const [labels, colors] = fn(row[dataKey], row.editable, rowIndex);
+      if (row.editable.tags.length === 1) {
+        return labels;
+      }
       return (
         <Popup
           position="top center"
+          on="hover"
           content={labels}
           trigger={
-            row.editable.tags.length > 1 ? (
-              <div styleName="rowcolumn-tooltip" role="gridcell">
-                {colors}
-                {row.editable.tags.length > 5 ? (
-                  <div className="more-tags-indicator">
-                    <Icon name="plus circle" color="grey" />
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <div>{labels}</div>
-            )
+            <div styleName="rowcolumn-tooltip" role="gridcell">
+              {colors}
+              {row.editable.tags.length > 5 ? (
+                <div className="more-tags-indicator">
+                  <Icon name="plus circle" color="grey" />
+                </div>
+              ) : null}
+            </div>
           }
-          on="hover"
         />
       );
     }
