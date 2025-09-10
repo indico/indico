@@ -88,21 +88,16 @@ export interface ScheduledMixin {
   maxColumn: number | null;
 }
 
-export interface UnscheduledContrib extends BaseEntry {
+export interface ContribEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Contribution;
-  attachments: Attachment[];
+  attachments?: Attachment[];
+  personLinks?: PersonLink[];
   sessionId?: number;
-}
-
-export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
-  type: EntryType.Contribution;
-  personLinks: PersonLink[];
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  backgroundColor: string;
 }
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
@@ -118,12 +113,12 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
 }
 
 export interface ChildBaseEntry {
-  sessionBlockId: string;
+  sessionBlockId?: string;
   parent?: Partial<BlockEntry>;
 }
 
-export type ChildContribEntry = ContribEntry | ChildBaseEntry;
-export type ChildBreakEntry = BreakEntry | ChildBaseEntry;
+export type ChildContribEntry = ContribEntry & ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
