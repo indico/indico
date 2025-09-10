@@ -8,7 +8,7 @@
 import submitRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
 import _ from 'lodash';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Field, Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Form, Popup} from 'semantic-ui-react';
@@ -22,7 +22,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import {EditingReviewAction} from '../../models';
 
-import {createRevisionComment, reviewEditable} from './actions';
+import {createRevisionComment, reviewEditable, setDraftComment} from './actions';
 import CommentForm from './CommentForm';
 import {getFilesFromRevision} from './FileManager/util';
 import JudgmentBoxHeader from './judgment/JudgmentBoxHeader';
@@ -60,8 +60,6 @@ const judgmentOptions = [
   },
 ];
 
-let savedComment = null;
-
 export default function ReviewForm() {
   const dispatch = useDispatch();
   const lastRevision = useSelector(selectors.getLastRevision);
@@ -72,6 +70,7 @@ export default function ReviewForm() {
   const {eventId, editableType, fileTypes} = useSelector(selectors.getStaticData);
   const tagOptions = useSelector(selectors.getNonSystemTags);
   const isOutdated = useSelector(selectors.isTimelineOutdated);
+  const draftComment = useSelector(selectors.getDraftComment);
   const currentUser = {
     fullName: Indico.User.fullName,
     avatarURL: Indico.User.avatarURL,
@@ -79,17 +78,23 @@ export default function ReviewForm() {
 
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [commentValue, setCommentValue] = useState('');
   const [syncComment, setSyncComment] = useState(false);
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
+
+  const onCommentChange = value => {
+    dispatch(setDraftComment(value));
+  };
 
   const createComment = async (formData, form) => {
     const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
     if (rv.error) {
       return rv.error;
     }
-    localStorage.removeItem('editingCommentDraft');
-    setTimeout(() => form.reset(), 0);
+    onCommentChange('');
+    setTimeout(() => {
+      form.reset();
+      setSyncComment(true);
+    }, 0);
   };
 
   const handleSubmission = (type, formData) =>
@@ -103,82 +108,59 @@ export default function ReviewForm() {
       formData
     );
 
-  useEffect(() => {
-    if (savedComment !== null) {
-      setCommentValue(savedComment);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOutdated) {
-      savedComment = commentValue;
-    }
-    if (savedComment !== null && savedComment === commentValue) {
-      setSyncComment(true);
-    }
-  }, [isOutdated, commentValue]);
-
   const judgmentForm = (
-    <Popup
-      trigger={
-        <div className="flexrow f-a-center" styleName="judgment-form">
-          <CommentForm
-            onSubmit={createComment}
-            commentValue={commentValue}
-            onCommentChange={setCommentValue}
-            syncComment={syncComment}
-            setSyncComment={setSyncComment}
-            disabled={isOutdated}
-            expanded={isOutdated}
+    <div className="flexrow f-a-center" styleName="judgment-form">
+      <CommentForm
+        onSubmit={createComment}
+        syncComment={syncComment}
+        setSyncComment={setSyncComment}
+        disabled={isOutdated}
+        expanded={isOutdated}
+      />
+      {canPerformSubmitterActions && canReview && !editor && (
+        <>
+          <span className="comment-or-review">
+            <Translate>or</Translate>
+          </span>
+          <EditableSubmissionButton
+            eventId={eventId}
+            contributionId={contribution.id}
+            contributionCode={contribution.code}
+            fileTypes={{[editableType]: fileTypes}}
+            uploadableFiles={lastRevisionWithFiles.files}
+            text={Translate.string('Submit files')}
+            onSubmit={handleSubmission}
           />
-          {canPerformSubmitterActions && canReview && !editor && (
-            <>
-              <span className="comment-or-review">
-                <Translate>or</Translate>
-              </span>
-              <EditableSubmissionButton
-                eventId={eventId}
-                contributionId={contribution.id}
-                contributionCode={contribution.code}
-                fileTypes={{[editableType]: fileTypes}}
-                uploadableFiles={lastRevisionWithFiles.files}
-                text={Translate.string('Submit files')}
-                onSubmit={handleSubmission}
-              />
-            </>
-          )}
-          {canJudge && (
-            <div className="flexcol align-strech">
-              <div className="review-trigger flexrow">
-                <span className="comment-or-review">
-                  <Translate>or</Translate>
-                </span>
-                <Dropdown
-                  className="judgment-btn"
-                  text={Translate.string('Judge', 'Judge editable (verb)')}
-                  direction="left"
-                  disabled={isOutdated}
-                  button
-                  floating
-                >
-                  <Dropdown.Menu>
-                    <JudgmentDropdownItems
-                      options={judgmentOptions}
-                      setJudgmentType={type => {
-                        setSyncComment(true);
-                        setJudgmentType(type);
-                      }}
-                    />
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            </div>
-          )}
+        </>
+      )}
+      {canJudge && (
+        <div className="flexcol align-strech">
+          <div className="review-trigger flexrow">
+            <span className="comment-or-review">
+              <Translate>or</Translate>
+            </span>
+            <Dropdown
+              className="judgment-btn"
+              text={Translate.string('Judge', 'Judge editable (verb)')}
+              direction="left"
+              disabled={isOutdated}
+              button
+              floating
+            >
+              <Dropdown.Menu>
+                <JudgmentDropdownItems
+                  options={judgmentOptions}
+                  setJudgmentType={type => {
+                    setSyncComment(true);
+                    setJudgmentType(type);
+                  }}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
-      }
-      content={Translate.string('This timeline is outdated. Please refresh the page.')}
-      disabled={!isOutdated}
-    />
+      )}
+    </div>
   );
 
   const handleReview = async formData => {
@@ -237,14 +219,14 @@ export default function ReviewForm() {
                     hideValidationError
                     autoFocus
                     required={judgmentType !== EditingReviewAction.accept}
-                    onChange={setCommentValue}
+                    onChange={onCommentChange}
                     /* otherwise changing required doesn't work properly if the field has been touched */
                     key={judgmentType}
                   />
                   {syncComment && (
                     <DirtyInitialValue
                       field="comment"
-                      value={commentValue}
+                      value={draftComment}
                       onUpdate={() => setSyncComment(false)}
                     />
                   )}

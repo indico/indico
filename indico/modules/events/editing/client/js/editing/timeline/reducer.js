@@ -7,7 +7,7 @@
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {SET_LOADING, SET_DETAILS, SET_NEW_DETAILS} from './actions';
+import {SET_LOADING, SET_DETAILS, SET_NEW_DETAILS, SET_DRAFT_COMMENT} from './actions';
 import {processRevisions} from './util';
 
 export const initialState = {
@@ -15,6 +15,7 @@ export const initialState = {
   newDetails: null,
   timelineBlocks: null,
   loading: false,
+  draftComment: '',
 };
 
 export default function reducer(state = initialState, action) {
@@ -34,6 +35,9 @@ export default function reducer(state = initialState, action) {
     case SET_NEW_DETAILS: {
       const newDetails = camelizeKeys(action.data);
       return {...state, newDetails};
+    }
+    case SET_DRAFT_COMMENT: {
+      return {...state, draftComment: action.comment};
     }
     default:
       return state;

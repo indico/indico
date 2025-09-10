@@ -12,6 +12,7 @@ import {EditableState, RevisionType} from '../../models';
 
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
+export const getDraftComment = state => state.timeline.draftComment;
 export const isInitialEditableDetailsLoading = state =>
   state.timeline.loading && !state.timeline.details;
 export const isTimelineOutdated = createSelector(
