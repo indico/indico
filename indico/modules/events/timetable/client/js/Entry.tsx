@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, SemanticICONS} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {useDraggable, useDroppable} from './dnd';
@@ -19,26 +19,26 @@ import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
 import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
+import {
+  minutesToPixels,
+  pixelsToMinutes,
+  snapPixels,
+  snapMinutes,
+  formatBlockTitle,
+  getIconByEntryType,
+} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
 
 interface DraggableEntryProps {
-  id: number;
+  id: string;
   [key: string]: any;
 }
 
 export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {
-    listeners: _listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: `${id}`,
-  });
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -88,19 +88,16 @@ export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
     />
   );
 
-  if (isSelected && !isDragging) {
-    return (
-      <EntryPopup
-        trigger={entry}
-        onClose={() => {
-          dispatch(actions.deselectEntry());
-        }}
-        entry={{id, ...rest}}
-      />
-    );
-  }
-
-  return entry;
+  return (
+    <EntryPopup
+      trigger={entry}
+      open={isSelected}
+      onClose={() => {
+        dispatch(actions.deselectEntry());
+      }}
+      entry={{id, ...rest}}
+    />
+  );
 }
 
 export function DraggableBlockEntry({id, ...rest}: DraggableEntryProps) {
@@ -115,6 +112,7 @@ interface _DraggableEntryProps {
 
 type DraggableContribEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -123,7 +121,6 @@ export default function ContributionEntry({
   title,
   blockRef,
   sessionTitle,
-  colors,
   selected,
   y,
   listeners,
@@ -135,7 +132,9 @@ export default function ContributionEntry({
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setChildDuration = () => {},
@@ -145,10 +144,8 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
@@ -302,11 +299,7 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-  const iconName = {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
-  }[type] as SemanticICONS;
+  const iconName = getIconByEntryType(type);
 
   const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 

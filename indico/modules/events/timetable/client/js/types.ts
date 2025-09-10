@@ -40,13 +40,14 @@ export interface LocationData {
   address: string;
   venueName: string;
   room: string;
-  roomName: string;
   inheriting?: boolean;
 }
 
-export interface Attachments {
-  files: object[];
-  folders: object[];
+export interface Attachment {
+  type: 'attachment' | 'folder';
+  downloadURL: string;
+  id: number;
+  title: string;
 }
 
 export interface Session {
@@ -54,7 +55,6 @@ export interface Session {
   title: string;
   isPoster: boolean;
   colors: Colors;
-  backgroundColor: string;
 }
 
 export interface BaseEntry {
@@ -77,41 +77,37 @@ export interface ScheduledMixin {
   maxColumn: number;
 }
 
-export interface UnscheduledContrib extends BaseEntry {
+export interface ContribEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Contribution;
-  attachments: Attachments;
+  attachments?: Attachment[];
+  personLinks?: PersonLink[];
   sessionId?: number;
-}
-
-export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
-  type: EntryType.Contribution;
-  personLinks: PersonLink[];
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  backgroundColor: string;
 }
-
-export interface ChildContribEntry extends ContribEntry {
-  sessionBlockId: number;
-}
-
-export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: number;
-}
-
-export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.SessionBlock;
   sessionId: number;
   sessionTitle: string;
+  // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
   personLinks: PersonLink[];
-  attachments: Attachments;
+  attachments: Attachment[];
+  colors?: Colors;
 }
+
+export interface ChildBaseEntry {
+  sessionBlockId?: number;
+  parent?: Partial<BlockEntry>;
+}
+
+export type ChildContribEntry = ContribEntry & ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
+export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;

@@ -12,14 +12,14 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {
-  Attachments,
+  Attachment,
   ChildEntry,
   Colors,
+  ContribEntry,
   DayEntries,
   EntryType,
   PersonLink,
   Session,
-  UnscheduledContrib,
 } from './types';
 import {getDefaultColorByType} from './utils';
 
@@ -48,7 +48,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
-  attachments?: Attachments;
+  attachments?: Attachment[];
   address?: string;
   venueName?: string;
   room?: string;
@@ -88,7 +88,7 @@ export function preprocessTimetableEntries(
       sessionId: number;
     }[];
   }
-): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
+): {dayEntries: DayEntries; unscheduled: ContribEntry[]} {
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];
@@ -130,12 +130,13 @@ export function preprocessTimetableEntries(
         personLinks,
         boardNumber,
         code,
+        attachments,
         locationData: {
           address,
           room,
           venueName,
         },
-        attachments,
+        colors,
       });
 
       if (entry.sessionId) {
