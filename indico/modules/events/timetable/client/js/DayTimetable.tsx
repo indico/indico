@@ -319,6 +319,9 @@ export function DayTimetable({
 
   useEffect(() => {
     if (wrapperRef.current) {
+      // We use a ref instead of scrollPosition directly to prevent jumping
+      // to the calculated position every single time DayTimetable renders,
+      // which mainly happens when changing days.
       wrapperRef.current.scrollTop = scrollPositionRef.current;
     }
   }, [wrapperRef]);
