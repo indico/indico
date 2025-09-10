@@ -22,7 +22,8 @@ from indico.util.marshmallow import EventTimezoneDateTimeField
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id',
+                  'session_title')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
@@ -31,6 +32,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
         _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
     ), attribute='person_links')
     duration = fields.TimeDelta(required=True)
+    session_title = fields.String(attribute='session.title', dump_only=True)
 
 
 def _get_break_session_id(entry):
