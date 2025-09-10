@@ -458,31 +458,25 @@ function EditableListDisplay({
   };
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
-    const labelTags = () => {
-      return (
-        <div style={{display: 'flex', flexWrap: 'nowrap'}}>
-          {tags.map(t => {
-            return (
-              <Label key={t.code} size="small" color={t.color}>
-                {t.code}
-              </Label>
-            );
-          })}
-        </div>
-      );
-    };
+    const labelTags = (
+      <div style={{display: 'flex', flexWrap: 'nowrap'}}>
+        {tags.map(t => (
+          <Label key={t.code} size="small" color={t.color}>
+            {t.code}
+          </Label>
+        ))}
+      </div>
+    );
 
-    const colorTags = () => {
-      return (
-        <div>
-          {tags.map(t => {
-            return <Label key={t.code} circular empty color={t.color} />;
-          })}
-        </div>
-      );
-    };
+    const colorTags = (
+      <div>
+        {tags.map(t => (
+          <Label key={t.code} circular empty color={t.color} />
+        ))}
+      </div>
+    );
 
-    return [labelTags(), colorTags()];
+    return [labelTags, colorTags];
   };
   const renderFuncs = {
     friendlyId: renderId,
