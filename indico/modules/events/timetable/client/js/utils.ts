@@ -107,6 +107,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     keywords,
     sessionId,
     sessionBlockId,
+    sessionTitle,
   } = data;
 
   const mappedObj = {
@@ -134,6 +135,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     children: [],
     sessionId: sessionId || null,
     sessionBlockId: sessionBlockId || null,
+    sessionTitle: sessionTitle || '',
     colors: mapTTEntryColor(data, sessions),
   };
 
