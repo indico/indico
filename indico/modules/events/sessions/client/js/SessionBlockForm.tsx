@@ -52,7 +52,6 @@ export function SessionBlockFormFields({
         label={Translate.string('Title')}
         description={Translate.string('Title of the session block')}
         autoFocus
-        required
       />
       <FinalDateTimePicker
         name="start_dt"
