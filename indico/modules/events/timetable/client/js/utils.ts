@@ -16,7 +16,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Colors, Entry, EntryType, Session} from './types';
+import {BlockEntry, Colors, Entry, EntryType, Session, TopLevelEntry} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -85,6 +85,7 @@ export function getDefaultColorByType(type: EntryType): Colors {
 
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
+
   const fallbackColor = colors
     ? {color: colors.text, backgroundColor: colors.background}
     : getDefaultColorByType(dbEntry.type);
@@ -113,7 +114,11 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
   }
 };
 
-export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry => {
+export const mapTTDataToEntry = (
+  data,
+  sessions: Record<number, Session> = {},
+  parent?: Partial<BlockEntry>
+): Entry => {
   data = camelizeKeys(data);
   const {
     type,
@@ -164,10 +169,12 @@ export const mapTTDataToEntry = (data, sessions, parent?: Partial<Entry>): Entry
       sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
     }),
     ...(parent && {
-      id: parent.id,
-      objId: parent.objId,
-      colors: parent.colors,
-      title: parent.title,
+      parent: {
+        id: parent.id,
+        objId: parent.objId,
+        colors: parent.colors,
+        title: parent.title,
+      },
     }),
   };
 

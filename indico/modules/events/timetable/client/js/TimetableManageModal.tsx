@@ -131,7 +131,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
     code: entry.code,
-    colors: entry.colors,
+    ...(entry.colors && {
+      colors: {
+        text: entry.colors.color,
+        background: entry.colors.backgroundColor,
+      },
+    }),
   };
 
   const typeLongNames = {

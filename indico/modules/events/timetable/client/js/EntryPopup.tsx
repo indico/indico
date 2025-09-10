@@ -44,14 +44,23 @@ function ActionPopup({content, trigger, ...rest}: PopupProps) {
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
-  const {type, title, attachments, parent: entryParent, colors} = entry;
-  const session = useSelector((state: ReduxState) =>
-    selectors.getSessionById(state, entry.sessionId)
-  );
-
+  const {
+    id,
+    objId,
+    type,
+    title,
+    attachments,
+    parent: entryParent,
+    colors,
+    duration,
+    startDt,
+    sessionId,
+    children,
+  } = entry;
   const eventId = useSelector(selectors.getEventId);
-  const startTime = moment(entry.startDt);
-  const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+  const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const startTime = moment(startDt);
+  const endTime = moment(startDt).add(duration, 'minutes');
 
   const _getOrderedLocationArray = () => {
     const {locationData = {}} = entry;
@@ -65,7 +74,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   };
 
   const onEdit = async () => {
-    const {objId} = entry;
     if (!objId) {
       return;
     }
@@ -82,8 +90,8 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     const sessions = session ? {[session.id]: session} : {};
     const draftEntry = mapTTDataToEntry(data, sessions);
 
-    if (entry.type === EntryType.SessionBlock) {
-      draftEntry.children = entry.children;
+    if (type === EntryType.SessionBlock) {
+      (draftEntry as BlockEntry).children = children;
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
@@ -115,6 +123,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         sessionId: entry.sessionId,
         locationParent: entry.childLocationParent,
         locationData: {...entry.childLocationParent.location_data, inheriting: true},
+        parent: {id, objId, title, colors},
       })
     );
   };
@@ -247,7 +256,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
             />
             <ActionPopup
               content={<Translate>Add new child</Translate>}
-              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
+              trigger={<Button basic icon="plus" onClick={onCreateChild.bind(this)} />}
             />
           </>
         )}
@@ -258,13 +267,18 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         {type === EntryType.Contribution ? (
           <ActionPopup
             content={<Translate>Unschedule contribution</Translate>}
-            trigger={<Button basic icon="calendar times" onClick={onDelete} />}
+            trigger={<Button basic icon="calendar times" onClick={onDelete.bind(this)} />}
           />
         ) : (
           <ActionPopup
             content={Translate.string('Delete')}
             trigger={
-              <Button basic title={Translate.string('Delete')} icon="trash" onClick={onDelete} />
+              <Button
+                basic
+                title={Translate.string('Delete')}
+                icon="trash"
+                onClick={onDelete.bind(this)}
+              />
             }
           />
         )}
