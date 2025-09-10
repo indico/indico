@@ -51,7 +51,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
@@ -1168,3 +1168,51 @@ class CustomTicketCode:
     def lookup_registration(cls, data: str) -> Registration | None:
         """Lookup a registration based on custom ticket code data."""
         raise NotImplementedError
+
+
+def prepare_participant_list_data(reglist, display, static_items):
+    column_names = {
+        'reg_date': _('Registration Date'),
+        'state': _('Registration State'),
+        'price': _('Price'),
+        'checked_in': _('Checked in'),
+        'checked_in_date': _('Check-in Date'),
+        'tags_present': _('Tags'),
+    }
+
+    headers = ['ID', 'Name']
+    headers.extend(item.title for item in display)
+    headers.extend(column_names[item_id] for item_id in static_items if item_id in column_names)
+
+    rows = []
+    for registration in reglist:
+        row = [f'#{registration.friendly_id}', registration.display_full_name]
+        reg_data_by_field = registration.data_by_field
+        for item in display:
+            reg_data = reg_data_by_field.get(item.id)
+            cell_data = '-'
+            if reg_data:
+                cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
+            row.append(cell_data)
+
+        for item_id in static_items:
+            cell_data = '-'
+            if item_id == 'reg_date':
+                cell_data = format_datetime(registration.submitted_dt)
+            elif item_id == 'state':
+                cell_data = registration.state.title
+            elif item_id == 'price':
+                cell_data = registration.render_price()
+            elif item_id == 'checked_in':
+                cell_data = 'Yes' if registration.checked_in else 'No'
+            elif item_id == 'checked_in_date':
+                if registration.checked_in_dt:
+                    cell_data = format_datetime(registration.checked_in_dt)
+            elif item_id == 'tags_present':
+                if registration.tags:
+                    cell_data = ', '.join(sorted(t.title for t in registration.tags))
+            row.append(cell_data or '-')
+
+        rows.append(row)
+
+    return headers, rows
