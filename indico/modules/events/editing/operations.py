@@ -53,7 +53,7 @@ class InvalidEditableState(BadRequest):
     """
 
     def __init__(self):
-        super().__init__(_('The requested action is not possible on this revision'))
+        super().__init__(_('The timeline is outdated. Please refresh the page and try again.'))
 
 
 def ensure_latest_revision(revision):

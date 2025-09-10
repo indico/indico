@@ -8,14 +8,15 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {DirtyInitialValue} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
-import {getDetails} from './selectors';
+import {setDraftComment} from './actions';
+import {getDetails, getDraftComment} from './selectors';
 
 import './CommentForm.module.scss';
 
@@ -24,13 +25,14 @@ export default function CommentForm({
   onToggleExpand,
   initialValues,
   expanded,
-  commentValue,
-  onCommentChange,
   syncComment,
   setSyncComment,
+  disabled,
 }) {
+  const dispatch = useDispatch();
   const {canCreateInternalComments} = useSelector(getDetails);
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
+  const draftComment = useSelector(getDraftComment);
 
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible ? {autoFocus: true} : {};
@@ -39,6 +41,9 @@ export default function CommentForm({
       setCommentFormVisible(true);
       onToggleExpand(true);
     }
+  };
+  const onCommentChange = value => {
+    dispatch(setDraftComment(value));
   };
   const handleSubmit = async (formData, form) => {
     const rv = await onSubmit(formData, form);
@@ -70,7 +75,7 @@ export default function CommentForm({
             {syncComment && (
               <DirtyInitialValue
                 field="text"
-                value={commentValue}
+                value={draftComment}
                 onUpdate={() => setSyncComment(false)}
               />
             )}
@@ -88,6 +93,7 @@ export default function CommentForm({
                 <Form.Group styleName="submit-buttons" inline>
                   <FinalSubmitButton
                     label={Translate.string('Comment', 'Leave a comment (verb)')}
+                    disabled={disabled}
                   />
                   <Button
                     disabled={fprops.submitting}
@@ -117,10 +123,9 @@ CommentForm.propTypes = {
     internal: PropTypes.bool,
   }),
   expanded: PropTypes.bool,
-  onCommentChange: PropTypes.func,
-  commentValue: PropTypes.string,
   syncComment: PropTypes.bool,
   setSyncComment: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 CommentForm.defaultProps = {
@@ -130,8 +135,6 @@ CommentForm.defaultProps = {
   },
   expanded: false,
   onToggleExpand: () => {},
-  onCommentChange: () => {},
-  commentValue: '',
   syncComment: false,
   setSyncComment: () => {},
 };
