@@ -15,11 +15,11 @@ import {
   Attachment,
   ChildEntry,
   Colors,
+  ContribEntry,
   DayEntries,
   EntryType,
   PersonLink,
   Session,
-  UnscheduledContrib,
 } from './types';
 import {getDefaultColorByType} from './utils';
 
@@ -88,7 +88,7 @@ export function preprocessTimetableEntries(
       sessionId: number;
     }[];
   }
-): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
+): {dayEntries: DayEntries; unscheduled: ContribEntry[]} {
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];

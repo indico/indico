@@ -55,7 +55,6 @@ export interface Session {
   title: string;
   isPoster: boolean;
   colors: Colors;
-  backgroundColor: string;
 }
 
 export interface BaseEntry {
@@ -78,21 +77,16 @@ export interface ScheduledMixin {
   maxColumn: number;
 }
 
-export interface UnscheduledContrib extends BaseEntry {
+export interface ContribEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Contribution;
-  attachments: Attachment[];
+  attachments?: Attachment[];
+  personLinks?: PersonLink[];
   sessionId?: number;
-}
-
-export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
-  type: EntryType.Contribution;
-  personLinks: PersonLink[];
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  backgroundColor: string;
 }
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
@@ -104,16 +98,15 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   personLinks: PersonLink[];
   attachments: Attachment[];
   colors?: Colors;
-  locationData?: LocationData;
 }
 
 export interface ChildBaseEntry {
-  sessionBlockId: number;
+  sessionBlockId?: number;
   parent?: Partial<BlockEntry>;
 }
 
-export type ChildContribEntry = ContribEntry | ChildBaseEntry;
-export type ChildBreakEntry = BreakEntry | ChildBaseEntry;
+export type ChildContribEntry = ContribEntry & ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
