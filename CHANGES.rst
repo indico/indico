@@ -7,6 +7,14 @@ Version 3.3.8
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix a legacy API giving access to profile details of other users due to a broken
+  authorization check (:cve:`2025-59034`, thanks :user:`inkz`)
+- Fix an XSS vulnerability in the LaTeX math rendering code applied to contribution
+  descriptions (:cve:`2025-59035`)
+
 Improvements
 ^^^^^^^^^^^^
 
