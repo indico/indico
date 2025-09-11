@@ -9,10 +9,6 @@
 @use './boxes' as *;
 
 .i-dropdown {
-  @include border-all();
-  @include default-border-radius();
-  @include single-box-shadow();
-  background: $light-gray;
   margin-top: 0;
   padding: 0;
   position: absolute;
