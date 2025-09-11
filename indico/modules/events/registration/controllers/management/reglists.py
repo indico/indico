@@ -25,7 +25,6 @@ from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError
 from indico.core.notifications import make_email, send_email
-from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -466,7 +465,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style."""
 
     def _process(self):
-        headers, rows = prepare_participant_list_data(
+        primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],
             static_items=self.export_config['static_item_ids'],
@@ -475,7 +474,13 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
         template_path = 'events/registration/pdf/participants_table.html'
         html = render_template(
-            template_path, event=self.event, headers=headers, rows=rows, generation_date=generation_date
+            template_path,
+            event=self.event,
+            primary_headers=primary_headers,
+            dynamic_headers=dynamic_headers,
+            static_headers=static_headers,
+            rows=rows,
+            generation_date=generation_date
         )
         pdf = create_pdf(html, css, self.event)
         return send_file('RegistrantsList.pdf', pdf, 'application/pdf')
@@ -485,9 +490,25 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style."""
 
     def _process(self):
-        static_item_ids, item_ids, _extra_item_ids = self.list_generator.get_item_ids()
-        pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids)
-        return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
+            reglist=self.registrations,
+            display=self.export_config['regform_items'],
+            static_items=self.export_config['static_item_ids'],
+        )
+        css = render_template('events/registration/pdf/participants_book.css')
+        generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
+        template_path = 'events/registration/pdf/participants_book.html'
+        html = render_template(
+            template_path,
+            event=self.event,
+            primary_headers=primary_headers,
+            dynamic_headers=dynamic_headers,
+            static_headers=static_headers,
+            rows=rows,
+            generation_date=generation_date,
+        )
+        pdf = create_pdf(html, css, self.event)
+        return send_file('RegistrantsBook.pdf', pdf, 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
