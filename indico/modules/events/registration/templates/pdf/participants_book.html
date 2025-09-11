@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <section class="title-page">
+        <div>{{ event.title }}</div>
+        <h1>{%- trans %}Registrants Book{% endtrans -%}</h1>
+    </section>
+
+    <section class="toc-page">
+        <h2>{%- trans %}Table of Contents{% endtrans -%}</h2>
+        {% for row in rows %}
+            <div class="toc-entry">
+                <div class="toc-name">{{ row['Name'] }}</div>
+                <div class="toc-page-num">{{ loop.index }}</div>
+            </div>
+        {% endfor %}
+    </section>
+
+    {% for row in rows %}
+    <section class="later-pages">
+        <header>
+            <div class="header-title">{{ event.title }} / {%- trans %}Registrants Book{% endtrans -%}</div>
+            <div class="header-name">{{ row['Name'] }}</div>
+        </header>
+        <div class="participant-title">
+            <h1>{{ row['Name'] }}</h1>
+            <h1>{{ row['ID'] }}</h1>
+        </div>
+        <div class="sub-section">
+            <h2>{%- trans %}Registration Details{% endtrans -%}</h2>
+            {% set static_items_order = [
+            "Registration Date",
+            "Registration State",
+            "Price",
+            "Checked in",
+            "Check-in Date",
+            "Tags"
+            ] %}
+            <div class="registration-details">
+                {% for header in static_items_order if header in static_headers %}
+                    <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="sub-section">
+            <h2>{%- trans %}Personal Details{% endtrans -%}</h2>
+            <div class="personal-details">
+                {% for header in dynamic_headers %}
+                    <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <footer>
+            <div class="footer-generation-date">{{ generation_date }}</div>
+            <div class="footer-page-num">Page {{ loop.index }}</div>
+        </footer>
+    </section>
+    {% endfor %}
+</body>
+
+</html>

@@ -17,6 +17,7 @@
     <table>
         <thead>
             <tr>
+                {% set headers = primary_headers + dynamic_headers + static_headers%}
                 {% for header in headers %}
                     <th>{{ header }}</th>
                 {% endfor %}
@@ -25,15 +26,9 @@
         <tbody>
             {% for row in rows %}
             <tr>
-                {% for cell in row %}
-                    <td>{{ cell }}</td>
+                {% for header in headers %}
+                    <td>{{ row[header] }}</td>
                 {% endfor %}
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="{{ headers|length }}" class="no-participants">
-                    There are no participants to display.
-                </td>
             </tr>
             {% endfor %}
         </tbody>
