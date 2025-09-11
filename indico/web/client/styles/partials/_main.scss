@@ -25,54 +25,8 @@
   }
 
   > menu {
+    @extend %menu;
     @extend %flex-row;
-  }
-
-  ind-menu > button::after {
-    @extend %icon;
-    @extend %icon-arrow-down;
-    display: block; // XXX: Required for transform to work
-  }
-
-  ind-menu > button[aria-expanded='true']::after {
-    transform: rotateX(-180deg);
-  }
-
-  ind-menu > menu :is(li, a) {
-    width: 100%;
-  }
-
-  > menu li {
-    list-style: none;
-    padding: 0;
-  }
-
-  li :is(a, button) {
-    @extend %flex-row;
-    flex: none;
-
-    background: var(--surface-inverse-color);
-    color: var(--text-inverse-color);
-    padding: 0.7em 1em;
-    border: none;
-
-    &:first-child,
-    &.arrow:last-of-type {
-      border-radius: 0;
-    }
-
-    &:hover,
-    &.open {
-      background: var(--surface-highlight-inverse-color);
-    }
-
-    &.arrow {
-      @include icon-after('icon-arrow-down');
-
-      &::after {
-        vertical-align: middle;
-      }
-    }
   }
 }
 

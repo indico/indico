@@ -5,20 +5,39 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-ind-menu menu {
+@use 'partials/icons';
+
+ind-menu {
   --time-menu-animation: 0.2s;
   --length-menu-travel: -0.4em;
-  position: absolute;
-  z-index: 1;
-}
 
-ind-menu [aria-expanded='true'] + menu {
-  animation: menu-slide-down var(--time-menu-animation);
-}
+  > menu {
+    position: absolute;
+    z-index: 1;
+  }
 
-ind-menu :not([aria-expanded='true']) + menu {
-  display: none; // must be set to none to hide it from a11y tools and tab navigation as well
-  animation: menu-slide-up var(--time-menu-animation);
+  > menu :is(li, a) {
+    width: 100%;
+  }
+
+  > button::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    display: block; // XXX: Required for transform to work
+  }
+
+  > button[aria-expanded='true']::after {
+    transform: rotateX(-180deg);
+  }
+
+  > button[aria-expanded='true'] + menu {
+    animation: menu-slide-down var(--time-menu-animation);
+  }
+
+  > :not([aria-expanded='true']) + menu {
+    display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+    animation: menu-slide-up var(--time-menu-animation);
+  }
 }
 
 @keyframes menu-slide-down {

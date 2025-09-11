@@ -1,0 +1,54 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+
+@use './variables';
+@use './layout';
+@use './utils';
+
+%menu-item {
+  padding: 0;
+
+  :is(a, button) {
+    @extend %flex-row;
+    flex: none;
+
+    background: var(--menu-background-color);
+    color: var(--menu-text-color);
+    padding: calc(var(--menu-vertical-padding-ratio) * var(--menu-padding))
+      var(--menu-padding);
+    border: none;
+
+    &:first-child,
+    &.arrow:last-of-type {
+      border-radius: 0;
+    }
+
+    &:hover,
+    &.open {
+      background: var(--surface-highlight-inverse-color);
+    }
+
+    &.arrow::after {
+      @extend %icon;
+      @extend %icon-arrow-down;
+
+      vertical-align: middle;
+      display: inline-block;
+      margin-left: 0.5em;
+    }
+  }
+}
+
+%menu {
+  list-style: none;
+
+  > li {
+    @extend %menu-item;
+  }
+}

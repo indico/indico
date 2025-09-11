@@ -6,8 +6,9 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
-@use 'partials/buttons' as *;
 @use 'design_system';
+@use 'partials/buttons' as *;
+@use 'widgets/create_event_button';
 
 .confirmation-dialog .body ul.categ-list {
   padding-left: 13px;
@@ -89,6 +90,10 @@
   flex-wrap: wrap;
   justify-self: flex-end;
   width: fit-content;
+
+  .create-event-button button {
+    border-radius: 2px;
+  }
 }
 
 .category-description {
@@ -226,7 +231,12 @@
   }
 
   li h3 {
-    font-family: Helvetica Neue, Helvetica, Verdana, Arial, sans-serif;
+    font-family:
+      Helvetica Neue,
+      Helvetica,
+      Verdana,
+      Arial,
+      sans-serif;
     font-weight: normal;
     font-size: 1em;
     margin-top: 0;
