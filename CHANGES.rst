@@ -20,7 +20,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Fix color contrast and semantics of the protection icon and event count in category link 
+  (:pr:`7071`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
