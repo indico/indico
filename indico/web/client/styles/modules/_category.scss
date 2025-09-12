@@ -316,9 +316,8 @@ ul.category-list {
     }
 
     a {
-      @include transition(color);
+      @extend %link;
       display: block;
-      color: lighten($dark-blue, 6%);
       padding: 0 0 0 1em;
       position: relative;
 
@@ -332,10 +331,6 @@ ul.category-list {
 
     &:hover {
       color: $light-black;
-
-      a {
-        color: darken($dark-blue, 6%);
-      }
 
       &::before {
         color: $light-black;
@@ -435,6 +430,7 @@ ul.category-resource-qtip {
     }
 
     .list-name a {
+      @extend %link;
       font-size: 17px;
     }
 
