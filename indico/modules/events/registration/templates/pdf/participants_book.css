@@ -1,129 +1,137 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2025 CERN
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see the
+ * LICENSE file for more details.
+ */
+
 body {
-    font-family: Times, serif;
-    line-height: 1.5;
-    color: #000;
+  font-family: Times, serif;
+  line-height: 1.5;
+  color: #000;
 }
 
 section {
-    page-break-after: always;
+  page-break-after: always;
 }
 
 .title-page {
-    display: block;
-    text-align: center;
+  display: block;
+  text-align: center;
 }
 
 .title-page > div {
-    font-size: 2em;
+  font-size: 2em;
 }
 
 .title-page > h1 {
-    margin-top: 350px;
-    font-size: 3em;
+  margin-top: 350px;
+  font-size: 3em;
 }
 
 .toc-page > h2 {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .toc-entry {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.75rem;
-    font-family: serif;
-    font-size: 1.1rem;
-    position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+  font-family: serif;
+  font-size: 1.1rem;
+  position: relative;
 }
 
 .toc-dots {
-    flex-grow: 1;
-    margin: 0 0.5rem;
-    border-bottom: 2px dotted #000;
-    align-self: baseline;
-    height: 1;
+  flex-grow: 1;
+  margin: 0 0.5rem;
+  border-bottom: 2px dotted #000;
+  align-self: baseline;
+  height: 1;
 }
 
 .participant-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-top: 1rem;
-    padding-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .participant-title h1 {
-    font-size: 1.5rem;
-    margin: 0;
-    font-weight: normal;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: normal;
 }
 
 .sub-section h2 {
-    font-size: 1.25rem;
-    font-weight: normal;
-    color: grey;
-    margin-bottom: 0.25rem;
-    border-bottom: 2px solid grey;
-    padding-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: normal;
+  color: grey;
+  margin-bottom: 0.25rem;
+  border-bottom: 2px solid grey;
+  padding-bottom: 0.25rem;
 }
 
 .registration-details p,
 .personal-details p {
-    margin: 0.25rem 0;
-    word-wrap: break-word;
+  margin: 0.25rem 0;
+  word-wrap: break-word;
 }
 
 .registration-details strong,
 .personal-details strong {
-    display: inline-block;
-    width: 200px;
+  display: inline-block;
+  width: 200px;
 }
 
 .later-pages {
-    position: relative;
-    page-break-before: always;
-    min-height: 100vh;
-    margin-top: 60px;
-    margin-bottom: 40px;
-    padding: 0;
+  position: relative;
+  page-break-before: always;
+  min-height: 100vh;
+  margin-top: 60px;
+  margin-bottom: 40px;
+  padding: 0;
 }
 
 @page {
-    @top-left{
-        content: element(header-title);
-    }
+  @top-left {
+    content: element(header-title);
+  }
 
-    @top-right{
-        content: element(header-name);
-    }
+  @top-right {
+    content: element(header-name);
+  }
 
-    @bottom-left {
-        content: element(footer-generation-date);
-    }
+  @bottom-left {
+    content: element(footer-generation-date);
+  }
 
-    @bottom-right{
-        content: element(footer-page-num);
-    }
+  @bottom-right {
+    content: element(footer-page-num);
+  }
 }
 
-header, footer {
-    color: gray;
+header,
+footer {
+  color: gray;
 }
 
-.header-title{
-    position: running(header-title);
+.header-title {
+  position: running(header-title);
 }
 
-.header-name{
-    position: running(header-name);
+.header-name {
+  position: running(header-name);
 }
 
-.footer-generation-date{
-    position: running(footer-generation-date);
+.footer-generation-date {
+  position: running(footer-generation-date);
 }
 
-.footer-page-num{
-    position: running(footer-page-num);
+.footer-page-num {
+  position: running(footer-page-num);
 }
-

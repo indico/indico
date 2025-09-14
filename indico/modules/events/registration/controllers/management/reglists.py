@@ -74,6 +74,7 @@ from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RH
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -462,10 +463,20 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
 
 class RHRegistrationsExportPDF(RHRegistrationsExportBase):
-    """Export registration list to a PDF in table style."""
+    """Export registration list to a PDF in table or book style."""
+
+    _base_spec = getattr(RHRegistrationsExportBase, 'normalize_url_spec', RH.normalize_url_spec)
+
+    normalize_url_spec = {
+        **_base_spec,
+        'preserved_args': (_base_spec.get('preserved_args', set()) | {'export_type'})
+    }
+
+    def _process_args(self):
+        super()._process_args()
+        self.export_type = request.view_args.get('export_type')
 
     def _process(self):
-        self.export_type = request.view_args.get('export_type')
         primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],

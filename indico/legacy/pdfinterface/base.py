@@ -15,18 +15,14 @@ from xml.sax import saxutils  # noqa: S406
 
 from PIL import Image as PILImage
 from reportlab import platypus
-from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.fonts import addMapping
 from reportlab.lib.pagesizes import A3, A4, A5, A6, LETTER, landscape
-from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm, inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.platypus import PageTemplate, SimpleDocTemplate
-from reportlab.platypus.frames import Frame
+from reportlab.platypus import SimpleDocTemplate
 
-from indico.util.i18n import _
 from indico.util.string import sanitize_for_platypus
 
 
