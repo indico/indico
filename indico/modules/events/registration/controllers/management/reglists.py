@@ -461,18 +461,30 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
         self.export_config = self.list_generator.get_list_export_config()
 
 
-class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
+class RHRegistrationsExportPDF(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style."""
 
     def _process(self):
+        self.export_type = request.view_args.get('export_type')
         primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],
             static_items=self.export_config['static_item_ids'],
         )
-        css = render_template('events/registration/pdf/participants_table.css')
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
-        template_path = 'events/registration/pdf/participants_table.html'
+        if self.export_type not in ('table', 'book'):
+            raise BadRequest('Invalid export type')
+
+        if self.export_type == 'table':
+            css_path = 'events/registration/pdf/participants_table.css'
+            template_path = 'events/registration/pdf/participants_table.html'
+            filename = 'RegistrantsList'
+        else:  # book
+            css_path = 'events/registration/pdf/participants_book.css'
+            template_path = 'events/registration/pdf/participants_book.html'
+            filename = 'RegistrantsBook'
+
+        css = render_template(css_path)
         html = render_template(
             template_path,
             event=self.event,
@@ -483,32 +495,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
             generation_date=generation_date
         )
         pdf = create_pdf(html, css, self.event)
-        return send_file('RegistrantsList.pdf', pdf, 'application/pdf')
-
-
-class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
-    """Export registration list to a PDF in book style."""
-
-    def _process(self):
-        primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
-            reglist=self.registrations,
-            display=self.export_config['regform_items'],
-            static_items=self.export_config['static_item_ids'],
-        )
-        css = render_template('events/registration/pdf/participants_book.css')
-        generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
-        template_path = 'events/registration/pdf/participants_book.html'
-        html = render_template(
-            template_path,
-            event=self.event,
-            primary_headers=primary_headers,
-            dynamic_headers=dynamic_headers,
-            static_headers=static_headers,
-            rows=rows,
-            generation_date=generation_date,
-        )
-        pdf = create_pdf(html, css, self.event)
-        return send_file('RegistrantsBook.pdf', pdf, 'application/pdf')
+        return send_file(f'{filename}.pdf', pdf, 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
