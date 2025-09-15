@@ -165,7 +165,7 @@ export function preprocessTimetableEntries(
             width: 0,
             column: 0,
             maxColumn: 0,
-            colors: ENTRY_COLORS_BY_BACKGROUND[entry.colors.backgroundColor],
+            colors: c.colors,
             parent: {
               colors,
               id,
