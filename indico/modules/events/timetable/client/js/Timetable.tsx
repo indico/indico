@@ -13,7 +13,7 @@ import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getDateKey} from './utils';
+import {getDateKey, minutesToPixels} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
@@ -24,36 +24,33 @@ export default function Timetable() {
   const entries = useSelector(selectors.getDayEntries);
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
-  const eventEndDt = useSelector(selectors.getEventEndDt);
-  // TODO: (Ajob) Get rid of this after disabled areas are merged
-  const showAllTimeslots = true;
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDateEntries = entries[getDateKey(currentDate)];
+
+  // TODO: (Ajob) This flag is temporary and likely to be replaced with a state
+  //              when we implement a weekview. This is unlikely to be the
+  //              current WeekView component, which does not use day timetables.
   const useWeekView = false;
-  const minHour = showAllTimeslots
-    ? 0
-    : Math.max(
-        Math.min(
-          eventStartDt.hour(),
-          ...(useWeekView
-            ? Object.values(entries)
-                .flat()
-                .map(e => e.startDt.hour())
-            : currentDateEntries.map(e => e.startDt.hour()))
-        ) - 1,
-        0
-      );
-  const maxHour = showAllTimeslots
-    ? 24
-    : Math.max(
-        eventEndDt.hour(),
-        ...(useWeekView
-          ? Object.values(entries)
-              .flat()
-              .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e => moment(e.startDt).add(e.duration, 'minutes').hour()))
-      );
+  const minScrollHour = 8;
+  const minHour = 0;
+  const maxHour = 23;
+
+  const _getScrollMoment = () => {
+    const scrollMoment = !currentDateEntries.length
+      ? moment.max(currentDate.hours(minScrollHour), eventStartDt)
+      : moment.min(currentDateEntries.map(e => e.startDt));
+
+    return moment(scrollMoment);
+  };
+
+  const _getScrollOffset = () => {
+    const scrollMoment = _getScrollMoment();
+    const scrollMinutes = scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes');
+    return minutesToPixels(scrollMinutes);
+  };
+
+  const initialScrollPosition = _getScrollOffset();
 
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
@@ -67,7 +64,7 @@ export default function Timetable() {
         />
       )}
       <div styleName="content">
-        {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
+        {useWeekView && <WeekTimetable minHour={minHour} maxHour={maxHour} entries={entries} />}
         {!useWeekView && (
           <DayTimetable
             dt={currentDate}
@@ -75,6 +72,7 @@ export default function Timetable() {
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}
+            scrollPosition={initialScrollPosition}
           />
         )}
       </div>
