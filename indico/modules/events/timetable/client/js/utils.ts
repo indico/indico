@@ -63,11 +63,13 @@ function gcd(a: number, b: number) {
   return a;
 }
 
-export const getEntryURL = (entry: {type: EntryType; objId: number | string}, eventId: number) => ({
-  [EntryType.Break]:        () => breakURL({event_id: eventId, break_id: entry.objId}),
-  [EntryType.SessionBlock]: () => sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
-  [EntryType.Contribution]: () => contributionURL({event_id: eventId, contrib_id: entry.objId}),
-}[entry.type]?.());
+export const getEntryURL = (entry: {type: EntryType; objId: number | string}, eventId: number) =>
+  ({
+    [EntryType.Break]: () => breakURL({event_id: eventId, break_id: entry.objId}),
+    [EntryType.SessionBlock]: () =>
+      sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
+    [EntryType.Contribution]: () => contributionURL({event_id: eventId, contrib_id: entry.objId}),
+  })[entry.type]?.();
 
 export function getDefaultColorByType(type: EntryType): Colors {
   return {

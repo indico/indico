@@ -23,7 +23,7 @@ import {
   ChildContribEntry,
   UnscheduledContrib,
 } from './types';
-import { getEntryURL } from './utils';
+import {getEntryURL} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -161,7 +161,7 @@ export function setDraftEntry(data): SetDraftEntryAction {
 }
 
 export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  return (dispatch) => {
+  return dispatch => {
     const newEntry = {...entry};
 
     const entryURL = getEntryURL(newEntry, eventId);

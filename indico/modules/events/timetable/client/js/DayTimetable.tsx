@@ -228,7 +228,7 @@ export function DayTimetable({
       over,
       delta,
       mouse,
-      calendar,
+      calendar
     );
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
   }
