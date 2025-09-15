@@ -23,6 +23,7 @@ import './Entry.module.scss';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
@@ -147,6 +148,10 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     presenters = _getPresentersArray();
   }
 
+  const styleColors = entryParent
+    ? ENTRY_COLORS_BY_BACKGROUND[entryParent.colors.backgroundColor]
+    : colors;
+
   return (
     <>
       <div styleName="header-wrapper">
@@ -164,7 +169,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
-              <Label circular size="tiny" styleName="header-accent" style={{...colors}} />
+              <Label circular size="tiny" styleName="header-accent" style={{...styleColors}} />
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
