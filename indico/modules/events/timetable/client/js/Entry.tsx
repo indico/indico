@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
@@ -23,7 +24,6 @@ import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTi
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
-import { ENTRY_COLORS_BY_BACKGROUND } from './colors';
 
 interface DraggableEntryProps {
   id: number;
