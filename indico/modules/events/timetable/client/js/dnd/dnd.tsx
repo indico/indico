@@ -291,16 +291,17 @@ export function DnDProvider({
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
         }
+        const mousePosition = {
+          x: e.pageX + state.current.scrollPosition.x,
+          y: e.pageY + state.current.scrollPosition.y,
+        };
         setDraggableData(d =>
           setMousePosition(
             setTransform(
               d,
               state.current.activeDraggable,
               state.current.initialMousePosition,
-              {
-                x: e.pageX + state.current.scrollPosition.x,
-                y: e.pageY + state.current.scrollPosition.y,
-              },
+              mousePosition,
               modifier
             ),
             state.current.activeDraggable,
