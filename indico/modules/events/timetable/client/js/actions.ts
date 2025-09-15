@@ -217,7 +217,7 @@ export function setDraftEntry(data): SetDraftEntryAction {
 }
 
 export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  return (dispatch) => {
+  return dispatch => {
     const newEntry = {...entry};
 
     const entryURL = getEntryURLByObjId(newEntry, eventId, entry.objId);
