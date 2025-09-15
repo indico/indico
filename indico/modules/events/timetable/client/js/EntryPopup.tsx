@@ -111,7 +111,8 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapTTDataToEntry(data, {[session.id]: session});
+    const sessions = session ? {[session.id]: session} : {};
+    const draftEntry = mapTTDataToEntry(data, sessions);
 
     if ('room' in draftEntry.locationData) {
       draftEntry.locationData.roomName = draftEntry.locationData.room;
