@@ -205,12 +205,11 @@ class RHTimetableBreak(RHManageEventBase):
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
-
         session_block_id = data.pop('timetable_entry', {}).get('parent', {}).get('session_block_id')
         self._move_entry(session_block_id)
 
-        if 'timetable_entry' in data and not data['timetable_entry']:
-            data.pop('timetable_entry')
+        if not data.get('timetable_entry'):
+            data.pop('timetable_entry', None)
 
         with (track_time_changes(), track_location_changes()):
             update_break_entry(self.break_, data)
@@ -226,7 +225,6 @@ class RHTimetableBreak(RHManageEventBase):
 
     @no_autoflush
     def _move_entry(self, session_block_id):
-
         entry = self.break_.timetable_entry
 
         if session_block_id is None:
@@ -235,7 +233,7 @@ class RHTimetableBreak(RHManageEventBase):
                 'start_dt': entry.start_dt
             })
         else:
-            target_block = self.event.get_session_block(int(session_block_id))
+            target_block = self.event.get_session_block(session_block_id)
 
             self.break_.session_block = target_block
             self.break_.session = target_block.session
@@ -315,7 +313,6 @@ class RHTimetableContribution(RHManageContributionBase):
         return references
 
     def _move_entry(self, session_block_id):
-
         entry = self.contrib.timetable_entry
 
         self.contrib.session_block = None
@@ -327,7 +324,7 @@ class RHTimetableContribution(RHManageContributionBase):
                 'start_dt': entry.start_dt
             })
         else:
-            target_block = self.event.get_session_block(int(session_block_id))
+            target_block = self.event.get_session_block(session_block_id)
 
             self.contrib.session_block = target_block
             self.contrib.session = target_block.session
