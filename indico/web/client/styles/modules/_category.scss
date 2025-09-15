@@ -442,13 +442,13 @@ ul.category-resource-qtip {
       padding: 0 15px;
       font-size: 1.2em;
       white-space: nowrap;
-      color: $dark-gray;
+      color: var(--text-secondary-color);
       max-width: 56px;
       min-width: 56px;
 
       a,
       a:hover {
-        color: $dark-gray;
+        color: var(--text-secondary-color);
       }
     }
 
@@ -466,7 +466,7 @@ ul.category-resource-qtip {
 
     .protected {
       font-weight: normal;
-      color: $dark-gray;
+      color: var(--text-secondary-color);
     }
 
     .ui.label {

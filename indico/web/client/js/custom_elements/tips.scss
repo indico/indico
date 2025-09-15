@@ -15,10 +15,11 @@ ind-with-toggletip {
   --arrow-top: auto;
   --arrow-bottom: auto;
   --arrow-direction: 0;
+  --flex-layout: inline-flex;
 
   // Flexbox ensures the tip content box is center-aligned
   // with the element to which it refers.
-  display: flex;
+  display: var(--flex-layout);
   align-items: center;
   justify-content: center;
 
