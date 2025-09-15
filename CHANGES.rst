@@ -10,7 +10,7 @@ Version 3.3.9
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Disallow comments/judgments on outdated editables (:pr:`7067`)
 
 Bugfixes
 ^^^^^^^^
