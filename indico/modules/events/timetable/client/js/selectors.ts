@@ -10,7 +10,7 @@ import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
 import {appendSessionAttributes} from './util';
-import {DAY_SIZE, getDateKey, minutesToPixels} from './utils';
+import {DAY_SIZE, getDateDiff, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -54,7 +54,7 @@ export const getEventEndDt = createSelector(
 export const getEventNumDays = createSelector(
   getEventStartDt,
   getEventEndDt,
-  (startDt, endDt) => endDt.diff(startDt, 'days') + 1
+  (startDt, endDt) => getDateDiff(startDt, endDt) + 1
 );
 export const getSessionById = createSelector(
   getSessions,

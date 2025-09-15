@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment, {Moment, unitOfTime} from 'moment';
 import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
@@ -178,6 +178,22 @@ export function useTraceUpdate(props) {
 
 export function getDateKey(date: Moment) {
   return date.format(DATE_KEY_FORMAT);
+}
+
+/*
+ * Gives the difference between two dates without modifying given dates. Takes into
+ * account cases where two dates might be within 24 hours of each other.
+ */
+export function getDateDiff(
+  dt1: Moment,
+  dt2: Moment,
+  unit: unitOfTime.Diff = 'day',
+  includeTime = false
+) {
+  dt1 = includeTime ? moment(dt1) : moment(dt1).startOf('day');
+  dt2 = includeTime ? moment(dt2) : moment(dt2).startOf('day');
+
+  return Math.abs(Math.ceil(dt1.diff(dt2, unit, includeTime)));
 }
 
 // Local storage utils

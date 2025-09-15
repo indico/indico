@@ -57,7 +57,6 @@ export default function Timetable() {
       <GlobalEvents />
       {!useWeekView && (
         <Toolbar
-          date={currentDate}
           onNavigate={d => {
             dispatch(actions.setCurrentDate(d, eventId));
           }}

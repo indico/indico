@@ -17,14 +17,9 @@ import PublicationStateSwitch from '../../../contributions/client/js/Publication
 import * as actions from './actions';
 import * as selectors from './selectors';
 import './Toolbar.module.scss';
+import {getDateDiff} from './utils';
 
-export default function Toolbar({
-  date,
-  onNavigate,
-}: {
-  date: Moment;
-  onNavigate: (dt: Moment) => void;
-}) {
+export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
   const ref = useRef(null);
   const daysBarRef = useRef<HTMLDivElement | null>(null);
@@ -41,9 +36,7 @@ export default function Toolbar({
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
-  // Math.ceil and float number allows this to work for a difference of a day
-  // but less than 24h, also across multiple months. Hence the 'true'.
-  const currentDayIdx = Math.ceil(date.diff(eventStart, 'days', true));
+  const currentDayIdx = getDateDiff(eventStart, currentDate);
   const currentDayIdxRef = useRef<number>(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
 
@@ -191,6 +184,7 @@ export default function Toolbar({
               {[...Array(numDays).keys()].map(n => {
                 const d = getDateFromIdx(n);
                 const isActive = n === currentDayIdx;
+
                 return (
                   <Menu.Item
                     fitted="horizontally"
