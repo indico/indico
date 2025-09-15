@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -225,7 +226,7 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry, sessionBlockId] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
@@ -479,12 +480,6 @@ function layoutAfterDropOnCalendar(
     }
   }
 
-  const entryColor = {...fromEntry, sessionId: null} as Entry;
-  delete (entryColor as any).textColor;
-  delete (entryColor as any).backgroundColor;
-
-  const {textColor, backgroundColor} = getEntryColor(entryColor, sessions);
-
   const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
@@ -495,12 +490,11 @@ function layoutAfterDropOnCalendar(
     ),
     sessionId: null,
     sessionBlockId: null,
-    textColor,
-    backgroundColor,
   };
 
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
+    delete draftEntry.parent;
   }
 
   if (draftEntry.type === EntryType.SessionBlock) {
@@ -594,12 +588,6 @@ function layoutAfterDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
-  const {textColor, backgroundColor} = getEntryColor(
-    {...fromEntry, sessionId: toBlock.sessionId},
-    sessions
-  );
-
-
   const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
@@ -610,8 +598,7 @@ function layoutAfterDropOnBlock(
     ),
     sessionBlockId: toBlock.id,
     sessionId: toBlock.sessionId,
-    textColor,
-    backgroundColor,
+    parent: _.pick(toBlock, ['id', 'objId', 'title', 'colors']),
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {

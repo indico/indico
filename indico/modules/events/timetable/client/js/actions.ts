@@ -23,7 +23,6 @@ import {
   ChildBreakEntry,
   ContribEntry,
   ChildContribEntry,
-  EntryType,
   Entry,
   UnscheduledContribEntry,
   Session,
@@ -217,38 +216,25 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-function _moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  let entryURL: string;
-  switch (entry.type) {
-    case EntryType.Break:
-      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
-      break;
-    case EntryType.SessionBlock:
-      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-      break;
-    default:
-      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-  }
-
-  const entryData = {
-    start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
-    session_block_id: sessionBlockId,
-  };
-
-  return synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
-    type: MOVE_ENTRY,
-    date,
-    entries,
-  });
-}
-
 export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  return (dispatch, getState) => {
-    const sessions = getState().sessions;
-    const color = getEntryColor(entry, sessions);
-    const sessionTitle = sessions[entry.sessionId]?.title || '';
-    const newEntry = {...entry, ...color, sessionTitle};
-    dispatch(_moveEntry(newEntry, eventId, entries, date, sessionBlockId));
+  return (dispatch) => {
+    const newEntry = {...entry};
+
+    const entryURL = getEntryURLByObjId(newEntry, eventId, entry.objId);
+
+    const entryData = {
+      start_dt: moment(newEntry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
+      session_block_id: sessionBlockId,
+    };
+
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+        type: MOVE_ENTRY,
+        date,
+        entries,
+        entry: newEntry,
+      })
+    );
   };
 }
 

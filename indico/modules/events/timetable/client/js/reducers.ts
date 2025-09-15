@@ -54,13 +54,40 @@ export default {
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
       }
       case actions.MOVE_ENTRY: {
-        const date = action.date;
-        const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
-            day,
-            day === date ? action.entries : dayEntries,
-          ])
-        );
+        const {date, entry, entries} = action;
+
+        let entryId: number,
+         newDayEntries: TopLevelEntry[];
+        if (entry.sessionBlockId) {
+          const parentId = entries.findIndex(e => e.id === entry.sessionBlockId);
+          const parent = entries[parentId];
+          entryId = parent.children.findIndex(e => e.id === entry.id);
+
+          const newChildren = layout([
+            ...parent.children.filter(c => c.id !== entry.id),
+            entry,
+          ]);
+          newDayEntries = [
+            ...entries.slice(0, parentId),
+            { ...parent, children: newChildren },
+            ...entries.slice(parentId + 1),
+          ];
+        } else {
+          entryId = entries.findIndex(e => e.id === entry.id);
+          newDayEntries = layout([
+              ...entries.slice(0, entryId),
+              entry,
+              ...entries.slice(entryId + 1),
+            ]);
+        }
+
+        const allEntries = state.changes[state.currentChangeIdx].entries;
+
+        const newEntries = {
+          ...allEntries,
+          [date]: newDayEntries,
+        };
+
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
