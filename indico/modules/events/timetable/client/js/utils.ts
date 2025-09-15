@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
+
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
 
@@ -58,6 +62,12 @@ function gcd(a: number, b: number) {
   }
   return a;
 }
+
+export const getEntryURL = (entry: {type: EntryType; objId: number | string}, eventId: number) => ({
+  [EntryType.Break]:        () => breakURL({event_id: eventId, break_id: entry.objId}),
+  [EntryType.SessionBlock]: () => sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
+  [EntryType.Contribution]: () => contributionURL({event_id: eventId, contrib_id: entry.objId}),
+}[entry.type]?.());
 
 export function getDefaultColorByType(type: EntryType): Colors {
   return {
