@@ -316,6 +316,7 @@ ul.category-list {
     }
 
     a {
+      @include transition(color);
       @extend %link;
       display: block;
       padding: 0 0 0 1em;
