@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
@@ -17,12 +17,14 @@ import {Translate} from 'indico/react/i18n';
 import {RevisionTypeStates} from '../../models';
 
 import {modifyReviewComment} from './actions';
+import {isTimelineOutdated} from './selectors';
 import {blockPropTypes} from './util';
 
 import './ReviewComment.module.scss';
 
 export default function ReviewComment({block, canEdit}) {
   const [editFormOpen, setEditFormOpen] = useState(false);
+  const isOutdated = useSelector(isTimelineOutdated);
   const dispatch = useDispatch();
 
   const handleSubmit = async formData => {
@@ -69,7 +71,7 @@ export default function ReviewComment({block, canEdit}) {
         <div className="markdown-text" dangerouslySetInnerHTML={{__html: block.commentHtml}} />
       )}
       <div styleName="action-buttons">
-        {canEdit && (
+        {canEdit && !isOutdated && (
           <a
             onClick={() => setEditFormOpen(!editFormOpen)}
             className="i-link icon-edit"

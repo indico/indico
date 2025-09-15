@@ -1,0 +1,16 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.sticky-message {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1;
+  border-radius: 5px;
+  box-shadow: 0 0.25em 0.75em rgba(0, 0, 0, 0.15),
+              0 0.125em 0.25em rgba(0, 0, 0, 0.1);
+}
