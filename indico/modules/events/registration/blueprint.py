@@ -118,10 +118,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-pre
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/import', 'registrations_import',
                  reglists.RHRegistrationsImport, methods=('GET', 'POST'))
 _bp.add_url_rule(
-    '/manage/registration/<int:reg_form_id>/registrations/<string:export_type>.pdf',
-    'registrations_pdf_export',
-    reglists.RHRegistrationsExportPDF,
-    methods=('POST',),
+    '/manage/registration/<int:reg_form_id>/registrations/<any(table, book):export_type>.pdf',
+    'registrations_pdf_export', reglists.RHRegistrationsExportPDF, methods=('POST',),
 )
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv', 'registrations_csv_export',
                  reglists.RHRegistrationsExportCSV, methods=('POST',))

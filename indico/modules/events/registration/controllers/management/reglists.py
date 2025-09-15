@@ -17,7 +17,7 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
-from webargs import fields
+from webargs import fields, validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -465,35 +465,35 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 class RHRegistrationsExportPDF(RHRegistrationsExportBase):
     """Export registration list to a PDF in table or book style."""
 
-    _base_spec = getattr(RHRegistrationsExportBase, 'normalize_url_spec', RH.normalize_url_spec)
-
     normalize_url_spec = {
-        **_base_spec,
-        'preserved_args': (_base_spec.get('preserved_args', set()) | {'export_type'})
+        'locators': {
+            lambda self: self.regform
+        },
+        'preserved_args': {'export_type'}
     }
 
-    def _process_args(self):
-        super()._process_args()
-        self.export_type = request.view_args.get('export_type')
-
-    def _process(self):
+    @use_kwargs({
+        'export_type': fields.String(
+            required=True,
+            validate=validate.OneOf(['table', 'book'])
+        )
+    }, location='view_args')
+    def _process(self, export_type):
         primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],
             static_items=self.export_config['static_item_ids'],
         )
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
-        if self.export_type not in ('table', 'book'):
-            raise BadRequest('Invalid export type')
 
-        if self.export_type == 'table':
+        if export_type == 'table':
             css_path = 'events/registration/pdf/participants_table.css'
             template_path = 'events/registration/pdf/participants_table.html'
-            filename = 'RegistrantsList'
+            filename = 'RegistrantsList.pdf'
         else:  # book
             css_path = 'events/registration/pdf/participants_book.css'
             template_path = 'events/registration/pdf/participants_book.html'
-            filename = 'RegistrantsBook'
+            filename = 'RegistrantsBook.pdf'
 
         css = render_template(css_path)
         html = render_template(
@@ -506,7 +506,7 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             generation_date=generation_date
         )
         pdf = create_pdf(html, css, self.event)
-        return send_file(f'{filename}.pdf', pdf, 'application/pdf')
+        return send_file(f'{filename}', pdf, 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):

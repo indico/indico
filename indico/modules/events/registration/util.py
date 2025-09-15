@@ -1207,7 +1207,7 @@ def prepare_participant_list_data(reglist, display, static_items):
 
         for item in display:
             reg_data = reg_data_by_field.get(item.id)
-            cell_data = '-'
+            cell_data = None
             if reg_data:
                 cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
             row[item.title] = cell_data
