@@ -49,7 +49,7 @@ export default function ResetReview({reviewURL}) {
       />
       <RequestConfirm
         header={Translate.string('Undo review')}
-        confirmText={Translate.string('Yes')}
+        confirmText={Translate.string('Undo')}
         onClose={() => setIsOpen(false)}
         requestFunc={resetRevisions}
         open={isOpen}
