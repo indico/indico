@@ -10,7 +10,6 @@ import moment from 'moment';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {
   Attachments,
   ChildEntry,
