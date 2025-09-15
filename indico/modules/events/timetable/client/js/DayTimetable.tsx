@@ -233,7 +233,6 @@ export function DayTimetable({
       delta,
       mouse,
       calendar,
-      sessions
     );
     dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
   }
@@ -547,7 +546,6 @@ function layoutAfterDropOnBlock(
   delta: Transform,
   mouse: MousePosition,
   calendar: Over,
-  sessions: Record<number, Session>
 ): [TopLevelEntry[], Entry] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
