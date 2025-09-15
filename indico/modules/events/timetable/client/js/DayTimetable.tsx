@@ -30,7 +30,7 @@ import {
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType, Session} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
@@ -117,7 +117,6 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
-  const sessions = useSelector(selectors.getSessions);
 
   const [isDragging, setIsDragging] = useState(false);
 
