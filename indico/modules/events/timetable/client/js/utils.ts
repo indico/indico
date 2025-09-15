@@ -17,6 +17,8 @@ export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const HOUR_SIZE = minutesToPixels(60);
+export const DAY_SIZE = 24 * HOUR_SIZE;
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
@@ -32,6 +34,10 @@ export function minutesToPixels(minutes: number) {
 
 export function pixelsToMinutes(pixels: number) {
   return Math.round(pixels / 2);
+}
+
+export function isWithinLimits(limits: [number, number], y: number, offsets = [0, 0]) {
+  return y > limits[0] + offsets[0] && y < limits[1] - offsets[1];
 }
 
 export function minutesFromStartOfDay(dt: Moment) {
@@ -106,8 +112,8 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     code,
     keywords,
     sessionId,
-    sessionBlockId,
     sessionTitle,
+    sessionBlockId,
   } = data;
 
   const mappedObj = {
