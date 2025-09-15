@@ -23,6 +23,7 @@ import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTi
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
+import { ENTRY_COLORS_BY_BACKGROUND } from './colors';
 
 interface DraggableEntryProps {
   id: number;
@@ -132,6 +133,7 @@ export default function ContributionEntry({
   isDragging,
   column,
   maxColumn,
+  parent,
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
@@ -157,6 +159,8 @@ export default function ContributionEntry({
     : {};
   renderChildren = renderChildren && _children.length > 0;
 
+  const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
+
   style = {
     ...style,
     position: 'absolute',
@@ -168,7 +172,7 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
-    ...colors,
+    ...styleColors,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
