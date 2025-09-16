@@ -19,7 +19,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
-import {FinalModalForm} from 'indico/react/forms/final-form';
+import {FinalModalForm, getChangedValues} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
@@ -257,7 +257,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
-  const handleSubmit = async data => {
+  const handleSubmit = async (data, form) => {
     const submitHandlers = isEditing
       ? {
           [EntryType.Contribution]: _handleEditContribution,
@@ -271,21 +271,19 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         };
 
     const submitHandler = submitHandlers[activeType];
-
     if (!submitHandler) {
       throw new Error('Invalid form or no submit function found');
     }
 
-    if (data['start_dt']) {
-      data['start_dt'] = moment(data['start_dt']).format('YYYY-MM-DDTHH:mm:ss');
+    if (isEditing) {
+      data = getChangedValues(data, form);
+    }
+
+    if (data.start_dt) {
+      data.start_dt = moment(data.start_dt).format('YYYY-MM-DDTHH:mm:ss');
     }
 
     const submitData = snakifyKeys(data);
-    // TODO: (Ajob) Remove once personlinks is fixed
-    if (isEditing) {
-      delete submitData['person_links'];
-    }
-
     const {data: resData} = await submitHandler(submitData);
     resData.type = activeType;
 
