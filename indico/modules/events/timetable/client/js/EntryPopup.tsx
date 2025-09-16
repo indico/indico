@@ -85,8 +85,8 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
 
   const _getOrderedLocationArray = () => {
     const {locationData = {}} = entry;
-    const {address, venueName, room} = locationData;
-    return Object.values([address, venueName, room]).filter(Boolean);
+    const {address, venueName, roomName} = locationData;
+    return Object.values([address, venueName, roomName]).filter(Boolean);
   };
 
   const _getPresentersArray = () => {
