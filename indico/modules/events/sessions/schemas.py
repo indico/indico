@@ -59,6 +59,7 @@ class SessionColorSchema(mm.Schema):
         return {k: f'#{v}' for k, v in data.items()}
 
 
+# TODO move to a proper place, this has nothing to do with sessions
 class LocationDataSchema(mm.Schema):
     venue = ModelField(Location, allow_none=True, data_key='venue_id')
     room = ModelField(Room, allow_none=True, data_key='room_id')
@@ -68,6 +69,7 @@ class LocationDataSchema(mm.Schema):
     inheriting = fields.Boolean()
 
 
+# TODO move to a proper place, this has nothing to do with sessions
 class LocationParentSchema(mm.Schema):
     location_data = fields.Nested(LocationDataSchema)
     title = fields.String()

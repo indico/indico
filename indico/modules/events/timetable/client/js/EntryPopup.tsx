@@ -145,6 +145,8 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         duration: newChildDuration,
         sessionBlockId: entry.objId,
         sessionId: entry.sessionId,
+        locationParent: entry.childLocationParent,
+        locationData: {...entry.childLocationParent.location_data, inheriting: true},
       })
     );
   };

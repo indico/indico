@@ -13,6 +13,7 @@ from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.events import EventType
+from indico.modules.events.sessions.schemas import LocationDataSchema, LocationParentSchema
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.date_time import iterdays
@@ -51,6 +52,7 @@ def get_color_data(obj):
 
 
 def _get_location_data(obj, *, management=False):
+    # TODO probably we can remove most of the stuff here in favor of locationData
     data = {}
     data['location'] = obj.venue_name
     data['room'] = obj.room_name
@@ -60,6 +62,8 @@ def _get_location_data(obj, *, management=False):
 
     if management:
         data['address'] = obj.address
+
+    data['locationData'] = LocationDataSchema().dump(obj)
     return data
 
 
@@ -189,6 +193,7 @@ class TimetableSerializer:
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
                      'friendlyId': block.session.friendly_id,
+                     'childLocationParent': LocationParentSchema().dump(block.child_location_parent),
                      **get_color_data(block.session)})
         return data
 
@@ -361,6 +366,7 @@ def serialize_event_info(event, *, management=False, user=None):
             'isDraft': should_show_draft_warning(event),
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
             'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
+            'locationParent': LocationParentSchema().dump(event),
             'contributions': [serialize_unscheduled_contribution(c, management=management,
                                                                  can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}

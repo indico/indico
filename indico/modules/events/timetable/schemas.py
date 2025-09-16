@@ -23,12 +23,13 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'location_parent',
-                  'session_id', 'session_title')
+                  'child_location_parent', 'session_id', 'session_title')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
     location_data = fields.Nested(LocationDataSchema)
     location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
+    child_location_parent = fields.Nested(LocationParentSchema)
     conveners = fields.List(fields.Nested(_SessionBlockPersonLinkSchema(unknown=EXCLUDE)), attribute='person_links')
     duration = fields.TimeDelta(required=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
