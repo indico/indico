@@ -474,6 +474,10 @@ ul.category-resource-qtip {
       vertical-align: 20%;
     }
   }
+
+  .toggle-hidden-events {
+    @extend %link-button;
+  }
 }
 
 .category-overview {
