@@ -258,7 +258,8 @@ class RHTimetableContribution(RHManageContributionBase):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
 
-        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        if (person_links := data.pop('person_links', None)) is not None:
+            data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
 
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)
