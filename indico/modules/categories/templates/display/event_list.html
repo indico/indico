@@ -8,12 +8,16 @@
             <div class="content smaller">
                 <span class="js-show-message">
                     {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Show{% endtrans %}</a>
+                    <button class="js-toggle-list toggle-hidden-events">
+                        {% trans %}Show{% endtrans %}
+                    </button>
                     <span class="icon-spinner js-spinner"></span>
                 </span>
                 <span class="js-hide-message">
                     {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
+                    <button class="js-toggle-list toggle-hidden-events">
+                        {% trans %}Hide{% endtrans %}
+                    </button>
                 </span>
             </div>
         {% endcall %}
