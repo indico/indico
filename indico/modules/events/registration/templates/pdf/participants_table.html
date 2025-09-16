@@ -17,9 +17,12 @@
     <table>
         <thead>
             <tr>
-                {% set headers = primary_headers + dynamic_headers + static_headers%}
+                {% set headers = primary_headers + dynamic_headers%}
                 {% for header in headers %}
                     <th>{{ header }}</th>
+                {% endfor %}
+                {% for static_item_id in static_headers %}
+                    <th>{{ static_column_names[static_item_id] }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -28,6 +31,9 @@
             <tr>
                 {% for header in headers %}
                     <td>{{ row[header] }}</td>
+                {% endfor %}
+                {% for static_item_id in static_headers %}
+                    <td>{{ row[static_item_id] }}</td>
                 {% endfor %}
             </tr>
             {% endfor %}
