@@ -152,6 +152,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         initialValues={initialValues}
         personLinkFieldParams={personLinkFieldParams}
         extraOptions={extraOptions}
+        locationParent={snakifyKeys(entry.locationParent)}
       />
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
@@ -160,7 +161,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         <SessionBlockFormFields
           eventId={eventId}
           extraOptions={extraOptions}
-          locationParent={null}
+          locationParent={snakifyKeys(entry.locationParent)}
         />
       </>
     ) : (
@@ -174,7 +175,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     [EntryType.Break]: (
       <BreakFormFields
         eventId={eventId}
-        locationParent={undefined}
+        locationParent={snakifyKeys(entry.locationParent)}
         initialValues={initialValues}
         extraOptions={extraOptions}
         hasParent={'sessionBlockId' in entry}
