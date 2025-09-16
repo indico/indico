@@ -27,6 +27,7 @@ Accessibility
   (:pr:`7073`, thanks :user:`foxbunny`)
 - Fix color contrast and screen reader support of the hidden block buttons
   in the event list (:pr:`7079`, thanks :user:`foxbunny`)
+- Fix contrast of the category info text (:pr:`7078`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
