@@ -1183,19 +1183,9 @@ class CustomTicketCode:
         raise NotImplementedError
 
 
-def prepare_participant_list_data(reglist, display, static_items):
-    column_names = {
-        'reg_date': _('Registration Date'),
-        'state': _('Registration State'),
-        'price': _('Price'),
-        'checked_in': _('Checked in'),
-        'checked_in_date': _('Check-in Date'),
-        'tags_present': _('Tags'),
-    }
-
+def prepare_participant_list_data(reglist, display, static_items_ids):
     primary_headers = ['ID', 'Name']
     dynamic_headers = [item.title for item in display]
-    static_headers = [column_names[item_id] for item_id in static_items if item_id in column_names]
 
     rows = []
     for registration in reglist:
@@ -1212,9 +1202,8 @@ def prepare_participant_list_data(reglist, display, static_items):
                 cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
             row[item.title] = cell_data
 
-        for item_id in static_items:
-            header = column_names.get(item_id)
-            cell_data = '-'
+        for item_id in static_items_ids:
+            cell_data = None
             if item_id == 'reg_date':
                 cell_data = format_datetime(registration.submitted_dt)
             elif item_id == 'state':
@@ -1229,8 +1218,8 @@ def prepare_participant_list_data(reglist, display, static_items):
             elif item_id == 'tags_present':
                 if registration.tags:
                     cell_data = ', '.join(sorted(t.title for t in registration.tags))
-            row[header] = cell_data or '-'
+            row[item_id] = cell_data or '-'
 
         rows.append(row)
 
-    return primary_headers, dynamic_headers, static_headers, rows
+    return primary_headers, dynamic_headers, rows

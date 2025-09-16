@@ -74,7 +74,6 @@ from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RH
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -479,10 +478,20 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
         )
     }, location='view_args')
     def _process(self, export_type):
-        primary_headers, dynamic_headers, static_headers, rows = prepare_participant_list_data(
+        static_items_order = [
+            'reg_date',
+            'state',
+            'price',
+            'checked_in',
+            'checked_in_date',
+            'tags_present'
+        ]
+        static_column_names = {key: data['title'] for key, data in self.list_generator.static_items.items()}
+
+        primary_headers, dynamic_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],
-            static_items=self.export_config['static_item_ids'],
+            static_items_ids=self.export_config['static_item_ids'],
         )
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
 
@@ -501,9 +510,10 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             event=self.event,
             primary_headers=primary_headers,
             dynamic_headers=dynamic_headers,
-            static_headers=static_headers,
+            static_headers=static_items_order,
             rows=rows,
-            generation_date=generation_date
+            generation_date=generation_date,
+            static_column_names=static_column_names
         )
         pdf = create_pdf(html, css, self.event)
         return send_file(f'{filename}', pdf, 'application/pdf')
