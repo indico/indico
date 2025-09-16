@@ -38,8 +38,9 @@ export interface Colors {
 
 export interface LocationData {
   address: string;
+  venueId?: number;
   venueName: string;
-  room: string;
+  roomId?: string;
   roomName: string;
   inheriting?: boolean;
 }

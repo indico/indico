@@ -129,12 +129,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     y: 0,
     personLinks: personLinks || conveners || [],
     boardNumber,
-    locationData: {
-      address: locationData.address,
-      room: locationData.roomName,
-      inheriting: locationData.inheriting,
-      venueName: locationData.venueName,
-    },
+    locationData,
     locationParent,
     code,
     keywords,
