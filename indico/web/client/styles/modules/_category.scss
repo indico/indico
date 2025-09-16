@@ -132,7 +132,7 @@
 .category-info {
   @include font-family-modern-body();
 
-  color: #888;
+  color: var(--text-secondary-color);
   font-size: 1.2em;
   min-height: 0.3em;
   margin: 0 0 2em 0;
