@@ -17,6 +17,14 @@ import {Translate} from 'indico/react/i18n';
 
 import './LocationField.module.scss';
 
+const EMPTY_LOCATION_VALUE = {
+  venue_id: null,
+  venue_name: '',
+  room_id: null,
+  room_name: '',
+  address: '',
+};
+
 const processLocations = (locations, value) => {
   if (!locations.length) {
     return [[], []];
@@ -184,7 +192,7 @@ export default function LocationField({
               onChange(
                 checked
                   ? {...locationParent.location_data, inheriting: true}
-                  : {...value, inheriting: false}
+                  : {...EMPTY_LOCATION_VALUE, inheriting: false}
               )
             }
             disabled={disabled}
