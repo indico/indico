@@ -45,7 +45,7 @@ fi
 
 
 # ESLint
-_get_files '*.js' '*.jsx'
+_get_files '*.js' '*.jsx' '*.ts' '*.tsx'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$($ESLINT_CMD --color "${FILES[@]}"); then
         STATUS=1
