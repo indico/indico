@@ -13,10 +13,10 @@ from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.events import EventType
-from indico.modules.events.sessions.schemas import LocationDataSchema, LocationParentSchema
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.date_time import iterdays
+from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.string import camelize_keys
 from indico.web.flask.util import url_for
 

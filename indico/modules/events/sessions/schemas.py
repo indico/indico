@@ -9,7 +9,6 @@ import hashlib
 
 from marshmallow import ValidationError, fields, post_dump, post_load
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.marshmallow import mm
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
@@ -17,10 +16,8 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.i18n import _
+from indico.util.locations import LocationDataSchema
 from indico.util.marshmallow import ModelField
 from indico.web.forms.colors import get_colors
 
@@ -57,39 +54,6 @@ class SessionColorSchema(mm.Schema):
     @post_dump
     def make_valid_hex_color(self, data, **kwargs):
         return {k: f'#{v}' for k, v in data.items()}
-
-
-# TODO move to a proper place, this has nothing to do with sessions
-class LocationDataSchema(mm.Schema):
-    venue = ModelField(Location, allow_none=True, data_key='venue_id')
-    room = ModelField(Room, allow_none=True, data_key='room_id')
-    venue_name = fields.String()
-    room_name = fields.String()
-    address = fields.String()
-    inheriting = fields.Boolean()
-
-
-# TODO move to a proper place, this has nothing to do with sessions
-class LocationParentSchema(mm.Schema):
-    location_data = fields.Nested(LocationDataSchema)
-    title = fields.String()
-
-    @post_dump(pass_original=True)
-    def _add_type(self, data, orig, **kwargs):
-        match orig:
-            case db.m.Contribution():
-                data['type'] = _('Contribution')
-            case db.m.Break():
-                data['type'] = _('Break')
-            case db.m.SessionBlock():
-                data['type'] = _('Block')
-            case db.m.Session():
-                data['type'] = _('Session')
-            case db.m.Event():
-                data['type'] = _('Event')
-            case _:
-                raise TypeError(f'Unexpected parent type {type(orig)}')
-        return data
 
 
 class SessionTypeSchema(mm.SQLAlchemyAutoSchema):

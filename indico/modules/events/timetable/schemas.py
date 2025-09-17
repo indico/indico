@@ -14,8 +14,9 @@ from indico.modules.events.contributions.schemas import (ContribFieldValueSchema
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.schemas import LocationDataSchema, LocationParentSchema, SessionColorSchema
+from indico.modules.events.sessions.schemas import SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
+from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
