@@ -184,10 +184,7 @@ export function getDateKey(date: Moment) {
  * Gives the difference between two dates without modifying given dates. Takes into
  * account cases where two dates might be within 24 hours of each other.
  */
-export function getDiffInDays(
-  dt1: Moment,
-  dt2: Moment,
-) {
+export function getDiffInDays(dt1: Moment, dt2: Moment) {
   dt1 = moment(dt1).startOf('day');
   dt2 = moment(dt2).startOf('day');
 
