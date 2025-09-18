@@ -17,7 +17,7 @@ import PublicationStateSwitch from '../../../contributions/client/js/Publication
 import * as actions from './actions';
 import * as selectors from './selectors';
 import './Toolbar.module.scss';
-import {getDateDiff} from './utils';
+import {getDiffInDays} from './utils';
 
 export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
@@ -36,7 +36,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
-  const currentDayIdx = getDateDiff(eventStart, currentDate);
+  const currentDayIdx = getDiffInDays(eventStart, currentDate);
   const currentDayIdxRef = useRef<number>(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
 
