@@ -129,6 +129,11 @@ export const getDefaultContribDurationMinutes = createSelector(
   staticData => staticData.defaultContribDurationMinutes
 );
 
+export const getEventLocationParent = createSelector(
+  getStaticData,
+  staticData => staticData.eventLocationParent
+);
+
 // Navigation state
 export const getIsExpanded = createSelector(
   getNavigation,
