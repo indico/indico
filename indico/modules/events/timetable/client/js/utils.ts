@@ -180,6 +180,17 @@ export function getDateKey(date: Moment) {
   return date.format(DATE_KEY_FORMAT);
 }
 
+/*
+ * Gives the difference between two dates without modifying given dates. Takes into
+ * account cases where two dates might be within 24 hours of each other.
+ */
+export function getDiffInDays(dt1: Moment, dt2: Moment) {
+  dt1 = moment(dt1).startOf('day');
+  dt2 = moment(dt2).startOf('day');
+
+  return Math.abs(dt1.diff(dt2, 'day'));
+}
+
 // Local storage utils
 export function setCurrentDateLocalStorage(date: Moment, eventId: number) {
   const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
