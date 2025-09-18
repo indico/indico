@@ -30,7 +30,7 @@ import {getCurrentDateLocalStorage} from './utils';
         `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
         eventInfo.startDate.tz
       );
-      const currentDate = getCurrentDateLocalStorage(eventId) || startDt;
+      const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
       const initialData = {
         staticData: {
           eventId,
