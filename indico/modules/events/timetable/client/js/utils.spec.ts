@@ -23,7 +23,7 @@ describe('getDiffInDays()', () => {
 
   it('Should compute same day difference regardless of argument order', () => {
     const startDay = Math.floor(Math.random() * 10);
-    const endDay = startDay + Math.floor(Math.random() * 15)
+    const endDay = startDay + Math.floor(Math.random() * 15);
     const dt1 = dt(`2025-09-${startDay} 21:00`);
     const dt2 = dt(`2025-09-${endDay} 16:00`);
 
