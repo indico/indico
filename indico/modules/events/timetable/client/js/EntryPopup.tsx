@@ -169,7 +169,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
-              <Label circular size="tiny" styleName="header-accent" style={{...styleColors}} />
+              <Label circular empty style={{...styleColors}} />
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
@@ -184,67 +184,65 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
           }}
         />
       </div>
-      <Card.Content styleName="main">
-        <List styleName="main-list">
-          <List.Item title={Translate.string('Date and time')}>
-            <Icon name="clock outline" />
-            {formatTimeRange('en', startTime, endTime)}
+      <Card.Content styleName="main" as={List}>
+        <List.Item title={Translate.string('Date and time')}>
+          <Icon name="clock outline" />
+          {formatTimeRange('en', startTime, endTime)}
+        </List.Item>
+        {entryParent?.title && (
+          <List.Item title={Translate.string('Session block title')}>
+            <Icon name="calendar alternate outline" />
+            <Label circular basic>
+              {entryParent.title}
+            </Label>
           </List.Item>
-          {entryParent?.title && (
-            <List.Item title={Translate.string('Session block title')}>
-              <Icon name="calendar alternate outline" />
-              <Label circular basic styleName="session">
-                {entryParent.title}
-              </Label>
-            </List.Item>
-          )}
-          {locationArray?.length > 0 && (
-            <List.Item title={Translate.string('Location')} style={{display: 'flex'}}>
-              <Icon name="map outline" />
-              <p>{locationArray.join(', ')}</p>
-            </List.Item>
-          )}
-          {presenters?.length > 0 && (
-            <List.Item title={Translate.string('Presenters')}>
-              <Icon name="user outline" />
-              <List styleName="inline">
-                {presenters.map(p => (
-                  <List.Item key={p.email}>
-                    <Label image basic>
-                      <Image src={p.avatarURL} />
-                      {p.name}
-                    </Label>
-                  </List.Item>
-                ))}
-              </List>
-            </List.Item>
-          )}
-          {attachments?.length > 0 && (
-            <List.Item title={Translate.string('Attachments')}>
-              <Icon name="copy outline" />
-              <List styleName="inline">
-                {attachments.map(a => {
-                  const iconName = {
-                    attachment: 'file',
-                    folder: 'folder',
-                  }[a.type];
+        )}
+        {locationArray?.length > 0 && (
+          <List.Item title={Translate.string('Location')} style={{display: 'flex'}}>
+            <Icon name="map outline" />
+            <p>{locationArray.join(', ')}</p>
+          </List.Item>
+        )}
+        {presenters?.length > 0 && (
+          <List.Item title={Translate.string('Presenters')}>
+            <Icon name="user outline" />
+            <List styleName="inline">
+              {presenters.map(p => (
+                <List.Item key={p.email}>
+                  <Label image basic>
+                    <Image src={p.avatarURL} />
+                    {p.name}
+                  </Label>
+                </List.Item>
+              ))}
+            </List>
+          </List.Item>
+        )}
+        {attachments?.length > 0 && (
+          <List.Item title={Translate.string('Attachments')}>
+            <Icon name="copy outline" />
+            <List styleName="inline">
+              {attachments.map(a => {
+                const iconName = {
+                  attachment: 'file',
+                  folder: 'folder',
+                }[a.type];
 
-                  return (
-                    <List.Item key={a.id}>
-                      <Label
-                        style={{fontWeight: 'normal'}}
-                        basic
-                        key={a.id}
-                        icon={iconName}
-                        content={a.title}
-                      />
-                    </List.Item>
-                  );
-                })}
-              </List>
-            </List.Item>
-          )}
-        </List>
+                return (
+                  <List.Item key={a.id}>
+                    <Label
+                      style={{fontWeight: 'normal'}}
+                      basic
+                      key={a.id}
+                      icon={iconName}
+                      content={a.title}
+                    />
+                  </List.Item>
+                );
+              })}
+            </List>
+          </List.Item>
+        )}
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
         {type === EntryType.SessionBlock && (

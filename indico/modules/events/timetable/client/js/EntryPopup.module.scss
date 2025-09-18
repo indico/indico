@@ -45,14 +45,14 @@
         > span {
           display: flex;
           align-items: center;
+          gap: 10px;
 
-          :global(.ui.label).header-accent {
-            margin: 0 10px 0 0;
-            min-height: 4px;
-            min-width: 4px;
-            height: 4px;
-            max-height: 4px;
-            max-width: 4px;
+          :global(.ui.label.empty) {
+            margin: 3px;
+            min-width: 12px;
+            max-width: 12px;
+            min-height: 12px;
+            max-height: 12px;
           }
 
           > span {
@@ -98,70 +98,62 @@
 }
 
 :global(.ui.popup > .content).main {
-  padding: 0;
-  margin: 20px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  text-align: left;
+  margin: 20px 0;
 
-  .main-list {
+  > :global(.item) {
     display: flex;
-    flex-direction: column;
     gap: 10px;
+    min-height: 28px;
+    align-items: center;
+    padding: 0;
 
-    > :global(.item) {
+    > :global(.icon) {
+      min-width: 18px;
+      max-width: 18px;
+      min-height: 18px;
+      max-height: 18px;
+      align-self: flex-start;
       display: flex;
-      gap: 10px;
-      min-height: 28px;
-      align-items: center;
+      justify-content: center;
+      margin: 5px 0;
+      padding: 0;
+    }
+
+    &:first-child {
+      margin: 0;
+    }
+
+    > :global(.label) {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      margin: 0;
+    }
+
+    :global(.ui.list) {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 0;
       padding: 0;
 
-      > :global(.icon) {
-        min-width: 18px;
-        max-width: 18px;
-        min-height: 18px;
-        max-height: 18px;
-        align-self: flex-start;
-        display: flex;
-        justify-content: center;
-        margin: 5px 0;
-        padding: 0;
-      }
-
-      &:first-child {
-        margin: 0;
-      }
-
-      > :global(.label) {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        margin: 0;
-      }
-
-      :global(.ui.list) {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin: 0;
+      > :global(.item) {
         padding: 0;
 
-        > :global(.item) {
-          padding: 0;
-
-          > :global(.ui.label) {
-            display: flex;
-          }
-
-          > :global(.ui.basic.image) {
-            font-weight: normal;
-          }
+        > :global(.ui.label) {
+          display: flex;
         }
 
-        &.inline {
-          flex-wrap: wrap;
-          flex-direction: row;
+        > :global(.ui.basic.image) {
+          font-weight: normal;
         }
+      }
+
+      &.inline {
+        flex-wrap: wrap;
+        flex-direction: row;
       }
     }
   }
