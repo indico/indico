@@ -4,6 +4,7 @@
     "allowJs": true,
     "noEmit": true,
     "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
     "isolatedModules": true,
     "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
