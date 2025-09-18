@@ -34,7 +34,7 @@
     >.header-wrapper-content {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 10px;
 
       > :global(.header) {
         margin: 0;
@@ -42,7 +42,7 @@
         flex-direction: column;
         gap: 10px;
 
-        >span {
+        > span {
           display: flex;
           align-items: center;
 
@@ -55,7 +55,7 @@
             max-width: 4px;
           }
 
-          >span {
+          > span {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -108,22 +108,34 @@
   .main-list {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 
     > :global(.item) {
       display: flex;
       gap: 10px;
-      margin: 10px 0 0 0;
+      min-height: 28px;
+      align-items: center;
+      padding: 0;
 
       > :global(.icon) {
         min-width: 18px;
-        text-align: center;
+        max-width: 18px;
+        min-height: 18px;
+        max-height: 18px;
+        align-self: flex-start;
         display: flex;
         justify-content: center;
-        margin: 0;
+        margin: 5px 0;
         padding: 0;
       }
 
       &:first-child {
+        margin: 0;
+      }
+
+      > :global(.label) {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
         margin: 0;
       }
 
@@ -137,8 +149,12 @@
         > :global(.item) {
           padding: 0;
 
-          > :global(.image) {
-            background-color: #e8e8e8;
+          > :global(.ui.label) {
+            display: flex;
+          }
+
+          > :global(.ui.basic.image) {
+            font-weight: normal;
           }
         }
 

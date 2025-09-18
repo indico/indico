@@ -16,7 +16,7 @@ import './EntryPopup.module.scss';
 import moment from 'moment';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {Button, Card, Icon, List, Popup, Label, Header, PopupProps} from 'semantic-ui-react';
+import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import './Entry.module.scss';
@@ -210,9 +210,9 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
               <List styleName="inline">
                 {presenters.map(p => (
                   <List.Item key={p.email}>
-                    <Label image>
-                      <img src={p.avatarURL} />
-                      <span>{p.name}</span>
+                    <Label image basic>
+                      <Image src={p.avatarURL} />
+                      {p.name}
                     </Label>
                   </List.Item>
                 ))}
