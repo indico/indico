@@ -7,6 +7,7 @@
 
 import locationsURL from 'indico-url:event_management.api_locations';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Dropdown, Form, Icon, Popup} from 'semantic-ui-react';
@@ -16,6 +17,14 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
 import './LocationField.module.scss';
+
+const EMPTY_LOCATION_VALUE = {
+  venue_id: null,
+  venue_name: '',
+  room_id: null,
+  room_name: '',
+  address: '',
+};
 
 const processLocations = (locations, value) => {
   if (!locations.length) {
@@ -67,7 +76,7 @@ export default function LocationField({
   const locations = data?.locations || [];
   const [venues, rooms] = processLocations(locations, value);
 
-  const handleChangeVenue = (_, {value: locationId}) => {
+  const handleChangeVenue = (evt, {value: locationId}) => {
     if (typeof locationId === 'string') {
       onChange({
         ...value,
@@ -87,7 +96,7 @@ export default function LocationField({
     });
   };
 
-  const handleChangeRoom = (_, {value: roomId}) => {
+  const handleChangeRoom = (evt, {value: roomId}) => {
     if (typeof roomId === 'string') {
       onChange({
         ...value,
@@ -108,7 +117,7 @@ export default function LocationField({
 
   const makeOnChange =
     key =>
-    (_, {value: fieldValue}) =>
+    (evt, {value: fieldValue}) =>
       onChange({...value, [key]: fieldValue});
 
   return (
@@ -180,11 +189,11 @@ export default function LocationField({
           <Form.Checkbox
             label={Translate.string('Use default')}
             checked={value.inheriting}
-            onChange={(_, {checked}) =>
+            onChange={(evt, {checked}) =>
               onChange(
                 checked
                   ? {...locationParent.location_data, inheriting: true}
-                  : {...value, inheriting: false}
+                  : {...EMPTY_LOCATION_VALUE, inheriting: false}
               )
             }
             disabled={disabled}
@@ -240,7 +249,7 @@ LocationField.defaultProps = {
 };
 
 export function FinalLocationField({name, ...rest}) {
-  return <FinalField name={name} component={LocationField} {...rest} />;
+  return <FinalField name={name} component={LocationField} isEqual={_.isEqual} {...rest} />;
 }
 
 FinalLocationField.propTypes = {
