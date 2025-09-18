@@ -104,6 +104,7 @@ export function DayTimetable({
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const eventEndDt = useSelector(selectors.getEventEndDt);
+  const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const limits = useSelector(selectors.getCurrentLimits);
@@ -266,6 +267,8 @@ export function DayTimetable({
         actions.setDraftEntry({
           startDt: moment.max(startDt, dt),
           duration: defaultContributionDuration,
+          locationParent: eventLocationParent,
+          locationData: {...eventLocationParent.location_data, inheriting: true},
           y,
         })
       );

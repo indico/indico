@@ -36,6 +36,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
+  const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const currentDayIdx = getDiffInDays(eventStart, currentDate);
   const currentDayIdxRef = useRef<number>(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
@@ -86,7 +87,12 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
       moment(e.startDt).add(e.duration, 'minutes')
     );
     const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
-    const draftEntry = {startDt: newDt, duration: defaultContributionDuration};
+    const draftEntry = {
+      startDt: newDt,
+      duration: defaultContributionDuration,
+      locationParent: eventLocationParent,
+      locationData: {...eventLocationParent.location_data, inheriting: true},
+    };
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
