@@ -55,7 +55,6 @@ from indico.modules.events.management.controllers.emails import (EmailRolesMetad
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
-from indico.modules.events.sessions.schemas import LocationParentSchema
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
@@ -64,6 +63,7 @@ from indico.modules.events.util import (check_event_locked, get_field_values, se
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
+from indico.util.locations import LocationParentSchema
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
 from indico.web.args import use_args, use_args_schema_context, use_kwargs

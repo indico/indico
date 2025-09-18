@@ -22,12 +22,12 @@ from indico.modules.events.contributions.models.references import ContributionRe
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema, LocationDataSchema
+from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import SortedList
+from indico.util.locations import LocationDataSchema
+from indico.util.marshmallow import EventTimezoneDateTimeField, SortedList
 from indico.web.flask.util import url_for
-from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
 class BasicContributionSchema(mm.SQLAlchemyAutoSchema):

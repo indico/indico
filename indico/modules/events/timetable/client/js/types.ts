@@ -38,10 +38,17 @@ export interface Colors {
 
 export interface LocationData {
   address: string;
+  venueId?: number;
   venueName: string;
-  room: string;
+  roomId?: string;
   roomName: string;
   inheriting?: boolean;
+}
+
+export interface LocationParent {
+  location_data: LocationParent;
+  type: string;
+  title: string;
 }
 
 export interface Attachments {
@@ -66,6 +73,7 @@ export interface BaseEntry {
   description: string;
   colors?: Colors;
   locationData?: LocationData;
+  locationParent?: LocationParent;
 }
 
 export interface ScheduledMixin {
@@ -111,6 +119,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   children: ChildEntry[];
   personLinks: PersonLink[];
   attachments: Attachments;
+  childLocationParent: LocationParent;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
