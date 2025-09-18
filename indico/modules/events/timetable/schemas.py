@@ -14,23 +14,24 @@ from indico.modules.events.contributions.schemas import (ContribFieldValueSchema
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.schemas import LocationDataSchema, SessionColorSchema
+from indico.modules.events.sessions.schemas import SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
+from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField
 
 
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id',
-                  'session_title')
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'location_parent',
+                  'child_location_parent', 'session_id', 'session_title')
         rh_context = ('event',)
 
     start_dt = EventTimezoneDateTimeField()
     location_data = fields.Nested(LocationDataSchema)
-    conveners = fields.List(fields.Nested(
-        _SessionBlockPersonLinkSchema(unknown=EXCLUDE),
-    ), attribute='person_links')
+    location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
+    child_location_parent = fields.Nested(LocationParentSchema)
+    conveners = fields.List(fields.Nested(_SessionBlockPersonLinkSchema(unknown=EXCLUDE)), attribute='person_links')
     duration = fields.TimeDelta(required=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
 
@@ -43,8 +44,8 @@ def _get_break_session_id(entry):
 class BreakSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Break
-        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'colors', 'type',
-                  'parent_id', 'session_block_id', 'session_id')
+        fields = ('id', 'title', 'description', 'start_dt', 'duration', 'location_data', 'location_parent', 'colors',
+                  'type', 'parent_id', 'session_block_id', 'session_id')
         rh_context = ('event',)
 
     title = fields.String(required=True)
@@ -52,6 +53,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     start_dt = EventTimezoneDateTimeField()
     duration = fields.TimeDelta(required=True)
     location_data = fields.Nested(LocationDataSchema)
+    location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
     colors = fields.Nested(SessionColorSchema)
     parent_id = fields.Integer(attribute='timetable_entry.parent_id')
     session_block_id = fields.Integer(attribute='timetable_entry.parent.session_block_id')
@@ -61,7 +63,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data', 'location_parent',
                   'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links', 'session_block',
                   'session_block_id', 'session_id')
         rh_context = ('event',)
@@ -73,6 +75,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
+    location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)

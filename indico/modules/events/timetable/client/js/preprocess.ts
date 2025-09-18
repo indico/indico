@@ -16,6 +16,7 @@ import {
   Colors,
   DayEntries,
   EntryType,
+  LocationData,
   PersonLink,
   Session,
   UnscheduledContrib,
@@ -48,9 +49,7 @@ interface SchemaBlock extends SchemaEntry {
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
   attachments?: Attachments;
-  address?: string;
-  venueName?: string;
-  room?: string;
+  locationData: LocationData;
 }
 
 const entryTypeMapping = {
@@ -99,9 +98,8 @@ export function preprocessTimetableEntries(
       const {
         duration,
         description = '',
-        address = '',
-        room = '',
-        location: venueName = '',
+        locationData,
+        childLocationParent,
         personLinks,
         boardNumber = '',
         code,
@@ -129,11 +127,8 @@ export function preprocessTimetableEntries(
         personLinks,
         boardNumber,
         code,
-        locationData: {
-          address,
-          room,
-          venueName,
-        },
+        locationData,
+        childLocationParent,
         attachments,
       });
 
@@ -156,11 +151,7 @@ export function preprocessTimetableEntries(
             sessionBlockId: dayEntries[day].at(-1).id,
             x: 0,
             y: 0,
-            locationData: {
-              address: c.address,
-              room: c.room,
-              venueName: c.venueName,
-            },
+            locationData: c.locationData,
             width: 0,
             column: 0,
             maxColumn: 0,
@@ -206,9 +197,7 @@ export function preprocessTimetableEntries(
           personLinks,
           boardNumber,
           code,
-          address,
-          room,
-          venueName,
+          locationData,
           attachments,
         }) => ({
           type: EntryType.Contribution,
@@ -221,11 +210,7 @@ export function preprocessTimetableEntries(
           personLinks,
           boardNumber,
           code,
-          locationData: {
-            address,
-            room,
-            venueName,
-          },
+          locationData,
           attachments,
         })
       ),
