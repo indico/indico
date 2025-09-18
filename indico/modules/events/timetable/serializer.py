@@ -16,6 +16,8 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.date_time import iterdays
+from indico.util.locations import LocationDataSchema, LocationParentSchema
+from indico.util.string import camelize_keys
 from indico.web.flask.util import url_for
 
 
@@ -48,19 +50,6 @@ def get_color_data(obj):
             'color': f'#{obj.text_color}',
         }
     }
-
-
-def _get_location_data(obj, *, management=False):
-    data = {}
-    data['location'] = obj.venue_name
-    data['room'] = obj.room_name
-    data['inheritLoc'] = obj.inherit_location
-    data['inheritRoom'] = obj.inherit_location
-    data['venueName'] = obj.venue_name
-
-    if management:
-        data['address'] = obj.address
-    return data
 
 
 def _get_person_link_roles(person_link):
@@ -172,7 +161,6 @@ class TimetableSerializer:
         else:
             entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
-        data.update(self._get_location_data(block))
         data.update({'entryType': 'Session',
                      'sessionId': block.session_id,
                      'sessionCode': block.session.code,
@@ -189,6 +177,8 @@ class TimetableSerializer:
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
                      'friendlyId': block.session.friendly_id,
+                     'locationData': camelize_keys(LocationDataSchema().dump(block)),
+                     'childLocationParent': LocationParentSchema().dump(block.child_location_parent),
                      **get_color_data(block.session)})
         return data
 
@@ -201,7 +191,6 @@ class TimetableSerializer:
         data.update(self._get_entry_data(entry))
         if contribution.session:
             data.update(get_color_data(contribution.session))
-        data.update(self._get_location_data(contribution))
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
@@ -213,8 +202,9 @@ class TimetableSerializer:
                      'code': contribution.code,
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
-                    #  'sessionSlotId': block.id if block else None,
-                    #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
+                     # 'sessionSlotId': block.id if block else None,
+                     # 'sessionSlotEntryId': entry.parent.id if entry.parent else None,
+                     'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
@@ -233,7 +223,6 @@ class TimetableSerializer:
         break_ = entry.break_
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update(self._get_location_data(break_))
         data.update({'entryType': 'Break',
                      '_type': 'BreakTimeSchEntry',
                      '_fossil': 'breakTimeSchEntry',
@@ -244,6 +233,7 @@ class TimetableSerializer:
                     #  'sessionSlotId': block.id if block else None,
                     #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': break_.title,
+                     'locationData': camelize_keys(LocationDataSchema().dump(break_)),
                      **get_color_data(break_)})
         return data
 
@@ -300,9 +290,6 @@ class TimetableSerializer:
                 'time': dt.astimezone(tzinfo).strftime('%H:%M:%S'),
                 'tz': str(tzinfo)}
 
-    def _get_location_data(self, obj):
-        return _get_location_data(obj, management=self.management)
-
     def _get_person_data(self, person_link):
         return _get_person_data(person_link, can_manage_event=self.can_manage_event)
 
@@ -344,8 +331,8 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
                  'url': url_for('contributions.display_contribution', contribution),
                  'friendlyId': contribution.friendly_id,
                  'references': [],
+                 'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
                  'board_number': contribution.board_number})
-    data.update(**_get_location_data(contribution, management=management))
     return data
 
 
@@ -361,6 +348,7 @@ def serialize_event_info(event, *, management=False, user=None):
             'isDraft': should_show_draft_warning(event),
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
             'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
+            'locationParent': LocationParentSchema().dump(event),
             'contributions': [serialize_unscheduled_contribution(c, management=management,
                                                                  can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
@@ -370,13 +358,9 @@ def serialize_session(sess):
     """Return data for a single session."""
     return {
         '_type': 'Session',
-        'address': sess.address,
         'description': sess.description,
         'id': sess.id,
         'isPoster': sess.is_poster,
-        'location': sess.venue_name,
-        'room': sess.room_name,
-        'roomFullname': sess.room_name,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
         'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60,
