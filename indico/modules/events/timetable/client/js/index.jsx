@@ -40,6 +40,7 @@ import {getCurrentDateLocalStorage} from './utils';
             eventInfo.endDate.tz
           ),
           defaultContribDurationMinutes: eventInfo.defaultContribDurationMinutes,
+          eventLocationParent: eventInfo.locationParent,
         },
         navigation: {
           isDraft: eventInfo.isDraft,
