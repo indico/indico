@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment, unitOfTime} from 'moment';
+import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
 
 import {camelizeKeys} from 'indico/utils/case';
