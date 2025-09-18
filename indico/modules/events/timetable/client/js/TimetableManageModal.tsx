@@ -19,7 +19,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
-import {FinalModalForm, getChangedValues} from 'indico/react/forms/final-form';
+import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
@@ -152,6 +152,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         initialValues={initialValues}
         personLinkFieldParams={personLinkFieldParams}
         extraOptions={extraOptions}
+        locationParent={snakifyKeys(entry.locationParent)}
       />
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
@@ -160,7 +161,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         <SessionBlockFormFields
           eventId={eventId}
           extraOptions={extraOptions}
-          locationParent={null}
+          locationParent={snakifyKeys(entry.locationParent)}
         />
       </>
     ) : (
@@ -174,7 +175,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     [EntryType.Break]: (
       <BreakFormFields
         eventId={eventId}
-        locationParent={undefined}
+        locationParent={snakifyKeys(entry.locationParent)}
         initialValues={initialValues}
         extraOptions={extraOptions}
         hasParent={'sessionBlockId' in entry}
@@ -284,7 +285,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     const submitData = snakifyKeys(data);
-    const {data: resData} = await submitHandler(submitData);
+    let resData;
+    try {
+      resData = (await submitHandler(submitData)).data;
+    } catch (exc) {
+      return handleSubmitError(exc);
+    }
     resData.type = activeType;
 
     const resEntry = mapTTDataToEntry(resData, sessions);

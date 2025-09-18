@@ -26,14 +26,15 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
-from indico.modules.events.sessions.schemas import (LocationParentSchema, SessionBlockSchema, SessionColorSchema,
-                                                    SessionSchema, SessionTypeSchema)
+from indico.modules.events.sessions.schemas import (SessionBlockSchema, SessionColorSchema, SessionSchema,
+                                                    SessionTypeSchema)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.timetable.operations import create_session_block_entry
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
+from indico.util.locations import LocationParentSchema
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_args_schema_context
 from indico.web.flask.templating import get_template_module
