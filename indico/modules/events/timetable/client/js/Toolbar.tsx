@@ -27,7 +27,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const eventStart = useSelector(selectors.getEventStartDt);
   const eventEnd = useSelector(selectors.getEventEndDt);
   const numDays = useSelector(selectors.getEventNumDays);
-  const numUnscheduled = useSelector(selectors.getNumUnscheduled);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
@@ -104,19 +103,17 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
       <Menu compact secondary styleName="actions-bar">
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
-          disabled={!showUnscheduled && numUnscheduled === 0}
           title={
             showUnscheduled
+              // TODO: (Ajob) Rename to 'show draft entries' or something like that
+              //              once we have changed this sidemenu's features.
               ? Translate.string('Hide unscheduled contributions')
               : Translate.string('Show unscheduled contributions')
           }
           styleName="action"
         >
           <Icon.Group>
-            <Icon name="file alternate outline" />
-            {!showUnscheduled && (
-              <Label color="red" size="mini" content={numUnscheduled} floating circular />
-            )}
+            <Icon name="grid layout" />
           </Icon.Group>
         </Menu.Item>
         <Menu.Item
