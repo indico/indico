@@ -103,11 +103,11 @@ export interface BreakEntry extends BaseEntry, ScheduledMixin {
 }
 
 export interface ChildContribEntry extends ContribEntry {
-  sessionBlockId: number;
+  sessionBlockId: string;
 }
 
 export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: number;
+  sessionBlockId: string;
 }
 
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
