@@ -157,6 +157,7 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
+  parent,
   colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
