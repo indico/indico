@@ -76,7 +76,6 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
         entry.type === EntryType.SessionBlock ? (
           <DraggableBlockEntry
             key={entry.id}
-            // setDuration={setDuration}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
