@@ -40,7 +40,6 @@ export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
-export const DISMISS_ERROR = 'Dismiss error';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
@@ -260,10 +259,6 @@ export function undoChange(): UndoChangeAction {
 
 export function redoChange(): RedoChangeAction {
   return {type: REDO_CHANGE};
-}
-
-export function dismissError() {
-  return {type: DISMISS_ERROR};
 }
 
 export function toggleShowUnscheduled() {
