@@ -8,7 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, Label, Menu} from 'semantic-ui-react';
+import {Icon, Menu} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -105,9 +105,9 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
           title={
             showUnscheduled
-              // TODO: (Ajob) Rename to 'show draft entries' or something like that
-              //              once we have changed this sidemenu's features.
-              ? Translate.string('Hide unscheduled contributions')
+              ? // TODO: (Ajob) Rename to 'show draft entries' or something like that
+                //              once we have changed this sidemenu's features.
+                Translate.string('Hide unscheduled contributions')
               : Translate.string('Show unscheduled contributions')
           }
           styleName="action"
