@@ -25,7 +25,6 @@ interface Entries {
   currentChangeIdx: number;
   selectedId: number | null;
   draggedIds: Set<number>;
-  error: string | null;
 }
 
 export interface ReduxState {
@@ -43,7 +42,6 @@ export default {
       currentChangeIdx: 0,
       selectedId: null,
       draggedIds: new Set(),
-      error: null,
     },
     action: actions.Action
   ) => {
@@ -404,8 +402,6 @@ export default {
           ...state,
           currentChangeIdx: Math.min(state.changes.length - 1, state.currentChangeIdx + 1),
         };
-      case actions.DISMISS_ERROR:
-        return {...state, error: null};
       default:
         return state;
     }
