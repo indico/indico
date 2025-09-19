@@ -475,7 +475,7 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
   }, []);
 
   const onMouseDown = useCallback(
-    (e: MouseEvent) => {
+    (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
