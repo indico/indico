@@ -361,8 +361,7 @@ export function layoutAfterUnscheduledDropOnBlock(
     sessionBlockId: toBlock.id,
   };
 
-  // TODO
-  if (draftEntry.backgroundColor) {
+  if ('backgroundColor' in draftEntry) {
     delete draftEntry.backgroundColor;
   }
 
