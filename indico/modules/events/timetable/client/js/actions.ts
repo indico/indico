@@ -114,6 +114,14 @@ interface DeleteBlockAction {
   eventId: number;
 }
 
+interface UndoChangeAction {
+  type: typeof UNDO_CHANGE;
+}
+
+interface RedoChangeAction {
+  type: typeof REDO_CHANGE;
+}
+
 export type Action =
   | ResizeEntryAction
   | MoveEntryAction
@@ -125,7 +133,9 @@ export type Action =
   | UpdateEntryAction
   | DeleteBreakAction
   | DeleteBlockAction
-  | SetDraftEntryAction;
+  | SetDraftEntryAction
+  | UndoChangeAction
+  | RedoChangeAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -244,11 +254,11 @@ export function unscheduleEntry(entry, eventId) {
   });
 }
 
-export function undoChange() {
+export function undoChange(): UndoChangeAction {
   return {type: UNDO_CHANGE};
 }
 
-export function redoChange() {
+export function redoChange(): RedoChangeAction {
   return {type: REDO_CHANGE};
 }
 
