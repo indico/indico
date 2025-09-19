@@ -13,6 +13,7 @@ import {Button} from 'semantic-ui-react';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
+import { Translate } from 'indico/react/i18n';
 
 function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[]}) {
   return (
@@ -104,7 +105,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               type="button"
               onClick={() => setSelectedFilter('no-session')}
             >
-              No assigned session
+              <Translate>No assigned session</Translate>
             </Button>
             {Object.entries(sessions)
               .filter(([id]) => hasContribs(id))
