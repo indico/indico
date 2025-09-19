@@ -47,6 +47,12 @@ export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
 
+interface SetTimetableDataAction {
+  type: typeof SET_TIMETABLE_DATA;
+  data: any;
+  eventInfo: any;
+}
+
 interface SetDraftEntryAction {
   type: typeof SET_DRAFT_ENTRY;
   data: TopLevelEntry | null;
@@ -122,6 +128,7 @@ interface RedoChangeAction {
 }
 
 export type Action =
+  | SetTimetableDataAction
   | ResizeEntryAction
   | MoveEntryAction
   | SelectEntryAction
@@ -136,7 +143,7 @@ export type Action =
   | UndoChangeAction
   | RedoChangeAction;
 
-export function setTimetableData(data, eventInfo) {
+export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
 }
 
