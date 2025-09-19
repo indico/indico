@@ -8,12 +8,14 @@
 import {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Button} from 'semantic-ui-react';
+import {Button, Label, Select} from 'semantic-ui-react';
+
+import SessionEditForm, {SessionCreateForm} from 'indico/modules/events/sessions/SessionForm';
+import {Translate} from 'indico/react/i18n';
 
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
-import { Translate } from 'indico/react/i18n';
 
 function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[]}) {
   return (
@@ -33,12 +35,16 @@ function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[
 }
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
+  const eventId = useSelector(selectors.getEventId);
+  const eventType = useSelector(selectors.getEventType);
   const contribs = useSelector(selectors.getUnscheduled);
+  const contribsGrouped = Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session');
   const sessions = useSelector(selectors.getSessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const wrapperRef = useRef(null);
 
-  const [selectedFilter, setSelectedFilter] = useState('no-session');
+  const [selectedFilter, setSelectedFilter] = useState<string | 'no-session'>('no-session');
+  const [draftSessionId, setDraftSessionId] = useState<number | 'new' | null>(null);
 
   const resizing = useRef<boolean>(false);
   const initialPosition = useRef<number>(0);
@@ -66,21 +72,52 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     };
   }, []);
 
-  function hasContribs(sessionId: string) {
-    return contribs.some(c => c.sessionId === parseInt(sessionId, 10));
-  }
-
   const currentContribs = useMemo(() => {
-    if (selectedFilter === 'no-session') {
-      return contribs.filter(c => !c.sessionId);
-    }
-    return contribs.filter(c => c.sessionId === parseInt(selectedFilter, 10));
+    return contribsGrouped[selectedFilter] ?? [];
   }, [contribs, selectedFilter]);
 
   if (!showUnscheduled) {
     return null;
   }
 
+  let dropdownSessions = Object.entries(sessions).map(([id, session]) => ({
+    value: +id,
+    text: (
+      <div styleName="session" style={{fontSize: '0.8em'}}>
+        <Label
+          empty
+          circular
+          style={{
+            ...session.colors,
+            width: '0.8em',
+            height: '0.8em',
+            fontWeight: 'normal',
+          }}
+        />
+        {session.title} ({contribsGrouped[id]?.length})
+      </div>
+    ),
+  }));
+
+  dropdownSessions = dropdownSessions.toSorted((s1, s2) => {
+    const l1 = contribsGrouped[s1.value]?.length ?? 0;
+    const l2 = contribsGrouped[s2.value]?.length ?? 0;
+
+    // TODO: (Ajob) Fix this logic to not shift things based on length but only
+    //              whether or not they have children.
+    // if (l1 === l2 || (l1 > 0 && l2 > 0)) {
+    //   return 0;
+    // } else if (l1 === 0) {
+    //   return -1;
+    // } else {
+    //   return 1;
+    // }
+    return l1 < l2;
+  });
+
+  // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
+  //              I propose we have some kind of filter option to search by entry type,
+  //              session, etc. If no filters are applied, everything is visible.
   return (
     <>
       <div
@@ -90,48 +127,86 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       >
         <div
           styleName="content"
-          style={{overflowX: 'auto', maxHeight: '100%', padding: '1em 1em 5em 0'}}
+          style={{overflowX: 'auto', height: '100%', padding: '1em 1em 5em 0'}}
         >
           <div
             style={{
               display: 'flex',
-              flexWrap: 'wrap',
-              gap: '.5em',
-              marginBottom: '2em',
+              flexDirection: 'column',
+              gap: '20px',
             }}
           >
-            <Button
-              primary={selectedFilter === 'no-session'}
-              type="button"
-              onClick={() => setSelectedFilter('no-session')}
-            >
-              <Translate>No assigned session</Translate>
-            </Button>
-            {Object.entries(sessions)
-              .filter(([id]) => hasContribs(id))
-              .map(([id, session]) => (
+            <div styleName="actions">
+              {/* TODO: (Ajob) This design is not great, but reworking the side-bar
+                               will be part of a separate PR.
+              */}
+              <Select
+                button
+                defaultValue="no-session"
+                onChange={(_, {value}) => setSelectedFilter(value)}
+                options={[
+                  {
+                    value: 'no-session',
+                    text: (
+                      <div styleName="session" style={{fontSize: '0.8em'}}>
+                        <Label
+                          empty
+                          circular
+                          color="grey"
+                          style={{
+                            width: '0.8em',
+                            height: '0.8em',
+                            fontWeight: 'normal',
+                          }}
+                        />
+                        <Translate>No assigned session</Translate>
+                      </div>
+                    ),
+                  },
+                  ...dropdownSessions,
+                ]}
+              />
+              {Number.isInteger(+selectedFilter) && (
                 <Button
-                  key={id}
+                  basic
                   type="button"
-                  primary={selectedFilter === id}
-                  onClick={() => setSelectedFilter(id)}
-                >
-                  <span style={{display: 'flex', gap: '.5em', alignItems: 'center'}}>
-                    <span>{session.title}</span>
-                    <span
-                      style={{
-                        borderRadius: '50%',
-                        width: '1em',
-                        height: '1em',
-                        ...session.colors,
-                      }}
-                    />
-                  </span>
-                </Button>
-              ))}
+                  title={Translate.string('Edit selected session')}
+                  icon="edit"
+                  size="mini"
+                  disabled={!Number.isInteger(+selectedFilter)}
+                  onClick={() => setDraftSessionId(+selectedFilter)}
+                />
+              )}
+              <Button
+                basic
+                type="button"
+                title={Translate.string('Create new session')}
+                icon="plus"
+                size="mini"
+                onClick={() => setDraftSessionId('new')}
+              />
+            </div>
           </div>
-
-          <UnscheduledContributionList dt={dt} contribs={currentContribs} />
+          {draftSessionId === 'new' && (
+            <SessionCreateForm
+              eventId={eventId}
+              eventType={eventType}
+              onClose={() => setDraftSessionId(null)}
+            />
+          )}
+          {Number.isInteger(draftSessionId) && (
+            <SessionEditForm
+              eventId={eventId}
+              eventType={eventType}
+              sessionId={draftSessionId as number}
+              onClose={() => setDraftSessionId(null)}
+            />
+          )}
+          {currentContribs.length > 0 ? (
+            <UnscheduledContributionList dt={dt} contribs={currentContribs} />
+          ) : (
+            <Translate>This session has no contributions</Translate>
+          )}
         </div>
       </div>
       <div

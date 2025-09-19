@@ -41,6 +41,10 @@ export const getEventId = createSelector(
     return staticData.eventId;
   }
 );
+export const getEventType = createSelector(
+  getStaticData,
+  staticData => staticData.eventType
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt
