@@ -199,8 +199,8 @@ export function preprocessTimetableEntries(
           code,
           locationData,
           attachments,
+          colors = getDefaultColorByType(EntryType.Contribution),
         }) => ({
-          type: EntryType.Contribution,
           id,
           objId,
           sessionId,
@@ -212,6 +212,7 @@ export function preprocessTimetableEntries(
           code,
           locationData,
           attachments,
+          colors,
         })
       ),
   };
