@@ -15,7 +15,7 @@ import {
   getWidthAndOffset,
   layoutGroupAfterMove,
 } from './layout';
-import {BlockEntry, ChildContribEntry, ChildEntry, ContribEntry} from './types';
+import {BlockEntry, ChildContribEntry, ChildEntry, ContribEntry, EntryType} from './types';
 
 function makeCounter() {
   let id = 0;
@@ -59,7 +59,7 @@ function contrib({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: number;
+  id?: string;
   title?: string;
   time: string;
   duration: number;
@@ -67,15 +67,20 @@ function contrib({
   maxColumn?: number;
 }): ContribEntry {
   if (id === undefined) {
-    id = nextId();
+    id = `c${nextId()}`;
   }
   if (title === undefined) {
     title = `Contrib ${id}`;
   }
+  const objId = parseInt(id.slice(1), 10);
   return {
     id,
+    objId,
     title,
-    type: 'contrib',
+    description: '',
+    personLinks: [],
+    attachments: {files: [], folders: []},
+    type: EntryType.Contribution,
     duration,
     ...scheduleMixin({time, column, maxColumn}),
   };
@@ -90,8 +95,8 @@ function childContrib({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: number;
-  sessionBlockId: number;
+  id?: string;
+  sessionBlockId: string;
   title?: string;
   time: string;
   duration: number;
@@ -110,7 +115,7 @@ function block({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: number;
+  id?: string;
   title?: string;
   children: ChildEntry[];
   time: string;
@@ -119,16 +124,23 @@ function block({
   maxColumn?: number;
 }): BlockEntry {
   if (id === undefined) {
-    id = nextId();
+    id = `b${nextId()}`;
   }
   if (title === undefined) {
     title = `Block ${id}`;
   }
+  const objId = parseInt(id.slice(1), 10);
   return {
     id,
+    objId,
     title,
-    type: 'block',
+    sessionTitle: 'Session',
+    description: '',
+    personLinks: [],
+    attachments: {files: [], folders: []},
+    type: EntryType.SessionBlock,
     sessionId: 0,
+    childLocationParent: {location_data: null, type: 'event', title: ''},
     duration,
     children,
     ...scheduleMixin({time, column, maxColumn}),
@@ -155,58 +167,58 @@ beforeEach(() => {
 
 describe('getGroups()', () => {
   const cases = [
-    {entries: [contrib({id: 0, time: '10:00', duration: 60})], groups: [new Set([0])]},
+    {entries: [contrib({id: 'c0', time: '10:00', duration: 60})], groups: [new Set(['c0'])]},
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
       ],
-      groups: [new Set([0]), new Set([1])],
+      groups: [new Set(['c0']), new Set(['c1'])],
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '10:30', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '10:30', duration: 60}),
       ],
-      groups: [new Set([0, 1])],
+      groups: [new Set(['c0', 'c1'])],
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '10:00', duration: 120}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '10:00', duration: 120}),
       ],
-      groups: [new Set([0, 1, 2])],
+      groups: [new Set(['c0', 'c1', 'c2'])],
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '12:00', duration: 60}),
-        contrib({id: 3, time: '10:30', duration: 90}),
-        contrib({id: 4, time: '11:00', duration: 120}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '12:00', duration: 60}),
+        contrib({id: 'c3', time: '10:30', duration: 90}),
+        contrib({id: 'c4', time: '11:00', duration: 120}),
       ],
-      groups: [new Set([0, 1, 2, 3, 4])],
+      groups: [new Set(['c0', 'c1', 'c2', 'c3', 'c4'])],
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '10:30', duration: 90}),
-        contrib({id: 3, time: '12:00', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '10:30', duration: 90}),
+        contrib({id: 'c3', time: '12:00', duration: 60}),
       ],
-      groups: [new Set([0, 1, 2]), new Set([3])],
+      groups: [new Set(['c0', 'c1', 'c2']), new Set(['c3'])],
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '10:20', duration: 60}),
-        contrib({id: 2, time: '12:00', duration: 60}),
-        contrib({id: 3, time: '12:20', duration: 60}),
-        contrib({id: 4, time: '14:00', duration: 60}),
-        contrib({id: 5, time: '14:20', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '10:20', duration: 60}),
+        contrib({id: 'c2', time: '12:00', duration: 60}),
+        contrib({id: 'c3', time: '12:20', duration: 60}),
+        contrib({id: 'c4', time: '14:00', duration: 60}),
+        contrib({id: 'c5', time: '14:20', duration: 60}),
       ],
-      groups: [new Set([0, 1]), new Set([2, 3]), new Set([4, 5])],
+      groups: [new Set(['c0', 'c1']), new Set(['c2', 'c3']), new Set(['c4', 'c5'])],
     },
   ];
 
@@ -219,47 +231,47 @@ describe('getGroups()', () => {
 
 describe('getGroup()', () => {
   const cases = [
-    {entries: [contrib({id: 0, time: '10:00', duration: 60})], group: new Set()},
+    {entries: [contrib({id: 'c0', time: '10:00', duration: 60})], group: new Set()},
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
       ],
       group: new Set(),
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '10:30', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '10:30', duration: 60}),
       ],
-      group: new Set([1]),
+      group: new Set(['c1']),
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '10:00', duration: 120}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '10:00', duration: 120}),
       ],
-      group: new Set([1, 2]),
+      group: new Set(['c1', 'c2']),
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '12:00', duration: 60}),
-        contrib({id: 3, time: '10:30', duration: 90}),
-        contrib({id: 4, time: '11:00', duration: 120}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '12:00', duration: 60}),
+        contrib({id: 'c3', time: '10:30', duration: 90}),
+        contrib({id: 'c4', time: '11:00', duration: 120}),
       ],
-      group: new Set([1, 2, 3, 4]),
+      group: new Set(['c1', 'c2', 'c3', 'c4']),
     },
     {
       entries: [
-        contrib({id: 0, time: '10:00', duration: 60}),
-        contrib({id: 1, time: '11:00', duration: 60}),
-        contrib({id: 2, time: '10:30', duration: 90}),
-        contrib({id: 3, time: '12:00', duration: 60}),
+        contrib({id: 'c0', time: '10:00', duration: 60}),
+        contrib({id: 'c1', time: '11:00', duration: 60}),
+        contrib({id: 'c2', time: '10:30', duration: 90}),
+        contrib({id: 'c3', time: '12:00', duration: 60}),
       ],
-      group: new Set([1, 2]),
+      group: new Set(['c1', 'c2']),
     },
   ];
 
@@ -489,18 +501,18 @@ describe('computeYOffset()', () => {
   it('Should compute the Y offset of child entries', () => {
     const entries = [
       block({
-        id: 0,
+        id: 'b0',
         time: '10:00',
         duration: 60,
-        children: [childContrib({sessionBlockId: 0, time: '10:00', duration: 30})],
+        children: [childContrib({sessionBlockId: 'b0', time: '10:00', duration: 30})],
       }),
       block({
-        id: 1,
+        id: 'b1',
         time: '11:00',
         duration: 60,
         children: [
-          childContrib({sessionBlockId: 1, time: '11:00', duration: 30}),
-          childContrib({sessionBlockId: 1, time: '11:30', duration: 30}),
+          childContrib({sessionBlockId: 'b1', time: '11:00', duration: 30}),
+          childContrib({sessionBlockId: 'b1', time: '11:30', duration: 30}),
         ],
       }),
     ];
