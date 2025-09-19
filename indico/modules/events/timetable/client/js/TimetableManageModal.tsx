@@ -16,6 +16,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
@@ -29,6 +30,7 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
+import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session} from './types';
@@ -95,7 +97,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onClose = () => null,
   onSubmit = () => null,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId} = entry;
