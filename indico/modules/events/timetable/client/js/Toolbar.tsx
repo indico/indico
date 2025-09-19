@@ -8,7 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, Label, Menu, Message} from 'semantic-ui-react';
+import {Icon, Label, Menu} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -30,7 +30,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
-  const error = useSelector(selectors.getError);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
@@ -102,15 +101,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
 
   return (
     <div styleName="toolbar" ref={ref}>
-      {error && (
-        <Message
-          warning
-          icon="warning sign"
-          header={error.title}
-          content={<p>{error.content}</p>}
-          onDismiss={() => dispatch(actions.dismissError())}
-        />
-      )}
       <Menu compact secondary styleName="actions-bar">
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}
