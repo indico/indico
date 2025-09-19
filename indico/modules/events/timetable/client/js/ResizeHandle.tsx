@@ -14,7 +14,6 @@ import './DayTimetable.module.scss';
 const gridSize = minutesToPixels(5);
 
 export default function ResizeHandle({
-  forBlock = false,
   duration,
   minDuration = 10,
   maxDuration,
@@ -23,7 +22,6 @@ export default function ResizeHandle({
   setGlobalDuration,
   setIsResizing,
 }: {
-  forBlock: boolean;
   duration: number;
   minDuration?: number;
   maxDuration?: number;
@@ -37,12 +35,12 @@ export default function ResizeHandle({
     resizeStartRef.current = e.clientY;
     setIsResizing(true);
 
-    function mouseMoveHandler(e: MouseEvent) {
+    function mouseMoveHandler(moveEvent: MouseEvent) {
       if (resizeStartRef.current === null) {
         return;
       }
 
-      let dy = e.clientY - resizeStartRef.current;
+      let dy = moveEvent.clientY - resizeStartRef.current;
       dy = Math.ceil(dy / gridSize) * gridSize;
       let newDuration = duration + pixelsToMinutes(dy);
 
@@ -58,7 +56,7 @@ export default function ResizeHandle({
       }
     }
 
-    const mouseUpHandler = (e: MouseEvent) => {
+    const mouseUpHandler = (mouseUpEvent: MouseEvent) => {
       document.removeEventListener('mouseup', mouseUpHandler);
       document.removeEventListener('mousemove', mouseMoveHandler);
 
@@ -66,7 +64,7 @@ export default function ResizeHandle({
         return;
       }
 
-      let dy = e.clientY - resizeStartRef.current;
+      let dy = mouseUpEvent.clientY - resizeStartRef.current;
       dy = Math.ceil(dy / gridSize) * gridSize;
       let newDuration = duration + pixelsToMinutes(dy);
 
@@ -87,7 +85,7 @@ export default function ResizeHandle({
 
   return (
     <div
-      styleName={`resize-handle ${forBlock ? 'block' : ''}`}
+      styleName="resize-handle"
       onMouseDown={resizeHandler}
       onPointerDown={e => {
         e.stopPropagation(); // prevent drag start on the parent block
