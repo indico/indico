@@ -47,6 +47,7 @@ export interface DraggableData {
   transform?: {x: number; y: number};
   mouse?: MousePosition;
   initialOffset?: Coords;
+  initialScroll?: {top: number; left: number};
 }
 
 export interface DragEvent {
