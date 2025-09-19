@@ -13,7 +13,7 @@ import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
-import {Colors} from './types';
+import {Colors, EntryType} from './types';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 import './ContributionEntry.module.scss';
@@ -54,7 +54,7 @@ export function DraggableUnscheduledContributionEntry({
     }
   }
 
-  let style = {
+  let style: React.CSSProperties = {
     fontSize: 15,
     ...colors,
   };
@@ -136,13 +136,18 @@ export function UnscheduledContributionEntry({
     fontSize: 15,
     borderRadius: 8,
     cursor: isDragging ? 'grabbing' : 'grab',
-    userSelect: 'none',
+    userSelect: 'none' as const,
     height: minutesToPixels(Math.max(duration, minutesToPixels(10)) - 1),
   };
 
   return (
     <div role="button" styleName="entry" style={style}>
-      <EntryTitle title={title} duration={duration} timeRange={timeRange} isBreak={false} />
+      <EntryTitle
+        title={title}
+        duration={duration}
+        timeRange={timeRange}
+        type={EntryType.Contribution}
+      />
     </div>
   );
 }
