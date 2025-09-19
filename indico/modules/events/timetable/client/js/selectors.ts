@@ -93,15 +93,6 @@ export const getUnscheduled = createSelector(
   (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
 
-export const getSelectedEntry = createSelector(
-  getDayEntries,
-  getSelectedId,
-  (entries, id) => {
-    entries = Object.values(entries).flatMap(x => x);
-    entries = entries.flatMap(e => (e.type === 'block' ? [e, ...e.children] : [e]));
-    return entries.find(e => e.id === id);
-  }
-);
 export const getDraftEntry = createSelector(
   getEntries,
   entries => entries.draftEntry
