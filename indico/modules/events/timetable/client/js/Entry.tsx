@@ -19,18 +19,20 @@ import {getWidthAndOffset} from './layout';
 import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
+import {ContribEntry, EntryType, BlockEntry, ScheduledMixin, BaseEntry} from './types';
 import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
 
-interface DraggableEntryProps {
-  id: number;
-  [key: string]: any;
+interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
+  id: string;
+  blockRef?: React.RefObject<HTMLDivElement>;
+  parentEndDt?: string;
+  setDuration: (duration: number) => void;
 }
 
-export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
   const {
     listeners: _listeners,
@@ -61,7 +63,7 @@ export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   const listeners = {
     ..._listeners,
     onClick,
-    onMouseDown: (event: MouseEvent) => {
+    onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
       if (event.button !== 0) {
         return;
       }
@@ -86,6 +88,8 @@ export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
       setNodeRef={setNodeRef}
       transform={transform}
       isDragging={isDragging}
+      selected={isSelected}
+      setDuration={setDuration}
     />
   );
 
@@ -104,17 +108,34 @@ export function DraggableEntry({id, ...rest}: DraggableEntryProps) {
   return entry;
 }
 
-export function DraggableBlockEntry({id, ...rest}: DraggableEntryProps) {
+interface DraggableBlockEntryProps extends BlockEntry {
+  id: string;
+  setDuration: (duration: number) => void;
+  setChildDuration: (id: string) => (duration: number) => void;
+}
+
+export function DraggableBlockEntry({id, ...rest}: DraggableBlockEntryProps) {
   return <DraggableEntry id={id} {...rest} />;
 }
 
-interface _DraggableEntryProps {
+interface _EntryProps {
+  sessionTitle?: string;
+  isDragging: boolean;
+  transform: {x: number; y: number} | null;
+  listeners: Record<string, unknown>;
+  setNodeRef: (element: HTMLElement | null) => void;
+  blockRef?: React.RefObject<HTMLDivElement>;
   selected: boolean;
   setDuration: (duration: number) => void;
-  parentEndDt?: moment.Moment;
+  onMouseUp?: () => void;
+  setChildDuration?: (id: string) => (duration: number) => void;
+  renderChildren?: boolean;
+  children?: ContribEntry[];
+  parent?: BlockEntry | null;
+  parentEndDt?: string;
 }
 
-type DraggableContribEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
+type DraggableContribEntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
 export default function ContributionEntry({
   type,
@@ -139,8 +160,8 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   parentEndDt,
   children: _children = [],
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  setChildDuration = () => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  setChildDuration = (_: string) => (_: number) => {},
   renderChildren = true,
 }: DraggableContribEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
@@ -181,13 +202,10 @@ export default function ContributionEntry({
 
   const timeRange = formatTimeRange('en', newStart, newEnd); // TODO: use current locale
   // shift children startDt by deltaMinutes
-  const children = _children.map(child => ({
+  const children: ContribEntry[] = _children.map(child => ({
     ...child,
-    startDt: moment(child.startDt).add(deltaMinutes, 'minutes').format(),
+    startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
-
-  // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);
-  // const setChildDuration = useCallback(() => {}, [])
 
   const latestChildEndDt = children.reduce((acc, child) => {
     const endDt = moment(child.startDt).add(child.duration, 'minutes');
@@ -205,7 +223,7 @@ export default function ContributionEntry({
     // TODO: This is not the nicest solution..
     if (elem) {
       if (isDragging || isResizing) {
-        elem.style.zIndex = 1000;
+        elem.style.zIndex = '1000';
       } else if (!isDragging && !isResizing) {
         elem.style.zIndex = '';
       }
@@ -269,7 +287,6 @@ export default function ContributionEntry({
               ? children.map(child => (
                   <DraggableEntry
                     key={child.id}
-                    selected={false}
                     setDuration={_children ? setChildDurations[child.id] : null}
                     blockRef={blockRef}
                     parentEndDt={moment(startDt)
