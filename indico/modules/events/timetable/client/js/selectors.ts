@@ -105,10 +105,6 @@ export const canRedo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx < entries.changes.length - 1
 );
-export const getError = createSelector(
-  getEntries,
-  entries => entries.error
-);
 
 export const showUnscheduled = createSelector(
   getDisplay,
