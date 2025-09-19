@@ -287,7 +287,7 @@ export function editEntry(entryType, entry) {
   return {type: EDIT_ENTRY, entryType, entry};
 }
 
-export function updateEntry(entryType, entry, currentDay) {
+export function updateEntry(entryType, entry, currentDay): UpdateEntryAction {
   return {type: UPDATE_ENTRY, entryType, entry, currentDay};
 }
 
