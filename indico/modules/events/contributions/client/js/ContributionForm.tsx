@@ -48,6 +48,7 @@ interface CustomField {
 }
 
 interface ContributionFormProps {
+  eventId: number;
   personLinkFieldParams?: Record<string, any>;
   locationParent?: Record<string, any>;
   customFields: CustomField[];
@@ -141,7 +142,6 @@ export function ContributionFormFields({
               <FinalDateTimePicker
                 name="start_dt"
                 label={Translate.string('Start date')}
-                sessionBlock={sessionBlock}
                 minStartDt={minStartDt || (sessionBlock && toMoment(sessionBlock.startDt))}
                 maxEndDt={
                   maxEndDt ||
@@ -200,6 +200,7 @@ export function ContributionFormFields({
 }
 
 export function ContributionForm({
+  eventId,
   personLinkFieldParams = {},
   locationParent = {},
   customFields = [],
@@ -262,6 +263,7 @@ export function ContributionForm({
       {...rest}
     >
       <ContributionFormFields
+        eventId={eventId}
         {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}}
       />
     </FinalModalForm>
@@ -444,7 +446,6 @@ export function EditContributionButton({
         <ContributionEditForm
           eventId={eventId}
           contribId={contribId}
-          eventTitle={eventTitle}
           onClose={() => setOpen(false)}
         />
       )}
