@@ -22,6 +22,60 @@
       }
     }
 
+    .actions {
+      display: flex;
+      margin-bottom: 20px;
+      height: 29px;
+
+      > :first-child {
+        width: 100%;
+        flex-shrink: 1;
+      }
+
+      :global(.dropdown) {
+        min-height: 29px;
+        height: 29px;
+
+        :global(.item),
+        :global(.ui.selection.dropdown) {
+          padding: 0 0.8em !important;
+          display: flex;
+          align-items: center;
+          height: 29px;
+        }
+      }
+
+      :global(.ui.selection.dropdown) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 29px;
+
+        > :global(.dropdown.icon) {
+          margin: -0.2em 0 0 0;
+          padding: 0;
+        }
+      }
+
+      :global(.active),
+      :global(.active.item) {
+        font-weight: normal;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      :global(.ui.button) {
+        padding: 0.8em;
+        font-weight: normal;
+
+        &:active {
+          background-color: transparent;
+        }
+      }
+    }
+
     .contribution {
       cursor: pointer;
       user-select: none;
@@ -29,6 +83,12 @@
       :global(.square.outline.icon) {
         cursor: pointer;
       }
+    }
+
+    .session {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .description {
