@@ -10,7 +10,7 @@ import moment, {Moment} from 'moment';
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries, EntryType} from './types';
+import {DayEntries, EntryType, isChildEntry} from './types';
 import {setCurrentDateLocalStorage} from './utils';
 
 interface Change {
@@ -83,7 +83,7 @@ export default {
         const dayKey = moment(startDt).format('YYYYMMDD');
         const dayEntries = newEntries[dayKey];
 
-        if (entry.sessionBlockId) {
+        if (isChildEntry(entry)) {
           const newDayEntries = newEntries[dayKey].map(e => {
             if (e.id === entry.sessionBlockId && e.type === EntryType.SessionBlock) {
               return {
@@ -129,7 +129,10 @@ export default {
         } else {
           newEntries[newDayKey] = layout(
             newEntries[newDayKey].map(e => {
-              if (entry.sessionBlockId === e.id) {
+              if (isChildEntry(entry) && entry.sessionBlockId === e.id) {
+                if (e.type !== EntryType.SessionBlock) {
+                  return e;
+                }
                 return {
                   ...e,
                   children: e.children.map(child => (child.id === entry.id ? entry : child)),
@@ -220,11 +223,11 @@ export default {
         return {...state, selectedId: action.id};
       case actions.DESELECT_ENTRY:
         return {...state, selectedId: null};
-      // return {...state};
       case actions.DELETE_BREAK: {
-        const {id} = action.entry;
-        if (action.entry.sessionBlockId) {
-          const sessionBlockId = action.entry.sessionBlockId;
+        const {entry} = action;
+        const {id} = entry;
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
               Object.entries(state.changes[state.currentChangeIdx].entries).map(
@@ -337,9 +340,10 @@ export default {
         };
       }
       case actions.UNSCHEDULE_ENTRY: {
-        const {id} = action.entry;
-        if (action.entry.sessionBlockId) {
-          const sessionBlockId = action.entry.sessionBlockId;
+        const {entry} = action;
+        const {id} = entry;
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
               Object.entries(state.changes[state.currentChangeIdx].entries).map(
