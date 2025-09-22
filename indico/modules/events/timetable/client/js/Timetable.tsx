@@ -14,7 +14,7 @@ import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {getDateKey, minutesToPixels} from './utils';
-import {WeekTimetable} from './WeekTimetable';
+// import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -63,7 +63,7 @@ export default function Timetable() {
         />
       )}
       <div styleName="content">
-        {useWeekView && <WeekTimetable minHour={minHour} maxHour={maxHour} entries={entries} />}
+        {/* {useWeekView && <WeekTimetable minHour={minHour} maxHour={maxHour} entries={entries} />} */}
         {!useWeekView && (
           <DayTimetable
             dt={currentDate}
