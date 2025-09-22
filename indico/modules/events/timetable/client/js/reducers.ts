@@ -23,7 +23,7 @@ interface Entries {
   draftEntry: any | null;
   changes: Change[];
   currentChangeIdx: number;
-  selectedId: number | null;
+  selectedId: string | null;
   draggedIds: Set<number>;
 }
 
