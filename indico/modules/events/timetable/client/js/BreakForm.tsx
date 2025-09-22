@@ -25,7 +25,7 @@ import {snakifyKeys} from 'indico/utils/case';
 import {LocationParentObj} from './types';
 
 interface BreakFormProps {
-  locationParent?: Record<string, any>;
+  locationParent?: LocationParentObj;
   onSubmit: (formData: any) => void;
   initialValues: Record<string, any>;
   loading: boolean;
@@ -90,7 +90,14 @@ export function BreakFormFields({
 }
 
 export function BreakForm({
-  locationParent = {},
+  locationParent = {
+    inheriting: false,
+    venue: '',
+    room: '',
+    venue_name: '',
+    room_name: '',
+    address: '',
+  },
   onSubmit,
   initialValues = {},
   loading,
@@ -116,7 +123,7 @@ export function BreakForm({
       size="small"
       {...rest}
     >
-      <BreakFormFields {...{locationParent, initialValues}} />
+      <BreakFormFields locationParent={locationParent} initialValues={initialValues} />
     </FinalModalForm>
   );
 }
