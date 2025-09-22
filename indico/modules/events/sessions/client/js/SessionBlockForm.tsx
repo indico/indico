@@ -14,8 +14,7 @@ import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
 import {LocationParentObj} from 'indico/modules/events/timetable/types';
-import {FinalLocationField} from 'indico/react/components';
-import {FinalSessionBlockPersonLinkField} from 'indico/react/components/PersonLinkField';
+import {FinalLocationField, FinalSessionBlockPersonLinkField} from 'indico/react/components';
 import {FinalInput} from 'indico/react/forms';
 import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
