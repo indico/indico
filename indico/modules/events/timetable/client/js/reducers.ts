@@ -10,7 +10,7 @@ import moment, {Moment} from 'moment';
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries, EntryType, isChildEntry} from './types';
+import {DayEntries, EntryType, isChildEntry, Session} from './types';
 import {setCurrentDateLocalStorage} from './utils';
 
 interface Change {
@@ -29,7 +29,7 @@ interface Entries {
 
 export interface ReduxState {
   entries: Entries;
-  sessions: any[];
+  sessions: Session[];
   navigation: {numDays: number; currentDate: Moment; isExpanded: boolean};
   display: {showUnscheduled: boolean};
 }
