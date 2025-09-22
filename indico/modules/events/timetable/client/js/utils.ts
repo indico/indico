@@ -59,7 +59,7 @@ function gcd(a: number, b: number) {
   return a;
 }
 
-export function getDefaultColorByType(type: EntryType): {color: string; backgroundColor: string} {
+export function getDefaultColorByType(type: EntryType): Colors {
   return {
     [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
     [EntryType.Break]: DEFAULT_BREAK_COLORS,
