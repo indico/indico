@@ -9,14 +9,14 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
-import {appendSessionAttributes} from './util';
+import {Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
 export const getDayEntries = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx].entries;
-export const getSessions = state => state.sessions;
+export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
 export const getLatestChange = (state: ReduxState) =>
@@ -130,3 +130,10 @@ export const getIsDraft = createSelector(
   getNavigation,
   navigation => navigation.isDraft
 );
+
+function appendSessionAttributes(entries, sessions: Session[]) {
+  return entries.map(e => {
+    const {isPoster, colors} = sessions[e.sessionId];
+    return e.sessionId ? {...e, isPoster, colors} : e;
+  });
+}
