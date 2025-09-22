@@ -1,29 +1,31 @@
-<div class="main-breadcrumb {{ 'management' if management }}"
+<nav aria-label="{% trans %}Breadcrumb{% endtrans %}" class="main-breadcrumb {{ 'management' if management }}"
      itemprop="breadcrumb" itemscope itemtype="http://schema.org/Breadcrumb">
-    <span class="path" itemscope itemtype="http://schema.org/BreadcrumbList">
+    <ol class="path" itemscope itemtype="http://schema.org/BreadcrumbList">
         {% for item in items %}
-            {%- if not loop.first -%}
-                <span class="sep">»</span>
-            {%- endif -%}
-            {%- if item.url -%}
-                <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                {%- if not loop.first -%}
+                    <span class="sep" aria-hidden="true">»</span>
+                {%- endif -%}
+                {%- if item.url -%}
                     <a href="{{ item.url }}" itemprop="item" class="item">
                         <span itemprop="name">{{ item.title|truncate(40) }}</span>
+                        {%- if loop.last -%}
+                            <span class="current-page-indicator"> ({% trans %}you are here{% endtrans %})</span>
+                        {%- endif -%}
                     </a>
-                    {%- if item.icon -%}
-                        <i class="{{ item.icon }}"></i>
-                    {%- endif -%}
-                    <meta itemprop="position" content="{{ loop.index }}" />
-                </span>
-            {%- else -%}
-                <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-                    <span class="item" itemprop="name">{{ item.title|truncate(40) }}</span>
-                    {%- if item.icon -%}
-                        <i class="{{ item.icon }}"></i>
-                    {%- endif -%}
-                    <meta itemprop="position" content="{{ loop.index }}" />
-                </span>
-            {%- endif -%}
+                {%- else -%}
+                    <span class="item" itemprop="name"{% if loop.last %} aria-current="page"{% endif %}>
+                        {{ item.title|truncate(40) }}
+                        {%- if loop.last -%}
+                            <span class="current-page-indicator"> ({% trans %}you are here{% endtrans %})</span>
+                        {%- endif -%}
+                    </span>
+                {%- endif -%}
+                {%- if item.icon -%}
+                    <i class="{{ item.icon }}"></i>
+                {%- endif -%}
+                <meta itemprop="position" content="{{ loop.index }}" />
+            </li>
         {% endfor %}
-    </span>
-</div>
+    </ol>
+</nav>
