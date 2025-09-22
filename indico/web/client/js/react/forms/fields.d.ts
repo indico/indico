@@ -13,6 +13,7 @@ interface SharedFieldProps {
   description?: React.ReactNode;
   autoFocus?: boolean;
   required?: boolean | 'no-validator';
+  disabled?: boolean;
 }
 
 interface FinalFieldProps extends SharedFieldProps {
@@ -51,6 +52,7 @@ interface FinalDropdownProps extends SharedFieldProps {
   label?: string | null;
   multiple?: boolean;
   selection?: boolean;
+  search?: boolean;
   nullIfEmpty?: boolean;
   parse?: (value: any) => any;
   format?: (value: any) => any;
