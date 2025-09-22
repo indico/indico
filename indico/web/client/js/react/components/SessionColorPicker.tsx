@@ -113,6 +113,7 @@ const SessionColorPickerAdapter: React.FC<SessionColorPickerAdapterProps> = ({in
 
 interface FinalSessionColorPickerProps {
   name: string;
+  label?: string;
 }
 
 export function FinalSessionColorPicker({name, ...rest}: FinalSessionColorPickerProps) {
