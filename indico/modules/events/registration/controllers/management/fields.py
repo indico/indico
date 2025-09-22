@@ -90,11 +90,11 @@ class GeneralFieldDataSchema(mm.Schema):
             return
         field = self.context['field']
         if field.parent.is_manager_only:
-            raise ValueError('Manager-only fields cannot be conditionally shown')
+            raise ValidationError('Manager-only fields cannot be conditionally shown')
         used_field_ids = set()
         if field.id is not None:
             if field.id == field_id:
-                raise ValueError('The field cannot conditionally depend on itself to be shown')
+                raise ValidationError('The field cannot conditionally depend on itself to be shown')
             used_field_ids.add(field.id)
         regform = self.context['regform']
         if not (condition_field := RegistrationFormItem.query.with_parent(regform).filter_by(id=field_id).first()):
