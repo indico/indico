@@ -211,8 +211,6 @@ interface EditSessionBlockButtonProps {
   eventId: number;
   sessionId: number;
   blockId: number;
-  eventTitle: string;
-  eventType: string;
   triggerSelector?: string;
 }
 
@@ -220,8 +218,6 @@ export function EditSessionBlockButton({
   eventId,
   sessionId,
   blockId,
-  eventTitle,
-  eventType,
   triggerSelector,
   ...rest
 }: EditSessionBlockButtonProps) {
@@ -249,56 +245,6 @@ export function EditSessionBlockButton({
           eventId={eventId}
           sessionId={sessionId}
           blockId={blockId}
-          eventType={eventType}
-          eventTitle={eventTitle}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </>
-  );
-}
-
-interface EditSessionBlockCreateButtonProps {
-  eventId: number;
-  sessionId: number;
-  eventTitle: string;
-  eventType: string;
-  triggerSelector?: string;
-}
-
-export function EditSessionBlockCreateButton({
-  eventId,
-  sessionId,
-  eventTitle,
-  eventType,
-  triggerSelector,
-  ...rest
-}: EditSessionBlockCreateButtonProps) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
-
-  return (
-    <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
-      {open && (
-        <SessionBlockEditForm
-          eventId={eventId}
-          sessionId={sessionId}
-          eventType={eventType}
-          eventTitle={eventTitle}
           onClose={() => setOpen(false)}
         />
       )}
