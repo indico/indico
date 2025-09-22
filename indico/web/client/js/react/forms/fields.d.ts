@@ -47,6 +47,7 @@ interface FinalRadioProps extends SharedFieldProps {
 
 interface FinalDropdownProps extends SharedFieldProps {
   options: object[];
+  placeholder?: string;
   label?: string | null;
   multiple?: boolean;
   selection?: boolean;
