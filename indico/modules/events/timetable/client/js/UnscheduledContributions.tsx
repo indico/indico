@@ -100,19 +100,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   }));
 
   dropdownSessions = dropdownSessions.toSorted((s1, s2) => {
-    const l1 = contribsGrouped[s1.value]?.length ?? 0;
-    const l2 = contribsGrouped[s2.value]?.length ?? 0;
+    const l1 = (contribsGrouped[s1.value] ?? []).length;
+    const l2 = (contribsGrouped[s2.value] ?? []).length;
 
-    // TODO: (Ajob) Fix this logic to not shift things based on length but only
-    //              whether or not they have children.
-    // if (l1 === l2 || (l1 > 0 && l2 > 0)) {
-    //   return 0;
-    // } else if (l1 === 0) {
-    //   return -1;
-    // } else {
-    //   return 1;
-    // }
-    return l1 < l2;
+    return l1 && l2 ? 0 : Math.sign(l2 - l1);
   });
 
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
