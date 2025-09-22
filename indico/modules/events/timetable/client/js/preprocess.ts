@@ -149,7 +149,6 @@ export function preprocessTimetableEntries(
             startDt: dateToMoment(c.startDate),
             duration: c.duration,
             sessionBlockId: dayEntries[day].at(-1).id,
-            x: 0,
             y: 0,
             locationData: c.locationData,
             column: 0,
