@@ -8,6 +8,7 @@
 import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
+import {DEFAULT_CONTRIB_COLORS} from './colors';
 import {ReduxState} from './reducers';
 import {Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
@@ -133,7 +134,7 @@ export const getIsDraft = createSelector(
 
 function appendSessionAttributes(entries, sessions: Session[]) {
   return entries.map(e => {
-    const {isPoster, colors} = sessions[e.sessionId];
+    const {isPoster = false, colors = DEFAULT_CONTRIB_COLORS} = sessions[e.sessionId] || {};
     return e.sessionId ? {...e, isPoster, colors} : e;
   });
 }
