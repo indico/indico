@@ -152,10 +152,11 @@ export function preprocessTimetableEntries(
             x: 0,
             y: 0,
             locationData: c.locationData,
-            width: 0,
             column: 0,
             maxColumn: 0,
             colors: c.colors,
+            // TODO
+            // @ts-expect-error the parent attribute is not in the type (yet)
             parent: {
               colors,
               id,
@@ -164,7 +165,7 @@ export function preprocessTimetableEntries(
             },
           };
 
-          if (childType === EntryType.Contribution) {
+          if (childEntry.type === EntryType.Contribution) {
             childEntry.attachments = c.attachments;
             childEntry.personLinks = c.personLinks;
           }
@@ -203,6 +204,7 @@ export function preprocessTimetableEntries(
         }) => ({
           id,
           objId,
+          type: EntryType.Contribution,
           sessionId,
           title,
           description,

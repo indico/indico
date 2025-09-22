@@ -87,7 +87,8 @@ export interface ScheduledMixin {
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
-  attachments: Attachments;
+  attachments?: Attachments;
+  personLinks: PersonLink[];
   sessionId?: number;
 }
 
@@ -117,9 +118,9 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionId: number;
   sessionTitle: string;
   children: ChildEntry[];
-  personLinks: PersonLink[];
-  attachments: Attachments;
   childLocationParent: LocationParent;
+  attachments?: Attachments;
+  personLinks: PersonLink[];
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
