@@ -100,6 +100,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
         onClose={() => {
           dispatch(actions.deselectEntry());
         }}
+        // @ts-expect-error The popup will be rewritten soon so let's just ignore this for now
         entry={{id, ...rest}}
       />
     );
