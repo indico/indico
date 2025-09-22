@@ -22,7 +22,7 @@ from indico.modules.events.registration.schemas import (CheckinEventSchema, Chec
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
 from indico.util.marshmallow import not_empty
 from indico.web.args import use_kwargs
-from indico.web.rh import cors, json_errors, oauth_scope
+from indico.web.rh import RH, cors, json_errors, oauth_scope
 
 
 @json_errors
@@ -162,16 +162,14 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
         return jsonify(result)
 
 
-class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
-    """Return back the picture from the picture field of the registration form."""
+class RHCheckinAPIRegistrationPicture(RH):
+    """Return the picture from the PersonalDataType.picture field of the registration form."""
 
     # TODO: De-duplicate this stuff (move this into a mixin)
     def _process_args(self):
-        super()._process_args()
-        registration_id = request.view_args['registration_id']
-        self.field_data = (RegistrationData.query
+        self.registration_data = (RegistrationData.query
                            .filter(RegistrationFormItem.input_type == 'picture',
-                                   RegistrationData.registration_id == registration_id,
+                                   RegistrationData.registration_id == request.view_args['registration_id'],
                                    RegistrationData.field_data_id == request.view_args['field_data_id'],
                                    RegistrationData.filename.isnot(None))
                            .join(RegistrationData.field_data)
@@ -179,5 +177,5 @@ class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
-    def _process(self):
-        return self.field_data.send()
+    def _process_GET(self):
+        return self.registration_data.send()

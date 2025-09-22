@@ -269,7 +269,7 @@ _bp.add_url_rule('!/api/checkin/ticket/<uuid:ticket_uuid>',
                  'api_checkin_registration_uuid', api_checkin.RHCheckinAPIRegistrationUUID)
 _bp.add_url_rule('!/api/checkin/ticket/custom-qr-code', 'api_checkin_registration_custom_qr_code',
                  api_checkin.RHCheckinAPIRegistrationCustomQRCode, methods=('POST',))
-_bp.add_url_rule('!/api/checkin/picture/event/<int:event_id>/registrations/<int:reg_form_id>/<int:registration_id>'
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>'
                  '/picture/<int:field_data_id>/<filename>', 'api_checkin_registration_picture',
                  api_checkin.RHCheckinAPIRegistrationPicture, methods=('GET', 'POST'))
 
