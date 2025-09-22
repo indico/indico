@@ -195,8 +195,8 @@ import './session_display';
 
   global.setupSessionBlockForm = function setupSessionBlockForm(field, trigger) {
     const element = document.querySelector(field);
-    const {eventId, sessionId, blockId, eventType, eventTitle} = element.dataset;
-    console.log(eventId, blockId, eventTitle, eventType);
+    const {eventId, sessionId, blockId} = element.dataset;
+    console.log(eventId, blockId);
 
     const portal = document.createElement('div');
     document.body.appendChild(portal);
@@ -206,8 +206,6 @@ import './session_display';
         eventId={+eventId}
         sessionId={sessionId && +sessionId}
         blockId={blockId && +blockId}
-        eventTitle={eventTitle}
-        eventType={eventType}
         triggerSelector={trigger}
       />,
       portal
