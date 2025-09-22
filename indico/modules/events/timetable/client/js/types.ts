@@ -76,21 +76,20 @@ export interface BaseEntry {
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
+  attachments?: Attachments;
+  personLinks: PersonLink[];
 }
 
 export interface ScheduledMixin {
   startDt: Moment;
   // position information
-  x: number;
   y: number;
-  column: number;
-  maxColumn: number;
+  column: number | null;
+  maxColumn: number | null;
 }
 
 export interface UnscheduledContrib extends BaseEntry {
   type: EntryType.Contribution;
-  attachments?: Attachments;
-  personLinks: PersonLink[];
   sessionId?: number;
 }
 
@@ -121,8 +120,6 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   sessionTitle: string;
   children: ChildEntry[];
   childLocationParent: LocationParent;
-  attachments?: Attachments;
-  personLinks: PersonLink[];
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
