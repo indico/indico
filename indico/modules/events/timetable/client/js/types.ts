@@ -20,6 +20,8 @@ export enum PersonLinkRole {
   SUBMITTER = 'submitter',
 }
 
+export type HexColor = `#${string}`;
+
 export interface PersonLink {
   affiliation: string;
   avatarURL: string;
@@ -32,8 +34,8 @@ export interface PersonLink {
 }
 
 export interface Colors {
-  color: string;
-  backgroundColor;
+  color: HexColor;
+  backgroundColor: HexColor;
 }
 
 export interface LocationData {
@@ -60,8 +62,8 @@ export interface Session {
   id?: number;
   title: string;
   isPoster: boolean;
+  defaultContribDurationMinutes: number;
   colors: Colors;
-  backgroundColor: string;
 }
 
 export interface BaseEntry {
