@@ -15,7 +15,6 @@ from indico.core.marshmallow import mm
 from indico.modules.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
@@ -109,7 +108,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
 
     def _get_personal_data_picture(self, registration):
         if picture := registration.get_personal_data_picture():
-            return url_for('.registration_picture', picture.locator.file, _external=True)
+            return url_for('.api_checkin_registration_picture', picture.locator.file, _external=True)
 
     def _get_registration_data(self, registration):
         regform = registration.registration_form
@@ -153,12 +152,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             if field['id'] in filenames:
                 obj = registration.data_by_field[field['id']]
                 field_data['data'] = filenames[field['id']]
-                picture_data = {
-                    'filename': filenames[field['id']],
-                    'url': (url_for('.registration_picture', obj.locator.file, _external=True)
-                            if field['inputType'] == 'picture' else None)
-                }
-                field_data['data'] = picture_data
+                if field['inputType'] == 'picture':
+                    field_data['data'] = url_for('.api_checkin_registration_picture', obj.locator.file, _external=True)
             section['fields'].append(field_data)
 
         return list(data.values())
