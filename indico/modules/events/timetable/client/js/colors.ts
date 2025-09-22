@@ -5,17 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const DEFAULT_CONTRIB_COLORS = {
+import {Colors, HexColor} from './types';
+
+export const DEFAULT_CONTRIB_COLORS: Colors = {
   color: '#ffffff',
   backgroundColor: '#5b1aff',
 };
 
-export const DEFAULT_BREAK_COLORS = {
+export const DEFAULT_BREAK_COLORS: Colors = {
   color: '#000000de',
   backgroundColor: '#cce2ff',
 };
 
-export const ENTRY_COLORS = [
+export const ENTRY_COLORS: {
+  color: HexColor;
+  backgroundColor: HexColor;
+  childBackgroundColor: HexColor;
+}[] = [
   // childColor is baed on the backgroundColor of the parent
   // If the parent text color (color) is dark, the childBackgroundColor is lighter than the parent backgroundColor
   // If the parent text color (color) is light, the childBackgroundColor is darker than the parent backgroundColor
@@ -41,7 +47,7 @@ export const ENTRY_COLORS = [
   {color: '#202020', backgroundColor: '#efebc2', childBackgroundColor: '#c0c0a0'},
 ];
 
-export const ENTRY_COLORS_BY_BACKGROUND = Object.fromEntries(
+export const ENTRY_COLORS_BY_BACKGROUND: Record<HexColor, Colors> = Object.fromEntries(
   ENTRY_COLORS.map(({backgroundColor, color, childBackgroundColor}) => [
     backgroundColor,
     {color, backgroundColor: childBackgroundColor},
