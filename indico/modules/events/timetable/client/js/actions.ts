@@ -207,7 +207,6 @@ export function deselectEntry(): DeselectEntryAction {
   return {type: DESELECT_ENTRY};
 }
 
-// TODO: (Marina) Look into ThunkActions for typing
 export function deleteBreak(entry, eventId) {
   const entryURL = breakURL({event_id: eventId, break_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {

@@ -8,10 +8,25 @@
 import moment, {Moment} from 'moment';
 
 import {Transform, Over, MousePosition} from './dnd';
-import {TopLevelEntry, Entry, EntryType, DayEntries} from './types';
+import {
+  TopLevelEntry,
+  Entry,
+  EntryType,
+  DayEntries,
+  UnscheduledContrib,
+  ChildContribEntry,
+  ContribEntry,
+} from './types';
 import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils.ts';
 
-function overlap<T extends Entry>(a: T, b: T) {
+// A subset of the properties of an entry (contrib, block, break) that are needed for layout calculations
+interface ScheduledEntry {
+  id: string;
+  startDt: Moment;
+  duration: number;
+}
+
+function overlap<T extends ScheduledEntry>(a: T, b: T) {
   const aEnd = a.startDt.clone().add(Math.max(a.duration, 10), 'minutes');
   const bEnd = b.startDt.clone().add(Math.max(b.duration, 10), 'minutes');
   return a.startDt.isBefore(bEnd) && b.startDt.isBefore(aEnd);
@@ -185,7 +200,7 @@ export function getGroups(entries: TopLevelEntry[]) {
  * For example, for entries A (8-10), B (10-12) and C (9:11) the group of A would
  * be {B, C}. because B is 'reachable' from A via C.
  */
-export function getGroup(entry: TopLevelEntry, entries: TopLevelEntry[]) {
+export function getGroup(entry: ScheduledEntry, entries: ScheduledEntry[]) {
   const group = new Set<string>();
   const seen = new Set<string>();
   seen.add(entry.id);
@@ -193,7 +208,12 @@ export function getGroup(entry: TopLevelEntry, entries: TopLevelEntry[]) {
   return group;
 }
 
-function dfs(curr: Entry, entries: TopLevelEntry[], group: Set<string>, seen: Set<string>) {
+function dfs(
+  curr: ScheduledEntry,
+  entries: ScheduledEntry[],
+  group: Set<string>,
+  seen: Set<string>
+) {
   for (const entry of entries) {
     if (seen.has(entry.id)) {
       continue;
@@ -251,14 +271,15 @@ export function getWidthAndOffset(column, maxColumn) {
 
 export function layoutAfterUnscheduledDrop(
   dt: Moment,
-  unscheduled: TopLevelEntry[],
+  unscheduled: UnscheduledContrib[],
   entries: TopLevelEntry[],
   who: string,
   calendar: Over,
   delta: Transform,
   mouse: MousePosition,
   offset: MousePosition
-) {
+): [TopLevelEntry[], UnscheduledContrib[], Moment] | undefined {
+  // TODO: add proper typing for unscheduled contribs
   const id = who.slice('unscheduled-'.length);
   const deltaMinutes = 0;
   const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
@@ -267,27 +288,27 @@ export function layoutAfterUnscheduledDrop(
     .startOf('day')
     .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
 
-  let entry = unscheduled.find(e => e.id === id);
-  if (!entry) {
+  const unscheduledEntry = unscheduled.find(e => e.id === id);
+  if (!unscheduledEntry) {
     return;
   }
 
-  if (entry.type !== EntryType.Contribution) {
+  if (unscheduledEntry.type !== EntryType.Contribution) {
     return;
   }
 
-  if (entry.sessionId) {
+  if (unscheduledEntry.sessionId) {
     return;
   }
 
-  entry = {
-    ...entry,
+  const entry: ContribEntry = {
+    ...unscheduledEntry,
     startDt,
     y: minutesToPixels(
-      moment(startDt)
-        .add(deltaMinutes, 'minutes')
-        .diff(moment(entry.startDt).startOf('day'), 'minutes')
+      moment(startDt).add(deltaMinutes, 'minutes').diff(moment(dt).startOf('day'), 'minutes')
     ),
+    column: null,
+    maxColumn: null,
   };
 
   const groupIds = getGroup(entry, entries);
@@ -300,7 +321,7 @@ export function layoutAfterUnscheduledDrop(
 
 export function layoutAfterUnscheduledDropOnBlock(
   dt: Moment,
-  unscheduled: TopLevelEntry[],
+  unscheduled: UnscheduledContrib[],
   entries: TopLevelEntry[],
   who: string,
   over: Over,
@@ -308,7 +329,10 @@ export function layoutAfterUnscheduledDropOnBlock(
   mouse: MousePosition,
   offset,
   calendar: Over
-) {
+):
+  | [TopLevelEntry[], UnscheduledContrib[], Moment, number]
+  | [TopLevelEntry[], UnscheduledContrib[], Moment]
+  | undefined {
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -352,13 +376,15 @@ export function layoutAfterUnscheduledDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
-  const draftEntry = {
+  const draftEntry: ChildContribEntry = {
     ...entry,
     startDt,
     y: minutesToPixels(
       moment(startDt).add(deltaMinutes, 'minutes').diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    column: null,
+    maxColumn: null,
   };
 
   if ('backgroundColor' in draftEntry) {
