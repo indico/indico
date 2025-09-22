@@ -14,7 +14,6 @@ import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {getDateKey, minutesToPixels} from './utils';
-// import {WeekTimetable} from './WeekTimetable';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -27,11 +26,6 @@ export default function Timetable() {
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentDateEntries = entries[getDateKey(currentDate)];
-
-  // TODO: (Ajob) This flag is temporary and likely to be replaced with a state
-  //              when we implement a weekview. This is unlikely to be the
-  //              current WeekView component, which does not use day timetables.
-  const useWeekView = false;
   const minScrollHour = 8;
   const minHour = 0;
   const maxHour = 23;
@@ -55,25 +49,20 @@ export default function Timetable() {
   return (
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
-      {!useWeekView && (
-        <Toolbar
-          onNavigate={d => {
-            dispatch(actions.setCurrentDate(d, eventId));
-          }}
-        />
-      )}
+      <Toolbar
+        onNavigate={d => {
+          dispatch(actions.setCurrentDate(d, eventId));
+        }}
+      />
       <div styleName="content">
-        {/* {useWeekView && <WeekTimetable minHour={minHour} maxHour={maxHour} entries={entries} />} */}
-        {!useWeekView && (
-          <DayTimetable
-            dt={currentDate}
-            eventId={eventId}
-            minHour={minHour}
-            maxHour={maxHour}
-            entries={currentDateEntries}
-            scrollPosition={initialScrollPosition}
-          />
-        )}
+        <DayTimetable
+          dt={currentDate}
+          eventId={eventId}
+          minHour={minHour}
+          maxHour={maxHour}
+          entries={currentDateEntries}
+          scrollPosition={initialScrollPosition}
+        />
       </div>
     </div>
   );
