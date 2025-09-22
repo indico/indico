@@ -75,7 +75,8 @@ class RegistrationFormEditForm(IndicoForm):
     _organizer_notification_fields = ('organizer_notifications_enabled', 'organizer_notification_recipients')
     _special_fields = _price_fields + _registrant_notification_fields + _organizer_notification_fields
 
-    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+    title = StringField(_('Title'), [DataRequired(), Length(max=1000)],
+                        description=_('The title of the registration form'))
     introduction = TextAreaField(_('Introduction'),
                                  description=_('Introduction to be displayed when filling out the registration form'))
     contact_info = StringField(_('Contact info'),
