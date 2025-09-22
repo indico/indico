@@ -8,6 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
 
 import './DayTimetable.module.scss';
 
@@ -25,6 +26,7 @@ import {
   layoutAfterUnscheduledDrop,
   layoutAfterUnscheduledDropOnBlock,
 } from './layout';
+import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
@@ -98,7 +100,7 @@ export function DayTimetable({
   entries,
   scrollPosition = 0,
 }: DayTimetableProps) {
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -445,7 +447,7 @@ function layoutAfterDropOnCalendar(
   over: Over,
   delta: Transform,
   mouse: MousePosition
-) {
+): [TopLevelEntry[], Entry] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
@@ -520,7 +522,7 @@ function layoutAfterDropOnCalendar(
       e => !groupIds.has(e.id) && e.id !== draftEntry.id && e.id !== fromBlock.id
     );
     if (groupIds.has(fromBlock.id)) {
-      fromBlock = group.find(e => e.id === fromBlock.id);
+      fromBlock = group.find(e => e.id === fromBlock.id) as BlockEntry;
       group = group.filter(e => e.id !== fromBlock.id);
     }
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
@@ -537,7 +539,7 @@ function layoutAfterDropOnBlock(
   delta: Transform,
   mouse: MousePosition,
   calendar: Over
-) {
+): [TopLevelEntry[], Entry] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
 
