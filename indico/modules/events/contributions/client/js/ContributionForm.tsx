@@ -24,8 +24,8 @@ import {
   FinalLocationField,
   FinalReferences,
   FinalTagList,
+  FinalContributionPersonLinkField,
 } from 'indico/react/components';
-import {FinalContributionPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalDateTimePicker, FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
