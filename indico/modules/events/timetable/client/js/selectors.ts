@@ -33,7 +33,7 @@ export const getCurrentDate = (state: ReduxState) => state.navigation.currentDat
 
 export const makeIsSelectedSelector = () =>
   createSelector(
-    [getSelectedId, (_state: ReduxState, id: number) => id],
+    [getSelectedId, (_state: ReduxState, id: string) => id],
     (selectedId, id) => selectedId === id
   );
 
