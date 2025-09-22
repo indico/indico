@@ -71,4 +71,7 @@ export {default as PersonDetailsModal} from './PersonDetailsModal';
 export {default as FinalAffiliationField, AffiliationField} from './AffiliationField';
 export {default as Captcha} from './Captcha';
 export {default as CountryDropdown, FinalCountryDropdown} from './CountryDropdown';
-export {FinalContributionPersonLinkField} from './PersonLinkField';
+export {
+  FinalContributionPersonLinkField,
+  FinalSessionBlockPersonLinkField,
+} from './PersonLinkField';
