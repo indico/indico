@@ -2,7 +2,7 @@
   "recommendations": [
     // linters
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
+    "biomejs.biome",
     "stylelint.vscode-stylelint",
     // python
     "ms-python.python",
