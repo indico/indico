@@ -7,12 +7,19 @@
 
 @use 'base/palette' as *;
 
+$actions-height: 36px;
+
 .contributions-container {
   width: min(25vw, 30em);
   flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
 
   .content {
     overflow: visible;
+    overflow-x: auto;
+    height: 100%;
+    padding: 1em 1em 5em 0;
 
     & > h4 {
       display: flex;
@@ -25,23 +32,29 @@
     .actions {
       display: flex;
       margin-bottom: 20px;
-      height: 29px;
+      height: $actions-height;
 
-      > :first-child {
-        width: 100%;
-        flex-shrink: 1;
+      :global(.ui.search.selection.dropdown > input.search) {
+        padding-left: 0.8em;
       }
 
-      :global(.dropdown) {
-        min-height: 29px;
-        height: 29px;
+      > :first-child:global(.dropdown) {
+        width: 100%;
+        flex-shrink: 1;
+        min-height: $actions-height;
+        height: $actions-height;
+
+        > :global(.menu > .header.text) {
+          padding: 0 1em;
+          font-size: 0.85em;
+        }
 
         :global(.item),
         :global(.ui.selection.dropdown) {
           padding: 0 0.8em !important;
           display: flex;
           align-items: center;
-          height: 29px;
+          height: $actions-height;
         }
       }
 
@@ -49,10 +62,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 29px;
+        height: $actions-height;
 
         > :global(.dropdown.icon) {
-          margin: -0.2em 0 0 0;
+          margin: 0.1em 0 0 0;
           padding: 0;
         }
       }
