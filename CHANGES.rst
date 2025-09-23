@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Do not allow sending registration invitation reminders without the invitation
+  link placeholder (:pr:`7093`)
 
 Accessibility
 ^^^^^^^^^^^^^

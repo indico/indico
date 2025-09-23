@@ -21,7 +21,7 @@ from indico.modules.events.registration.schemas import RegistrationInvitationSch
 from indico.modules.events.registration.util import create_invitation, import_invitations_from_csv
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import ngettext
-from indico.util.marshmallow import LowercaseString, no_relative_urls, not_empty
+from indico.util.marshmallow import LowercaseString, make_validate_indico_placeholders, no_relative_urls, not_empty
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -108,7 +108,11 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
 
     @use_kwargs({
         'sender_address': fields.String(required=True, validate=not_empty),
-        'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
+        'body': fields.String(required=True, validate=[
+            not_empty,
+            no_relative_urls,
+            make_validate_indico_placeholders('registration-invitation-reminder-email')
+        ]),
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
