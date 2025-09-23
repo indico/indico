@@ -20,6 +20,7 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.schemas import RegistrationInvitationSchema
 from indico.modules.events.registration.util import create_invitation, import_invitations_from_csv
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import ngettext
 from indico.util.marshmallow import LowercaseString, make_validate_indico_placeholders, no_relative_urls, not_empty
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
@@ -80,6 +81,18 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
                 create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
                                   skip_moderation=skip_moderation, skip_access_check=skip_access_check,
                                   lock_email=lock_email)
+            self.regform.log(
+                EventLogRealm.management, LogKind.other, 'Registration', 'Invitations sent', session.user,
+                data={
+                    'Sender': email_sender,
+                    'Subject': form.email_subject.data,
+                    'Body': form.email_body.data,
+                    'Skip moderation': skip_moderation,
+                    'Skip access check': skip_access_check,
+                    'Lock email': lock_email,
+                    '_html_fields': ['Body'],
+                }
+            )
             num = len(form.users.data)
             flash(ngettext('The invitation has been sent.',
                            '{n} invitations have been sent.',
@@ -132,6 +145,16 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
                 email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Registration', session.user)
+            self.regform.log(
+                EventLogRealm.management, LogKind.other, 'Registration', 'Invitation reminders sent', session.user,
+                data={
+                    'Sender': sender_address,
+                    'CC to sender': copy_for_sender,
+                    'Subject': subject,
+                    'Body': body,
+                    '_html_fields': ['Body'],
+                }
+            )
         return jsonify(count=len(self.invitations))
 
 
