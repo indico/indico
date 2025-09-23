@@ -128,8 +128,15 @@ class EventReminder(RenderModeMixin, db.Model):
     )
     #: How long before the event start the reminder should be sent
     #: This is needed to update the `scheduled_dt` when changing the
-    #: start  time of the event.
+    #: start time of the event.
     event_start_delta = db.Column(
+        db.Interval,
+        nullable=True
+    )
+    #: How long after the event end the reminder should be sent
+    #: This is needed to update the `scheduled_dt` when changing the
+    #: end time of the event.
+    event_end_delta = db.Column(
         db.Interval,
         nullable=True
     )
@@ -313,13 +320,31 @@ class EventReminder(RenderModeMixin, db.Model):
         return recipients
 
     @hybrid_property
-    def is_relative(self):
-        """Return if the reminder is relative to the event time."""
+    def is_start_time_relative(self):
+        """Return true if the reminder is relative to the event start time."""
         return self.event_start_delta is not None
+
+    @is_start_time_relative.expression
+    def is_start_time_relative(cls):
+        return cls.event_start_delta.isnot(None)
+
+    @hybrid_property
+    def is_end_time_relative(self):
+        """Return true if the reminder is relative to the event end time."""
+        return self.event_end_delta is not None
+
+    @is_end_time_relative.expression
+    def is_end_time_relative(cls):
+        return cls.event_end_delta.isnot(None)
+
+    @hybrid_property
+    def is_relative(self):
+        """Return true if the reminder is relative either to the event start or end time."""
+        return self.event_start_delta is not None or self.event_end_delta is not None
 
     @is_relative.expression
     def is_relative(cls):
-        return cls.event_start_delta.isnot(None)
+        return cls.event_start_delta.isnot(None) | cls.event_end_delta.isnot(None)
 
     @property
     def is_overdue(self):
