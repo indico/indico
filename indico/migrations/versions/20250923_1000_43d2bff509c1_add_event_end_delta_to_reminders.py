@@ -18,7 +18,14 @@ depends_on = None
 
 def upgrade():
     op.add_column('reminders', sa.Column('event_end_delta', sa.Interval(), nullable=True), schema='events')
+    op.create_check_constraint(
+        'event_start_delta_or_end_delta_is_null',
+        'reminders',
+        '(event_start_delta IS NULL) OR (event_end_delta IS NULL)',
+        schema='events'
+    )
 
 
 def downgrade():
+    op.drop_constraint('event_start_delta_or_end_delta_is_null', 'reminders', schema='events')
     op.drop_column('reminders', 'event_end_delta', schema='events')
