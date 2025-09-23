@@ -131,7 +131,7 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
                 email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
-            send_email(email, self.event, 'Registration')
+            send_email(email, self.event, 'Registration', session.user)
         return jsonify(count=len(self.invitations))
 
 
