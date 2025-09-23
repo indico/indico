@@ -63,20 +63,20 @@ class RHOAuthAuthorize(RHProtected):
     CSRF_ENABLED = False
 
     def _process(self):
-        rv = self._process_consent()
-        if rv is True:
-            return auth_server.create_authorization_response(grant_user=session.user)
-        elif rv is False:
-            return auth_server.create_authorization_response(grant_user=None)
-        else:
-            return rv
-
-    def _process_consent(self):
         try:
             grant = auth_server.get_consent_grant(end_user=session.user)
         except OAuth2Error as error:
             return render_template('oauth/authorize_errors.html', error=error.error)
 
+        rv = self._process_consent(grant)
+        if rv is True:
+            return auth_server.create_authorization_response(grant_user=session.user, grant=grant)
+        elif rv is False:
+            return auth_server.create_authorization_response(grant_user=None, grant=grant)
+        else:
+            return rv
+
+    def _process_consent(self, grant):
         application = grant.client
 
         if request.method == 'POST':
@@ -90,7 +90,9 @@ class RHOAuthAuthorize(RHProtected):
 
         link = application.user_links.filter_by(user=session.user).first()
         authorized_scopes = set(link.scopes) if link else set()
-        requested_scopes = set(scope_to_list(grant.request.scope)) if grant.request.scope else authorized_scopes
+        requested_scopes = (
+            set(scope_to_list(grant.request.payload.scope)) if grant.request.payload.scope else authorized_scopes
+        )
         if requested_scopes <= authorized_scopes:
             return True
 
