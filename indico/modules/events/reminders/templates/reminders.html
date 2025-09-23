@@ -19,8 +19,10 @@
                        data-title="{{ _("Reminder details") if reminder.is_sent else _("Edit reminder")}}"
                        data-ajax-dialog
                        data-reload-after>
-                        {%- if reminder.is_relative -%}
+                        {%- if reminder.is_start_time_relative -%}
                             {{ reminder.event_start_delta|format_human_timedelta('hours') }} before the event
+                        {%- elif reminder.is_end_time_relative -%}
+                            {{ reminder.event_end_delta|format_human_timedelta('hours') }} after the event
                         {%- else -%}
                             {{ reminder.scheduled_dt|format_datetime(timezone=tzinfo) }} <small>({{ tzinfo }})</small>
                         {%- endif -%}
