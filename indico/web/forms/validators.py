@@ -7,7 +7,7 @@
 
 import re
 from datetime import date, timedelta
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import urlsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
@@ -17,8 +17,7 @@ from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
-from indico.util.string import extract_link_hrefs, has_relative_links, is_valid_mail
-from indico.web.flask.util import endpoint_for_url
+from indico.util.string import has_endpoint_links, has_relative_links, is_valid_mail
 
 
 class UsedIf:
@@ -446,16 +445,8 @@ class NoEndpointLinks:
         self.query_args = query_args
 
     def __call__(self, form, field):
-        if not field.data:
-            return
-        hrefs = extract_link_hrefs(field.data)
-        for url in hrefs:
-            if not (endpoint_info := endpoint_for_url(url)):
-                continue
-            if self.endpoint != endpoint_info[0]:
-                continue
-            if not self.query_args or (self.query_args & parse_qs(urlsplit(url).query).keys()):
-                raise ValidationError(_('This field contains a forbidden link. Did you mean to use a placeholder?'))
+        if has_endpoint_links(field.data, self.endpoint, self.query_args):
+            raise ValidationError(_('This field contains a forbidden link. Did you mean to use a placeholder?'))
 
 
 class MastodonServer:
