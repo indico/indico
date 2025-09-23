@@ -21,13 +21,15 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Fix category list link color contrast (:pr:`7070`, thanks :user:`foxbunny`)
-- Fix color contrast and semantics of the protection icon and event count in category link 
+- Fix color contrast and semantics of the protection icon and event count in category link
   (:pr:`7071`, thanks :user:`foxbunny`)
-- Fix color contrast and screen reader support of the icons in the event list 
+- Fix color contrast and screen reader support of the icons in the event list
   (:pr:`7073`, thanks :user:`foxbunny`)
 - Fix color contrast and screen reader support of the hidden block buttons
   in the event list (:pr:`7079`, thanks :user:`foxbunny`)
 - Fix contrast of the category info text (:pr:`7078`, thanks :user:`foxbunny`)
+- Fix contrast and screen reader support in breadcrumbs (:pr:`7088`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
