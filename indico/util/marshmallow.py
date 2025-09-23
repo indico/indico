@@ -8,6 +8,7 @@
 import os
 import re
 from datetime import datetime, time, timedelta
+from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 
 import yaml
@@ -23,8 +24,9 @@ from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders
-from indico.util.string import get_format_placeholders, has_relative_links
+from indico.util.string import extract_link_hrefs, get_format_placeholders, has_relative_links
 from indico.util.user import principal_from_identifier
+from indico.web.flask.util import endpoint_for_url
 
 
 HUMANIZED_DATE_RE = re.compile(r'^(?:(?P<number>-?\d+)(?P<unit>[dwM]))|(?P<iso_date>\d{4}-\d{2}-\d{2})$')
@@ -60,6 +62,32 @@ def no_relative_urls(value):
     """Validator that checks links/images use absolute URLs."""
     if value and has_relative_links(value):
         raise ValidationError(_('Links and images may not use relative URLs.'))
+
+
+def no_endpoint_links(endpoint, query_args=frozenset()):
+    """Validator that rejects links pointing to the given endpoint.
+
+    This checks only ``a[href]``, but not URLs present as plain text or in any
+    other (unexpected) places.
+
+    It is intended for places where a placeholder containing a unique/secret link
+    is expected to be used, but users may copy&paste emails from the event log or
+    other places and accidentally include a hardcoded token (of someone else).
+    """
+
+    def _validator(value):
+        if not value:
+            return
+        hrefs = extract_link_hrefs(value)
+        for url in hrefs:
+            if not (endpoint_info := endpoint_for_url(url)):
+                continue
+            if endpoint != endpoint_info[0]:
+                continue
+            if not query_args or (query_args & parse_qs(urlsplit(url).query).keys()):
+                raise ValidationError(_('This field contains a forbidden link. Did you mean to use a placeholder?'))
+
+    return _validator
 
 
 def validate_format_placeholders(format_string, valid_placeholders, required_placeholders=None):

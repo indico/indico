@@ -7,7 +7,7 @@
 
 import re
 from datetime import date, timedelta
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
@@ -17,7 +17,8 @@ from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
-from indico.util.string import has_relative_links, is_valid_mail
+from indico.util.string import extract_link_hrefs, has_relative_links, is_valid_mail
+from indico.web.flask.util import endpoint_for_url
 
 
 class UsedIf:
@@ -418,7 +419,7 @@ class SecurePassword:
 
 
 class NoRelativeURLs:
-    """Validate that an HTML strings contains no relative URLs.
+    """Validate that an HTML string contains no relative URLs.
 
     This checks only ``img[src]`` and ``a[href]``, but not URLs present as plain
     text or in any other (unexpected) places.
@@ -427,6 +428,34 @@ class NoRelativeURLs:
     def __call__(self, form, field):
         if field.data and has_relative_links(field.data):
             raise ValidationError(_('Links and images may not use relative URLs.'))
+
+
+class NoEndpointLinks:
+    """Validate that an HTML string contains no URLs for the given endpoint.
+
+    This checks only ``a[href]``, but not URLs present as plain text or in any
+    other (unexpected) places.
+
+    It is intended for places where a placeholder containing a unique/secret link
+    is expected to be used, but users may copy&paste emails from the event log or
+    other places and accidentally include a hardcoded token (of someone else).
+    """
+
+    def __init__(self, endpoint, query_args=frozenset()):
+        self.endpoint = endpoint
+        self.query_args = query_args
+
+    def __call__(self, form, field):
+        if not field.data:
+            return
+        hrefs = extract_link_hrefs(field.data)
+        for url in hrefs:
+            if not (endpoint_info := endpoint_for_url(url)):
+                continue
+            if self.endpoint != endpoint_info[0]:
+                continue
+            if not self.query_args or (self.query_args & parse_qs(urlsplit(url).query).keys()):
+                raise ValidationError(_('This field contains a forbidden link. Did you mean to use a placeholder?'))
 
 
 class MastodonServer:

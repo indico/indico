@@ -341,6 +341,12 @@ def has_relative_links(html_text):
     )
 
 
+def extract_link_hrefs(html_text):
+    doc = html.fromstring(html_text)
+    return {link for el, attrib, link, _pos in doc.iterlinks()
+            if el.tag == 'a' and attrib == 'href' and urlsplit(link).scheme != 'mailto'}
+
+
 def is_valid_mail(emails_string, multi=True):
     # XXX: This is deprecated, use `validate_email` or `validate_emails` instead!
     # Remove this in 2.2 when the 'multi' mode is not needed anymore (only used in RB)

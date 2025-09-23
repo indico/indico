@@ -13,6 +13,8 @@ Improvements
 - Disallow comments/judgments on outdated editables (:pr:`7067`)
 - Log original email content (with placeholders) when emailing registrants or
   sending invitations (:pr:`7093`)
+- Disallow sending registration emails or invitations containing hardcoded (and
+  usually incorrect) token links (:pr:`7093`)
 
 Bugfixes
 ^^^^^^^^
