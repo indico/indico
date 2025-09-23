@@ -86,6 +86,8 @@ class EventReminder(RenderModeMixin, db.Model):
 
     __tablename__ = 'reminders'
     __table_args__ = (db.Index(None, 'scheduled_dt', postgresql_where=db.text('not is_sent')),
+                      db.CheckConstraint('(event_start_delta IS NULL) OR (event_end_delta IS NULL)',
+                                         name='event_start_delta_or_end_delta_is_null'),
                       {'schema': 'events'})
     possible_render_modes = {RenderMode.html, RenderMode.plain_text}
     default_render_mode = RenderMode.html
