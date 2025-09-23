@@ -48,7 +48,6 @@ ignore = [
     'RUF022',  # autofix messes up our formatting instead of just sorting
     'RUF027',  # also triggers on i18n functions -> too noisy for now
     'RUF052',  # we often use underscore-prefixed variables in tests and to cache regexps in function definitions
-    'UP038',   # it looks kind of weird and it slower than a tuple
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
     'D1',      # we have way too many missing docstrings :(
