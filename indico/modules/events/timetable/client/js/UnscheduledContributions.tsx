@@ -5,10 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {partition} from 'lodash';
 import {Moment} from 'moment';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Button, Label, Select} from 'semantic-ui-react';
+import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
 
 import SessionEditForm, {SessionCreateForm} from 'indico/modules/events/sessions/SessionForm';
 import {Translate} from 'indico/react/i18n';
@@ -16,6 +17,15 @@ import {Translate} from 'indico/react/i18n';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
+
+enum FilterType {
+  ALL = 'all-sessions',
+  NO_SESSION = 'no-session',
+}
+
+function FragmentWithoutWarning({key, children}: {key: string; children: ReactNode}) {
+  return <Fragment key={key}>{children}</Fragment>;
+}
 
 function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[]}) {
   return (
@@ -42,8 +52,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const sessions = useSelector(selectors.getSessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const wrapperRef = useRef(null);
+  const minSidebarWidthPx = 280;
 
-  const [selectedFilter, setSelectedFilter] = useState<string | 'no-session'>('no-session');
+  const [selectedFilter, setSelectedFilter] = useState<string | FilterType>('no-session');
   const [draftSessionId, setDraftSessionId] = useState<number | 'new' | null>(null);
 
   const resizing = useRef<boolean>(false);
@@ -59,8 +70,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       if (resizing.current) {
         const diff = e.pageX - initialPosition.current;
         const width = wrapperRef.current.offsetWidth + diff;
-        initialPosition.current = e.pageX;
-        wrapperRef.current.style.width = `${width}px`;
+        if (width >= minSidebarWidthPx) {
+          initialPosition.current = e.pageX;
+          wrapperRef.current.style.width = `${width}px`;
+        }
       }
     }
 
@@ -72,39 +85,74 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     };
   }, []);
 
+  const sessionSearch = (options: DropdownItemProps[], value: string) =>
+    options.filter(o => o.title && o.title.toLowerCase().includes(value.toLowerCase()));
+
   const currentContribs = useMemo(() => {
-    return contribsGrouped[selectedFilter] ?? [];
-  }, [contribs, selectedFilter]);
+    return selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
+  }, [contribs, selectedFilter, contribsGrouped]);
+
+  const [sessionsWithContribs, sessionsWithoutContribs] = partition(
+    Object.entries(sessions)
+      .map(([id, session]) => ({
+        value: +id,
+        title: session.title,
+        count: (contribsGrouped[id] ?? []).length,
+        text: (
+          <div styleName="session">
+            <Label empty circular style={{...session.colors}} />
+            {session.title}
+          </div>
+        ),
+      }))
+      .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
+    e => e.count > 0
+  );
+  const dropdownSessions = [
+    {
+      as: FragmentWithoutWarning,
+      key: 'sep-filters',
+      content: (
+        <DropdownHeader>
+          <Translate>Filters</Translate>
+        </DropdownHeader>
+      ),
+    },
+    {
+      value: 'no-session',
+      title: Translate.string('No assigned session'),
+      text: (
+        <div styleName="session">
+          <Label empty circular color="grey" />
+          <Translate>No assigned session</Translate>
+        </div>
+      ),
+    },
+    {
+      as: FragmentWithoutWarning,
+      key: 'sep-with-contribs',
+      content: (
+        <DropdownHeader>
+          <Translate>Sessions with contributions</Translate>
+        </DropdownHeader>
+      ),
+    },
+    ...sessionsWithContribs,
+    {
+      as: FragmentWithoutWarning,
+      key: 'sep-without-contribs',
+      content: (
+        <DropdownHeader>
+          <Translate>Empty sessions</Translate>
+        </DropdownHeader>
+      ),
+    },
+    ...sessionsWithoutContribs,
+  ];
 
   if (!showUnscheduled) {
     return null;
   }
-
-  let dropdownSessions = Object.entries(sessions).map(([id, session]) => ({
-    value: +id,
-    text: (
-      <div styleName="session" style={{fontSize: '0.8em'}}>
-        <Label
-          empty
-          circular
-          style={{
-            ...session.colors,
-            width: '0.8em',
-            height: '0.8em',
-            fontWeight: 'normal',
-          }}
-        />
-        {session.title} ({contribsGrouped[id]?.length})
-      </div>
-    ),
-  }));
-
-  dropdownSessions = dropdownSessions.toSorted((s1, s2) => {
-    const l1 = (contribsGrouped[s1.value] ?? []).length;
-    const l2 = (contribsGrouped[s2.value] ?? []).length;
-
-    return l1 && l2 ? 0 : Math.sign(l2 - l1);
-  });
 
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
   //              I propose we have some kind of filter option to search by entry type,
@@ -113,70 +161,46 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     <>
       <div
         styleName="contributions-container"
-        style={{height: '100%', overflow: 'hidden'}}
+        style={{minWidth: `${minSidebarWidthPx}px`}}
         ref={wrapperRef}
       >
-        <div
-          styleName="content"
-          style={{overflowX: 'auto', height: '100%', padding: '1em 1em 5em 0'}}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px',
-            }}
-          >
-            <div styleName="actions">
-              {/* TODO: (Ajob) This design is not great, but reworking the side-bar
-                               will be part of a separate PR.
-              */}
-              <Select
-                button
-                defaultValue="no-session"
-                onChange={(_, {value}) => setSelectedFilter(value)}
-                options={[
-                  {
-                    value: 'no-session',
-                    text: (
-                      <div styleName="session" style={{fontSize: '0.8em'}}>
-                        <Label
-                          empty
-                          circular
-                          color="grey"
-                          style={{
-                            width: '0.8em',
-                            height: '0.8em',
-                            fontWeight: 'normal',
-                          }}
-                        />
-                        <Translate>No assigned session</Translate>
-                      </div>
-                    ),
-                  },
-                  ...dropdownSessions,
-                ]}
-              />
-              {Number.isInteger(+selectedFilter) && (
-                <Button
-                  basic
-                  type="button"
-                  title={Translate.string('Edit selected session')}
-                  icon="edit"
-                  size="mini"
-                  disabled={!Number.isInteger(+selectedFilter)}
-                  onClick={() => setDraftSessionId(+selectedFilter)}
-                />
-              )}
+        <div styleName="content">
+          <div styleName="actions">
+            <Select
+              button
+              placeholder={Translate.string('All sessions')}
+              search={sessionSearch}
+              onClose={() => {
+                const searchInput = wrapperRef.current.querySelector(
+                  'div .ui.button.search.selection.dropdown input.search'
+                );
+                searchInput.blur();
+              }}
+              noResultsMessage={Translate.string('No sessions found.')}
+              clearable
+              defaultValue="no-session"
+              onChange={(_, {value}: {_: unknown; value: string}) => setSelectedFilter(value)}
+              options={dropdownSessions}
+            />
+            {Number.isInteger(selectedFilter) && (
               <Button
                 basic
                 type="button"
-                title={Translate.string('Create new session')}
-                icon="plus"
-                size="mini"
-                onClick={() => setDraftSessionId('new')}
+                title={Translate.string('Edit selected session')}
+                icon="edit"
+                size="small"
+                disabled={!Number.isInteger(+selectedFilter)}
+                onClick={() => setDraftSessionId(+selectedFilter)}
               />
-            </div>
+            )}
+            <Button
+              basic
+              type="button"
+              title={Translate.string('Create new session')}
+              icon="plus"
+              size="small"
+              onClick={() => setDraftSessionId('new')}
+            />
           </div>
           {draftSessionId === 'new' && (
             <SessionCreateForm
