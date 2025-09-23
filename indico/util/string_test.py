@@ -11,11 +11,11 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import (AutoLinkExtension, HTMLLinker, camelize, camelize_keys, crc32, format_email_with_name,
-                                format_repr, has_relative_links, html_to_plaintext, make_unique_token,
-                                normalize_linebreaks, normalize_phone_number, render_markdown, sanitize_email,
-                                sanitize_for_platypus, sanitize_html, seems_html, slugify, snakify, snakify_keys,
-                                strip_tags, text_to_repr)
+from indico.util.string import (AutoLinkExtension, HTMLLinker, camelize, camelize_keys, crc32, extract_link_hrefs,
+                                format_email_with_name, format_repr, has_endpoint_links, has_relative_links,
+                                html_to_plaintext, make_unique_token, normalize_linebreaks, normalize_phone_number,
+                                render_markdown, sanitize_email, sanitize_for_platypus, sanitize_html, seems_html,
+                                slugify, snakify, snakify_keys, strip_tags, text_to_repr)
 
 
 def test_seems_html():
@@ -293,6 +293,33 @@ def test_sanitize_html_escaped_quotes(input, output):
 ))
 def test_has_relative_links(input, expected):
     assert has_relative_links(input) == expected
+
+
+@pytest.mark.parametrize(('input', 'expected'), (
+    ('<a href="/foo">test</a>', {'/foo'}),
+    ('<img src="/bar">', set()),
+    ('<a href="/foo">test</a><img src="/bar">', {'/foo'}),
+    ('<div><span><a href="/foo">test</a></span><img src="/bar"></div>', {'/foo'}),
+    ('<a href="//example.com/foo">test</a><img src="//example.com/bar">', {'//example.com/foo'}),
+    ('<a href="foo">test</a><img src="bar">', {'foo'}),
+    ('<a href="https://example.com/foo">test</a><img src="https://example.com/bar">', {'https://example.com/foo'}),
+    ('<a href="mailto:foobar@example.com">test</a>', set()),
+))
+def test_extract_link_hrefs(input, expected):
+    assert extract_link_hrefs(input) == expected
+
+
+@pytest.mark.parametrize(('input', 'endpoint', 'args', 'expected'), (
+    ('<a href="http://localhost/ping">test</a>', 'core.ping', None, True),
+    ('<a href="http://example.com/ping">test</a>', 'core.ping', None, False),
+    ('<a href="//example.com/ping">test</a>', 'core.ping', None, False),
+    ('<a href="/ping">test</a>', 'core.ping', None, True),
+    ('<a href="/ping">test</a>', 'foo', None, False),
+    ('<a href="/ping">test</a>', 'core.ping', {'foo'}, False),
+    ('<a href="/ping?foo=bar">test</a>', 'core.ping', {'foo'}, True),
+))
+def test_has_endpoint_links(input, endpoint, args, expected):
+    assert has_endpoint_links(input, endpoint, args) == expected
 
 
 @pytest.mark.parametrize(('name', 'address', 'expected'), (

@@ -18,7 +18,7 @@ from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
 from xml.etree.ElementTree import Element
 
@@ -339,6 +339,27 @@ def has_relative_links(html_text):
         for el, attrib, link, _pos in doc.iterlinks()
         if (el.tag, attrib) in {('a', 'href'), ('img', 'src')}
     )
+
+
+def extract_link_hrefs(html_text):
+    doc = html.fromstring(html_text)
+    return {link for el, attrib, link, _pos in doc.iterlinks()
+            if el.tag == 'a' and attrib == 'href' and urlsplit(link).scheme != 'mailto'}
+
+
+def has_endpoint_links(html_text, endpoint, query_args=None) -> bool:
+    """Check if an HTML string contains links to a specific Flask endpoint."""
+    from indico.web.flask.util import endpoint_for_url
+    if not html_text:
+        return False
+    for url in extract_link_hrefs(html_text):
+        if not (endpoint_info := endpoint_for_url(url)):
+            continue
+        if endpoint != endpoint_info[0]:
+            continue
+        if not query_args or (query_args & parse_qs(urlsplit(url).query).keys()):
+            return True
+    return False
 
 
 def is_valid_mail(emails_string, multi=True):
