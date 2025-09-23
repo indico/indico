@@ -9,7 +9,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Form} from 'semantic-ui-react';
 
-import {FinalInput, FinalTextArea, validators as v} from 'indico/react/forms';
+import {
+  FinalDropdown,
+  FinalInput,
+  FinalTextArea,
+  parsers as p,
+  validators as v,
+} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
@@ -49,19 +55,33 @@ TextAreaInput.defaultProps = {
 };
 
 export function TextAreaSettings() {
+  const contentValidationOptions = [
+    {key: 'nourl', value: 'no_url', text: Translate.string('Disallow URLs')},
+    {key: 'urlonly', value: 'url_only', text: Translate.string('Valid URL')},
+  ];
   return (
-    <Form.Group widths="equal">
-      <FinalInput
-        name="numberOfRows"
-        type="number"
-        label={Translate.string('Rows')}
-        placeholder={String(TextAreaInput.defaultProps.numberOfRows)}
-        step="1"
-        min="1"
-        max="20"
-        validate={v.optional(v.range(1, 20))}
-        fluid
+    <>
+      <FinalDropdown
+        name="contentValidation"
+        label={Translate.string('Content Validation')}
+        options={contentValidationOptions}
+        placeholder={Translate.string('None', 'Content Validation')}
+        parse={p.nullIfEmpty}
+        selection
       />
-    </Form.Group>
+      <Form.Group widths="equal">
+        <FinalInput
+          name="numberOfRows"
+          type="number"
+          label={Translate.string('Rows')}
+          placeholder={String(TextAreaInput.defaultProps.numberOfRows)}
+          step="1"
+          min="1"
+          max="20"
+          validate={v.optional(v.range(1, 20))}
+          fluid
+        />
+      </Form.Group>
+    </>
   );
 }
