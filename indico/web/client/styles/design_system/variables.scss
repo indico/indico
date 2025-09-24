@@ -144,3 +144,13 @@ body {
   --menu-vertical-padding-ratio: 0.7;
   --menu-border: 1px solid var(--menu-border-color);
 }
+
+%dark-mode {
+  // This is a foundation of the dark mode support. It's not yet used as a full app-wide
+  // dark mode so it only contains a subset of the variables. Currently it is used in
+  // areas of the dark pages like lectures and meetings.
+
+  --text-secondary-color: #b5b5b5;
+
+  --clickable-text-color: #21c0ff;
+}

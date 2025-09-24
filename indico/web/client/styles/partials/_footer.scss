@@ -6,17 +6,27 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 .footer {
-  color: $light-black;
   padding: 10px 5px 10px 10px;
 
   &.dark {
+    @extend %dark-mode;
+
     color: $gray;
   }
 
   img {
     vertical-align: middle;
+  }
+
+  span {
+    @extend %secondary-text-normal;
+  }
+
+  a {
+    @extend %link;
   }
 
   .footer-logo {
@@ -46,11 +56,7 @@
   }
 
   .version {
-    color: $gray;
-  }
-
-  &.dark .version {
-    color: $dark-gray;
+    @extend %secondary-text-normal;
   }
 }
 
