@@ -22,8 +22,9 @@ import {
   ContribEntry,
   ChildContribEntry,
   UnscheduledContrib,
+  Entry,
 } from './types';
-import {getEntryURL} from './utils';
+import {getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -103,7 +104,6 @@ interface CreateEntryAction {
 
 interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
-  entryType: string;
   entry: TopLevelEntry;
   currentDay: string;
 }
@@ -160,14 +160,19 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  return dispatch => {
-    const newEntry = {...entry};
+export function moveEntry(entry: Entry, date: string, sessionBlockId?) {
+  return (dispatch, getState) => {
+    const color = entry.colors;
 
-    const entryURL = getEntryURL(newEntry, eventId);
+    const newEntry = {...entry, ...color};
+
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+
+    const entryURL = getEntryURLByObjId(eventId, newEntry.type, newEntry.objId);
 
     const entryData = {
-      start_dt: moment(newEntry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
+      start_dt: moment(newEntry.startDt).format(),
       session_block_id: sessionBlockId,
     };
 
@@ -175,7 +180,6 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
       synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
         type: MOVE_ENTRY,
         date,
-        entries,
         entry: newEntry,
       })
     );

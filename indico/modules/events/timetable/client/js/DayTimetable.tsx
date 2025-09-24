@@ -22,7 +22,6 @@ import {
   computeYoffset,
   getGroup,
   layout,
-  layoutGroup,
   layoutGroupAfterMove,
   layoutAfterUnscheduledDrop,
   layoutAfterUnscheduledDropOnBlock,
@@ -113,7 +112,6 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
-
   const [isDragging, setIsDragging] = useState(false);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
@@ -204,14 +202,12 @@ export function DayTimetable({
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
     const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-    dispatch(
-      actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
-    );
+    dispatch(actions.scheduleEntry(eventId, contribId, startDt, newUnscheduled, blockId));
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
+    const [movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
+    dispatch(actions.moveEntry(movedEntry, getDateKey(dt), null));
   }
 
   function handleDropOnBlock(
@@ -221,7 +217,7 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+    const [movedEntry, blockId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
@@ -229,7 +225,7 @@ export function DayTimetable({
       mouse,
       calendar
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
+    dispatch(actions.moveEntry(movedEntry, getDateKey(dt), blockId));
   }
 
   useEffect(() => {
@@ -508,21 +504,8 @@ function layoutAfterDropOnCalendar(
 
   if (!fromBlock) {
     // Drop from top level to top level
-    const oldGroupIds = getGroup(
-      fromEntry,
-      entries.filter(e => e.id !== fromEntry.id)
-    );
-    let oldGroup = entries.filter(e => oldGroupIds.has(e.id) && !groupIds.has(e.id));
-    const otherEntries = entries.filter(
-      e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
-    );
-    oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
-    return [[...otherEntries, ...oldGroup, ...group], draftEntry];
+    return [draftEntry];
   } else {
-    // Drop from block to top level (== a break)
-    const otherEntries = entries.filter(
-      e => !groupIds.has(e.id) && e.id !== draftEntry.id && e.id !== fromBlock.id
-    );
     if (groupIds.has(fromBlock.id)) {
       fromBlock = group.find(e => e.id === fromBlock.id) as BlockEntry;
       group = group.filter(e => e.id !== fromBlock.id);
@@ -530,7 +513,7 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return [[...otherEntries, ...group, fromBlock], draftEntry];
+    return [draftEntry];
   }
 }
 
@@ -555,7 +538,6 @@ function layoutAfterDropOnBlock(
 
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
-  const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined;
   if (!fromBlock) {
@@ -608,43 +590,11 @@ function layoutAfterDropOnBlock(
       'minutes'
     );
   }
-
-  const groupIds = getGroup(
-    draftEntry,
-    toBlock.children.filter(e => e.id !== draftEntry.id)
-  );
-  let group = toBlock.children.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, draftEntry, mousePosition);
-
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
-
   if (!fromBlock) {
-    return [
-      layout([
-        ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
-        {...toBlock, children: [...otherChildren, ...group]},
-      ]),
-      draftEntry,
-      toBlock.objId,
-    ];
+    return [draftEntry, toBlock.objId];
   } else if (toBlock.id === fromBlock.id) {
-    const otherEntries = entries.filter(e => e.id !== toBlock.id);
-    return [
-      layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
-      draftEntry,
-      toBlock.objId,
-    ];
+    return [draftEntry, toBlock.objId];
   } else {
-    const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
-    const fromChildren = fromBlock.children.filter(e => e.id !== draftEntry.id);
-    return [
-      layout([
-        ...otherEntries,
-        {...fromBlock, children: fromChildren},
-        {...toBlock, children: [...otherChildren, ...group]},
-      ]),
-      draftEntry,
-      toBlock.objId,
-    ];
+    return [draftEntry, toBlock.objId];
   }
 }
