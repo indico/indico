@@ -445,7 +445,6 @@ function layoutAfterDropOnCalendar(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  sessions?: Record<number, Session>
 ): [TopLevelEntry[], Entry] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
@@ -523,7 +522,7 @@ function layoutAfterDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  calendar: Over,
+  calendar: Over
 ): [TopLevelEntry[], Entry] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
