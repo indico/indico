@@ -11,7 +11,7 @@ import moment, {Moment} from 'moment';
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries, EntryType, isChildEntry, Session} from './types';
+import {ChildEntry, DayEntries, EntryType, isChildEntry, Session} from './types';
 import {getDateKey, setCurrentDateLocalStorage} from './utils';
 
 interface Change {
@@ -68,13 +68,21 @@ export default {
               : e
           );
 
-        const parent = newDayEntries.find(e => e.id === entry.sessionBlockId);
+        const parent =
+          'sessionBlockId' in entry
+            ? newDayEntries.find(e => e.id === (entry as ChildEntry).sessionBlockId)
+            : undefined;
 
         const targetArr = date === newDayKey ? base : newDayEntries;
 
         if (parent) {
           newDayEntries = targetArr.map(e =>
-            e.id === parent.id ? {...e, children: layout([...e.children, entry])} : e
+            e.id === parent.id && e.type === EntryType.SessionBlock
+              ? {
+                  ...e,
+                  children: layout([...e.children, entry]).filter(isChildEntry) as ChildEntry[],
+                }
+              : e
           );
         } else {
           newDayEntries = layout([...targetArr, entry]);
