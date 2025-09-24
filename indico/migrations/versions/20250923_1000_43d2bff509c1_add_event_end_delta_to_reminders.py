@@ -27,5 +27,5 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_constraint('event_start_delta_or_end_delta_is_null', 'reminders', schema='events')
+    op.drop_constraint('ck_reminders_event_start_delta_or_end_delta_is_null', 'reminders', schema='events')
     op.drop_column('reminders', 'event_end_delta', schema='events')
