@@ -108,7 +108,6 @@ interface CreateEntryAction {
 
 interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
-  entryType: string;
   entry: TopLevelEntry;
   currentDay: string;
 }
@@ -216,14 +215,16 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string, sessionBlockId?) {
-  return dispatch => {
-    const newEntry = {...entry};
+export function moveEntry(entry: Entry, date: string, sessionBlockId?) {
+  return (dispatch, getState) => {
 
-    const entryURL = getEntryURLByObjId(newEntry, eventId, entry.objId);
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
 
     const entryData = {
-      start_dt: moment(newEntry.startDt).format('YYYY-MM-DDTHH:mm:ss'),
+      start_dt: moment(entry.startDt).format(),
       session_block_id: sessionBlockId,
     };
 
@@ -231,8 +232,7 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
       synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
         type: MOVE_ENTRY,
         date,
-        entries,
-        entry: newEntry,
+        entry,
       })
     );
   };

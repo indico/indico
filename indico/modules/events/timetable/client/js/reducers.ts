@@ -12,7 +12,7 @@ import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {DayEntries, EntryType, isChildEntry, Session} from './types';
-import {setCurrentDateLocalStorage} from './utils';
+import {getDateKey, setCurrentDateLocalStorage} from './utils';
 
 interface Change {
   change: any;
@@ -54,34 +54,36 @@ export default {
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
       }
       case actions.MOVE_ENTRY: {
-        const {date, entry, entries} = action;
-
-        let entryId: number, newDayEntries: TopLevelEntry[];
-        if (entry.sessionBlockId) {
-          const parentId = entries.findIndex(e => e.id === entry.sessionBlockId);
-          const parent = entries[parentId];
-          entryId = parent.children.findIndex(e => e.id === entry.id);
-
-          const newChildren = layout([...parent.children.filter(c => c.id !== entry.id), entry]);
-          newDayEntries = [
-            ...entries.slice(0, parentId),
-            {...parent, children: newChildren},
-            ...entries.slice(parentId + 1),
-          ];
-        } else {
-          entryId = entries.findIndex(e => e.id === entry.id);
-          newDayEntries = layout([
-            ...entries.slice(0, entryId),
-            entry,
-            ...entries.slice(entryId + 1),
-          ]);
-        }
-
+        const {date, entry} = action;
         const allEntries = state.changes[state.currentChangeIdx].entries;
+        const dayEntries = allEntries[date];
+        const newDayKey = getDateKey(entry.startDt);
+        let newDayEntries = allEntries[newDayKey];
+
+        const base = dayEntries
+          .filter(e => e.id !== entry.id)
+          .map(e =>
+            e.type === EntryType.SessionBlock
+              ? {...e, children: e.children.filter(c => c.id !== entry.id)}
+              : e
+          );
+
+        const parent = newDayEntries.find(e => e.id === entry.sessionBlockId);
+
+        const targetArr = date === newDayKey ? base : newDayEntries;
+
+        if (parent) {
+          newDayEntries = targetArr.map(e =>
+            e.id === parent.id ? {...e, children: layout([...e.children, entry])} : e
+          );
+        } else {
+          newDayEntries = layout([...targetArr, entry]);
+        }
 
         const newEntries = {
           ...allEntries,
-          [date]: newDayEntries,
+          [date]: base,
+          [newDayKey]: newDayEntries,
         };
 
         return {
