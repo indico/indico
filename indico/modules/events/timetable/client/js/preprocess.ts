@@ -154,6 +154,8 @@ export function preprocessTimetableEntries(
             column: 0,
             maxColumn: 0,
             colors: c.colors || getDefaultColorByType(childType),
+            // TODO
+            // @ts-expect-error the parent attribute is not in the type (yet)
             parent: {
               colors,
               id,

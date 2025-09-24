@@ -202,7 +202,9 @@ export function DayTimetable({
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
     const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-    dispatch(actions.scheduleEntry(eventId, contribId, startDt, newUnscheduled, blockId));
+    dispatch(
+      actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
+    );
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
@@ -444,8 +446,8 @@ function layoutAfterDropOnCalendar(
   who: string,
   over: Over,
   delta: Transform,
-  mouse: MousePosition,
-): [TopLevelEntry[], Entry] {
+  mouse: MousePosition
+): [Entry, number] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
@@ -483,6 +485,8 @@ function layoutAfterDropOnCalendar(
 
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
+    // TODO
+    // @ts-expect-error the parent attribute is not in the type (yet)
     delete draftEntry.parent;
   }
 
@@ -503,7 +507,7 @@ function layoutAfterDropOnCalendar(
 
   if (!fromBlock) {
     // Drop from top level to top level
-    return [draftEntry];
+    return [draftEntry, null];
   } else {
     if (groupIds.has(fromBlock.id)) {
       fromBlock = group.find(e => e.id === fromBlock.id) as BlockEntry;
@@ -512,7 +516,7 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return [draftEntry];
+    return [draftEntry, null];
   }
 }
 
@@ -523,7 +527,7 @@ function layoutAfterDropOnBlock(
   delta: Transform,
   mouse: MousePosition,
   calendar: Over
-): [TopLevelEntry[], Entry] {
+): [Entry, number] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
 

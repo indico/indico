@@ -105,6 +105,7 @@ interface CreateEntryAction {
 interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
   entry: TopLevelEntry;
+  entryType: string;
   currentDay: string;
 }
 
