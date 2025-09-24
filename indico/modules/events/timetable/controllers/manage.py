@@ -205,8 +205,8 @@ class RHTimetableBreak(RHManageEventBase):
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
-        session_block_id = data.pop('timetable_entry', {}).get('parent', {}).get('session_block_id')
-        self._move_entry(session_block_id)
+        session_block_id = data.pop('session_block_id', None)
+        self._change_parent(session_block_id)
 
         if not data.get('timetable_entry'):
             data.pop('timetable_entry', None)
@@ -224,14 +224,14 @@ class RHTimetableBreak(RHManageEventBase):
         return '', 204
 
     @no_autoflush
-    def _move_entry(self, session_block_id):
+    def _change_parent(self, session_block_id):
         entry = self.break_.timetable_entry
 
         if session_block_id is None:
-            update_timetable_entry(entry, {
-                'parent': None,
-                'start_dt': entry.start_dt
-            })
+            self.break_.session_block = None
+            self.break_.session = None
+            if entry.parent is not None:
+                update_timetable_entry(entry, {'parent': None, 'start_dt': entry.start_dt})
         else:
             target_block = self.event.get_session_block(session_block_id)
 
@@ -287,7 +287,7 @@ class RHTimetableContribution(RHManageContributionBase):
         if (person_links := data.pop('person_links', None)) is not None:
             data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
         session_block_id = data.pop('session_block_id', None)
-        self._move_entry(session_block_id)
+        self._change_parent(session_block_id)
 
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)
@@ -312,7 +312,7 @@ class RHTimetableContribution(RHManageContributionBase):
                                                     value=entry['value']))
         return references
 
-    def _move_entry(self, session_block_id):
+    def _change_parent(self, session_block_id):
         entry = self.contrib.timetable_entry
 
         self.contrib.session_block = None
