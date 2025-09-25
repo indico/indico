@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -21,10 +22,10 @@ import {
   computeYoffset,
   getGroup,
   layout,
-  layoutGroup,
   layoutGroupAfterMove,
   layoutAfterUnscheduledDrop,
   layoutAfterUnscheduledDropOnBlock,
+  layoutGroup,
 } from './layout';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
@@ -209,7 +210,7 @@ export function DayTimetable({
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
   }
 
   function handleDropOnBlock(
@@ -219,7 +220,7 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+    const [newLayout, movedEntry, blockId] = layoutAfterDropOnBlock(
       entries,
       who,
       over,
@@ -227,7 +228,7 @@ export function DayTimetable({
       mouse,
       calendar
     );
-    dispatch(actions.moveEntry(movedEntry, eventId, newLayout, getDateKey(dt)));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }
 
   useEffect(() => {
@@ -447,7 +448,7 @@ function layoutAfterDropOnCalendar(
   over: Over,
   delta: Transform,
   mouse: MousePosition
-): [TopLevelEntry[], Entry] {
+): [TopLevelEntry[], Entry, number] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
@@ -466,13 +467,9 @@ function layoutAfterDropOnCalendar(
     }
 
     fromEntry = fromBlock.children.find(c => c.id === who);
-    if (!fromEntry || fromEntry.type !== EntryType.Break) {
+    if (!fromEntry) {
       return;
     }
-  }
-
-  if (fromEntry.type === EntryType.Contribution && fromEntry.sessionId) {
-    return; // contributions with sessions assigned cannot be scheduled at the top level
   }
 
   const draftEntry = {
@@ -483,10 +480,15 @@ function layoutAfterDropOnCalendar(
         .add(deltaMinutes, 'minutes')
         .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
+    sessionId: null,
+    sessionBlockId: null,
   };
 
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
+    // TODO
+    // @ts-expect-error the parent attribute is not in the type (yet)
+    delete draftEntry.parent;
   }
 
   if (draftEntry.type === EntryType.SessionBlock) {
@@ -515,7 +517,7 @@ function layoutAfterDropOnCalendar(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
     );
     oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
-    return [[...otherEntries, ...oldGroup, ...group], draftEntry];
+    return [[...otherEntries, ...oldGroup, ...group], draftEntry, null];
   } else {
     // Drop from block to top level (== a break)
     const otherEntries = entries.filter(
@@ -528,7 +530,7 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return [[...otherEntries, ...group, fromBlock], draftEntry];
+    return [[...otherEntries, ...group, fromBlock], draftEntry, null];
   }
 }
 
@@ -539,7 +541,7 @@ function layoutAfterDropOnBlock(
   delta: Transform,
   mouse: MousePosition,
   calendar: Over
-): [TopLevelEntry[], Entry] {
+): [TopLevelEntry[], Entry, number] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
 
@@ -569,16 +571,7 @@ function layoutAfterDropOnBlock(
     return;
   }
 
-  if (fromEntry.type === EntryType.Contribution) {
-    if (!fromEntry.sessionId) {
-      // Allow top level contributions being dropped on blocks to be treated as if they
-      // were dropped directly on the calendar instead
-      return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
-    }
-    if (fromEntry.sessionId !== toBlock.sessionId) {
-      return; // contributions cannot be moved to blocks of different sessions
-    }
-  } else if (fromEntry.type === EntryType.SessionBlock) {
+  if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
@@ -597,6 +590,8 @@ function layoutAfterDropOnBlock(
         .diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    sessionId: toBlock.sessionId,
+    parent: _.pick(toBlock, ['id', 'objId', 'title', 'colors']),
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
@@ -630,12 +625,14 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
     return [
       layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
       draftEntry,
+      toBlock.objId,
     ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
@@ -647,6 +644,7 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
+      toBlock.objId,
     ];
   }
 }
