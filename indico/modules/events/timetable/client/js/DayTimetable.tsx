@@ -448,7 +448,7 @@ function layoutAfterDropOnCalendar(
   over: Over,
   delta: Transform,
   mouse: MousePosition
-): [TopLevelEntry[], Entry, number ] {
+): [TopLevelEntry[], Entry, number] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
@@ -618,7 +618,6 @@ function layoutAfterDropOnBlock(
 
   const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
 
-
   if (!fromBlock) {
     return [
       layout([
@@ -626,14 +625,14 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
-      toBlock.objId
+      toBlock.objId,
     ];
   } else if (toBlock.id === fromBlock.id) {
     const otherEntries = entries.filter(e => e.id !== toBlock.id);
     return [
       layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]),
       draftEntry,
-      toBlock.objId
+      toBlock.objId,
     ];
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
@@ -645,7 +644,7 @@ function layoutAfterDropOnBlock(
         {...toBlock, children: [...otherChildren, ...group]},
       ]),
       draftEntry,
-      toBlock.objId
+      toBlock.objId,
     ];
   }
 }
