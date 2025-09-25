@@ -214,7 +214,7 @@ export function DayTimetable({
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.moveEntry(movedEntry, newLayout, getDateKey(dt), null));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
   }
 
   function handleDropOnBlock(
@@ -232,7 +232,7 @@ export function DayTimetable({
       mouse,
       calendar
     );
-    dispatch(actions.moveEntry(movedEntry, newLayout, getDateKey(dt), blockId));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }
 
   useEffect(() => {
