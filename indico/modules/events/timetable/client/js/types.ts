@@ -73,11 +73,11 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  personLinks: PersonLink[];
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
   attachments?: Attachment[];
-  personLinks: PersonLink[];
 }
 
 export interface ScheduledMixin {
@@ -88,10 +88,14 @@ export interface ScheduledMixin {
   maxColumn: number | null;
 }
 
+export interface UnscheduledContribEntry extends BaseEntry {
+  type: EntryType.Contribution;
+  sessionId?: number;
+}
+
 export interface ContribEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Contribution;
   attachments?: Attachment[];
-  personLinks?: PersonLink[];
   sessionId?: number;
 }
 
@@ -107,8 +111,8 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
   personLinks: PersonLink[];
-  attachments: Attachment[];
   childLocationParent: LocationParent;
+  attachments?: Attachment[];
   colors?: Colors;
 }
 
