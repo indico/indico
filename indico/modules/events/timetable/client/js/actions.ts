@@ -36,7 +36,8 @@ export const DELETE_SESSION = 'Delete session';
 export const CREATE_SESSION = 'Create session';
 export const EDIT_SESSION = 'Edit session';
 export const SET_CURRENT_DATE = 'Set current date';
-export const MOVE_ENTRY = 'Move entry';
+export const ADD_SESSION_DATA = 'Add session data';
+export const CHANGE_ENTRY_LAYOUT = 'Change entry layout';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
@@ -71,8 +72,8 @@ interface ResizeEntryAction {
   entry: Entry;
 }
 
-interface MoveEntryAction {
-  type: typeof MOVE_ENTRY;
+interface ChangeEntryLayoutAction {
+  type: typeof CHANGE_ENTRY_LAYOUT;
   date: string;
   entries: TopLevelEntry[];
   entry: TopLevelEntry;
@@ -136,7 +137,7 @@ interface RedoChangeAction {
 export type Action =
   | SetTimetableDataAction
   | ResizeEntryAction
-  | MoveEntryAction
+  | ChangeEntryLayoutAction
   | SelectEntryAction
   | DeselectEntryAction
   | ScheduleEntryAction
@@ -216,7 +217,12 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry: Entry, entries: TopLevelEntry[], date: string, sessionBlockId?) {
+export function changeEntryLayout(
+  entry: Entry,
+  entries: TopLevelEntry[],
+  date: string,
+  sessionBlockId?
+) {
   return (dispatch, getState) => {
 
     const {staticData} = getState();
@@ -231,7 +237,7 @@ export function moveEntry(entry: Entry, entries: TopLevelEntry[], date: string, 
 
     return dispatch(
       synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
-        type: MOVE_ENTRY,
+        type: CHANGE_ENTRY_LAYOUT,
         date,
         entry,
       })
