@@ -22,7 +22,7 @@ from indico.modules.events.registration.schemas import (CheckinEventSchema, Chec
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
 from indico.util.marshmallow import not_empty
 from indico.web.args import use_kwargs
-from indico.web.rh import RH, cors, json_errors, oauth_scope
+from indico.web.rh import cors, json_errors, oauth_scope
 
 
 @json_errors
@@ -162,5 +162,9 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
         return jsonify(result)
 
 
-class RHCheckinAPIRegistrationPicture(DownloadRegistrationPictureMixin, RH):
+class RHCheckinAPIRegistrationPicture(DownloadRegistrationPictureMixin, RHCheckinAPIBase):
     """Return the picture from the picture field of the registration form."""
+
+    def _process_args(self):
+        RHCheckinAPIBase._process_args(self)
+        DownloadRegistrationPictureMixin._process_args(self)
