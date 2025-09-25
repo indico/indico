@@ -74,7 +74,9 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     return personLinks.filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER));
   };
 
-  const onEdit = async () => {
+  const onEdit = async (e) => {
+    e.stopPropagation();
+    onClose();
     if (!objId) {
       return;
     }
@@ -96,7 +98,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
-    onClose();
   };
 
   const onCreateChild = async (e: MouseEvent) => {
@@ -131,6 +132,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
 
   const onDelete = async (e: MouseEvent) => {
     e.stopPropagation();
+    onClose();
 
     const deleteEntry = {
       [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
@@ -139,7 +141,6 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     }[entry.type];
 
     deleteEntry();
-    onClose();
   };
 
   const locationArray = _getOrderedLocationArray();
