@@ -21,8 +21,8 @@ import {
   ChildBreakEntry,
   ContribEntry,
   ChildContribEntry,
-  UnscheduledContrib,
   EntryType,
+  UnscheduledContribEntry,
 } from './types';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
@@ -85,7 +85,7 @@ interface ScheduleEntryAction {
   type: typeof SCHEDULE_ENTRY;
   date: string;
   entries: TopLevelEntry[];
-  unscheduled: UnscheduledContrib[];
+  unscheduled: UnscheduledContribEntry[];
 }
 
 interface UnscheduleEntryAction {
@@ -230,7 +230,7 @@ export function scheduleEntry(
   contribId: number,
   startDt: Moment,
   entries: TopLevelEntry[],
-  unscheduled: UnscheduledContrib[],
+  unscheduled: UnscheduledContribEntry[],
   blockId?: number
 ) {
   const scheduleURL = scheduleContribURL(
