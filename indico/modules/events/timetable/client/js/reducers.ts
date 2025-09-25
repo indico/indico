@@ -11,8 +11,8 @@ import moment, {Moment} from 'moment';
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {ChildEntry, DayEntries, EntryType, isChildEntry, Session} from './types';
-import {getDateKey, setCurrentDateLocalStorage} from './utils';
+import {DayEntries, EntryType, isChildEntry, Session} from './types';
+import {setCurrentDateLocalStorage} from './utils';
 
 interface Change {
   change: any;
@@ -54,45 +54,13 @@ export default {
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
       }
       case actions.MOVE_ENTRY: {
-        const {date, entry} = action;
-        const allEntries = state.changes[state.currentChangeIdx].entries;
-        const dayEntries = allEntries[date];
-        const newDayKey = getDateKey(entry.startDt);
-        let newDayEntries = allEntries[newDayKey];
-
-        const base = dayEntries
-          .filter(e => e.id !== entry.id)
-          .map(e =>
-            e.type === EntryType.SessionBlock
-              ? {...e, children: e.children.filter(c => c.id !== entry.id)}
-              : e
-          );
-
-        const parent =
-          'sessionBlockId' in entry
-            ? newDayEntries.find(e => e.id === (entry as ChildEntry).sessionBlockId)
-            : undefined;
-
-        const targetArr = date === newDayKey ? base : newDayEntries;
-
-        if (parent) {
-          newDayEntries = targetArr.map(e =>
-            e.id === parent.id && e.type === EntryType.SessionBlock
-              ? {
-                  ...e,
-                  children: layout([...e.children, entry]).filter(isChildEntry) as ChildEntry[],
-                }
-              : e
-          );
-        } else {
-          newDayEntries = layout([...targetArr, entry]);
-        }
-
-        const newEntries = {
-          ...allEntries,
-          [date]: base,
-          [newDayKey]: newDayEntries,
-        };
+        const date = action.date;
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            day === date ? action.entries : dayEntries,
+          ])
+        );
 
         return {
           ...state,
