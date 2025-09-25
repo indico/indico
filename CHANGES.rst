@@ -37,6 +37,7 @@ Accessibility
 - Fix contrast and screen reader support in breadcrumbs (:pr:`7088`,
   thanks :user:`foxbunny`)
 - Fix the semantics for the empty materials text (:pr:`7096`, thanks :user:`foxbunny`)
+- Fix announcements accessibility (:pr:`7098`, thanks :user:`foxbuny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
