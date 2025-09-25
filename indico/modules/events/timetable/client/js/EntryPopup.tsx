@@ -74,7 +74,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     return personLinks.filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER));
   };
 
-  const onEdit = async (e) => {
+  const onEdit = async e => {
     e.stopPropagation();
     onClose();
     if (!objId) {
