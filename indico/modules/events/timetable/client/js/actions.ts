@@ -161,7 +161,7 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry: Entry, date: string, sessionBlockId?) {
+export function moveEntry(entry: Entry, entries: TopLevelEntry[], date: string, sessionBlockId?) {
   return (dispatch, getState) => {
     const color = entry.colors;
 
@@ -182,6 +182,7 @@ export function moveEntry(entry: Entry, date: string, sessionBlockId?) {
         type: MOVE_ENTRY,
         date,
         entry: newEntry,
+        entries,
       })
     );
   };
