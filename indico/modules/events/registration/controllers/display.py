@@ -18,9 +18,9 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
-from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
-                                                            RegistrationFormMixin, UploadRegistrationFileMixin,
-                                                            UploadRegistrationPictureMixin)
+from indico.modules.events.registration.controllers import (CheckEmailMixin, DownloadRegistrationPictureMixin,
+                                                            RegistrationEditMixin, RegistrationFormMixin,
+                                                            UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
                                                                    RegistrationFormItem)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -629,7 +629,7 @@ class RHReceiptDownload(RHRegistrationFormRegistrationBase):
         return self.receipt_file.file.send()
 
 
-class RHRegistrationDownloadPicture(RHRegistrationFormRegistrationBase):
+class RHRegistrationDownloadPicture(DownloadRegistrationPictureMixin, RHRegistrationFormRegistrationBase):
     """Download a picture attached to a registration."""
 
     normalize_url_spec = {
@@ -640,21 +640,10 @@ class RHRegistrationDownloadPicture(RHRegistrationFormRegistrationBase):
     }
 
     def _process_args(self):
-        super()._process_args()
+        RHRegistrationFormRegistrationBase._process_args(self)
         if self.registration.id != request.view_args['registration_id']:
             raise BadRequest('Invalid picture reference')
-        self.field_data = (RegistrationData.query
-                           .filter(RegistrationFormItem.input_type == 'picture',
-                                   RegistrationData.registration_id == self.registration.id,
-                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                   RegistrationData.filename.isnot(None))
-                           .join(RegistrationData.field_data)
-                           .join(RegistrationFormFieldData.field)
-                           .options(joinedload('registration').joinedload('registration_form'))
-                           .one())
-
-    def _process(self):
-        return self.field_data.send()
+        DownloadRegistrationPictureMixin._process_args(self)
 
 
 class RHParticipantListPictureDownload(RHParticipantList):
