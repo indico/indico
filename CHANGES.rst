@@ -36,6 +36,7 @@ Accessibility
 - Fix contrast of the category info text (:pr:`7078`, thanks :user:`foxbunny`)
 - Fix contrast and screen reader support in breadcrumbs (:pr:`7088`,
   thanks :user:`foxbunny`)
+- Fix the semantics for the empty materials text (:pr:`7096`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
