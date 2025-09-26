@@ -19,7 +19,6 @@ import './UnscheduledContributions.module.scss';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum FilterType {
-  ALL = 'all-sessions',
   NO_SESSION = 'no-session',
 }
 
@@ -54,7 +53,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const wrapperRef = useRef(null);
   const minSidebarWidthPx = 280;
 
-  const [selectedFilter, setSelectedFilter] = useState<string | FilterType>('no-session');
+  const [selectedFilter, setSelectedFilter] = useState<string | FilterType>();
   const [draftSessionId, setDraftSessionId] = useState<number | 'new' | null>(null);
 
   const resizing = useRef<boolean>(false);
@@ -101,7 +100,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         text: (
           <div styleName="session">
             <Label empty circular style={{...session.colors}} />
-            {session.title}
+            <span>{session.title}</span>
           </div>
         ),
       }))
@@ -124,7 +123,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       text: (
         <div styleName="session">
           <Label empty circular color="grey" />
-          <Translate>No assigned session</Translate>
+          <span>
+            <Translate>No assigned session</Translate>
+          </span>
         </div>
       ),
     },
@@ -168,7 +169,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
           <div styleName="actions">
             <Select
               button
-              placeholder={Translate.string('All sessions')}
+              placeholder={Translate.string('Filter sessions')}
               search={sessionSearch}
               onClose={() => {
                 const searchInput = wrapperRef.current.querySelector(
@@ -178,7 +179,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               }}
               noResultsMessage={Translate.string('No sessions found.')}
               clearable
-              defaultValue="no-session"
               onChange={(_, {value}: {_: unknown; value: string}) => setSelectedFilter(value)}
               options={dropdownSessions}
             />
