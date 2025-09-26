@@ -20,6 +20,7 @@ Improvements
 - Log local group membership changes of users (:pr:`7122`, thanks :user:`tomako`)
 - Warn when downloading files from an editable not assigned to you (:issue:`7131`,
   :pr:`7132`)
+- Add an option to request changes in bulk on the editable list (:pr:`7100`)
 
 Bugfixes
 ^^^^^^^^
@@ -311,7 +312,6 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Add a log for user actions, similar to that in events and categories (:pr:`6779`, :pr:`6813`,
   thanks :user:`tomako`)
-- Add an option to request changes in bulk on the editable list (:pr:`6466`)
 
 Bugfixes
 ^^^^^^^^
