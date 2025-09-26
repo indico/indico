@@ -16,17 +16,15 @@ from werkzeug.exceptions import Forbidden
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.editing.controllers.backend.util import (confirm_and_publish_changes,
-                                                                    review_and_publish_editable)
+from indico.modules.events.editing.controllers.backend.util import review_and_publish_editable
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
 from indico.modules.events.editing.models.editable import Editable, EditableState
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
+from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.operations import (assign_editor, create_revision_comment, generate_editables_json,
                                                       generate_editables_zip, unassign_editor)
-from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingConfirmationAction,
-                                                   EditingEditableListSchema, EditingReviewAction,
+from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingEditableListSchema, EditingReviewAction,
                                                    FilteredEditableSchema)
 from indico.modules.files.models.files import File
 from indico.util.i18n import _
@@ -155,21 +153,26 @@ class RHCreateComment(RHEditablesBase):
 
 class RHApplyJudgment(RHEditablesBase):
     @use_kwargs({
-        'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject']))
+        'action': fields.Enum(EditingReviewAction, required=True, validate=validate.OneOf({
+            EditingReviewAction.accept,
+            EditingReviewAction.reject,
+            EditingReviewAction.request_update
+        })),
+        'comment': fields.String(load_default='')
     })
-    def _process(self, action):
+    def _process(self, action, comment):
+        disallowed_state = {
+            EditingReviewAction.accept: EditableState.accepted,
+            EditingReviewAction.reject: EditableState.rejected,
+            EditingReviewAction.request_update: EditableState.needs_submitter_changes
+        }[action]
         changed = []
         for editable in self.editables:
-            revision = editable.latest_revision
-            if action == 'accept' and not revision.has_publishable_files:
+            if action == EditingReviewAction.accept and not editable.has_publishable_files:
                 continue
-            if revision.type == RevisionType.ready_for_review:
-                review_and_publish_editable(revision, EditingReviewAction[action], '')
-            elif revision.type == RevisionType.needs_submitter_confirmation and action == 'accept':
-                confirm_and_publish_changes(revision, EditingConfirmationAction.accept, '')
-                db.session.flush()
-            else:
+            if editable.state == disallowed_state:
                 continue
+            review_and_publish_editable(editable.latest_revision, action, comment, management=True)
             db.session.expire(editable)
             changed.append(editable)
         return EditableBasicSchema(many=True).jsonify(changed)

@@ -15,6 +15,7 @@ Improvements
   sending invitations (:pr:`7093`)
 - Disallow sending registration emails or invitations containing hardcoded (and
   usually incorrect) token links (:pr:`7093`)
+- Add an option to request changes in bulk on the editable list (:pr:`7100`)
 
 Bugfixes
 ^^^^^^^^
