@@ -15,6 +15,7 @@ Improvements
   sending invitations (:pr:`7093`)
 - Disallow sending registration emails or invitations containing hardcoded (and
   usually incorrect) token links (:pr:`7093`)
+- Add an option to request changes in bulk on the editable list (:pr:`7100`)
 
 Bugfixes
 ^^^^^^^^
@@ -302,7 +303,6 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Add a log for user actions, similar to that in events and categories (:pr:`6779`, :pr:`6813`,
   thanks :user:`tomako`)
-- Add an option to request changes in bulk on the editable list (:pr:`6466`)
 
 Bugfixes
 ^^^^^^^^
