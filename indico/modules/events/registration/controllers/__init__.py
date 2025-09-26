@@ -6,12 +6,15 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
-from sqlalchemy.orm import defaultload
+from sqlalchemy.orm import defaultload, joinedload
 from webargs.flaskparser import abort
 
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.items import RegistrationFormItem
+from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
                                                      get_form_registration_data, load_registration_schema,
                                                      make_registration_schema, modify_registration,
@@ -144,3 +147,21 @@ class UploadRegistrationPictureMixin:
 
     def get_file_metadata(self):
         return super().get_file_metadata() | {'registration_picture_checked': True}
+
+
+class DownloadRegistrationPictureMixin:
+    """Mixin to download a registration picture."""
+
+    def _process_args(self):
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationFormItem.input_type == 'picture',
+                                   RegistrationData.registration_id == request.view_args['registration_id'],
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
+                           .join(RegistrationData.field_data)
+                           .join(RegistrationFormFieldData.field)
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .one())
+
+    def _process(self):
+        return self.field_data.send()

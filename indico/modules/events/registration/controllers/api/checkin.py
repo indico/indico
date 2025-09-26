@@ -14,6 +14,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration.controllers import DownloadRegistrationPictureMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
@@ -159,3 +160,11 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
             'i': [qr_code_version, url, _base64_encode_uuid(self.registration.ticket_uuid)]
         }
         return jsonify(result)
+
+
+class RHCheckinAPIRegistrationPicture(DownloadRegistrationPictureMixin, RHCheckinAPIBase):
+    """Return the picture from the picture field of the registration form."""
+
+    def _process_args(self):
+        RHCheckinAPIBase._process_args(self)
+        DownloadRegistrationPictureMixin._process_args(self)
