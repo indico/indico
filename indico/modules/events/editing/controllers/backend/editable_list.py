@@ -9,7 +9,6 @@ import uuid
 
 from flask import jsonify, request, session
 from marshmallow import fields, validate
-from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import and_, func, over
 from werkzeug.exceptions import Forbidden
@@ -154,7 +153,7 @@ class RHCreateComment(RHEditablesBase):
 
 class RHApplyJudgment(RHEditablesBase):
     @use_kwargs({
-        'action': EnumField(EditingReviewAction, required=True, validate=validate.OneOf({
+        'action': fields.Enum(EditingReviewAction, required=True, validate=validate.OneOf({
             EditingReviewAction.accept,
             EditingReviewAction.reject,
             EditingReviewAction.request_update
