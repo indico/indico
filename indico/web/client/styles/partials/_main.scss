@@ -99,7 +99,7 @@ div.page-header-dark {
 }
 
 /* Announcements */
-div.announcement-bar {
+div.announcement-bar:not([hidden]) {
   @include font-family-title();
 
   display: flex;
@@ -114,9 +114,20 @@ div.announcement-bar {
   }
 
   .close-button {
+    @extend %button-icon-only;
+
     display: flex;
     font-size: 1.5em;
     cursor: pointer;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-close;
+    }
+  }
+
+  .close-button span {
+    @extend %visually-hidden;
   }
 
   &.highlight {

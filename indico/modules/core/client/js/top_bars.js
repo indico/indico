@@ -23,19 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.setProperty('--extra-bars', numBars);
   }
 
-  document.querySelectorAll('.announcement-bar .close-button').forEach(elem => {
-    elem.addEventListener('click', () => {
-      const bar = elem.closest('.announcement-bar');
-      window.localStorage.setItem('hideAnnouncement', bar.dataset.hash);
-      bar.style.display = 'none';
+  document.querySelectorAll('.announcement-bar').forEach(announcementBar => {
+    announcementBar.hidden = localStorage.hideAnnouncement === announcementBar.dataset.hash;
+
+    announcementBar.addEventListener('click', evt => {
+      if (!evt.target.closest('.close-button')) {
+        return;
+      }
+
+      window.localStorage.setItem('hideAnnouncement', announcementBar.dataset.hash);
+      announcementBar.hidden = true;
       refreshPageHeight();
     });
-  });
-
-  document.querySelectorAll('.announcement-bar').forEach(elem => {
-    if (window.localStorage.getItem('hideAnnouncement') !== elem.dataset.hash) {
-      elem.style.display = 'flex';
-    }
   });
 
   refreshPageHeight();
