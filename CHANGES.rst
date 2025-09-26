@@ -36,6 +36,8 @@ Accessibility
 - Fix contrast of the category info text (:pr:`7078`, thanks :user:`foxbunny`)
 - Fix contrast and screen reader support in breadcrumbs (:pr:`7088`,
   thanks :user:`foxbunny`)
+- Improve dropdown accessibility in category list toolbar (:pr:`7069`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
