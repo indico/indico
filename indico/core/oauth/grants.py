@@ -21,13 +21,13 @@ class IndicoAuthorizationCodeGrant(AuthorizationCodeGrant):
     TOKEN_ENDPOINT_AUTH_METHODS = ('client_secret_basic', 'client_secret_post', 'none')
 
     def save_authorization_code(self, code, request):
-        code_challenge = request.data.get('code_challenge')
-        code_challenge_method = request.data.get('code_challenge_method')
+        code_challenge = request.payload.data.get('code_challenge')
+        code_challenge_method = request.payload.data.get('code_challenge_method')
         auth_code = OAuth2AuthorizationCode(
             code=code,
             client_id=request.client.client_id,
-            redirect_uri=request.redirect_uri,
-            scope=request.scope,
+            redirect_uri=request.payload.redirect_uri,
+            scope=request.payload.scope,
             user_id=request.user.id,
             code_challenge=code_challenge,
             code_challenge_method=code_challenge_method,
@@ -48,14 +48,12 @@ class IndicoAuthorizationCodeGrant(AuthorizationCodeGrant):
 
     def validate_requested_scope(self):
         """Validate if requested scope is supported by Authorization Server."""
-        scope = self.request.scope
-        state = self.request.state
-        if scope:
+        if scope := self.request.payload.scope:
             allowed = set(scope_to_list(self.request.client.get_allowed_scope(scope)))
             requested = set(scope_to_list(scope))
             if not (requested <= allowed):
-                raise InvalidScopeError(state=state)
-        return self.server.validate_requested_scope(scope, state)
+                raise InvalidScopeError
+        return self.server.validate_requested_scope(scope)
 
 
 class IndicoCodeChallenge(CodeChallenge):

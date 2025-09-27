@@ -11,6 +11,7 @@
 @use 'rb:styles/sui_fixes' as *;
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'design_system';
 
 $indico-top-bar-height: 50px;
 
@@ -163,7 +164,7 @@ a {
     align-items: center;
   }
 
-  .icon {
+  .content .icon {
     margin-right: 0.5em;
   }
 
@@ -172,7 +173,7 @@ a {
   }
 }
 
-.announcement-bar {
+.announcement-bar:not([hidden]) {
   @include banner-bar();
 
   &.highlight {
@@ -191,9 +192,29 @@ a {
   }
 
   .close-button {
-    margin-left: auto;
-    cursor: pointer;
-    line-height: 1em;
+    appearance: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2em;
+    aspect-ratio: 1;
+    padding: 0.5em;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .close-button-label {
+    @extend %visually-hidden;
+  }
+
+  .close-button .icon {
+    margin: 0;
+    width: auto;
+    height: auto;
   }
 }
 

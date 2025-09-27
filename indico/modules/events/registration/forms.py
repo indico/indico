@@ -44,7 +44,7 @@ from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipient
 from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import (DataRetentionPeriodValidator, HiddenUnless, IndicoEmail, LinkedDateTime,
-                                         NoRelativeURLs)
+                                         NoEndpointLinks, NoRelativeURLs)
 from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
@@ -75,7 +75,8 @@ class RegistrationFormEditForm(IndicoForm):
     _organizer_notification_fields = ('organizer_notifications_enabled', 'organizer_notification_recipients')
     _special_fields = _price_fields + _registrant_notification_fields + _organizer_notification_fields
 
-    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+    title = StringField(_('Title'), [DataRequired(), Length(max=1000)],
+                        description=_('The title of the registration form'))
     introduction = TextAreaField(_('Introduction'),
                                  description=_('Introduction to be displayed when filling out the registration form'))
     contact_info = StringField(_('Contact info'),
@@ -239,17 +240,22 @@ class RegistrationExceptionalModificationForm(IndicoForm):
 
 
 class InvitationFormBase(IndicoForm):
-    _invitation_fields = ('skip_moderation', 'skip_access_check')
+    _invitation_fields = ('skip_moderation', 'skip_access_check', 'lock_email')
     _email_fields = ('email_sender', 'email_subject', 'email_body')
     email_sender = SelectField(_('Sender'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
-    email_body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()],
-                               widget=TinyMCEWidget(absolute_urls=True))
+    email_body = TextAreaField(
+        _('Email body'),
+        [DataRequired(), NoRelativeURLs(), NoEndpointLinks('event_registration.display_regform', {'invitation'})],
+        widget=TinyMCEWidget(absolute_urls=True)
+    )
     skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
     skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
                                      description=_('If enabled, the user will be able to register even if the event '
                                                    'is access-restricted.'))
+    lock_email = BooleanField(_('Lock email address'), widget=SwitchWidget(),
+                              description=_('If enabled, the email address cannot be changed during registration.'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -334,7 +340,11 @@ class EmailRegistrantsForm(IndicoForm):
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
     subject = StringField(_('Subject'), [DataRequired(), Length(max=200)])
-    body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
+    body = TextAreaField(
+        _('Email body'),
+        [DataRequired(), NoRelativeURLs(), NoEndpointLinks('event_registration.display_regform', {'token'})],
+        widget=TinyMCEWidget(absolute_urls=True),
+    )
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send a copy of each email to my mailbox'))

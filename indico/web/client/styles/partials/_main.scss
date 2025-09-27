@@ -74,6 +74,10 @@
       }
     }
   }
+
+  ind-with-tooltip {
+    --flex-layout: flex;
+  }
 }
 
 /* Header */
@@ -95,7 +99,7 @@ div.page-header-dark {
 }
 
 /* Announcements */
-div.announcement-bar {
+div.announcement-bar:not([hidden]) {
   @include font-family-title();
 
   display: flex;
@@ -110,9 +114,20 @@ div.announcement-bar {
   }
 
   .close-button {
+    @extend %button-icon-only;
+
     display: flex;
     font-size: 1.5em;
     cursor: pointer;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-close;
+    }
+  }
+
+  .close-button span {
+    @extend %visually-hidden;
   }
 
   &.highlight {
@@ -161,7 +176,7 @@ div.announcement-bar {
 
 /* Breadcrumbs */
 
-div.main-breadcrumb {
+nav.main-breadcrumb {
   @include font-family-title();
 
   background-color: darken($light-gray, 5%);
@@ -173,18 +188,34 @@ div.main-breadcrumb {
   }
 
   .path {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    li {
+      display: flex;
+      align-items: center;
+    }
+
     .sep {
-      color: $dark-gray;
+      color: var(--text-secondary-color);
       padding: 0 0.5em;
     }
 
     .item {
-      color: $light-black;
+      color: var(--text-color);
       font-size: 12px;
     }
 
     a.item:hover {
-      color: $dark-blue;
+      color: var(--clickable-text-highlight-color);
+    }
+
+    .current-page-indicator {
+      @extend %visually-hidden;
     }
   }
 }

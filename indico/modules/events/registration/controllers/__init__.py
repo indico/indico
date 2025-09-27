@@ -37,10 +37,11 @@ class RegistrationFormMixin:
         form_items_strategy.joinedload('show_if_field')
         children_strategy = form_items_strategy.joinedload('children')
         children_strategy.joinedload('current_data')
-        self.regform = (RegistrationForm.query
-                        .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
-                        .options(form_items_strategy)
-                        .one())
+        self.regform: RegistrationForm = (
+            RegistrationForm.query.filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
+            .options(form_items_strategy)
+            .one()
+        )
 
 
 class RegistrationEditMixin:

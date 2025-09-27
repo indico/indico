@@ -8,12 +8,16 @@
             <div class="content smaller">
                 <span class="js-show-message">
                     {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Show{% endtrans %}</a>
+                    <button class="js-toggle-list toggle-hidden-events">
+                        {% trans %}Show{% endtrans %}
+                    </button>
                     <span class="icon-spinner js-spinner"></span>
                 </span>
                 <span class="js-hide-message">
                     {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
+                    <button class="js-toggle-list toggle-hidden-events">
+                        {% trans %}Hide{% endtrans %}
+                    </button>
                 </span>
             </div>
         {% endcall %}
@@ -101,9 +105,16 @@
                 {% set is_lecture = (event.type == 'lecture') %}
                 <li>
                     <span class="event-icons">
-                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}" title="{% trans %}Export{% endtrans %}"></a>
+                        <ind-with-tooltip>
+                            <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}" aria-label="{% trans title=event.title|e %}Export {{ title }} to calendar{% endtrans %}">
+                                <span data-tip-content>{% trans %}Export{% endtrans %}</span>
+                            </a>
+                        </ind-with-tooltip>
                         {% if session.user and event in session.user.favorite_events %}
-                            <i class="icon-star" title="{% trans %}You have favorited this event.{% endtrans %}"></i>
+                            <ind-with-tooltip>
+                                <i class="icon-star"></i>
+                                <span data-tip-content>{% trans %}You have favorited this event.{% endtrans %}</span>
+                            </ind-with-tooltip>
                         {% endif %}
                     </span>
                     <span class="list-name">
@@ -122,7 +133,10 @@
                                     </span>
                                 {% endif %}
                                 {% if event.is_self_protected %}
-                                    <span class="icon-shield" data-type="restricted" title="{% trans %}Protected{% endtrans %}"></span>
+                                    <ind-with-tooltip>
+                                        <span class="icon-shield" data-type="restricted"></span>
+                                        <span data-tip-content>{% trans %}Protected{% endtrans %}</span>
+                                    </ind-with-tooltip>
                                 {% endif %}
 
                                 {% if is_recent(event.created_dt) %}

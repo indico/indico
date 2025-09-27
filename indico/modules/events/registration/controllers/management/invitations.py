@@ -20,8 +20,10 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.schemas import RegistrationInvitationSchema
 from indico.modules.events.registration.util import create_invitation, import_invitations_from_csv
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import ngettext
-from indico.util.marshmallow import LowercaseString, no_relative_urls, not_empty
+from indico.util.marshmallow import (LowercaseString, make_validate_indico_placeholders, no_endpoint_links,
+                                     no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -73,11 +75,25 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         form = form_cls(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_access_check = form.skip_access_check.data
+        lock_email = form.lock_email.data
         if form.validate_on_submit():
             email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             for user in form.users.data:
                 create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
-                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check)
+                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check,
+                                  lock_email=lock_email)
+            self.regform.log(
+                EventLogRealm.management, LogKind.other, 'Registration', 'Invitations sent', session.user,
+                data={
+                    'Sender': email_sender,
+                    'Subject': form.email_subject.data,
+                    'Body': form.email_body.data,
+                    'Skip moderation': skip_moderation,
+                    'Skip access check': skip_access_check,
+                    'Lock email': lock_email,
+                    '_html_fields': ['Body'],
+                }
+            )
             num = len(form.users.data)
             flash(ngettext('The invitation has been sent.',
                            '{n} invitations have been sent.',
@@ -106,7 +122,12 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
 
     @use_kwargs({
         'sender_address': fields.String(required=True, validate=not_empty),
-        'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
+        'body': fields.String(required=True, validate=[
+            not_empty,
+            no_relative_urls,
+            no_endpoint_links('event_registration.display_regform', {'invitation'}),
+            make_validate_indico_placeholders('registration-invitation-reminder-email')
+        ]),
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
@@ -125,7 +146,17 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
                 email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
-            send_email(email, self.event, 'Registration')
+            send_email(email, self.event, 'Registration', session.user)
+            self.regform.log(
+                EventLogRealm.management, LogKind.other, 'Registration', 'Invitation reminders sent', session.user,
+                data={
+                    'Sender': sender_address,
+                    'CC to sender': copy_for_sender,
+                    'Subject': subject,
+                    'Body': body,
+                    '_html_fields': ['Body'],
+                }
+            )
         return jsonify(count=len(self.invitations))
 
 
@@ -187,6 +218,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
             skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
             skip_access_check = form.skip_access_check.data
             skip_existing = form.skip_existing.data
+            lock_email = form.lock_email.data
             delimiter = form.delimiter.data.delimiter
             email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
@@ -195,6 +227,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
                                                                skip_moderation=skip_moderation,
                                                                skip_access_check=skip_access_check,
                                                                skip_existing=skip_existing,
+                                                               lock_email=lock_email,
                                                                delimiter=delimiter)
             sent = len(invitations)
             flash(self._format_flash_message(sent, skipped), 'success' if sent > 0 else 'warning')

@@ -7,6 +7,8 @@ General Information
 The user export is only available for authenticated users, i.e. when
 using an API key and a signature (if enabled).
 
+.. deprecated:: 3.3.8
+    Will be removed in Indico v3.4. Use ``/api/user/`` instead.
 
 URL Format
 ----------

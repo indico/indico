@@ -132,7 +132,7 @@
 .category-info {
   @include font-family-modern-body();
 
-  color: #888;
+  color: var(--text-secondary-color);
   font-size: 1.2em;
   min-height: 0.3em;
   margin: 0 0 2em 0;
@@ -295,7 +295,8 @@ ul.category-list {
     user-select: none;
 
     background: #f2f2f2;
-    display: block;
+    display: flex;
+    align-items: center;
     line-height: 2.5em;
     color: #b3b3b3;
     cursor: pointer;
@@ -303,22 +304,11 @@ ul.category-list {
     border-top: 1px solid #fafafa;
     border-bottom: 1px solid #e6e6e6;
 
-    .number-events {
-      float: right;
-      margin-right: 1em;
-    }
-
-    .protection {
-      float: right;
-      color: #a36264;
-      height: 1em;
-      width: 1em;
-    }
-
     a {
       @include transition(color);
+      @extend %link;
+      flex: 1;
       display: block;
-      color: lighten($dark-blue, 6%);
       padding: 0 0 0 1em;
       position: relative;
 
@@ -330,26 +320,54 @@ ul.category-list {
       }
     }
 
-    &:hover {
-      color: $light-black;
+    .category-description {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0.5em;
 
-      a {
-        color: darken($dark-blue, 6%);
+      .number-events {
+        color: var(--text-secondary-color);
+        margin-right: 0.5em;
       }
 
-      &::before {
-        color: $light-black;
+      .protection {
+        display: flex;
+        height: 1em;
+        width: 1em;
+        color: #a36264;
+
+        &::before {
+          @extend %icon;
+          @extend %icon-shield;
+        }
+
+        > span {
+          @extend %visually-hidden;
+        }
+
+        &.not-protected {
+          opacity: 0;
+        }
       }
     }
 
-    &::before {
+    &:hover {
+      color: $light-black;
+
+      &::after {
+        color: var(--text-secondary-color);
+      }
+    }
+
+    &::after {
       @include transition(color);
       @extend %icon-arrow-right-sparse;
       color: #ccc;
-      float: right;
       font-family: 'icomoon-ultimate';
       margin-right: 1em;
       margin-left: 1em;
+      flex-shrink: 0;
     }
   }
 }
@@ -424,17 +442,18 @@ ul.category-resource-qtip {
       padding: 0 15px;
       font-size: 1.2em;
       white-space: nowrap;
-      color: $dark-gray;
+      color: var(--text-secondary-color);
       max-width: 56px;
       min-width: 56px;
 
       a,
       a:hover {
-        color: $dark-gray;
+        color: var(--text-secondary-color);
       }
     }
 
     .list-name a {
+      @extend %link;
       font-size: 17px;
     }
 
@@ -447,13 +466,17 @@ ul.category-resource-qtip {
 
     .protected {
       font-weight: normal;
-      color: $dark-gray;
+      color: var(--text-secondary-color);
     }
 
     .ui.label {
       text-transform: uppercase;
       vertical-align: 20%;
     }
+  }
+
+  .toggle-hidden-events {
+    @extend %link-button;
   }
 }
 

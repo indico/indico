@@ -18,7 +18,7 @@ from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
 from xml.etree.ElementTree import Element
 
@@ -245,12 +245,18 @@ def strip_tags(text):
     return do_striptags(text or '')
 
 
-def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **kwargs):
-    """Mako markdown to HTML filter.
+def _escape_for_mathjax(text):
+    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+
+def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, **kwargs):
+    """Convert Markdown to HTML.
 
     :param text: Markdown source to convert to HTML
-    :param escape_latex_math: Whether math expression should be left untouched or a function that will be called
-                              to replace math-mode segments.
+    :param escape_latex_math: Whether math expression should be left untouched or a function
+                              that will be called to replace math-mode segments. If a function
+                              is provided, it must ensure that the output is safe for whatever
+                              context the output is used in.
     :param md: An alternative markdown processor (can be used
                to generate e.g. a different format)
     :param extra_html: Whether to allow a bigger set of HTML tags
@@ -264,6 +270,11 @@ def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **k
             segment = m.group(0)
             if callable(escape_latex_math):
                 segment = escape_latex_math(segment)
+            else:
+                # mathjax supports escaped html entities, but since the latex blocks do not pass through
+                # bleach we need to manually escape them, without using bleach which would also clean up
+                # unclosed tags (which aren't tags) and thus break certain latex strings that look like tags
+                segment = _escape_for_mathjax(segment)
             math_segments.append(segment)
             return LATEX_MATH_PLACEHOLDER
 
@@ -328,6 +339,27 @@ def has_relative_links(html_text):
         for el, attrib, link, _pos in doc.iterlinks()
         if (el.tag, attrib) in {('a', 'href'), ('img', 'src')}
     )
+
+
+def extract_link_hrefs(html_text):
+    doc = html.fromstring(html_text)
+    return {link for el, attrib, link, _pos in doc.iterlinks()
+            if el.tag == 'a' and attrib == 'href' and urlsplit(link).scheme != 'mailto'}
+
+
+def has_endpoint_links(html_text, endpoint, query_args=None) -> bool:
+    """Check if an HTML string contains links to a specific Flask endpoint."""
+    from indico.web.flask.util import endpoint_for_url
+    if not html_text:
+        return False
+    for url in extract_link_hrefs(html_text):
+        if not (endpoint_info := endpoint_for_url(url)):
+            continue
+        if endpoint != endpoint_info[0]:
+            continue
+        if not query_args or (query_args & parse_qs(urlsplit(url).query).keys()):
+            return True
+    return False
 
 
 def is_valid_mail(emails_string, multi=True):
@@ -428,7 +460,7 @@ def is_legacy_id(id_):
     numeric or have a leading zero, resulting in different objects
     with the same numeric id.
     """
-    return not isinstance(id_, int) and (not id_.isdigit() or str(int(id_)) != id_)
+    return isinstance(id_, str) and (not id_.isdigit() or str(int(id_)) != id_)
 
 
 def text_to_repr(text, html=False, max_length=50):

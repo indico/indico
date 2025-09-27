@@ -7,9 +7,20 @@
         <ul class="category-list" data-subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
             {% for category in parent_category.children %}
                 <li>
-                    <span class="protection {{ 'icon-shield' if category.is_self_protected }}"></span>
-                    <span class="number-events" id="category-event-count-{{ category.id }}"></span>
-                    <a href="{{ url_for('.display', category) }}" class="name">{{ category.title }}</a>
+                    <a href="{{ url_for('.display', category) }}" class="name"
+                       aria-describedby="category-description-{{ category.id }}">{{ category.title }}</a>
+                    <span class="category-description" id="category-description-{{ category.id }}">
+                        <span class="number-events" id="category-event-count-{{ category.id }}"></span>
+                        {% if category.is_self_protected %}
+                            <span class="protection">
+                                <span>{% trans %}Protected category{% endtrans %}</span>
+                            </span>
+                        {% else %}
+                            <span class="protection not-protected">
+                                <span>{% trans %}Public category{% endtrans %}</span>
+                            </span>
+                        {% endif %}
+                    </span>
                 </li>
             {% endfor %}
         </ul>

@@ -37,13 +37,14 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
           guides
           rotatable
         />
-        <Icon
-          styleName="back"
-          name="arrow left"
-          color="grey"
-          size="large"
+        <button
+          styleName="back-button"
+          type="button"
           onClick={() => backAction()}
-        />
+          aria-label={Translate.string('Cancel')}
+        >
+          <Icon name="arrow left" color="grey" size="large" />
+        </button>
         <Button.Group>
           <Button
             styleName="cropper-action-btn"

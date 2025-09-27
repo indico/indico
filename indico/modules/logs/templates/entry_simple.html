@@ -2,11 +2,11 @@
 
 {% macro render_diff(data) %}
     {% for key, values in data.items() if key != '_diff' %}
-        {{ render_row(key, compare(*values), 'diff preformatted') }}
+        {{ render_row(key, compare(*values), content_class='diff preformatted') }}
     {% endfor %}
 {% endmacro %}
 
-{% macro render_row(caption, content, content_class='') %}
+{% macro render_row(caption, content, content_class='', html=false) %}
     <tr class="i-table content">
         <td class="i-table caption log-caption">
             {{ caption }}
@@ -19,6 +19,8 @@
                             <li>{{ item }}</li>
                         {% endfor %}
                     </ul>
+                {% elif html %}
+                    {{- content|sanitize_html -}}
                 {% else %}
                     {{- content -}}
                 {% endif -%}
@@ -28,11 +30,11 @@
 {% endmacro %}
 
 {% block entry_detail_rows %}
-    {% for key, value in data if value not in ('', none) %}
+    {% for key, value in data.items() if value not in ('', none) and key != '_html_fields' %}
         {% if value._diff %}
             {{ render_diff(value) }}
         {% else %}
-            {{ render_row(key, value) }}
+            {{ render_row(key, value, html=(key in data._html_fields|default([]))) }}
         {% endif %}
     {% else %}
         <tr class="i-table content">

@@ -21,7 +21,17 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm, Popup} from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Loader,
+  Checkbox,
+  Message,
+  Dropdown,
+  Confirm,
+  Label,
+  Popup,
+} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -312,6 +322,11 @@ function EditableListDisplay({
     ['editor', Translate.string('Editor'), 400],
   ];
 
+  const tagsExist = sortedList.some(x => x.editable?.tags?.length > 0);
+  if (tagsExist) {
+    columnHeaders.push(['tags', Translate.string('Tags'), 135, {disableSort: true}]);
+  }
+
   const programCodeKey = contribution => contribution.code;
   const titleKey = contribution => contribution.title.toLowerCase();
   const revisionKey = contribution => contribution.editable && contribution.editable.revisionCount;
@@ -441,6 +456,28 @@ function EditableListDisplay({
       />
     );
   };
+  const renderTags = (__, editable) => {
+    const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
+    const labelTags = (
+      <div className="editable-list-tag-labels">
+        {tags.map(t => (
+          <Label key={t.code} size="small" color={t.color}>
+            {t.code}
+          </Label>
+        ))}
+      </div>
+    );
+
+    const colorTags = (
+      <div>
+        {tags.map(t => (
+          <Label key={t.code} circular empty color={t.color} />
+        ))}
+      </div>
+    );
+
+    return [labelTags, colorTags];
+  };
   const renderFuncs = {
     friendlyId: renderId,
     title: renderTitle,
@@ -448,23 +485,49 @@ function EditableListDisplay({
     revision: editable => (editable ? editable.revisionCount : ''),
     status: renderStatus,
     editor: renderEditor,
+    tags: renderTags,
   };
 
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
     const row = sortedList[rowIndex];
     const fn = renderFuncs[dataKey];
-    return (
-      <TooltipIfTruncated>
-        <div
-          styleName="rowcolumn-tooltip"
-          role="gridcell"
-          style={dataKey === 'title' ? {display: 'block'} : {}}
-        >
-          {fn(row[dataKey], row.editable, rowIndex)}
-        </div>
-      </TooltipIfTruncated>
-    );
+
+    if (dataKey !== 'tags') {
+      return (
+        <TooltipIfTruncated>
+          <div
+            styleName="rowcolumn-tooltip"
+            role="gridcell"
+            style={dataKey === 'title' ? {display: 'block'} : {}}
+          >
+            {fn(row[dataKey], row.editable, rowIndex)}
+          </div>
+        </TooltipIfTruncated>
+      );
+    } else if (row.editable?.tags) {
+      const [labels, colors] = fn(row[dataKey], row.editable, rowIndex);
+      if (row.editable.tags.length === 1) {
+        return labels;
+      }
+      return (
+        <Popup
+          position="left center"
+          on="hover"
+          content={labels}
+          trigger={
+            <div styleName="rowcolumn-tooltip" role="gridcell">
+              {colors}
+              {row.editable.tags.length > 5 ? (
+                <div styleName="more-tags-indicator">
+                  <Icon name="plus circle" color="grey" />
+                </div>
+              ) : null}
+            </div>
+          }
+        />
+      );
+    }
   };
 
   const toggleSelectAll = dataChecked => {
@@ -689,7 +752,7 @@ function EditableListDisplay({
             {({height, isScrolling, onChildScroll, scrollTop}) => (
               <Table
                 autoHeight
-                width={1000}
+                width={1115}
                 styleName="table"
                 height={height}
                 isScrolling={isScrolling}

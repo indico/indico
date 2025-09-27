@@ -52,7 +52,7 @@ class SimpleRenderer(EventLogRendererBase):
     def get_data(cls, entry):
         data = entry.data
         if isinstance(entry.data, dict):
-            data = sorted(entry.data.items())
+            data = dict(sorted(entry.data.items()))
         return data
 
 

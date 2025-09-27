@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -33,7 +33,7 @@ jobs:
         run: uv run --no-sync --isolated --with hatchling .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
       - name: Extract changelog 📜
         run: python .github/utils/extract_changelog.py "${GITHUB_REF#refs/tags/v}" /tmp/changelog.md
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         name: Setup Node
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -90,13 +90,13 @@ jobs:
       - uses: actions/download-artifact@v5
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: indico-wheel/
           attestations: false
       - name: Publish to PyPI 🚀
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           packages-dir: indico-wheel/
       - name: Publish GitHub release 🐙

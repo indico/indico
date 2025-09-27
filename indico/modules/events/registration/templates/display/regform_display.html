@@ -133,6 +133,7 @@
                 data-initial-values="{{ initial_values | tojson | forceescape }}"
                 data-management="{{ management | tojson | forceescape }}"
                 data-moderated="{{ moderated | tojson | forceescape }}"
+                data-lock-email="{{ (invitation.lock_email if invitation else false) | tojson | forceescape }}"
                 data-publish-to-participants="{{ regform.publish_registrations_participants.name }}"
                 data-publish-to-public="{{ regform.publish_registrations_public.name }}"
                 data-policy-agreement-required="{{ regform.require_privacy_policy_agreement | tojson | forceescape }}"

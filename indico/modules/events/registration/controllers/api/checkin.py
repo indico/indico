@@ -5,18 +5,21 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import jsonify, request
 from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
+from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
+from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
+from indico.util.marshmallow import not_empty
 from indico.web.args import use_kwargs
 from indico.web.rh import cors, json_errors, oauth_scope
 
@@ -130,3 +133,29 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
 
     def _process_GET(self):
         return CheckinRegistrationSchema().jsonify(self.registration)
+
+
+class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
+    """Get Indico-style ticket details for a specific registration from a custom plugin QR code."""
+
+    @use_kwargs({
+        'data': fields.String(required=True, validate=not_empty),
+        'qr_name': fields.String(required=True, validate=not_empty),
+    }, location='json')
+    def _process_args(self, data, qr_name):
+        try:
+            qr_handler = get_custom_ticket_qr_code_handlers()[qr_name]
+        except KeyError:
+            raise BadRequest('Unknown code')
+        if not (reg := qr_handler.lookup_registration(data)):
+            raise NotFound('No registration found')
+        self.event = reg.event
+        self.registration = reg
+
+    def _process_POST(self):
+        url = config.BASE_URL.removeprefix('https://')
+        qr_code_version = 2
+        result = {
+            'i': [qr_code_version, url, _base64_encode_uuid(self.registration.ticket_uuid)]
+        }
+        return jsonify(result)

@@ -218,11 +218,12 @@ class RHContributionAuthor(RHContributionDisplayBase):
                        .one())
 
     def _process(self):
+        # Show all contributions for the same person in the event
         author_contribs = (Contribution.query.with_parent(self.event)
                            .join(ContributionPersonLink)
                            .options(joinedload('event'))
                            .options(load_only('id', 'title'))
-                           .filter(ContributionPersonLink.id == self.author.id,
+                           .filter(ContributionPersonLink.person_id == self.author.person_id,
                                    ContributionPersonLink.author_type != AuthorType.none)
                            .all())
         return WPContributions.render_template('display/contribution_author.html', self.event,

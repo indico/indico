@@ -99,4 +99,24 @@ $border: 1px solid $pastel-gray;
     /* stylelint-disable-next-line value-keyword-case */
     fill: currentColor;
   }
+
+  .more-tags-indicator {
+    position: absolute;
+    right: 0;
+    top: 48%;
+    transform: translateY(-50%);
+    z-index: 1;
+    background-color: white;
+    padding-top: 0.9em;
+    padding-bottom: 0.9em;
+    cursor: pointer;
+  }
+}
+
+:global(.editable-list-tag-labels) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  row-gap: 0.5em;
 }

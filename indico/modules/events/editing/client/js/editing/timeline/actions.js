@@ -13,6 +13,7 @@ import {getStaticData, getNewDetails} from './selectors';
 export const SET_LOADING = 'SET_LOADING';
 export const SET_DETAILS = 'SET_DETAILS';
 export const SET_NEW_DETAILS = 'SET_NEW_DETAILS';
+export const SET_DRAFT_COMMENT = 'SET_DRAFT_COMMENT';
 
 export function loadTimeline() {
   return async (dispatch, getStore) => {
@@ -99,4 +100,8 @@ export function resetReviews(url) {
     null,
     () => loadTimeline()
   );
+}
+
+export function setDraftComment(comment) {
+  return {type: SET_DRAFT_COMMENT, comment};
 }

@@ -53,7 +53,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.signals import make_interceptable, values_from_signal
+from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 from indico.web.args import parser
@@ -406,7 +406,13 @@ def create_registration(regform, data, invitation=None, management=False, notify
             continue
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
-        value = data.get(form_item.html_field_name, default) if can_modify else default
+        if (invitation and invitation.lock_email and form_item.type == RegistrationFormItemType.field_pd and
+                form_item.personal_data_type == PersonalDataType.email):
+            value = invitation.email
+        elif can_modify:
+            value = data.get(form_item.html_field_name, default)
+        else:
+            value = default
         if value is NotImplemented:  # un-modifiable field w/ no default value
             continue
         data_entry = RegistrationData()
@@ -897,7 +903,8 @@ def update_regform_item_positions(regform):
             child.position = next(positions if child_active else disabled_positions)
 
 
-def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check):
+def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
+                      lock_email):
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
@@ -905,6 +912,7 @@ def create_invitation(regform, user, email_sender, email_subject, email_body, *,
         affiliation=user['affiliation'],
         skip_moderation=skip_moderation,
         skip_access_check=skip_access_check,
+        lock_email=lock_email,
     )
     regform.invitations.append(invitation)
     db.session.flush()
@@ -938,8 +946,8 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     ]
 
 
-def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *,
-                                skip_moderation=True, skip_access_check=True, skip_existing=False, delimiter=','):
+def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *, skip_moderation=True,
+                                skip_access_check=True, skip_existing=False, lock_email=False, delimiter=','):
     """Import invitations from a CSV file.
 
     :return: A list of invitations and the number of skipped records which
@@ -977,7 +985,8 @@ def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, e
         filtered_records.append(user)
 
     invitations = [create_invitation(regform, user, email_sender, email_subject, email_body,
-                                     skip_moderation=skip_moderation, skip_access_check=skip_access_check)
+                                     skip_moderation=skip_moderation, skip_access_check=skip_access_check,
+                                     lock_email=lock_email)
                    for user in filtered_records]
     skipped_records = len(user_records) - len(filtered_records)
     return invitations, skipped_records
@@ -1139,3 +1148,23 @@ def load_registration_schema(regform, schema_cls, *, registration=None, partial_
     #      so we can use `exclude` here even with `unknown=RAISE` on the schema.
     schema = schema_cls(partial=partial_fields, exclude={f.html_field_name for f in hidden_fields})
     return parser.parse(schema)
+
+
+def get_custom_ticket_qr_code_handlers():
+    """Get a dict containing custom ticket QR code handlers."""
+    return named_objects_from_signal(signals.event.registration.custom_ticket_qr_code_handler.send())
+
+
+class CustomTicketCode:
+    """Base class for custom ticket codes."""
+
+    #: unique name of the code - must be all-lowercase
+    name = None
+    #: Regex used by the checkin app to match all ticket codes that should be handled by this class.
+    #: This regex will be used in JavaScript code, so make sure to not use anything Python-specific.
+    regex = None
+
+    @classmethod
+    def lookup_registration(cls, data: str) -> Registration | None:
+        """Lookup a registration based on custom ticket code data."""
+        raise NotImplementedError

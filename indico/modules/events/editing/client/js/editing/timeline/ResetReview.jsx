@@ -7,17 +7,19 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
 import {RequestConfirm} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import {resetReviews} from './actions';
+import {isTimelineOutdated} from './selectors';
 
 export default function ResetReview({reviewURL}) {
   const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const isOutdated = useSelector(isTimelineOutdated);
   const dispatch = useDispatch();
 
   const resetRevisions = async () => {
@@ -29,11 +31,15 @@ export default function ResetReview({reviewURL}) {
   return (
     <>
       <Popup
-        content={Translate.string('Undo review')}
+        content={
+          isOutdated
+            ? Translate.string('This timeline is outdated. Please refresh the page.')
+            : Translate.string('Undo review')
+        }
         trigger={
           <Icon
             name="undo"
-            disabled={submitting}
+            disabled={submitting || isOutdated}
             onClick={() => setIsOpen(true)}
             color="grey"
             size="large"
@@ -42,14 +48,14 @@ export default function ResetReview({reviewURL}) {
         }
       />
       <RequestConfirm
-        header={Translate.string('Reset review')}
-        confirmText={Translate.string('Reset')}
+        header={Translate.string('Undo review')}
+        confirmText={Translate.string('Undo')}
         onClose={() => setIsOpen(false)}
         requestFunc={resetRevisions}
         open={isOpen}
         negative
       >
-        <Translate>Are you sure you want to reset the review?</Translate>
+        <Translate>Are you sure you want to undo the review?</Translate>
       </RequestConfirm>
     </>
   );

@@ -298,7 +298,10 @@ def test_introspection_inactive(dummy_application, dummy_token, test_client, rea
     resp = test_client.post('/oauth/introspect', data=data)
     if reason == 'appdisabled':
         assert resp.status_code == 400
-        assert resp.json == {'error': 'invalid_client'}
+        assert resp.json == {
+            'error': 'invalid_client',
+            'error_description': 'The client does not exist on this server.',
+        }
     else:
         assert resp.json == {'active': False}
 

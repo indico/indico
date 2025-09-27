@@ -328,6 +328,16 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             send_email(email, self.event, 'Registration', session.user,
                        log_metadata={'registration_id': registration.id})
 
+        self.regform.log(
+            EventLogRealm.management, LogKind.other, 'Registration', 'Participants emailed', session.user,
+            data={
+                'Sender': sender_address,
+                'Subject': form.subject.data,
+                'Body': form.body.data,
+                '_html_fields': ['Body'],
+            }
+        )
+
     def _process(self):
         with self.regform.event.force_event_locale():
             tpl = get_template_module('events/registration/emails/custom_email_default.html')

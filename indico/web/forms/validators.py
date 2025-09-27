@@ -17,7 +17,7 @@ from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
-from indico.util.string import has_relative_links, is_valid_mail
+from indico.util.string import has_endpoint_links, has_relative_links, is_valid_mail
 
 
 class UsedIf:
@@ -418,7 +418,7 @@ class SecurePassword:
 
 
 class NoRelativeURLs:
-    """Validate that an HTML strings contains no relative URLs.
+    """Validate that an HTML string contains no relative URLs.
 
     This checks only ``img[src]`` and ``a[href]``, but not URLs present as plain
     text or in any other (unexpected) places.
@@ -427,6 +427,26 @@ class NoRelativeURLs:
     def __call__(self, form, field):
         if field.data and has_relative_links(field.data):
             raise ValidationError(_('Links and images may not use relative URLs.'))
+
+
+class NoEndpointLinks:
+    """Validate that an HTML string contains no URLs for the given endpoint.
+
+    This checks only ``a[href]``, but not URLs present as plain text or in any
+    other (unexpected) places.
+
+    It is intended for places where a placeholder containing a unique/secret link
+    is expected to be used, but users may copy&paste emails from the event log or
+    other places and accidentally include a hardcoded token (of someone else).
+    """
+
+    def __init__(self, endpoint, query_args=frozenset()):
+        self.endpoint = endpoint
+        self.query_args = query_args
+
+    def __call__(self, form, field):
+        if has_endpoint_links(field.data, self.endpoint, self.query_args):
+            raise ValidationError(_('This field contains a forbidden link. Did you mean to use a placeholder?'))
 
 
 class MastodonServer:
