@@ -640,7 +640,7 @@ class RHRegistrationDownloadPicture(RHRegistrationFormRegistrationBase):
     }
 
     def _process_args(self):
-        super()._process_args()
+        RHRegistrationFormRegistrationBase._process_args(self)
         if self.registration.id != request.view_args['registration_id']:
             raise BadRequest('Invalid picture reference')
         self.field_data = (RegistrationData.query

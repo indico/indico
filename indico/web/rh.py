@@ -440,7 +440,16 @@ def json_errors(rh):
 
 
 def cors(rh=None, /, **options):
-    """Enable CORS for the decorated RH."""
+    """Enable CORS for the decorated RH.
+
+    Note that this MUST NOT be used for RHs that use ``send_file()`` from
+    an actual file, or ``send()`` from a file in a storage backend, because
+    depending on how these files are served, the CORS headers would not
+    actually be included in the response sent to the client.
+
+    If you need to use CORS no such an endpoint, read the file contents
+    into a `BytesIO` and use ``send_file`` with that.
+    """
 
     def decorator(rh):
         rh._CORS = options

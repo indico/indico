@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from io import BytesIO
+
 from flask import jsonify, request
 from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
@@ -14,13 +16,16 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.items import RegistrationFormItem
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
 from indico.util.marshmallow import not_empty
 from indico.web.args import use_kwargs
+from indico.web.flask.util import send_file
 from indico.web.rh import cors, json_errors, oauth_scope
 
 
@@ -159,3 +164,35 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
             'i': [qr_code_version, url, _base64_encode_uuid(self.registration.ticket_uuid)]
         }
         return jsonify(result)
+
+
+class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
+    """Return the picture from the picture field of the registration form."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field_data.locator.registrant_file
+        }
+    }
+
+    def _process_args(self):
+        RHCheckinAPIBase._process_args(self)
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationFormItem.input_type == 'picture',
+                                   RegistrationData.registration_id == request.view_args['registration_id'],
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
+                           .join(RegistrationData.field_data)
+                           .join(RegistrationFormFieldData.field)
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .one())
+
+    def _process(self):
+        # We cannot use `self.field_data.send()` here because depending on the storage backend
+        # the CORS headers would be lost. In case of nginx+xaccelredirect this could be fixed
+        # via the nginx config, but when redirecting to a signed S3 URL, this is not possible
+        # since S3 only allows setting such headers on the bucket level, but not for individual
+        # presigned urls
+        with self.field_data.open() as fd:
+            data = BytesIO(fd.read())
+        return send_file(self.field_data.filename, data, self.field_data.content_type)
