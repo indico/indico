@@ -108,7 +108,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
 
     def _get_personal_data_picture(self, registration):
         if picture := registration.get_personal_data_picture():
-            return url_for('.api_checkin_registration_picture', picture.locator.file, _external=True)
+            return url_for('.api_checkin_registration_picture', picture.locator.file)
 
     def _get_registration_data(self, registration: Registration):
         regform = registration.registration_form
@@ -154,7 +154,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 obj = data_by_field[field['id']]
                 field_data['data'] = filenames[field['id']]
                 if field['inputType'] == 'picture':
-                    field_data['data'] = url_for('.api_checkin_registration_picture', obj.locator.file, _external=True)
+                    field_data['data'] = url_for('.api_checkin_registration_picture', obj.locator.file)
             section['fields'].append(field_data)
 
         return list(data.values())
