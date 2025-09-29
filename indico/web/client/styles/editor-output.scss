@@ -76,6 +76,7 @@
     margin-left: 1.2em;
   }
   // Nested list styling to match WYSIWYG editor preview
+  // Follows standard hierarchy: disc→circle→square, decimal→alpha→roman
   ul {
     list-style-type: disc;
 
