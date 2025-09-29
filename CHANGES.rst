@@ -15,6 +15,7 @@ Improvements
   sending invitations (:pr:`7093`)
 - Disallow sending registration emails or invitations containing hardcoded (and
   usually incorrect) token links (:pr:`7093`)
+- Add support for showing registration pictures in the check-in app (:pr:`7099`)
 
 Bugfixes
 ^^^^^^^^
@@ -42,7 +43,7 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Expose registration form image data for use in the check-in app (:pr:`6506`)
+- Nothing so far
 
 
 Version 3.3.8
