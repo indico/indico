@@ -70,7 +70,6 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
         // TODO
         // @ts-expect-error the children attribute is not in the type (yet)
         const child = e.children.find(c => c.id === id);
-        console.log('child', child);
         dispatch(actions.resizeEntry(child, duration, getDateKey(dt)));
       };
     }

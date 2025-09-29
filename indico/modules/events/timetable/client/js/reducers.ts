@@ -157,7 +157,6 @@ export default {
         };
       }
       case actions.RESIZE_ENTRY: {
-        console.log('resizing reducer');
         const {date, duration, entry} = action;
         let newDayEntries;
 

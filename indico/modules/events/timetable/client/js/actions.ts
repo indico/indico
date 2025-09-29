@@ -193,7 +193,6 @@ export function toggleDraft() {
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
   return (dispatch, getState) => {
-    console.log('resizeEntry', entry, duration, date);
     const {staticData} = getState();
     const eventId = staticData.eventId;
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
