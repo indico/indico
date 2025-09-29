@@ -16,19 +16,22 @@ import {Translate} from 'indico/react/i18n';
 
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
+import {UnscheduledContrib} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
-enum FilterType {
+enum GenericFilterType {
   NO_SESSION = 'no-session',
 }
+
+type FilterType = GenericFilterType & number;
 
 function FragmentWithoutWarning({key, children}: {key: string; children: ReactNode}) {
   return <Fragment key={key}>{children}</Fragment>;
 }
 
-function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[]}) {
+function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: UnscheduledContrib[]}) {
   return (
-    <div style={{display: 'flex', flexDirection: 'column', gap: '1em'}}>
+    <div styleName="contributions-list">
       {contribs.map(contrib => (
         <DraggableUnscheduledContributionEntry
           key={contrib.id}
@@ -44,69 +47,51 @@ function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: any[
 }
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
+  const minSidebarWidthPx = 280;
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const resizing = useRef(false);
+  const initialPosition = useRef<number>(0);
+
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>();
+  const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
+
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
   const contribs = useSelector(selectors.getUnscheduled);
-  const contribsGrouped = Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session');
   const sessions = useSelector(selectors.getSessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const wrapperRef = useRef(null);
-  const minSidebarWidthPx = 280;
 
-  const [selectedFilter, setSelectedFilter] = useState<string | FilterType>();
-  const [draftSessionId, setDraftSessionId] = useState<number | 'new' | null>(null);
-
-  const resizing = useRef<boolean>(false);
-  const initialPosition = useRef<number>(0);
-
-  useEffect(() => {
-    function onMouseUp() {
-      resizing.current = false;
-      initialPosition.current = 0;
-    }
-
-    function onMouseMove(e) {
-      if (resizing.current) {
-        const diff = e.pageX - initialPosition.current;
-        const width = wrapperRef.current.offsetWidth + diff;
-        if (width >= minSidebarWidthPx) {
-          initialPosition.current = e.pageX;
-          wrapperRef.current.style.width = `${width}px`;
-        }
-      }
-    }
-
-    document.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('mousemove', onMouseMove);
-    return () => {
-      document.removeEventListener('mouseup', onMouseUp);
-      document.removeEventListener('mousemove', onMouseMove);
-    };
-  }, []);
-
-  const sessionSearch = (options: DropdownItemProps[], value: string) =>
-    options.filter(o => o.title && o.title.toLowerCase().includes(value.toLowerCase()));
+  const contribsGrouped = useMemo(
+    () => Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session'),
+    [contribs]
+  );
 
   const currentContribs = useMemo(() => {
     return selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
   }, [contribs, selectedFilter, contribsGrouped]);
 
-  const [sessionsWithContribs, sessionsWithoutContribs] = partition(
-    Object.entries(sessions)
-      .map(([id, session]) => ({
-        value: +id,
-        title: session.title,
-        count: (contribsGrouped[id] ?? []).length,
-        text: (
-          <div styleName="session">
-            <Label empty circular style={{...session.colors}} />
-            <span>{session.title}</span>
-          </div>
-        ),
-      }))
-      .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
-    e => e.count > 0
+  const [sessionsWithContribs, sessionsWithoutContribs] = useMemo(
+    () =>
+      partition(
+        Object.entries(sessions)
+          .map(([id, session]) => ({
+            value: id,
+            title: session.title,
+            count: (contribsGrouped[id] ?? []).length,
+            text: (
+              <div styleName="session">
+                <Label empty circular style={{...session.colors}} />
+                <span>{session.title}</span>
+              </div>
+            ),
+          }))
+          .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
+        e => e.count > 0
+      ),
+    [sessions, contribsGrouped]
   );
+
   const dropdownSessions = [
     {
       as: FragmentWithoutWarning,
@@ -151,86 +136,119 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     ...sessionsWithoutContribs,
   ];
 
-  if (!showUnscheduled) {
-    return null;
+  const sessionSearch = (options: DropdownItemProps[], value: string) =>
+    options.filter(o => o.title && o.title.toLowerCase().includes(value.toLowerCase()));
+
+  const blurDropdown = () => {
+    const searchInput = wrapperRef.current.querySelector<HTMLInputElement>(
+      'div .ui.button.search.selection.dropdown input.search'
+    );
+    searchInput?.blur();
+  };
+
+  function onMouseUp() {
+    resizing.current = false;
+    initialPosition.current = 0;
   }
+
+  function onMouseMove(e: MouseEvent) {
+    if (resizing.current) {
+      const diff = e.pageX - initialPosition.current;
+      const width = wrapperRef.current.offsetWidth + diff;
+
+      if (width >= minSidebarWidthPx) {
+        initialPosition.current = e.pageX;
+        wrapperRef.current.style.width = `${width}px`;
+      }
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+
+    return () => {
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+  }, []);
 
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
   //              I propose we have some kind of filter option to search by entry type,
   //              session, etc. If no filters are applied, everything is visible.
   return (
-    <>
-      <div
-        styleName="contributions-container"
-        style={{minWidth: `${minSidebarWidthPx}px`}}
-        ref={wrapperRef}
-      >
-        <div styleName="content">
-          <div styleName="actions">
-            <Select
-              button
-              placeholder={Translate.string('Filter sessions')}
-              search={sessionSearch}
-              onClose={() => {
-                const searchInput = wrapperRef.current.querySelector(
-                  'div .ui.button.search.selection.dropdown input.search'
-                );
-                searchInput.blur();
-              }}
-              noResultsMessage={Translate.string('No sessions found.')}
-              clearable
-              onChange={(_, {value}: {_: unknown; value: string}) => setSelectedFilter(value)}
-              options={dropdownSessions}
-            />
-            {Number.isInteger(selectedFilter) && (
+    showUnscheduled && (
+      <>
+        <div
+          styleName="contributions-container"
+          style={{minWidth: `${minSidebarWidthPx}px`}}
+          ref={wrapperRef}
+        >
+          <div styleName="content">
+            <div styleName="actions">
+              <Select
+                button
+                placeholder={Translate.string('Filter sessions')}
+                search={sessionSearch}
+                onClose={blurDropdown}
+                noResultsMessage={Translate.string('No sessions found')}
+                clearable
+                onChange={(_, {value}: {_: unknown; value: FilterType}) => {
+                  // TODO: (Ajob) Fix bug where clicking enter on an options
+                  //              keeps dropdown open.
+                  setSelectedFilter(value);
+                }}
+                options={dropdownSessions}
+              />
+              {Number.isInteger(selectedFilter) && (
+                <Button
+                  basic
+                  type="button"
+                  title={Translate.string('Edit selected session')}
+                  icon="edit"
+                  size="small"
+                  onClick={() => setSelectedSessionId(selectedFilter)}
+                />
+              )}
               <Button
                 basic
                 type="button"
-                title={Translate.string('Edit selected session')}
-                icon="edit"
+                title={Translate.string('Create new session')}
+                icon="plus"
                 size="small"
-                disabled={!Number.isInteger(+selectedFilter)}
-                onClick={() => setDraftSessionId(+selectedFilter)}
+                onClick={() => setSelectedSessionId('draft')}
+              />
+            </div>
+            {selectedSessionId === 'draft' && (
+              <SessionCreateForm
+                eventId={eventId}
+                eventType={eventType}
+                onClose={() => setSelectedSessionId(null)}
               />
             )}
-            <Button
-              basic
-              type="button"
-              title={Translate.string('Create new session')}
-              icon="plus"
-              size="small"
-              onClick={() => setDraftSessionId('new')}
-            />
+            {Number.isInteger(selectedSessionId) && (
+              <SessionEditForm
+                eventId={eventId}
+                eventType={eventType}
+                sessionId={selectedSessionId as number}
+                onClose={() => setSelectedSessionId(null)}
+              />
+            )}
+            {currentContribs.length > 0 ? (
+              <UnscheduledContributionList dt={dt} contribs={currentContribs} />
+            ) : (
+              <Translate>This session has no contributions</Translate>
+            )}
           </div>
-          {draftSessionId === 'new' && (
-            <SessionCreateForm
-              eventId={eventId}
-              eventType={eventType}
-              onClose={() => setDraftSessionId(null)}
-            />
-          )}
-          {Number.isInteger(draftSessionId) && (
-            <SessionEditForm
-              eventId={eventId}
-              eventType={eventType}
-              sessionId={draftSessionId as number}
-              onClose={() => setDraftSessionId(null)}
-            />
-          )}
-          {currentContribs.length > 0 ? (
-            <UnscheduledContributionList dt={dt} contribs={currentContribs} />
-          ) : (
-            <Translate>This session has no contributions</Translate>
-          )}
         </div>
-      </div>
-      <div
-        styleName="pane-resize-handle"
-        onMouseDown={e => {
-          resizing.current = true;
-          initialPosition.current = e.pageX;
-        }}
-      />
-    </>
+        <div
+          styleName="pane-resize-handle"
+          onMouseDown={e => {
+            resizing.current = true;
+            initialPosition.current = e.pageX;
+          }}
+        />
+      </>
+    )
   );
 }
