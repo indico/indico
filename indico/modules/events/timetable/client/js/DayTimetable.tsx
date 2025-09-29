@@ -52,23 +52,27 @@ interface DayTimetableProps {
 const TABLE_MARGIN_TOP = 10;
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
-  const dispatch = useDispatch();
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
-      obj[e.id] = (duration: number) =>
-        dispatch(actions.resizeEntry(getDateKey(dt), e.id, duration, dt));
+      obj[e.id] = (duration: number) => dispatch(actions.resizeEntry(e, duration, getDateKey(dt)));
     }
     return obj;
-  }, [entries, dispatch, dt, eventId]);
+  }, [entries, dispatch, dt]);
 
-   const setChildDurations = useMemo(() => {
+  const setChildDurations = useMemo(() => {
     const obj = {};
 
     for (const e of entries) {
-      obj[e.id] = (id: string) => (duration: number) =>
-        dispatch(actions.resizeEntry(getDateKey(dt), id, duration, e.id, dt));
+      obj[e.id] = (id: Entry) => (duration: number) => {
+        // TODO
+        // @ts-expect-error the children attribute is not in the type (yet)
+        const child = e.children.find(c => c.id === id);
+        console.log('child', child);
+        dispatch(actions.resizeEntry(child, duration, getDateKey(dt)));
+      };
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -357,7 +361,7 @@ export function DayTimetable({
           <DnDCalendar>
             <div ref={calendarRef} style={{background: limitsGradient}}>
               <Lines minHour={minHour} maxHour={maxHour} />
-              <MemoizedTopLevelEntries dt={dt} entries={entries} eventId={eventId} />
+              <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {draftEntry && (
                 <DraggableEntry
                   id="draft"

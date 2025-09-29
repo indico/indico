@@ -23,7 +23,9 @@ import {
   ChildContribEntry,
   UnscheduledContrib,
   EntryType,
+  Entry,
 } from './types';
+import {getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -61,9 +63,8 @@ interface SetDraftEntryAction {
 interface ResizeEntryAction {
   type: typeof RESIZE_ENTRY;
   date: string;
-  id: string;
   duration: number;
-  sessionBlockId?: string;
+  entry: Entry;
 }
 
 interface MoveEntryAction {
@@ -190,33 +191,23 @@ export function toggleDraft() {
   return {type: TOGGLE_DRAFT};
 }
 
-export function resizeEntry(entry, eventId, duration, date) {
-  let entryURL: string;
+export function resizeEntry(entry: Entry, duration: number, date: string) {
+  return (dispatch, getState) => {
+    console.log('resizeEntry', entry, duration, date);
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
+    const entryData = {duration: duration * 60};
 
-  switch (entry.type) {
-    case EntryType.Break:
-      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
-      break;
-    case EntryType.SessionBlock:
-      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-      break;
-    default:
-      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-  }
-
-  const entryData = {duration: duration * 60};
-
-  return synchronizedAjaxAction(
-    () => indicoAxios.patch(entryURL, entryData),
-    () => ({
-      type: RESIZE_ENTRY,
-      date,
-      id: entry.id,
-      duration,
-      parentId: entry.sessionBlockId ?? entry,
-      entryData,
-    })
-  );
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+        type: RESIZE_ENTRY,
+        date,
+        duration,
+        entry,
+      })
+    );
+  };
 }
 
 export function selectEntry(id: string): SelectEntryAction {
