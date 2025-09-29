@@ -7,6 +7,12 @@
 
 @use 'base/palette' as *;
 
+.contributions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .contributions-container {
   width: min(280px, 100%);
   flex-shrink: 0;
