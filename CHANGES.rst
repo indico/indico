@@ -48,6 +48,7 @@ Bugfixes
 - Preserve configured registration date formats in Excel exports (:pr:`7157`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 - Fixed inconsistent styling of nested lists in minutes and editor output (:pr:`XXXX`)
+- Fixed inconsistent styling of nested lists in minutes and editor output (:pr:`7105`)
 
 Accessibility
 ^^^^^^^^^^^^^
