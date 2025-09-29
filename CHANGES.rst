@@ -49,6 +49,7 @@ Bugfixes
   :user:`duartegalvao, unconventionaldotdev`)
 - Fixed inconsistent styling of nested lists in minutes and editor output (:pr:`XXXX`)
 - Fixed inconsistent styling of nested lists in minutes and editor output (:pr:`7105`)
+- Fix inconsistent styling of nested lists in minutes and editor output (:pr:`7105`)
 
 Accessibility
 ^^^^^^^^^^^^^
