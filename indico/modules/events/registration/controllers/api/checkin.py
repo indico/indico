@@ -169,6 +169,12 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
 class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
     """Return the picture from the picture field of the registration form."""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field_data.locator.registrant_file
+        }
+    }
+
     def _process_args(self):
         RHCheckinAPIBase._process_args(self)
         self.field_data = (RegistrationData.query
