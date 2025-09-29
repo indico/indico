@@ -110,7 +110,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
         if picture := registration.get_personal_data_picture():
             return url_for('.api_checkin_registration_picture', picture.locator.file, _external=True)
 
-    def _get_registration_data(self, registration):
+    def _get_registration_data(self, registration: Registration):
         regform = registration.registration_form
         form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
         reg_data = get_form_registration_data(regform, registration, management=True)
@@ -128,6 +128,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 'fields': []
             }
 
+        data_by_field = registration.data_by_field
         for field in fields:
             if field['inputType'] == 'label':
                 # Do not include labels in the response
@@ -150,7 +151,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             # File field stores the uuid as data which is not helpful.
             # We want to show the filename instead.
             if field['id'] in filenames:
-                obj = registration.data_by_field[field['id']]
+                obj = data_by_field[field['id']]
                 field_data['data'] = filenames[field['id']]
                 if field['inputType'] == 'picture':
                     field_data['data'] = url_for('.api_checkin_registration_picture', obj.locator.file, _external=True)
