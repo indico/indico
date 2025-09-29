@@ -265,13 +265,13 @@ _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/reg
                  'api_checkin_registrations', api_checkin.RHCheckinAPIRegistrations)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>',
                  'api_checkin_registration', api_checkin.RHCheckinAPIRegistration, methods=('GET', 'PATCH'))
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>'
+                 '/picture/<int:field_data_id>/<filename>', 'api_checkin_registration_picture',
+                 api_checkin.RHCheckinAPIRegistrationPicture)
 _bp.add_url_rule('!/api/checkin/ticket/<uuid:ticket_uuid>',
                  'api_checkin_registration_uuid', api_checkin.RHCheckinAPIRegistrationUUID)
 _bp.add_url_rule('!/api/checkin/ticket/custom-qr-code', 'api_checkin_registration_custom_qr_code',
                  api_checkin.RHCheckinAPIRegistrationCustomQRCode, methods=('POST',))
-_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>'
-                 '/picture/<int:field_data_id>/<filename>', 'api_checkin_registration_picture',
-                 api_checkin.RHCheckinAPIRegistrationPicture, methods=('GET', 'POST'))
 
 # Deprecated Check-in app API
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
