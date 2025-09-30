@@ -10,7 +10,7 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import moment, {Moment} from 'moment';
+import {Moment} from 'moment';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -71,6 +71,7 @@ interface ChangeEntryLayoutAction {
   date: string;
   entries: TopLevelEntry[];
   entry: TopLevelEntry;
+  sessionBlockId?: number;
 }
 
 interface SelectEntryAction {
@@ -164,17 +165,16 @@ export function changeEntryLayout(
   entry: Entry,
   entries: TopLevelEntry[],
   date: string,
-  sessionBlockId?
+  sessionBlockId?: number
 ) {
   return (dispatch, getState) => {
-
     const {staticData} = getState();
     const eventId = staticData.eventId;
 
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
 
     const entryData = {
-      start_dt: moment(entry.startDt).format(),
+      start_dt: entry.startDt.format(),
       session_block_id: sessionBlockId,
     };
 

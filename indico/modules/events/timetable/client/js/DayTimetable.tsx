@@ -214,7 +214,7 @@ export function DayTimetable({
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt)));
   }
 
   function handleDropOnBlock(
@@ -452,7 +452,7 @@ function layoutAfterDropOnCalendar(
   over: Over,
   delta: Transform,
   mouse: MousePosition
-): [TopLevelEntry[], Entry, number] {
+): [TopLevelEntry[], Entry, number] | [TopLevelEntry[], Entry] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
@@ -521,7 +521,7 @@ function layoutAfterDropOnCalendar(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
     );
     oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
-    return [[...otherEntries, ...oldGroup, ...group], draftEntry, null];
+    return [[...otherEntries, ...oldGroup, ...group], draftEntry];
   } else {
     // Drop from block to top level (== a break)
     const otherEntries = entries.filter(
@@ -534,7 +534,7 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return [[...otherEntries, ...group, fromBlock], draftEntry, null];
+    return [[...otherEntries, ...group, fromBlock], draftEntry];
   }
 }
 
@@ -578,7 +578,9 @@ function layoutAfterDropOnBlock(
   if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
-    return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
+    const calendarResult = layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
+    const [newLayout, movedEntry] = calendarResult;
+    return [newLayout, movedEntry, toBlock.objId];
   }
 
   if (fromEntry.duration > toBlock.duration) {
