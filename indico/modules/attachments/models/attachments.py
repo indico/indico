@@ -8,6 +8,7 @@
 import posixpath
 
 from flask import g
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -183,7 +184,19 @@ class Attachment(SearchableTitleMixin, ProtectionMixin, VersionedResourceMixin, 
         db.String,
         nullable=True
     )
-
+    #: The ID of the attachment that was converted from
+    converted_from_id = db.Column(
+        db.Integer,
+        db.ForeignKey('attachments.attachments.id'),
+        nullable=True,
+        index=True
+    )
+    #: Attachment annotations (metadata)
+    annotations = db.Column(
+        JSONB,
+        nullable=False,
+        default={}
+    )
     #: The user who created the attachment
     user = db.relationship(
         'User',
@@ -211,7 +224,19 @@ class Attachment(SearchableTitleMixin, ProtectionMixin, VersionedResourceMixin, 
     #: The ACL of the folder (used for ProtectionMode.protected)
     acl = association_proxy('acl_entries', 'principal', creator=lambda v: AttachmentPrincipal(principal=v))
 
+    converted_from = db.relationship(
+        'Attachment',
+        lazy=True,
+        remote_side=id,
+        backref=db.backref(
+            'converted_into',
+            primaryjoin='(Attachment.id == Attachment.converted_from_id) & ~Attachment.is_deleted',
+            lazy=True
+        )
+    )
+
     # relationship backrefs:
+    # - converted_into (Attachment.converted_from)
     # - legacy_mapping (LegacyAttachmentMapping.attachment)
 
     @property

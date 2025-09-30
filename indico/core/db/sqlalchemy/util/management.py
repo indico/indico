@@ -98,7 +98,7 @@ def delete_all_tables(db):
             ''')  # noqa: S608
             for stmt, in row:
                 conn.execute(stmt)
-            conn.execute(DropSchema(schema))
+            conn.execute(DropSchema(schema, cascade=True))
     transaction.commit()
 
 
