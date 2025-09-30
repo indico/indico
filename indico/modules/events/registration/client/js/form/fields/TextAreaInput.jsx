@@ -20,6 +20,7 @@ import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
 
+import {contentValidationOptions} from './TextInput';
 import {mapPropsToAttributes} from './util';
 
 const attributeMap = {
@@ -54,21 +55,10 @@ TextAreaInput.defaultProps = {
   numberOfRows: 2,
 };
 
-export function TextAreaSettings() {
-  const contentValidationOptions = [
-    {key: 'nourl', value: 'no_url', text: Translate.string('Disallow URLs')},
-    {key: 'urlonly', value: 'url_only', text: Translate.string('Valid URL')},
-  ];
+export function TextAreaSettings(...itemData) {
+  const settings = itemData[0];
   return (
     <>
-      <FinalDropdown
-        name="contentValidation"
-        label={Translate.string('Content Validation')}
-        options={contentValidationOptions}
-        placeholder={Translate.string('None', 'Content Validation')}
-        parse={p.nullIfEmpty}
-        selection
-      />
       <Form.Group widths="equal">
         <FinalInput
           name="numberOfRows"
@@ -82,6 +72,15 @@ export function TextAreaSettings() {
           fluid
         />
       </Form.Group>
+      <FinalDropdown
+        name="contentValidation"
+        label={Translate.string('Content validation')}
+        options={contentValidationOptions}
+        placeholder={Translate.string('None', 'Content validation')}
+        parse={p.nullIfEmpty}
+        selection
+        disabled={settings.fieldIsContentValidationProtected}
+      />
     </>
   );
 }

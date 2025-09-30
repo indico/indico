@@ -18,6 +18,11 @@ import '../../../styles/regform.module.scss';
 
 const attributeMap = {minLength: 'minLength', maxLength: 'maxLength'};
 
+export const contentValidationOptions = [
+  {key: 'nourl', value: 'no_url', text: Translate.string('Disallow URLs')},
+  {key: 'urlonly', value: 'url_only', text: Translate.string('Valid URL')},
+];
+
 export default function TextInput({htmlId, htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
   return (
@@ -50,21 +55,8 @@ TextInput.defaultProps = {
 
 export function TextSettings(...itemData) {
   const settings = itemData[0];
-  const contentValidationOptions = [
-    {key: 'nourl', value: 'no_url', text: Translate.string('Disallow URLs')},
-    {key: 'urlonly', value: 'url_only', text: Translate.string('Valid URL')},
-  ];
   return (
     <>
-      <FinalDropdown
-        name="contentValidation"
-        label={Translate.string('Content Validation')}
-        options={contentValidationOptions}
-        placeholder={Translate.string('None', 'Content Validation')}
-        parse={p.nullIfEmpty}
-        selection
-        disabled={settings.fieldIsContentValidationProtected}
-      />
       <Form.Group widths="equal">
         <FinalInput
           name="minLength"
@@ -101,6 +93,15 @@ export function TextSettings(...itemData) {
           fluid
         />
       </Form.Group>
+      <FinalDropdown
+        name="contentValidation"
+        label={Translate.string('Content validation')}
+        options={contentValidationOptions}
+        placeholder={Translate.string('None', 'Content validation')}
+        parse={p.nullIfEmpty}
+        selection
+        disabled={settings.fieldIsContentValidationProtected}
+      />
     </>
   );
 }

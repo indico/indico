@@ -318,16 +318,16 @@ def check_registration_email(regform, email, registration=None, management=False
             return {'status': 'ok', 'user': None}
 
 
-def check_registration_field_content(data, constraint):
-    """Check whether field data observes the constraint in field's content validation."""
+def check_registration_field_content(field, value):
+    """Check whether field value observes the constraint in field's content validation."""
+    constraint = field.data.get('content_validation')
     if constraint == 'url_only':
-        if urlparse(data).scheme not in ('http', 'https'):
-            return _('Not a valid URL.')
+        if urlparse(value).scheme not in ('http', 'https'):
+            raise ValidationError(_('Not a valid URL.'), field_name=field.html_field_name)
     elif constraint == 'no_url':
         pattern = r'https?://\S+|www\.\S+'
-        if re.findall(pattern, data):
-            return _('URL not allowed.')
-    return None
+        if re.findall(pattern, value):
+            raise ValidationError(_('URLs are not allowed in this field.'), field_name=field.html_field_name)
 
 
 class RegistrationSchemaBase(IndicoSchema):
@@ -362,15 +362,10 @@ def make_registration_schema(
 
         @validates_schema(skip_on_field_errors=True)
         def validate_content(self, data, **kwargs):
-            print('validate schema, (data, rf):', data, regform)
-            form_items = {f.html_field_name: f for f in regform.active_fields}
-            for field_name, value in data.items():
-                form_item = form_items.get(field_name)
-                if not form_item:
-                    continue
-                if form_item.data.get('content_validation'):
-                    if error := check_registration_field_content(value, form_item.data.get('content_validation')):
-                        raise ValidationError(error, field_name=field_name)
+            for field in regform.active_fields:
+                if field.html_field_name in data:
+                    check_registration_field_content(field, data.get(field.html_field_name, ''))
+                # TODO: check existing values of non modified fields
 
     schema = {}
 
