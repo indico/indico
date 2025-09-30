@@ -240,6 +240,7 @@ export function changeEntryLayout(
         type: CHANGE_ENTRY_LAYOUT,
         date,
         entry,
+        entries,
       })
     );
   };
