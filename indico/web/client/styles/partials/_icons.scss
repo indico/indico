@@ -473,6 +473,10 @@ i[class^='icon-']::before {
 %icon-loop {
   content: '\e95b';
 }
+.icon-magic::before,
+%icon-magic {
+  content: '\e99e';
+}
 .icon-mail::before,
 %icon-mail {
   content: '\e95c';

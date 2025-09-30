@@ -363,6 +363,26 @@
       color: $light-black;
       font-size: 0.9em;
     }
+
+    &[data-attachment-source] {
+      padding-right: 0.3em !important;
+
+      &:hover {
+        &::after {
+          color: $light-black;
+        }
+      }
+
+      @include icon-after('icon-magic');
+
+      &::after {
+        line-height: 1;
+        font-size: 1.2em;
+        color: $dark-gray;
+        vertical-align: top;
+        margin-left: 0.5em;
+      }
+    }
   }
 
   .folder .i-button.attachment,
