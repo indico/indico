@@ -171,7 +171,7 @@ class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.field_data.locator.registrant_file
+            lambda self: self.field_data.locator.file
         }
     }
 
