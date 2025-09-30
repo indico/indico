@@ -157,9 +157,11 @@ export default {
         };
       }
       case actions.RESIZE_ENTRY: {
-        const {date, id, sessionBlockId, duration} = action;
+        const {date, duration, entry} = action;
         let newDayEntries;
-        if (sessionBlockId !== undefined) {
+
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
           const parent = state.changes[state.currentChangeIdx].entries[date].find(
             e => e.id === sessionBlockId
           );
@@ -167,36 +169,32 @@ export default {
             return state;
           }
           newDayEntries = layout(
-            state.changes[state.currentChangeIdx].entries[date].map(entry => {
-              if (entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) {
+            state.changes[state.currentChangeIdx].entries[date].map(e => {
+              if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
                 return {
-                  ...entry,
-                  children: entry.children.map(child => {
-                    if (child.id === id) {
+                  ...e,
+                  children: e.children.map(child => {
+                    if (child.id === entry.id) {
                       return {
                         ...child,
-                        duration: moment(entry.startDt)
+                        duration: moment(e.startDt)
                           .add(duration, 'minutes')
-                          .isBefore(moment(child.startDt).add(entry.duration, 'minutes'))
+                          .isBefore(moment(child.startDt).add(e.duration, 'minutes'))
                           ? duration
-                          : entry.duration,
+                          : e.duration,
                       };
                     }
                     return child;
                   }),
                 };
               }
-              return entry;
+              return e;
             })
           );
         } else {
-          const entry = state.changes[state.currentChangeIdx].entries[date].find(e => e.id === id);
-          if (!entry) {
-            return state;
-          }
           newDayEntries = layout(
             state.changes[state.currentChangeIdx].entries[date].map(e =>
-              e.id === id ? {...e, duration} : e
+              e.id === entry.id ? {...e, duration} : e
             )
           );
         }
