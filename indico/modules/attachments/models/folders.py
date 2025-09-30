@@ -100,7 +100,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     attachments = db.relationship(
         'Attachment',
         primaryjoin=lambda: (Attachment.folder_id == AttachmentFolder.id) & ~Attachment.is_deleted,
-        order_by=lambda: db.func.lower(Attachment.title),
+        order_by=Attachment.title.collate('case_insensitive'),
         viewonly=True,
         lazy=True
     )
