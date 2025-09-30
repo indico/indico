@@ -61,7 +61,6 @@ export default {
             day === date ? action.entries : dayEntries,
           ])
         );
-
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
