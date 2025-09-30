@@ -24,7 +24,7 @@ import {
   UnscheduledContrib,
   Entry,
 } from './types';
-import { getEntryURLByObjId } from './utils';
+import {getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -183,6 +183,7 @@ export function changeEntryLayout(
         type: CHANGE_ENTRY_LAYOUT,
         date,
         entry,
+        entries,
       })
     );
   };
