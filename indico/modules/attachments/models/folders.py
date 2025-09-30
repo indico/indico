@@ -17,6 +17,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.core.db.sqlalchemy.util.queries import COLLATION_INDICO_CASE_INSENSITIVE
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal
 from indico.modules.attachments.util import can_manage_attachments
@@ -100,7 +101,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
     attachments = db.relationship(
         'Attachment',
         primaryjoin=lambda: (Attachment.folder_id == AttachmentFolder.id) & ~Attachment.is_deleted,
-        order_by=lambda: db.func.lower(Attachment.title),
+        order_by=Attachment.title.collate(COLLATION_INDICO_CASE_INSENSITIVE),
         viewonly=True,
         lazy=True
     )
