@@ -20,7 +20,7 @@ from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.scopes import SCOPES
 from indico.modules.auth import Identity
 from indico.modules.users import User
-from indico.modules.users.operations import create_user
+from indico.modules.users import operations as op
 from indico.modules.users.util import anonymize_user, search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.date_time import utc_to_server
@@ -117,7 +117,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
 
 @cli.command()
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
-def create(grant_admin):
+def create_user(grant_admin):
     """Create a new user."""
     user_type = 'user' if not grant_admin else 'admin'
     while True:
@@ -148,8 +148,11 @@ def create(grant_admin):
         return
 
     identity = Identity(provider='indico', identifier=username, password=password)
-    user = create_user(email, {'first_name': first_name, 'last_name': last_name, 'affiliation': affiliation}, identity)
-    user.is_admin = grant_admin
+    user = op.create_user(email,
+                          {'first_name': first_name, 'last_name': last_name, 'affiliation': affiliation},
+                          identity)
+    if grant_admin:
+        op.grant_admin(user)
     _print_user_info(user)
 
     if click.confirm(click.style(f'Create the new {user_type}?', fg='yellow'), default=True):
@@ -171,7 +174,7 @@ def grant_admin(user_id):
         click.secho('This user already has administration rights', fg='yellow')
         return
     if click.confirm(click.style('Grant administration rights to this user?', fg='yellow')):
-        user.is_admin = True
+        op.grant_admin(user)
         db.session.commit()
         click.secho('Administration rights granted successfully', fg='green')
 
@@ -189,7 +192,7 @@ def revoke_admin(user_id):
         click.secho('This user does not have administration rights', fg='yellow')
         return
     if click.confirm(click.style('Revoke administration rights from this user?', fg='yellow')):
-        user.is_admin = False
+        op.revoke_admin(user)
         db.session.commit()
         click.secho('Administration rights revoked successfully', fg='green')
 

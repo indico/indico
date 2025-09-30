@@ -12,7 +12,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
-from indico.modules.logs.models.entries import LogKind, UserLogRealm
+from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
 from indico.modules.users import User, logger
 from indico.modules.users.util import anonymize_user
 
@@ -94,3 +94,31 @@ def delete_or_anonymize_user(user):
     else:
         signals.users.db_deleted.send(user, flushed=True)
         logger.info('User %r deleted %s', session.user if session else None, user_repr)
+
+
+def grant_admin(user):
+    if user.is_admin:
+        return
+    user.is_admin = True
+    session_user = session.user if session else None
+    remote_addr = request.remote_addr if request else None
+    AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
+                    f'Admin privileges granted to {user.full_name}',
+                    session_user, data={'IP': remote_addr, 'User ID': user.id})
+    user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session_user,
+             data={'IP': remote_addr})
+    logger.warning('Admin rights granted to %r by %r [%s]', user, session_user, remote_addr)
+
+
+def revoke_admin(user):
+    if not user.is_admin:
+        return
+    user.is_admin = False
+    session_user = session.user if session else None
+    remote_addr = request.remote_addr if request else None
+    AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
+                    f'Admin privileges revoked from {user.full_name}',
+                    session_user, data={'IP': remote_addr, 'User ID': user.id})
+    user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session_user,
+             data={'IP': remote_addr})
+    logger.warning('Admin rights revoked from %r by %r [%s]', user, session_user, remote_addr)
