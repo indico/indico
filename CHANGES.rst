@@ -23,6 +23,7 @@ Bugfixes
 - Do not allow sending registration invitation reminders without the invitation
   link placeholder (:pr:`7093`)
 - Correctly log the user sending a registration invitation reminder (:pr:`7093`)
+- Fix inconsistent styling of nested lists in minutes and editor output (:pr:`7105`)
 
 Accessibility
 ^^^^^^^^^^^^^
