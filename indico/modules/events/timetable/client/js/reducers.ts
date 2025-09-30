@@ -160,7 +160,7 @@ export default {
         const {date, duration, entry} = action;
         let newDayEntries;
 
-        if ('sessionBlockId' in entry && entry.sessionBlockId !== undefined) {
+        if (isChildEntry(entry)) {
           const sessionBlockId = entry.sessionBlockId;
           const parent = state.changes[state.currentChangeIdx].entries[date].find(
             e => e.id === sessionBlockId
