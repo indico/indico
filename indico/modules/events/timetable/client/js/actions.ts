@@ -23,7 +23,9 @@ import {
   ChildContribEntry,
   UnscheduledContrib,
   EntryType,
+  Entry,
 } from './types';
+import {getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -61,9 +63,8 @@ interface SetDraftEntryAction {
 interface ResizeEntryAction {
   type: typeof RESIZE_ENTRY;
   date: string;
-  id: string;
   duration: number;
-  sessionBlockId?: string;
+  entry: Entry;
 }
 
 interface MoveEntryAction {
@@ -190,13 +191,22 @@ export function toggleDraft() {
   return {type: TOGGLE_DRAFT};
 }
 
-export function resizeEntry(
-  date: string,
-  id: string,
-  duration: number,
-  sessionBlockId?: string
-): ResizeEntryAction {
-  return {type: RESIZE_ENTRY, date, id, duration, sessionBlockId};
+export function resizeEntry(entry: Entry, duration: number, date: string) {
+  return (dispatch, getState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
+    const entryData = {duration: duration * 60};
+
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+        type: RESIZE_ENTRY,
+        date,
+        duration,
+        entry,
+      })
+    );
+  };
 }
 
 export function selectEntry(id: string): SelectEntryAction {
