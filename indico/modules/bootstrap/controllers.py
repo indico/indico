@@ -21,6 +21,7 @@ from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.core.settings import core_settings
 from indico.modules.users import User
+from indico.modules.users.operations import grant_admin
 from indico.util.i18n import get_all_locales
 from indico.util.network import is_private_url
 from indico.util.system import get_os
@@ -55,7 +56,6 @@ class RHBootstrap(RH):
         user.last_name = setup_form.last_name.data
         user.affiliation = setup_form.affiliation.data
         user.email = setup_form.email.data
-        user.is_admin = True
 
         identifier = setup_form.username.data if config.LOCAL_USERNAMES else str(uuid4())
         identity = Identity(provider='indico', identifier=identifier, password=setup_form.password.data)
@@ -63,6 +63,7 @@ class RHBootstrap(RH):
 
         db.session.add(user)
         db.session.flush()
+        grant_admin(user)
 
         user.settings.set('timezone', config.DEFAULT_TIMEZONE)
         user.settings.set('lang', session.lang or config.DEFAULT_LOCALE)
