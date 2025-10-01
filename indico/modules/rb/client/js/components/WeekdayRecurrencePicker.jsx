@@ -5,19 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button} from 'semantic-ui-react';
 
 import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
-export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
-  const WEEKDAYS = moment.weekdays(true).map(wd => ({
-    value: moment().day(wd).locale('en').format('ddd').toLowerCase(),
-    text: moment().isoWeekday(wd).format('ddd'),
-  }));
+import {getWeekdaysMapping} from '../util';
 
+export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
   const handleDayClick = day => {
     const selected = value.includes(day);
     if (disabled || (requireOneSelected && selected && value.length === 1)) {
@@ -33,10 +29,12 @@ export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSe
     onChange(newValue);
   };
 
+  const weekdays = getWeekdaysMapping();
+
   return (
     <div>
       <Button.Group>
-        {WEEKDAYS.map(weekday => (
+        {weekdays.map(weekday => (
           <Button
             type="button"
             key={weekday.value}

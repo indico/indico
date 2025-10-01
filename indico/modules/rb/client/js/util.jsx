@@ -296,6 +296,23 @@ export function renderRecurrenceWeekdays({weekdays, repetition = null, weekdaysO
   return Translate.string('Every {weekdays}', {weekdays: formattedWeekdays});
 }
 
+/**
+ * Returns an array of localized shorthand weekday names with their corresponding
+ * English shorthand values.
+ * @returns {Array<{text: string, value: string}>} Array of weekday value-text pairs
+ */
+export function getWeekdaysMapping() {
+  const weekdayNames = moment.weekdays(true);
+  const firstDayOfWeek = moment.localeData().firstDayOfWeek();
+  return weekdayNames.map((__, index) => {
+    const dayNumber = (firstDayOfWeek + index) % 7;
+    return {
+      value: moment().day(dayNumber).locale('en').format('ddd').toLowerCase(),
+      text: moment().day(dayNumber).format('ddd'),
+    };
+  });
+}
+
 const _legendLabels = {
   candidates: {label: Translate.string('Available'), style: 'available'},
   bookings: {label: Translate.string('Booking'), style: 'booking'},
