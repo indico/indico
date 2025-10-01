@@ -5,29 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button} from 'semantic-ui-react';
 
 import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
-/**
- * Returns an array of localized shorthand weekday names with their corresponding
- * English shorthand values.
- * @returns {Array<{text: string, value: string}>} Array of weekday value-text pairs
- */
-export function getWeekdaysMapping() {
-  const weekdayNames = moment.weekdays(true);
-  const firstDayOfWeek = moment.localeData().firstDayOfWeek();
-  return weekdayNames.map((_, index) => {
-    const dayNumber = (firstDayOfWeek + index) % 7;
-    return {
-      value: moment().day(dayNumber).locale('en').format('ddd').toLowerCase(),
-      text: moment().day(dayNumber).format('ddd'),
-    };
-  });
-}
+import {getWeekdaysMapping} from '../util';
 
 export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
   const handleDayClick = day => {

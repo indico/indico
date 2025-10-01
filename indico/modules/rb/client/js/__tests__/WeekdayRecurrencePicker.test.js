@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 
-import {getWeekdaysMapping} from '../components/WeekdayRecurrencePicker';
+import {getWeekdaysMapping} from '../util';
 
 describe('can localize shorthand weekday names, but can keep the values in English', () => {
   let oldLocale = null;
