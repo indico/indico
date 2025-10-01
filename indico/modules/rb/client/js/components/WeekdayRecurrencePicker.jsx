@@ -12,17 +12,24 @@ import {Button} from 'semantic-ui-react';
 
 import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
-export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
+/**
+ * Returns an array of localized shorthand weekday names with their corresponding
+ * English shorthand values.
+ * @returns {Array<{text: string, value: string}>} Array of weekday value-text pairs
+ */
+export function getWeekdaysMapping() {
   const weekdayNames = moment.weekdays(true);
-  const WEEKDAYS = weekdayNames.map((_, index) => {
-    const firstDayOfWeek = moment.localeData().firstDayOfWeek();
+  const firstDayOfWeek = moment.localeData().firstDayOfWeek();
+  return weekdayNames.map((_, index) => {
     const dayNumber = (firstDayOfWeek + index) % 7;
     return {
       value: moment().day(dayNumber).locale('en').format('ddd').toLowerCase(),
       text: moment().day(dayNumber).format('ddd'),
     };
   });
+}
 
+export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
   const handleDayClick = day => {
     const selected = value.includes(day);
     if (disabled || (requireOneSelected && selected && value.length === 1)) {
@@ -38,10 +45,12 @@ export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSe
     onChange(newValue);
   };
 
+  const weekdays = getWeekdaysMapping();
+
   return (
     <div>
       <Button.Group>
-        {WEEKDAYS.map(weekday => (
+        {weekdays.map(weekday => (
           <Button
             type="button"
             key={weekday.value}

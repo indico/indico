@@ -7,6 +7,8 @@
 
 import moment from 'moment';
 
+import {getWeekdaysMapping} from '../components/WeekdayRecurrencePicker';
+
 describe('can localize shorthand weekday names, but can keep the values in English', () => {
   let oldLocale = null;
 
@@ -89,20 +91,9 @@ describe('can localize shorthand weekday names, but can keep the values in Engli
         Weekday Values (en): ${expectedValues}
     `, () => {
       moment.locale(locale);
-
-      const weekdayNames = moment.weekdays(true);
-      const WEEKDAYS = weekdayNames.map((_, index) => {
-        const firstDayOfWeek = moment.localeData().firstDayOfWeek();
-        const dayNumber = (firstDayOfWeek + index) % 7;
-        return {
-          value: moment().day(dayNumber).locale('en').format('ddd').toLowerCase(),
-          text: moment().day(dayNumber).format('ddd'),
-        };
-      });
-
-      const texts = WEEKDAYS.map(wd => wd.text);
-      const values = WEEKDAYS.map(wd => wd.value);
-
+      const weekdays = getWeekdaysMapping();
+      const texts = weekdays.map(wd => wd.text);
+      const values = weekdays.map(wd => wd.value);
       expect(texts).toEqual(expectedTexts);
       expect(values).toEqual(expectedValues);
     });
