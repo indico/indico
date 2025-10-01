@@ -12,7 +12,7 @@ from indico.web.flask.templating import get_template_module
 
 
 def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_description, subject, message):
-    """Return template modules for reminder email in both text/html abd text/plain format if applicable.
+    """Return template modules for reminder email in both text/html and text/plain format if applicable.
 
     Legacy reminder (text/plain message) -> text/plain email format only
     Standard reminder (text/html message) -> both text/html and text/plain email format
