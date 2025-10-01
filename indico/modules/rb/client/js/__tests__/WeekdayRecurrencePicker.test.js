@@ -8,77 +8,35 @@
 import moment from 'moment';
 
 describe('can localize shorthand weekday names, but can keep the values in English', () => {
-  const cases = [
-    {
-      locale: 'de',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.', 'So.'],
-    },
-    {
-      locale: 'en-gb',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    },
-    {
-      locale: 'en-us',
-      expectedValues: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-      expectedTexts: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    },
-    {
-      locale: 'fr',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'],
-    },
-    {
-      locale: 'pt-br',
-      expectedValues: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-      expectedTexts: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
-    },
-    {
-      locale: 'es',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.', 'dom.'],
-    },
-    {
-      locale: 'it',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'],
-    },
-    {
-      locale: 'tr',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
-    },
-    {
-      locale: 'pl',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['pon', 'wt', 'śr', 'czw', 'pt', 'sob', 'ndz'],
-    },
-    {
-      locale: 'mn',
-      expectedValues: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
-      expectedTexts: ['Ням', 'Дав', 'Мяг', 'Лха', 'Пүр', 'Баа', 'Бям'],
-    },
-    {
-      locale: 'uk',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'нд'],
-    },
-    {
-      locale: 'hu',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['hét', 'kedd', 'sze', 'csüt', 'pén', 'szo', 'vas'],
-    },
-    {
-      locale: 'zh-cn',
-      expectedValues: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      expectedTexts: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-    },
-  ];
+  let oldLocale = null;
 
-  cases.forEach(({locale, expectedValues, expectedTexts}) => {
-    it(`should return correct mappings in ${locale}`, () => {
-      const oldLocale = moment.locale();
+  beforeEach(() => {
+    oldLocale = moment.locale();
+  });
+
+  afterEach(() => {
+    moment.locale(oldLocale);
+  });
+
+  describe.each`
+    locale     | expectedValues                                       | expectedTexts
+    ${'de'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.', 'So.']}
+    ${'en-gb'} | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
+    ${'en-us'} | ${['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']} | ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
+    ${'fr'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.']}
+    ${'pt-br'} | ${['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']} | ${['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb']}
+    ${'es'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.', 'dom.']}
+    ${'it'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom']}
+    ${'tr'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']}
+    ${'pl'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['pon', 'wt', 'śr', 'czw', 'pt', 'sob', 'ndz']}
+    ${'mn'}    | ${['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']} | ${['Ням', 'Дав', 'Мяг', 'Лха', 'Пүр', 'Баа', 'Бям']}
+    ${'uk'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'нд']}
+    ${'hu'}    | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['hét', 'kedd', 'sze', 'csüt', 'pén', 'szo', 'vas']}
+    ${'zh-cn'} | ${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']} | ${['周一', '周二', '周三', '周四', '周五', '周六', '周日']}
+  `('should return correct mappings in $locale', ({locale, expectedValues, expectedTexts}) => {
+    it(`Localized Text:      ${expectedTexts}
+        Weekday Values (en): ${expectedValues}
+    `, () => {
       moment.locale(locale);
 
       const weekdayNames = moment.weekdays(true);
@@ -96,7 +54,6 @@ describe('can localize shorthand weekday names, but can keep the values in Engli
 
       expect(texts).toEqual(expectedTexts);
       expect(values).toEqual(expectedValues);
-      moment.locale(oldLocale);
     });
   });
 });
