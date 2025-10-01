@@ -201,6 +201,10 @@ class RHAPISession(RHManageSessionBase):
             update_session(self.session, data)
         return SessionSchema().jsonify(self.session)
 
+    def _process_DELETE(self):
+        delete_session(self.session)
+        return '', 204
+
 
 class RHAPISessionList(RHManageSessionsBase):
 
@@ -212,8 +216,8 @@ class RHAPICreateSession(RHManageSessionsBase):
 
     @use_args(SessionSchema)
     def _process_POST(self, data):
-        print('session data', data)
-        create_session(self.event, data)
+        session = create_session(self.event, data)
+        return SessionSchema().jsonify(session)
 
 
 class RHAPICreateSessionBlock(RHManageSessionBase):

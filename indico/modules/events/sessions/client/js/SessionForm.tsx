@@ -29,7 +29,7 @@ interface SessionFormProps {
   header: string;
   locationParent: any;
   onSubmit: (formData: any) => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 interface SessionFormFieldsProps {
@@ -84,7 +84,7 @@ export function SessionFormFields({
   );
 }
 
-function SessionForm({
+export function SessionForm({
   eventType,
   sessionTypes,
   initialValues,
@@ -98,9 +98,9 @@ function SessionForm({
       id="session-form"
       header={header}
       onSubmit={onSubmit}
-      onClose={onClose}
       initialValues={initialValues}
       size="small"
+      {...(onClose ? {onClose} : {})}
     >
       <SessionFormFields {...{eventType, sessionTypes, locationParent}} />
     </FinalModalForm>
