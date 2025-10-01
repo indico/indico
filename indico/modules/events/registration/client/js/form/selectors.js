@@ -12,6 +12,7 @@ import {Translate} from 'indico/react/i18n';
 
 export const getStaticData = state => state.staticData;
 
+/** Get all sections, including disabled ones. */
 export const getFlatSections = state => state.sections;
 export const getItems = state => state.items;
 export const getHiddenItemsInitialized = state => state.hiddenItems.ready;

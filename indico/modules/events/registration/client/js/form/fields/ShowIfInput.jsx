@@ -14,15 +14,25 @@ import {FinalDropdown} from 'indico/react/forms';
 import {Fieldset, unsortedArraysEqual} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {getItems, getFlatSections} from '../selectors';
+import {getItems, getNestedSections} from '../selectors';
 
 import {getFieldRegistry} from './registry';
 
 export function ShowIfInput({fieldId: thisFieldId}) {
   const fields = useSelector(getItems);
-  const sections = useSelector(getFlatSections);
+  const sections = useSelector(getNestedSections);
   const fieldRegistry = getFieldRegistry();
   const form = useForm();
+
+  const choices = sections.flatMap(section =>
+    section.items
+      .filter(({id, inputType}) => id !== thisFieldId && !!fieldRegistry[inputType].showIfOptions)
+      .map(({title, id: fieldId, isEnabled}) => ({
+        value: fieldId,
+        text: `${section.title} » ${title}`,
+        disabled: !isEnabled,
+      }))
+  );
 
   return (
     <Fieldset legend={Translate.string('Show if')}>
@@ -31,15 +41,7 @@ export function ShowIfInput({fieldId: thisFieldId}) {
         /* i18n: Form field */
         label={Translate.string('Field')}
         placeholder={Translate.string('Select field...')}
-        options={Object.values(fields)
-          .filter(
-            ({id, inputType}) => id !== thisFieldId && !!fieldRegistry[inputType].showIfOptions
-          )
-          .map(({title, id: fieldId, sectionId, isEnabled}) => ({
-            value: fieldId,
-            text: `${sections[sectionId].title} » ${title}`,
-            disabled: !isEnabled,
-          }))}
+        options={choices}
         closeOnChange
         selection
         allowNull
