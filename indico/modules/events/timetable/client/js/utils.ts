@@ -83,11 +83,15 @@ export function getDefaultColorByType(type: EntryType): Colors {
   }[type];
 }
 
+export function mapTTColor(dbColors): Colors {
+    return {color: dbColors.text, backgroundColor: dbColors.background};
+}
+
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
 
   const fallbackColor = colors
-    ? {color: colors.text, backgroundColor: colors.background}
+    ? mapTTColor(colors)
     : getDefaultColorByType(dbEntry.type);
 
   if (type === EntryType.SessionBlock) {
@@ -112,6 +116,13 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
     case EntryType.Break:
       return `b${id}`;
   }
+};
+
+export const mapTTDataToSession = (data): Session => {
+  data = camelizeKeys(data);
+  data.colors = mapTTColor(data.colors);
+  data.defaultContributionMinutes = data.defaultContributionDuration / 60;
+  return data;
 };
 
 export const mapTTDataToEntry = (
@@ -249,4 +260,16 @@ export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number
     ...child,
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
+}
+
+/*
+ * Gets rid of all top-level keys that are the same as the reference object.
+ */
+export function filterEqualKeysByRef(obj, refObj) {
+  return Object.keys(obj).reduce((acc, curr) => {
+    if (obj[curr] !== refObj[curr]) {
+      acc[curr] = obj[curr];
+    }
+    return acc;
+  }, {});
 }

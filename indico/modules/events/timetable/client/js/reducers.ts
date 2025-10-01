@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 
 import * as actions from './actions';
@@ -412,10 +413,20 @@ export default {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
-      case actions.ADD_SESSION_DATA:
+      case actions.EDIT_SESSION:
         return preprocessSessionData({
           ...Object.fromEntries(Object.entries(state)),
-          [action.data.id]: {...action.data, isPoster: false},
+          [action.session.id]: {...action.session, isPoster: false},
+        });
+      case actions.DELETE_SESSION: {
+        return _.omit(state, action.sessionId);;
+      }
+      case actions.CREATE_SESSION:
+        console.log('sessions', state);
+        console.log('create session', action.session);
+        return preprocessSessionData({
+          ...Object.fromEntries(Object.entries(state)),
+          [action.session.id]: {...action.session, isPoster: false},
         });
       default:
         return state;
@@ -435,7 +446,7 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action) => {
+  display: (state = {showUnscheduled: true}, action) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};

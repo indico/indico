@@ -8,15 +8,16 @@
 import {partition} from 'lodash';
 import {Moment} from 'moment';
 import React, {Fragment, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
 
-import SessionEditForm, {SessionCreateForm} from 'indico/modules/events/sessions/SessionForm';
 import {Translate} from 'indico/react/i18n';
 
+import * as actions from './actions';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
-import {UnscheduledContrib} from './types';
+import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
+import {Session, UnscheduledContrib} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum GenericFilterType {
@@ -47,6 +48,7 @@ function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: Unsc
 }
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
+  const dispatch = useDispatch();
   const minSidebarWidthPx = 280;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -56,11 +58,11 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>();
   const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
 
-  const eventId = useSelector(selectors.getEventId);
-  const eventType = useSelector(selectors.getEventType);
   const contribs = useSelector(selectors.getUnscheduled);
   const sessions = useSelector(selectors.getSessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
+
+  console.log('changted sessions', sessions);
 
   const contribsGrouped = useMemo(
     () => Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session'),
@@ -71,14 +73,13 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     return selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
   }, [contribs, selectedFilter, contribsGrouped]);
 
-  const [sessionsWithContribs, sessionsWithoutContribs] = useMemo(
-    () =>
+  const [sessionsWithContribs, sessionsWithoutContribs] = 
       partition(
-        Object.entries(sessions)
-          .map(([id, session]) => ({
-            value: id,
+        Object.values(sessions)
+          .map(session => ({
+            value: session.id,
             title: session.title,
-            count: (contribsGrouped[id] ?? []).length,
+            count: (contribsGrouped[session.id] ?? []).length,
             text: (
               <div styleName="session">
                 <Label empty circular style={{...session.colors}} />
@@ -88,9 +89,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
           }))
           .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
         e => e.count > 0
-      ),
-    [sessions, contribsGrouped]
-  );
+      )
 
   const dropdownSessions = [
     {
@@ -154,12 +153,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   function onMouseMove(e: MouseEvent) {
     if (resizing.current) {
       const diff = e.pageX - initialPosition.current;
-      const width = wrapperRef.current.offsetWidth + diff;
-
-      if (width >= minSidebarWidthPx) {
-        initialPosition.current = e.pageX;
-        wrapperRef.current.style.width = `${width}px`;
-      }
+      const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
+      initialPosition.current = wrapperRef.current.offsetLeft + width;
+      wrapperRef.current.style.width = `${width}px`;
     }
   }
 
@@ -210,6 +206,19 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   onClick={() => setSelectedSessionId(selectedFilter)}
                 />
               )}
+              {Number.isInteger(selectedFilter) && (
+                <Button
+                  basic
+                  type="button"
+                  title={Translate.string('Delete selected session')}
+                  icon="trash"
+                  size="small"
+                  onClick={() => {
+                    dispatch(actions.deleteSession(selectedFilter));
+                    setSelectedFilter(null);
+                  }}
+                />
+              )}
               <Button
                 basic
                 type="button"
@@ -219,21 +228,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 onClick={() => setSelectedSessionId('draft')}
               />
             </div>
-            {selectedSessionId === 'draft' && (
-              <SessionCreateForm
-                eventId={eventId}
-                eventType={eventType}
-                onClose={() => setSelectedSessionId(null)}
-              />
-            )}
-            {Number.isInteger(selectedSessionId) && (
-              <SessionEditForm
-                eventId={eventId}
-                eventType={eventType}
-                sessionId={selectedSessionId as number}
-                onClose={() => setSelectedSessionId(null)}
-              />
-            )}
             {currentContribs.length > 0 ? (
               <UnscheduledContributionList dt={dt} contribs={currentContribs} />
             ) : (
@@ -248,6 +242,21 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
             initialPosition.current = e.pageX;
           }}
         />
+        {selectedSessionId &&
+          (selectedSessionId === 'draft' ? (
+            <TimetableSessionCreateModal
+              onClose={() => setSelectedSessionId(null)}
+              onSuccess={(session: Session) => {
+                setSelectedFilter(session.id)
+              }}
+              sessionId={selectedSessionId}
+            />
+          ) : (
+            <TimetableSessionEditModal
+              onClose={() => setSelectedSessionId(null)}
+              sessionId={selectedSessionId}
+            />
+          ))}
       </>
     )
   );
