@@ -58,6 +58,19 @@ def _get_reminder_cloner(sender, **kwargs):
     return ReminderCloner
 
 
+@signals.core.get_placeholders.connect_via('event-reminder-email')
+def _get_event_reminder_placeholders(sender, recipient=None, event=None, **kwargs):
+    from indico.modules.events.placeholders import (EventLinkPlaceholder, EventStartDatePlaceholder,
+                                                    EventStartTimePlaceholder, EventTitlePlaceholder)
+    from indico.modules.events.reminders.placeholders import RecipientFirstNamePlaceholder, RecipientLastNamePlaceholder
+    yield RecipientFirstNamePlaceholder
+    yield RecipientLastNamePlaceholder
+    yield EventTitlePlaceholder
+    yield EventLinkPlaceholder
+    yield EventStartDatePlaceholder
+    yield EventStartTimePlaceholder
+
+
 class ReminderCloner(EventCloner):
     name = 'reminders'
     friendly_name = _('Reminders')

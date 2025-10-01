@@ -16,8 +16,10 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders.models.reminders import ReminderType
+from indico.modules.events.reminders.placeholders import RecipientFirstNamePlaceholder, RecipientLastNamePlaceholder
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.placeholders import render_placeholder_info
 from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
@@ -114,6 +116,7 @@ class ReminderForm(IndicoForm):
 
         else:
             self.message.label.text = _('Email body')
+            self.message.description = render_placeholder_info('event-reminder-email')
             del self.include_summary
             del self.include_description
 
@@ -136,7 +139,19 @@ class ReminderForm(IndicoForm):
             return
         scheduled_dt = self.scheduled_dt.data
         if scheduled_dt is not None and scheduled_dt.date() < now_utc().date():
-            raise ValidationError(_('The specified date is in the past'))
+            raise ValidationError(_('The specified date is in the past.'))
+
+    def _validate_recipient_placeholders(self, field):
+        if self._reminder_type == ReminderType.custom and self.recipients.data:
+            if RecipientFirstNamePlaceholder.is_in(field.data) or RecipientLastNamePlaceholder.is_in(field.data):
+                raise ValidationError(_('Recipient-specific placeholders are not valid '
+                                        'when email addresses entered manually.'))
+
+    def validate_subject(self, field):
+        self._validate_recipient_placeholders(field)
+
+    def validate_message(self, field):
+        self._validate_recipient_placeholders(field)
 
     @generated_data
     def scheduled_dt(self):
