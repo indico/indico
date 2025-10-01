@@ -43,7 +43,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Refactor conference page theme CSS to allow easier theming using CSS variables
+  (:pr:`7110`, thanks :user:`foxbunny`)
 
 
 Version 3.3.8
