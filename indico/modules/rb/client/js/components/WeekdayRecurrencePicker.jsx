@@ -13,10 +13,15 @@ import {Button} from 'semantic-ui-react';
 import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
 export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
-  const WEEKDAYS = moment.weekdays(true).map(wd => ({
-    value: moment().day(wd).locale('en').format('ddd').toLowerCase(),
-    text: moment().isoWeekday(wd).format('ddd'),
-  }));
+  const weekdayNames = moment.weekdays(true);
+  const WEEKDAYS = weekdayNames.map((_, index) => {
+    const firstDayOfWeek = moment.localeData().firstDayOfWeek();
+    const dayNumber = (firstDayOfWeek + index) % 7;
+    return {
+      value: moment().day(dayNumber).locale('en').format('ddd').toLowerCase(),
+      text: moment().day(dayNumber).format('ddd'),
+    };
+  });
 
   const handleDayClick = day => {
     const selected = value.includes(day);
