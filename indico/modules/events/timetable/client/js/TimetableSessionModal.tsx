@@ -48,8 +48,8 @@ export function TimetableSessionEditModal({sessionId, onClose}: TimetableSession
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = (data, form) => {
-    dispatch(actions.editSession(data.id, getChangedValues(data, form)));
+  const handleSubmit = (formData, form) => {
+    dispatch(actions.editSession(data.id, getChangedValues(formData, form)));
     onClose();
   };
 
