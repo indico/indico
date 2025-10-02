@@ -176,11 +176,10 @@ export function editSession(session: Session) {
   };
 }
 
-export function createSession(session: Session, callbackFn?: (session: Session) => unknown) {
+export function createSession(session: Session) {
   return async (dispatch, getState) => {
     const {
       staticData: {eventId},
-      sessions,
     } = getState();
     const url = createSessionURL({event_id: eventId});
 
@@ -191,8 +190,6 @@ export function createSession(session: Session, callbackFn?: (session: Session) 
         type: CREATE_SESSION,
         session: mapTTDataToSession(newSession),
       });
-      console.log('state', sessions);
-      callbackFn(newSession);
     } catch (e) {
       handleAxiosError(e);
     }
@@ -207,7 +204,10 @@ export function deleteSession(sessionId: number) {
     const url = sessionURL({event_id: eventId, session_id: sessionId});
 
     return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.delete(url))
+      synchronizedAjaxAction(() => indicoAxios.delete(url), {
+        type: DELETE_SESSION,
+        sessionId,
+      })
     );
   };
 }

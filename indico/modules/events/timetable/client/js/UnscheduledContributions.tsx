@@ -7,7 +7,7 @@
 
 import {partition} from 'lodash';
 import {Moment} from 'moment';
-import React, {Fragment, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Fragment, ReactNode, useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
 
@@ -17,7 +17,7 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
-import {Session, UnscheduledContrib} from './types';
+import {UnscheduledContrib} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum GenericFilterType {
@@ -60,18 +60,12 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
   const contribs = useSelector(selectors.getUnscheduled);
   const sessions = useSelector(selectors.getSessions);
+  const prevSessions = useRef(sessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
 
-  console.log('changted sessions', sessions);
+  const contribsGrouped = Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session');
 
-  const contribsGrouped = useMemo(
-    () => Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session'),
-    [contribs]
-  );
-
-  const currentContribs = useMemo(() => {
-    return selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
-  }, [contribs, selectedFilter, contribsGrouped]);
+  const currentContribs = selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
 
   const [sessionsWithContribs, sessionsWithoutContribs] = 
       partition(
@@ -95,6 +89,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     {
       as: FragmentWithoutWarning,
       key: 'sep-filters',
+      disabled: true,
       content: (
         <DropdownHeader>
           <Translate>Filters</Translate>
@@ -116,6 +111,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     {
       as: FragmentWithoutWarning,
       key: 'sep-with-contribs',
+      disabled: true,
       content: (
         <DropdownHeader>
           <Translate>Sessions with contributions</Translate>
@@ -126,6 +122,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     {
       as: FragmentWithoutWarning,
       key: 'sep-without-contribs',
+      disabled: true,
       content: (
         <DropdownHeader>
           <Translate>Empty sessions</Translate>
@@ -169,6 +166,29 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     };
   }, []);
 
+  // Keep track of sessions changes to update filter if needed
+  useEffect(() => {
+    const oldKeys = Object.keys(prevSessions.current);
+    const newKeys = Object.keys(sessions);
+
+    if (
+      !(prevSessions.current && sessions) ||
+      (oldKeys?.length === newKeys?.length)
+    ) {
+      return;
+    }
+
+    let newFilter = null;
+    if (oldKeys.length < newKeys.length) {
+      newFilter = +newKeys
+        .filter(k => !prevSessions.current[k])
+        ?.pop();
+    }
+
+    setSelectedFilter(newFilter);
+    prevSessions.current = sessions;
+  }, [sessions]);
+
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
   //              I propose we have some kind of filter option to search by entry type,
   //              session, etc. If no filters are applied, everything is visible.
@@ -185,12 +205,12 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               <Select
                 button
                 placeholder={Translate.string('Filter sessions')}
+                value={selectedFilter}
                 search={sessionSearch}
-                onClose={blurDropdown}
                 noResultsMessage={Translate.string('No sessions found')}
                 clearable
                 onChange={(_, {value}: {_: unknown; value: FilterType}) => {
-                  // TODO: (Ajob) Fix bug where clicking enter on an options
+                  // TODO: (Ajob) Fix bug where clicking enter on an option
                   //              keeps dropdown open.
                   setSelectedFilter(value);
                 }}
@@ -215,7 +235,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   size="small"
                   onClick={() => {
                     dispatch(actions.deleteSession(selectedFilter));
-                    setSelectedFilter(null);
                   }}
                 />
               )}
@@ -246,10 +265,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
           (selectedSessionId === 'draft' ? (
             <TimetableSessionCreateModal
               onClose={() => setSelectedSessionId(null)}
-              onSuccess={(session: Session) => {
-                setSelectedFilter(session.id)
-              }}
-              sessionId={selectedSessionId}
             />
           ) : (
             <TimetableSessionEditModal

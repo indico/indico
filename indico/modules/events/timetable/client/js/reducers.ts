@@ -414,20 +414,18 @@ export default {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
       case actions.EDIT_SESSION:
-        return preprocessSessionData({
-          ...Object.fromEntries(Object.entries(state)),
-          [action.session.id]: {...action.session, isPoster: false},
-        });
+        return {
+          ...state,
+          ...preprocessSessionData({[action.session.id]: {...action.session}}),
+        };
       case actions.DELETE_SESSION: {
-        return _.omit(state, action.sessionId);;
+        return _.omit(state, action.sessionId);
       }
       case actions.CREATE_SESSION:
-        console.log('sessions', state);
-        console.log('create session', action.session);
-        return preprocessSessionData({
-          ...Object.fromEntries(Object.entries(state)),
-          [action.session.id]: {...action.session, isPoster: false},
-        });
+        return {
+          ...state,
+          ...preprocessSessionData({[action.session.id]: {...action.session, isPoster: false}}),
+        };
       default:
         return state;
     }
