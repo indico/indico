@@ -101,6 +101,10 @@ class GeneralFieldDataSchema(mm.Schema):
             raise ValidationError('The field to show does not belong to the same registration form.')
         if not condition_field.field_impl.allow_condition:
             raise ValidationError('This field cannot be used as a condition.')
+        if not condition_field.is_enabled:
+            raise ValidationError('Disabled fields cannot be used as a condition.')
+        if not condition_field.parent.is_enabled:
+            raise ValidationError('Fields in disabled sections cannot be used as a condition.')
         # Avoid cycles
         next_field_id = field_id
         while next_field_id is not None:
