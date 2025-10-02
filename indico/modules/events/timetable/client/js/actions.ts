@@ -28,7 +28,7 @@ import {
   UnscheduledContribEntry,
   Session,
 } from './types';
-import {getEntryURLByObjId, filterEqualKeysByRef, mapTTDataToSession} from './utils';
+import {getEntryURLByObjId, mapTTDataToSession} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -157,20 +157,20 @@ export function setSessionData(data) {
   return {type: SET_SESSION_DATA, data};
 }
 
-export function editSession(session: Session) {
+export function editSession(sessionId: number, session: Session) {
   return (dispatch, getState) => {
     const {
       staticData: {eventId},
       sessions,
     } = getState();
-    const url = sessionURL({event_id: eventId, session_id: session.id});
-    const oldSession = sessions[session.id];
-    const sessionChangeObj = filterEqualKeysByRef(session, oldSession);
+    const url = sessionURL({event_id: eventId, session_id: sessionId});
+    const newSessionObj = mapTTDataToSession(session);
+    const changedSession = {...sessions[sessionId], ...newSessionObj};
 
     return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.patch(url, sessionChangeObj), {
+      synchronizedAjaxAction(() => indicoAxios.patch(url, session), {
         type: EDIT_SESSION,
-        session: mapTTDataToSession(session),
+        session: changedSession,
       })
     );
   };

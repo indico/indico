@@ -118,9 +118,13 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
 
 export const mapTTDataToSession = (data): Session => {
   data = camelizeKeys(data);
-  data.colors = mapTTColor(data.colors);
-  data.defaultContributionMinutes = data.defaultContributionDuration / 60;
-  return data;
+  return {
+    ...data,
+    ...(data.colors && {colors: mapTTColor(data.colors)}),
+    ...(data.defaultContributionDuration && {
+      defaultContribDurationMinutes: data.defaultContributionDuration / 60,
+    }),
+  };
 };
 
 export const mapTTDataToEntry = (
@@ -258,16 +262,4 @@ export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number
     ...child,
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
-}
-
-/*
- * Gets rid of all top-level keys that are the same as the reference object.
- */
-export function filterEqualKeysByRef(obj, refObj) {
-  return Object.keys(obj).reduce((acc, curr) => {
-    if (obj[curr] !== refObj[curr]) {
-      acc[curr] = obj[curr];
-    }
-    return acc;
-  }, {});
 }

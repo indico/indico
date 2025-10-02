@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux/es';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {SessionForm} from 'indico/modules/events/sessions/SessionForm';
+import {getChangedValues} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
@@ -47,11 +48,8 @@ export function TimetableSessionEditModal({sessionId, onClose}: TimetableSession
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = (formData: any) => {
-    if (formData.type === '') {
-      formData.type = null;
-    }
-    dispatch(actions.editSession(formData));
+  const handleSubmit = (data, form) => {
+    dispatch(actions.editSession(data.id, getChangedValues(data, form)));
     onClose();
   };
 
