@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import sessionURL from 'indico-url:sessions.api_manage_session';
 import sessionColorURL from 'indico-url:sessions.api_random_session_color';
 import locationParentURL from 'indico-url:sessions.api_sessions_location_parent';
