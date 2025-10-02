@@ -593,12 +593,25 @@ class RHUserEmails(RHUserBase):
     def _process(self):
         form = UserEmailsForm()
         if form.validate_on_submit():
-            self._send_confirmation(form.email.data)
+            email = form.email.data
+
+            # Admin adding email for another user: skip verification
+            if session.user.is_admin and session.user != self.user:
+                self.user.secondary_emails.add(email)
+                self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added by admin', session.user,
+                              data={'Email': email})
+                signals.users.email_added.send(self.user, email=email, silent=False)
+                flash(_('The email address {email} has been added to the account.').format(email=email), 'success')
+                return redirect(url_for('.user_emails'))
+
+            # Normal flow: send confirmation
+            self._send_confirmation(email)
             self.user.log(UserLogRealm.user, LogKind.other, 'Profile', 'Validating new secondary email',
-                          session.user, data={'Email': form.email.data})
+                          session.user, data={'Email': email})
             flash(_('We have sent an email to {email}. Please click the link in that email within 24 hours to '
-                    'confirm your new email address.').format(email=form.email.data), 'success')
+                    'confirm your new email address.').format(email=email), 'success')
             return redirect(url_for('.user_emails'))
+
         return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
 
