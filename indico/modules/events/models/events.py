@@ -765,6 +765,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             yield 'notes_edit'
             if self.scheduled_notes:
                 yield 'notes_compile'
+        yield 'summarize'
         if self.can_manage_attachments(session.user):
             yield 'attachments_edit'
 
