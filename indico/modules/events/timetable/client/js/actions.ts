@@ -21,9 +21,9 @@ import {
   ChildBreakEntry,
   ContribEntry,
   ChildContribEntry,
-  UnscheduledContrib,
   EntryType,
   Entry,
+  UnscheduledContribEntry,
 } from './types';
 import {getEntryURLByObjId} from './utils';
 
@@ -86,7 +86,7 @@ interface ScheduleEntryAction {
   type: typeof SCHEDULE_ENTRY;
   date: string;
   entries: TopLevelEntry[];
-  unscheduled: UnscheduledContrib[];
+  unscheduled: UnscheduledContribEntry[];
 }
 
 interface UnscheduleEntryAction {
@@ -240,7 +240,7 @@ export function scheduleEntry(
   contribId: number,
   startDt: Moment,
   entries: TopLevelEntry[],
-  unscheduled: UnscheduledContrib[],
+  unscheduled: UnscheduledContribEntry[],
   blockId?: number
 ) {
   const scheduleURL = scheduleContribURL(
