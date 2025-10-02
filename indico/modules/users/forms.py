@@ -100,6 +100,9 @@ class UserPreferencesForm(IndicoForm):
 class UserEmailsForm(IndicoForm):
     email = EmailField(_('Add new email address'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x])
 
+    # Only show for admins; set in the view
+    skip_validation = BooleanField(_('Skip email validation (admin only)'))
+
     def validate_email(self, field):
         conflict = (UserEmail.query
                     .filter(~User.is_pending,

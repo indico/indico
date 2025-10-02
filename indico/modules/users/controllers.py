@@ -50,7 +50,8 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
-from indico.modules.users.operations import create_user, delete_or_anonymize_user, grant_admin, revoke_admin
+from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
+                                             revoke_admin)
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
@@ -592,15 +593,18 @@ class RHUserEmails(RHUserBase):
 
     def _process(self):
         form = UserEmailsForm()
+
+        # Only show the checkbox with email verification skip flag if user is admin and editing another user
+        show_skip = session.user.is_admin and session.user != self.user
+        if not show_skip:
+            del form.skip_validation
+
         if form.validate_on_submit():
             email = form.email.data
+            skip_validation = getattr(form, 'skip_validation', None) and form.skip_validation.data
 
-            # Admin adding email for another user: skip verification
-            if session.user.is_admin and session.user != self.user:
-                self.user.secondary_emails.add(email)
-                self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added by admin',
-                              session.user, data={'Email': email})
-                signals.users.email_added.send(self.user, email=email, silent=False)
+            if skip_validation:
+                add_secondary_email(self.user, email, session.user)
                 flash(_('The email address {email} has been added to the account.').format(email=email), 'success')
                 return redirect(url_for('.user_emails'))
 
@@ -642,23 +646,7 @@ class RHUserEmailsVerify(RHUserBase):
         valid, existing = self._validate(data)
         if valid:
             self.token_storage.delete(token)
-
-            if existing and existing.is_pending:
-                logger.info('Found pending user %s to be merged into %s', existing, self.user)
-
-                # If the pending user has missing names, copy them from the active one
-                # to allow it to be marked as not pending and deleted during the merge.
-                existing.first_name = existing.first_name or self.user.first_name
-                existing.last_name = existing.last_name or self.user.last_name
-
-                merge_users(existing, self.user)
-                flash(_("Merged data from existing '{}' identity").format(existing.email))
-                existing.is_pending = False
-
-            self.user.secondary_emails.add(data['email'])
-            self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added', session.user,
-                          data={'Email': data['email']})
-            signals.users.email_added.send(self.user, email=data['email'], silent=False)
+            add_secondary_email(self.user, data['email'], session.user)
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 

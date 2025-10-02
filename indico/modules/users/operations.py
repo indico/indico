@@ -14,7 +14,8 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
 from indico.modules.users import User, logger
-from indico.modules.users.util import anonymize_user
+from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.util import anonymize_user, merge_users
 
 
 def create_user(email, data, identity=None, settings=None, other_emails=None, from_moderation=True):
@@ -73,6 +74,34 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     user.log(UserLogRealm.user, LogKind.positive, 'User', 'User created', session.user if session else None, data=data)
     db.session.flush()
     return user
+
+
+def add_secondary_email(user, email, actor, merge_pending=True):
+    """
+    Adds a secondary email to a user, optionally merging a pending user with the same email.
+
+    If a pending user exists with the given email, merges that user into the target user
+    before adding the email. Logs the action and emits the email_added signal.
+
+    :param user: The target `User` to add the secondary email to.
+    :param email: The email address to add as a secondary email.
+    :param actor: The `User` performing the action (for logging).
+    :param merge_pending: Whether to merge a pending user with the same email (default: True).
+    """
+    from indico.modules.logs.models.entries import LogKind, UserLogRealm
+    from indico.modules.users import logger, signals
+
+    existing = UserEmail.query.filter_by(is_user_deleted=False, email=email).first()
+    if merge_pending and existing and existing.user.is_pending:
+        logger.info('Found pending user %s to be merged into %s', existing.user, user)
+        existing.user.first_name = existing.user.first_name or user.first_name
+        existing.user.last_name = existing.user.last_name or user.last_name
+        merge_users(existing.user, user)
+        existing.user.is_pending = False
+
+    user.secondary_emails.add(email)
+    user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added', actor, data={'Email': email})
+    signals.users.email_added.send(user, email=email, silent=False)
 
 
 def delete_or_anonymize_user(user):
