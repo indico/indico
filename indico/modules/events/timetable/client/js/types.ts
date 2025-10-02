@@ -127,7 +127,9 @@ export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
 
 export function isChildEntry(entry: Entry): entry is ChildEntry {
-  return 'sessionBlockId' in entry;
+  // TODO: (Ajob) This is bypassing the 'Entry' type check because 'sessionBlockId'
+  //              is not in the 'Entry' type. Find cleaner solution
+  return entry['sessionBlockId'];
 }
 
 // Request objects (lowercase)
