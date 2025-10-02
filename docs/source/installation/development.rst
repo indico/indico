@@ -127,12 +127,28 @@ You'll then be able to access the message log at `<http://localhost:1080>`_.
 Creating the DB
 ---------------
 
+Linux
++++++
+
 .. code-block:: shell
 
     sudo -u postgres createuser $USER --createdb
     sudo -u postgres createdb indico_template -O $USER
     sudo -u postgres psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
     createdb indico -T indico_template
+
+macOS
++++++
+If you’re on macOS with PostgreSQL installed via Homebrew, you should not use `sudo -u postgres …` — that only works on Linux systems where a system user named postgres exists.
+Use the follwing instead:
+
+.. code-block:: shell
+
+    createdb indico_template -O $USER
+    psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
+    createdb indico -T indico_template
+
+
 
 
 .. _configuring-dev:
