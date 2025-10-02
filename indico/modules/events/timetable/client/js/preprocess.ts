@@ -11,7 +11,7 @@ import moment from 'moment';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {
-  Attachments,
+  Attachment,
   ChildEntry,
   Colors,
   DayEntries,
@@ -19,7 +19,7 @@ import {
   LocationData,
   PersonLink,
   Session,
-  UnscheduledContrib,
+  UnscheduledContribEntry,
 } from './types';
 import {getDefaultColorByType} from './utils';
 
@@ -33,6 +33,7 @@ interface SchemaEntry {
   id: string;
   objId: number;
   title: string;
+  description?: string;
   colors?: Colors;
   slotTitle?: string;
 }
@@ -48,7 +49,7 @@ interface SchemaBlock extends SchemaEntry {
   sessionTitle?: string;
   entries?: Record<string, SchemaEntry>;
   personLinks?: PersonLink[];
-  attachments?: Attachments;
+  attachments?: Attachment[];
   locationData: LocationData;
 }
 
@@ -86,7 +87,7 @@ export function preprocessTimetableEntries(
       sessionId: number;
     }[];
   }
-): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
+): {dayEntries: DayEntries; unscheduled: UnscheduledContribEntry[]} {
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];
@@ -130,6 +131,7 @@ export function preprocessTimetableEntries(
         locationData,
         childLocationParent,
         attachments,
+        colors,
       });
 
       if (entry.sessionId) {
@@ -146,6 +148,8 @@ export function preprocessTimetableEntries(
             objId: c.objId,
             id: c.id,
             title: c.title,
+            description: c.description || '',
+            personLinks: c.personLinks || [],
             startDt: dateToMoment(c.startDate),
             duration: c.duration,
             sessionBlockId: dayEntries[day].at(-1).id,
@@ -154,8 +158,6 @@ export function preprocessTimetableEntries(
             column: 0,
             maxColumn: 0,
             colors: c.colors,
-            // TODO
-            // @ts-expect-error the parent attribute is not in the type (yet)
             parent: {
               colors,
               id,
