@@ -598,8 +598,8 @@ class RHUserEmails(RHUserBase):
             # Admin adding email for another user: skip verification
             if session.user.is_admin and session.user != self.user:
                 self.user.secondary_emails.add(email)
-                self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added by admin', session.user,
-                              data={'Email': email})
+                self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added by admin',
+                              session.user, data={'Email': email})
                 signals.users.email_added.send(self.user, email=email, silent=False)
                 flash(_('The email address {email} has been added to the account.').format(email=email), 'success')
                 return redirect(url_for('.user_emails'))
