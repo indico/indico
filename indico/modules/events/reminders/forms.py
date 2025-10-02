@@ -23,6 +23,7 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoRadioField, TimeDeltaField)
 from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
+from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, NoRelativeURLs
 from indico.web.forms.widgets import TinyMCEWidget
 
@@ -83,6 +84,8 @@ class ReminderForm(IndicoForm):
         self._reminder_type = reminder_type
         self._render_mode = render_mode
         self.timezone = self.event.timezone
+        if self._reminder_type == ReminderType.custom:
+            inject_validators(self, 'message', [DataRequired()])
         super().__init__(*args, **kwargs)
         allowed_senders = self.event.get_allowed_sender_emails(include_noreply=True,
                                                                extra=self.reply_to_address.object_data)
@@ -108,8 +111,6 @@ class ReminderForm(IndicoForm):
 
         else:
             self.message.label.text = _('Email body')
-            self.message.validators.append(DataRequired())
-            self.message.flags.required = True
             del self.include_summary
             del self.include_description
 
