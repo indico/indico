@@ -11,11 +11,12 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
+import {SemanticICONS} from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {Colors, Entry, EntryType, Session} from './types';
+import {BlockEntry, Colors, Entry, EntryType, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -84,6 +85,7 @@ export function getDefaultColorByType(type: EntryType): Colors {
 
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
+
   const fallbackColor = colors
     ? {color: colors.text, backgroundColor: colors.background}
     : getDefaultColorByType(dbEntry.type);
@@ -101,18 +103,22 @@ export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {})
   return fallbackColor;
 }
 
-export const getEntryUniqueId = (entry): string => {
-  switch (entry.type) {
+export const getEntryUniqueId = (type: EntryType, id: string): string => {
+  switch (type) {
     case EntryType.SessionBlock:
-      return `s${entry.id}`;
+      return `s${id}`;
     case EntryType.Contribution:
-      return `c${entry.id}`;
+      return `c${id}`;
     case EntryType.Break:
-      return `b${entry.id}`;
+      return `b${id}`;
   }
 };
 
-export const mapTTDataToEntry = (data, sessions): Entry => {
+export const mapTTDataToEntry = (
+  data,
+  sessions: Record<number, Session> = {},
+  parent?: Partial<BlockEntry>
+): Entry => {
   data = camelizeKeys(data);
   const {
     type,
@@ -135,7 +141,7 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
   } = data;
 
   const mappedObj = {
-    id: getEntryUniqueId(data),
+    id: getEntryUniqueId(type, id),
     objId: id,
     type,
     title,
@@ -158,14 +164,30 @@ export const mapTTDataToEntry = (data, sessions): Entry => {
     sessionBlockId: sessionBlockId || null,
     sessionTitle: sessionTitle || '',
     colors: mapTTEntryColor(data, sessions),
+    ...(sessionId && {sessionId}),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
+    }),
+    ...(parent && {
+      parent: {
+        id: parent.id,
+        objId: parent.objId,
+        colors: parent.colors,
+        title: parent.title,
+      },
+    }),
   };
-
-  if (sessionBlockId) {
-    mappedObj.sessionBlockId = `s${sessionBlockId}`;
-  }
 
   return mappedObj;
 };
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
+}
 
 export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
   return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
