@@ -17,7 +17,7 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
-import {UnscheduledContrib} from './types';
+import {UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum GenericFilterType {
@@ -30,7 +30,7 @@ function FragmentWithoutWarning({key, children}: {key: string; children: ReactNo
   return <Fragment key={key}>{children}</Fragment>;
 }
 
-function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: UnscheduledContrib[]}) {
+function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: UnscheduledContribEntry[]}) {
   return (
     <div styleName="contributions-list">
       {contribs.map(contrib => (
