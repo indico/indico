@@ -46,16 +46,16 @@ export interface LocationData {
   roomName: string;
   inheriting?: boolean;
 }
-
 export interface LocationParent {
   location_data: LocationParent;
   type: string;
   title: string;
 }
-
-export interface Attachments {
-  files: object[];
-  folders: object[];
+export interface Attachment {
+  type: 'attachment' | 'folder';
+  downloadURL: string;
+  id: number;
+  title: string;
 }
 
 export interface Session {
@@ -73,11 +73,11 @@ export interface BaseEntry {
   title: string;
   duration: number;
   description: string;
+  personLinks: PersonLink[];
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
-  attachments?: Attachments;
-  personLinks: PersonLink[];
+  attachments?: Attachment[];
 }
 
 export interface ScheduledMixin {
@@ -88,39 +88,42 @@ export interface ScheduledMixin {
   maxColumn: number | null;
 }
 
-export interface UnscheduledContrib extends BaseEntry {
+export interface UnscheduledContribEntry extends BaseEntry {
   type: EntryType.Contribution;
   sessionId?: number;
 }
 
-export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {
+export interface ContribEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Contribution;
-  personLinks: PersonLink[];
+  attachments?: Attachment[];
+  sessionId?: number;
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.Break;
   sessionId?: number;
-  backgroundColor: string;
 }
-
-export interface ChildContribEntry extends ContribEntry {
-  sessionBlockId: string;
-}
-
-export interface ChildBreakEntry extends BreakEntry {
-  sessionBlockId: string;
-}
-
-export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.SessionBlock;
   sessionId: number;
   sessionTitle: string;
+  // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
+  personLinks: PersonLink[];
   childLocationParent: LocationParent;
+  attachments?: Attachment[];
+  colors?: Colors;
 }
+
+export interface ChildBaseEntry {
+  sessionBlockId?: string;
+  parent?: Partial<BlockEntry>;
+}
+
+export type ChildContribEntry = ContribEntry & ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
+export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;
