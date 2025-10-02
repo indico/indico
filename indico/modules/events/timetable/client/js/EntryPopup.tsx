@@ -260,7 +260,7 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
             />
             <ActionPopup
               content={<Translate>Add new child</Translate>}
-              trigger={<Button basic icon="plus" onClick={onCreateChild.bind(this)} />}
+              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
             />
           </>
         )}
@@ -271,19 +271,12 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         {type === EntryType.Contribution ? (
           <ActionPopup
             content={<Translate>Unschedule contribution</Translate>}
-            trigger={<Button basic icon="calendar times" onClick={onDelete.bind(this)} />}
+            trigger={<Button basic icon="calendar times" onClick={onDelete} />}
           />
         ) : (
           <ActionPopup
             content={Translate.string('Delete')}
-            trigger={
-              <Button
-                basic
-                title={Translate.string('Delete')}
-                icon="trash"
-                onClick={onDelete.bind(this)}
-              />
-            }
+            trigger={<Button basic icon="trash" onClick={onDelete} />}
           />
         )}
       </Card.Content>
