@@ -139,7 +139,7 @@ Linux
 
 macOS
 +++++
-If you’re on macOS with PostgreSQL installed via Homebrew, you should not use `sudo -u postgres …` — that only works on Linux systems where a system user named postgres exists.
+If you’re on macOS with PostgreSQL installed via Homebrew, you should not use ``sudo -u postgres …`` — that only works on Linux systems where a system user named postgres exists.
 Use the follwing instead:
 
 .. code-block:: shell
@@ -197,7 +197,7 @@ On the second one we'll run the Indico Development server:
 
     indico run -h <your-hostname> -q --enable-evalex
 
-Double-check that your hostname matches that which has been set in the config file (by the wizard). If you went with the default settings provided by the wizard it should be something like `indico run -h 127.0.0.1 -p 8000 -q --enable-evalex`. 
+Double-check that your hostname matches that which has been set in the config file (by the wizard). If you went with the default settings provided by the wizard it should be something like ``indico run -h 127.0.0.1 -p 8000 -q --enable-evalex``. 
 
 It is also worth mentioning that when working on a plugin, it is necessary to run another webpack watcher
 to build the plugin assets. That can be accomplished using the same command as above with an argument specifying
