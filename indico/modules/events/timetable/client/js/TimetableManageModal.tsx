@@ -33,8 +33,8 @@ import {BreakFormFields} from './BreakForm';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {EntryType, Session} from './types';
-import {DATE_KEY_FORMAT, mapTTDataToEntry, shiftEntries} from './utils';
+import {BlockEntry, EntryType, Session} from './types';
+import {DATE_KEY_FORMAT, getEntryUniqueId, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
 
@@ -98,12 +98,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dayEntries = useSelector(selectors.getCurrentDayEntries);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
-  const {objId} = entry;
+  const {objId, sessionBlockId} = entry;
   const isEditing = !!objId;
-  const {sessionBlockId} = entry;
   const isCreatingChild = !!sessionBlockId;
+  const parent = dayEntries.find(
+    e => e.id === getEntryUniqueId(EntryType.SessionBlock, sessionBlockId)
+  ) as Partial<BlockEntry>;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -128,7 +131,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
     code: entry.code,
-    colors: entry.colors,
+    ...(entry.colors && {
+      colors: {
+        text: entry.colors.color,
+        background: entry.colors.backgroundColor,
+      },
+    }),
   };
 
   const typeLongNames = {
@@ -295,7 +303,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData, sessions);
+    const resEntry = mapTTDataToEntry(resData, sessions, parent);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {

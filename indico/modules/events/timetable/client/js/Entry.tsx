@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, SemanticICONS} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -19,8 +19,15 @@ import {getWidthAndOffset} from './layout';
 import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ContribEntry, EntryType, BlockEntry, ScheduledMixin, BaseEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
+import {ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {
+  minutesToPixels,
+  pixelsToMinutes,
+  snapPixels,
+  snapMinutes,
+  formatBlockTitle,
+  getIconByEntryType,
+} from './utils';
 
 import './DayTimetable.module.scss';
 import './ContributionEntry.module.scss';
@@ -34,14 +41,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {
-    listeners: _listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: `${id}`,
-  });
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -93,20 +93,17 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
     />
   );
 
-  if (isSelected && !isDragging) {
-    return (
-      <EntryPopup
-        trigger={entry}
-        onClose={() => {
-          dispatch(actions.deselectEntry());
-        }}
-        // @ts-expect-error The popup will be rewritten soon so let's just ignore this for now
-        entry={{id, ...rest}}
-      />
-    );
-  }
-
-  return entry;
+  return (
+    <EntryPopup
+      trigger={entry}
+      open={isSelected}
+      onClose={() => {
+        dispatch(actions.deselectEntry());
+      }}
+      // @ts-expect-error The popup will be rewritten soon so let's just ignore this for now
+      entry={{id, ...rest}}
+    />
+  );
 }
 
 interface DraggableBlockEntryProps extends BlockEntry {
@@ -138,6 +135,7 @@ interface _EntryProps {
 
 type DraggableContribEntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
+// TODO: (Ajob) Fix these type errors
 export default function ContributionEntry({
   type,
   id,
@@ -146,7 +144,6 @@ export default function ContributionEntry({
   title,
   blockRef,
   sessionTitle,
-  colors,
   selected,
   y,
   listeners,
@@ -155,11 +152,13 @@ export default function ContributionEntry({
   isDragging,
   column,
   maxColumn,
-  parent,
   setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
+  // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
+  parent,
+  colors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
@@ -169,10 +168,8 @@ export default function ContributionEntry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({
-    id: `${id}`,
-    // disabled: true,
-  });
+  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
@@ -324,11 +321,7 @@ export function EntryTitle({
   timeRange: string;
   type: EntryType;
 }) {
-  const iconName = {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
-  }[type] as SemanticICONS;
+  const iconName = getIconByEntryType(type);
 
   const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 
