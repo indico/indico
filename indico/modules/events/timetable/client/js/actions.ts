@@ -10,7 +10,7 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import moment, {Moment} from 'moment';
+import {Moment} from 'moment';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -22,7 +22,6 @@ import {
   ContribEntry,
   ChildContribEntry,
   UnscheduledContrib,
-  EntryType,
   Entry,
 } from './types';
 import {getEntryURLByObjId} from './utils';
@@ -32,7 +31,7 @@ export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
 export const SET_CURRENT_DATE = 'Set current date';
 export const ADD_SESSION_DATA = 'Add session data';
-export const MOVE_ENTRY = 'Move entry';
+export const CHANGE_ENTRY_LAYOUT = 'Change entry layout';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
@@ -67,10 +66,12 @@ interface ResizeEntryAction {
   entry: Entry;
 }
 
-interface MoveEntryAction {
-  type: typeof MOVE_ENTRY;
+interface ChangeEntryLayoutAction {
+  type: typeof CHANGE_ENTRY_LAYOUT;
   date: string;
   entries: TopLevelEntry[];
+  entry: TopLevelEntry;
+  sessionBlockId?: number;
 }
 
 interface SelectEntryAction {
@@ -103,8 +104,8 @@ interface CreateEntryAction {
 
 interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
-  entryType: string;
   entry: TopLevelEntry;
+  entryType: string;
   currentDay: string;
 }
 
@@ -131,7 +132,7 @@ interface RedoChangeAction {
 export type Action =
   | SetTimetableDataAction
   | ResizeEntryAction
-  | MoveEntryAction
+  | ChangeEntryLayoutAction
   | SelectEntryAction
   | DeselectEntryAction
   | ScheduleEntryAction
@@ -160,27 +161,32 @@ export function setDraftEntry(data): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
-  let entryURL: string;
+export function changeEntryLayout(
+  entry: Entry,
+  entries: TopLevelEntry[],
+  date: string,
+  sessionBlockId?: number
+) {
+  return (dispatch, getState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
 
-  switch (entry.type) {
-    case EntryType.Break:
-      entryURL = breakURL({event_id: eventId, break_id: entry.objId});
-      break;
-    case EntryType.SessionBlock:
-      entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-      break;
-    default:
-      entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-  }
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
 
-  const entryData = {start_dt: moment(entry.startDt).format('YYYY-MM-DDTHH:mm:ss')};
+    const entryData = {
+      start_dt: entry.startDt.format(),
+      session_block_id: sessionBlockId,
+    };
 
-  return synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
-    type: MOVE_ENTRY,
-    date,
-    entries,
-  });
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+        type: CHANGE_ENTRY_LAYOUT,
+        date,
+        entry,
+        entries,
+      })
+    );
+  };
 }
 
 export function toggleExpand() {
