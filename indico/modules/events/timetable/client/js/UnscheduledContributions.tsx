@@ -67,23 +67,22 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
   const currentContribs = selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
 
-  const [sessionsWithContribs, sessionsWithoutContribs] = 
-      partition(
-        Object.values(sessions)
-          .map(session => ({
-            value: session.id,
-            title: session.title,
-            count: (contribsGrouped[session.id] ?? []).length,
-            text: (
-              <div styleName="session">
-                <Label empty circular style={{...session.colors}} />
-                <span>{session.title}</span>
-              </div>
-            ),
-          }))
-          .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
-        e => e.count > 0
-      )
+  const [sessionsWithContribs, sessionsWithoutContribs] = partition(
+    Object.values(sessions)
+      .map(session => ({
+        value: session.id,
+        title: session.title,
+        count: (contribsGrouped[session.id] ?? []).length,
+        text: (
+          <div styleName="session">
+            <Label empty circular style={{...session.colors}} />
+            <span>{session.title}</span>
+          </div>
+        ),
+      }))
+      .toSorted((o1, o2) => o1.title.localeCompare(o2.title)),
+    e => e.count > 0
+  );
 
   const dropdownSessions = [
     {
@@ -135,13 +134,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const sessionSearch = (options: DropdownItemProps[], value: string) =>
     options.filter(o => o.title && o.title.toLowerCase().includes(value.toLowerCase()));
 
-  const blurDropdown = () => {
-    const searchInput = wrapperRef.current.querySelector<HTMLInputElement>(
-      'div .ui.button.search.selection.dropdown input.search'
-    );
-    searchInput?.blur();
-  };
-
   function onMouseUp() {
     resizing.current = false;
     initialPosition.current = 0;
@@ -171,18 +163,13 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     const oldKeys = Object.keys(prevSessions.current);
     const newKeys = Object.keys(sessions);
 
-    if (
-      !(prevSessions.current && sessions) ||
-      (oldKeys?.length === newKeys?.length)
-    ) {
+    if (!(prevSessions.current && sessions) || oldKeys?.length === newKeys?.length) {
       return;
     }
 
     let newFilter = null;
     if (oldKeys.length < newKeys.length) {
-      newFilter = +newKeys
-        .filter(k => !prevSessions.current[k])
-        ?.pop();
+      newFilter = +newKeys.filter(k => !prevSessions.current[k])?.pop();
     }
 
     setSelectedFilter(newFilter);
@@ -263,9 +250,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         />
         {selectedSessionId &&
           (selectedSessionId === 'draft' ? (
-            <TimetableSessionCreateModal
-              onClose={() => setSelectedSessionId(null)}
-            />
+            <TimetableSessionCreateModal onClose={() => setSelectedSessionId(null)} />
           ) : (
             <TimetableSessionEditModal
               onClose={() => setSelectedSessionId(null)}
