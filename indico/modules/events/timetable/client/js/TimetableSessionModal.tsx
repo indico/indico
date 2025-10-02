@@ -93,10 +93,9 @@ export function TimetableSessionEditModal({
 
 interface TimetableSessionCreateModalProps {
   onClose: () => void;
-  onSuccess: (session: Session) => unknown;
 }
 
-export function TimetableSessionCreateModal({onClose, onSuccess = () => null}: TimetableSessionCreateModalProps) {
+export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateModalProps) {
   const dispatch = useDispatch();
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
@@ -112,7 +111,7 @@ export function TimetableSessionCreateModal({onClose, onSuccess = () => null}: T
   );
 
   const handleSubmit = (formData: any) => {
-    dispatch(actions.createSession(formData, onSuccess));
+    dispatch(actions.createSession(formData));
     onClose();
   };
 
