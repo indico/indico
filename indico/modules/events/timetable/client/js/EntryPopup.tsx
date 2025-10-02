@@ -12,79 +12,56 @@ import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
+import './EntryPopup.module.scss';
 import moment from 'moment';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  Icon,
-  List,
-  Popup,
-  SemanticICONS,
-} from 'semantic-ui-react';
+import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
-import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import './Entry.module.scss';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
-import {formatBlockTitle, mapTTDataToEntry} from './utils';
+import {mapTTDataToEntry} from './utils';
 
-function ColoredDot({color}: {color: string}) {
+function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
-    <div
-      style={{
-        width: 15,
-        minWidth: 15,
-        height: 15,
-        borderRadius: '50%',
-        backgroundColor: color,
-      }}
+    <Popup
+      inverted
+      size="mini"
+      position="bottom center"
+      content={content}
+      trigger={trigger}
+      {...rest}
     />
-  );
-}
-
-function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactNode}) {
-  return (
-    <Card.Description
-      style={{marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 5, textAlign: 'left'}}
-    >
-      <Icon name={icon} size="large" />
-      {children}
-    </Card.Description>
   );
 }
 
 function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
   const dispatch = useDispatch();
   const {
+    id,
+    objId,
     type,
     title,
-    sessionTitle,
-    colors: {backgroundColor},
+    attachments,
+    parent: entryParent,
+    colors,
+    duration,
+    startDt,
+    sessionId,
+    children,
   } = entry;
   const eventId = useSelector(selectors.getEventId);
-  const startTime = moment(entry.startDt);
-  const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
-
-  const session = useSelector((state: ReduxState) =>
-    selectors.getSessionById(state, entry.sessionId)
-  );
-
-  const _getFileCount = () => {
-    const {attachments = {}} = entry;
-    const {files = [], folders = []} = attachments;
-    return files.length + folders.length;
-  };
+  const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const startTime = moment(startDt);
+  const endTime = moment(startDt).add(duration, 'minutes');
 
   const _getOrderedLocationArray = () => {
     const {locationData = {}} = entry;
@@ -94,13 +71,12 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
 
   const _getPresentersArray = () => {
     const {personLinks = []} = entry;
-    return personLinks
-      .filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER))
-      .map(p => p.name);
+    return personLinks.filter(p => !p.roles || p.roles.includes(PersonLinkRole.SPEAKER));
   };
 
-  const onEdit = async () => {
-    const {objId} = entry;
+  const onEdit = async e => {
+    e.stopPropagation();
+    onClose();
     if (!objId) {
       return;
     }
@@ -117,12 +93,11 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     const sessions = session ? {[session.id]: session} : {};
     const draftEntry = mapTTDataToEntry(data, sessions);
 
-    if (entry.type === EntryType.SessionBlock) {
-      draftEntry.children = entry.children;
+    if (type === EntryType.SessionBlock) {
+      (draftEntry as BlockEntry).children = children;
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
-    onClose();
   };
 
   const onCreateChild = async (e: MouseEvent) => {
@@ -150,12 +125,14 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
         sessionId: entry.sessionId,
         locationParent: entry.childLocationParent,
         locationData: {...entry.childLocationParent.location_data, inheriting: true},
+        parent: {id, objId, title, colors},
       })
     );
   };
 
   const onDelete = async (e: MouseEvent) => {
     e.stopPropagation();
+    onClose();
 
     const deleteEntry = {
       [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
@@ -164,109 +141,146 @@ function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
     }[entry.type];
 
     deleteEntry();
-    onClose();
   };
 
   const locationArray = _getOrderedLocationArray();
-  let presenters, fileCount;
+  let presenters;
   if (type !== EntryType.Break) {
     presenters = _getPresentersArray();
-    fileCount = _getFileCount();
   }
 
+  const styleColors = entryParent
+    ? ENTRY_COLORS_BY_BACKGROUND[entryParent.colors.backgroundColor]
+    : colors;
+
   return (
-    <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
-      <Card.Content>
-        <Card.Header>
-          <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
-            <ButtonGroup>
-              <Button icon="edit" onClick={onEdit} />
-              {/* TODO: (Ajob) Evaluate if we actually need the button below */}
-              {/* <Button icon="paint brush" /> */}
-              {type === EntryType.Contribution ? (
-                <Popup
-                  content={<Translate>Unschedule contribution</Translate>}
-                  inverted
-                  size="mini"
-                  position="bottom center"
-                  trigger={<Button icon="calendar times" onClick={onDelete} color="orange" />}
-                />
-              ) : (
-                <Button icon="trash" onClick={onDelete} />
-              )}
-              {type === EntryType.SessionBlock && (
-                <>
-                  <Popup
-                    content={<Translate>Add new child</Translate>}
-                    size="mini"
-                    trigger={<Button icon="plus" onClick={onCreateChild} color="green" />}
-                  />
-                  <Dropdown button inline icon="ellipsis vertical">
-                    <DropdownMenu>
-                      <DropdownItem>
-                        {/* Implement session edit or redirect to page */}
-                        <Icon name="edit" />
-                        <Translate>Edit session</Translate>
-                      </DropdownItem>
-                      <DropdownItem>
-                        <Icon name="shield" />
-                        <Translate>Edit session protection</Translate>
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </>
-              )}
-            </ButtonGroup>
-            <ButtonGroup>
-              <Button
-                icon="close"
-                onClick={e => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-              />
-            </ButtonGroup>
-          </div>
-        </Card.Header>
-        <Card.Header style={{marginTop: 20, marginLeft: 4, marginBottom: 20, fontSize: '1.6em'}}>
-          <div style={{display: 'flex', gap: 10, alignItems: 'center'}}>
-            <ColoredDot color={backgroundColor} />
-            <div>
-              {type === EntryType.SessionBlock ? formatBlockTitle(sessionTitle, title) : title}
-            </div>
-          </div>
-        </Card.Header>
-        <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
-        {locationArray.length ? (
-          <CardItem icon="map marker alternate">
-            <List style={{textAlign: 'left', marginTop: 0}}>
-              {locationArray.map((v: string, i) => (
-                <List.Item color="red" key={i}>
-                  {v}
+    <>
+      <div styleName="header-wrapper">
+        <div styleName="header-wrapper-content">
+          {entryParent && session && (
+            <Label
+              circular
+              title={Translate.string('Session title')}
+              styleName="session"
+              size="tiny"
+              style={{...entryParent.colors}}
+            >
+              <Translate>{session.title}</Translate>
+            </Label>
+          )}
+          <Header as="h5" color={!title ? 'grey' : null}>
+            <span>
+              <Label circular empty style={{...styleColors}} />
+              <span>{title || Translate.string('No title')}</span>
+            </span>
+          </Header>
+        </div>
+        <Button
+          basic
+          icon="close"
+          styleName="close"
+          onClick={e => {
+            e.stopPropagation();
+            onClose();
+          }}
+        />
+      </div>
+      <Card.Content styleName="main" as={List}>
+        <List.Item title={Translate.string('Date and time')}>
+          <Icon name="clock outline" />
+          {formatTimeRange('en', startTime, endTime)}
+        </List.Item>
+        {entryParent?.title && (
+          <List.Item title={Translate.string('Session block title')}>
+            <Icon name="calendar alternate outline" />
+            <Label circular basic>
+              {entryParent.title}
+            </Label>
+          </List.Item>
+        )}
+        {locationArray?.length > 0 && (
+          <List.Item title={Translate.string('Location')} style={{display: 'flex'}}>
+            <Icon name="map outline" />
+            <p>{locationArray.join(', ')}</p>
+          </List.Item>
+        )}
+        {presenters?.length > 0 && (
+          <List.Item title={Translate.string('Presenters')}>
+            <Icon name="user outline" />
+            <List styleName="inline">
+              {presenters.map(p => (
+                <List.Item key={p.email}>
+                  <Label image basic>
+                    <Image src={p.avatarURL} />
+                    {p.name}
+                  </Label>
                 </List.Item>
               ))}
             </List>
-          </CardItem>
-        ) : null}
-        {presenters && presenters.length ? (
-          <CardItem icon="microphone">
-            {presenters.join(', ') || Translate.string('No presenters')}
-          </CardItem>
-        ) : null}
-        {fileCount ? (
-          <CardItem icon="file outline">
-            <PluralTranslate count={fileCount}>
-              <Singular>
-                <Param name="count" value={fileCount} /> file
-              </Singular>
-              <Plural>
-                <Param name="count" value={fileCount} /> files
-              </Plural>
-            </PluralTranslate>
-          </CardItem>
-        ) : null}
+          </List.Item>
+        )}
+        {attachments?.length > 0 && (
+          <List.Item title={Translate.string('Attachments')}>
+            <Icon name="copy outline" />
+            <List styleName="inline">
+              {attachments.map(a => {
+                const iconName = {
+                  attachment: 'file',
+                  folder: 'folder',
+                }[a.type];
+
+                return (
+                  <List.Item key={a.id}>
+                    <Label
+                      style={{fontWeight: 'normal'}}
+                      basic
+                      key={a.id}
+                      icon={iconName}
+                      content={a.title}
+                    />
+                  </List.Item>
+                );
+              })}
+            </List>
+          </List.Item>
+        )}
       </Card.Content>
-    </Card>
+      <Card.Content styleName="actions" textAlign="right">
+        {type === EntryType.SessionBlock && (
+          <>
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session protection</Translate>}
+              trigger={<Button disabled basic icon="shield" />}
+            />
+            {/* TODO: (Ajob) Evaluate this feature */}
+            <ActionPopup
+              content={<Translate>Edit session</Translate>}
+              trigger={<Button disabled basic icon="calendar alternate outline" />}
+            />
+            <ActionPopup
+              content={<Translate>Add new child</Translate>}
+              trigger={<Button basic icon="plus" onClick={onCreateChild} />}
+            />
+          </>
+        )}
+        <ActionPopup
+          content={Translate.string('Edit')}
+          trigger={<Button basic icon="edit" onClick={onEdit} />}
+        />
+        {type === EntryType.Contribution ? (
+          <ActionPopup
+            content={<Translate>Unschedule contribution</Translate>}
+            trigger={<Button basic icon="calendar times" onClick={onDelete} />}
+          />
+        ) : (
+          <ActionPopup
+            content={Translate.string('Delete')}
+            trigger={<Button basic icon="trash" onClick={onDelete} />}
+          />
+        )}
+      </Card.Content>
+    </>
   );
 }
 
@@ -274,20 +288,23 @@ export function EntryPopup({
   trigger,
   onClose,
   entry,
+  open = false,
 }: {
   trigger: React.ReactNode;
   onClose: () => void;
   entry: BreakEntry | ContribEntry | BlockEntry;
+  open?: boolean;
 }) {
   return (
     <Popup
       trigger={trigger}
       on="click"
-      position="top center"
-      open
+      open={open}
+      position="top left"
       onClose={onClose}
       basic
       hideOnScroll
+      styleName="wrapper"
     >
       <EntryPopupContent entry={entry} onClose={onClose} />
     </Popup>
