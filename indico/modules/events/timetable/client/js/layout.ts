@@ -13,9 +13,9 @@ import {
   Entry,
   EntryType,
   DayEntries,
-  UnscheduledContrib,
   ChildContribEntry,
   ContribEntry,
+  UnscheduledContribEntry,
 } from './types';
 import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils.ts';
 
@@ -271,14 +271,14 @@ export function getWidthAndOffset(column, maxColumn) {
 
 export function layoutAfterUnscheduledDrop(
   dt: Moment,
-  unscheduled: UnscheduledContrib[],
+  unscheduled: UnscheduledContribEntry[],
   entries: TopLevelEntry[],
   who: string,
   calendar: Over,
   delta: Transform,
   mouse: MousePosition,
   offset: MousePosition
-): [TopLevelEntry[], UnscheduledContrib[], Moment] | undefined {
+): [TopLevelEntry[], UnscheduledContribEntry[], Moment] | undefined {
   // TODO: add proper typing for unscheduled contribs
   const id = who.slice('unscheduled-'.length);
   const deltaMinutes = 0;
@@ -321,7 +321,7 @@ export function layoutAfterUnscheduledDrop(
 
 export function layoutAfterUnscheduledDropOnBlock(
   dt: Moment,
-  unscheduled: UnscheduledContrib[],
+  unscheduled: UnscheduledContribEntry[],
   entries: TopLevelEntry[],
   who: string,
   over: Over,
@@ -330,8 +330,8 @@ export function layoutAfterUnscheduledDropOnBlock(
   offset,
   calendar: Over
 ):
-  | [TopLevelEntry[], UnscheduledContrib[], Moment, number]
-  | [TopLevelEntry[], UnscheduledContrib[], Moment]
+  | [TopLevelEntry[], UnscheduledContribEntry[], Moment, number]
+  | [TopLevelEntry[], UnscheduledContribEntry[], Moment]
   | undefined {
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
