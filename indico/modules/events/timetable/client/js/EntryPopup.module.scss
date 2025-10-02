@@ -1,0 +1,160 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@keyframes transitionPopup {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+:global(.ui.popup).wrapper {
+  box-shadow: none;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  animation: 0.1s ease-in-out 1 transitionPopup;
+  padding: 20px;
+  word-break: break-word;
+  text-align: left;
+  max-width: 400px;
+
+  >.header-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    >.header-wrapper-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      > :global(.header) {
+        margin: 0;
+        display: inline-flex;
+        flex-direction: column;
+        gap: 10px;
+
+        > span {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          :global(.ui.label.empty) {
+            margin: 3px;
+            min-width: 12px;
+            max-width: 12px;
+            min-height: 12px;
+            max-height: 12px;
+          }
+
+          > span {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+        }
+
+        > :global(.icon) {
+          font-size: 1em;
+          line-height: 1em;
+          padding: 5px;
+          margin-right: 0;
+        }
+      }
+    }
+
+    > :global(.ui.basic.button).close {
+      box-shadow: none;
+      height: 0;
+      margin: 0 0 0 10px;
+      padding: 3px 0;
+      border: none;
+      font-size: 1.2em;
+    }
+  }
+
+  :global(.label).session {
+    align-self: flex-start;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    min-width: unset;
+  }
+
+  :global(.content).actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+}
+
+:global(.ui.popup > .content).main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+
+  > :global(.item) {
+    display: flex;
+    gap: 10px;
+    min-height: 28px;
+    align-items: center;
+    padding: 0;
+
+    > :global(.icon) {
+      min-width: 18px;
+      max-width: 18px;
+      min-height: 18px;
+      max-height: 18px;
+      align-self: flex-start;
+      display: flex;
+      justify-content: center;
+      margin: 5px 0;
+      padding: 0;
+    }
+
+    &:first-child {
+      margin: 0;
+    }
+
+    > :global(.label) {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      margin: 0;
+    }
+
+    :global(.ui.list) {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 0;
+      padding: 0;
+
+      > :global(.item) {
+        padding: 0;
+
+        > :global(.ui.label) {
+          display: flex;
+        }
+
+        > :global(.ui.basic.image) {
+          font-weight: normal;
+        }
+      }
+
+      &.inline {
+        flex-wrap: wrap;
+        flex-direction: row;
+      }
+    }
+  }
+}
