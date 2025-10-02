@@ -16,6 +16,7 @@ Improvements
 - Disallow sending registration emails or invitations containing hardcoded (and
   usually incorrect) token links (:pr:`7093`)
 - Add support for showing registration pictures in the check-in app (:pr:`7099`)
+- Support post-event reminders relative to the event end time (:pr:`7094`)
 
 Bugfixes
 ^^^^^^^^
