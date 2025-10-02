@@ -28,7 +28,7 @@ interface SessionFormProps {
   initialValues: any;
   header: string;
   locationParent: any;
-  onSubmit: (formData: any) => void;
+  onSubmit: (formData: any, form?: any) => void;
   onClose?: () => void;
 }
 

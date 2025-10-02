@@ -48,7 +48,7 @@ function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: Unsc
 }
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
   const minSidebarWidthPx = 280;
 
   const wrapperRef = useRef<HTMLDivElement>(null);

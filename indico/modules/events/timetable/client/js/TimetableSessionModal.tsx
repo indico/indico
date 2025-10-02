@@ -34,7 +34,7 @@ interface TimetableSessionEditModalProps {
 }
 
 export function TimetableSessionEditModal({sessionId, onClose}: TimetableSessionEditModalProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
 
@@ -49,7 +49,7 @@ export function TimetableSessionEditModal({sessionId, onClose}: TimetableSession
   );
 
   const handleSubmit = (formData, form) => {
-    dispatch(actions.editSession(data.id, getChangedValues(formData, form)));
+    dispatch(actions.editSession(formData.id, getChangedValues(formData, form)));
     onClose();
   };
 
@@ -87,7 +87,7 @@ interface TimetableSessionCreateModalProps {
 }
 
 export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateModalProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
 
