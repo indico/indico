@@ -84,15 +84,13 @@ export function getDefaultColorByType(type: EntryType): Colors {
 }
 
 export function mapTTColor(dbColors): Colors {
-    return {color: dbColors.text, backgroundColor: dbColors.background};
+  return {color: dbColors.text, backgroundColor: dbColors.background};
 }
 
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
 
-  const fallbackColor = colors
-    ? mapTTColor(colors)
-    : getDefaultColorByType(dbEntry.type);
+  const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
 
   if (type === EntryType.SessionBlock) {
     return sessions[sessionId].colors ?? fallbackColor;

@@ -13,33 +13,26 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import { Session } from './types';
 
 interface TimetableSessionModalProps {
   sessionId?: number | 'draft';
   onClose: () => void;
 }
 
-export default function TimetableSessionModal({
-  sessionId,
-  onClose,
-}: TimetableSessionModalProps) {
+export default function TimetableSessionModal({sessionId, onClose}: TimetableSessionModalProps) {
   return sessionId === 'draft' ? (
     <TimetableSessionCreateModal onClose={onClose} />
   ) : (
     <TimetableSessionEditModal sessionId={sessionId} onClose={onClose} />
   );
-};
+}
 
 interface TimetableSessionEditModalProps {
   sessionId: number;
   onClose: () => void;
 }
 
-export function TimetableSessionEditModal({
-  sessionId,
-  onClose,
-}: TimetableSessionEditModalProps) {
+export function TimetableSessionEditModal({sessionId, onClose}: TimetableSessionEditModalProps) {
   const dispatch = useDispatch();
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
