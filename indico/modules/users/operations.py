@@ -101,12 +101,15 @@ def grant_admin(user):
         return
     user.is_admin = True
     session_user = session.user if session else None
-    remote_addr = request.remote_addr if request else None
+    log_data = {}
+    if remote_addr := (request.remote_addr if request else None):
+        log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
-                    f'Admin privileges granted to {user.full_name}',
-                    session_user, data={'IP': remote_addr, 'User ID': user.id})
-    user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session_user,
-             data={'IP': remote_addr})
+                    f'Admin privileges granted to {user.full_name}', session_user,
+                    data=log_data | {'User ID': user.id})
+    user.log(UserLogRealm.management, LogKind.positive, 'Admins',
+             'Admin privileges granted', session_user,
+             data=log_data)
     logger.warning('Admin rights granted to %r by %r [%s]', user, session_user, remote_addr)
 
 
@@ -115,10 +118,13 @@ def revoke_admin(user):
         return
     user.is_admin = False
     session_user = session.user if session else None
-    remote_addr = request.remote_addr if request else None
+    log_data = {}
+    if remote_addr := (request.remote_addr if request else None):
+        log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
-                    f'Admin privileges revoked from {user.full_name}',
-                    session_user, data={'IP': remote_addr, 'User ID': user.id})
-    user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session_user,
-             data={'IP': remote_addr})
+                    f'Admin privileges revoked from {user.full_name}', session_user,
+                    data=log_data | {'User ID': user.id})
+    user.log(UserLogRealm.management, LogKind.negative, 'Admins',
+             'Admin privileges revoked', session_user,
+             data=log_data)
     logger.warning('Admin rights revoked from %r by %r [%s]', user, session_user, remote_addr)
