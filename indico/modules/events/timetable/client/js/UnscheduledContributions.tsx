@@ -30,7 +30,13 @@ function FragmentWithoutWarning({key, children}: {key: string; children: ReactNo
   return <Fragment key={key}>{children}</Fragment>;
 }
 
-function UnscheduledContributionList({dt, contribs}: {dt: Moment; contribs: UnscheduledContribEntry[]}) {
+function UnscheduledContributionList({
+  dt,
+  contribs,
+}: {
+  dt: Moment;
+  contribs: UnscheduledContribEntry[];
+}) {
   return (
     <div styleName="contributions-list">
       {contribs.map(contrib => (
