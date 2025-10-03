@@ -139,6 +139,7 @@ Linux
 
 macOS
 +++++
+
 If you’re on macOS with PostgreSQL installed via Homebrew, you should not use ``sudo -u postgres …`` — that only works on Linux systems where a system user named postgres exists.
 Use the follwing instead:
 
