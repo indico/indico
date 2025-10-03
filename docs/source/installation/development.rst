@@ -149,8 +149,6 @@ Use the follwing instead:
     createdb indico -T indico_template
 
 
-
-
 .. _configuring-dev:
 
 Configuring
