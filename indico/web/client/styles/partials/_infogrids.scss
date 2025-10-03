@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 .infogrid {
   margin: 1em 0 2em 0;
@@ -21,6 +22,15 @@
       margin-top: 0;
     }
   }
+
+  h2,
+  h3 span {
+    @extend %visually-hidden;
+  }
+
+  a {
+    @extend %link;
+  }
 }
 
 .infoline {
@@ -33,13 +43,17 @@
   line-height: initial;
 
   .icon {
-    color: $gray;
+    color: var(--text-secondary-color);
     font-size: 2rem;
     padding-right: 0.5em;
   }
 
   .text {
     flex-grow: 1;
+  }
+
+  .text p {
+    margin-bottom: 0;
   }
 
   .attachments-box {
@@ -67,8 +81,13 @@
     color: $black;
   }
 
+  .timezone-label {
+    @extend %visually-hidden;
+  }
+
   .timezone {
-    color: $gray;
+    display: block;
+    color: var(--text-secondary-color);
   }
 }
 

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 @mixin attachment-line {
   line-height: 1rem;
@@ -49,8 +50,6 @@
 
   tr {
     > td {
-      font-size: 0.9rem;
-
       padding: 0.2rem 0.3rem;
 
       &:first-child {
@@ -108,12 +107,12 @@
         &:first-child::before,
         > a,
         > span {
-          color: $light-black;
+          color: var(--text-secondary-color);
         }
 
         > a {
           &:hover {
-            color: $black;
+            color: var(--text-color);
           }
 
           &::before {
@@ -360,8 +359,7 @@
     .title {
       @include ellipsis();
 
-      color: $light-black;
-      font-size: 0.9em;
+      color: var(--text-secondary-color);
     }
 
     &[data-attachment-source] {
