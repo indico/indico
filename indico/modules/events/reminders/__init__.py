@@ -38,7 +38,10 @@ def _event_times_changed(sender, obj, **kwargs):
     from indico.modules.events.reminders.models.reminders import EventReminder
     event = obj
     for reminder in event.reminders.filter(EventReminder.is_relative, ~EventReminder.is_sent):
-        new_dt = event.start_dt - reminder.event_start_delta
+        if reminder.is_start_time_relative:
+            new_dt = event.start_dt - reminder.event_start_delta
+        else:
+            new_dt = event.end_dt + reminder.event_end_delta
         if reminder.scheduled_dt != new_dt:
             logger.info('Changing start time of %s to %s', reminder, new_dt)
             reminder.scheduled_dt = new_dt
@@ -84,8 +87,11 @@ class ReminderCloner(EventCloner):
             if (old_reminder.forms and regform_map is None) or (old_reminder.tags and tag_map is None):
                 logger.info('Not cloning reminder %s linked to registration forms/tags', old_reminder)
                 continue
-            scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
-            # Skip anything that's would have been sent on a past date.
+            if old_reminder.is_start_time_relative:
+                scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
+            else:
+                scheduled_dt = new_event.end_dt + old_reminder.event_end_delta
+            # Skip anything that would have been sent on a past date.
             # We ignore the time on purpose so cloning an event shortly before will
             # still trigger a reminder that's just a few hours overdue.
             if scheduled_dt.date() < now_utc().date():

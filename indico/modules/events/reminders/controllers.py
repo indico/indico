@@ -78,9 +78,12 @@ class RHEditReminder(RHSpecificReminderBase):
 
     def _get_defaults(self):
         reminder = self.reminder
-        if reminder.is_relative:
-            defaults_kwargs = {'schedule_type': 'relative',
+        if reminder.is_start_time_relative:
+            defaults_kwargs = {'schedule_type': 'start_time_relative',
                                'relative_delta': reminder.event_start_delta}
+        elif reminder.is_end_time_relative:
+            defaults_kwargs = {'schedule_type': 'end_time_relative',
+                               'relative_delta': reminder.event_end_delta}
         else:
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_dt': reminder.scheduled_dt}
@@ -115,7 +118,7 @@ class RHAddReminder(RHRemindersBase):
     }, location='query')
     def _process(self, reminder_type):
         form = ReminderForm(event=self.event,
-                            schedule_type='relative',
+                            schedule_type='start_time_relative',
                             attach_ical=reminder_type == ReminderType.standard,
                             reminder_type=reminder_type,
                             render_mode=RenderMode.html)
