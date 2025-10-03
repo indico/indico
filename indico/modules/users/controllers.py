@@ -643,7 +643,7 @@ class RHUserEmailsVerify(RHUserBase):
     def _process(self):
         token = request.view_args['token']
         data = self.token_storage.get(token)
-        valid, existing = self._validate(data)
+        valid, _ = self._validate(data)
         if valid:
             self.token_storage.delete(token)
             add_secondary_email(self.user, data['email'], session.user)
