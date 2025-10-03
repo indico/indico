@@ -6,6 +6,7 @@
 
 RUFF_CMD='ruff check'
 ESLINT_CMD='npx eslint'
+BIOME_CMD='npx @biomejs/biome format --colors=force'
 STYLELINT_CMD='npx stylelint'
 
 RED=$(echo -e $"\033[1;31m")
@@ -29,7 +30,7 @@ _get_files() {
 # Most spammy checks first so the most likely useful ones are at the
 # bottom and thus less likely to scroll out of view immediately
 
-# SASSLint
+# Stylelint
 _get_files '*.scss' '*.css'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$(FORCE_COLOR=1 $STYLELINT_CMD -q "${FILES[@]}"); then
@@ -44,8 +45,8 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
 fi
 
 
-# ESLint
-_get_files '*.js' '*.jsx' '*.ts' '*.tsx'
+# ESLint + Biome
+_get_files '*.js' '*.jsx' '*.ts' '*.tsx' '*.mjs'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$($ESLINT_CMD --color "${FILES[@]}"); then
         STATUS=1
@@ -55,6 +56,13 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
         STATUS=1
         echo "${BRIGHTYELLOW}There are JS warnings in your code:${RESET}"
         echo "$RESULT"
+    fi
+
+    if ! RESULT=$($BIOME_CMD "${FILES[@]}" 2>&1); then
+        STATUS=1
+        echo "${RED}There are formatting issues in your code:${RESET}"
+        echo "$RESULT"
+        echo
     fi
 fi
 
