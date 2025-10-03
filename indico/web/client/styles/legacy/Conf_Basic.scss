@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+
 /*
         Default Styles and layout for Conf-pages
         Do not custom this CSS
@@ -288,7 +290,7 @@ li.over ul {
 /* ------Misc------ */
 
 .conferenceDetails .description {
-  color: #777;
+  color: var(--text-secondary-color);
   font-size: 1.2em;
   margin: 1em 0 2em 0;
 }
