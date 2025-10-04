@@ -41,7 +41,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import serialize_event_for_ical
-from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
@@ -50,7 +50,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
-from indico.modules.users.operations import create_user, delete_or_anonymize_user
+from indico.modules.users.operations import create_user, delete_or_anonymize_user, grant_admin, revoke_admin
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
@@ -694,22 +694,10 @@ class RHAdmins(RHAdminBase):
             added = form.admins.data - admins
             removed = admins - form.admins.data
             for user in added:
-                user.is_admin = True
-                AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
-                                f'Admin privileges granted to {user.full_name}',
-                                session.user, data={'IP': request.remote_addr, 'User ID': user.id})
-                user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session.user,
-                         data={'IP': request.remote_addr})
-                logger.warning('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
+                grant_admin(user)
                 flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
             for user in removed:
-                user.is_admin = False
-                AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
-                                f'Admin privileges revoked from {user.full_name}',
-                                session.user, data={'IP': request.remote_addr, 'User ID': user.id})
-                user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session.user,
-                         data={'IP': request.remote_addr})
-                logger.warning('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)
+                revoke_admin(user)
                 flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
             return redirect(url_for('.admins'))
 
