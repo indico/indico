@@ -205,6 +205,12 @@ class RHTimetableBreak(RHManageEventBase):
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
+        session_block_id = data.pop('session_block_id', None)
+        self._change_parent(session_block_id)
+
+        if not data.get('timetable_entry'):
+            data.pop('timetable_entry', None)
+
         with (track_time_changes(), track_location_changes()):
             update_break_entry(self.break_, data)
 
@@ -216,6 +222,26 @@ class RHTimetableBreak(RHManageEventBase):
     def _process_DELETE(self):
         delete_timetable_entry(self.break_.timetable_entry)
         return '', 204
+
+    @no_autoflush
+    def _change_parent(self, session_block_id):
+        entry = self.break_.timetable_entry
+
+        if session_block_id is None:
+            self.break_.session_block = None
+            self.break_.session = None
+            if entry.parent is not None:
+                update_timetable_entry(entry, {'parent': None, 'start_dt': entry.start_dt})
+        else:
+            target_block = self.event.get_session_block(session_block_id)
+
+            self.break_.session_block = target_block
+            self.break_.session = target_block.session
+
+            update_timetable_entry(entry, {
+                'parent': target_block.timetable_entry,
+                'start_dt': entry.start_dt
+            })
 
 
 class RHTimetableContributionCreate(RHManageContributionsBase):
@@ -260,6 +286,8 @@ class RHTimetableContribution(RHManageContributionBase):
 
         if (person_links := data.pop('person_links', None)) is not None:
             data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
+        session_block_id = data.pop('session_block_id', None)
+        self._change_parent(session_block_id)
 
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)
@@ -283,6 +311,28 @@ class RHTimetableContribution(RHManageContributionBase):
             references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
                                                     value=entry['value']))
         return references
+
+    def _change_parent(self, session_block_id):
+        entry = self.contrib.timetable_entry
+
+        self.contrib.session_block = None
+        self.contrib.session = None
+
+        if session_block_id is None:
+            update_timetable_entry(entry, {
+                'parent': None,
+                'start_dt': entry.start_dt
+            })
+        else:
+            target_block = self.event.get_session_block(session_block_id)
+
+            self.contrib.session_block = target_block
+            self.contrib.session = target_block.session
+
+            update_timetable_entry(entry, {
+                'parent': target_block.timetable_entry,
+                'start_dt': entry.start_dt
+            })
 
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):

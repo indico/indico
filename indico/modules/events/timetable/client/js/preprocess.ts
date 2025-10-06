@@ -157,7 +157,7 @@ export function preprocessTimetableEntries(
             locationData: c.locationData,
             column: 0,
             maxColumn: 0,
-            colors: c.colors,
+            colors: c.colors || getDefaultColorByType(childType),
             parent: {
               colors,
               id,
