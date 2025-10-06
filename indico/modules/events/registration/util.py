@@ -1203,21 +1203,23 @@ def prepare_participant_list_data(reglist, display, static_items_ids):
             row[item.title] = cell_data
 
         for item_id in static_items_ids:
-            cell_data = None
-            if item_id == 'reg_date':
-                cell_data = format_datetime(registration.submitted_dt)
-            elif item_id == 'state':
-                cell_data = registration.state.title
-            elif item_id == 'price':
-                cell_data = registration.render_price()
-            elif item_id == 'checked_in':
-                cell_data = 'Yes' if registration.checked_in else 'No'
-            elif item_id == 'checked_in_date':
-                if registration.checked_in_dt:
-                    cell_data = format_datetime(registration.checked_in_dt)
-            elif item_id == 'tags_present':
-                if registration.tags:
-                    cell_data = ', '.join(sorted(t.title for t in registration.tags))
+            match item_id:
+                case 'reg_date':
+                    cell_data = format_datetime(registration.submitted_dt)
+                case 'state':
+                    cell_data = registration.state.title
+                case 'price':
+                    cell_data = registration.render_price()
+                case 'checked_in':
+                    cell_data = 'Yes' if registration.checked_in else 'No'
+                case 'checked_in_date':
+                    if registration.checked_in_dt:
+                        cell_data = format_datetime(registration.checked_in_dt)
+                case 'tags_present':
+                    if registration.tags:
+                        cell_data = ', '.join(sorted(t.title for t in registration.tags))
+                case _:
+                    cell_data = None
             row[item_id] = cell_data or '-'
 
         rows.append(row)
