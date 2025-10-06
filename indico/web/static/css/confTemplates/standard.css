@@ -8,8 +8,8 @@
   --conf-theme-header-bg: #1a64a0;
   --conf-theme-header-border-top: #234173;
   --conf-theme-header-border-bottom: #0f4c80;
-  --conf-theme-header-text: white;
   --conf-theme-header-border-top-width: 0;
+  --conf-theme-header-text: white;
 
   /* Subtitle area */
   --conf-theme-subtitle-bg: #f5faff;
@@ -38,7 +38,7 @@
   --conf-theme-support-text: #aaa;
 
   /* Background images */
-  --conf-theme-sprite-image: url(static:images/conf/sprites_blue.png);
+  --conf-theme-sprite-image: url(images/conf/sprites_blue.png);
 
   /* Announcement colors */
   --conf-theme-announcement-bg: #f5faff;
