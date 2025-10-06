@@ -484,14 +484,10 @@ function layoutAfterDropOnCalendar(
         .add(deltaMinutes, 'minutes')
         .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
-    sessionId: null,
-    sessionBlockId: null,
   };
 
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
-    // TODO
-    // @ts-expect-error the parent attribute is not in the type (yet)
     delete draftEntry.parent;
   }
 
