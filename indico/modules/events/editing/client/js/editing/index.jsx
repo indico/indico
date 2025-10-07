@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const headerHeight =
     document.querySelector('div.header').getBoundingClientRect().height +
-    document.querySelector('div.main-breadcrumb').getBoundingClientRect().height;
+    document.querySelector('.main-breadcrumb').getBoundingClientRect().height;
   document.body.style.setProperty('--header-height', headerHeight);
 
   const eventTitle = editingElement.dataset.eventTitle;
