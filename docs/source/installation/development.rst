@@ -127,11 +127,26 @@ You'll then be able to access the message log at `<http://localhost:1080>`_.
 Creating the DB
 ---------------
 
+Linux
++++++
+
 .. code-block:: shell
 
     sudo -u postgres createuser $USER --createdb
     sudo -u postgres createdb indico_template -O $USER
     sudo -u postgres psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
+    createdb indico -T indico_template
+
+macOS
++++++
+
+If you are on macOS with PostgreSQL installed via Homebrew, you should not use ``sudo`` as that only works on Linux
+systems where a system user named ``postgres`` exists. Use the following instead:
+
+.. code-block:: shell
+
+    createdb indico_template -O $USER
+    psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
     createdb indico -T indico_template
 
 
@@ -182,6 +197,8 @@ On the second one we'll run the Indico Development server:
     indico run -h <your-hostname> -q --enable-evalex
 
 Double-check that your hostname matches that which has been set in the config file (by the wizard).
+If you went with the default settings provided by the wizard it might be something like
+``indico run -h 127.0.0.1 -p 8000 -q --enable-evalex``
 
 It is also worth mentioning that when working on a plugin, it is necessary to run another webpack watcher
 to build the plugin assets. That can be accomplished using the same command as above with an argument specifying
