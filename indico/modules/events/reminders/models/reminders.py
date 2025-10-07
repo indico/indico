@@ -392,6 +392,7 @@ class EventReminder(RenderModeMixin, db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         sender = self.event.get_verbose_email_sender(self.reply_to_address)
+        html_email_tpl = text_email_tpl = None
         for recipient in recipients:
             with self.event.force_event_locale():
                 if self.reminder_type == ReminderType.custom:
@@ -402,10 +403,15 @@ class EventReminder(RenderModeMixin, db.Model):
                 else:
                     subject = self.subject
                     message = self.message
-                html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type,
-                                                                        self.render_mode,
-                                                                        self.include_summary, self.include_description,
-                                                                        subject, message)
+                # Get the email template only if necessary
+                # * standard reminder: it's always the same so it is needed to get only once
+                # * custom reminder: it is needed only if the content is really customized (i.e. using placeholders)
+                if subject != self.subject or message != self.message or not (html_email_tpl or text_email_tpl):
+                    html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type,
+                                                                            self.render_mode,
+                                                                            self.include_summary,
+                                                                            self.include_description,
+                                                                            subject, message)
                 alternatives = ([(text_email_tpl.get_body(), 'text/plain')]
                                 if html_email_tpl and text_email_tpl else None)
                 email = self._make_email(sender, recipient.email, html_email_tpl or text_email_tpl, attachments,
