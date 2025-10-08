@@ -17,7 +17,7 @@ import {
   ContribEntry,
   UnscheduledContribEntry,
 } from './types';
-import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils.ts';
+import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 // A subset of the properties of an entry (contrib, block, break) that are needed for layout calculations
 interface ScheduledEntry {
