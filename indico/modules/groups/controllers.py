@@ -7,7 +7,7 @@
 
 from operator import attrgetter
 
-from flask import flash, jsonify, redirect, request
+from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from werkzeug.exceptions import Forbidden, NotFound
@@ -21,6 +21,7 @@ from indico.modules.groups.forms import EditGroupForm, SearchForm
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.groups.util import serialize_group
 from indico.modules.groups.views import WPGroupsAdmin
+from indico.modules.logs import LogKind, UserLogRealm
 from indico.modules.users import User
 from indico.util.i18n import _, pgettext
 from indico.web.args import use_kwargs
@@ -111,13 +112,26 @@ class RHGroupEdit(RHAdminBase):
         existing_group = self.group if not self.new_group else None
         form = EditGroupForm(obj=existing_group, group=existing_group)
         if form.validate_on_submit():
+            existing_members = set()
+            if not self.new_group:
+                existing_members = self.group.members
             form.populate_obj(self.group)
             if self.new_group:
                 db.session.add(self.group)
                 msg = _("The group '{name}' has been created.")
+                added_users = self.group.members
+                removed_users = set()
             else:
                 msg = _("The group '{name}' has been updated.")
+                added_users = self.group.members - existing_members
+                removed_users = existing_members - self.group.members
             db.session.flush()
+            for user in added_users:
+                user.log(UserLogRealm.user, LogKind.positive, 'Groups',
+                         f'Added to user group "{self.group.name}" ({self.group.id})', session.user)
+            for user in removed_users:
+                user.log(UserLogRealm.user, LogKind.negative, 'Groups',
+                         f'Removed from user group "{self.group.name}" ({self.group.id})', session.user)
             flash(msg.format(name=self.group.name), 'success')
             return redirect(url_for('.groups'))
         return WPGroupsAdmin.render_template('group_edit.html', group=existing_group, form=form)
@@ -145,7 +159,10 @@ class RHGroupDeleteMember(RHLocalGroupBase):
     """Admin group member deletion (ajax)."""
 
     def _process(self):
-        self.group.members.discard(User.get(request.view_args['user_id']))
+        user = User.get(request.view_args['user_id'])
+        self.group.members.discard(user)
+        user.log(UserLogRealm.user, LogKind.negative, 'Groups',
+                 f'Removed from user group "{self.group.name}" ({self.group.id})', session.user)
         return jsonify(success=True)
 
 
