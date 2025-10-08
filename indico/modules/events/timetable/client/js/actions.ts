@@ -100,7 +100,6 @@ interface ScheduleEntryAction {
 interface UnscheduleEntryAction {
   type: typeof UNSCHEDULE_ENTRY;
   entry: ContribEntry | ChildContribEntry;
-  eventId: number;
 }
 
 interface CreateEntryAction {
@@ -139,6 +138,24 @@ interface SetSessionDataAction {
   data: any;
 }
 
+interface ToggleShowUnscheduledAction {
+  type: typeof TOGGLE_SHOW_UNSCHEDULED;
+}
+
+interface SetCurrentDateAction {
+  type: typeof SET_CURRENT_DATE;
+  date: Moment;
+  eventId: number;
+}
+
+interface ToggleExpandAction {
+  type: typeof TOGGLE_EXPAND;
+}
+
+interface ToggleDraftAction {
+  type: typeof TOGGLE_DRAFT;
+}
+
 export type Action =
   | SetTimetableDataAction
   | ResizeEntryAction
@@ -154,7 +171,11 @@ export type Action =
   | SetDraftEntryAction
   | UndoChangeAction
   | RedoChangeAction
-  | SetSessionDataAction;
+  | SetSessionDataAction
+  | ToggleShowUnscheduledAction
+  | SetCurrentDateAction
+  | ToggleExpandAction
+  | ToggleDraftAction;
 
 export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -246,11 +267,11 @@ export function moveEntry(entry: Entry, eventId: number, entries: TopLevelEntry[
   });
 }
 
-export function toggleExpand() {
+export function toggleExpand(): ToggleExpandAction {
   return {type: TOGGLE_EXPAND};
 }
 
-export function toggleDraft() {
+export function toggleDraft(): ToggleDraftAction {
   return {type: TOGGLE_DRAFT};
 }
 
@@ -320,11 +341,10 @@ export function scheduleEntry(
   );
 }
 
-export function unscheduleEntry(entry: Entry, eventId: number) {
+export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: UNSCHEDULE_ENTRY,
-    entryURL,
     entry,
   });
 }
@@ -365,7 +385,7 @@ export function updateEntry(
   return {type: UPDATE_ENTRY, entryType, entry, currentDay};
 }
 
-export function setCurrentDate(date: Moment, eventId: number) {
+export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
   return {type: SET_CURRENT_DATE, date, eventId};
 }
 

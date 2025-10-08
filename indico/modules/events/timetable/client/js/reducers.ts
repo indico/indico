@@ -12,7 +12,7 @@ import * as actions from './actions';
 import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {Entries, EntryType, isChildEntry} from './types';
+import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
 import {setCurrentDateLocalStorage} from './utils';
 
 export default {
@@ -273,7 +273,7 @@ export default {
           return state;
         }
 
-        const contribs = block.children
+        const contribs = (block as BlockEntry).children
           .filter(e => e.type === 'contrib')
           .map(({startDt, ...rest}) => rest);
         const newEntries = layoutDays(
@@ -410,7 +410,7 @@ export default {
         return state;
     }
   },
-  navigation: (state: any, action: any) => {
+  navigation: (state: any, action: Action) => {
     state = {isExpanded: false, ...state};
     switch (action.type) {
       case actions.SET_CURRENT_DATE:
@@ -424,7 +424,7 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action: any) => {
+  display: (state = {showUnscheduled: false}, action: Action) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
