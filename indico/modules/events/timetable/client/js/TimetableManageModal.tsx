@@ -320,9 +320,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const changeForm = (key: EntryType) => {
     setActiveType(key);
-    if (key === EntryType.SessionBlock && !sessionValues.length) {
-      forms[activeType];
-    }
   };
 
   const meetsSubmitConditions = () => {
