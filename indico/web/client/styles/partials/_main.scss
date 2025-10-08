@@ -231,7 +231,12 @@ nav.main-breadcrumb {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 0.1em;
+
+  color: var(--text-color);
+
+  [data-dialog] {
+    color: inherit;
+  }
 
   .popup-trigger,
   .login {
@@ -258,6 +263,10 @@ nav.main-breadcrumb {
     &:is(:hover, :focus-visible) {
       background: var(--surface-green-secondary-color);
     }
+
+    &::before {
+      @extend %icon-earth;
+    }
   }
 
   .popup-trigger[data-protection-mode='restricted'] {
@@ -267,6 +276,10 @@ nav.main-breadcrumb {
     &:is(:hover, :focus-visible) {
       background: var(--surface-red-secondary-color);
     }
+
+    &::before {
+      @extend %icon-shield;
+    }
   }
 
   .popup-trigger[data-protection-mode='network'] {
@@ -275,6 +288,10 @@ nav.main-breadcrumb {
 
     &:is(:hover, :focus-visible) {
       background: var(--surface-yellow-secondary-color);
+    }
+
+      &::before {
+      @extend %icon-shield;
     }
   }
 

@@ -157,10 +157,12 @@ const verticalPreferBelowPosition = {
   },
 };
 
-const unaligned = {
-  calculateAlignment() {},
-  setAlignment() {},
-};
+// Example of no-op mixin if needed:
+
+// const unaligned = {
+//   calculateAlignment() {},
+//   setAlignment() {},
+// };
 
 const verticalCenter = {
   calculateAlignment() {},
@@ -291,7 +293,9 @@ export function position(target, anchor, strategy, callback) {
     strategy.setAlignment();
     strategy.setArrowDirection();
   };
-  const adjustWithFullGeometryReset = () => strategy.resetGeometry(adjustPosition);
+  const adjustWithFullGeometryReset = () => {
+    strategy.resetGeometry(adjustPosition);
+  };
 
   window.addEventListener('resize', adjustWithFullGeometryReset, {
     signal: positioningAbortController.signal,

@@ -40,6 +40,7 @@ ind-with-popup {
 
   dialog[data-position-check] {
     display: block;
+    min-width: max-content;
     pointer-events: none;
     opacity: 0;
   }
