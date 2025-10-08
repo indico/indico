@@ -16,10 +16,9 @@ import {useDraggable, useDroppable} from './dnd';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
-import {ReduxState} from './reducers';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {ReduxState, ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,

@@ -26,10 +26,9 @@ import {
   layoutAfterUnscheduledDrop,
   layoutAfterUnscheduledDropOnBlock,
 } from './layout';
-import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {ReduxState, TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,

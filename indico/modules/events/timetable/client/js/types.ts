@@ -145,3 +145,38 @@ export interface LocationParentObj {
   address: string;
   inheriting: boolean;
 }
+
+interface Change {
+  change: any;
+  entries: DayEntries;
+  unscheduled: any[];
+}
+
+export interface Entries {
+  draftEntry: any | null;
+  changes: Change[];
+  currentChangeIdx: number;
+  selectedId: string | null;
+  draggedIds: Set<number>;
+}
+
+interface StaticData {
+  eventId: number;
+  startDt: Moment;
+  endDt: Moment;
+  defaultContribDurationMinutes: number;
+  eventLocationParent: LocationParent;
+}
+
+export interface Navigation {
+  currentDate: Moment;
+  isExpanded: boolean;
+}
+
+export interface ReduxState {
+  entries: Entries;
+  sessions: Record<string, Session>;
+  navigation: Navigation;
+  display: {showUnscheduled: boolean};
+  staticData: StaticData;
+}

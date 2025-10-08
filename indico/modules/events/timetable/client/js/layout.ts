@@ -327,7 +327,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  offset,
+  offset: MousePosition,
   calendar: Over
 ):
   | [TopLevelEntry[], UnscheduledContribEntry[], Moment, number]
@@ -336,7 +336,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
-  if (toBlock.type !== EntryType.SessionBlock) {
+  if (toBlock?.type !== EntryType.SessionBlock) {
     return;
   }
   const deltaMinutes = 0;

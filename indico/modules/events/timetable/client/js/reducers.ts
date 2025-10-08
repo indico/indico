@@ -6,46 +6,14 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 
 import * as actions from './actions';
+import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries, EntryType, isChildEntry, LocationParent, Session} from './types';
+import {Entries, EntryType, isChildEntry} from './types';
 import {setCurrentDateLocalStorage} from './utils';
-
-interface Change {
-  change: any;
-  entries: DayEntries;
-  unscheduled: any[];
-}
-
-interface Entries {
-  draftEntry: any | null;
-  changes: Change[];
-  currentChangeIdx: number;
-  selectedId: string | null;
-  draggedIds: Set<number>;
-}
-
-interface StaticData {
-  eventId: number;
-  startDt: Moment;
-  endDt: Moment;
-  defaultContribDurationMinutes: number;
-  eventLocationParent: LocationParent;
-}
-
-export interface ReduxState {
-  entries: Entries;
-  sessions: Session[];
-  navigation: {
-    currentDate: Moment;
-    isExpanded: boolean;
-  };
-  display: {showUnscheduled: boolean};
-  staticData: StaticData;
-}
 
 export default {
   entries: (
@@ -421,7 +389,7 @@ export default {
         return state;
     }
   },
-  sessions: (state = [], action) => {
+  sessions: (state = [], action: Action) => {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
@@ -442,7 +410,7 @@ export default {
         return state;
     }
   },
-  navigation: (state, action) => {
+  navigation: (state: any, action: any) => {
     state = {isExpanded: false, ...state};
     switch (action.type) {
       case actions.SET_CURRENT_DATE:
@@ -456,7 +424,7 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action) => {
+  display: (state = {showUnscheduled: false}, action: any) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
