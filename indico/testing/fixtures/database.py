@@ -41,10 +41,6 @@ def local_postgresql():
     temp_dir = tempfile.mkdtemp(prefix='indicotestpg.')
     postgres_args = f'-h "" -k "{temp_dir}"'
     try:
-        # remove PG* variables from environment, as they may cause the following commands to fail
-        for env_var in ('PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT', 'PGDATABASE'):
-            os.environ.pop(env_var, None)
-
         silent_check_call(['initdb', '--encoding', 'UTF8', temp_dir])
         silent_check_call(['pg_ctl', '-D', temp_dir, '-w', '-o', postgres_args, 'start'])
         silent_check_call(['createdb', '-h', temp_dir, db_name])
@@ -79,6 +75,10 @@ def postgresql():
     will do nothing and simply return the connection string from that variable.
     If set to an empty string, tests relying on the database will be skipped.
     """
+    # remove PG* variables from environment, as they may cause the following commands to fail
+    for env_var in ('PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT', 'PGDATABASE'):
+        os.environ.pop(env_var, None)
+
     # Use existing database
     if 'INDICO_TEST_DATABASE_URI' in os.environ:
         dsn = os.environ['INDICO_TEST_DATABASE_URI']
