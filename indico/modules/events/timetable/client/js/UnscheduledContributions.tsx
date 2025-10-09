@@ -55,7 +55,7 @@ function UnscheduledContributionList({
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
-  const minSidebarWidthPx = 280;
+  const minSidebarWidthPx = 320;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const resizing = useRef(false);
@@ -113,32 +113,50 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         </div>
       ),
     },
-    {
-      as: FragmentWithoutWarning,
-      key: 'sep-with-contribs',
-      disabled: true,
-      content: (
-        <DropdownHeader>
-          <Translate>Sessions with contributions</Translate>
-        </DropdownHeader>
-      ),
-    },
+    ...(sessionsWithContribs.length
+      ? [
+          {
+            as: FragmentWithoutWarning,
+            key: 'sep-with-contribs',
+            disabled: true,
+            content: (
+              <DropdownHeader>
+                <Translate>Sessions with contributions</Translate>
+              </DropdownHeader>
+            ),
+          },
+        ]
+      : []),
     ...sessionsWithContribs,
-    {
-      as: FragmentWithoutWarning,
-      key: 'sep-without-contribs',
-      disabled: true,
-      content: (
-        <DropdownHeader>
-          <Translate>Empty sessions</Translate>
-        </DropdownHeader>
-      ),
-    },
+    ...(sessionsWithoutContribs.length
+      ? [
+          {
+            as: FragmentWithoutWarning,
+            key: 'sep-without-contribs',
+            disabled: true,
+            content: (
+              <DropdownHeader>
+                <Translate>Empty sessions</Translate>
+              </DropdownHeader>
+            ),
+          },
+        ]
+      : []),
     ...sessionsWithoutContribs,
   ];
 
   const sessionSearch = (options: DropdownItemProps[], value: string) =>
-    options.filter(o => o.title && o.title.toLowerCase().includes(value.toLowerCase()));
+    options
+      // Primary filter to match search term
+      .filter(
+        o => o.as === FragmentWithoutWarning || o.title.toLowerCase().includes(value.toLowerCase())
+      )
+      // Secondary filter to remove consecutive dividers
+      .filter(
+        (o, i, arr) =>
+          o.as !== FragmentWithoutWarning ||
+          (arr[i + 1] && arr[i + 1].as !== FragmentWithoutWarning)
+      );
 
   function onMouseUp() {
     resizing.current = false;
@@ -199,6 +217,8 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 button
                 placeholder={Translate.string('Filter sessions')}
                 value={selectedFilter}
+                selectOnBlur={false}
+                selectOnNavigation={false}
                 search={sessionSearch}
                 noResultsMessage={Translate.string('No sessions found')}
                 clearable
