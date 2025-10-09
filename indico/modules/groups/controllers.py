@@ -24,6 +24,7 @@ from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.logs import LogKind, UserLogRealm
 from indico.modules.users import User
 from indico.util.i18n import _, pgettext
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -128,10 +129,10 @@ class RHGroupEdit(RHAdminBase):
             db.session.flush()
             for user in added_users:
                 user.log(UserLogRealm.user, LogKind.positive, 'Groups',
-                         f'Added to user group "{self.group.name}" ({self.group.id})', session.user)
+                         f'Added to group {self.group.name}', session.user, meta={'group_id': self.group.id})
             for user in removed_users:
                 user.log(UserLogRealm.user, LogKind.negative, 'Groups',
-                         f'Removed from user group "{self.group.name}" ({self.group.id})', session.user)
+                         f'Removed from group {self.group.name}', session.user, meta={'group_id': self.group.id})
             flash(msg.format(name=self.group.name), 'success')
             return redirect(url_for('.groups'))
         return WPGroupsAdmin.render_template('group_edit.html', group=existing_group, form=form)
@@ -158,11 +159,11 @@ class RHGroupDelete(RHLocalGroupBase):
 class RHGroupDeleteMember(RHLocalGroupBase):
     """Admin group member deletion (ajax)."""
 
-    def _process(self):
-        user = User.get(request.view_args['user_id'])
+    @use_kwargs({'user': ModelField(User, required=True, data_key='user_id')}, location='view_args')
+    def _process(self, user):
         self.group.members.discard(user)
         user.log(UserLogRealm.user, LogKind.negative, 'Groups',
-                 f'Removed from user group "{self.group.name}" ({self.group.id})', session.user)
+                 f'Removed from group {self.group.name}', session.user, meta={'group_id': self.group.id})
         return jsonify(success=True)
 
 
