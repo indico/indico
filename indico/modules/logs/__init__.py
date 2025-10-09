@@ -9,7 +9,7 @@ from flask import session
 
 from indico.core import signals
 from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
-                                                EventLogEntry, EventLogRealm, LogKind)
+                                                EventLogEntry, EventLogRealm, LogKind, UserLogEntry, UserLogRealm)
 from indico.modules.logs.renderers import EmailRenderer, SimpleRenderer
 from indico.modules.logs.util import get_log_renderers
 from indico.util.i18n import _
@@ -17,8 +17,8 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('AppLogEntry', 'CategoryLogEntry', 'EventLogEntry', 'EventLogRealm', 'AppLogRealm', 'CategoryLogRealm',
-           'LogKind')
+__all__ = ('AppLogEntry', 'AppLogRealm', 'CategoryLogEntry', 'CategoryLogRealm',
+           'EventLogEntry', 'EventLogRealm', 'UserLogEntry', 'UserLogRealm', 'LogKind')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
