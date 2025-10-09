@@ -112,32 +112,34 @@ def remove_users_from_group(users, group, *, extra_log_data=None):
                  data=extra_log_data, meta={'group_id': group.id})
 
 
-def grant_admin(user, **log_data):
+def grant_admin(user, extra_log_data=None):
     if user.is_admin:
         return
     user.is_admin = True
     session_user = session.user if session else None
+    log_data = extra_log_data or {}
     if remote_addr := (request.remote_addr if request else None):
         log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
                     f'Admin privileges granted to {user.full_name}', session_user,
-                    data=log_data | {'User ID': user.id})
+                    data={**log_data, 'User ID': user.id})
     user.log(UserLogRealm.management, LogKind.positive, 'Admins',
              'Admin privileges granted', session_user,
              data=log_data)
     logger.warning('Admin rights granted to %r by %r [%s]', user, session_user, remote_addr)
 
 
-def revoke_admin(user, **log_data):
+def revoke_admin(user, extra_log_data=None):
     if not user.is_admin:
         return
     user.is_admin = False
     session_user = session.user if session else None
+    log_data = extra_log_data or {}
     if remote_addr := (request.remote_addr if request else None):
         log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
                     f'Admin privileges revoked from {user.full_name}', session_user,
-                    data=log_data | {'User ID': user.id})
+                    data={**log_data, 'User ID': user.id})
     user.log(UserLogRealm.management, LogKind.negative, 'Admins',
              'Admin privileges revoked', session_user,
              data=log_data)
