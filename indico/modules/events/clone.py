@@ -171,6 +171,9 @@ class EventProtectionCloner(EventCloner):
         contribution_settings_data = contribution_settings.get_all(self.old_event)
         contribution_settings.set_multi(new_event, {
             'submitters_can_edit': contribution_settings_data['submitters_can_edit'],
+            'submitters_can_edit_title': contribution_settings_data['submitters_can_edit_title'],
+            'submitters_can_edit_description': contribution_settings_data['submitters_can_edit_description'],
+            'submitters_can_edit_persons': contribution_settings_data['submitters_can_edit_persons'],
             'submitters_can_edit_custom': contribution_settings_data['submitters_can_edit_custom']
         })
 
