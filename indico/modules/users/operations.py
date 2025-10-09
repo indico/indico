@@ -112,12 +112,11 @@ def remove_users_from_group(users, group, *, extra_log_data=None):
                  data=extra_log_data, meta={'group_id': group.id})
 
 
-def grant_admin(user):
+def grant_admin(user, **log_data):
     if user.is_admin:
         return
     user.is_admin = True
     session_user = session.user if session else None
-    log_data = {}
     if remote_addr := (request.remote_addr if request else None):
         log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.positive, 'Admins',
@@ -129,12 +128,11 @@ def grant_admin(user):
     logger.warning('Admin rights granted to %r by %r [%s]', user, session_user, remote_addr)
 
 
-def revoke_admin(user):
+def revoke_admin(user, **log_data):
     if not user.is_admin:
         return
     user.is_admin = False
     session_user = session.user if session else None
-    log_data = {}
     if remote_addr := (request.remote_addr if request else None):
         log_data['IP'] = remote_addr
     AppLogEntry.log(AppLogRealm.admin, LogKind.negative, 'Admins',
