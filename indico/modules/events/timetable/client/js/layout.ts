@@ -261,7 +261,7 @@ export function computeYoffset(entries: TopLevelEntry[], startHour: number): Top
  * C: {column: 2, maxColumn: 3} -> {width: 25%, offset: 50%}
  * D: {column: 3, maxColumn: 3} -> {width: 25%, offset: 75%}
  */
-export function getWidthAndOffset(column, maxColumn) {
+export function getWidthAndOffset(column: number, maxColumn: number) {
   const columnWidth = 100 / (maxColumn + 1);
   return {
     width: `${columnWidth}%`,

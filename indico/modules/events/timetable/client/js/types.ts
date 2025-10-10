@@ -47,7 +47,7 @@ export interface LocationData {
   inheriting?: boolean;
 }
 export interface LocationParent {
-  location_data: LocationParent;
+  location_data: LocationData;
   type: string;
   title: string;
 }
@@ -59,7 +59,7 @@ export interface Attachment {
 }
 
 export interface Session {
-  id?: number;
+  id: number; // XXX probably we need an id-less variant during creation, but that should be a separate type
   title: string;
   isPoster: boolean;
   defaultContribDurationMinutes: number;
