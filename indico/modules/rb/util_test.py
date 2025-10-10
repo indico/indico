@@ -12,8 +12,8 @@ import pytz
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import ReservationState
-from indico.modules.rb.util import (format_weekdays, get_booking_params_for_event, get_prebooking_collisions,
-                                    rb_check_user_access, rb_is_admin)
+from indico.modules.rb.util import (format_weekdays, get_booking_params_for_event, get_locations_with_rooms,
+                                    get_prebooking_collisions, rb_check_user_access, rb_is_admin)
 from indico.testing.util import bool_matrix
 
 
@@ -151,3 +151,26 @@ def test_get_prebooking_collisions(create_reservation, dummy_user, freeze_time):
 ))
 def test_format_weekdays(weekdays, expected):
     assert format_weekdays(weekdays) == expected
+
+
+def test_get_locations_with_rooms(db, create_location, create_room, count_queries):
+    loc2 = create_location('Foo')
+    loc1 = create_location('Bar')
+    create_room(location=loc1, building='69')  # 69/2-3
+    create_room(location=loc1, building='7')  # 7/2-3
+    create_room(location=loc1, verbose_name='Foo')  # 1/2-3 - Foo
+    create_room(location=loc2)  # 1/2-3
+    create_room(location=loc2, building='0', is_deleted=True)  # 0/2-3
+    db.session.expire_all()
+
+    assert db.m.Location.query.count() == 3  # dummy_location is activated by create_room
+
+    locations = get_locations_with_rooms()
+    with count_queries() as cnt:
+        assert len(locations) == 2  # empty locations are omitted
+        assert len(locations[0].rooms) == 3
+        assert [r.full_name for r in locations[0].rooms] == ['1/2-3 - Foo', '7/2-3', '69/2-3']
+        assert len(locations[1].rooms) == 1  # deleted rooms are omitted
+        assert [r.full_name for r in locations[1].rooms] == ['1/2-3']
+
+    assert cnt() == 0

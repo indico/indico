@@ -11,11 +11,13 @@ on:
       - master
       - '*.x'
       - a11y
+      - timetable
   pull_request:
     branches:
       - master
       - '*.x'
       - a11y
+      - timetable
 
 permissions:
   contents: read
@@ -117,6 +119,10 @@ jobs:
       - name: Run eslint
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx indico/
+
+      - name: Typecheck TS files
+        if: success() || failure()
+        run: npx tsc --noEmit
 
       - name: Run stylelint for all files
         if: github.event_name == 'push' && (success() || failure())
