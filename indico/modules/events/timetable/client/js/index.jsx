@@ -26,6 +26,7 @@ import {getCurrentDateLocalStorage} from './utils';
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
+      const eventType = eventInfo.type;
       const startDt = moment.tz(
         `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
         eventInfo.startDate.tz
@@ -34,6 +35,7 @@ import {getCurrentDateLocalStorage} from './utils';
       const initialData = {
         staticData: {
           eventId,
+          eventType,
           startDt,
           endDt: moment.tz(
             `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,

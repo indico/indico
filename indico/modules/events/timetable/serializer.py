@@ -12,7 +12,6 @@ from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.date_time import iterdays
@@ -341,7 +340,7 @@ def serialize_event_info(event, *, management=False, user=None):
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,
-            'isConference': event.type_ == EventType.conference,
+            'type': event.type,
             'isDraft': should_show_draft_warning(event),
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
             'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
