@@ -138,6 +138,21 @@ interface SetSessionDataAction {
   data: any;
 }
 
+interface EditSessionAction {
+  type: typeof EDIT_SESSION;
+  session: Session;
+}
+
+interface CreateSessionAction {
+  type: typeof CREATE_SESSION;
+  session: Session;
+}
+
+interface DeleteSessionAction {
+  type: typeof DELETE_SESSION;
+  sessionId: number;
+}
+
 interface ToggleShowUnscheduledAction {
   type: typeof TOGGLE_SHOW_UNSCHEDULED;
 }
@@ -172,6 +187,9 @@ export type Action =
   | UndoChangeAction
   | RedoChangeAction
   | SetSessionDataAction
+  | EditSessionAction
+  | CreateSessionAction
+  | DeleteSessionAction
   | ToggleShowUnscheduledAction
   | SetCurrentDateAction
   | ToggleExpandAction
@@ -186,7 +204,7 @@ export function setSessionData(data: any): SetSessionDataAction {
 }
 
 export function editSession(sessionId: number, session: Session) {
-  return (dispatch, getState) => {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
       sessions,
@@ -205,7 +223,10 @@ export function editSession(sessionId: number, session: Session) {
 }
 
 export function createSession(session: Session) {
-  return async (dispatch, getState) => {
+  return async (
+    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
+    getState: () => ReduxState
+  ) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -225,7 +246,7 @@ export function createSession(session: Session) {
 }
 
 export function deleteSession(sessionId: number) {
-  return (dispatch, getState) => {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
