@@ -17,7 +17,7 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import PublicationModal from './PublicationModal';
 
 interface PublicationStateSwitch {
-  eventId: string;
+  eventId: number;
   onSuccess?: () => void;
   [key: string]: any;
 }
