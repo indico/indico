@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import createSessionURL from 'indico-url:sessions.api_create_session';
+import sessionURL from 'indico-url:sessions.api_manage_session';
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
@@ -24,14 +26,17 @@ import {
   EntryType,
   Entry,
   UnscheduledContribEntry,
+  Session,
 } from './types';
-import {getEntryURLByObjId} from './utils';
+import {getEntryURLByObjId, mapTTDataToSession} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
+export const DELETE_SESSION = 'Delete session';
+export const CREATE_SESSION = 'Create session';
+export const EDIT_SESSION = 'Edit session';
 export const SET_CURRENT_DATE = 'Set current date';
-export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
@@ -152,8 +157,59 @@ export function setSessionData(data) {
   return {type: SET_SESSION_DATA, data};
 }
 
-export function addSessionData(data) {
-  return {type: ADD_SESSION_DATA, data};
+export function editSession(sessionId: number, session: Session) {
+  return (dispatch, getState) => {
+    const {
+      staticData: {eventId},
+      sessions,
+    } = getState();
+    const url = sessionURL({event_id: eventId, session_id: sessionId});
+    const newSessionObj = mapTTDataToSession(session);
+    const changedSession = {...sessions[sessionId], ...newSessionObj};
+
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.patch(url, session), {
+        type: EDIT_SESSION,
+        session: changedSession,
+      })
+    );
+  };
+}
+
+export function createSession(session: Session) {
+  return async (dispatch, getState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const url = createSessionURL({event_id: eventId});
+
+    try {
+      const {data: newSession} = await indicoAxios.post(url, session);
+
+      await dispatch({
+        type: CREATE_SESSION,
+        session: mapTTDataToSession(newSession),
+      });
+    } catch (e) {
+      handleAxiosError(e);
+    }
+  };
+}
+
+export function deleteSession(sessionId: number) {
+  return (dispatch, getState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const url = sessionURL({event_id: eventId, session_id: sessionId});
+
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.delete(url), {
+        type: DELETE_SESSION,
+        sessionId,
+      })
+    );
+  };
 }
 
 export function setDraftEntry(data): SetDraftEntryAction {
