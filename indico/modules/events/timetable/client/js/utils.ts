@@ -83,12 +83,14 @@ export function getDefaultColorByType(type: EntryType): Colors {
   }[type];
 }
 
+export function mapTTColor(dbColors): Colors {
+  return {color: dbColors.text, backgroundColor: dbColors.background};
+}
+
 export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
 
-  const fallbackColor = colors
-    ? {color: colors.text, backgroundColor: colors.background}
-    : getDefaultColorByType(dbEntry.type);
+  const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
 
   if (type === EntryType.SessionBlock) {
     return sessions[sessionId].colors ?? fallbackColor;
@@ -112,6 +114,17 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
     case EntryType.Break:
       return `b${id}`;
   }
+};
+
+export const mapTTDataToSession = (data): Session => {
+  data = camelizeKeys(data);
+  return {
+    ...data,
+    ...(data.colors && {colors: mapTTColor(data.colors)}),
+    ...(data.defaultContributionDuration && {
+      defaultContribDurationMinutes: data.defaultContributionDuration / 60,
+    }),
+  };
 };
 
 export const mapTTDataToEntry = (
