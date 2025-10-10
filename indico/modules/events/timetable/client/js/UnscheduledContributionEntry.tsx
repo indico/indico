@@ -26,7 +26,7 @@ export function DraggableUnscheduledContributionEntry({
   duration,
   colors,
 }: {
-  id: number;
+  id: string;
   dt: Moment;
   title: string;
   duration: number;
