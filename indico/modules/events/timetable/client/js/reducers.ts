@@ -444,7 +444,7 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: true}, action) => {
+  display: (state = {showUnscheduled: false}, action) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
