@@ -18,7 +18,7 @@
        href="{{ attachment.link_url if visible_link else attachment.download_url }}" target="_blank"
        rel="noopener noreferrer"
        title="{{ attachment.description or attachment.title }}
-              {%- if attachment.annotations.source %} ({{attachment.annotations.source}}){% endif %}
+              {%- if attachment.annotations.source %} ({{ attachment.annotations.source }}){% endif %}
               {%- if attachment.is_self_protected %} ({% trans %}Protected{% endtrans %}){% endif %}">
         {%- if not has_label -%}
             <span class="title">{{ attachment.title }}</span>
