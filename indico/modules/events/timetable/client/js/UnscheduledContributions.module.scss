@@ -7,18 +7,83 @@
 
 @use 'base/palette' as *;
 
+.contributions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .contributions-container {
-  width: min(25vw, 30em);
+  width: min(320px, 100%);
   flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
 
   .content {
     overflow: visible;
+    overflow-x: auto;
+    height: 100%;
+    padding: 1em 1em 1em 0;
 
     & > h4 {
       display: flex;
 
       & > i:global(.icon) {
         margin-left: auto;
+      }
+    }
+
+    .actions {
+      display: flex;
+      margin-bottom: 20px;
+
+      :global(.ui.search.selection.dropdown) {
+        width: 100%;
+        min-width: 0;
+        flex-shrink: 1;
+        flex-grow: 0;
+        font-size: 1rem;
+
+        > input:global(.search) {
+          left: 0;
+        }
+
+        > :global(.menu > .header.text) {
+          text-wrap: wrap;
+        }
+
+        :global(.divider.text) {
+          line-height: unset;
+          width: 100%;
+          flex: 1;
+          min-width: 0;
+
+          .session {
+            width: 100%;
+          }
+        }
+
+        > button {
+          flex-shrink: 0;
+          flex-grow: 1;
+        }
+      }
+
+      :global(.active),
+      :global(.active.item) {
+        font-weight: normal;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      :global(.ui.button) {
+        font-weight: normal;
+
+        &:active {
+          background-color: transparent;
+        }
       }
     }
 
@@ -31,11 +96,18 @@
       }
     }
 
-    .description {
-      margin-top: 0.5em;
-      font-size: 0.9em;
-      font-style: italic;
-      color: $gray;
+    .session {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 0;
+
+      > span {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-top: -1px;
+      }
     }
   }
 }

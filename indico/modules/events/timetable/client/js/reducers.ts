@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 
 import * as actions from './actions';
@@ -412,11 +413,19 @@ export default {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
-      case actions.ADD_SESSION_DATA:
-        return preprocessSessionData({
-          ...Object.fromEntries(Object.entries(state)),
-          [action.data.id]: {...action.data, isPoster: false},
-        });
+      case actions.EDIT_SESSION:
+        return {
+          ...state,
+          ...preprocessSessionData({[action.session.id]: {...action.session}}),
+        };
+      case actions.DELETE_SESSION: {
+        return _.omit(state, action.sessionId);
+      }
+      case actions.CREATE_SESSION:
+        return {
+          ...state,
+          ...preprocessSessionData({[action.session.id]: {...action.session, isPoster: false}}),
+        };
       default:
         return state;
     }
