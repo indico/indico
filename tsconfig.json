@@ -2,12 +2,12 @@
   "compilerOptions": {
     "target": "ESNext",
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": false,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "isolatedModules": true,
     "moduleResolution": "Node",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -29,6 +29,8 @@
       "axios/unsafe/*": ["./node_modules/axios/lib/*"],
       "*": ["./node_modules/*"]
     },
+    "strictNullChecks": true,
+    "strict": true,
     "typeRoots": ["./node_modules/@types"]
   },
   "include": ["indico/**/client/**/*", "indico/web/client/js/types", "indico/global.d.ts"]

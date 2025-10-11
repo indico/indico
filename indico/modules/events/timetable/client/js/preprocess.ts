@@ -61,7 +61,7 @@ const entryTypeMapping = {
 
 export function preprocessSessionData(
   data: Record<string, SchemaSession>
-): Record<number, Session> {
+): Record<string, Session> {
   return Object.fromEntries(
     Object.entries(data).map(([, s]) => [
       s.id,

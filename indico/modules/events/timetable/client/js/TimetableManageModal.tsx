@@ -30,10 +30,9 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {BlockEntry, EntryType, Session} from './types';
+import {ReduxState, BlockEntry, EntryType, Session} from './types';
 import {DATE_KEY_FORMAT, getEntryUniqueId, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
@@ -196,7 +195,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
-  const _handleCreateContribution = async data => {
+  const _handleCreateContribution = async (data: any) => {
     data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
@@ -220,7 +219,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
   };
 
-  const _handleCreateSessionBlock = async data => {
+  const _handleCreateSessionBlock = async (data: any) => {
     data.conveners = data.person_links;
     data = _.pick(data, [
       'session_id',
@@ -240,7 +239,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   // TODO: Implement logic for breaks
-  const _handleCreateBreak = async data => {
+  const _handleCreateBreak = async (data: any) => {
     data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
@@ -256,19 +255,19 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
-  const _handleEditContribution = async data => {
+  const _handleEditContribution = async (data: any) => {
     return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: objId}), data);
   };
 
-  const _handleEditSessionBlock = async data => {
+  const _handleEditSessionBlock = async (data: any) => {
     return indicoAxios.patch(sessionBlockURL({event_id: eventId, session_block_id: objId}), data);
   };
 
-  const _handleEditBreak = async data => {
+  const _handleEditBreak = async (data: any) => {
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
-  const handleSubmit = async (data, form) => {
+  const handleSubmit = async (data: any, form: any) => {
     const submitHandlers = isEditing
       ? {
           [EntryType.Contribution]: _handleEditContribution,
@@ -321,9 +320,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const changeForm = (key: EntryType) => {
     setActiveType(key);
-    if (key === EntryType.SessionBlock && !sessionValues.length) {
-      forms[activeType];
-    }
   };
 
   const meetsSubmitConditions = () => {
