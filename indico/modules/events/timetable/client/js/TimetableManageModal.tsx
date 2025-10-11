@@ -267,7 +267,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
-  const handleSubmit = async (data, form) => {
+  const handleSubmit = async (data: any, form: any) => {
     const submitHandlers = isEditing
       ? {
           [EntryType.Contribution]: _handleEditContribution,

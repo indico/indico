@@ -22,6 +22,8 @@ export enum PersonLinkRole {
 
 export type HexColor = `#${string}`;
 
+export type EventType = 'lecture' | 'meeting' | 'conference';
+
 export interface PersonLink {
   affiliation: string;
   avatarURL: string;
@@ -166,6 +168,7 @@ interface StaticData {
   endDt: Moment;
   defaultContribDurationMinutes: number;
   eventLocationParent: LocationParent;
+  eventType: EventType;
 }
 
 export interface Navigation {

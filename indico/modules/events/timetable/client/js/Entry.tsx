@@ -48,8 +48,8 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   // if dragged, this prevents selecting the entry on drag end (and thus showing the popup)
   const isClick = useRef<boolean>(true);
 
-  function onClick(e) {
-    e.stopPropagation();
+  function onClick(evt: React.MouseEvent<HTMLElement>) {
+    evt.stopPropagation();
     if (isClick.current) {
       dispatch(actions.selectEntry(id));
     }
@@ -118,7 +118,7 @@ export function DraggableBlockEntry({id, ...rest}: DraggableBlockEntryProps) {
 interface _EntryProps {
   sessionTitle?: string;
   isDragging: boolean;
-  transform: {x: number; y: number} | null;
+  transform: {x: number; y: number} | undefined;
   listeners: Record<string, unknown>;
   setNodeRef: (element: HTMLElement | null) => void;
   blockRef?: React.RefObject<HTMLDivElement>;
@@ -159,7 +159,7 @@ export default function ContributionEntry({
   parent,
   colors,
   children: _children = [],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
   renderChildren = true,
 }: DraggableContribEntryProps) {
