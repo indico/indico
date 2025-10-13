@@ -40,7 +40,7 @@ jobs:
 
       - name: Install uv
         if: matrix.language == 'python'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Install Python dependencies
         if: matrix.language == 'python'
@@ -51,7 +51,7 @@ jobs:
           echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           setup-python-dependencies: false
@@ -61,7 +61,7 @@ jobs:
           # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4

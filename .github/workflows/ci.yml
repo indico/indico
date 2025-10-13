@@ -40,7 +40,7 @@ jobs:
           cache-dependency-path: package*.json
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -174,7 +174,7 @@ jobs:
           python-version: ${{ env[matrix.python_version_var] }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
@@ -220,7 +220,7 @@ jobs:
           python-version: ${{ env[matrix.python_version_var] }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
@@ -253,7 +253,7 @@ jobs:
           cache-dependency-path: package*.json
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Cache node_modules
         uses: actions/cache@v4
