@@ -115,54 +115,54 @@
 .action-box {
   @include action-box();
   @include action-box-colors(
-    $color: $dark-gray,
-    $emphasis-color: $light-black,
-    $background-color: $light-gray,
-    $border-color: $dark-gray
+    $color: var(--msg-default-text-color),
+    $emphasis-color: var(--msg-default-main-color),
+    $background-color: var(--msg-default-background-color),
+    $border-color: var(--msg-default-main-color)
   );
 
   &.highlight {
     @include action-box-colors(
-      $color: $light-black,
-      $emphasis-color: $blue,
-      $background-color: $light-blue,
-      $border-color: $blue
+      $color: var(--msg-highlight-text-color),
+      $emphasis-color: var(--msg-highlight-main-color),
+      $background-color: var(--msg-highlight-background-color),
+      $border-color: var(--msg-highlight-main-color)
     );
   }
 
   &.warning {
     @include action-box-colors(
-      $color: $dark-gray,
-      $emphasis-color: $yellow,
-      $background-color: $light-yellow,
-      $border-color: $yellow
+      $color: var(--msg-warning-text-color),
+      $emphasis-color: var(--msg-warning-main-color),
+      $background-color: var(--msg-warning-background-color),
+      $border-color: var(--msg-warning-main-color)
     );
   }
 
   &.danger {
     @include action-box-colors(
-      $color: $light-black,
-      $emphasis-color: $red,
-      $background-color: $light-red,
-      $border-color: $red
+      $color: var(--msg-danger-text-color),
+      $emphasis-color: var(--msg-danger-main-color),
+      $background-color: var(--msg-danger-background-color),
+      $border-color: var(--msg-danger-main-color)
     );
   }
 
   &.disabled {
     @include action-box-colors(
-      $color: $light-black,
-      $emphasis-color: $black,
-      $background-color: $pastel-gray,
-      $border-color: $black
+      $color: var(--msg-disabled-text-color),
+      $emphasis-color: var(--msg-disabled-main-color),
+      $background-color: var(--msg-disabled-background-color),
+      $border-color: var(--msg-disabled-main-color)
     );
   }
 
   &.accept {
     @include action-box-colors(
-      $color: $light-black,
-      $emphasis-color: $green,
-      $background-color: $light-green,
-      $border-color: $green
+      $color: var(--msg-accept-text-color),
+      $emphasis-color: var(--msg-accept-main-color),
+      $background-color: var(--msg-accept-background-color),
+      $border-color: var(--msg-accept-main-color)
     );
   }
 

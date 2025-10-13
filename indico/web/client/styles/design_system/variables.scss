@@ -108,6 +108,26 @@ body {
   --text-size-abs-xl: 1.5rem;
   --text-size-abs-xxl: 2rem;
 
+  // Special messages components (action boxes, notices, etc.)
+  --msg-default-main-color: var(--text-color);
+  --msg-default-background-color: #f9f9f9;
+  --msg-default-text-color: var(--text-color);
+  --msg-highlight-main-color: var(--accent-color);
+  --msg-highlight-background-color: #edf4fd;
+  --msg-highlight-text-color: var(--text-color);
+  --msg-warning-main-color: #aa5302;
+  --msg-warning-background-color: #feefd5;
+  --msg-warning-text-color: var(--text-color);
+  --msg-danger-main-color: #d60000;
+  --msg-danger-background-color: #ffeded;
+  --msg-danger-text-color: var(--text-color);
+  --msg-accept-main-color: #1a8344;
+  --msg-accept-background-color: #ebfdeb;
+  --msg-accept-text-color: var(--text-color);
+  --msg-disabled-main-color: #9f9d9d;
+  --msg-disabled-background-color: #f9f9f9;
+  --msg-disabled-text-color: var(--text-secondary-color);
+
   // TODO: Compensates from base font size of 14px coming from SUI.
   // This should be set to 1 once SUI is removed.
   //
