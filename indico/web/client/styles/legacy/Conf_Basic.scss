@@ -16,9 +16,7 @@
 :root {
   /* Header */
   --conf-theme-header-bg: #1a64a0;
-  --conf-theme-header-border-top: #234173;
   --conf-theme-header-border-bottom: #0f4c80;
-  --conf-theme-header-border-top-width: 0;
   --conf-theme-header-text: white;
 
   /* Subtitle area */
@@ -95,7 +93,6 @@
   color: var(--conf-theme-header-text);
   min-height: 90px;
   text-align: left;
-  border-top: var(--conf-theme-header-border-top-width) solid var(--conf-theme-header-border-top);
   border-bottom: 1px solid var(--conf-theme-header-border-bottom);
   background: var(--conf-theme-header-bg) var(--conf-theme-title-sprite-bg) repeat-x 0 -24px;
 }
