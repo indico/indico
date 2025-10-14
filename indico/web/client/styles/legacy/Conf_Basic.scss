@@ -12,6 +12,45 @@
         Do not custom this CSS
     */
 
+// CSS Variables for conference theme customization
+:root {
+  /* Header */
+  --conf-theme-header-bg: #1a64a0;
+  --conf-theme-header-border-bottom: #0f4c80;
+  --conf-theme-header-text: white;
+
+  /* Subtitle area */
+  --conf-theme-subtitle-bg: #f5faff;
+  --conf-theme-subtitle-border: #d5e4f1;
+  --conf-theme-subtitle-text: #24425a;
+
+  /* Menu colors */
+  --conf-theme-menu-bg: #f6f6f6;
+  --conf-theme-menu-border: #ccc;
+  --conf-theme-menu-link: #275c86;
+  --conf-theme-menu-selected: #bd891a;
+  --conf-theme-menu-selected-bg: #dadada;
+  --conf-theme-menu-selected-border: #d0d0d0;
+
+  --conf-theme-hover-bg: #e0e0e0;
+  --conf-theme-hover-color: var(--conf-theme-menu-link);
+
+  /* Support box */
+  --conf-theme-support-bg: #f6f6f6;
+  --conf-theme-support-border: #ccc;
+  --conf-theme-support-header-bg: #1a64a0;
+  --conf-theme-support-header-text: #f3f3f3;
+  --conf-theme-support-text: #aaa;
+
+  /* Announcement colors */
+  --conf-theme-announcement-bg: #f5faff;
+  --conf-theme-announcement-border: #c2d6e7;
+  --conf-theme-announcement-text: #0f283d;
+  --conf-theme-announcement-border-top: 1px solid var(--conf-theme-announcement-border);
+  --conf-theme-announcement-border-bottom: none;
+  --conf-theme-announcement-shadow: inset 0 0 0.3em var(--conf-theme-announcement-border);
+}
+
 /*     ------Wrapper------ */
 
 /*     this is the wrapper of whole conference page */
@@ -26,7 +65,7 @@
     Header
 */
 .confheader {
-  background: #1a64a0;
+  background: var(--conf-theme-header-bg);
 }
 
 .confheader .event-label {
@@ -48,10 +87,11 @@
 }
 
 .confTitleBox {
-  color: white;
+  color: var(--conf-theme-header-text);
   min-height: 90px;
   text-align: left;
-  background: #1a64a0;
+  border-bottom: 1px solid var(--conf-theme-header-border-bottom);
+  background: var(--conf-theme-header-bg) repeat-x 0 -24px;
 }
 
 .confTitle {
@@ -68,13 +108,13 @@
   font-size: 22pt;
   display: block;
   padding: 25px 0;
-  color: white;
+  color: var(--conf-theme-header-text);
 }
 
 .confSubTitleBox {
-  background: #f5faff;
-  border-bottom: 1px solid #d5e4f1;
-  border-top: 1px solid #d5e4f1;
+  background: var(--conf-theme-subtitle-bg);
+  border-bottom: 1px solid var(--conf-theme-subtitle-border);
+  border-top: 1px solid var(--conf-theme-subtitle-border);
   padding: 0.5rem 0;
 }
 
@@ -86,7 +126,7 @@
   width: 950px;
   margin: 0 auto;
   font-size: 11pt;
-  color: #24425a;
+  color: var(--conf-theme-subtitle-text);
 }
 
 .confSubTitle a {
@@ -145,9 +185,9 @@ div.event-details {
 #outer {
   width: 100%;
   position: relative;
-  background: #f6f6f6;
+  background: var(--conf-theme-menu-bg);
 
-  border: 1px solid #ccc;
+  border: 1px solid var(--conf-theme-menu-border);
 
   list-style-image: none;
   list-style-position: outside;
@@ -172,8 +212,9 @@ div.event-details {
   cursor: default;
 }
 
-#outer li a:not(.no-link):hover {
-  background: #e0e0e0;
+#outer li a:hover {
+  background: var(--conf-theme-hover-bg);
+  color: var(--conf-theme-hover-color);
 }
 
 .conf_leftMenu {
@@ -184,10 +225,12 @@ div.event-details {
 
 .menuConfTitle {
   text-align: left;
+  /* Common color shared by brown and orange themes */
+  color: #0200c6;
 }
 
 .menuConfTitle a {
-  color: #275c86;
+  color: var(--conf-theme-menu-link);
   padding: 7px 12px;
 }
 
@@ -209,10 +252,15 @@ li.menuConfMiddleCell a {
 
 .menuConfSelected,
 .menuConfMiddleCellSelected {
-  color: #bd891a;
-  background: #dadada;
-  border-bottom: 1px solid #d0d0d0;
-  border-top: 1px solid #d0d0d0;
+  color: var(--conf-theme-menu-selected);
+  background: var(--conf-theme-menu-selected-bg);
+  border-bottom: 1px solid var(--conf-theme-menu-selected-border);
+  border-top: 1px solid var(--conf-theme-menu-selected-border);
+}
+
+/* Common selected menu link styling */
+.menuConfSelected a {
+  color: var(--conf-theme-menu-link);
 }
 
 .menuConfBottomCell {
@@ -325,14 +373,16 @@ pre {
 }
 
 .simpleTextAnnouncement {
-  background: #f5faff url(static:images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
-  border-top: 1px solid #c2d6e7;
+  background: var(--conf-theme-announcement-bg) repeat-x scroll 0 -400px;
+  border-top: var(--conf-theme-announcement-border-top);
+  border-bottom: var(--conf-theme-announcement-border-bottom);
+  box-shadow: var(--conf-theme-announcement-shadow);
   padding: 8px 0;
   font-family: Verdana, sans-serif;
   font-weight: bold;
   font-size: 10pt;
   text-align: center;
-  color: #0f283d;
+  color: var(--conf-theme-announcement-text);
 }
 
 /* Elements not part of the conference itself */
@@ -350,14 +400,14 @@ ul.chair_list {
 .support_box {
   margin-top: 10px !important;
   width: 100%;
-  color: #aaa;
-  background: #f6f6f6;
-  border: 1px solid #ccc;
+  color: var(--conf-theme-support-text);
+  background: var(--conf-theme-support-bg);
+  border: 1px solid var(--conf-theme-support-border);
 }
 
 .support_box > h3 {
-  color: #f3f3f3;
-  background: #1a64a0;
+  color: var(--conf-theme-support-header-text);
+  background: var(--conf-theme-support-header-bg);
   margin: 0 0 5px 0;
   padding: 5px;
   font-weight: normal;
