@@ -13,6 +13,7 @@
   "event_layout": "events/layout",
   "event_management": "events/management",
   "event_roles": "events/roles",
+  "formify": "formify",
   "global": "global",
   "papers": "papers",
   "registration": "registration",

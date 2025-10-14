@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.controllers.management import RHEventManageRegFormBase
 from indico.modules.events.registration.models.invitations import (InvitationState, MockRegistrationInvitation,
                                                                    RegistrationInvitation)
 from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
@@ -57,7 +57,7 @@ def _get_invitation_data(regform):
     }
 
 
-class RHRegistrationFormInvitations(RHManageRegFormBase):
+class RHRegistrationFormInvitations(RHEventManageRegFormBase):
     """Overview of all registration invitations."""
 
     def _process(self):
@@ -68,7 +68,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
                                                     has_pending_invitations=_has_pending_invitations(invitations))
 
 
-class RHRegistrationFormInvite(RHManageRegFormBase):
+class RHRegistrationFormInvite(RHEventManageRegFormBase):
     """Invite someone to register."""
 
     @use_kwargs(NewInvitationSchema)
@@ -142,7 +142,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
             })
 
 
-class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
+class RHRegistrationFormInviteMetadata(RHEventManageRegFormBase):
     """Provide metadata required to render the invitation dialog."""
 
     def _process(self):
@@ -161,7 +161,7 @@ class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
         })
 
 
-class RHRegistrationFormImportInvites(RHManageRegFormBase):
+class RHRegistrationFormImportInvites(RHEventManageRegFormBase):
     """Import invitations from a CSV file using the REST API."""
 
     @use_kwargs(InvitationImportSchema)
@@ -189,7 +189,7 @@ class RHRegistrationFormImportInvites(RHManageRegFormBase):
         return jsonify(skipped=skipped, sent=len(invitations), **_get_invitation_data(self.regform))
 
 
-class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
+class RHRegistrationFormImportInvitesUpload(RHEventManageRegFormBase):
     """Process a CSV file into invitation user records."""
 
     @use_kwargs({'file': fields.Raw(required=True)}, location='files')
@@ -209,7 +209,7 @@ class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
         return InvitationUserSchema(many=True).jsonify(rows)
 
 
-class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
+class RHRegistrationFormInvitationPreview(RHEventManageRegFormBase):
     """Return a preview of an invitation email."""
 
     @use_kwargs({
@@ -237,14 +237,14 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
-class RHPendingInvitationsBase(RHManageRegFormBase):
+class RHPendingInvitationsBase(RHEventManageRegFormBase):
     """Mixin for RHs that work on pending invitations."""
 
     @use_kwargs({
         'invitation_ids': fields.List(fields.Int(), load_default=None),
     })
     def _process_args(self, invitation_ids):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         query = (RegistrationInvitation.query.with_parent(self.regform)
                  .filter(RegistrationInvitation.state == InvitationState.pending))
         if invitation_ids is not None:
@@ -333,7 +333,7 @@ class RHRegistrationFormRemindersPreview(RHPendingInvitationsBase):
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
-class RHRegistrationFormInvitationBase(RHManageRegFormBase):
+class RHRegistrationFormInvitationBase(RHEventManageRegFormBase):
     """Base class for RH working on one invitation."""
 
     normalize_url_spec = {
@@ -343,7 +343,7 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
     }
 
     def _process_args(self):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         self.invitation = RegistrationInvitation.get_or_404(request.view_args['invitation_id'])
 
 

@@ -21,9 +21,9 @@ from speaklater import is_lazy_string
 
 from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWithTOC, Spacer, escape
 from indico.modules.events.layout.util import get_menu_entry_by_name
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.settings import track_settings
+from indico.modules.formify.models.items import PersonalDataType
 from indico.util.date_time import format_date, format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.string import format_full_name, render_markdown, sanitize_for_platypus, strip_tags, truncate

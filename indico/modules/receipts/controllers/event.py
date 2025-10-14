@@ -19,12 +19,12 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.categories.models.categories import Category
-from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.controllers.management import RHEventManageRegFormsBase
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.files.models.files import File
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
@@ -46,7 +46,7 @@ from indico.web.flask.util import send_file
 IMAGE_PREVIEW_SIZE = 256
 
 
-class RHAllEventTemplates(RHManageRegFormsBase):
+class RHAllEventTemplates(RHEventManageRegFormsBase):
     """Get all available receipt templates for an event."""
 
     def _apply_event_defaults(self, tpl, defaults):
@@ -101,7 +101,7 @@ def _make_image_preview(img):
         return ''
 
 
-class RHEventImages(RHManageRegFormsBase):
+class RHEventImages(RHEventManageRegFormsBase):
     """Get all available images for an event."""
 
     def _process(self):
@@ -147,13 +147,13 @@ class EventReceiptTemplateMixin:
             raise Forbidden
 
 
-class RenderReceiptsBase(EventReceiptTemplateMixin, RHManageRegFormsBase):
+class RenderReceiptsBase(EventReceiptTemplateMixin, RHEventManageRegFormsBase):
     @use_kwargs({
         'registration_ids': fields.List(fields.Integer(), required=True),
         'custom_fields': fields.Dict(keys=fields.String, load_default=lambda: {}),
     })
     def _process_args(self, registration_ids, custom_fields):
-        RHManageRegFormsBase._process_args(self)
+        RHEventManageRegFormsBase._process_args(self)
         EventReceiptTemplateMixin._process_args(self)
         self.registrations = (Registration.query
                               .filter(Registration.id.in_(registration_ids),
@@ -163,7 +163,7 @@ class RenderReceiptsBase(EventReceiptTemplateMixin, RHManageRegFormsBase):
         self.custom_fields_raw = custom_fields
 
     def _check_access(self):
-        RHManageRegFormsBase._check_access(self)
+        RHEventManageRegFormsBase._check_access(self)
         EventReceiptTemplateMixin._check_access(self)
 
     def _get_custom_fields(self):
@@ -271,7 +271,7 @@ class RHGenerateReceipts(RenderReceiptsBase):
         return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 
-class RHExportReceipts(ZipGeneratorMixin, RHManageRegFormsBase):
+class RHExportReceipts(ZipGeneratorMixin, RHEventManageRegFormsBase):
     """Export an archive of multiple receipts."""
 
     def _prepare_folder_structure(self, file):
@@ -288,7 +288,7 @@ class RHExportReceipts(ZipGeneratorMixin, RHManageRegFormsBase):
         'receipt_ids': fields.List(fields.Integer(), required=True, validate=not_empty),
     })
     def _process_args(self, receipt_ids):
-        RHManageRegFormsBase._process_args(self)
+        RHEventManageRegFormsBase._process_args(self)
         self.receipts = (ReceiptFile.query
                          .filter(ReceiptFile.file_id.in_(receipt_ids),
                                  ReceiptFile.registration.has(event=self.event),

@@ -11,14 +11,14 @@ from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDi
 from indico.web.views import WPJinjaMixin
 
 
-class WPManageRegistration(WPEventManagement):
-    template_prefix = 'events/registration/'
+class WPEventManageRegistrationForm(WPEventManagement):
+    template_prefix = 'formify/'
     bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_receipts.js',
-               'module_receipts.css')
+               'module_receipts.css', 'module_formify.js', 'module_formify.css')
 
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         self.regform = kwargs.get('regform')
-        self.registration = kwargs.get('registration')
+        self.url_prefix = 'event_registration'
         WPEventManagement.__init__(self, rh, event_, active_menu_item, **kwargs)
 
     @property
@@ -31,6 +31,14 @@ class WPManageRegistration(WPEventManagement):
             if regform and regform.is_participation:
                 return 'participants'
         return 'registration'
+
+
+class WPManageRegistration(WPEventManageRegistrationForm):
+    template_prefix = 'events/registration/'
+
+    def __init__(self, rh, event_, active_menu_item=None, **kwargs):
+        self.registration = kwargs.get('registration')
+        WPEventManageRegistrationForm.__init__(self, rh, event_, active_menu_item, **kwargs)
 
 
 class WPManageRegistrationStats(WPManageRegistration):
@@ -53,7 +61,8 @@ class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConfer
     template_prefix = 'events/registration/'
     base_class = WPConferenceDisplayBase
     menu_entry_name = 'registration'
-    bundles = ('module_events.registration.js', 'module_events.registration.css')
+    bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_formify.js',
+               'module_formify.css')
 
 
 class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
@@ -63,4 +72,5 @@ class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
 class WPDisplayRegistrationFormSimpleEvent(DisplayRegistrationFormMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/registration/'
     base_class = WPSimpleEventDisplayBase
-    bundles = ('module_events.registration.js', 'module_events.registration.css')
+    bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_formify.js',
+               'module_formify.css')

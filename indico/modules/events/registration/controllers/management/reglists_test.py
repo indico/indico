@@ -11,14 +11,14 @@ import pytest
 from flask import request
 from werkzeug.exceptions import UnprocessableEntity
 
-from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCreate,
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationsBasePrice)
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_registration
+from indico.modules.formify.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.formify.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.items import RegistrationFormSection
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'

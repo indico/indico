@@ -1,0 +1,114 @@
+{% extends 'categories/management/base.html' if category|default(none) else 'events/management/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Registration{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% if event is defined %}
+        {% trans -%}
+            Registration forms allow people to register for the event.
+        {%- endtrans %}
+    {% else %}
+        {% trans -%}
+            Create Registration forms re-usable by events within this category or subcategories.
+        {%- endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if event is defined %}
+        {% include 'events/registration/management/_regform_list_event_features.html' %}
+    {% endif %}
+    {{ template_hook('extra-registration-settings', target=target) }}
+    <div class="regform-list">
+        <h3>{% trans %}List of registration forms{% endtrans %}</h3>
+        {% for regform in regforms %}
+            <div class="action-box">
+                <div class="section">
+                    <div class="icon icon-quill"></div>
+                    <div class="text">
+                        <div class="label">{{ regform.title }}</div>
+                    </div>
+                    <div class="toolbar">
+                        {% if event is defined %}
+                            <div class="group">
+                                {% set purged_title %}
+                                    {% trans %}Registration is disabled due to an expired retention period{% endtrans %}
+                                {% endset %}
+                                <a href="{{ url_for('event_registration.manage_reglist', regform) }}"
+                                class="i-button icon-users {% if regform.is_purged %}disabled{% endif %}"
+                                {% if regform.is_purged %}title="{{ purged_title }}"{% endif %}>
+                                    {%- trans %}Registrations{% endtrans -%}
+                                    {% block existing_count scoped %}
+                                        <span class="badge">
+                                            {{- regform.active_registration_count -}}
+                                            {% if regform.registration_limit %}
+                                                / {{ regform.registration_limit }}
+                                            {%- endif -%}
+                                        </span>
+                                    {% endblock %}
+                                </a>
+                            </div>
+                        {% endif %}
+                        <div class="group">
+                            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
+                                {% trans %}Manage{% endtrans %}
+                            </a>
+                        </div>
+                        {% block delete_regform_button scoped %}
+                            <div class="group hide-if-locked">
+                                <button class="i-button icon-remove danger text-color"
+                                        title="{% trans %}Delete this registration form{% endtrans %}"
+                                        data-qtip-style="danger"
+                                        data-href="{{ url_for('.delete_regform', regform) }}"
+                                        data-method="POST"
+                                        data-title="{% trans %}Delete registration form?{% endtrans %}"
+                                        data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></button>
+                            </div>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {%- call message_box('info', fixed_width=true) -%}
+                {% trans %}There are no registration forms yet.{% endtrans %}
+            {%- endcall %}
+        {% endfor %}
+    </div>
+
+    <div class="toolbar f-j-end hide-if-locked">
+        {% block create_form_button %}
+            {% if event is defined %}
+                <a href="" class="i-button icon-plus arrow js-dropdown"
+                   title="{% trans %}Create form{% endtrans %}"
+                   data-toggle="dropdown">
+                    {%- trans %}Create form{% endtrans -%}
+                </a>
+                <ul class="i-dropdown">
+                    <li>
+                        <a href="{{ url_for('.create_regform', target) }}">
+                            {%- trans %}Create new form{% endtrans -%}
+                        </a>
+                    </li>
+                    {# TODO, if there are no template regforms in any category then this option shouldn't show #}
+                    <li>
+                        <a href="{{ url_for('event_registration.create_regform_from_template', target) }}">
+                            {%- trans %}Create from template{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
+            {% else %}
+                <a href="{{ url_for('.create_regform', target) }}" class="i-button icon-plus">
+                    {%- trans %}Create form{% endtrans -%}
+                </a>
+            {% endif %}
+        {% endblock %}
+    </div>
+    {% if event is defined %}
+        <script>
+            setupRegistrationFormListPage();
+        </script>
+    {% endif %}
+{% endblock %}

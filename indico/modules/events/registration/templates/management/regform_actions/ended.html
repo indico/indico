@@ -15,8 +15,8 @@
 
 {% block now_button %}
     <div class="group">
-        <button data-href="{{ url_for('.open_regform', regform) }}"
-                data-method="POST" 
+        <button data-href="{{ url_for('event_registration.open_regform', regform) }}"
+                data-method="POST"
                 class="i-button"
                 data-confirm="{% trans %}Registrations finished already. Do you want to open them again?{% endtrans %}">
             {% trans %}Reopen now{% endtrans %}

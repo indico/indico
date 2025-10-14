@@ -8,9 +8,9 @@
 import pytest
 from marshmallow import ValidationError
 
-from indico.modules.events.registration.controllers.management.fields import GeneralFieldDataSchema
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormSection
+from indico.modules.formify.controllers.management.fields import GeneralFieldDataSchema
+from indico.modules.formify.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.items import PersonalDataType, RegistrationFormSection
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'

@@ -107,3 +107,19 @@ class WPCategoryManagement(WPCategory):
         if menu_item := get_menu_item('category-management-sidemenu', self.active_menu_item, category=self.category):
             return (*title_parts, menu_item.title)
         return title_parts
+
+
+class WPCategoryManageRegistrationForm(WPCategoryManagement):
+    template_prefix = 'formify/'
+    bundles = ('module_categories.registration.js', 'module_formify.js', 'module_formify.css')
+
+    def __init__(self, rh, category, active_menu_item=None, **kwargs):
+        self.regform = kwargs.get('regform')
+        WPCategoryManagement.__init__(self, rh, category, active_menu_item, **kwargs)
+
+    def _get_parent_category_breadcrumb_url(self, category, management=False):
+        if not management:
+            return category.url
+        # we don't want template-specific urls since those may be tied
+        # to the previous category
+        return url_for('categories.manage_regform_list', category)

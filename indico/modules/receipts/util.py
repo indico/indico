@@ -36,8 +36,8 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings

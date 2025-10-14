@@ -15,7 +15,7 @@ from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.pdf import PIXELS_CM
 from indico.modules.designer.placeholders import GROUPS
 from indico.modules.events.models.events import Event
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.util.date_time import now_utc
 from indico.util.placeholders import get_placeholders
 

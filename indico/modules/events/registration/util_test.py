@@ -16,16 +16,16 @@ from flask import session
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
                                                      get_registered_event_persons, get_ticket_qr_code_data,
                                                      get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration)
+from indico.modules.formify.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.formify.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.users.models.users import UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
