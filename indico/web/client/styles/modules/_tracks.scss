@@ -48,15 +48,6 @@
   }
 }
 
-ul.sub-tracks {
-  list-style-type: none;
-  padding-left: 30px;
-
-  li h3 {
-    font-size: 14px !important;
-  }
-}
-
 .embedded-track-list {
   padding: 30px 20px;
   border: 1px solid $pastel-gray;
@@ -113,9 +104,12 @@ ul.tracks {
   list-style-type: none;
   padding-left: 0;
 
-  li {
+  > li {
     color: $black;
-    margin-top: 2em;
+
+    &:not(:first-child) {
+      margin-top: 2em;
+    }
 
     .track-title {
       @include border-bottom($separator-color);
@@ -138,5 +132,18 @@ ul.tracks {
     .description {
       color: $light-black;
     }
+  }
+}
+
+ul.sub-tracks {
+  list-style-type: none;
+  padding-left: 30px;
+
+  > li:not(:first-child) {
+    margin-top: 2em;
+  }
+
+  > li .track-title > h3 {
+    font-size: 14px !important;
   }
 }

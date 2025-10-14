@@ -15,7 +15,7 @@
 
 {% block content %}
     {% if program %}
-        <div class="quotation tracks js-mathjax">
+        <div class="quotation editor-output js-mathjax">
             {{- program -}}
         </div>
     {% endif %}
@@ -47,9 +47,11 @@
                 </a>
             {% endif %}
         </div>
-        <div class="description">
-            {{- track.description -}}
-        </div>
+        {% if track.description %}
+            <div class="description editor-output">
+                {{- track.description -}}
+            </div>
+        {% endif %}
     </li>
 {% endmacro %}
 
@@ -58,9 +60,11 @@
         <div class="track-title flexrow f-a-center">
             <h3 class="f-self-stretch">{{ group.title }}</h3>
         </div>
-        <div class="description">
-            {{- group.description -}}
-        </div>
+        {% if group.description %}
+            <div class="description editor-output">
+                {{- group.description -}}
+            </div>
+        {% endif %}
         {% if group.tracks %}
             <ul class="sub-tracks f-j-space-between ">
                 {% for track in group.tracks %}
