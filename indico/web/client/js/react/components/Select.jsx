@@ -6,10 +6,19 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useRef} from 'react';
+import React, {useRef, useEffect} from 'react';
 
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {optionPropType} from 'indico/react/util/propTypes';
+
+function DefaultLabel({option}) {
+  return option.label ?? option.value;
+}
+
+DefaultLabel.propTypes = {
+  option: optionPropType,
+};
 
 export default function Select({
   options,
@@ -18,9 +27,18 @@ export default function Select({
   disabled,
   required,
   className,
+  filter,
+  optionComponent: Option,
+  placeholder,
   ...inputProps
 }) {
   const indSelectRef = useRef();
+
+  useEffect(() => {
+    if (filter) {
+      indSelectRef.current.filterByKeyword = filter;
+    }
+  }, [filter]);
 
   // Boolean attributes need special treatment because React
   // sets attributes rather than properties on custom elements.
@@ -39,7 +57,7 @@ export default function Select({
   return (
     <ind-select ref={indSelectRef} value={value} {...inputProps} data-clearable={!required}>
       <div className="caption" data-caption>
-        <Translate>Select a choice</Translate>
+        {placeholder}
       </div>
       {required ? null : (
         <button type="button" className="clear" value="clear" hidden>
@@ -75,8 +93,8 @@ export default function Select({
             }
 
             return (
-              <li role="option" data-value={option.value} key={option.value} {...optionProps}>
-                {option.label ?? option.value}
+              <li key={option.value} role="option" data-value={option.value} {...optionProps}>
+                <Option option={option} />
               </li>
             );
           })}
@@ -105,10 +123,16 @@ Select.propTypes = {
   required: PropTypes.bool,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  filter: PropTypes.func,
+  optionComponent: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
   className: PropTypes.string,
+  placeholder: PropTypes.string,
 };
 
 Select.defaultProps = {
   disabled: false,
   required: false,
+  filter: undefined,
+  optionComponent: DefaultLabel,
+  placeholder: Translate.string('Select an choice'),
 };

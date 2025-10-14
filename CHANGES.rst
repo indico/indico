@@ -111,6 +111,8 @@ Accessibility
   thanks :user:`foxbunny`)
 - Improve screen reader + keyboard support in the registration form picture field
   (:pr:`7064, 7065`, thanks :user:`foxbunny`)
+- New time picker with improved accessibility and usability (:pr:`6930`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
