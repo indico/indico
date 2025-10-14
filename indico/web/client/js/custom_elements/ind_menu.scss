@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
 @use 'partials/icons';
 
 ind-menu {
@@ -15,15 +16,23 @@ ind-menu {
   display: inline-flex;
 
   > menu {
-    position: absolute;
-    top: 100%;
-    min-width: 100%;
+    @extend %popup-positioned-target;
+    min-width: var(--anchor-width, 100%);
     width: max-content;
     z-index: 1;
   }
 
   > menu :is(li, a) {
     width: 100%;
+  }
+
+  &:not([open]) > menu:not([data-position-check]) {
+    display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+  }
+
+  > menu[data-position-check] {
+    opacity: 0;
+    pointer-events: none;
   }
 
   > button::after {
@@ -36,13 +45,8 @@ ind-menu {
     transform: rotateX(-180deg);
   }
 
-  > button[aria-expanded='true'] + menu {
+  &[open] > button[aria-expanded='true'] + menu {
     animation: menu-slide-down var(--time-menu-animation);
-  }
-
-  > :not([aria-expanded='true']) + menu {
-    display: none; // must be set to none to hide it from a11y tools and tab navigation as well
-    animation: menu-slide-up var(--time-menu-animation);
   }
 }
 
