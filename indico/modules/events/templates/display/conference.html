@@ -9,29 +9,38 @@
         </div>
 
         <div class="infogrid">
+            <h2>{% trans %}Conference information{% endtrans %}</h2>
             <div class="infoline date">
-                <span title="{% trans %}Date/Time{% endtrans %}" class="icon icon-time" aria-hidden="true"></span>
+                <h3 class="icon icon-time">
+                    <span>{% trans %}Date/Time{% endtrans %}</span>
+                </h3>
                 <div class="text">
-                    <div>
+                    <p>
                         <span class="label">{% trans %}Starts{% endtrans %}</span>
                         <time datetime="{{ event.start_dt_display.isoformat() }}">
                             {{ event.start_dt_display|format_datetime(timezone=event.display_tzinfo) }}
                         </time>
-                    </div>
-                    <div>
+                    </p>
+                    <p>
                         <span class="label">{% trans %}Ends{% endtrans %}</span>
                         <time datetime="{{ event.end_dt_display.isoformat() }}">
                             {{ event.end_dt_display|format_datetime(timezone=event.display_tzinfo) }}
                         </time>
-                    </div>
-                    <div class="timezone">{{ event.display_tzinfo.zone }}</div>
+                    </p>
+                    <p>
+                        {% set display_tz = event.display_tzinfo.zone %}
+                        <span class="timezone-label">{% trans %}All times are in {{ display_tz }}{% endtrans %}</span>
+                        <span class="timezone" aria-hidden="true">{{ display_tz }}</span>
+                    </p>
                 </div>
             </div>
 
             {% block location_info %}
                 {% if event.has_location_info or event.address %}
                     <div class="infoline location">
-                        <span title="{% trans %}Location{% endtrans %}" class="icon icon-location" aria-hidden="true"></span>
+                        <h3 class="icon icon-location">
+                            <span>{% trans %}Location{% endtrans %}</span>
+                        </h3>
                         <div class="text">
                             <div class="place">
                                 {{ event.venue_name }}
@@ -58,8 +67,9 @@
 
             {% if event.person_links %}
                 <div class="infoline chairs clear">
-                    <span title="{% trans %}Chairpersons{% endtrans %}" class="icon icon-user"
-                          aria-hidden="true"></span>
+                    <h3 class="icon icon-user">
+                        <span>{% trans %}Chairpersons{% endtrans %}</span>
+                    </h3>
                     <ul class="chair_list text">
                         {% for link in event.person_links|sort(attribute='display_order_key') %}
                             <li>
@@ -83,7 +93,9 @@
             {% set can_attach = event.can_manage_attachments(session.user) %}
             {% if can_attach or event.attached_items %}
                 <div class="infoline material material-list">
-                    <span title="{% trans %}Materials{% endtrans %}" class="icon icon-attachment" aria-hidden="true"></span>
+                    <h3 class="icon icon-attachment">
+                        <span>{% trans %}Materials{% endtrans %}</span>
+                    </h3>
                     <div class="text attachments-box">
                         {{ render_attachments(event.attached_items, management=false) }}
                     </div>
@@ -101,8 +113,9 @@
 
             {% if event.additional_info %}
                 <div class="infoline info">
-                    <span title="{% trans %}Extra information{% endtrans %}" class="icon icon-info"
-                          aria-hidden="true"></span>
+                    <h3 class="icon icon-info">
+                        <span>{% trans %}Extra information{% endtrans %}</span>
+                    </h3>
                     <div class="text">
                         {{ event.additional_info|rich_markup }}
                     </div>
