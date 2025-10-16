@@ -52,10 +52,10 @@ export const pickItemURL = createSelector(
 export const getURLParams = createSelector(
   getStaticData,
   staticData => {
-    const {eventId, regformId} = staticData;
+    const {targetLocator, regformId} = staticData;
     return (sectionId = null, itemId = null) => {
       const params = {
-        event_id: eventId,
+        ...targetLocator,
         reg_form_id: regformId,
       };
 
