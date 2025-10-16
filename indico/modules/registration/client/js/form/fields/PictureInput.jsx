@@ -32,7 +32,7 @@ export default function PictureInput({
   isRequired,
   minPictureSize,
 }) {
-  const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
+  const {regformId, targetLocator, registrationUuid, fileData} = useSelector(getStaticData);
   const initialPictureDetails = fileData ? fileData[htmlName] || null : null;
   const isManagement = useSelector(getManagement);
   const [invitationToken, formToken] = useMemo(() => {
@@ -43,7 +43,7 @@ export default function PictureInput({
   const previewURL = isManagement ? managementPreviewURL : registrantPreviewURL;
   const uploadURL = isManagement ? managementUploadURL : registrantUploadURL;
   const uploadUrlParams = {
-    event_id: eventId,
+    ...targetLocator,
     reg_form_id: regformId,
     field_id: fieldId,
   };
@@ -57,6 +57,7 @@ export default function PictureInput({
     uploadUrlParams.form_token = formToken;
   }
   const previewUrlParams = initialPictureDetails ? initialPictureDetails.locator : null;
+  const isTemplateForm = 'category_id' in targetLocator;
 
   return (
     <div styleName="file-field" id={htmlId}>
@@ -64,8 +65,8 @@ export default function PictureInput({
         name={htmlName}
         disabled={disabled}
         required={isRequired}
-        uploadURL={uploadURL(uploadUrlParams)}
-        previewURL={previewUrlParams ? previewURL(previewUrlParams) : ''}
+        uploadURL={isTemplateForm ? '' : uploadURL(uploadUrlParams)}
+        previewURL={isTemplateForm || !previewUrlParams ? '' : previewURL(previewUrlParams)}
         initialPictureDetails={initialPictureDetails}
         minPictureSize={minPictureSize}
       />
