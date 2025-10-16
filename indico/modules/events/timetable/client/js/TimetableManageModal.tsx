@@ -232,10 +232,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'conveners',
       'code',
     ]);
-    const resData = await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
-    resData['person_links'] = resData['conveners'];
-    delete resData['conveners'];
-    return resData;
+    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 
   // TODO: Implement logic for breaks
