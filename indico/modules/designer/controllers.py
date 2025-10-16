@@ -537,41 +537,55 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
         return jsonify(template=template_data, backside_template_id=self.template.id)
 
 
-class RHToggleTicketDefaultOnCategory(RHManageCategoryBase):
+class RHToggleDefaultCategoryDesignerTemplateBase(RHManageCategoryBase):
+    template_type = None
+    default_template_attr = None
+
+    @use_kwargs({'template': ModelField(DesignerTemplate, required=True, data_key='template_id')}, location='view_args')
+    def _process_args(self, template):
+        RHManageCategoryBase._process_args(self)
+        self.template = template
+
     def _process(self):
-        template = DesignerTemplate.get_or_404(request.view_args['template_id'])
-        all_ticket_templates = [tpl for tpl in get_all_templates(self.category)
-                                if tpl.type == TemplateType.badge and tpl.is_ticket]
-        if template not in all_ticket_templates:
+        all_templates = self._get_all_templates()
+        if self.template not in all_templates:
             raise Exception('Invalid template')
-        if template == self.category.default_ticket_template:
+        if self.template == getattr(self.category, self.default_template_attr):
             # already the default -> clear it
-            self.category.default_ticket_template = None
-        elif template == get_default_ticket_on_category(self.category, only_inherited=True):
+            setattr(self.category, self.default_template_attr, None)
+        elif self.template == self._get_default_template_on_category():
             # already the inherited default -> clear it instead of setting it explicitly
-            self.category.default_ticket_template = None
+            setattr(self.category, self.default_template_attr, None)
         else:
-            self.category.default_ticket_template = template
-        if self.category.is_root and not self.category.default_ticket_template:
-            raise Exception('Cannot clear default ticket template on root category')
+            setattr(self.category, self.default_template_attr, self.template)
+        if self.category.is_root and not getattr(self.category, self.default_template_attr):
+            raise Exception(f'Cannot clear default {self.template_type} template on root category')
         return jsonify_data(html=_render_template_list(self.category))
 
+    def _get_all_templates(self):
+        raise NotImplementedError
 
-class RHToggleBadgeDefaultOnCategory(RHManageCategoryBase):
-    def _process(self):
-        template = DesignerTemplate.get_or_404(request.view_args['template_id'])
-        all_badge_templates = [tpl for tpl in get_all_templates(self.category)
-                               if tpl.type == TemplateType.badge and not tpl.is_ticket]
-        if template not in all_badge_templates:
-            raise Exception('Invalid template')
-        if template == self.category.default_badge_template:
-            # already the default -> clear it
-            self.category.default_badge_template = None
-        elif template == get_default_badge_on_category(self.category, only_inherited=True):
-            # already the inherited default -> clear it instead of setting it explicitly
-            self.category.default_badge_template = None
-        else:
-            self.category.default_badge_template = template
-        if self.category.is_root and not self.category.default_badge_template:
-            raise Exception('Cannot clear default ticket template on root category')
-        return jsonify_data(html=_render_template_list(self.category))
+    def _get_default_template_on_category(self):
+        raise NotImplementedError
+
+
+class RHToggleTicketDefaultOnCategory(RHToggleDefaultCategoryDesignerTemplateBase):
+    template_type = 'ticket'
+    default_template_attr = 'default_ticket_template'
+
+    def _get_all_templates(self):
+        return [tpl for tpl in get_all_templates(self.category) if tpl.type == TemplateType.badge and tpl.is_ticket]
+
+    def _get_default_template_on_category(self):
+        return get_default_ticket_on_category(self.category, only_inherited=True)
+
+
+class RHToggleBadgeDefaultOnCategory(RHToggleDefaultCategoryDesignerTemplateBase):
+    template_type = 'badge'
+    default_template_attr = 'default_badge_template'
+
+    def _get_all_templates(self):
+        return [tpl for tpl in get_all_templates(self.category) if tpl.type == TemplateType.badge and not tpl.is_ticket]
+
+    def _get_default_template_on_category(self):
+        return get_default_badge_on_category(self.category, only_inherited=True)
