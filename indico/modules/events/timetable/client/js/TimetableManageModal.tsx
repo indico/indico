@@ -22,7 +22,7 @@ import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
@@ -193,7 +193,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
-  const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
+  const [activeType, setActiveType] = useState<EntryType>(
+    isEditing ? entry.type : Object.keys(forms)[0]
+  );
 
   const _handleCreateContribution = async (data: any) => {
     data.session_block_id = sessionBlockId;
@@ -212,11 +214,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'code',
       'session_block_id',
     ]);
-    try {
-      return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
-    } catch (error) {
-      handleAxiosError(error, true);
-    }
+    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
   const _handleCreateSessionBlock = async (data: any) => {
@@ -341,7 +339,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       size="small"
       header={
         isEditing
-          ? `${Translate.string('Edit')} ${typeLongNames[entry.type]}`
+          ? `${Translate.string('Edit')} ${typeLongNames[entry.type as EntryType]}`
           : Translate.string('Create new timetable entry')
       }
       noSubmitButton
@@ -364,16 +362,16 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
             <div>
               {Object.keys(forms)
                 .filter(key => !(isCreatingChild && key === EntryType.SessionBlock))
-                .map((key: EntryType) => (
+                .map(key => (
                   <Button
                     key={key}
                     type="button"
                     onClick={() => {
-                      changeForm(key);
+                      changeForm(key as EntryType);
                     }}
                     color={activeType === key ? 'blue' : undefined}
                   >
-                    {typeLongNames[key]}
+                    {typeLongNames[key as EntryType]}
                   </Button>
                 ))}
             </div>

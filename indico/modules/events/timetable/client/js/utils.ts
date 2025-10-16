@@ -116,7 +116,7 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
   }
 };
 
-export const mapTTDataToSession = (data): Session => {
+export const mapTTDataToSession = (data: any): Session => {
   data = camelizeKeys(data);
   return {
     ...data,

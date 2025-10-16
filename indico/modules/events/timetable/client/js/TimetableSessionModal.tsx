@@ -10,6 +10,7 @@ import sessionColorURL from 'indico-url:sessions.api_random_session_color';
 import locationParentURL from 'indico-url:sessions.api_sessions_location_parent';
 import typesURL from 'indico-url:sessions.types_rest';
 
+import {FormApi} from 'final-form';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux/es';
 import {Dimmer, Loader} from 'semantic-ui-react';
@@ -42,7 +43,7 @@ export function TimetableSessionEditModal({sessionId, onClose}: TimetableSession
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = (formData, form) => {
+  const handleSubmit = (formData: any, form: FormApi) => {
     dispatch(actions.editSession(formData.id, getChangedValues(formData, form)));
     onClose();
   };

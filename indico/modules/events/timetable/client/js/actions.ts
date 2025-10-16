@@ -203,7 +203,7 @@ export function setSessionData(data: any): SetSessionDataAction {
   return {type: SET_SESSION_DATA, data};
 }
 
-export function editSession(sessionId: number, session: Session) {
+export function editSession(sessionId: number, session: Partial<Session>) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
