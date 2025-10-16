@@ -29,7 +29,7 @@ interface SessionFormProps {
   header: string;
   locationParent: any;
   onSubmit: (formData: any, form?: any) => void;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 interface SessionFormFieldsProps {
@@ -98,9 +98,9 @@ export function SessionForm({
       id="session-form"
       header={header}
       onSubmit={onSubmit}
+      onClose={onClose}
       initialValues={initialValues}
       size="small"
-      {...(onClose ? {onClose} : {})}
     >
       <SessionFormFields {...{eventType, sessionTypes, locationParent}} />
     </FinalModalForm>
@@ -262,6 +262,10 @@ export function EditSessionButton({
     }
     const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
+    if (!element) {
+      console.error(`No element matched ${triggerSelector}`);
+      return;
+    }
     element.addEventListener('click', handler);
     return () => element.removeEventListener('click', handler);
   }, [triggerSelector]);
@@ -306,6 +310,10 @@ export function AddSessionButton({
     }
     const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
+    if (!element) {
+      console.error(`No element matched ${triggerSelector}`);
+      return;
+    }
     element.addEventListener('click', handler);
     return () => element.removeEventListener('click', handler);
   }, [triggerSelector]);

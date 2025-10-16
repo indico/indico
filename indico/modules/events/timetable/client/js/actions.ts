@@ -13,6 +13,8 @@ import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
+import {Dispatch} from 'redux';
+import {ThunkDispatch} from 'redux-thunk/es';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -27,6 +29,7 @@ import {
   Entry,
   UnscheduledContribEntry,
   Session,
+  ReduxState,
 } from './types';
 import {getEntryURLByObjId, mapTTDataToSession} from './utils';
 
@@ -97,7 +100,6 @@ interface ScheduleEntryAction {
 interface UnscheduleEntryAction {
   type: typeof UNSCHEDULE_ENTRY;
   entry: ContribEntry | ChildContribEntry;
-  eventId: number;
 }
 
 interface CreateEntryAction {
@@ -116,13 +118,11 @@ interface UpdateEntryAction {
 interface DeleteBreakAction {
   type: typeof DELETE_BREAK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
-  eventId: number;
 }
 
 interface DeleteBlockAction {
   type: typeof DELETE_BLOCK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
-  eventId: number;
 }
 
 interface UndoChangeAction {
@@ -131,6 +131,44 @@ interface UndoChangeAction {
 
 interface RedoChangeAction {
   type: typeof REDO_CHANGE;
+}
+
+interface SetSessionDataAction {
+  type: typeof SET_SESSION_DATA;
+  data: any;
+}
+
+interface EditSessionAction {
+  type: typeof EDIT_SESSION;
+  session: Session;
+}
+
+interface CreateSessionAction {
+  type: typeof CREATE_SESSION;
+  session: Session;
+}
+
+interface DeleteSessionAction {
+  type: typeof DELETE_SESSION;
+  sessionId: number;
+}
+
+interface ToggleShowUnscheduledAction {
+  type: typeof TOGGLE_SHOW_UNSCHEDULED;
+}
+
+interface SetCurrentDateAction {
+  type: typeof SET_CURRENT_DATE;
+  date: Moment;
+  eventId: number;
+}
+
+interface ToggleExpandAction {
+  type: typeof TOGGLE_EXPAND;
+}
+
+interface ToggleDraftAction {
+  type: typeof TOGGLE_DRAFT;
 }
 
 export type Action =
@@ -147,18 +185,26 @@ export type Action =
   | DeleteBlockAction
   | SetDraftEntryAction
   | UndoChangeAction
-  | RedoChangeAction;
+  | RedoChangeAction
+  | SetSessionDataAction
+  | EditSessionAction
+  | CreateSessionAction
+  | DeleteSessionAction
+  | ToggleShowUnscheduledAction
+  | SetCurrentDateAction
+  | ToggleExpandAction
+  | ToggleDraftAction;
 
 export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
 }
 
-export function setSessionData(data) {
+export function setSessionData(data: any): SetSessionDataAction {
   return {type: SET_SESSION_DATA, data};
 }
 
-export function editSession(sessionId: number, session: Session) {
-  return (dispatch, getState) => {
+export function editSession(sessionId: number, session: Partial<Session>) {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
       sessions,
@@ -177,7 +223,10 @@ export function editSession(sessionId: number, session: Session) {
 }
 
 export function createSession(session: Session) {
-  return async (dispatch, getState) => {
+  return async (
+    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
+    getState: () => ReduxState
+  ) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -197,7 +246,7 @@ export function createSession(session: Session) {
 }
 
 export function deleteSession(sessionId: number) {
-  return (dispatch, getState) => {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -212,11 +261,11 @@ export function deleteSession(sessionId: number) {
   };
 }
 
-export function setDraftEntry(data): SetDraftEntryAction {
+export function setDraftEntry(data: any): SetDraftEntryAction {
   return {type: SET_DRAFT_ENTRY, data};
 }
 
-export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string) {
+export function moveEntry(entry: Entry, eventId: number, entries: TopLevelEntry[], date: string) {
   let entryURL: string;
 
   switch (entry.type) {
@@ -239,29 +288,28 @@ export function moveEntry(entry, eventId, entries: TopLevelEntry[], date: string
   });
 }
 
-export function toggleExpand() {
+export function toggleExpand(): ToggleExpandAction {
   return {type: TOGGLE_EXPAND};
 }
 
-export function toggleDraft() {
+export function toggleDraft(): ToggleDraftAction {
   return {type: TOGGLE_DRAFT};
 }
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
-  return (dispatch, getState) => {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {staticData} = getState();
     const eventId = staticData.eventId;
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
     const entryData = {duration: duration * 60};
 
-    return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
-        type: RESIZE_ENTRY,
-        date,
-        duration,
-        entry,
-      })
-    );
+    const action = synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+      type: RESIZE_ENTRY,
+      date,
+      duration,
+      entry,
+    } as ResizeEntryAction);
+    return dispatch(action);
   };
 }
 
@@ -273,20 +321,18 @@ export function deselectEntry(): DeselectEntryAction {
   return {type: DESELECT_ENTRY};
 }
 
-export function deleteBreak(entry, eventId) {
+export function deleteBreak(entry: BreakEntry, eventId: number) {
   const entryURL = breakURL({event_id: eventId, break_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: DELETE_BREAK,
-    entryURL,
     entry,
   });
 }
 
-export function deleteBlock(entry, eventId) {
+export function deleteBlock(entry: BlockEntry, eventId: number) {
   const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: DELETE_BLOCK,
-    entryURL,
     entry,
   });
 }
@@ -316,11 +362,10 @@ export function scheduleEntry(
   );
 }
 
-export function unscheduleEntry(entry, eventId) {
+export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
     type: UNSCHEDULE_ENTRY,
-    entryURL,
     entry,
   });
 }
@@ -336,27 +381,32 @@ export function redoChange(): RedoChangeAction {
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
-function _createEntry(entryType, entry) {
+
+function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
   return {type: CREATE_ENTRY, entryType, entry};
 }
 
-export function createEntry(entryType, entry) {
-  return dispatch => {
+export function createEntry(entryType: EntryType, entry: Entry) {
+  return (dispatch: Dispatch<Action>) => {
     const color = entry.colors;
     const newEntry = {...entry, ...color};
     dispatch(_createEntry(entryType, newEntry));
   };
 }
 
-export function editEntry(entryType, entry) {
+export function editEntry(entryType: EntryType, entry: Entry) {
   return {type: EDIT_ENTRY, entryType, entry};
 }
 
-export function updateEntry(entryType, entry, currentDay): UpdateEntryAction {
+export function updateEntry(
+  entryType: EntryType,
+  entry: Entry,
+  currentDay: string
+): UpdateEntryAction {
   return {type: UPDATE_ENTRY, entryType, entry, currentDay};
 }
 
-export function setCurrentDate(date: Moment, eventId: number) {
+export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
   return {type: SET_CURRENT_DATE, date, eventId};
 }
 
@@ -375,7 +425,7 @@ class RequestQueue {
     this.working = false;
   }
 
-  submitRequest(request) {
+  submitRequest(request: () => Promise<object>) {
     this.requests.push(request);
     if (!this.working) {
       this._processRequests().catch(error => {
@@ -389,7 +439,7 @@ class RequestQueue {
     while (this.requests.length) {
       const requestFunc = this.requests.shift();
       try {
-        await requestFunc();
+        await requestFunc?.();
       } catch (error) {
         handleAxiosError(error, true);
       }
@@ -406,8 +456,8 @@ const requestQueue = new RequestQueue();
  * @param requestFunc Function that does the AJAX request (typically an indicoAxios call).
  * @param action Action to dispatch immediately before the request.
  */
-export function synchronizedAjaxAction(requestFunc: () => Promise<object>, action?: object) {
-  return dispatch => {
+export function synchronizedAjaxAction(requestFunc: () => Promise<object>, action?: Action) {
+  return (dispatch: Dispatch) => {
     if (action) {
       dispatch(action);
     }

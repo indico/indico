@@ -12,6 +12,11 @@ interface Coords {
   y: number;
 }
 
+export interface CoordsWithOffset extends Coords {
+  offsetX: number;
+  offsetY: number;
+}
+
 export type MousePosition = Coords;
 export type Transform = Coords;
 
