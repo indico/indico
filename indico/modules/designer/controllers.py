@@ -542,9 +542,9 @@ class RHToggleDefaultCategoryDesignerTemplateBase(RHManageCategoryBase):
     default_template_attr = None
 
     @use_kwargs({'template': ModelField(DesignerTemplate, required=True, data_key='template_id')}, location='view_args')
-    def _process_args(self, **kwargs):
+    def _process_args(self, template):
         RHManageCategoryBase._process_args(self)
-        self.template = kwargs['template']
+        self.template = template
 
     def _process(self):
         all_templates = self._get_all_templates()
