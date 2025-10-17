@@ -111,31 +111,29 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
                     <Icon name="download" /> <Translate>Download ZIP</Translate>
                   </Button>
                 }
-                content={
-                  <div styleName="download-popup">
-                    <Message warning>
-                      <Icon name="warning sign" />
-                      <Translate>
-                        You haven't assigned this editable to yourself. Are you sure you want to
-                        download it anyway?
-                      </Translate>
-                    </Message>
-                    <Button
-                      as="a"
-                      href={downloadURL}
-                      icon
-                      positive
-                      styleName="confirm-download"
-                      labelPosition="left"
-                    >
-                      <Icon name="check" />
-                      <Translate>Yes, download anyway</Translate>
-                    </Button>
-                  </div>
-                }
                 on="click"
                 position="right center"
-              />
+              >
+                <div styleName="download-popup">
+                  <Message warning>
+                    <Icon name="warning sign" />
+                    <Translate>
+                      You haven't assigned this editable to yourself. Are you sure you want to
+                      download it anyway?
+                    </Translate>
+                  </Message>
+                  <Button
+                    as="a"
+                    href={downloadURL}
+                    icon
+                    styleName="confirm-download"
+                    labelPosition="left"
+                  >
+                    <Icon name="download" />
+                    <Translate>Download anyway</Translate>
+                  </Button>
+                </div>
+              </Popup>
             ) : (
               <Button
                 as="a"
