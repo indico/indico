@@ -142,7 +142,7 @@ import setupReactPaperTimeline from './setup';
 })(window);
 
 customElements.define(
-  'ind-paper-types-management',
+  'ind-paper-file-types-management',
   class extends HTMLElement {
     connectedCallback() {
       domReady.then(() => {
