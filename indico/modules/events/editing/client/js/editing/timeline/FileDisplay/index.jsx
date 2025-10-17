@@ -116,7 +116,7 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
                     <Message warning>
                       <Icon name="warning sign" />
                       <Translate>
-                        You haven’t assigned this editable to yourself. Are you sure you want to
+                        You haven't assigned this editable to yourself. Are you sure you want to
                         download it anyway?
                       </Translate>
                     </Message>
