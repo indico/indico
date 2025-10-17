@@ -1,0 +1,9 @@
+{% extends 'events/papers/management/_base.html' %}
+
+{% block content %}
+    <h1>WIP: Edit through papers</h1>
+    <ind-paper-types-management
+        event-id="{{ event.id }}"
+        search-token="{{ make_user_search_token() }}"
+    ></ind-editing-management>
+{% endblock %}
