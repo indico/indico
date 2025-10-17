@@ -8,25 +8,33 @@
 from flask import flash, render_template, request, session
 from werkzeug.exceptions import NotFound
 
+from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.editing.controllers.base import TokenAccessMixin
+from indico.modules.events.editing.schemas import EditableFileTypeArgs
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
                                                 PaperTeamsForm, make_competences_form)
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperReview, PaperReviewType
 from indico.modules.events.papers.models.revisions import PaperRevision
-from indico.modules.events.papers.operations import (close_cfp, create_competences, open_cfp, schedule_cfp,
-                                                     set_deadline, set_reviewing_state, update_competences,
+from indico.modules.events.papers.operations import (close_cfp, create_competences, create_new_file_type,
+                                                     delete_file_type, open_cfp, schedule_cfp, set_deadline,
+                                                     set_reviewing_state, update_competences, update_file_type,
                                                      update_team_members)
+from indico.modules.events.papers.schemas import PaperFileTypeSchema
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
+from indico.web.args import use_rh_args
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -314,3 +322,46 @@ class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
 
         sort_reviewing_questions(questions, question_ids)
         return jsonify_data(flash=False)
+
+
+class RHPapersCreateFileType(RHManageEventBase):
+    """Create a new file type."""
+
+    SERVICE_ALLOWED = True
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+
+    @use_rh_args(EditableFileTypeArgs)
+    def _process(self, data):
+        file_type = create_new_file_type(self.event, **data)
+        return PaperFileTypeSchema().jsonify(file_type)
+
+
+class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
+    """Delete/update a file type."""
+
+    SERVICE_ALLOWED = True
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.file_type = (PaperFileType.query
+                          .with_parent(self.event)
+                          .filter_by(id=request.view_args['file_type_id'])
+                          .first_or_404())
+
+    @use_rh_args(EditableFileTypeArgs, partial=True)
+    def _process_PATCH(self, data):
+        update_file_type(self.file_type, **data)
+        return PaperFileTypeSchema().jsonify(self.file_type)
+
+    def _process_DELETE(self):
+        if self.file_type.publishable:
+            is_last = not (PaperFileType.query
+                           .with_parent(self.event)
+                           .filter(PaperFileType.publishable, PaperFileType.id != self.file_type.id)
+                           .has_rows())
+            if is_last:
+                raise UserValueError(_('Cannot delete the only publishable file type'))
+        delete_file_type(self.file_type)
+        return '', 204
