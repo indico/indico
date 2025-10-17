@@ -18,6 +18,8 @@ Improvements
 - Add support for showing registration pictures in the check-in app (:pr:`7099`)
 - Support post-event reminders relative to the event end time (:pr:`7094`)
 - Log local group membership changes of users (:pr:`7122`, thanks :user:`tomako`)
+- Warn when downloading files from an editable not assigned to you (:issue:`7131`,
+  :pr:`7132`)
 
 Bugfixes
 ^^^^^^^^
