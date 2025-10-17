@@ -1,7 +1,7 @@
 """Add annotations and converted_from_id to attachments, add case-insensitive collation
 
 Revision ID: e4f49c197158
-Revises: 869fb2760b41
+Revises: 43d2bff509c1
 Create Date: 2025-09-25 16:31:15.926991
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'e4f49c197158'
-down_revision = '869fb2760b41'
+down_revision = '43d2bff509c1'
 branch_labels = None
 depends_on = None
 
