@@ -22,7 +22,9 @@ from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.groups.util import serialize_group
 from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.users import User
+from indico.modules.users.operations import add_users_to_group, remove_users_from_group
 from indico.util.i18n import _, pgettext
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -111,11 +113,14 @@ class RHGroupEdit(RHAdminBase):
         existing_group = self.group if not self.new_group else None
         form = EditGroupForm(obj=existing_group, group=existing_group)
         if form.validate_on_submit():
-            form.populate_obj(self.group)
+            form.populate_obj(self.group, skip={'members'})
             if self.new_group:
                 db.session.add(self.group)
+                add_users_to_group(form.members.data, self.group)
                 msg = _("The group '{name}' has been created.")
             else:
+                add_users_to_group(form.members.data - self.group.members, self.group)
+                remove_users_from_group(self.group.members - form.members.data, self.group)
                 msg = _("The group '{name}' has been updated.")
             db.session.flush()
             flash(msg.format(name=self.group.name), 'success')
@@ -144,8 +149,9 @@ class RHGroupDelete(RHLocalGroupBase):
 class RHGroupDeleteMember(RHLocalGroupBase):
     """Admin group member deletion (ajax)."""
 
-    def _process(self):
-        self.group.members.discard(User.get(request.view_args['user_id']))
+    @use_kwargs({'user': ModelField(User, required=True, data_key='user_id')}, location='view_args')
+    def _process(self, user):
+        remove_users_from_group({user}, self.group)
         return jsonify(success=True)
 
 

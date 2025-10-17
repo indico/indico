@@ -17,6 +17,7 @@ Improvements
   usually incorrect) token links (:pr:`7093`)
 - Add support for showing registration pictures in the check-in app (:pr:`7099`)
 - Support post-event reminders relative to the event end time (:pr:`7094`)
+- Log local group membership changes of users (:pr:`7122`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^

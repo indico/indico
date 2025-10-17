@@ -94,3 +94,19 @@ def delete_or_anonymize_user(user):
     else:
         signals.users.db_deleted.send(user, flushed=True)
         logger.info('User %r deleted %s', session.user if session else None, user_repr)
+
+
+def add_users_to_group(users, group, *, extra_log_data=None):
+    for user in (set(users) - group.members):
+        group.members.add(user)
+        user.log(UserLogRealm.user, LogKind.positive, 'Groups',
+                 f'Added to group {group.name}', session.user if session else None,
+                 data=extra_log_data, meta={'group_id': group.id})
+
+
+def remove_users_from_group(users, group, *, extra_log_data=None):
+    for user in (set(users) & group.members):
+        group.members.discard(user)
+        user.log(UserLogRealm.user, LogKind.negative, 'Groups',
+                 f'Removed from group {group.name}', session.user if session else None,
+                 data=extra_log_data, meta={'group_id': group.id})
