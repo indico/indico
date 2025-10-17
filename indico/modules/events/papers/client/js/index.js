@@ -7,7 +7,15 @@
 
 /* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false, enableIfChecked:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'indico/modules/events/reviews';
+
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
+import {domReady} from 'indico/utils/domstate';
+
+import FileTypeManager from '../../../editing/client/js/management/editable_type/file_types/FileTypeManager';
 
 import setupReactPaperTimeline from './setup';
 
@@ -132,6 +140,28 @@ import setupReactPaperTimeline from './setup';
     });
   };
 })(window);
+
+customElements.define(
+  'ind-paper-types-management',
+  class extends HTMLElement {
+    connectedCallback() {
+      domReady.then(() => {
+        ReactDOM.render(
+          <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+            <h1>Hello</h1>
+            {/* <EditableTypeSubPageNav title="File types" /> */}
+            <FileTypeManager eventId={+this.getAttribute('event-id')} editableType="paper" />
+          </UserSearchTokenContext.Provider>,
+          this
+        );
+      });
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
 
 document.addEventListener('DOMContentLoaded', () => {
   setupReactPaperTimeline();

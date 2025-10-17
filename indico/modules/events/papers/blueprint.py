@@ -7,7 +7,7 @@
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import api, display, management, paper, templates
+from indico.modules.events.papers.controllers import api, common, display, frontend, management, paper, templates
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -28,6 +28,13 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>/review/<any(content,layout):revie
                  api.RHCreateReview, methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit',
                  'api_update_review', api.RHUpdateReview, methods=('POST',))
+
+_bp.add_url_rule('papers/api/file-types', 'api_papers_file_types',
+                 common.RHPapersFileTypes)
+_bp.add_url_rule('papers/api/file-types', 'api_papers_add_file_type',
+                 management.RHPapersCreateFileType, methods=('POST',))
+_bp.add_url_rule('papers/api/file-types/<int:file_type_id>', 'api_papers_edit_file_type',
+                 management.RHPapersEditFileType, methods=('PATCH', 'DELETE'))
 
 # Display pages
 _bp.add_url_rule('/papers/', 'call_for_papers', display.RHCallForPapers)
@@ -78,6 +85,10 @@ _bp.add_url_rule('/manage/papers/schedule', 'schedule_cfp', management.RHSchedul
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/open', 'open_cfp', management.RHOpenCFP, methods=('POST',))
 _bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, methods=('POST',))
+
+# File types
+_bp.add_url_rule('/manage/papers/types', 'manage_file_types',
+                frontend.RHPapersDashboard, methods=('GET', 'POST'))
 
 # URLs available in both management and display areas
 # Note: When adding a new one here make sure to specify `defaults=defaults`
