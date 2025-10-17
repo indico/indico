@@ -1,7 +1,7 @@
 """Add paper file types table
 
 Revision ID: af9d03d7073c
-Revises: 43d2bff509c1
+Revises: 932389d22b1f
 Create Date: 2025-10-14 13:38:27.605748
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'af9d03d7073c'
-down_revision = '43d2bff509c1'
+down_revision = '932389d22b1f'
 branch_labels = None
 depends_on = None
 
