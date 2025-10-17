@@ -10,8 +10,5 @@ from indico.modules.events.papers.views import WPManagePapers
 
 
 class RHPapersDashboard(RHManagePapersBase):
-    EVENT_FEATURE = None
-
     def _process(self):
-        template = 'file_types.html' if self.event.has_feature('papers') else 'disabled.html'
-        return WPManagePapers.render_template(f'management/{template}', self.event)
+        return WPManagePapers.render_template('management/file_types.html', self.event)
