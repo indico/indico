@@ -1,0 +1,90 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import PropTypes from 'prop-types';
+import React, {useState} from 'react';
+import {Form as FinalForm} from 'react-final-form';
+import {useDispatch, useSelector} from 'react-redux';
+import {Button, Form, Label} from 'semantic-ui-react';
+
+import {FinalSubmitButton} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
+
+import {modifyReviewTags} from './actions'; // You need to implement this action
+import FinalTagInput from './judgment/TagInput';
+import {isTimelineOutdated} from './selectors';
+import {blockPropTypes} from './util';
+
+import './ReviewTags.module.scss';
+
+export default function ReviewTags({block, canEdit, tagOptions}) {
+  const [editFormOpen, setEditFormOpen] = useState(false);
+  const isOutdated = useSelector(isTimelineOutdated);
+  const dispatch = useDispatch();
+
+  const handleSubmit = async formData => {
+    const rv = await dispatch(modifyReviewTags(block, formData));
+    if (rv.error) {
+      return rv.error;
+    }
+    setEditFormOpen(false);
+  };
+
+  return (
+    <div styleName="review-tags">
+      {editFormOpen ? (
+        <div className="f-self-stretch">
+          <FinalForm
+            onSubmit={handleSubmit}
+            initialValues={{tags: block.tags.map(t => t.id)}}
+            subscription={{submitting: true}}
+          >
+            {fprops => (
+              <Form onSubmit={fprops.handleSubmit}>
+                <FinalTagInput name="tags" options={tagOptions} autoFocus />
+                <Form.Group styleName="submit-buttons" inline>
+                  <FinalSubmitButton label={Translate.string('Save tags')} />
+                  <Button
+                    disabled={fprops.submitting}
+                    content={Translate.string('Cancel')}
+                    onClick={() => {
+                      setEditFormOpen(false);
+                    }}
+                  />
+                </Form.Group>
+              </Form>
+            )}
+          </FinalForm>
+        </div>
+      ) : (
+        // TODO: (Michel) Improve tag listing style
+        <div styleName="tag-list">
+          {block.tags.map(tag => (
+            <Label color={tag.color} key={tag.id}>
+              {tag.verboseTitle}
+            </Label>
+          ))}
+        </div>
+      )}
+      <div styleName="action-buttons">
+        {canEdit && !isOutdated && (
+          <a
+            onClick={() => setEditFormOpen(!editFormOpen)}
+            className="i-link icon-edit"
+            title={Translate.string('Edit tags')}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReviewTags.propTypes = {
+  block: PropTypes.shape(blockPropTypes).isRequired,
+  canEdit: PropTypes.bool.isRequired,
+  tagOptions: PropTypes.array.isRequired,
+};

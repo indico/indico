@@ -105,3 +105,11 @@ export function resetReviews(url) {
 export function setDraftComment(comment) {
   return {type: SET_DRAFT_COMMENT, comment};
 }
+
+export function modifyReviewTags(revision, formData) {
+  return submitFormAction(
+    () => indicoAxios.patch(revision.reviewURL, formData),
+    null,
+    () => loadTimeline()
+  );
+}
