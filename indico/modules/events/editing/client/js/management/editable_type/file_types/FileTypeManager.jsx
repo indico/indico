@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
-import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import createFileTypeURL from 'indico-url:papers.api_papers_add_file_type';
+import editFileTypeURL from 'indico-url:papers.api_papers_edit_file_type';
+import fileTypesURL from 'indico-url:papers.api_papers_file_types';
 
 import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';

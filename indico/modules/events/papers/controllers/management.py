@@ -327,11 +327,6 @@ class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
 class RHPapersCreateFileType(RHManageEventBase):
     """Create a new file type."""
 
-    SERVICE_ALLOWED = True
-
-    def _process_args(self):
-        RHManageEventBase._process_args(self)
-
     @use_rh_args(EditableFileTypeArgs)
     def _process(self, data):
         file_type = create_new_file_type(self.event, **data)
@@ -356,6 +351,12 @@ class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
         return PaperFileTypeSchema().jsonify(self.file_type)
 
     def _process_DELETE(self):
+        # TODO: (Ajob) Fix the revisionfile logic
+        # if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
+        #     raise UserValueError(_('Cannot delete file type which already has files'))
+
+        # if self.file_type.review_conditions:
+        #     raise UserValueError(_('Cannot delete file type which is used in a review condition'))
         if self.file_type.publishable:
             is_last = not (PaperFileType.query
                            .with_parent(self.event)
