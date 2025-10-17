@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Icon, Label, Popup} from 'semantic-ui-react';
+import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -76,7 +76,7 @@ FileTypeDisplay.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-export default function FileDisplay({downloadURL, fileTypes, files, tags, outdated}) {
+export default function FileDisplay({downloadURL, fileTypes, files, outdated}) {
   return (
     <div
       styleName={toClasses({
@@ -92,15 +92,9 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
         </div>
       )}
       <div styleName="download-tag-wrapper">
-        <div styleName="tag-display">
-          {tags.map(tag => (
-            <Label color={tag.color} key={tag.id}>
-              {tag.verboseTitle}
-            </Label>
-          ))}
-        </div>
         {files.length !== 0 && (
           <div>
+            {/* TODO: (Michel) Fix download button styling, it's floating left */}
             <Button
               as="a"
               href={downloadURL}
@@ -122,13 +116,6 @@ FileDisplay.propTypes = {
   downloadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
-  tags: PropTypes.arrayOf(
-    PropTypes.shape({
-      color: PropTypes.string.isRequired,
-      id: PropTypes.number.isRequired,
-      verboseTitle: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   outdated: PropTypes.bool,
 };
 
