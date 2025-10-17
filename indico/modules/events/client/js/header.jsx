@@ -8,18 +8,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const calendarContainer = document.querySelector('#event-calendar-link');
+let calendarExportContainer = null;
 
-  if (!calendarContainer) {
-    return;
-  }
-
-  const {eventId, eventContribCount, eventSessionBlockCount} = calendarContainer.dataset;
-  const eventInSeries = calendarContainer.dataset.eventInSeries !== undefined;
+document.addEventListener('indico:action:calendar-export', e => {
+  const {eventId, eventContribCount, eventSessionBlockCount, eventInSeries} = e.detail;
   const options = [
     {
       key: 'event',
@@ -49,23 +44,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Create container once and reuse it
+  if (!calendarExportContainer) {
+    calendarExportContainer = document.createElement('div');
+    calendarExportContainer.style.display = 'inline-block';
+    e.detail.trigger.after(calendarExportContainer);
+  }
+
+  const handleCleanup = () => {
+    ReactDOM.unmountComponentAtNode(calendarExportContainer);
+  };
+
   ReactDOM.render(
-    <ICSCalendarLink
+    <ICSCalendarLink.Static
       endpoint="events.export_event_ical"
       params={{event_id: eventId}}
-      renderButton={classes => (
-        <IButton
-          icon="calendar"
-          dropdown
-          classes={{'height-full': true, 'text-color': true, subtle: true, ...classes}}
-          title={Translate.string('Export')}
-        />
-      )}
-      dropdownPosition="top left"
-      popupPosition="bottom right"
       options={options}
-      eventInSeries={eventInSeries}
+      eventInSeries={eventInSeries !== undefined}
+      onClose={handleCleanup}
+      triggerElement={e.detail.trigger}
     />,
-    calendarContainer
+    calendarExportContainer
   );
 });
