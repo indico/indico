@@ -151,7 +151,7 @@ class RHGroupDeleteMember(RHLocalGroupBase):
 
     @use_kwargs({'user': ModelField(User, required=True, data_key='user_id')}, location='view_args')
     def _process(self, user):
-        remove_users_from_group([user], self.group)
+        remove_users_from_group({user}, self.group)
         return jsonify(success=True)
 
 
