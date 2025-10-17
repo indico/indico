@@ -13,7 +13,9 @@ from flask import session
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.editing.operations import FILE_TYPE_ATTRS
 from indico.modules.events.papers import logger
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.files import PaperFile
@@ -354,3 +356,28 @@ def set_deadline(event, role, deadline, enforce=True):
     logger.info('Paper reviewing deadline (%s) set in %r by %r', role.name, event, session.user)
     event.log(EventLogRealm.reviewing, LogKind.change, 'Papers',
               f'Paper reviewing deadline ({role.title}) set', session.user, data=log_data)
+
+
+def create_new_file_type(event, **data):
+    file_type = PaperFileType(event=event)
+    file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
+    db.session.flush()
+    logger.info('File type %r for %s created by %r', file_type, session.user)
+    file_type.log(EventLogRealm.management, LogKind.positive, 'Papers', f'File type {file_type.name} created',
+                  session.user)
+    return file_type
+
+
+def update_file_type(file_type, **data):
+    changes = file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
+    db.session.flush()
+    logger.info('File type %r updated by %r', file_type, session.user)
+    file_type.log(EventLogRealm.management, LogKind.change, 'Papers', f'File type {file_type.name} updated',
+                  session.user, data={'Changes': make_diff_log(changes, FILE_TYPE_ATTRS)})
+
+
+def delete_file_type(file_type):
+    logger.info('File type %r deleted by %r', file_type, session.user)
+    file_type.log(EventLogRealm.management, LogKind.negative, 'Papers', f'File type {file_type.name} deleted',
+                  session.user)
+    db.session.delete(file_type)
