@@ -205,10 +205,13 @@
                     {{ _render_filters() }}
                 {% endif %}
 
-                <div id="event-calendar-link" data-event-id="{{ event.id }}"
-                     data-event-contrib-count="{{ event.contributions_count }}"
-                     data-event-session-block-count="{{ event.session_block_count }}"
-                     {% if event.series %}data-event-in-series{% endif %}></div>
+                <button class="i-button text-color subtle icon-calendar arrow"
+                        data-action="event-export-calendar"
+                        data-event-id="{{ event.id }}"
+                        data-event-contrib-count="{{ event.contributions_count }}"
+                        data-event-session-block-count="{{ event.session_block_count }}"
+                        {% if event.series %}data-event-in-series{% endif %}
+                        title="{% trans %}Export{% endtrans %}"></button>
 
                 {% if event.type == 'meeting' %}
                     <button class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
