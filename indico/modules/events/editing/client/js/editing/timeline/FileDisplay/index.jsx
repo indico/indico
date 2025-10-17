@@ -7,13 +7,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Icon, Label, Popup} from 'semantic-ui-react';
+import {useSelector} from 'react-redux';
+import {Button, Icon, Label, Message, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
+import {getDetails} from '../selectors';
 
 import './FileDisplay.module.scss';
 
@@ -77,6 +79,7 @@ FileTypeDisplay.propTypes = {
 };
 
 export default function FileDisplay({downloadURL, fileTypes, files, tags, outdated}) {
+  const {canAssignSelf} = useSelector(getDetails);
   return (
     <div
       styleName={toClasses({
@@ -101,16 +104,50 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
         </div>
         {files.length !== 0 && (
           <div>
-            <Button
-              as="a"
-              href={downloadURL}
-              floated="right"
-              styleName="download-button"
-              icon
-              primary
-            >
-              <Icon name="download" /> <Translate>Download ZIP</Translate>
-            </Button>
+            {canAssignSelf ? (
+              <Popup
+                trigger={
+                  <Button floated="right" styleName="download-button" icon primary>
+                    <Icon name="download" /> <Translate>Download ZIP</Translate>
+                  </Button>
+                }
+                content={
+                  <div styleName="download-popup">
+                    <Message warning>
+                      <Icon name="warning sign" />
+                      <Translate>
+                        You haven’t assigned this editable to yourself. Are you sure you want to
+                        download it anyway?
+                      </Translate>
+                    </Message>
+                    <Button
+                      as="a"
+                      href={downloadURL}
+                      icon
+                      positive
+                      styleName="confirm-download"
+                      labelPosition="left"
+                    >
+                      <Icon name="check" />
+                      <Translate>Yes, download anyway</Translate>
+                    </Button>
+                  </div>
+                }
+                on="click"
+                position="right center"
+              />
+            ) : (
+              <Button
+                as="a"
+                href={downloadURL}
+                floated="right"
+                styleName="download-button"
+                icon
+                primary
+              >
+                <Icon name="download" /> <Translate>Download ZIP</Translate>
+              </Button>
+            )}
           </div>
         )}
       </div>
