@@ -14,6 +14,7 @@ from indico.modules.events.contributions.schemas import BasicContributionSchema
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.models.events import Event
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
@@ -24,6 +25,7 @@ from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.modules.users.schemas import BasicUserSchema
 from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
+from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
 
@@ -226,6 +228,29 @@ class PaperDumpSchema(PaperSchema):
 
     class Meta(PaperSchema.Meta):
         fields = ('is_in_final_state', 'contribution', 'revisions', 'state')
+
+
+class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = PaperFileType
+        # fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
+        #           'filename_template', 'is_used_in_condition', 'url')
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable',
+                  'filename_template', 'url')
+
+    # TODO: (Ajob) Find out what to do exactly with these fields
+    # is_used = Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
+    # is_used_in_condition = Function(lambda ft: EditingReviewCondition.query.with_parent(ft).has_rows())
+    url = Function(lambda ft: url_for('.api_papers_edit_file_type',
+                                             ft.event,
+                                             file_type_id=ft.id,
+                                             _external=True))
+
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
+        return data
 
 
 paper_schema = PaperSchema()
