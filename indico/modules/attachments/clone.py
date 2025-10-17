@@ -85,6 +85,11 @@ class AttachmentCloner(EventCloner):
                 if obj.is_deleted or (isinstance(obj, db.m.SubContribution) and obj.contribution.is_deleted):
                     continue
                 self._clone_attachment_folder(old_folder, mapping[old_folder.link_type][obj])
+        # re-populate converted_from
+        for old, new in self._attachment_map.items():
+            if old.converted_from:
+                # the attachment may be missing in the map in case it has been deleted
+                new.converted_from = self._attachment_map.get(old.converted_from)
 
     def _clone_attachment_folder(self, old_folder, new_object):
         folder_attrs = get_attrs_to_clone(AttachmentFolder)

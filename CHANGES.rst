@@ -47,7 +47,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Allow plugins to store custom annotations/metadata on attachments, and indicate that
+  it has been converted from antoher attachment (:pr:`7108`)
 
 
 Version 3.3.8
