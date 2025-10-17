@@ -49,7 +49,7 @@ from indico.modules.events.controllers.base import EditEventSettingsMixin
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
-                                                                 EmailRolesSendMixin)
+                                                                 EmailRolesSendMixin, get_roles_from_person_link)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
@@ -927,11 +927,14 @@ class RHContributionsAPIEmailContribRolesMetadata(EmailRolesMetadataMixin, RHMan
 class RHContributionsAPIEmailContribRolesPreview(EmailRolesPreviewMixin, RHManageContributionsActionsBase):
     object_context = 'contributions'
 
-    def get_placeholder_kwargs(self):
-        for contrib in self.contribs:
-            for p in contrib.person_links:
-                if p.email:
-                    return {'person': p, 'contribution': contrib}
+    def get_placeholder_kwargs(self, recipient_roles):
+        if recipient_roles:
+            for contrib in self.contribs:
+                for p in contrib.person_links:
+                    person_roles = get_roles_from_person_link(p)
+                    if p.email and person_roles & recipient_roles:
+                        return {'person': p, 'contribution': contrib}
+
         return {'person': self.event.creator, 'contribution': self.contribs[0]}
 
 
@@ -943,5 +946,5 @@ class RHContributionsAPIEmailContribRolesSend(EmailRolesSendMixin, RHManageContr
         for contrib in self.contribs:
             log_metadata = {'contribution_id': contrib.id}
             for person_link in contrib.person_links:
-                if person_link.email and self.get_roles_from_person_link(person_link) & roles:
+                if person_link.email and get_roles_from_person_link(person_link) & roles:
                     yield person_link.email, {'contribution': contrib, 'person': person_link}, log_metadata
