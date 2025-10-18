@@ -486,12 +486,15 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             'checked_in_date',
             'tags_present'
         ]
-        static_column_names = {key: data['title'] for key, data in self.list_generator.static_items.items()}
+        static_item_ids_from_config = self.export_config['static_item_ids']
+        static_column_names = {key: data['title']
+                               for key, data in self.list_generator.static_items.items()
+                               if key in static_item_ids_from_config}
 
         primary_headers, dynamic_headers, rows = prepare_participant_list_data(
             reglist=self.registrations,
             display=self.export_config['regform_items'],
-            static_items_ids=self.export_config['static_item_ids'],
+            static_items_ids=static_item_ids_from_config,
         )
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
 
