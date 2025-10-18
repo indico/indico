@@ -1200,7 +1200,7 @@ def prepare_participant_list_data(reglist, display, static_items_ids):
             cell_data = None
             if reg_data:
                 cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
-            row[item.title] = cell_data
+            row[item.title] = cell_data or '-'
 
         for item_id in static_items_ids:
             match item_id:
@@ -1212,12 +1212,10 @@ def prepare_participant_list_data(reglist, display, static_items_ids):
                     cell_data = registration.render_price()
                 case 'checked_in':
                     cell_data = 'Yes' if registration.checked_in else 'No'
-                case 'checked_in_date':
-                    if registration.checked_in_dt:
-                        cell_data = format_datetime(registration.checked_in_dt)
-                case 'tags_present':
-                    if registration.tags:
-                        cell_data = ', '.join(sorted(t.title for t in registration.tags))
+                case 'checked_in_date' if registration.checked_in_dt:
+                    cell_data = format_datetime(registration.checked_in_dt)
+                case 'tags_present' if registration.tags:
+                    cell_data = ', '.join(sorted(t.title for t in registration.tags))
                 case _:
                     cell_data = None
             row[item_id] = cell_data or '-'
