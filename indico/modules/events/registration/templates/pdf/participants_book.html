@@ -22,36 +22,40 @@
     </section>
 
     {% for row in rows %}
-    <section class="later-pages">
-        <header>
-            <div class="header-title">{{ event.title }} / {%- trans %}Registrants Book{% endtrans -%}</div>
-            <div class="header-name">{{ row['Name'] }}</div>
-        </header>
-        <div class="participant-title">
-            <h1>{{ row['Name'] }}</h1>
-            <h1>{{ row['ID'] }}</h1>
-        </div>
-        <div class="sub-section">
-            <h2>{%- trans %}Registration Details{% endtrans -%}</h2>
-            <div class="registration-details">
-                 {% for item_id in static_headers %}
-                    <p><strong>{{ static_column_names[item_id] }}:</strong> {{ row[item_id] }}</p>
-                {% endfor %}
+        <section class="later-pages">
+            <header>
+                <div class="header-title">{{ event.title }} / {%- trans %}Registrants Book{% endtrans -%}</div>
+                <div class="header-name">{{ row['Name'] }}</div>
+            </header>
+            <div class="participant-title">
+                <h1>{{ row['Name'] }}</h1>
+                <h1>{{ row['ID'] }}</h1>
             </div>
-        </div>
-        <div class="sub-section">
-            <h2>{%- trans %}Personal Details{% endtrans -%}</h2>
-            <div class="personal-details">
-                {% for header in dynamic_headers %}
-                    <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
-                {% endfor %}
+            <div class="sub-section">
+                <h2>{%- trans %}Registration Details{% endtrans -%}</h2>
+                <div class="registration-details">
+                    {% for item_id in static_headers %}
+                        {% if item_id in static_column_names %}
+                            <p><strong>{{ static_column_names[item_id] }}:</strong> {{ row[item_id] }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-        <footer>
-            <div class="footer-generation-date">{{ generation_date }}</div>
-            <div class="footer-page-num">Page {{ loop.index }}</div>
-        </footer>
-    </section>
+            <div class="sub-section">
+                <h2>{%- trans %}Personal Details{% endtrans -%}</h2>
+                <div class="personal-details">
+                    {% for header in dynamic_headers %}
+                        {% if header in row %}
+                            <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <footer>
+                <div class="footer-generation-date">{{ generation_date }}</div>
+                <div class="footer-page-num">Page {{ loop.index }}</div>
+            </footer>
+        </section>
     {% endfor %}
 </body>
 
