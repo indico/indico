@@ -22,20 +22,24 @@
                     <th>{{ header }}</th>
                 {% endfor %}
                 {% for static_item_id in static_headers %}
-                    <th>{{ static_column_names[static_item_id] }}</th>
+                    {% if static_item_id in static_column_names %}
+                        <th>{{ static_column_names[static_item_id] }}</th>
+                    {% endif %}
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
-            <tr>
-                {% for header in headers %}
-                    <td>{{ row[header] }}</td>
-                {% endfor %}
-                {% for static_item_id in static_headers %}
-                    <td>{{ row[static_item_id] }}</td>
-                {% endfor %}
-            </tr>
+                <tr>
+                    {% for header in headers %}
+                        <td>{{ row[header] }}</td>
+                    {% endfor %}
+                    {% for static_item_id in static_headers %}
+                        {% if static_item_id in row %}
+                            <td>{{ row[static_item_id] }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
             {% endfor %}
         </tbody>
     </table>
