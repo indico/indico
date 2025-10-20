@@ -240,7 +240,7 @@ class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
 
     # TODO: (Ajob) Fix is_used fn to work with proper query
     # is_used = Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
-    url = Function(lambda ft: url_for('.api_papers_edit_file_type',
+    url = Function(lambda ft: url_for('.api_edit_file_type',
                                              ft.event,
                                              file_type_id=ft.id,
                                              _external=True))
