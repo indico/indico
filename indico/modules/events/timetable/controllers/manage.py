@@ -205,8 +205,11 @@ class RHTimetableBreak(RHManageEventBase):
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
+        session_block_specified = 'session_block_id' in data
         session_block_id = data.pop('session_block_id', None)
-        self._change_parent(session_block_id)
+
+        if session_block_specified:
+            self._change_parent(session_block_id)
 
         if not data.get('timetable_entry'):
             data.pop('timetable_entry', None)
@@ -238,7 +241,7 @@ class RHTimetableBreak(RHManageEventBase):
         try:
             target_id = int(session_block_id)
         except (TypeError, ValueError):
-            raise BadRequest('Invalid session block id')
+            raise BadRequest('Invalid session block id !!!!')
 
         if current_block is not None and current_block.id == target_id:
             return
@@ -295,8 +298,12 @@ class RHTimetableContribution(RHManageContributionBase):
 
         if (person_links := data.pop('person_links', None)) is not None:
             data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
+
+        session_block_specified = 'session_block_id' in data
         session_block_id = data.pop('session_block_id', None)
-        self._change_parent(session_block_id)
+
+        if session_block_specified:
+            self._change_parent(session_block_id)
 
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data)
@@ -334,27 +341,24 @@ class RHTimetableContribution(RHManageContributionBase):
                 'parent': None,
                 'start_dt': entry.start_dt
             })
-        try:
-            target_id = int(session_block_id)
-        except (TypeError, ValueError):
-            raise BadRequest('Invalid session block id')
 
-        if current_block is not None and current_block.id == target_id:
+        if current_block is not None and current_block.id == session_block_id:
             return
 
-        target_block = self.event.get_session_block(target_id)
-        if target_block is None:
-            raise BadRequest('Session block does not exist')
-        if getattr(target_block.session, 'event_id', None) != self.event.id:
-            raise BadRequest('Session block does not belong to this event')
+        if session_block_id is not None:
+            target_block = self.event.get_session_block(session_block_id)
+            if target_block is None:
+                raise BadRequest('Session block does not exist')
+            if getattr(target_block.session, 'event_id', None) != self.event.id:
+                raise BadRequest('Session block does not belong to this event')
 
-        self.contrib.session_block = target_block
-        self.contrib.session = target_block.session
+            self.contrib.session_block = target_block
+            self.contrib.session = target_block.session
 
-        update_timetable_entry(entry, {
-            'parent': target_block.timetable_entry,
-            'start_dt': entry.start_dt
-        })
+            update_timetable_entry(entry, {
+                'parent': target_block.timetable_entry,
+                'start_dt': entry.start_dt
+            })
 
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):
