@@ -1,7 +1,7 @@
 """Add attachment annotations + converted_from
 
 Revision ID: 932389d22b1f
-Revises: e4f49c197158
+Revises: 43d2bff509c1
 Create Date: 2025-10-17 14:43:47.050322
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '932389d22b1f'
-down_revision = 'e4f49c197158'
+down_revision = '43d2bff509c1'
 branch_labels = None
 depends_on = None
 
