@@ -29,11 +29,11 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>/review/<any(content,layout):revie
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit',
                  'api_update_review', api.RHUpdateReview, methods=('POST',))
 
-_bp.add_url_rule('/papers/api/file-types/', 'api_papers_file_types',
+_bp.add_url_rule('/papers/api/file-types/', 'api_file_types',
                  common.RHPapersFileTypes)
-_bp.add_url_rule('/papers/api/file-types/', 'api_papers_add_file_type',
+_bp.add_url_rule('/papers/api/file-types/', 'api_add_file_type',
                  management.RHPapersCreateFileType, methods=('POST',))
-_bp.add_url_rule('/papers/api/file-types/<int:file_type_id>', 'api_papers_edit_file_type',
+_bp.add_url_rule('/papers/api/file-types/<int:file_type_id>', 'api_edit_file_type',
                  management.RHPapersEditFileType, methods=('PATCH', 'DELETE'))
 
 # Display pages
