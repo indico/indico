@@ -148,9 +148,11 @@ customElements.define(
       domReady.then(() => {
         ReactDOM.render(
           <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
-            <h1>Hello</h1>
-            {/* <EditableTypeSubPageNav title="File types" /> */}
-            <FileTypeManager eventId={+this.getAttribute('event-id')} editableType="paper" />
+            <FileTypeManager
+              eventId={+this.getAttribute('event-id')}
+              editableType="paper"
+              endpoint="papers"
+            />
           </UserSearchTokenContext.Provider>,
           this
         );

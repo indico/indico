@@ -5,9 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import createFileTypeURL from 'indico-url:papers.api_papers_add_file_type';
-import editFileTypeURL from 'indico-url:papers.api_papers_edit_file_type';
-import fileTypesURL from 'indico-url:papers.api_papers_file_types';
+import editingCreateFileTypeURL from 'indico-url:event_editing.api_add_file_type';
+import editingEditFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
+import editingFileTypesURL from 'indico-url:event_editing.api_file_types';
+import papersCreateFileTypeURL from 'indico-url:papers.api_add_file_type';
+import papersEditFileTypeURL from 'indico-url:papers.api_edit_file_type';
+import papersFileTypesURL from 'indico-url:papers.api_file_types';
 
 import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';
@@ -25,7 +28,18 @@ import FileTypeModal from './FileTypeModal';
 
 import './FileTypeManager.module.scss';
 
-const initialState = {
+interface FileTypeManagerProps {
+  eventId: number;
+  editableType: typeof EditableType;
+  endpoint?: string;
+}
+
+interface FileTypeManagerState {
+  fileType: string;
+  operation: 'add' | 'edit' | 'delete';
+}
+
+const initialState: FileTypeManagerState = {
   fileType: null,
   operation: null,
 };
@@ -45,6 +59,25 @@ function fileTypesReducer(state, action) {
   }
 }
 
+function getFileTypeURLs(endpoint) {
+  switch (endpoint) {
+    case 'event_editing':
+      return {
+        getAllURL: editingFileTypesURL,
+        createURL: editingCreateFileTypeURL,
+        editURL: editingEditFileTypeURL,
+      };
+    case 'papers':
+      return {
+        getAllURL: papersFileTypesURL,
+        createURL: papersCreateFileTypeURL,
+        editURL: papersEditFileTypeURL,
+      };
+    default:
+      throw new Error(`Unknown file types endpoint: ${endpoint}`);
+  }
+}
+
 function StatusIcon({active, icon, text}) {
   return (
     <Icon size="small" color={active ? 'blue' : 'grey'} name={icon} title={active ? text : ''} />
@@ -57,18 +90,23 @@ StatusIcon.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
-export default function FileTypeManager({eventId, editableType}) {
+export default function FileTypeManager({
+  eventId,
+  editableType,
+  endpoint = 'event_editing',
+}: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
+  const {getAllURL, createURL, editURL} = getFileTypeURLs(endpoint);
   const {
     data,
     loading: isLoadingFileTypes,
     reFetch,
     lastData,
-  } = useIndicoAxios(fileTypesURL({event_id: eventId, type: editableType}), {camelize: true});
+  } = useIndicoAxios(getAllURL({event_id: eventId, type: editableType}), {camelize: true});
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({event_id: eventId, type: editableType}), formData);
+      await indicoAxios.post(createURL({event_id: eventId, type: editableType}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -76,7 +114,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -87,7 +125,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
 
     try {
       await indicoAxios.delete(url);
@@ -228,8 +266,3 @@ export default function FileTypeManager({eventId, editableType}) {
     </div>
   );
 }
-
-FileTypeManager.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
-};
