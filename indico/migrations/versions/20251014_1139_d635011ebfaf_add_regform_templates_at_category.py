@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.add_column('forms', sa.Column('category_id', sa.Integer(), nullable=True), schema='event_registration')
-    op.add_column('forms', sa.Column('cloned_from_id', sa.Integer(), nullable=True), schema='event_registration')
+    op.add_column('forms', sa.Column('template_id', sa.Integer(), nullable=True), schema='event_registration')
     op.create_foreign_key(None, 'forms', 'categories', ['category_id'], ['id'],
                           source_schema='event_registration', referent_schema='categories')
     op.create_check_constraint('event_xor_category_id_null', 'forms', '(event_id IS NULL) != (category_id IS NULL)',
@@ -45,6 +45,8 @@ def upgrade():
         FOR EACH ROW
         EXECUTE FUNCTION disallow_registration_on_forms_linked_to_categories();
     ''')
+    op.drop_constraint('ck_logs_valid_enum_realm', 'logs', schema='categories')
+    op.create_check_constraint('valid_enum_realm', 'logs', '(realm = ANY (ARRAY[1, 2, 3]))', schema='categories')
 
 
 def downgrade():
@@ -79,5 +81,8 @@ def downgrade():
     op.execute('''DELETE FROM event_registration.forms WHERE category_id IS NOT NULL; ''')
     op.drop_constraint('ck_forms_event_xor_category_id_null', 'forms', schema='event_registration')
     op.drop_column('forms', 'category_id', schema='event_registration')
-    op.drop_column('forms', 'cloned_from_id', schema='event_registration')
+    op.drop_column('forms', 'template_id', schema='event_registration')
     op.alter_column('forms', 'event_id', existing_type=sa.Integer(), nullable=False, schema='event_registration')
+    op.execute('''DELETE FROM categories.logs WHERE realm = 3;''')
+    op.drop_constraint('ck_logs_valid_enum_realm', 'logs', schema='categories')
+    op.create_check_constraint('valid_enum_realm', 'logs', '(realm = ANY (ARRAY[1, 2]))', schema='categories')
