@@ -226,22 +226,31 @@ class RHTimetableBreak(RHManageEventBase):
     @no_autoflush
     def _change_parent(self, session_block_id):
         entry = self.break_.timetable_entry
+        current_block = self.break_.session_block_obj
 
         if session_block_id is None:
+            if current_block is None:
+                return
             self.break_.session_block = None
             self.break_.session = None
             if entry.parent is not None:
                 update_timetable_entry(entry, {'parent': None, 'start_dt': entry.start_dt})
-        else:
-            target_block = self.event.get_session_block(session_block_id)
+        try:
+            target_id = int(session_block_id)
+        except (TypeError, ValueError):
+            raise BadRequest('Invalid session block id')
 
-            self.break_.session_block = target_block
-            self.break_.session = target_block.session
+        if current_block is not None and current_block.id == target_id:
+            return
+        target_block = self.event.get_session_block(session_block_id)
 
-            update_timetable_entry(entry, {
-                'parent': target_block.timetable_entry,
-                'start_dt': entry.start_dt
-            })
+        self.break_.session_block = target_block
+        self.break_.session = target_block.session
+
+        update_timetable_entry(entry, {
+            'parent': target_block.timetable_entry,
+            'start_dt': entry.start_dt
+        })
 
 
 class RHTimetableContributionCreate(RHManageContributionsBase):
@@ -314,25 +323,38 @@ class RHTimetableContribution(RHManageContributionBase):
 
     def _change_parent(self, session_block_id):
         entry = self.contrib.timetable_entry
-
-        self.contrib.session_block = None
-        self.contrib.session = None
+        current_block = self.contrib.session_block
 
         if session_block_id is None:
+            if current_block is None:
+                return
+            self.contrib.session_block = None
+            self.contrib.session = None
             update_timetable_entry(entry, {
                 'parent': None,
                 'start_dt': entry.start_dt
             })
-        else:
-            target_block = self.event.get_session_block(session_block_id)
+        try:
+            target_id = int(session_block_id)
+        except (TypeError, ValueError):
+            raise BadRequest('Invalid session block id')
 
-            self.contrib.session_block = target_block
-            self.contrib.session = target_block.session
+        if current_block is not None and current_block.id == target_id:
+            return
 
-            update_timetable_entry(entry, {
-                'parent': target_block.timetable_entry,
-                'start_dt': entry.start_dt
-            })
+        target_block = self.event.get_session_block(target_id)
+        if target_block is None:
+            raise BadRequest('Session block does not exist')
+        if getattr(target_block.session, 'event_id', None) != self.event.id:
+            raise BadRequest('Session block does not belong to this event')
+
+        self.contrib.session_block = target_block
+        self.contrib.session = target_block.session
+
+        update_timetable_entry(entry, {
+            'parent': target_block.timetable_entry,
+            'start_dt': entry.start_dt
+        })
 
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):
