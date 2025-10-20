@@ -99,15 +99,6 @@ def delete_all_tables(db):
             ''', (schema,))
             for stmt, in row:
                 conn.execute(stmt)
-            # delete all custom collations
-            row = conn.execute('''
-                SELECT 'DROP COLLATION ' || ns.nspname || '.' || collname
-                FROM pg_collation
-                INNER JOIN pg_namespace ns ON (pg_collation.collnamespace = ns.oid)
-                WHERE ns.nspname = %s order by collname;
-            ''', (schema,))
-            for stmt, in row:
-                conn.execute(stmt)
             conn.execute(DropSchema(schema))
     transaction.commit()
 

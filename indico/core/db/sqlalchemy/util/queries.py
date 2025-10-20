@@ -9,12 +9,9 @@ import re
 
 from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
-from sqlalchemy.sql.expression import quoted_name
 
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'\\])')
-
-COLLATION_INDICO_CASE_INSENSITIVE = quoted_name('indico.case_insensitive', False)
 
 
 def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
