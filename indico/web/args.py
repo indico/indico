@@ -12,6 +12,9 @@ from marshmallow import EXCLUDE, Schema
 from webargs.flaskparser import FlaskParser
 from webargs.multidictproxy import MultiDictProxy
 from werkzeug.datastructures import MultiDict
+from werkzeug.exceptions import NotFound, UnprocessableEntity
+
+from indico.util.i18n import _
 
 
 def _strip_whitespace(value):
@@ -56,9 +59,17 @@ def handle_error(error, req, schema, *, error_status_code, error_headers):
     # this gets even worse when using the `json_or_form_or_query` meta location where we don't
     # have detailed location information anyway.
     namespaced = error.messages  # mutating this below is safe
-    error.messages = namespaced.popitem()[1]
+    location, error.messages = namespaced.popitem()
     assert not namespaced  # we never expect to have more than one location
-    parser.handle_error(error, req, schema, error_status_code=error_status_code, error_headers=error_headers)
+    try:
+        parser.handle_error(error, req, schema, error_status_code=error_status_code, error_headers=error_headers)
+    except UnprocessableEntity as exc:
+        if location not in ('view_args', 'path'):
+            raise
+        # For validation errors coming from URL rule args, it is more logical to treat those as 404 errors;
+        # typically these are from something like a ModelField where no row has been found for the ID, but
+        # even for other fields a 404 is more logical considering the bad data is part of the path.
+        raise NotFound(_('The specified item could not be found.')) from exc
 
 
 def _split_kwargs(kwargs):
