@@ -36,6 +36,11 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
 
   return (
     <div styleName="review-tags">
+      {!block.tags.length && (
+        <span styleName="no-tags">
+          <Translate>No tags</Translate>
+        </span>
+      )}
       {editFormOpen ? (
         <div className="f-self-stretch">
           <FinalForm
@@ -61,7 +66,6 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
           </FinalForm>
         </div>
       ) : (
-        // TODO: (Michel) Improve tag listing style
         <div styleName="tag-list">
           {block.tags.map(tag => (
             <Label color={tag.color} key={tag.id}>
