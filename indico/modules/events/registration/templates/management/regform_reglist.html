@@ -88,13 +88,13 @@
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
+                               data-href="{{ url_for('.registrations_pdf_export', regform, export_type='table') }}">
                                 {%- trans %}PDF (table style){% endtrans -%}
                             </a>
                         </li>
                         <li>
                             <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
+                               data-href="{{ url_for('.registrations_pdf_export', regform, export_type='book') }}">
                                 {%- trans %}PDF (book style){% endtrans -%}
                             </a>
                         </li>
