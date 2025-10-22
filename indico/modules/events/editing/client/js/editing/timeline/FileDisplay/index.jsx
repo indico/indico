@@ -15,7 +15,7 @@ import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
-import {getDetails} from '../selectors';
+import * as selectors from '../selectors';
 
 import './FileDisplay.module.scss';
 
@@ -79,7 +79,8 @@ FileTypeDisplay.propTypes = {
 };
 
 export default function FileDisplay({downloadURL, fileTypes, files, tags, outdated}) {
-  const {canAssignSelf} = useSelector(getDetails);
+  const {canAssignSelf} = useSelector(selectors.getDetails);
+  const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   return (
     <div
       styleName={toClasses({
@@ -104,7 +105,7 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
         </div>
         {files.length !== 0 && (
           <div>
-            {canAssignSelf ? (
+            {canAssignSelf && !canPerformSubmitterActions ? (
               <Popup
                 trigger={
                   <Button floated="right" styleName="download-button" icon primary>
