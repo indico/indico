@@ -129,17 +129,17 @@ export default function FileDisplay({downloadURL, fileTypes, files, outdated}) {
                 </div>
               </Popup>
             ) : (
-              // TODO: (Michel) Fix download button styling, it's floating left 
+              // TODO: (Michel) Fix download button styling, it's floating left
               <Button
-                  as="a"
-                  href={downloadURL}
-                  floated="right"
-                  styleName="download-button"
-                  icon
-                  primary
-                >
-                  <Icon name="download" /> <Translate>Download ZIP</Translate>
-                </Button>
+                as="a"
+                href={downloadURL}
+                floated="right"
+                styleName="download-button"
+                icon
+                primary
+              >
+                <Icon name="download" /> <Translate>Download ZIP</Translate>
+              </Button>
             )}
           </div>
         )}
