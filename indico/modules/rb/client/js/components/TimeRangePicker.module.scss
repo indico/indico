@@ -5,34 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.time-range-picker {
-  display: flex;
-  justify-content: space-between;
-  width: 200px;
+.time-range-picker:not(#bump-specificity) {
+  // FIXME: Temporary hack until RB form is moved to design system
+  --control-border: 1px solid rgba(34, 36, 38, 0.15);
+  --control-text-box-border-focus-color: #85b7d9;
 
-  .start-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
+  &:focus-within {
+    outline: none;
   }
 
-  .end-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
-
-    :global(.menu) {
-      min-width: 140px !important;
-    }
-  }
-
-  .duration {
-    font-size: 0.7em;
-    color: #808c99;
-    white-space: nowrap;
-  }
-
-  .end-time-item {
-    white-space: nowrap;
+  input {
+    outline: none;
   }
 }
