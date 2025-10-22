@@ -18,7 +18,7 @@ class PaperFileType(BaseFileType):
     def __table_args__(cls):
         return (
             db.Index(
-                'ix_uq_paper_file_types_event_id_name_lower',
+                'ix_uq_file_types_event_id_name_lower',
                 cls.event_id,
                 db.func.lower(cls.name),
                 unique=True,
