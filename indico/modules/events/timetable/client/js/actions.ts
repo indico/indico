@@ -232,7 +232,7 @@ export function changeEntryLayout(
 
     const entryData = {
       start_dt: entry.startDt.format(),
-      session_block_id: sessionBlockId,
+      session_block_id: sessionBlockId ?? null,
     };
 
     return dispatch(
