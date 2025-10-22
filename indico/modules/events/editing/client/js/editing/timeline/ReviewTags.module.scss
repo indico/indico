@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .review-tags {
   display: flex;
 
@@ -22,4 +24,9 @@
   .submit-buttons {
     margin-bottom: 0.25em !important;
   }
+}
+
+.no-tags {
+  font-style: italic;
+  color: $gray;
 }
