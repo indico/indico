@@ -16,6 +16,7 @@ import {UserSearchTokenContext} from 'indico/react/components/principals/Search'
 import {domReady} from 'indico/utils/domstate';
 
 import FileTypeManager from '../../../editing/client/js/management/editable_type/file_types/FileTypeManager';
+import PaperSubmissionButton from '../js/components/PaperSubmissionButton';
 
 import setupReactPaperTimeline from './setup';
 
@@ -156,6 +157,22 @@ customElements.define(
           </UserSearchTokenContext.Provider>,
           this
         );
+      });
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
+
+customElements.defineWhenDomReady(
+  'ind-paper-submission-button',
+
+  class extends HTMLElement {
+    connectedCallback() {
+      domReady.then(() => {
+        ReactDOM.render(<PaperSubmissionButton />, this);
       });
     }
 
