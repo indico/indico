@@ -17,7 +17,7 @@
                     {{ _render_cancelled_actions(registration) }}
                 {% endif %}
             </div>
-            {% block render_check_in scoped %}
+            {% block checkin_state scoped %}
                 {% if registration.state.name in ('unpaid', 'complete') %}
                     {{ _render_check_in(registration) }}
                 {% endif %}
