@@ -82,9 +82,9 @@
         {% block create_form_button %}
             {% if event is defined %}
                 <a href="" class="i-button icon-plus arrow js-dropdown"
-                   title="Create form"
+                   title="{% trans %}Create form{% endtrans %}"
                    data-toggle="dropdown">
-                    Create form
+                    {%- trans %}Create form{% endtrans -%}
                 </a>
                 <ul class="i-dropdown">
                     <li>
@@ -92,7 +92,7 @@
                             {%- trans %}Create new form{% endtrans -%}
                         </a>
                     </li>
-                    {# TODO Segi, if there are no template regforms in any category then this option shouldn't show #}
+                    {# TODO, if there are no template regforms in any category then this option shouldn't show #}
                     <li>
                         <a href="{{ url_for('event_registration.create_regform_from_template', target) }}">
                             {%- trans %}Create from template{% endtrans -%}
