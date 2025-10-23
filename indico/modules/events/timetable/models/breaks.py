@@ -62,7 +62,7 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
 
     @property
     def session_block_obj(self):
-        return self.timetable_entry.session_block if self.timetable_entry else None
+        return self.timetable_entry.parent.session_block if self.timetable_entry else None
 
     @property
     def location_parent(self):

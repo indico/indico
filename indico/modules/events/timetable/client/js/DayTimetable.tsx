@@ -214,7 +214,7 @@ export function DayTimetable({
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
     const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt)));
+    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
   }
 
   function handleDropOnBlock(

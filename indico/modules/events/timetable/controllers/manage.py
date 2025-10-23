@@ -238,10 +238,8 @@ class RHTimetableBreak(RHManageEventBase):
             self.break_.session = None
             if entry.parent is not None:
                 update_timetable_entry(entry, {'parent': None, 'start_dt': entry.start_dt})
-        try:
-            target_id = int(session_block_id)
-        except (TypeError, ValueError):
-            raise BadRequest('Invalid session block id !!!!')
+
+        target_id = int(session_block_id)
 
         if current_block is not None and current_block.id == target_id:
             return
@@ -349,8 +347,6 @@ class RHTimetableContribution(RHManageContributionBase):
             target_block = self.event.get_session_block(session_block_id)
             if target_block is None:
                 raise BadRequest('Session block does not exist')
-            if getattr(target_block.session, 'event_id', None) != self.event.id:
-                raise BadRequest('Session block does not belong to this event')
 
             self.contrib.session_block = target_block
             self.contrib.session = target_block.session
