@@ -93,12 +93,17 @@ export function EmailDialog({
 }) {
   const [preview, setPreview] = useState(null);
 
-  const togglePreview = async ({body, subject}) => {
+  const togglePreview = async ({body, subject, recipient_roles: recipientRoles}) => {
     if (preview) {
       setPreview(undefined);
       return;
     }
-    const {data} = await indicoAxios.post(previewURL, {body, subject, ...previewContext});
+    const {data} = await indicoAxios.post(previewURL, {
+      body,
+      subject,
+      recipient_roles: recipientRoles,
+      ...previewContext,
+    });
     setPreview(data);
   };
 

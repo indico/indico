@@ -26,7 +26,7 @@ from indico.modules.events.editing.schemas import (EditableFileTypeArgs, Editabl
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.editing.util import get_editors
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
-                                                                 EmailRolesSendMixin)
+                                                                 EmailRolesSendMixin, get_roles_from_person_link)
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _, orig_string
@@ -311,5 +311,5 @@ class RHEmailNotSubmittedEditablesSend(EmailRolesSendMixin, RHEditableTypeManage
         for contrib in contribs:
             log_metadata = {'contribution_id': contrib.id}
             for person_link in contrib.person_links:
-                if person_link.email and self.get_roles_from_person_link(person_link) & roles:
+                if person_link.email and get_roles_from_person_link(person_link) & roles:
                     yield person_link.email, {'contribution': contrib, 'person': person_link}, log_metadata
