@@ -31,7 +31,9 @@ import CalendarLegend from './components/CalendarLegend';
     containerLegendSelector,
     tz,
     categoryURL,
-    categoryId
+    categoryId,
+    period,
+    date
   ) {
     const cachedEvents = {};
     const container = document.querySelector(containerCalendarSelector);
@@ -63,8 +65,8 @@ import CalendarLegend from './components/CalendarLegend';
                 <div className="ui popup bottom left visible" style={{position: 'relative'}}>
                   <CalendarSingleDatePicker
                     date={serializeDate(toMoment(calendar.getDate()))}
-                    onChange={date => {
-                      resolve(serializeDate(toMoment(date)));
+                    onChange={d => {
+                      resolve(serializeDate(toMoment(d)));
                     }}
                   />
                 </div>
@@ -80,7 +82,8 @@ import CalendarLegend from './components/CalendarLegend';
         },
       },
       plugins: [dayGridPlugin],
-      initialView: 'dayGridMonth',
+      initialView: {month: 'dayGridMonth', week: 'dayGridWeek', day: 'dayGridDay'}[period],
+      initialDate: date,
       timeZone: tz,
       firstDay: 1,
       height: 850,
