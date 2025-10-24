@@ -265,6 +265,7 @@ def update_review_tags(revision, tags):
     _ensure_revision_can_be_updated(revision)
     old_tags = revision.tags
     revision.tags = set(tags)
+    revision.modified_dt = now_utc()
     db.session.flush()
     logger.info('Review tags on revision %r updated by %r', revision, session.user)
     changes = {'tags': (', '.join(sorted(t.code for t in old_tags)),
