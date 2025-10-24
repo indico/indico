@@ -233,11 +233,11 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         argmap = {'tags': EditingTagsField(self.event, load_default=None)}
         tags = parser.parse(argmap, unknown=EXCLUDE)['tags']
 
-        if (text is None and tags is None):
+        if text is None and tags is None:
             raise BadRequest(_('No changes specified'))
-        if (text is not None):
+        if text is not None:
             update_review_comment(self.revision, text)
-        if (tags is not None):
+        if tags is not None:
             update_review_tags(self.revision, tags)
         return '', 204
 
