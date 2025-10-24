@@ -232,7 +232,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     def _process_PATCH(self, text):
         argmap = {'tags': EditingTagsField(self.event, load_default=None)}
         tags = parser.parse(argmap, unknown=EXCLUDE)['tags']
-        print(tags)
+
         if (text is None and tags is None):
             raise BadRequest(_('No changes specified'))
         if (text is not None):
