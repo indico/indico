@@ -20,6 +20,8 @@ Improvements
 - Log local group membership changes of users (:pr:`7122`, thanks :user:`tomako`)
 - Warn when downloading files from an editable not assigned to you (:issue:`7131`,
   :pr:`7132`)
+- Add URL args to set the default view and date of the cataegory calendar view
+  (:pr:`7144`)
 
 Bugfixes
 ^^^^^^^^

@@ -566,8 +566,12 @@ class _EventProxy:
 
 
 class RHCategoryCalendarView(RHDisplayCategoryBase):
-    def _process(self):
-        return WPCategoryCalendar.render_template('display/calendar.html', self.category)
+    @use_kwargs({
+        'period': fields.String(load_default='month', validate=validate.OneOf(['day', 'month', 'week'])),
+        'date': fields.Date(load_default=None),
+    }, location='query')
+    def _process(self, period, date):
+        return WPCategoryCalendar.render_template('display/calendar.html', self.category, period=period, date=date)
 
 
 class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):

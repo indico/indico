@@ -30,7 +30,9 @@
             'category-calendar-legend',
             {{ category.display_tzinfo.zone | tojson }},
             {{ url_for('categories.calendar_events', category) | tojson }},
-            {{ category.id }}
+            {{ category.id }},
+            {{ period | tojson }},
+            {{ date | tojson }},
         );
     </script>
 {% endblock %}
