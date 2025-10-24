@@ -230,7 +230,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         'text': fields.String(load_default=None),
     })
     def _process_PATCH(self, text):
-        argmap = {'tags': EditingTagsField(self.event, load_default=None)}
+        argmap = {'tags': EditingTagsField(self.event, allow_system_tags=True, load_default=None)}
         tags = parser.parse(argmap, unknown=EXCLUDE)['tags']
 
         if text is None and tags is None:
