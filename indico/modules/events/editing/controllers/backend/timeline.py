@@ -28,7 +28,7 @@ from indico.modules.events.editing.operations import (assign_editor, create_new_
                                                       create_submitter_revision, delete_editable,
                                                       delete_revision_comment, ensure_latest_revision, replace_revision,
                                                       unassign_editor, undo_review, update_review_comment,
-                                                      update_revision_comment)
+                                                      update_review_tags, update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
@@ -227,10 +227,18 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         return '', 204
 
     @use_kwargs({
-        'text': fields.String(required=True),
+        'text': fields.String(load_default=None),
     })
     def _process_PATCH(self, text):
-        update_review_comment(self.revision, text)
+        argmap = {'tags': EditingTagsField(self.event, load_default=None)}
+        tags = parser.parse(argmap, unknown=EXCLUDE)['tags']
+        print(tags)
+        if (text is None and tags is None):
+            raise BadRequest(_('No changes specified'))
+        if (text is not None):
+            update_review_comment(self.revision, text)
+        if (tags is not None):
+            update_review_tags(self.revision, tags)
         return '', 204
 
     def _process_DELETE(self):
