@@ -261,6 +261,21 @@ def update_review_comment(revision, text):
 
 
 @no_autoflush
+def update_review_tags(revision, tags):
+    _ensure_revision_can_be_updated(revision)
+    old_tags = revision.tags
+    revision.tags = set(tags)
+    db.session.flush()
+    logger.info('Review tags on revision %r updated by %r', revision, session.user)
+    changes = {'tags': (', '.join(sorted(t.code for t in old_tags)),
+                        ', '.join(sorted(t.code for t in revision.tags)))}
+    log_fields = {'tags': 'Tags'}
+    revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
+                          f'Review tags on {revision.editable.log_title} updated',
+                          session.user, data={'Changes': make_diff_log(changes, log_fields)})
+
+
+@no_autoflush
 def reset_editable(revision):
     _ensure_revision_can_be_updated(revision)
     editable = revision.editable
