@@ -58,15 +58,7 @@
 
 .download-tag-wrapper {
   display: flex;
-
-  .tag-display {
-    flex-grow: 1;
-    margin-left: -3px;
-
-    :global(.ui.label) {
-      margin: 3px 0 0 3px;
-    }
-  }
+  justify-content: flex-end;
 
   .download-button {
     white-space: nowrap;
