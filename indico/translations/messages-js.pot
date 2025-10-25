@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.7-dev\n"
+"Project-Id-Version: Indico 3.3.9-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-14 12:20+0200\n"
+"POT-Creation-Date: 2025-10-25 13:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -369,6 +369,14 @@ msgstr ""
 msgid "Undoing previous operation..."
 msgstr ""
 
+#: indico/modules/events/papers/templates/assign_role.html
+#: indico/modules/events/papers/templates/management/competences.html
+#: indico/modules/events/papers/templates/management/paper_person_list.html
+#: indico/modules/events/persons/templates/management/person_list.html
+msgctxt "Person"
+msgid "Name"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/index.js indico/modules/events/registration/client/js/registration.js
 msgid "Terms and Conditions"
 msgstr ""
@@ -402,7 +410,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/reminders/templates/edit_reminder.html
-msgid "Reminder Preview"
+msgid "Reminder preview"
 msgstr ""
 
 #: indico/modules/events/sessions/client/js/index.js

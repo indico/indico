@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.7-dev\n"
+"Project-Id-Version: Indico 3.3.9-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-14 12:19+0200\n"
+"POT-Creation-Date: 2025-10-25 13:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,11 +109,8 @@ msgstr ""
 #: indico/modules/attachments/forms.py indico/modules/categories/forms.py indico/modules/designer/templates/template.html
 #: indico/modules/events/contributions/forms.py indico/modules/events/contributions/templates/management/types_dialog.html
 #: indico/modules/events/editing/templates/management/editor_list.html indico/modules/events/forms.py
-#: indico/modules/events/papers/forms.py indico/modules/events/papers/templates/assign_role.html
-#: indico/modules/events/papers/templates/management/_templates.html
-#: indico/modules/events/papers/templates/management/competences.html
-#: indico/modules/events/papers/templates/management/paper_person_list.html indico/modules/events/payment/forms.py
-#: indico/modules/events/payment/plugins.py indico/modules/events/persons/templates/management/person_list.html
+#: indico/modules/events/papers/forms.py indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/payment/forms.py indico/modules/events/payment/plugins.py
 #: indico/modules/events/registration/wallets/apple.py indico/modules/events/roles/forms.py
 #: indico/modules/events/sessions/forms.py indico/modules/events/sessions/templates/management/types_dialog.html
 #: indico/modules/events/templates/admin/_reference_type_list.html indico/modules/groups/templates/_group_members.html
@@ -645,6 +642,10 @@ msgstr ""
 msgid "You may use Markdown and basic HTML elements for formatting."
 msgstr ""
 
+#: indico/modules/announcement/templates/display.html
+msgid "Dismiss"
+msgstr ""
+
 #: indico/modules/announcement/templates/settings.html
 msgid "The announcement is a message shown on top of each Indico page."
 msgstr ""
@@ -1014,6 +1015,7 @@ msgstr ""
 #: indico/modules/events/contributions/templates/management/types_dialog.html indico/modules/events/forms.py
 #: indico/modules/events/management/forms.py indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/papers/forms.py indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/display/session_display.html indico/modules/events/sessions/util.py
 #: indico/modules/events/surveys/fields/base.py indico/modules/events/surveys/forms.py
@@ -1119,11 +1121,31 @@ msgid "Include materials from sessions/contributions scheduled on the selected d
 msgstr ""
 
 #: indico/modules/attachments/forms.py
-msgid "Managers only"
+msgid "Upload: Managers only"
 msgstr ""
 
 #: indico/modules/attachments/forms.py
 msgid "Only allow managers to upload materials to the event, contributions and sessions."
+msgstr ""
+
+#: indico/modules/attachments/forms.py
+msgid "Material packages"
+msgstr ""
+
+#: indico/modules/attachments/forms.py
+msgid "Specify who can generate a material package."
+msgstr ""
+
+#: indico/modules/attachments/settings.py indico/modules/events/contributions/models/fields.py
+msgid "Everyone"
+msgstr ""
+
+#: indico/modules/attachments/settings.py
+msgid "Logged-in users"
+msgstr ""
+
+#: indico/modules/attachments/settings.py
+msgid "Event managers"
 msgstr ""
 
 #: indico/modules/attachments/controllers/event_package.py
@@ -1389,11 +1411,13 @@ msgid "Settings"
 msgstr ""
 
 #: indico/modules/attachments/templates/attachments.html
-msgid "Upload permissions"
+msgid "Material permissions"
 msgstr ""
 
-#: indico/modules/attachments/templates/attachments.html
-msgid "Set upload permissions"
+#: indico/modules/attachments/templates/attachments.html indico/modules/categories/forms.py
+#: indico/modules/events/contributions/forms.py indico/modules/events/management/forms.py
+#: indico/modules/events/sessions/forms.py indico/web/templates/forms/permissions_widget.html
+msgid "Permissions"
 msgstr ""
 
 #: indico/modules/attachments/templates/generate_package.html indico/modules/designer/templates/template.html
@@ -2285,12 +2309,6 @@ msgstr ""
 msgid "Logo that will show up next to the category description. Will be automatically resized to at most 200x200 pixels."
 msgstr ""
 
-#: indico/modules/categories/forms.py indico/modules/events/contributions/forms.py
-#: indico/modules/events/management/forms.py indico/modules/events/sessions/forms.py
-#: indico/web/templates/forms/permissions_widget.html
-msgid "Permissions"
-msgstr ""
-
 #: indico/modules/categories/forms.py indico/modules/events/contributions/forms.py indico/modules/events/forms.py
 #: indico/modules/events/layout/forms.py indico/modules/events/management/forms.py indico/modules/events/sessions/forms.py
 msgid "Protection mode"
@@ -2773,6 +2791,14 @@ msgstr ""
 msgid "Categories in %(category_title)s"
 msgstr ""
 
+#: indico/modules/categories/templates/display/category_list.html
+msgid "Protected category"
+msgstr ""
+
+#: indico/modules/categories/templates/display/category_list.html
+msgid "Public category"
+msgstr ""
+
 #: indico/modules/categories/templates/display/event_list.html
 msgid "Some events in the list below have been hidden."
 msgstr ""
@@ -2790,6 +2816,11 @@ msgid "There is one event in the past."
 msgid_plural "There are %(count)s events in the past."
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/modules/categories/templates/display/event_list.html
+#, python-format
+msgid "Export %(title)s to calendar"
+msgstr ""
 
 #: indico/modules/categories/templates/display/event_list.html
 #: indico/modules/events/abstracts/templates/display/abstracts.html
@@ -2857,12 +2888,12 @@ msgstr ""
 
 #: indico/modules/categories/templates/display/sidebar.html
 #, python-format
-msgid "ongoing until %(time)s"
+msgid "Ongoing until %(time)s"
 msgstr ""
 
 #: indico/modules/categories/templates/display/sidebar.html
 #, python-format
-msgid "starts %(time)s"
+msgid "Starts %(time)s"
 msgstr ""
 
 #: indico/modules/categories/templates/display/overview/base.html
@@ -4586,6 +4617,10 @@ msgid "Corresponding author"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py
+msgid "Their email addresses will be published in the Book of Abstracts."
+msgstr ""
+
+#: indico/modules/events/abstracts/forms.py
 msgid "Show abstract IDs"
 msgstr ""
 
@@ -4964,7 +4999,7 @@ msgid "Additional CC e-mail addresses (one per line)"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py indico/modules/events/registration/forms.py
-#: indico/modules/events/registration/templates/management/email_preview.html
+#: indico/modules/events/registration/templates/management/email_preview.html indico/modules/events/reminders/forms.py
 #: indico/modules/events/reminders/templates/preview.html indico/modules/logs/templates/entry_email.html
 msgid "Subject"
 msgstr ""
@@ -6833,6 +6868,7 @@ msgid "Warning: this email address will be able to sign the agreement!"
 msgstr ""
 
 #: indico/modules/events/agreements/forms.py indico/modules/events/registration/forms.py
+#: indico/modules/events/reminders/forms.py
 msgid "Email body"
 msgstr ""
 
@@ -7412,10 +7448,6 @@ msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
 msgid "Submitter edit settings changed successfully"
-msgstr ""
-
-#: indico/modules/events/contributions/models/fields.py
-msgid "Everyone"
 msgstr ""
 
 #: indico/modules/events/contributions/models/fields.py
@@ -8012,7 +8044,7 @@ msgid "Editing (configured tags, file types, review conditions)"
 msgstr ""
 
 #: indico/modules/events/editing/operations.py
-msgid "The requested action is not possible on this revision"
+msgid "The timeline is outdated. Please refresh the page and try again."
 msgstr ""
 
 #: indico/modules/events/editing/schemas.py
@@ -10197,6 +10229,15 @@ msgstr ""
 msgid "Export as JSON"
 msgstr ""
 
+#. Full name of the person
+#: indico/modules/events/papers/templates/assign_role.html
+#: indico/modules/events/papers/templates/management/competences.html
+#: indico/modules/events/papers/templates/management/paper_person_list.html
+#: indico/modules/events/persons/templates/management/person_list.html
+msgctxt "Person"
+msgid "Name"
+msgstr ""
+
 #: indico/modules/events/papers/templates/assign_role.html
 #: indico/modules/events/papers/templates/management/competences.html
 #: indico/modules/events/papers/templates/management/overview.html
@@ -11688,6 +11729,14 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "If enabled, the user will be able to register even if the event is access-restricted."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Lock email address"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "If enabled, the email address cannot be changed during registration."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -13372,42 +13421,6 @@ msgstr ""
 msgid "Your registration for the event %(link)s%(title)s%(endlink)s %(at_time)s is now %(strong)sunpaid%(endstrong)s."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Pending invitations"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Accepted invitations"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Declined invitations"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Nobody has been invited yet."
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Mark as declined"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Mark invitation as declined"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Do you really want to mark this invitation as declined by the invitee?"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Delete invitation"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/_invitation_list.html
-msgid "Do you really want to delete this invitation?"
-msgstr ""
-
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 msgid "<strong>Tip</strong>: if your printer does not align the badges correctly, you can tweak the margins."
 msgstr ""
@@ -14250,7 +14263,11 @@ msgid "A reminder at {} has been created."
 msgstr ""
 
 #: indico/modules/events/reminders/forms.py
-msgid "Relative to the event start time"
+msgid "Before the event start time"
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid "After the event end time"
 msgstr ""
 
 #: indico/modules/events/reminders/forms.py
@@ -14309,7 +14326,8 @@ msgstr ""
 msgid "The email address that will show up as the sender."
 msgstr ""
 
-#: indico/modules/events/reminders/forms.py indico/modules/events/reminders/templates/emails/event_reminder.txt
+#: indico/modules/events/reminders/forms.py indico/modules/events/reminders/templates/emails/event_reminder.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.txt
 msgid "Note"
 msgstr ""
 
@@ -14375,11 +14393,15 @@ msgid "Since this event has the %(label)s label, no reminders will be sent for i
 msgstr ""
 
 #: indico/modules/events/reminders/templates/reminders.html
-msgid "Pending Reminders"
+msgid "Pending reminders"
 msgstr ""
 
 #: indico/modules/events/reminders/templates/reminders.html
-msgid "Add Reminder"
+msgid "Add custom reminder"
+msgstr ""
+
+#: indico/modules/events/reminders/templates/reminders.html
+msgid "Add standard reminder"
 msgstr ""
 
 #: indico/modules/events/reminders/templates/reminders.html
@@ -14387,20 +14409,50 @@ msgid "There are no pending reminders."
 msgstr ""
 
 #: indico/modules/events/reminders/templates/reminders.html
-msgid "Sent Reminders"
+msgid "Sent reminders"
 msgstr ""
 
+#: indico/modules/events/reminders/templates/emails/_agenda.html
 #: indico/modules/events/reminders/templates/emails/_agenda.txt
 #, python-format
 msgid "Agenda for %(title)s"
 msgstr ""
 
+#: indico/modules/events/reminders/templates/emails/_agenda.html
 #: indico/modules/events/reminders/templates/emails/_agenda.txt
 msgid "There are no events scheduled."
 msgstr ""
 
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
 msgid "Event reminder"
+msgstr ""
+
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
+#, python-format
+msgid "Please note that the event <a href=\"%(url)s\">\"%(title)s\"%(label)s</a> will start on %(start)s (%(tz)s)."
+msgstr ""
+
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.txt
+#, python-format
+msgid "It will take place at %(loc)s"
+msgstr ""
+
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.txt
+msgid "It will take place at the following address:"
+msgstr ""
+
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.txt
+#, python-format
+msgid "room %(r)s"
+msgstr ""
+
+#: indico/modules/events/reminders/templates/emails/event_reminder.html
+#: indico/modules/events/reminders/templates/emails/event_reminder.txt
+msgid "Address:"
 msgstr ""
 
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
@@ -14409,25 +14461,7 @@ msgid "Please note that the event \"%(title)s\"%(label)s will start on %(start)s
 msgstr ""
 
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
-#, python-format
-msgid "It will take place at %(loc)s"
-msgstr ""
-
-#: indico/modules/events/reminders/templates/emails/event_reminder.txt
-msgid "It will take place at the following address:"
-msgstr ""
-
-#: indico/modules/events/reminders/templates/emails/event_reminder.txt
 msgid "You can access the full event here:"
-msgstr ""
-
-#: indico/modules/events/reminders/templates/emails/event_reminder.txt
-#, python-format
-msgid "room %(r)s"
-msgstr ""
-
-#: indico/modules/events/reminders/templates/emails/event_reminder.txt
-msgid "Address:"
 msgstr ""
 
 #: indico/modules/events/requests/__init__.py indico/modules/events/requests/templates/event_requests.html
@@ -19486,6 +19520,27 @@ msgstr ""
 msgid "EEEE"
 msgstr ""
 
+#. keep the single quotes around the string
+#: indico/util/date_time.py
+msgid "'yesterday'"
+msgstr ""
+
+#. keep the single quotes around the string
+#: indico/util/date_time.py
+msgid "'today'"
+msgstr ""
+
+#. keep the single quotes around the string
+#: indico/util/date_time.py
+msgid "'tomorrow'"
+msgstr ""
+
+#. keep the single quotes around the string, and only translate the "Last".
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
+#: indico/util/date_time.py
+msgid "'last' EEEE"
+msgstr ""
+
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
 msgid "'Yesterday' 'at' {time_fmt}"
@@ -19518,8 +19573,33 @@ msgstr ""
 msgid "{date_fmt} 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the strings, and only translate the text inside
+#: indico/util/date_time.py
+msgid "'yesterday' 'at' {time_fmt}"
+msgstr ""
+
+#. keep the single quotes around the strings, and only translate the text inside
+#: indico/util/date_time.py
+msgid "'today' 'at' {time_fmt}"
+msgstr ""
+
+#. keep the single quotes around the strings, and only translate the text inside
+#: indico/util/date_time.py
+msgid "'tomorrow' 'at' {time_fmt}"
+msgstr ""
+
+#. keep the single quotes around the strings, and only translate the text inside.
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
+#: indico/util/date_time.py
+msgid "'last' EEEE 'at' {time_fmt}"
+msgstr ""
+
 #: indico/util/marshmallow.py indico/web/forms/validators.py
 msgid "Links and images may not use relative URLs."
+msgstr ""
+
+#: indico/util/marshmallow.py indico/web/forms/validators.py
+msgid "This field contains a forbidden link. Did you mean to use a placeholder?"
 msgstr ""
 
 #: indico/util/marshmallow.py
@@ -19610,6 +19690,10 @@ msgstr ""
 msgid "This text has been automatically converted from HTML to Markdown. Please double-check that it's properly displayed."
 msgstr ""
 
+#: indico/web/args.py indico/web/rh.py
+msgid "The specified item could not be found."
+msgstr ""
+
 #: indico/web/breadcrumbs.py
 msgid "My unlisted events"
 msgstr ""
@@ -19618,10 +19702,6 @@ msgstr ""
 msgid ""
 "It looks like there was a problem with your current session. Please use your browser's back button, reload the page "
 "and try again."
-msgstr ""
-
-#: indico/web/rh.py
-msgid "The specified item could not be found."
 msgstr ""
 
 #: indico/web/util.py
@@ -19939,6 +20019,14 @@ msgid "Years"
 msgstr ""
 
 #: indico/web/forms/fields/datetime.py
+msgid "Disabled day selected"
+msgstr ""
+
+#: indico/web/forms/fields/datetime.py
+msgid "Disabled date selected"
+msgstr ""
+
+#: indico/web/forms/fields/datetime.py
 msgid "Date must be specified"
 msgstr ""
 
@@ -20168,6 +20256,14 @@ msgstr ""
 #: indico/web/templates/bad_url_error.html
 #, python-format
 msgid "This Indico instance can only be accessed via <a href=\"%(url)s\">%(url)s</a>"
+msgstr ""
+
+#: indico/web/templates/breadcrumbs.html
+msgid "Breadcrumb"
+msgstr ""
+
+#: indico/web/templates/breadcrumbs.html
+msgid "you are here"
 msgstr ""
 
 #: indico/web/templates/confirmation_dialog.html

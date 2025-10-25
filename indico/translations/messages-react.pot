@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-25 12:20+0200\n"
+"POT-Creation-Date: 2025-10-25 13:57+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -164,6 +164,8 @@ msgstr ""
 #: indico/modules/receipts/client/js/templates/Editor.jsx
 #: indico/modules/users/client/js/UserBlock.jsx
 #: indico/web/client/js/react/components/RequestConfirm.jsx
+#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
+#: indico/web/client/js/react/components/pictures/PictureWebcam.jsx
 #: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx
 #: indico/web/client/js/react/components/principals/Search.jsx
 #: indico/web/client/js/react/forms/final-form.jsx
@@ -785,7 +787,7 @@ msgid "Delete poster"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/DeleteEditable.jsx
-msgid "This operation is not reversible. Are you sure you want to procceed?"
+msgid "This operation is not reversible. Are you sure you want to proceed?"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
@@ -802,6 +804,16 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "Download ZIP"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+msgid ""
+"You haven't assigned this editable to yourself. Are you sure you want to "
+"download it anyway?"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+msgid "Download anyway"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
@@ -859,19 +871,20 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
+msgid "This timeline is outdated. Please refresh the page."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
 msgid "Undo review"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
-msgid "Reset review"
+msgid "Undo"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
-msgid "Reset"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
-msgid "Are you sure you want to reset the review?"
+msgid "Are you sure you want to undo the review?"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewComment.jsx
@@ -973,7 +986,7 @@ msgid "This revision has been retracted by the editor."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx
-msgid "This revision has been updated"
+msgid "This timeline has been updated"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx
@@ -2280,8 +2293,44 @@ msgstr ""
 msgid "Display my participation to everyone who can see this event"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/components/EmailPendingInvitationsButton.jsx
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Mark as declined"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Mark invitation as declined"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Do you really want to mark this invitation as declined by the invitee?"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Delete invitation"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Do you really want to delete this invitation?"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Nobody has been invited yet."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
 msgid "Send reminders"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Pending invitations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Accepted invitations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InvitationList.tsx
+msgid "Declined invitations"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
@@ -2664,6 +2713,11 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
+msgid "Extra slots"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
 msgid "This field is required"
 msgstr ""
 
@@ -2743,10 +2797,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ShowIfInput.jsx
 msgid "Select values..."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
-msgid "Select extra slots"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
@@ -3061,6 +3111,10 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
 msgid "Register"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/invitations.js
+msgid "Remind all"
 msgstr ""
 
 #: indico/modules/events/sessions/client/js/session_display.jsx
