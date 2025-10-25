@@ -66,7 +66,7 @@ export default function DeleteEditable() {
         open={isOpen}
         persistent
       >
-        <Translate>This operation is not reversible. Are you sure you want to procceed?</Translate>
+        <Translate>This operation is not reversible. Are you sure you want to proceed?</Translate>
       </RequestConfirmDelete>
     </>
   );
