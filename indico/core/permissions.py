@@ -177,8 +177,20 @@ def get_split_permissions(permissions):
     return full_access_permission, read_access_permission, other_permissions
 
 
+def update_read_permissions(obj, form):
+    """Update the read permissions of an object (a `ProtectionMixin` instance), based on the corresponding WTForm."""
+    current_principals = {acl_entry.principal for acl_entry in obj.acl_entries}
+    new_principals = set(form.acl.data or {})
+    to_be_added = new_principals - current_principals
+    to_be_removed = current_principals - new_principals
+    for principal in to_be_added:
+        obj.update_principal(principal, read_access=True)
+    for principal in to_be_removed:
+        obj.update_principal(principal, read_access=False)
+
+
 def update_permissions(obj, form):
-    """Update the permissions of an object, based on the corresponding WTForm."""
+    """Update the permissions of an object (a `ProtectionManagerMixin` instance), based on the corresponding WTForm."""
     from indico.modules.categories import Category
     from indico.modules.events import Event
     from indico.util.user import principal_from_identifier
