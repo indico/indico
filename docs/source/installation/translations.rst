@@ -1,9 +1,9 @@
 Translations
 ************
 
-Indico comes with a number of languages by default. In release 3.2, those are:
+Indico comes with a number of languages by default. In release 3.3, those are:
 English (default), French, Portuguese, Spanish, Chinese, Ukrainian, Polish,
-Mongolian, Turkish, German, Czech, Italian, Hungarian, Swedish and Japanese (in the order of integration).
+Mongolian, Turkish, German, Czech, Italian, Hungarian, Swedish, Japanese and Finnish (in the order of integration).
 Additional languages are being prepared on the
 `Transifex platform <https://www.transifex.com/indico/>`_.
 

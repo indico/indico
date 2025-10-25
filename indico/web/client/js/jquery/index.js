@@ -19,6 +19,7 @@ import 'moment/locale/cs';
 import 'moment/locale/de';
 import 'moment/locale/en-ca';
 import 'moment/locale/es';
+import 'moment/locale/fi';
 import 'moment/locale/fr';
 import 'moment/locale/hu';
 import 'moment/locale/it';

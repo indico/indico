@@ -20,6 +20,7 @@ Indico is currently available in the following languages:
 - Hungarian 🇭🇺
 - Swedish 🇸🇪
 - Japanese 🇯🇵
+- Finnish 🇫🇮
 
 Languages with partial translations:
 

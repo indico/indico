@@ -7,6 +7,11 @@ Version 3.3.9
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Finnish
+
 Improvements
 ^^^^^^^^^^^^
 
