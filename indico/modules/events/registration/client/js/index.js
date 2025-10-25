@@ -17,11 +17,8 @@ import './reglists';
 
 import {domReady} from 'indico/utils/domstate';
 
-import ConsentToPublishEditor from './components/ConsentToPublishEditor';
 import ParticipantList from './components/participant-list/ParticipantList';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
-import setupRegformSetup from './form_setup';
-import setupRegformSubmission from './form_submission';
 
 (function(global) {
   $(document).ready(() => {
@@ -106,42 +103,6 @@ import setupRegformSubmission from './form_submission';
   document.addEventListener('DOMContentLoaded', () => {
     setupRegistrationTags();
     $('#registration-details').parent().on('indico:htmlUpdated', setupRegistrationTags);
-  });
-
-  function setupConsentToPublish() {
-    const rootElement = document.getElementById('registration-summary-consent-to-publish');
-
-    if (rootElement) {
-      const {locator, publishToParticipants, publishToPublic, initialConsentToPublish} =
-        rootElement.dataset;
-
-      ReactDOM.render(
-        <ConsentToPublishEditor
-          locator={JSON.parse(locator)}
-          publishToParticipants={publishToParticipants}
-          publishToPublic={publishToPublic}
-          initialConsentToPublish={initialConsentToPublish}
-        />,
-        rootElement
-      );
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setupConsentToPublish();
-    $('#registration-info').parent().on('indico:htmlUpdated', setupConsentToPublish);
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const setupRootElement = document.getElementById('registration-form-setup-container');
-    if (setupRootElement) {
-      setupRegformSetup(setupRootElement);
-    }
-
-    const submissionRootElement = document.getElementById('registration-form-submission-container');
-    if (submissionRootElement) {
-      setupRegformSubmission(submissionRootElement);
-    }
   });
 
   customElements.define(
