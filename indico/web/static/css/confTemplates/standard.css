@@ -36,7 +36,7 @@
   --conf-theme-support-text: #aaa;
 
   /* Background images */
-  --conf-theme-sprite-image: url(images/conf/sprites_blue.png);
+  --conf-theme-sprite-image: url('/images/conf/sprites_blue.png');
 
   /* Announcement colors */
   --conf-theme-announcement-bg: #f5faff;
