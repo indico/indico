@@ -250,6 +250,8 @@ export const dateSettingsFormDecorator = createDecorator({
 export const dateSettingsInitialData = {
   dateFormat: '%d/%m/%Y',
   timeFormat: null,
+  minDate: null,
+  maxDate: null,
 };
 
 export function DateSettings() {
@@ -308,7 +310,8 @@ export function DateSettings() {
               name="minDate"
               label={Translate.string('Minimum date')}
               max={maxDate}
-              parse={date => date}
+              parse={date => date || null}
+              allowNull
             />
           )}
         </Field>
@@ -318,7 +321,8 @@ export function DateSettings() {
               name="maxDate"
               label={Translate.string('Maximum date')}
               min={minDate}
-              parse={date => date}
+              parse={date => date || null}
+              allowNull
             />
           )}
         </Field>
