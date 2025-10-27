@@ -46,8 +46,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* height of the div must be
-  A4 height - 25mm added by WeasyPrint by default */
+  /* height of the div must be:
+  197mm (A4 height) minus 25mm added by WeasyPrint by default */
   height: 272mm;
   width: 100%;
   left: 0;
@@ -61,6 +61,8 @@ body {
 .cover > div.cover-wrapper > div {
   text-align: center;
   width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
 }
 
 /* TOC */
