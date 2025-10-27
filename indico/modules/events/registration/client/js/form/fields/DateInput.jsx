@@ -127,11 +127,6 @@ export default function DateInput({
     /%([HMdmY])/g,
     (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'})[c]
   );
-  const validateDateTime = dateTime => {
-    if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
-      return Translate.string('The provided date is invalid.');
-    }
-  };
 
   const validateDateTimeWithMinMax = dateTime => {
     if (dateTime && !moment(dateTime, moment.ISO_8601, true).isValid()) {
@@ -155,7 +150,7 @@ export default function DateInput({
         disabled={disabled}
         dateFormat={friendlyDateFormat}
         timeFormat={timeFormat}
-        validate={validateDateTime}
+        validate={validateDateTimeWithMinMax}
         parse={v => v}
         minDate={minDate}
         maxDate={maxDate}
