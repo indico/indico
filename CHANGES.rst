@@ -53,6 +53,8 @@ Accessibility
 - Fix the semantics for the empty materials text (:pr:`7096`, thanks :user:`foxbunny`)
 - Fix announcements accessibility (:pr:`7098`, thanks :user:`foxbuny`)
 - Fix conference description color contrast (:pr:`7118`, thanks :user:`foxbunny`)
+- Improve dropdown accessibility in category list toolbar (:pr:`7069`, 
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -7,6 +7,7 @@
 
 import './ind_menu.scss';
 import CustomElementBase from 'indico/custom_elements/_base';
+import * as positioning from 'indico/utils/positioning';
 
 let lastId = 0; // Track the assigned IDs to give each element a unique ID
 
@@ -14,6 +15,7 @@ CustomElementBase.defineWhenDomReady(
   'ind-menu',
   class extends CustomElementBase {
     setup() {
+      const indMenu = this;
       const trigger = this.querySelector('button');
       const list = this.querySelector('menu');
 
@@ -27,8 +29,25 @@ CustomElementBase.defineWhenDomReady(
       list.id = list.id || `dropdown-list-${lastId++}`;
       trigger.setAttribute('aria-controls', list.id);
 
+      let abortPositioning;
+
       trigger.addEventListener('click', () => {
-        trigger.setAttribute('aria-expanded', trigger.getAttribute('aria-expanded') !== 'true');
+        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+        if (isExpanded) {
+          abortPositioning?.();
+          trigger.setAttribute('aria-expanded', false);
+          list.hidden = true;
+          indMenu.removeAttribute('open');
+        } else {
+          trigger.setAttribute('aria-expanded', true);
+          list.hidden = false;
+          abortPositioning = positioning.position(
+            list,
+            trigger,
+            positioning.dropdownPositionStrategy,
+            () => indMenu.toggleAttribute('open', true)
+          );
+        }
       });
 
       this.addEventListener('focusout', () => {
@@ -37,7 +56,10 @@ CustomElementBase.defineWhenDomReady(
           if (this.contains(document.activeElement)) {
             return;
           }
+          abortPositioning?.();
           trigger.removeAttribute('aria-expanded');
+          list.hidden = true;
+          indMenu.removeAttribute('open');
         });
       });
 
@@ -46,7 +68,10 @@ CustomElementBase.defineWhenDomReady(
           return;
         }
         if (evt.code === 'Escape') {
+          abortPositioning?.();
           trigger.removeAttribute('aria-expanded');
+          list.hidden = true;
+          indMenu.removeAttribute('open');
           trigger.focus();
         }
       });
