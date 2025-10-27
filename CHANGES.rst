@@ -59,6 +59,8 @@ Internal Changes
 
 - Allow plugins to store custom annotations/metadata on attachments, and indicate that
   it has been converted from antoher attachment (:pr:`7108`)
+- Refactor conference page theme CSS to allow easier theming using CSS variables
+  (:pr:`7110`, thanks :user:`foxbunny`)
 
 
 Version 3.3.8
