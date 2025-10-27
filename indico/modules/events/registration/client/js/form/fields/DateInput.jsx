@@ -331,7 +331,7 @@ export function DateSettings() {
   );
 }
 
-export function DateSettingsFormValidator({minDate, maxDate, dateFormat}) {
+export function dateSettingsFormValidator({minDate, maxDate, dateFormat}) {
   if (minDate && maxDate && dateFormat) {
     if (
       ['%m/%Y', '%m.%Y'].includes(dateFormat) &&

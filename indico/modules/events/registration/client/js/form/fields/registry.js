@@ -34,7 +34,7 @@ import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
   DateSettings,
   dateSettingsFormDecorator,
-  DateSettingsFormValidator,
+  dateSettingsFormValidator,
   dateSettingsInitialData,
 } from './DateInput';
 import EmailInput from './EmailInput';
@@ -140,7 +140,7 @@ const fieldRegistry = {
     inputComponent: DateInput,
     settingsComponent: DateSettings,
     settingsFormDecorators: [dateSettingsFormDecorator],
-    settingsFormValidator: DateSettingsFormValidator,
+    settingsFormValidator: dateSettingsFormValidator,
     settingsFormInitialData: dateSettingsInitialData,
     icon: 'calendar',
   },
