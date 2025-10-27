@@ -231,8 +231,8 @@ class DateField(RegistrationFormFieldBase):
                 data['time_format'] = '12h'
             elif time_date_formats[1] == '%H:%M':
                 data['time_format'] = '24h'
-        data['min_date'] = unversioned_data.get('min_date') or None
-        data['max_date'] = unversioned_data.get('max_date') or None
+        data['min_date'] = unversioned_data.get('min_date')
+        data['max_date'] = unversioned_data.get('max_date')
         return data
 
     @classmethod
