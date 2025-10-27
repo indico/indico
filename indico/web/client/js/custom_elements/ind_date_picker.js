@@ -103,6 +103,10 @@ CustomElementBase.define(
         input.select();
         input.focus();
       });
+      input.addEventListener('click', () => {
+        // Select all text when clicking on the input
+        input.select();
+      });
       input.addEventListener('keydown', evt => {
         if (evt.code === 'ArrowDown' && evt.altKey) {
           openDialog(indCalendar, input);
@@ -248,6 +252,14 @@ CustomElementBase.define(
       this.addEventListener('x-attrchange.range-start-max', updateSelectionLimits);
       this.addEventListener('x-attrchange.range-end-min', updateSelectionLimits);
       this.addEventListener('x-attrchange.range-end-max', updateSelectionLimits);
+      rangeStartInput.addEventListener('click', () => {
+        // Select all text when clicking on the input
+        rangeStartInput.select();
+      });
+      rangeEndInput.addEventListener('click', () => {
+        // Select all text when clicking on the input
+        rangeEndInput.select();
+      });
       rangeStartInput.addEventListener('input', () => {
         const date = parseDate(rangeStartInput.value);
         indCalendar.rangeStart = date;
