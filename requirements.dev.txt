@@ -45,7 +45,7 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.6.9
+coverage[toml]==7.6.9
     # via pytest-cov
 docker==7.1.0
     # via -r requirements.dev.in
@@ -141,7 +141,7 @@ pytest==8.3.4
     #   pytest-snapshot
 pytest-cov==6.0.0
     # via -r requirements.dev.in
-pytest-localserver==0.9.0.post0
+pytest-localserver[smtp]==0.9.0.post0
     # via -r requirements.dev.in
 pytest-mock==3.14.0
     # via -r requirements.dev.in
@@ -229,7 +229,7 @@ sqlbag==0.1.1617247075
     # via migra
 sqlparse==0.5.3
     # via -r requirements.dev.in
-starlette==0.47.2
+starlette==0.49.1
     # via sphinx-autobuild
 tomlkit==0.13.2
     # via -r requirements.dev.in
