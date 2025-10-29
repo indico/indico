@@ -27,6 +27,8 @@ Improvements
   :pr:`7132`)
 - Add URL args to set the default view and date of the cataegory calendar view
   (:pr:`7144`)
+- Add the ability to clear date picker fields with a button 
+  (:pr:`7151`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^

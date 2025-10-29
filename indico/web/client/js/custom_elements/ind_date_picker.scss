@@ -23,7 +23,11 @@ ind-date-picker {
     padding-right: 2.5em;
   }
 
-  > button {
+  &[data-clearable='true'] > input {
+    padding-right: 4.5em;
+  }
+
+  > button[data-calendar-trigger] {
     @extend %text-size-reset;
     @extend %button-icon-only;
 
@@ -34,18 +38,29 @@ ind-date-picker {
     aspect-ratio: 1;
   }
 
-  > button::before {
+  > button[data-calendar-trigger]::before {
     @extend %icon;
     @extend %icon-calendar;
   }
 
-  > button:disabled {
+  > button[data-calendar-trigger]:disabled {
     pointer-events: none;
     opacity: 0.45;
   }
 
-  > button span {
+  > button[data-calendar-trigger] span {
     @extend %visually-hidden;
+  }
+
+  .clear:not([hidden]) {
+    @extend %button-clear-icon;
+    position: absolute;
+    right: 2.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.2em;
+    width: 2em;
+    aspect-ratio: 1;
   }
 
   .date-format {
@@ -89,7 +104,7 @@ ind-date-range-picker {
     font-weight: bold;
   }
 
-  fieldset button {
+  fieldset button[data-calendar-trigger] {
     @extend %button-icon-only;
     padding: var(--control-padding);
 
@@ -97,6 +112,12 @@ ind-date-range-picker {
       @extend %icon;
       @extend %icon-calendar;
     }
+  }
+
+  .clear:not([hidden]) {
+    @extend %button-clear-icon;
+    padding: var(--control-padding);
+    width: auto;
   }
 
   input[type='text'] {

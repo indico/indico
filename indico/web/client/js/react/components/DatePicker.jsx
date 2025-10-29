@@ -34,12 +34,14 @@ export default function DatePicker({
   }
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));
+  const showClear = !inputProps.required;
 
   return (
     <ind-date-picker
       min={fromISOLocalDate(min)?.toDateString()}
       max={fromISOLocalDate(max)?.toDateString()}
       format={format}
+      data-clearable={showClear ? 'true' : undefined}
     >
       <input
         type="text"
@@ -48,6 +50,11 @@ export default function DatePicker({
         {...inputProps}
         placeholder={format}
       />
+      {showClear && (
+        <button type="button" className="clear" value="clear">
+          <Translate as="span">Clear</Translate>
+        </button>
+      )}
       <button
         type="button"
         disabled={inputProps.disabled}

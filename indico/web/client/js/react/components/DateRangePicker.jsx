@@ -34,6 +34,7 @@ export default function DateRangePicker({
   disabled,
   startDisabled,
   endDisabled,
+  required,
   onChange,
   onFocus,
   onBlur,
@@ -49,6 +50,7 @@ export default function DateRangePicker({
   }
   const startLocked = disabled || (value?.startDate && startDisabled);
   const endLocked = disabled || (value?.endDate && endDisabled);
+  const showClear = !required;
 
   if (min) {
     rangeStartMin = rangeEndMin = min;
@@ -135,6 +137,11 @@ export default function DateRangePicker({
         >
           <Translate as="span">Open a calendar</Translate>
         </button>
+        {showClear && (
+          <button type="button" className="clear" value="clear" onClick={markTouched}>
+            <Translate as="span">Clear</Translate>
+          </button>
+        )}
 
         <span className="date-format" data-format>
           <Translate>
@@ -162,6 +169,7 @@ DateRangePicker.propTypes = {
   disabled: PropTypes.bool,
   startDisabled: PropTypes.bool,
   endDisabled: PropTypes.bool,
+  required: PropTypes.bool,
   value: PropTypes.shape({
     startDate: PropTypes.string,
     endDate: PropTypes.string,
@@ -185,6 +193,7 @@ DateRangePicker.defaultProps = {
   disabled: false,
   startDisabled: false,
   endDisabled: false,
+  required: false,
   label: Translate.string('Select a date range'),
   rangeStartLabel: Translate.string('Start'),
   rangeEndLabel: Translate.string('End'),
