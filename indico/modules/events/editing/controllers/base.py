@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import request, session
-from marshmallow import EXCLUDE
+from marshmallow import fields
 from werkzeug.exceptions import NotFound, Unauthorized
 
 from indico.core.oauth.util import TOKEN_PREFIX_SERVICE
@@ -18,7 +18,7 @@ from indico.modules.events.editing.settings import editing_settings
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import Event
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser
+from indico.web.args import parse_single_arg, use_kwargs
 from indico.web.rh import RequireUserMixin
 
 
@@ -115,9 +115,12 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
             return True
         return self.editable is not None and self.editable.can_see_timeline(session.user)
 
-    def _process_args(self):
+    @use_kwargs({
+        'editable_type': fields.Enum(EditableType, data_key='type'),
+    }, location='view_args')
+    def _process_args(self, editable_type):
         RHContributionDisplayBase._process_args(self)
-        self.editable_type = EditableType[request.view_args['type']]
+        self.editable_type = editable_type
         self.editable = (Editable.query
                          .with_parent(self.contrib)
                          .filter_by(type=self.editable_type)
@@ -130,10 +133,12 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
 class RHEditablesBase(RHEditingManagementBase):
     """Base class for operations on multiple editables."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'editable_type': fields.Enum(EditableType, data_key='type'),
+    }, location='view_args')
+    def _process_args(self, editable_type):
         RHEditingManagementBase._process_args(self)
-        self.editable_type = EditableType[request.view_args['type']]
-        self.editables = parser.parse({
-            'editables': EditableList(required=True, event=self.event, editable_type=self.editable_type,
-                                      validate=not_empty)
-        }, unknown=EXCLUDE)['editables']
+        self.editable_type = editable_type
+        self.editables = parse_single_arg(
+            'editables', EditableList(self.event, self.editable_type, required=True, validate=not_empty)
+        )

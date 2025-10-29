@@ -19,18 +19,36 @@ from indico.util.marshmallow import FilesField, ModelField, ModelList
 
 
 class EditingFilesField(Dict):
-    def __init__(self, event, contrib, editable_type, allow_claimed_files=False, **kwargs):
+    def __init__(self, event=None, contrib=None, editable_type=None, /, *, allow_claimed_files=False, **kwargs):
         self.event = event
         self.contrib = contrib
-        self.editing_file_types_query = EditingFileType.query.with_parent(event).filter_by(type=editable_type)
+        self.editable_type = editable_type
 
-        keys_field = ModelField(EditingFileType, get_query=lambda m, ctx: self.editing_file_types_query)
+        def _get_query(m, ctx):
+            return self._get_editing_file_types_query(event or ctx['event'], editable_type or ctx['editable_type'])
+
+        keys_field = ModelField(EditingFileType, get_query=_get_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
-        validators = [*kwargs.pop('validate', []), self.validate_files]
-        super().__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
+        super().__init__(keys=keys_field, values=values_field, **kwargs)
+
+    def _get_editing_file_types_query(self, event, editable_type):
+        return EditingFileType.query.with_parent(event).filter_by(type=editable_type)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        rv = super()._deserialize(value, attr, data, **kwargs)
+        self.validate_files(rv)
+        return rv
 
     def validate_files(self, value):
-        required_types = {ft for ft in self.editing_file_types_query if ft.required}
+        contrib = self.contrib or self.context['contrib']
+
+        required_types = {
+            ft
+            for ft in self._get_editing_file_types_query(
+                self.event or self.context['event'], self.editable_type or self.context['editable_type']
+            )
+            if ft.required
+        }
 
         # ensure all required file types have files
         required_missing = required_types - {ft for ft, files in value.items() if files}
@@ -56,7 +74,7 @@ class EditingFilesField(Dict):
             # ensure all filenames conform to the template
             if file_type.filename_template:
                 filenames = {os.path.splitext(f.filename)[0] for f in files}
-                filename_template = file_type.filename_template.replace('{code}', self.contrib.code)
+                filename_template = file_type.filename_template.replace('{code}', contrib.code)
                 if not all(fnmatch.fnmatch(filename, filename_template) for filename in filenames):
                     raise ValidationError(
                         f"Some files do not conform to the filename template '{file_type.filename_template}'"
@@ -76,9 +94,9 @@ class EditingFilesField(Dict):
 
 
 class EditingTagsField(ModelList):
-    def __init__(self, event, allow_system_tags=False, **kwargs):
+    def __init__(self, event=None, /, *, allow_system_tags=None, **kwargs):
         def _get_query(m, ctx):
-            query = m.query.with_parent(event)
+            query = m.query.with_parent(event or ctx['event'])
             if not allow_system_tags:
                 query = query.filter_by(system=False)
             return query
@@ -87,7 +105,7 @@ class EditingTagsField(ModelList):
 
 
 class EditableList(ModelList):
-    def __init__(self, event, editable_type, **kwargs):
+    def __init__(self, event, editable_type, /, **kwargs):
         def _get_query(m, ctx):
             return (m.query
                     .join(Contribution)
