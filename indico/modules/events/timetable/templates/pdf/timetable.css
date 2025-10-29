@@ -46,8 +46,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* height of the div must be:
-  197mm (A4 height) minus 25mm added by WeasyPrint by default */
+  /* height of the div must be: 197mm (A4 height) minus 25mm added by WeasyPrint by default */
   height: 272mm;
   width: 100%;
   left: 0;

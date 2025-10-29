@@ -36,6 +36,7 @@ Bugfixes
 - Correctly log the user sending a registration invitation reminder (:pr:`7093`)
 - Fix error in weekday recurrence picker when using the Turkish locale (:pr:`7113`)
 - Do not allow selecting fields in disabled sections as a condition (:pr:`7114`)
+- Fix timetable PDF cover page layout to allow proper centering of content (:pr:`7149`)
 
 Accessibility
 ^^^^^^^^^^^^^
