@@ -73,6 +73,7 @@ Internal Changes
   it has been converted from antoher attachment (:pr:`7108`)
 - Refactor conference page theme CSS to allow easier theming using CSS variables
   (:pr:`7110`, thanks :user:`foxbunny`)
+- Add clear button to optional date picker fields (:pr:`7151`, thanks :user:`foxbunny`)
 
 
 Version 3.3.8
