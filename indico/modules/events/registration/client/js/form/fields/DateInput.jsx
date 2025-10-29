@@ -272,6 +272,10 @@ export function DateSettings() {
     {key: '12h', value: '12h', text: Translate.string('12 hours')},
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
+  const minYearFormatfilter = d => {
+    const m = moment(d);
+    return m.isValid() && m.month() === 0 && m.date() === 1;
+  };
   return (
     <>
       <Form.Group widths="equal">
@@ -299,15 +303,20 @@ export function DateSettings() {
         </Field>
       </Form.Group>
       <Form.Group widths="equal">
-        <Field name="maxDate" subscription={{value: true}}>
-          {({input: {value: maxDate}}) => (
-            <FinalDatePicker
-              name="minDate"
-              label={Translate.string('Minimum date')}
-              max={maxDate}
-              parse={date => date || null}
-              allowNull
-            />
+        <Field name="dateFormat" subscription={{value: true}}>
+          {({input: {value: dateFormat}}) => (
+            <Field name="maxDate" subscription={{value: true}}>
+              {({input: {value: maxDate}}) => (
+                <FinalDatePicker
+                  name="minDate"
+                  label={Translate.string('Minimum date')}
+                  max={maxDate}
+                  parse={date => date || null}
+                  allowNull
+                  {...(dateFormat === '%Y' ? {filter: minYearFormatfilter} : {})}
+                />
+              )}
+            </Field>
           )}
         </Field>
         <Field name="minDate" subscription={{value: true}}>

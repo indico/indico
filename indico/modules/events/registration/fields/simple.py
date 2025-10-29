@@ -188,6 +188,11 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
     def validate_min_max_dates(self, data, **kwargs):
         if data.get('min_date') and data.get('max_date') and data['min_date'] > data['max_date']:
             raise ValidationError(_('Maximum date must be greater than the minimum date.'))
+        date_format = data['date_format']
+        if (min_date := data.get('min_date')) and date_format == '%Y':
+            if min_date.month != 1 or min_date.day != 1:
+                raise ValidationError(_('The minimum date must be January 1st for the year only format.'),
+                                        'min_date')
 
     @pre_load
     def _merge_date_time_formats(self, data, **kwargs):
