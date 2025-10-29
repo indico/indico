@@ -273,7 +273,7 @@ export function DateSettings() {
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
   const minYearFormatfilter = d => {
-    const m = moment(d);
+    const m = moment(d, moment.ISO_8601, true);
     return m.isValid() && m.month() === 0 && m.date() === 1;
   };
   return (
@@ -347,6 +347,18 @@ export function dateSettingsFormValidator({minDate, maxDate, dateFormat}) {
       return {
         minDate: msg,
         maxDate: msg,
+      };
+    }
+    const minDateMoment = moment(minDate, moment.ISO_8601, true);
+    if (
+      dateFormat === '%Y' &&
+      (!minDateMoment.isValid() || minDateMoment.month() !== 0 || minDateMoment.date() !== 1)
+    ) {
+      const msg = Translate.string(
+        'The minimum date must be January 1st for the year only format.'
+      );
+      return {
+        minDate: msg,
       };
     }
   }
