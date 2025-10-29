@@ -175,32 +175,10 @@ ind-select {
   }
 
   .clear:not([hidden]) {
+    @extend %button-clear-icon;
     position: absolute;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     right: 2em;
-    min-width: 0;
     padding: 0.2em;
     width: auto;
-
-    border: 0;
-    background: transparent;
-  }
-
-  .clear > span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
-  .clear::after {
-    @extend %icon;
-    @extend %icon-cross;
-    display: inline-block;
-    width: 1em;
-    aspect-ratio: 1;
   }
 }

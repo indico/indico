@@ -107,25 +107,16 @@ ind-combo-box {
   }
 
   button[value='clear']:not([hidden]) {
-    @extend %button-clear;
-    @extend %flex-inline-center;
+    @extend %button-clear-icon;
     position: absolute;
     top: 50%;
     right: 2em;
     width: 1.5em;
     aspect-ratio: 1;
-    padding: 0;
-
     transform: translateY(-50%);
 
     &::after {
-      @extend %icon;
-      @extend %icon-cross;
       font-size: 87.5%;
-    }
-
-    span {
-      @extend %visually-hidden;
     }
   }
 }
