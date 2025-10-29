@@ -349,14 +349,5 @@ export function dateSettingsFormValidator({minDate, maxDate, dateFormat}) {
         maxDate: msg,
       };
     }
-    if (dateFormat === '%Y' && !moment(minDate).add(1, 'year').isSameOrBefore(moment(maxDate))) {
-      const msg = Translate.string(
-        'The minimum and maximum dates must be at least one year apart for the selected date format.'
-      );
-      return {
-        minDate: msg,
-        maxDate: msg,
-      };
-    }
   }
 }
