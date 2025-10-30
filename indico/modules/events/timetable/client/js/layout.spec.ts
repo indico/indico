@@ -140,7 +140,11 @@ function block({
     attachments: [],
     type: EntryType.SessionBlock,
     sessionId: 0,
-    childLocationParent: {location_data: null, type: 'event', title: ''},
+    childLocationParent: {
+      location_data: {venueName: 'Foo', roomName: 'bar', address: ''},
+      type: 'Event',
+      title: '',
+    },
     duration,
     children,
     ...scheduleMixin({time, column, maxColumn}),
@@ -354,7 +358,7 @@ describe('layoutGroup()', () => {
 
 describe('layoutGroupAfterMove()', () => {
   it('No overlapping entries', () => {
-    const group = [];
+    const group: any[] = [];
     const entry = contrib({time: '10:00', duration: 60});
     const mousePosition = 0.25;
 

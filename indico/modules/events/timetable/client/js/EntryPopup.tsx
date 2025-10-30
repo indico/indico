@@ -25,9 +25,8 @@ import {indicoAxios} from 'indico/utils/axios';
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
-import {ReduxState} from './reducers';
 import * as selectors from './selectors';
-import {BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
+import {ReduxState, BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
 import {mapTTDataToEntry} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
@@ -43,7 +42,13 @@ function ActionPopup({content, trigger, ...rest}: PopupProps) {
   );
 }
 
-function EntryPopupContent({entry, onClose}: {entry; onClose: () => void}) {
+function EntryPopupContent({
+  entry,
+  onClose,
+}: {
+  entry: BreakEntry | ContribEntry | BlockEntry;
+  onClose: () => void;
+}) {
   const dispatch = useDispatch();
   const {
     id,
