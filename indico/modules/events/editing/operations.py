@@ -268,8 +268,7 @@ def update_review_tags(revision, tags):
     revision.modified_dt = now_utc()
     db.session.flush()
     logger.info('Review tags on revision %r updated by %r', revision, session.user)
-    changes = {'tags': (', '.join(sorted(t.code for t in old_tags)),
-                        ', '.join(sorted(t.code for t in revision.tags)))}
+    changes = {'tags': ({t.code for t in old_tags}, {t.code for t in revision.tags})}
     log_fields = {'tags': 'Tags'}
     revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
                           f'Review tags on {revision.editable.log_title} updated',
