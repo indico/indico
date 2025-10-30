@@ -17,7 +17,7 @@ import {
   ContribEntry,
   UnscheduledContribEntry,
 } from './types';
-import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils.ts';
+import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 // A subset of the properties of an entry (contrib, block, break) that are needed for layout calculations
 interface ScheduledEntry {
@@ -261,7 +261,7 @@ export function computeYoffset(entries: TopLevelEntry[], startHour: number): Top
  * C: {column: 2, maxColumn: 3} -> {width: 25%, offset: 50%}
  * D: {column: 3, maxColumn: 3} -> {width: 25%, offset: 75%}
  */
-export function getWidthAndOffset(column, maxColumn) {
+export function getWidthAndOffset(column: number, maxColumn: number) {
   const columnWidth = 100 / (maxColumn + 1);
   return {
     width: `${columnWidth}%`,
@@ -327,7 +327,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  offset,
+  offset: MousePosition,
   calendar: Over
 ):
   | [TopLevelEntry[], UnscheduledContribEntry[], Moment, number]
@@ -336,7 +336,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
-  if (toBlock.type !== EntryType.SessionBlock) {
+  if (toBlock?.type !== EntryType.SessionBlock) {
     return;
   }
   const deltaMinutes = 0;

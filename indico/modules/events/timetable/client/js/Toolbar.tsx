@@ -42,7 +42,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const gradientWidth = 10;
   const dayWidth = 60;
 
-  const getDateFromIdx = (idx): Moment => eventStart.clone().add(idx, 'days');
+  const getDateFromIdx = (idx: number): Moment => eventStart.clone().add(idx, 'days');
 
   const scrollToDay = (dayIndex: number, behavior: ScrollBehavior = 'instant') => {
     if (!daysBarRef.current) {
@@ -68,6 +68,10 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   };
 
   const scrollByPage = (pageDelta: number, behavior: ScrollBehavior = 'smooth') => {
+    if (!daysBarRef.current) {
+      console.error('no daysBarRef');
+      return;
+    }
     const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
     const dayDelta = daysPerPage * pageDelta;
     scrollByDay(dayDelta, behavior);
