@@ -53,7 +53,7 @@ export default {
         const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
       }
-      case actions.MOVE_ENTRY: {
+      case actions.CHANGE_ENTRY_LAYOUT: {
         const date = action.date;
         const newEntries = Object.fromEntries(
           Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
