@@ -8,9 +8,8 @@
 import React from 'react';
 import {Label} from 'semantic-ui-react';
 
+import {FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-
-import {FinalDropdown} from '../../../../../web/client/js/react/forms';
 
 import {Session} from './types';
 
@@ -21,7 +20,7 @@ interface SessionOption {
 }
 
 interface SessionSelectProps {
-  sessions?: Session[];
+  sessions: Session[];
   [key: string]: unknown;
 }
 
