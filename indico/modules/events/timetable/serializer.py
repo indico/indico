@@ -188,8 +188,6 @@ class TimetableSerializer:
         contribution = entry.contribution
         data = {}
         data.update(self._get_entry_data(entry))
-        if contribution.session:
-            data.update(get_color_data(contribution.session))
         data.update({'entryType': 'Contribution',
                      '_type': 'ContribSchEntry',
                      '_fossil': 'contribSchEntryDisplay',
