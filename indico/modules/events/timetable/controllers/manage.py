@@ -229,15 +229,15 @@ class RHTimetableBreak(RHManageEventBase):
     @no_autoflush
     def _change_parent(self, session_block_id):
         entry = self.break_.timetable_entry
-        current_block = self.break_.session_block_obj
+        current_block = self.break_.session_block
 
         if session_block_id is None:
             if current_block is None:
                 return
-            self.break_.session_block = None
-            self.break_.session = None
             if entry.parent is not None:
-                update_timetable_entry(entry, {'parent': None, 'start_dt': entry.start_dt})
+                self.break_.session_block = None
+                self.break_.session = None
+                return
 
         target_id = int(session_block_id)
 
