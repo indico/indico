@@ -247,31 +247,31 @@ def undo_review(revision):
 
 
 @no_autoflush
-def update_review_comment(revision, text):
+def update_review(revision, text, tags):
     _ensure_revision_can_be_updated(revision)
-    changes = {'comment': (revision.comment, text)}
-    log_fields = {'comment': 'Comment'}
-    revision.comment = text
+
+    changes = {}
+    log_fields = {}
+
+    if text is not None:
+        changes['comment'] = (revision.comment, text)
+        log_fields['comment'] = 'Comment'
+        revision.comment = text
+
+    if tags is not None:
+        old_tags = revision.tags
+        revision.tags = set(tags)
+        changes['tags'] = ({t.code for t in old_tags}, {t.code for t in revision.tags})
+        log_fields['tags'] = 'Tags'
+
+    if not changes:
+        return
+
     revision.modified_dt = now_utc()
     db.session.flush()
-    logger.info('Review comment on revision %r updated by %r', revision, session.user)
+    logger.info('Review on revision %r updated by %r', revision, session.user, list(changes.keys()))
     revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
-                          f'Review comment on {revision.editable.log_title} updated',
-                          session.user, data={'Changes': make_diff_log(changes, log_fields)})
-
-
-@no_autoflush
-def update_review_tags(revision, tags):
-    _ensure_revision_can_be_updated(revision)
-    old_tags = revision.tags
-    revision.tags = set(tags)
-    revision.modified_dt = now_utc()
-    db.session.flush()
-    logger.info('Review tags on revision %r updated by %r', revision, session.user)
-    changes = {'tags': ({t.code for t in old_tags}, {t.code for t in revision.tags})}
-    log_fields = {'tags': 'Tags'}
-    revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
-                          f'Review tags on {revision.editable.log_title} updated',
+                          f'Review on {revision.editable.log_title} updated',
                           session.user, data={'Changes': make_diff_log(changes, log_fields)})
 
 
