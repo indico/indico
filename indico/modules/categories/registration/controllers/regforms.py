@@ -27,7 +27,7 @@ class RHCategoryRegistrationFormManage(ManageRegistrationFormsAreaMixin, RHCateg
     """Specific category registration form management."""
 
     def _process(self):
-        return WPCategoryManageRegistrationForm  .render_template('management/regform.html', self.category,
+        return WPCategoryManageRegistrationForm.render_template('management/regform.html', self.category,
                                                             regform=self.regform)
 
 

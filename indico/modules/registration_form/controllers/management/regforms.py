@@ -66,7 +66,7 @@ class ManageRegistrationFormsMixin(ManageRegistrationFormsAreaMixin):
             return WPEventManageRegistrationForm.render_template('management/regform_list.html', self.event,
                                                              target=self.target, regforms=regforms)
         else:
-            return WPCategoryManageRegistrationForm  .render_template('management/regform_list.html', self.category,
+            return WPCategoryManageRegistrationForm.render_template('management/regform_list.html', self.category,
                                                                 'registration', target=self.target, regforms=regforms)
 
 
@@ -102,7 +102,7 @@ class RegistrationFormCreateMixin(ManageRegistrationFormsAreaMixin):
             return WPEventManageRegistrationForm.render_template('management/regform_create.html', self.event,
                                                              form=form, target=self.target, regform=None)
         else:
-            return WPCategoryManageRegistrationForm  .render_template('management/regform_create.html', self.category,
+            return WPCategoryManageRegistrationForm.render_template('management/regform_create.html', self.category,
                                                                 'registration', form=form, target=self.target,
                                                                 regform=None)
 
