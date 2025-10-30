@@ -40,7 +40,7 @@ from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser, use_kwargs
+from indico.web.args import parser, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 
 
@@ -168,21 +168,19 @@ class RHCreateEditable(RHContributionEditableBase):
         RHContributionEditableBase._check_access(self)
         if not self.contrib.can_submit_proceedings(session.user):
             raise Forbidden
-        # TODO: check if submitting papers for editing is allowed in the event
         if self.editable_type.name not in self.contrib.allowed_types_for_editable:
             raise Forbidden
 
-    def _process(self):
-        if self.editable:
-            raise UserValueError(_('Editable already exists'))
+    @use_rh_kwargs({
+        'files': EditingFilesField(required=True),
+    }, rh_context=('event', 'contrib', 'editable_type'))
+    def _process(self, files):
+        assert not self.editable  # already covered by the `allowed_types_for_editable` check
 
-        args = parser.parse({
-            'files': EditingFilesField(self.event, self.contrib, self.editable_type, required=True)
-        })
         service_url = editing_settings.get(self.event, 'service_url')
         revision_type = RevisionType.new if service_url else RevisionType.ready_for_review
 
-        editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], revision_type)
+        editable = create_new_editable(self.contrib, self.editable_type, session.user, files, revision_type)
         if service_url:
             try:
                 service_handle_new_editable(editable, session.user)
@@ -286,14 +284,12 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
     def _check_revision_access(self):
         return self.editable.can_perform_submitter_actions(session.user)
 
-    def _process(self):
-        args = parser.parse({
-            'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
-                                       required=True)
-        })
-
+    @use_rh_kwargs({
+        'files': EditingFilesField(allow_claimed_files=True, required=True),
+    }, rh_context=('event', 'contrib', 'editable_type'))
+    def _process(self, files):
         service_url = editing_settings.get(self.event, 'service_url')
-        new_revision = create_submitter_revision(self.revision, session.user, args['files'])
+        new_revision = create_submitter_revision(self.revision, session.user, files)
 
         if service_url:
             try:
