@@ -17,7 +17,7 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import PublicationModal from './PublicationModal';
 
 interface PublicationStateSwitch {
-  eventId: string;
+  eventId: number;
   onSuccess?: () => void;
   [key: string]: any;
 }
@@ -58,7 +58,7 @@ export default function PublicationStateSwitch({
           ? Translate.string('Unpublish timetable and contributions to event participants')
           : Translate.string('Publish timetable and contributions to event participants')
       }
-      color={published ? 'green' : null}
+      color={published ? 'green' : undefined}
       {...rest}
     >
       <Icon name={published ? 'lock open' : 'lock'} />
