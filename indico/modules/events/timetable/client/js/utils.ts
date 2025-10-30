@@ -16,7 +16,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, Session} from './types';
+import {BlockEntry, Colors, Entry, EntryType, HexColor, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -76,18 +76,18 @@ export const getEntryURLByObjId = (
   }[entryType];
 };
 
-export function getDefaultColorByType(type: EntryType): Colors {
+export function getDefaultColorByType(type: Exclude<EntryType, 'block'>): Colors {
   return {
     [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
     [EntryType.Break]: DEFAULT_BREAK_COLORS,
   }[type];
 }
 
-export function mapTTColor(dbColors): Colors {
+export function mapTTColor(dbColors: {text: HexColor; background: HexColor}): Colors {
   return {color: dbColors.text, backgroundColor: dbColors.background};
 }
 
-export function mapTTEntryColor(dbEntry, sessions: Record<number, Session> = {}): Colors {
+export function mapTTEntryColor(dbEntry: any, sessions: Record<string, Session> = {}): Colors {
   const {sessionId, type, colors} = dbEntry;
 
   const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
@@ -116,7 +116,7 @@ export const getEntryUniqueId = (type: EntryType, id: string): string => {
   }
 };
 
-export const mapTTDataToSession = (data): Session => {
+export const mapTTDataToSession = (data: any): Session => {
   data = camelizeKeys(data);
   return {
     ...data,
@@ -128,8 +128,8 @@ export const mapTTDataToSession = (data): Session => {
 };
 
 export const mapTTDataToEntry = (
-  data,
-  sessions: Record<number, Session> = {},
+  data: any,
+  sessions: Record<string, Session> = {},
   parent?: Partial<BlockEntry>
 ): Entry => {
   data = camelizeKeys(data);
@@ -210,7 +210,7 @@ export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
  * Custom hook to log changes to props.
  * Useful for figuring out why a component is re-rendering.
  */
-export function useTraceUpdate(props) {
+export function useTraceUpdate(props: any) {
   const prev = useRef(props);
   useEffect(() => {
     const changedProps = Object.entries(props).reduce((ps, [k, v]) => {
@@ -218,7 +218,7 @@ export function useTraceUpdate(props) {
         ps[k] = [prev.current[k], v];
       }
       return ps;
-    }, {});
+    }, {} as any);
     if (Object.keys(changedProps).length > 0) {
       console.log('Changed props:', changedProps);
     }

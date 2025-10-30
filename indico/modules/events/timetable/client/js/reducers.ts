@@ -6,34 +6,14 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 
 import * as actions from './actions';
+import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {DayEntries, EntryType, isChildEntry, Session} from './types';
+import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
 import {setCurrentDateLocalStorage} from './utils';
-
-interface Change {
-  change: any;
-  entries: DayEntries;
-  unscheduled: any[];
-}
-
-interface Entries {
-  draftEntry: any | null;
-  changes: Change[];
-  currentChangeIdx: number;
-  selectedId: string | null;
-  draggedIds: Set<number>;
-}
-
-export interface ReduxState {
-  entries: Entries;
-  sessions: Session[];
-  navigation: {numDays: number; currentDate: Moment; isExpanded: boolean};
-  display: {showUnscheduled: boolean};
-}
 
 export default {
   entries: (
@@ -293,7 +273,7 @@ export default {
           return state;
         }
 
-        const contribs = block.children
+        const contribs = (block as BlockEntry).children
           .filter(e => e.type === 'contrib')
           .map(({startDt, ...rest}) => rest);
         const newEntries = layoutDays(
@@ -409,13 +389,14 @@ export default {
         return state;
     }
   },
-  sessions: (state = [], action) => {
+  sessions: (state = [], action: Action) => {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
       case actions.EDIT_SESSION:
         return {
           ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
           ...preprocessSessionData({[action.session.id]: {...action.session}}),
         };
       case actions.DELETE_SESSION: {
@@ -424,13 +405,14 @@ export default {
       case actions.CREATE_SESSION:
         return {
           ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
           ...preprocessSessionData({[action.session.id]: {...action.session, isPoster: false}}),
         };
       default:
         return state;
     }
   },
-  navigation: (state, action) => {
+  navigation: (state: any, action: Action) => {
     state = {isExpanded: false, ...state};
     switch (action.type) {
       case actions.SET_CURRENT_DATE:
@@ -444,7 +426,7 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action) => {
+  display: (state = {showUnscheduled: false}, action: Action) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
