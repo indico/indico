@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Form, Label} from 'semantic-ui-react';
+import {Button, Form, Label, Popup} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -75,11 +75,13 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
         </div>
       )}
       <div styleName="action-buttons">
-        {canEdit && !isOutdated && (
-          <a
-            onClick={() => setEditFormOpen(!editFormOpen)}
-            className="i-link icon-edit"
-            title={Translate.string('Edit tags')}
+        {canEdit && !isOutdated && !editFormOpen && (
+          <Popup
+            content={Translate.string('Edit tags')}
+            position="bottom center"
+            trigger={
+              <a onClick={() => setEditFormOpen(!editFormOpen)} className="i-link icon-edit" />
+            }
           />
         )}
       </div>
