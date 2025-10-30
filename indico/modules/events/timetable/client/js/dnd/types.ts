@@ -44,7 +44,6 @@ export interface Droppable {
 
 export interface Draggable {
   node: HTMLRef;
-  fixed: boolean;
 }
 
 export interface DraggableData {
@@ -53,6 +52,7 @@ export interface DraggableData {
   mouse?: MousePosition;
   initialOffset?: Coords;
   initialScroll?: {top: number; left: number};
+  fixed: boolean;
 }
 
 export interface DragEvent {

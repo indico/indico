@@ -340,7 +340,7 @@ export function DnDProvider({
       const target = e.target as HTMLElement;
       const draggable = draggables[state.current.activeDraggable];
 
-      if (draggable.fixed) {
+      if (draggableData.fixed) {
         // fixed elements don't move with the scroll
         return;
       }
@@ -362,7 +362,7 @@ export function DnDProvider({
         setTransformOnScroll(d, state.current.activeDraggable, {x: deltaX, y: deltaY}, modifier)
       );
     },
-    [modifier, draggables]
+    [modifier, draggables, draggableData]
   );
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {
