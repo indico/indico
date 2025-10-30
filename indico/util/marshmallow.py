@@ -457,6 +457,8 @@ class EventTimezoneDateTimeField(fields.DateTime):
     """Marshmallow field for dealing with dates in the event's timezone.
 
     The event should be passed in the schema's context as 'event'.
+    Since times in Indico typically have a granularity of minutes, any time
+    that contains seconds (or microseconds) will be rejected.
     """
 
     def _serialize(self, value, attr, obj, **kwargs):
@@ -469,6 +471,8 @@ class EventTimezoneDateTimeField(fields.DateTime):
         if value is None:
             return None
         dt = super()._deserialize(value, attr, data, **kwargs)
+        if dt.second or dt.microsecond:
+            raise self.make_error('invalid', input=value, obj_type=self.OBJ_TYPE)
         event_tz = self.context['event'].tzinfo
         if dt.tzinfo is None:
             localized = event_tz.localize(dt)
