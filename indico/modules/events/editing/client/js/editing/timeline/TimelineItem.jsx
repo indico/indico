@@ -128,7 +128,7 @@ export default function TimelineItem({block, index}) {
                   downloadURL={block.downloadFilesURL}
                   outdated={!isLastTimelineBlockWithFiles}
                 />
-                {Boolean(block.commentHtml || block.files.length) && <Divider />}
+                {!!(block.commentHtml || block.files.length) && !!block.tags.length && <Divider />}
                 <ReviewTags block={block} canEdit={canEdit} tagOptions={tagOptions} />
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastValidBlock && (
                   <ChangesConfirmation />

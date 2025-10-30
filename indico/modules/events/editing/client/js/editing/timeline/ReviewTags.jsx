@@ -36,7 +36,7 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
 
   return (
     <div styleName="review-tags">
-      {!block.tags.length && !editFormOpen && (
+      {!block.tags.length && !editFormOpen && canEdit && (
         <span styleName="no-tags">
           <Translate>No tags</Translate>
         </span>
