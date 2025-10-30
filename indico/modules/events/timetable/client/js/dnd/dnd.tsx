@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react';
 import {createContext, useContextSelector} from 'use-context-selector';
 
@@ -21,6 +22,7 @@ import {
   Over,
   Transform,
   HTMLRef,
+  CoordsWithOffset,
 } from './types';
 import {pointerInside} from './utils';
 
@@ -34,7 +36,7 @@ interface DnDState {
   scrollPosition: MousePosition;
   initialScrollPosition: MousePosition;
   initialOffset: MousePosition;
-  activeDraggable?: string;
+  activeDraggable: string | null;
 }
 
 interface DnDContextType {
@@ -46,28 +48,10 @@ interface DnDContextType {
   unregisterDroppable: (id: string) => void;
   registerDraggable: (id: string, fixed: boolean, node: HTMLRef) => void;
   unregisterDraggable: (id: string) => void;
-  onMouseDown: (
-    id: string,
-    draggable: Draggable,
-    position: {x: number; y: number; offsetX: number; offsetY: number}
-  ) => void;
+  onMouseDown: (id: string, draggable: Draggable, position: CoordsWithOffset) => void;
 }
-const DnDContext = createContext<DnDContextType>({
-  draggables: {},
-  droppables: {},
-  draggableData: {},
-  onDrop: null,
-  registerDroppable: null,
-  unregisterDroppable: null,
-  registerDraggable: null,
-  unregisterDraggable: null,
-  onMouseDown: null,
-});
-
-function removeKey(obj, deleteKey) {
-  const {[deleteKey]: _, ...newObj} = obj; // eslint-disable-line @typescript-eslint/no-unused-vars
-  return newObj;
-}
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const DnDContext = createContext<DnDContextType>(null!);
 
 function setBoundingRectAndScroll(draggableData: DraggableData, node: HTMLRef, id: string) {
   const draggable = draggableData[id];
@@ -233,20 +217,20 @@ export function DnDProvider({
       !state.current.activeDraggable.startsWith('unscheduled'),
   });
 
-  const registerDroppable = useCallback((id, node) => {
+  const registerDroppable = useCallback((id: string, node: HTMLRef) => {
     setDroppables(d => ({...d, [id]: {node}}));
   }, []);
 
-  const unregisterDroppable = useCallback(id => {
-    setDroppables(d => removeKey(d, id));
+  const unregisterDroppable = useCallback((id: string) => {
+    setDroppables(d => _.omit(d, id));
   }, []);
 
-  const registerDraggable = useCallback((id, fixed, node) => {
+  const registerDraggable = useCallback((id: string, fixed: boolean, node: HTMLRef) => {
     setDraggableData(d => ({...d, [id]: {fixed}}));
     setDraggables(d => ({...d, [id]: {node}}));
   }, []);
 
-  const unregisterDraggable = useCallback(id => {
+  const unregisterDraggable = useCallback((id: string) => {
     if (state.current.activeDraggable === id) {
       state.current = {
         state: 'idle',
@@ -257,16 +241,17 @@ export function DnDProvider({
         activeDraggable: null,
       };
     }
-    setDraggableData(d => removeKey(d, id));
-    setDraggables(d => removeKey(d, id));
+    setDraggableData(d => _.omit(d, id));
+    setDraggables(d => _.omit(d, id));
   }, []);
 
-  const onMouseDown = useCallback((id: string, draggable: Draggable, {x, y, offsetX, offsetY}) => {
+  const onMouseDown = useCallback((id: string, draggable: Draggable, where: CoordsWithOffset) => {
     if (state.current.state === 'idle') {
       if (!draggable) {
         return;
       }
 
+      const {x, y, offsetX, offsetY} = where;
       const scrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
       state.current = {
         state: 'mousedown',
@@ -347,7 +332,7 @@ export function DnDProvider({
   );
 
   const onScroll = useCallback(
-    (e: MouseEvent) => {
+    (e: Event) => {
       if (state.current.state !== 'dragging') {
         return;
       }
@@ -355,7 +340,7 @@ export function DnDProvider({
       const target = e.target as HTMLElement;
       const draggable = draggables[state.current.activeDraggable];
 
-      if (draggable.fixed) {
+      if (draggableData.fixed) {
         // fixed elements don't move with the scroll
         return;
       }
@@ -377,7 +362,7 @@ export function DnDProvider({
         setTransformOnScroll(d, state.current.activeDraggable, {x: deltaX, y: deltaY}, modifier)
       );
     },
-    [modifier, draggables]
+    [modifier, draggables, draggableData]
   );
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {

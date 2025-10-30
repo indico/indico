@@ -22,6 +22,8 @@ export enum PersonLinkRole {
 
 export type HexColor = `#${string}`;
 
+export type EventType = 'lecture' | 'meeting' | 'conference';
+
 export interface PersonLink {
   affiliation: string;
   avatarURL: string;
@@ -47,7 +49,7 @@ export interface LocationData {
   inheriting?: boolean;
 }
 export interface LocationParent {
-  location_data: LocationParent;
+  location_data: LocationData;
   type: string;
   title: string;
 }
@@ -59,7 +61,7 @@ export interface Attachment {
 }
 
 export interface Session {
-  id?: number;
+  id: number; // XXX probably we need an id-less variant during creation, but that should be a separate type
   title: string;
   isPoster: boolean;
   defaultContribDurationMinutes: number;
@@ -144,4 +146,40 @@ export interface LocationParentObj {
   room_name: string;
   address: string;
   inheriting: boolean;
+}
+
+interface Change {
+  change: any;
+  entries: DayEntries;
+  unscheduled: any[];
+}
+
+export interface Entries {
+  draftEntry: any | null;
+  changes: Change[];
+  currentChangeIdx: number;
+  selectedId: string | null;
+  draggedIds: Set<number>;
+}
+
+interface StaticData {
+  eventId: number;
+  startDt: Moment;
+  endDt: Moment;
+  defaultContribDurationMinutes: number;
+  eventLocationParent: LocationParent;
+  eventType: EventType;
+}
+
+export interface Navigation {
+  currentDate: Moment;
+  isExpanded: boolean;
+}
+
+export interface ReduxState {
+  entries: Entries;
+  sessions: Record<string, Session>;
+  navigation: Navigation;
+  display: {showUnscheduled: boolean};
+  staticData: StaticData;
 }
