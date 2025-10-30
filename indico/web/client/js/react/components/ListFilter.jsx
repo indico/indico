@@ -223,6 +223,7 @@ export default function ListFilter({
         </Dropdown.Menu>
       </Dropdown>
       <Input
+        autoFocus
         placeholder={Translate.string('Enter #id or search string')}
         onChange={(e, {value}) => setSearchText(value)}
         value={searchText}
