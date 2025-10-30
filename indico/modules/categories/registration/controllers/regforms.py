@@ -7,7 +7,7 @@
 
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase, RHCategoryManageRegformsBase
 from indico.modules.categories.views import WPCategoryManageRegistrationForm
-from indico.modules.registration_form.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
+from indico.modules.forms.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
                                                                               ManageRegistrationFormsMixin,
                                                                               RegistrationFormCreateMixin,
                                                                               RegistrationFormDeleteMixin,

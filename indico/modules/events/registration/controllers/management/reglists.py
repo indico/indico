@@ -63,7 +63,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.registration_form.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.forms.models.items import PersonalDataType, RegistrationFormItemType
 from indico.util.date_time import format_currency, now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext

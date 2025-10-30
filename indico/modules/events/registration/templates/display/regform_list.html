@@ -44,7 +44,7 @@
                 <tr>
                     <td>
                         {% if event.can_manage(session.user, 'registration') %}
-                            <a href="{{ url_for('registration_form.manage_regform', regform) }}">{{ regform.title }}</a>
+                            <a href="{{ url_for('forms.manage_regform', regform) }}">{{ regform.title }}</a>
                         {% else %}
                             {{ regform.title }}
                         {% endif %}

@@ -13,7 +13,7 @@ from webargs import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
-from indico.modules.registration_form.models.forms import RegistrationForm
+from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag

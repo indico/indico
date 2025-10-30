@@ -63,7 +63,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
         yield SideMenuItem('participants', _('Participants'), url_for('event_participation.manage', event),
                            section='organization')
     if event.has_feature('registration'):
-        yield SideMenuItem('registration', _('Registration'), url_for('registration_form.manage_regform_list', event),
+        yield SideMenuItem('registration', _('Registration'), url_for('forms.manage_regform_list', event),
                            section=registration_section)
 
 
@@ -103,7 +103,7 @@ def _inject_event_header(event, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.registration.models.registrations import Registration
-    from indico.modules.registration_form.models.forms import RegistrationForm
+    from indico.modules.forms.models.forms import RegistrationForm
 
     def _visible_registration(event):
         if not event.has_feature('registration'):

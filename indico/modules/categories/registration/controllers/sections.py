@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase
-from indico.modules.registration_form.controllers.management.sections import (ManageRegFormSectionBaseMixin,
+from indico.modules.forms.controllers.management.sections import (ManageRegFormSectionBaseMixin,
                                                                          RegistrationFormAddSectionMixin,
                                                                          RegistrationFormModifySectionMixin,
                                                                          RegistrationFormMoveSection,

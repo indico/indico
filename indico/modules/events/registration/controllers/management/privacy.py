@@ -12,7 +12,7 @@ from indico.modules.events.registration.controllers.management import RHEventMan
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import update_registration_consent_to_publish
 
-from indico.modules.registration_form.controllers.management.privacy import RHRegistrationPrivacyMixin
+from indico.modules.forms.controllers.management.privacy import RHRegistrationPrivacyMixin
 from indico.web.args import use_kwargs
 
 

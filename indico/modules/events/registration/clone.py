@@ -10,7 +10,7 @@ from indico.core.db import db
 from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.models.events import EventType
-from indico.modules.registration_form.models.forms import RegistrationForm
+from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _

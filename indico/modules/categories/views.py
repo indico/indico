@@ -110,8 +110,8 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryManageRegistrationForm(WPCategoryManagement):
-    template_prefix = 'registration_form/'
-    bundles = ('module_categories.registration.js', 'module_registration_form.js', 'module_registration_form.css')
+    template_prefix = 'forms/'
+    bundles = ('module_categories.registration.js', 'module_forms.js', 'module_forms.css')
 
     def __init__(self, rh, category, active_menu_item=None, **kwargs):
         self.regform = kwargs.get('regform')
@@ -122,4 +122,4 @@ class WPCategoryManageRegistrationForm(WPCategoryManagement):
             return category.url
         # we don't want template-specific urls since those may be tied
         # to the previous category
-        return url_for('registration_form.manage_regform_list', category)
+        return url_for('forms.manage_regform_list', category)

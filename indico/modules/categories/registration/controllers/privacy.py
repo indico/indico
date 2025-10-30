@@ -7,7 +7,7 @@
 
 
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase
-from indico.modules.registration_form.controllers.management.privacy import RHRegistrationPrivacyMixin
+from indico.modules.forms.controllers.management.privacy import RHRegistrationPrivacyMixin
 
 
 class RHCategoryRegistrationPrivacy(RHRegistrationPrivacyMixin, RHCategoryManageRegFormBase):

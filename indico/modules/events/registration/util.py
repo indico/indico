@@ -32,14 +32,14 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
-from indico.modules.registration_form.fields.accompanying import AccompanyingPersonsField
-from indico.modules.registration_form.fields.choices import (AccommodationField, ChoiceBaseField,
+from indico.modules.forms.fields.accompanying import AccompanyingPersonsField
+from indico.modules.forms.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
-from indico.modules.registration_form.models.form_fields import (RegistrationFormFieldData,
+from indico.modules.forms.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
-from indico.modules.registration_form.models.forms import RegistrationForm
+from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.registration_form.models.items import (PersonalDataType, RegistrationFormItemType,
+from indico.modules.forms.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
 from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
                                                                      RegistrationVisibility)

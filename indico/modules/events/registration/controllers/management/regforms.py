@@ -32,16 +32,16 @@ from indico.modules.events.registration.views import (WPEventManageRegistrationF
                                                       WPManageRegistration, WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
-from indico.modules.registration_form.clone import RegistrationFormCloner
-from indico.modules.registration_form.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
+from indico.modules.forms.clone import RegistrationFormCloner
+from indico.modules.forms.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
                                                                               ManageRegistrationFormsMixin,
                                                                               RegistrationFormCreateMixin,
                                                                               RegistrationFormDeleteMixin,
                                                                               RegistrationFormEditMixin,
                                                                               RegistrationFormModifyMixin)
-from indico.modules.registration_form.forms import RegistrationFormCreateForm, RegistrationFormCreateFromTemplateForm
-from indico.modules.registration_form.models.forms import Registration, RegistrationForm, RegistrationState
-from indico.modules.registration_form.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.forms.forms import RegistrationFormCreateForm, RegistrationFormCreateFromTemplateForm
+from indico.modules.forms.models.forms import Registration, RegistrationForm, RegistrationState
+from indico.modules.forms.models.items import PersonalDataType, RegistrationFormItemType
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
 from indico.web.args import use_kwargs
@@ -276,7 +276,7 @@ class RHRegistrationFormOpen(RHEventManageRegFormBase):
             else:
                 log_text = f'Registration form "{self.regform.title}" was reopened'
             self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
-        return redirect(url_for('registration_form.manage_regform', self.regform))
+        return redirect(url_for('forms.manage_regform', self.regform))
 
 
 class RHRegistrationFormClose(RHEventManageRegFormBase):
@@ -288,7 +288,7 @@ class RHRegistrationFormClose(RHEventManageRegFormBase):
         logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'
         self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
-        return redirect(url_for('registration_form.manage_regform', self.regform))
+        return redirect(url_for('forms.manage_regform', self.regform))
 
 
 class RHRegistrationFormSchedule(RHEventManageRegFormBase):
@@ -358,6 +358,6 @@ class RHRegistrationFormCreateFromTemplate(RHEventManageRegFormsBase):
             new_regform.log(EventLogRealm.management, LogKind.positive, 'Registration',
                             f'Registration form "{new_regform.title}" has been created from {cloned_from_message}',
                             session.user, data=data)
-            return redirect(url_for('registration_form.manage_regform', new_regform))
+            return redirect(url_for('forms.manage_regform', new_regform))
         return WPEventManageRegistrationForm.render_template('management/regform_create_from_template.html', self.event,
                                                              form=form, event=self.event)
