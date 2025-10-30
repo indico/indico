@@ -5,18 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import addFieldURL from 'indico-url:registration_form.add_field';
-import addSectionURL from 'indico-url:registration_form.add_section';
-import addTextURL from 'indico-url:registration_form.add_text';
-import modifyFieldURL from 'indico-url:registration_form.modify_field';
-import modifySectionURL from 'indico-url:registration_form.modify_section';
-import modifyTextURL from 'indico-url:registration_form.modify_text';
-import moveFieldURL from 'indico-url:registration_form.move_field';
-import moveSectionURL from 'indico-url:registration_form.move_section';
-import moveTextURL from 'indico-url:registration_form.move_text';
-import toggleFieldURL from 'indico-url:registration_form.toggle_field';
-import toggleSectionURL from 'indico-url:registration_form.toggle_section';
-import toggleTextURL from 'indico-url:registration_form.toggle_text';
+import addFieldURL from 'indico-url:forms.add_field';
+import addSectionURL from 'indico-url:forms.add_section';
+import addTextURL from 'indico-url:forms.add_text';
+import modifyFieldURL from 'indico-url:forms.modify_field';
+import modifySectionURL from 'indico-url:forms.modify_section';
+import modifyTextURL from 'indico-url:forms.modify_text';
+import moveFieldURL from 'indico-url:forms.move_field';
+import moveSectionURL from 'indico-url:forms.move_section';
+import moveTextURL from 'indico-url:forms.move_text';
+import toggleFieldURL from 'indico-url:forms.toggle_field';
+import toggleSectionURL from 'indico-url:forms.toggle_section';
+import toggleTextURL from 'indico-url:forms.toggle_text';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
