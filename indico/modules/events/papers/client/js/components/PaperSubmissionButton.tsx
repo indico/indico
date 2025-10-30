@@ -5,10 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import apiUploadExistingURL from 'indico-url:event_editing.api_add_contribution_file';
-import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
-import apiUploadURL from 'indico-url:event_editing.api_upload';
-import editableURL from 'indico-url:event_editing.editable';
+import fileTypesURL from 'indico-url:papers.api_file_types';
+import apiUploadURL from 'indico-url:papers.api_upload';
+import submitRevisionURL from 'indico-url:papers.submit_revision';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
@@ -17,38 +16,34 @@ import {Button, Form, Modal} from 'semantic-ui-react';
 
 import {FinalFileManager} from 'indico/modules/events/editing/editing/timeline/FileManager';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
 
 type OnSubmitFn = (type: string, formData: unknown) => Promise<void> | void;
-
-interface UploadableFile {
-  filename: string;
-  downloadURL: string;
-  id: number;
-}
 
 interface PaperSubmissionButtonProps {
   eventId: number;
   contributionId: number;
-  uploadableFiles?: UploadableFile[];
   onSubmit?: OnSubmitFn;
 }
 
 export default function PaperSubmissionButton({
   eventId,
   contributionId,
-  uploadableFiles = [],
   onSubmit,
 }: PaperSubmissionButtonProps) {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
+  const fileTypes = camelizeKeys(data || []);
 
   const submitRevision = async formData => {
     try {
       if (onSubmit) {
         await onSubmit('paper', formData);
       } else {
-        await indicoAxios.put(
+        await indicoAxios.post(
           submitRevisionURL({event_id: eventId, contrib_id: contributionId}),
           formData
         );
@@ -56,7 +51,6 @@ export default function PaperSubmissionButton({
     } catch (e) {
       return handleSubmitError(e);
     }
-    location.href = editableURL({event_id: eventId, contrib_id: contributionId});
   };
 
   return (
@@ -79,24 +73,19 @@ export default function PaperSubmissionButton({
             <Modal.Content>
               <Form id="submit-papers-form" onSubmit={handleSubmit}>
                 <FinalFileManager
-                  uploadableFiles="paper"
                   name="files"
-                  fileTypes={[]}
+                  fileTypes={fileTypes}
+                  files={[]}
                   uploadURL={apiUploadURL({
                     event_id: eventId,
                     contrib_id: contributionId,
                   })}
-                  uploadExistingURL={apiUploadExistingURL({
-                    event_id: eventId,
-                    contrib_id: contributionId,
-                  })}
-                  files={uploadableFiles}
                   mustChange
                 />
               </Form>
             </Modal.Content>
             <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
-              <FinalSubmitButton form="submit-editable-form" label={Translate.string('Submit')} />
+              <FinalSubmitButton form="submit-papers-form" label={Translate.string('Submit')} />
               <Button onClick={() => setModalOpen(true)}>
                 <Translate>Cancel</Translate>
               </Button>

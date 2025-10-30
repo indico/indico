@@ -10,17 +10,18 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
-from indico.modules.events.papers.forms import PaperSubmissionForm
+from indico.modules.events.papers.fields import PaperFilesField
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.papers import Paper
-from indico.modules.events.papers.operations import create_paper_revision
+from indico.modules.events.papers.operations import create_new_paper_revision
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_user_submittable_contributions)
 from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDisplayCallForPapersReact,
                                                 WPDisplayReviewingArea)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.args import parser
+from indico.web.util import jsonify_data, jsonify_template
 
 
 class RHSubmitPaper(RHPaperBase):
@@ -42,12 +43,11 @@ class RHSubmitPaper(RHPaperBase):
                                                      'Please contact the event organizer for further assistance.')))
 
     def _process(self):
-        form = PaperSubmissionForm()
-        if form.validate_on_submit():
-            paper = Paper(self.contribution)
-            create_paper_revision(paper, session.user, form.files.data)
-            return jsonify_data(flash=False)
-        return jsonify_form(form, form_header_kwargs={'action': request.relative_url}, disable_if_locked=False)
+        args = parser.parse({
+            'files': PaperFilesField(self.event, self.contribution, required=True)
+        })
+        create_new_paper_revision(self.contribution, session.user, args['files'])
+        return jsonify_data(flash=False)
 
 
 class RHPaperTimeline(RHPaperBase):
@@ -128,3 +128,10 @@ class RHSelectContribution(RHCallForPapers):
 
     def _process(self):
         return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)
+
+
+class RHPapersUploadFile(UploadFileMixin, RHPapersBase):
+    """Upload a file for peer reviewing."""
+
+    def get_file_context(self):
+        return ['event', self.event.id, 'papers', 'uploads']

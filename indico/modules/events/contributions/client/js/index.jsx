@@ -35,7 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     'ind-paper-submission-button',
     class extends HTMLElement {
       connectedCallback() {
-        ReactDOM.render(<PaperSubmissionButton />, this);
+        ReactDOM.render(
+          <PaperSubmissionButton
+            eventId={this.getAttribute('event-id')}
+            contributionId={this.getAttribute('contribution-id')}
+            contributionCode={this.getAttribute('contribution-code')}
+            uploadableFiles={JSON.parse(this.getAttribute('uploadable-files')) || []}
+          />,
+          this
+        );
       }
 
       disconnectedCallback() {

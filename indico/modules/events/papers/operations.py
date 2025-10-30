@@ -19,6 +19,7 @@ from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.files import PaperFile
+from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperAction, PaperCommentVisibility, PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
@@ -149,6 +150,40 @@ def create_paper_revision(paper, submitter, files):
                     'Paper revision {} submitted for contribution {} ({})'  # noqa: UP032
                     .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
     return revision
+
+
+def _make_paper_files(files, paper, revision):
+    paper_files = []
+    for files_arr in files.values():
+        for file in files_arr:
+            print('filez arr', files_arr)
+            filename = secure_client_filename(file.filename)
+            content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
+            paper_files.append(
+                PaperFile(
+                    filename=filename,
+                    content_type=content_type,
+                    paper_revision=revision,
+                    size=file.size,
+                    md5=file.md5,
+                    storage_backend=file.storage_backend,
+                    storage_file_id=file.storage_file_id,
+                    _contribution=paper.contribution,
+                )
+            )
+
+    return paper_files
+
+
+@no_autoflush
+def create_new_paper_revision(contribution, submitter, files):
+    paper = Paper(contribution=contribution)
+    revision = PaperRevision(paper=paper, submitter=submitter)
+    _make_paper_files(files, paper, revision)
+    db.session.flush()
+    db.session.expire(revision._contribution, ['_paper_last_revision'])
+    logger.info('Paper created by %s for %s', submitter, paper.contribution)
+    return paper
 
 
 @no_autoflush
