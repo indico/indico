@@ -227,7 +227,7 @@ def _get_management_permissions(sender, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_registration_cloners(sender, **kwargs):
     from indico.modules.events.registration import clone
-    from indico.modules.registration_form import clone as regform_clone
+    from indico.modules.forms import clone as regform_clone
     yield clone.RegistrationTagCloner
     yield clone.RegistrationCloner
     yield regform_clone.RegistrationFormCloner

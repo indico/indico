@@ -13,7 +13,7 @@ from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.modules.logs.models.entries import LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.modules.registration_form import logger
+from indico.modules.forms import logger
 from indico.modules.forms.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.forms.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.util.i18n import _

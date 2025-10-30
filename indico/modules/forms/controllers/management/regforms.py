@@ -21,7 +21,7 @@ from indico.modules.events.registration.util import create_personal_data_fields,
 from indico.modules.events.registration.views import WPEventManageRegistrationForm
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
-from indico.modules.registration_form import logger
+from indico.modules.forms import logger
 from indico.modules.forms.forms import RegistrationFormCreateForm, RegistrationFormEditForm
 from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.forms.operations import update_registration_form_settings

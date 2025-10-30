@@ -20,7 +20,7 @@ from indico.core.marshmallow import mm
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.modules.registration_form import logger
+from indico.modules.forms import logger
 from indico.modules.forms.controllers.management.sections import ManageRegFormSectionBaseMixin
 from indico.modules.forms.fields import get_field_types
 from indico.modules.forms.models.form_fields import RegistrationFormField
