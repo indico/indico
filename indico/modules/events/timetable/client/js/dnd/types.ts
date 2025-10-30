@@ -12,6 +12,11 @@ interface Coords {
   y: number;
 }
 
+export interface CoordsWithOffset extends Coords {
+  offsetX: number;
+  offsetY: number;
+}
+
 export type MousePosition = Coords;
 export type Transform = Coords;
 
@@ -39,7 +44,6 @@ export interface Droppable {
 
 export interface Draggable {
   node: HTMLRef;
-  fixed: boolean;
 }
 
 export interface DraggableData {
@@ -48,6 +52,7 @@ export interface DraggableData {
   mouse?: MousePosition;
   initialOffset?: Coords;
   initialScroll?: {top: number; left: number};
+  fixed: boolean;
 }
 
 export interface DragEvent {

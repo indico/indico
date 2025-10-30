@@ -228,6 +228,10 @@ export function EditSessionBlockButton({
     }
     const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
+    if (!element) {
+      console.error(`No element matched ${triggerSelector}`);
+      return;
+    }
     element.addEventListener('click', handler);
     return () => element.removeEventListener('click', handler);
   }, [triggerSelector]);

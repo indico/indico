@@ -22,7 +22,7 @@ import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
@@ -30,10 +30,9 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
-import {BlockEntry, EntryType, Session} from './types';
+import {ReduxState, BlockEntry, EntryType, Session} from './types';
 import {DATE_KEY_FORMAT, getEntryUniqueId, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
@@ -194,9 +193,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
-  const [activeType, setActiveType] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
+  const [activeType, setActiveType] = useState<EntryType>(
+    isEditing ? entry.type : Object.keys(forms)[0]
+  );
 
-  const _handleCreateContribution = async data => {
+  const _handleCreateContribution = async (data: any) => {
     data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
@@ -213,14 +214,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'code',
       'session_block_id',
     ]);
-    try {
-      return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
-    } catch (error) {
-      handleAxiosError(error, true);
-    }
+    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
-  const _handleCreateSessionBlock = async data => {
+  const _handleCreateSessionBlock = async (data: any) => {
     data.conveners = data.person_links;
     data = _.pick(data, [
       'session_id',
@@ -233,14 +230,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       'conveners',
       'code',
     ]);
-    const resData = await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
-    resData['person_links'] = resData['conveners'];
-    delete resData['conveners'];
-    return resData;
+    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 
   // TODO: Implement logic for breaks
-  const _handleCreateBreak = async data => {
+  const _handleCreateBreak = async (data: any) => {
     data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
@@ -256,19 +250,19 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
-  const _handleEditContribution = async data => {
+  const _handleEditContribution = async (data: any) => {
     return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: objId}), data);
   };
 
-  const _handleEditSessionBlock = async data => {
+  const _handleEditSessionBlock = async (data: any) => {
     return indicoAxios.patch(sessionBlockURL({event_id: eventId, session_block_id: objId}), data);
   };
 
-  const _handleEditBreak = async data => {
+  const _handleEditBreak = async (data: any) => {
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
-  const handleSubmit = async (data, form) => {
+  const handleSubmit = async (data: any, form: any) => {
     const submitHandlers = isEditing
       ? {
           [EntryType.Contribution]: _handleEditContribution,
@@ -321,9 +315,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const changeForm = (key: EntryType) => {
     setActiveType(key);
-    if (key === EntryType.SessionBlock && !sessionValues.length) {
-      forms[activeType];
-    }
   };
 
   const meetsSubmitConditions = () => {
@@ -348,7 +339,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       size="small"
       header={
         isEditing
-          ? `${Translate.string('Edit')} ${typeLongNames[entry.type]}`
+          ? `${Translate.string('Edit')} ${typeLongNames[entry.type as EntryType]}`
           : Translate.string('Create new timetable entry')
       }
       noSubmitButton
@@ -371,16 +362,16 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
             <div>
               {Object.keys(forms)
                 .filter(key => !(isCreatingChild && key === EntryType.SessionBlock))
-                .map((key: EntryType) => (
+                .map(key => (
                   <Button
                     key={key}
                     type="button"
                     onClick={() => {
-                      changeForm(key);
+                      changeForm(key as EntryType);
                     }}
                     color={activeType === key ? 'blue' : undefined}
                   >
-                    {typeLongNames[key]}
+                    {typeLongNames[key as EntryType]}
                   </Button>
                 ))}
             </div>
