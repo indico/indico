@@ -396,6 +396,7 @@ export default {
       case actions.EDIT_SESSION:
         return {
           ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
           ...preprocessSessionData({[action.session.id]: {...action.session}}),
         };
       case actions.DELETE_SESSION: {
@@ -404,6 +405,7 @@ export default {
       case actions.CREATE_SESSION:
         return {
           ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
           ...preprocessSessionData({[action.session.id]: {...action.session, isPoster: false}}),
         };
       default:
