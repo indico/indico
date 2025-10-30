@@ -40,6 +40,8 @@ interface SchemaEntry {
 
 interface SchemaSession extends SchemaEntry {
   isPoster: boolean;
+  defaultContribDurationMinutes: number;
+  colors: Colors;
 }
 
 interface SchemaBlock extends SchemaEntry {
@@ -61,7 +63,8 @@ const entryTypeMapping = {
 
 export function preprocessSessionData(
   data: Record<string, SchemaSession>
-): Record<number, Session> {
+): Record<string, Session> {
+  // @ts-expect-error number vs string mess with ids, to be fixed later...
   return Object.fromEntries(
     Object.entries(data).map(([, s]) => [
       s.id,
