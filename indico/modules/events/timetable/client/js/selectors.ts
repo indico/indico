@@ -9,17 +9,16 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {DEFAULT_CONTRIB_COLORS} from './colors';
-import {ReduxState} from './reducers';
-import {Session} from './types';
+import {ReduxState, Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
-export const getStaticData = state => state.staticData;
+export const getStaticData = (state: ReduxState) => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
 export const getDayEntries = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx].entries;
 export const getSessions = (state: ReduxState) => state.sessions;
-export const getNavigation = state => state.navigation;
-export const getDisplay = state => state.display;
+export const getNavigation = (state: ReduxState) => state.navigation;
+export const getDisplay = (state: ReduxState) => state.display;
 export const getLatestChange = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx];
 
@@ -128,12 +127,8 @@ export const getIsExpanded = createSelector(
   getNavigation,
   navigation => navigation.isExpanded
 );
-export const getIsDraft = createSelector(
-  getNavigation,
-  navigation => navigation.isDraft
-);
 
-function appendSessionAttributes(entries, sessions: Session[]) {
+function appendSessionAttributes(entries: any[], sessions: Record<string, Session>) {
   return entries.map(e => {
     const {isPoster = false, colors = DEFAULT_CONTRIB_COLORS} = sessions[e.sessionId] || {};
     return e.sessionId ? {...e, isPoster, colors} : e;
