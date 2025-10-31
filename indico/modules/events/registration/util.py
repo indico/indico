@@ -558,6 +558,14 @@ def update_registration_consent_to_publish(registration, consent_to_publish):
     registration.consent_to_publish = consent_to_publish
 
 
+def get_registration_spreadsheet_column_formats(regform_items):
+    """Return the configured formats for date columns in registration exports."""
+    return {
+        unique_col(item.title, item.id): item.data['date_format']
+        for item in regform_items if item.input_type == 'date'
+    }
+
+
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
     """Generate a spreadsheet data from a given registration list.
 
@@ -606,11 +614,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 if item.id not in data or not data[item.id].data:  # missing or empty data for the field
                     registration_dict[key] = ''
                     continue
-                dt = datetime.fromisoformat(data[item.id].data).replace(tzinfo=tzinfo)
-                if ':' in item.data.get('date_format'):
-                    registration_dict[key] = dt
-                else:
-                    registration_dict[key] = dt.date()
+                registration_dict[key] = datetime.fromisoformat(data[item.id].data).replace(tzinfo=tzinfo)
             elif item.id in data:
                 registration_dict[key] = item.field_impl.render_spreadsheet_data(data[item.id])
             else:
