@@ -20,6 +20,7 @@ import ReactDOM from 'react-dom';
 import 'indico/modules/events/util/types_dialog';
 import 'indico/react/components/AffiliationPopup';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
+import PaperSubmissionButton from 'indico/modules/events/papers/components/PaperSubmissionButton';
 import {IButton, ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -30,6 +31,27 @@ import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 
 document.addEventListener('DOMContentLoaded', () => {
+  customElements.define(
+    'ind-paper-submission-button',
+    class extends HTMLElement {
+      connectedCallback() {
+        ReactDOM.render(
+          <PaperSubmissionButton
+            eventId={this.getAttribute('event-id')}
+            contributionId={this.getAttribute('contribution-id')}
+            contributionCode={this.getAttribute('contribution-code')}
+            uploadableFiles={JSON.parse(this.getAttribute('uploadable-files')) || []}
+          />,
+          this
+        );
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
+
   const calendarContainer = document.querySelector('#contribution-calendar-link');
 
   if (!calendarContainer) {
