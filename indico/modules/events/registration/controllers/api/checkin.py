@@ -16,9 +16,9 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
-from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
-from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import RegistrationFormItem
+from indico.modules.registration_form.models.form_fields import RegistrationFormFieldData
+from indico.modules.registration_form.models.forms import RegistrationForm
+from indico.modules.registration_form.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)

@@ -8,11 +8,9 @@
 import base64
 import csv
 import dataclasses
-import itertools
 import uuid
 from datetime import datetime
 from io import BytesIO
-from operator import attrgetter
 
 from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
@@ -34,14 +32,14 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
-from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
-from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
+from indico.modules.registration_form.fields.accompanying import AccompanyingPersonsField
+from indico.modules.registration_form.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
-from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
+from indico.modules.registration_form.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.registration_form.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
+from indico.modules.registration_form.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
 from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
                                                                      RegistrationVisibility)
@@ -152,13 +150,6 @@ def get_country_field(regform):
 def get_flat_section_setup_data(regform):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
     item_data = {f.id: f.view_data for f in regform.form_items
-                 if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
-    return {'sections': section_data, 'items': item_data}
-
-
-def get_flat_section_positions_setup_data(regform):
-    section_data = {s.id: s.position for s in regform.sections if not s.is_deleted}
-    item_data = {f.id: f.position for f in regform.form_items
                  if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
     return {'sections': section_data, 'items': item_data}
 
@@ -886,21 +877,6 @@ def generate_ticket(registration):
 
 def get_ticket_attachments(registration):
     return [('Ticket.pdf', generate_ticket(registration).getvalue())]
-
-
-def update_regform_item_positions(regform):
-    """Update positions when deleting/disabling an item in order to prevent gaps."""
-    section_positions = itertools.count(1)
-    disabled_section_positions = itertools.count(1000)
-    for section in sorted(regform.sections, key=attrgetter('position')):
-        section_active = section.is_enabled and not section.is_deleted
-        section.position = next(section_positions if section_active else disabled_section_positions)
-        # ensure consistent field ordering
-        positions = itertools.count(1)
-        disabled_positions = itertools.count(1000)
-        for child in section.children:
-            child_active = child.is_enabled and not child.is_deleted
-            child.position = next(positions if child_active else disabled_positions)
 
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,

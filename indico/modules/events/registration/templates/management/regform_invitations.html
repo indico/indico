@@ -1,7 +1,7 @@
-{% extends 'events/registration/management/_regform_base.html' %}
+{% extends 'registration_form/management/_regform_base.html' %}
 
 {% block back_button_url -%}
-    {{ url_for('.manage_regform', regform) }}
+    {{ url_for('registration_form.manage_regform', regform) }}
 {%- endblock %}
 
 {% block subtitle %}

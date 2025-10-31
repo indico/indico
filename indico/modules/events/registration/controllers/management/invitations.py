@@ -14,7 +14,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.controllers.management import RHEventManageRegFormBase
 from indico.modules.events.registration.forms import ImportInvitationsForm, InvitationFormExisting, InvitationFormNew
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.schemas import RegistrationInvitationSchema
@@ -53,7 +53,7 @@ def _get_invitation_data(regform):
     }
 
 
-class RHRegistrationFormInvitations(RHManageRegFormBase):
+class RHRegistrationFormInvitations(RHEventManageRegFormBase):
     """Overview of all registration invitations."""
 
     def _process(self):
@@ -64,7 +64,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
                                                     has_pending_invitations=_has_pending_invitations(invitations))
 
 
-class RHRegistrationFormInvite(RHManageRegFormBase):
+class RHRegistrationFormInvite(RHEventManageRegFormBase):
     """Invite someone to register."""
 
     def _process(self):
@@ -102,14 +102,14 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
 
 
-class RHPendingInvitationsBase(RHManageRegFormBase):
+class RHPendingInvitationsBase(RHEventManageRegFormBase):
     """Mixin for RHs that work on pending invitations."""
 
     @use_kwargs({
         'invitation_ids': fields.List(fields.Int(), load_default=None),
     })
     def _process_args(self, invitation_ids):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         query = (RegistrationInvitation.query.with_parent(self.regform)
                  .filter(RegistrationInvitation.state == InvitationState.pending))
         if invitation_ids is not None:
@@ -198,7 +198,7 @@ class RHRegistrationFormRemindersPreview(RHPendingInvitationsBase):
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
-class RHRegistrationFormInviteImport(RHManageRegFormBase):
+class RHRegistrationFormInviteImport(RHEventManageRegFormBase):
     """Import invitations from a CSV file."""
 
     def _format_flash_message(self, sent, skipped):
@@ -236,7 +236,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
                                 regform=self.regform)
 
 
-class RHRegistrationFormInvitationBase(RHManageRegFormBase):
+class RHRegistrationFormInvitationBase(RHEventManageRegFormBase):
     """Base class for RH working on one invitation."""
 
     normalize_url_spec = {
@@ -246,7 +246,7 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
     }
 
     def _process_args(self):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         self.invitation = RegistrationInvitation.get_or_404(request.view_args['invitation_id'])
 
 
