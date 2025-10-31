@@ -233,10 +233,12 @@ class PaperDumpSchema(PaperSchema):
 class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFileType
-        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
+        # fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
+        #           'filename_template', 'url')
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable',
                   'filename_template', 'url')
 
-    is_used = Function(lambda ft: PaperRevision.query.with_parent(ft).has_rows())
+    # is_used = Function(lambda ft: PaperRevision.query.with_parent(ft).has_rows())
     url = Function(lambda ft: url_for('.api_edit_file_type',
                                              ft.event,
                                              file_type_id=ft.id,
