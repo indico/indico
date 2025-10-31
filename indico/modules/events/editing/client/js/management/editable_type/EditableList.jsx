@@ -31,7 +31,6 @@ import {
   Confirm,
   Label,
   Popup,
-  Dimmer,
 } from 'semantic-ui-react';
 
 import {
@@ -902,7 +901,6 @@ EditableListDisplay.propTypes = {
 };
 
 function JudgmentModal({action, numEditables, numSkipped, onSubmit, onClose}) {
-  const [loading, setLoading] = useState(false);
   const header = {
     [EditingReviewAction.accept]: Translate.string('Accept latest revision'),
     [EditingReviewAction.requestUpdate]: Translate.string('Request changes'),
@@ -910,9 +908,7 @@ function JudgmentModal({action, numEditables, numSkipped, onSubmit, onClose}) {
   }[action];
 
   const handleSubmit = async values => {
-    setLoading(true);
     await onSubmit({action, ...values});
-    setLoading(false);
   };
 
   if (numEditables === numSkipped) {
@@ -970,9 +966,6 @@ function JudgmentModal({action, numEditables, numSkipped, onSubmit, onClose}) {
         label={Translate.string('Comment')}
         placeholder={Translate.string('Leave a comment for the authors...')}
       />
-      <Dimmer active={loading} inverted>
-        <Loader />
-      </Dimmer>
     </FinalModalForm>
   );
 }
