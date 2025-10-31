@@ -636,7 +636,7 @@ function EditableListDisplay({
     checkedEditablesRequest(createCommentURL, data);
   };
 
-  const applyJudgment = async values => {
+  const submitJudgment = async values => {
     const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, values);
     if (rv) {
       setSkippedEditables(checked.length - rv.length);
@@ -868,7 +868,7 @@ function EditableListDisplay({
               x => x.editable.state === EditingActionState[openJudgmentModal]
             ).length
           }
-          onApply={applyJudgment}
+          onSubmit={submitJudgment}
           onClose={() => setOpenJudgmentModal(null)}
         />
       )}
@@ -901,7 +901,7 @@ EditableListDisplay.propTypes = {
   canAssignSelf: PropTypes.bool.isRequired,
 };
 
-function JudgmentModal({action, numEditables, numSkipped, onApply, onClose}) {
+function JudgmentModal({action, numEditables, numSkipped, onSubmit, onClose}) {
   const [loading, setLoading] = useState(false);
   const header = {
     [EditingReviewAction.accept]: Translate.string('Accept latest revision'),
@@ -911,7 +911,7 @@ function JudgmentModal({action, numEditables, numSkipped, onApply, onClose}) {
 
   const handleSubmit = async values => {
     setLoading(true);
-    await onApply({action, ...values});
+    await onSubmit({action, ...values});
     setLoading(false);
   };
 
@@ -981,6 +981,6 @@ JudgmentModal.propTypes = {
   action: PropTypes.oneOf(Object.values(EditingReviewAction)).isRequired,
   numEditables: PropTypes.number.isRequired,
   numSkipped: PropTypes.number.isRequired,
-  onApply: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
