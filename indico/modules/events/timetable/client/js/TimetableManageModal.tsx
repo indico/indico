@@ -19,14 +19,13 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 
+import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
+import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
-
-import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
-import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
