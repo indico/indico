@@ -233,13 +233,10 @@ class PaperDumpSchema(PaperSchema):
 class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFileType
-        # fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
-        #           'filename_template', 'url')
-        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable',
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
                   'filename_template', 'url')
 
-    # TODO: (Ajob) Fix is_used fn to work with proper query
-    # is_used = Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
+    is_used = Function(lambda ft: PaperRevision.query.with_parent(ft).has_rows())
     url = Function(lambda ft: url_for('.api_edit_file_type',
                                              ft.event,
                                              file_type_id=ft.id,
