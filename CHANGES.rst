@@ -28,6 +28,8 @@ Improvements
 - Add URL args to set the default view and date of the cataegory calendar view
   (:pr:`7144`)
 - Allow changing review tags in the editing timeline (:issue:`7133`, :pr:`7134`)
+- Add an option to request changes in bulk on the editable list (:issue:`7062`,
+  :pr:`7100`)
 
 Bugfixes
 ^^^^^^^^
