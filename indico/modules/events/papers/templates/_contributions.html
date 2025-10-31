@@ -143,9 +143,7 @@
                     data-ajax-dialog>
                     {%- trans %}Submit paper{% endtrans -%}
                 </a>
-                <!-- TODO: (Ajob) Attributes need to be changed, this is a WIP -->
                 <ind-paper-submission-button
-                    available-types="{{ contribution.allowed_types_for_editable|tojson|forceescape }}"
                     event-id="{{ contribution.event_id }}"
                     contribution-id="{{ contribution.id }}"
                     contribution-code="{{ contribution.code }}">
