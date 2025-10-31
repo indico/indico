@@ -14,7 +14,7 @@ import {Button, Form, Label, Popup} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {modifyReview} from './actions'; // You need to implement this action
+import {modifyReview} from './actions';
 import FinalTagInput from './judgment/TagInput';
 import {isTimelineOutdated} from './selectors';
 import {blockPropTypes} from './util';
