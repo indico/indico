@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Button, Icon, Label, Message, Popup} from 'semantic-ui-react';
+import {Button, Icon, Message, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -78,7 +78,7 @@ FileTypeDisplay.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-export default function FileDisplay({downloadURL, fileTypes, files, tags, outdated}) {
+export default function FileDisplay({downloadURL, fileTypes, files, outdated}) {
   const {canAssignSelf} = useSelector(selectors.getDetails);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   return (
@@ -95,61 +95,42 @@ export default function FileDisplay({downloadURL, fileTypes, files, tags, outdat
           ))}
         </div>
       )}
-      <div styleName="download-tag-wrapper">
-        <div styleName="tag-display">
-          {tags.map(tag => (
-            <Label color={tag.color} key={tag.id}>
-              {tag.verboseTitle}
-            </Label>
-          ))}
-        </div>
-        {files.length !== 0 && (
-          <div>
-            {canAssignSelf && !canPerformSubmitterActions ? (
-              <Popup
-                trigger={
-                  <Button floated="right" styleName="download-button" icon primary>
-                    <Icon name="download" /> <Translate>Download ZIP</Translate>
-                  </Button>
-                }
-                on="click"
-                position="right center"
-              >
-                <div styleName="download-popup">
-                  <Message warning>
-                    <Icon name="warning sign" />
-                    <Translate>
-                      You haven't assigned this editable to yourself. Are you sure you want to
-                      download it anyway?
-                    </Translate>
-                  </Message>
-                  <Button
-                    as="a"
-                    href={downloadURL}
-                    icon
-                    styleName="confirm-download"
-                    labelPosition="left"
-                  >
-                    <Icon name="download" />
-                    <Translate>Download anyway</Translate>
-                  </Button>
-                </div>
-              </Popup>
-            ) : (
+      {files.length !== 0 &&
+        (canAssignSelf && !canPerformSubmitterActions ? (
+          <Popup
+            trigger={
+              <Button floated="right" icon primary>
+                <Icon name="download" /> <Translate>Download ZIP</Translate>
+              </Button>
+            }
+            on="click"
+            position="right center"
+          >
+            <div styleName="download-popup">
+              <Message warning>
+                <Icon name="warning sign" />
+                <Translate>
+                  You haven't assigned this editable to yourself. Are you sure you want to download
+                  it anyway?
+                </Translate>
+              </Message>
               <Button
                 as="a"
                 href={downloadURL}
-                floated="right"
-                styleName="download-button"
                 icon
-                primary
+                styleName="confirm-download"
+                labelPosition="left"
               >
-                <Icon name="download" /> <Translate>Download ZIP</Translate>
+                <Icon name="download" />
+                <Translate>Download anyway</Translate>
               </Button>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          </Popup>
+        ) : (
+          <Button as="a" href={downloadURL} floated="right" icon primary>
+            <Icon name="download" /> <Translate>Download ZIP</Translate>
+          </Button>
+        ))}
     </div>
   );
 }
@@ -158,13 +139,6 @@ FileDisplay.propTypes = {
   downloadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
-  tags: PropTypes.arrayOf(
-    PropTypes.shape({
-      color: PropTypes.string.isRequired,
-      id: PropTypes.number.isRequired,
-      verboseTitle: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   outdated: PropTypes.bool,
 };
 

@@ -27,6 +27,7 @@ Improvements
   :pr:`7132`)
 - Add URL args to set the default view and date of the cataegory calendar view
   (:pr:`7144`)
+- Allow changing review tags in the editing timeline (:issue:`7133`, :pr:`7134`)
 
 Bugfixes
 ^^^^^^^^

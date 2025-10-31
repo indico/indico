@@ -29,7 +29,6 @@ export default function Timeline() {
   const isInitialEditableDetailsLoading = useSelector(selectors.isInitialEditableDetailsLoading);
   const needsSubmitterChanges = useSelector(selectors.needsSubmitterChanges);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
-  const lastRevision = useSelector(selectors.getLastRevision);
   const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
@@ -92,7 +91,6 @@ export default function Timeline() {
             fileTypes={fileTypes}
             files={lastRevisionWithFiles.files}
             downloadURL={lastRevisionWithFiles.downloadFilesURL}
-            tags={lastRevision.tags}
           />
         )}
       </TimelineHeader>

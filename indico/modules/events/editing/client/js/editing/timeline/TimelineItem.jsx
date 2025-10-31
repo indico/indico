@@ -23,6 +23,7 @@ import FileDisplay from './FileDisplay';
 import ResetReview from './ResetReview';
 import ReviewComment from './ReviewComment';
 import ReviewForm from './ReviewForm';
+import ReviewTags from './ReviewTags';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
@@ -41,6 +42,7 @@ export default function TimelineItem({block, index}) {
   const canEditLastRevision = useSelector(selectors.canEditLastRevision);
   const {canComment} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
+  const tagOptions = useSelector(selectors.getNonSystemTags);
   const isLastBlock = lastTimelineBlock.id === block.id;
   const isLastValidBlock = lastValidTimelineBlock.id === block.id;
   const isLastTimelineBlockWithFiles = lastTimelineBlockWithFiles.id === block.id;
@@ -119,14 +121,15 @@ export default function TimelineItem({block, index}) {
                   </Message>
                 )}
                 {block.commentHtml && <ReviewComment block={block} canEdit={canEdit} />}
-                {block.commentHtml && !!(block.files.length || block.tags.length) && <Divider />}
+                {block.commentHtml && !!block.files.length && <Divider />}
                 <FileDisplay
                   fileTypes={fileTypes}
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
-                  tags={block.tags}
                   outdated={!isLastTimelineBlockWithFiles}
                 />
+                {!!(block.commentHtml || block.files.length) && !!block.tags.length && <Divider />}
+                <ReviewTags block={block} canEdit={canEdit} tagOptions={tagOptions} />
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastValidBlock && (
                   <ChangesConfirmation />
                 )}

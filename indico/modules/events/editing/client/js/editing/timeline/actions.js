@@ -54,7 +54,7 @@ export function confirmEditableChanges(revision, formData) {
   );
 }
 
-export function modifyReviewComment(revision, formData) {
+export function modifyReview(revision, formData) {
   return submitFormAction(
     () => indicoAxios.patch(revision.reviewURL, formData),
     null,

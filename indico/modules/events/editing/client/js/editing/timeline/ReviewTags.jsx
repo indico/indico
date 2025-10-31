@@ -9,20 +9,19 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Form, Popup} from 'semantic-ui-react';
+import {Button, Form, Label, Popup} from 'semantic-ui-react';
 
-import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {RevisionTypeStates} from '../../models';
-
 import {modifyReview} from './actions';
+import FinalTagInput from './judgment/TagInput';
 import {isTimelineOutdated} from './selectors';
 import {blockPropTypes} from './util';
 
-import './ReviewComment.module.scss';
+import './ReviewTags.module.scss';
 
-export default function ReviewComment({block, canEdit}) {
+export default function ReviewTags({block, canEdit, tagOptions}) {
   const [editFormOpen, setEditFormOpen] = useState(false);
   const isOutdated = useSelector(isTimelineOutdated);
   const dispatch = useDispatch();
@@ -36,25 +35,24 @@ export default function ReviewComment({block, canEdit}) {
   };
 
   return (
-    <div styleName="review-comment">
+    <div styleName="review-tags">
+      {!block.tags.length && !editFormOpen && canEdit && (
+        <span styleName="no-tags">
+          <Translate>No tags</Translate>
+        </span>
+      )}
       {editFormOpen ? (
         <div className="f-self-stretch">
           <FinalForm
             onSubmit={handleSubmit}
-            initialValues={{comment: block.comment}}
+            initialValues={{tags: block.tags.map(t => t.id)}}
             subscription={{submitting: true}}
           >
             {fprops => (
               <Form onSubmit={fprops.handleSubmit}>
-                <FinalTextArea
-                  name="comment"
-                  placeholder={Translate.string('Leave a comment...')}
-                  autoFocus
-                  required={RevisionTypeStates[block.type.name] !== 'accepted'}
-                  hideValidationError
-                />
+                <FinalTagInput name="tags" options={tagOptions} autoFocus />
                 <Form.Group styleName="submit-buttons" inline>
-                  <FinalSubmitButton label={Translate.string('Save changes')} />
+                  <FinalSubmitButton label={Translate.string('Save tags')} />
                   <Button
                     disabled={fprops.submitting}
                     content={Translate.string('Cancel')}
@@ -68,12 +66,18 @@ export default function ReviewComment({block, canEdit}) {
           </FinalForm>
         </div>
       ) : (
-        <div className="markdown-text" dangerouslySetInnerHTML={{__html: block.commentHtml}} />
+        <div styleName="tag-list">
+          {block.tags.map(tag => (
+            <Label color={tag.color} key={tag.id}>
+              {tag.verboseTitle}
+            </Label>
+          ))}
+        </div>
       )}
       <div styleName="action-buttons">
         {canEdit && !isOutdated && (
           <Popup
-            content={Translate.string('Edit review comment')}
+            content={Translate.string('Edit tags')}
             position="bottom center"
             trigger={
               <a onClick={() => setEditFormOpen(!editFormOpen)} className="i-link icon-edit" />
@@ -85,7 +89,8 @@ export default function ReviewComment({block, canEdit}) {
   );
 }
 
-ReviewComment.propTypes = {
+ReviewTags.propTypes = {
   block: PropTypes.shape(blockPropTypes).isRequired,
   canEdit: PropTypes.bool.isRequired,
+  tagOptions: PropTypes.array.isRequired,
 };

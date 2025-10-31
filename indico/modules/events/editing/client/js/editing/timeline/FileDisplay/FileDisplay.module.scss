@@ -56,23 +56,6 @@
   color: $gray;
 }
 
-.download-tag-wrapper {
-  display: flex;
-
-  .tag-display {
-    flex-grow: 1;
-    margin-left: -3px;
-
-    :global(.ui.label) {
-      margin: 3px 0 0 3px;
-    }
-  }
-
-  .download-button {
-    white-space: nowrap;
-  }
-}
-
 .download-popup {
   display: flex;
   flex-direction: column;

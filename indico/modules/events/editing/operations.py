@@ -44,6 +44,11 @@ FILE_TYPE_ATTRS = {
     'filename_template': {'title': 'Filename template', 'type': 'string'},
 }
 
+PATCH_REVISION_ATTRS = {
+    'comment': {'title': 'Comment', 'type': 'text'},
+    'tags': {'title': 'Tags', 'convert': lambda change: [sorted(t.title for t in tags) for tags in change]},
+}
+
 
 class InvalidEditableState(BadRequest):
     """
@@ -247,17 +252,17 @@ def undo_review(revision):
 
 
 @no_autoflush
-def update_review_comment(revision, text):
+def update_review(revision: EditingRevision, data: dict):
     _ensure_revision_can_be_updated(revision)
-    changes = {'comment': (revision.comment, text)}
-    log_fields = {'comment': 'Comment'}
-    revision.comment = text
+    changes = revision.populate_from_dict(data, keys=PATCH_REVISION_ATTRS)
+    if not changes:
+        return
     revision.modified_dt = now_utc()
     db.session.flush()
-    logger.info('Review comment on revision %r updated by %r', revision, session.user)
+    logger.info('Review on revision %r updated by %r: %r', revision, session.user, changes.keys())
     revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
-                          f'Review comment on {revision.editable.log_title} updated',
-                          session.user, data={'Changes': make_diff_log(changes, log_fields)})
+                          f'Review on {revision.editable.log_title} updated',
+                          session.user, data={'Changes': make_diff_log(changes, PATCH_REVISION_ATTRS)})
 
 
 @no_autoflush

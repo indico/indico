@@ -27,7 +27,7 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Revi
 from indico.modules.events.editing.operations import (assign_editor, create_new_editable, create_revision_comment,
                                                       create_submitter_revision, delete_editable,
                                                       delete_revision_comment, ensure_latest_revision, replace_revision,
-                                                      unassign_editor, undo_review, update_review_comment,
+                                                      unassign_editor, undo_review, update_review,
                                                       update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
@@ -40,7 +40,7 @@ from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser, use_kwargs, use_rh_kwargs
+from indico.web.args import parser, use_kwargs, use_rh_args, use_rh_kwargs
 from indico.web.flask.util import send_file
 
 
@@ -226,11 +226,12 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         review_and_publish_editable(self.revision, action, comment, args['tags'], args.get('files'))
         return '', 204
 
-    @use_kwargs({
-        'text': fields.String(required=True),
-    })
-    def _process_PATCH(self, text):
-        update_review_comment(self.revision, text)
+    @use_rh_args({
+        'comment': fields.String(),
+        'tags': EditingTagsField(allow_system_tags=True)
+    }, rh_context=('event',))
+    def _process_PATCH(self, data):
+        update_review(self.revision, data)
         return '', 204
 
     def _process_DELETE(self):
