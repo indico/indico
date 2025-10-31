@@ -40,7 +40,7 @@ from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
-from indico.web.args import parser, use_kwargs, use_rh_kwargs
+from indico.web.args import parser, use_kwargs, use_rh_args, use_rh_kwargs
 from indico.web.flask.util import send_file
 
 
@@ -226,12 +226,12 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         review_and_publish_editable(self.revision, action, comment, args['tags'], args.get('files'))
         return '', 204
 
-    @use_rh_kwargs({
-        'text': fields.String(load_default=None),
-        'tags': EditingTagsField(allow_system_tags=True, load_default=None)
+    @use_rh_args({
+        'comment': fields.String(),
+        'tags': EditingTagsField(allow_system_tags=True)
     }, rh_context=('event',))
-    def _process_PATCH(self, text, tags):
-        update_review(self.revision, text, tags)
+    def _process_PATCH(self, data):
+        update_review(self.revision, data)
         return '', 204
 
     def _process_DELETE(self):

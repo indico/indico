@@ -14,7 +14,7 @@ import {Button, Form, Label, Popup} from 'semantic-ui-react';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {modifyReviewTags} from './actions'; // You need to implement this action
+import {modifyReview} from './actions'; // You need to implement this action
 import FinalTagInput from './judgment/TagInput';
 import {isTimelineOutdated} from './selectors';
 import {blockPropTypes} from './util';
@@ -27,7 +27,7 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
   const dispatch = useDispatch();
 
   const handleSubmit = async formData => {
-    const rv = await dispatch(modifyReviewTags(block, formData));
+    const rv = await dispatch(modifyReview(block, formData));
     if (rv.error) {
       return rv.error;
     }

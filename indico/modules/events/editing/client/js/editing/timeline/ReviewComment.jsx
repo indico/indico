@@ -16,7 +16,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {RevisionTypeStates} from '../../models';
 
-import {modifyReviewComment} from './actions';
+import {modifyReview} from './actions';
 import {isTimelineOutdated} from './selectors';
 import {blockPropTypes} from './util';
 
@@ -28,7 +28,7 @@ export default function ReviewComment({block, canEdit}) {
   const dispatch = useDispatch();
 
   const handleSubmit = async formData => {
-    const rv = await dispatch(modifyReviewComment(block, formData));
+    const rv = await dispatch(modifyReview(block, formData));
     if (rv.error) {
       return rv.error;
     }
@@ -41,13 +41,13 @@ export default function ReviewComment({block, canEdit}) {
         <div className="f-self-stretch">
           <FinalForm
             onSubmit={handleSubmit}
-            initialValues={{text: block.comment}}
+            initialValues={{comment: block.comment}}
             subscription={{submitting: true}}
           >
             {fprops => (
               <Form onSubmit={fprops.handleSubmit}>
                 <FinalTextArea
-                  name="text"
+                  name="comment"
                   placeholder={Translate.string('Leave a comment...')}
                   autoFocus
                   required={RevisionTypeStates[block.type.name] !== 'accepted'}
