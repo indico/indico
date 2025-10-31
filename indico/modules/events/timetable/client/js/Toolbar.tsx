@@ -10,14 +10,14 @@ import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Menu} from 'semantic-ui-react';
 
+import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
-
-import PublicationStateSwitch from '../../../contributions/client/js/PublicationStateSwitch';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import './Toolbar.module.scss';
 import {getDiffInDays} from './utils';
+
+import './Toolbar.module.scss';
 
 export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
