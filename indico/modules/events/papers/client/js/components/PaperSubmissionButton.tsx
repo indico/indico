@@ -7,6 +7,7 @@
 
 import fileTypesURL from 'indico-url:papers.api_file_types';
 import apiUploadURL from 'indico-url:papers.api_upload';
+import paperTimelineURL from 'indico-url:papers.paper_timeline';
 import submitRevisionURL from 'indico-url:papers.submit_revision';
 
 import _ from 'lodash';
@@ -48,6 +49,8 @@ export default function PaperSubmissionButton({
           formData
         );
       }
+
+      location.href = paperTimelineURL({event_id: eventId, contrib_id: contributionId});
     } catch (e) {
       return handleSubmitError(e);
     }
