@@ -12,7 +12,6 @@ import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/reviews';
 
-import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {domReady} from 'indico/utils/domstate';
 
 import FileTypeManager from '../../../editing/client/js/management/editable_type/file_types/FileTypeManager';
@@ -147,13 +146,11 @@ customElements.define(
     connectedCallback() {
       domReady.then(() => {
         ReactDOM.render(
-          <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
-            <FileTypeManager
-              eventId={+this.getAttribute('event-id')}
-              editableType="paper"
-              endpoint="papers"
-            />
-          </UserSearchTokenContext.Provider>,
+          <FileTypeManager
+            eventId={+this.getAttribute('event-id')}
+            editableType="paper"
+            endpoint="papers"
+          />,
           this
         );
       });
