@@ -47,18 +47,27 @@ class PaperEmailSettingsField(JSONField):
 
 
 class PaperFilesField(Dict):
-    def __init__(self, event, contrib, allow_claimed_files=False, **kwargs):
+    def __init__(self, event=None, contrib=None, /, *, allow_claimed_files=False, **kwargs):
         self.event = event
         self.contrib = contrib
-        self.file_types_query = PaperFileType.query.with_parent(event)
 
-        keys_field = ModelField(PaperFileType, get_query=lambda m, ctx: self.file_types_query)
+        def _get_query(m, ctx):
+            return self._get_file_types_query(event or ctx['event'])
+
+        keys_field = ModelField(PaperFileType, get_query=_get_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
-        validators = [*kwargs.pop('validate', []), self.validate_files]
-        super().__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
+        super().__init__(keys=keys_field, values=values_field, **kwargs)
+
+    def _get_file_types_query(self, event):
+        return PaperFileType.query.with_parent(event)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        rv = super()._deserialize(value, attr, data, **kwargs)
+        self.validate_files(rv)
+        return rv
 
     def validate_files(self, value):
-        required_types = {ft for ft in self.file_types_query if ft.required}
+        required_types = {ft for ft in self._get_file_types_query(self.event or self.context['event']) if ft.required}
 
         # ensure all required file types have files
         required_missing = required_types - {ft for ft, files in value.items() if files}

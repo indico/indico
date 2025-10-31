@@ -20,7 +20,7 @@ from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDispla
                                                 WPDisplayReviewingArea)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.web.args import parser
+from indico.web.args import use_rh_kwargs
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -42,11 +42,11 @@ class RHSubmitPaper(RHPaperBase):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
 
-    def _process(self):
-        args = parser.parse({
-            'files': PaperFilesField(self.event, self.contribution, required=True)
-        })
-        create_new_paper_revision(self.contribution, session.user, args['files'])
+    @use_rh_kwargs({
+        'files': PaperFilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
+        create_new_paper_revision(self.contribution, session.user, files)
         return jsonify_data(flash=False)
 
 
