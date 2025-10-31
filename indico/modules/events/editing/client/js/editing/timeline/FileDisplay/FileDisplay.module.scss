@@ -56,15 +56,6 @@
   color: $gray;
 }
 
-.download-tag-wrapper {
-  display: flex;
-  justify-content: flex-end;
-
-  .download-button {
-    white-space: nowrap;
-  }
-}
-
 .download-popup {
   display: flex;
   flex-direction: column;
