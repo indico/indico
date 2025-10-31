@@ -39,6 +39,8 @@ Bugfixes
 - Do not allow selecting fields in disabled sections as a condition (:pr:`7114`)
 - Fix timetable PDF cover page layout to allow proper centering of content (:issue:`7148`,
   :pr:`7149`)
+- Preserve configured registration date formats in Excel exports (:pr:`7157`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
