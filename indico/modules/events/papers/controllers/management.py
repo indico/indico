@@ -336,8 +336,6 @@ class RHPapersCreateFileType(RHManageEventBase):
 class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
     """Delete/update a file type."""
 
-    SERVICE_ALLOWED = True
-
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.file_type = (PaperFileType.query
