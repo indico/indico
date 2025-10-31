@@ -99,7 +99,7 @@ export default function FileDisplay({downloadURL, fileTypes, files, outdated}) {
         (canAssignSelf && !canPerformSubmitterActions ? (
           <Popup
             trigger={
-              <Button floated="right" styleName="download-button" icon primary>
+              <Button floated="right" icon primary>
                 <Icon name="download" /> <Translate>Download ZIP</Translate>
               </Button>
             }
@@ -127,14 +127,7 @@ export default function FileDisplay({downloadURL, fileTypes, files, outdated}) {
             </div>
           </Popup>
         ) : (
-          <Button
-            as="a"
-            href={downloadURL}
-            floated="right"
-            styleName="download-button"
-            icon
-            primary
-          >
+          <Button as="a" href={downloadURL} floated="right" icon primary>
             <Icon name="download" /> <Translate>Download ZIP</Translate>
           </Button>
         ))}
