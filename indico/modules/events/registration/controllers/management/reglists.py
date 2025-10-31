@@ -55,6 +55,7 @@ from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
+                                                     get_registration_spreadsheet_column_formats,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
                                                      import_registrations_from_csv, load_registration_schema,
                                                      make_registration_schema)
@@ -501,7 +502,8 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
                                                                 self.export_config['static_item_ids'])
-        return send_xlsx('registrations.xlsx', headers, rows, tz=self.event.tzinfo)
+        column_formats = get_registration_spreadsheet_column_formats(self.export_config['regform_items'])
+        return send_xlsx('registrations.xlsx', headers, rows, tz=self.event.tzinfo, column_formats=column_formats)
 
 
 class RHRegistrationsImport(RHRegistrationsActionBase):
