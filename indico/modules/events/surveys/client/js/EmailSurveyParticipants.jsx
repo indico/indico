@@ -13,13 +13,12 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
+import {EmailDialog} from 'indico/modules/events/persons/EmailDialog';
 import {FinalEmailList} from 'indico/react/components';
 import {FinalCheckbox, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-
-import {EmailDialog} from '../../../persons/client/js/EmailDialog';
 
 export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
   const [sentCount, setSentCount] = useState(0);
