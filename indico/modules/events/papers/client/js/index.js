@@ -7,6 +7,10 @@
 
 /* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false, enableIfChecked:false */
 
+import createFileTypeURL from 'indico-url:papers.api_add_file_type';
+import editFileTypeURL from 'indico-url:papers.api_edit_file_type';
+import fileTypeURL from 'indico-url:papers.api_file_types';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -148,8 +152,9 @@ customElements.define(
         ReactDOM.render(
           <FileTypeManager
             eventId={+this.getAttribute('event-id')}
-            editableType="paper"
-            endpoint="papers"
+            getAllURLFn={fileTypeURL}
+            editURLFn={editFileTypeURL}
+            createURLFn={createFileTypeURL}
           />,
           this
         );

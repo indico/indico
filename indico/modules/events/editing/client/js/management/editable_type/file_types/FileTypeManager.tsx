@@ -5,16 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editingCreateFileTypeURL from 'indico-url:event_editing.api_add_file_type';
-import editingEditFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
-import editingFileTypesURL from 'indico-url:event_editing.api_file_types';
-import papersCreateFileTypeURL from 'indico-url:papers.api_add_file_type';
-import papersEditFileTypeURL from 'indico-url:papers.api_edit_file_type';
-import papersFileTypesURL from 'indico-url:papers.api_file_types';
-
-import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';
-import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Loader,
+  Message,
+  Segment,
+  Popup,
+  Label,
+  SemanticICONS,
+} from 'semantic-ui-react';
 
 import {RequestConfirmDelete, TooltipIfTruncated} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
@@ -22,16 +23,15 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import {EditableType} from '../../../models';
-
 import FileTypeModal from './FileTypeModal';
 
 import './FileTypeManager.module.scss';
 
 interface FileTypeManagerProps {
   eventId: number;
-  editableType: typeof EditableType;
-  endpoint?: string;
+  getAllURLFn: (params?) => string;
+  createURLFn: (params?) => string;
+  editURLFn: (params?) => string;
 }
 
 interface FileTypeManagerState {
@@ -59,54 +59,29 @@ function fileTypesReducer(state, action) {
   }
 }
 
-function getFileTypeURLs(endpoint) {
-  switch (endpoint) {
-    case 'event_editing':
-      return {
-        getAllURL: editingFileTypesURL,
-        createURL: editingCreateFileTypeURL,
-        editURL: editingEditFileTypeURL,
-      };
-    case 'papers':
-      return {
-        getAllURL: papersFileTypesURL,
-        createURL: papersCreateFileTypeURL,
-        editURL: papersEditFileTypeURL,
-      };
-    default:
-      throw new Error(`Unknown file types endpoint: ${endpoint}`);
-  }
-}
-
-function StatusIcon({active, icon, text}) {
+function StatusIcon({active, icon, text}: {active: boolean; icon: SemanticICONS; text: string}) {
   return (
     <Icon size="small" color={active ? 'blue' : 'grey'} name={icon} title={active ? text : ''} />
   );
 }
 
-StatusIcon.propTypes = {
-  active: PropTypes.bool.isRequired,
-  icon: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-};
-
 export default function FileTypeManager({
   eventId,
-  editableType,
-  endpoint = 'event_editing',
+  getAllURLFn,
+  createURLFn,
+  editURLFn,
 }: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
-  const {getAllURL, createURL, editURL} = getFileTypeURLs(endpoint);
   const {
     data,
     loading: isLoadingFileTypes,
     reFetch,
     lastData,
-  } = useIndicoAxios(getAllURL({event_id: eventId, type: editableType}), {camelize: true});
+  } = useIndicoAxios(getAllURLFn({event_id: eventId}), {camelize: true});
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createURL({event_id: eventId, type: editableType}), formData);
+      await indicoAxios.post(createURLFn({event_id: eventId}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -114,7 +89,7 @@ export default function FileTypeManager({
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURLFn({event_id: eventId, file_type_id: fileTypeId});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -125,7 +100,7 @@ export default function FileTypeManager({
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURLFn({event_id: eventId, file_type_id: fileTypeId});
 
     try {
       await indicoAxios.delete(url);
