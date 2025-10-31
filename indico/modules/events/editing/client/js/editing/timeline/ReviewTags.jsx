@@ -75,7 +75,7 @@ export default function ReviewTags({block, canEdit, tagOptions}) {
         </div>
       )}
       <div styleName="action-buttons">
-        {canEdit && !isOutdated && !editFormOpen && (
+        {canEdit && !isOutdated && (
           <Popup
             content={Translate.string('Edit tags')}
             position="bottom center"
