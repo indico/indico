@@ -87,7 +87,6 @@ export default function Timeline() {
         eventId={eventId}
       >
         {details.hasPublishedRevision && (
-          // TODO: (Michel) Check that removing the tags doesn't affect anything
           <FileDisplay
             fileTypes={fileTypes}
             files={lastRevisionWithFiles.files}
