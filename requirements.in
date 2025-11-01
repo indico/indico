@@ -61,6 +61,7 @@ sqlalchemy<2  # major upgrade
 terminaltables
 translitcodec
 ua-parser
+unidecode
 wallet-py3k
 weasyprint
 webargs
