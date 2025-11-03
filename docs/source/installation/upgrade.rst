@@ -85,7 +85,7 @@ changes, the command will simply do nothing.
     some tables in the database.  Unless you have very high activity
     on your instance, this lock can be acquired quickly, but if the
     upgrade command seems to hang for more than a few seconds, you can
-    restart uWSGI by running ``systemctl restart uwsgi.service`` as
+    restart uWSGI by running ``systemctl restart indico-uwsgi.service`` as
     *root* (in a separate shell, i.e. don't abort the upgrade command!)
     which will ensure nothing is accessing Indico for a moment.
 
