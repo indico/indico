@@ -11,8 +11,12 @@ from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
+
+
+NOT_CLONED_TYPE_SETTINGS = ('submission_enabled', 'editing_enabled')
 
 
 class EditingSettingsCloner(EventCloner):
@@ -27,10 +31,19 @@ class EditingSettingsCloner(EventCloner):
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._filetype_map = {}
+        self._clone_settings(new_event)
         self._clone_tags(new_event)
         self._clone_filetypes(new_event)
         self._clone_review_conditions(new_event)
         db.session.flush()
+
+    def _clone_settings(self, new_event):
+        editing_settings.set(new_event, 'editable_types', editing_settings.get(self.old_event, 'editable_types'))
+        for type_settings in editable_type_settings.values():
+            data = type_settings.get_all(self.old_event, no_defaults=True)
+            for name in NOT_CLONED_TYPE_SETTINGS:
+                data.pop(name, None)
+            type_settings.set_multi(new_event, data)
 
     def _clone_tags(self, new_event):
         attrs = get_attrs_to_clone(EditingTag)
