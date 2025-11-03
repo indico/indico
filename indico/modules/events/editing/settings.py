@@ -19,6 +19,9 @@ editing_settings = EventSettingsProxy('editing', {
 _defaults = {
     'self_assign_allowed': False,
     'anonymous_team': False,
+    # the following settings are not cloned since they are usually toggled at some point
+    # while an event happens. make sure to keep EditingSettingsCloner up to date when adding
+    # new settings that should also not be cloned
     'submission_enabled': False,
     'editing_enabled': False,
 }

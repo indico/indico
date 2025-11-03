@@ -31,6 +31,7 @@ Improvements
 - Add an option to request changes in bulk on the editable list (:issue:`7062`,
   :pr:`7100`)
 - Clone persons settings when cloning an event (:pr:`7158`)
+- Clone editable-type-specific settings when cloning an event (:pr:`7158`)
 
 Bugfixes
 ^^^^^^^^
