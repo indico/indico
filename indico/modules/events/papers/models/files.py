@@ -10,6 +10,7 @@ import posixpath
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage.models import StoredFileMixin
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, strict_str, text_to_repr
@@ -39,12 +40,26 @@ class PaperFile(StoredFileMixin, db.Model):
         index=True,
         nullable=True
     )
+    file_type_id = db.Column(
+        db.ForeignKey('event_paper_reviewing.file_types.id'),
+        index=True,
+        nullable=True
+    )
 
     _contribution = db.relationship(
         'Contribution',
         lazy=True,
         backref=db.backref(
             '_paper_files',
+            lazy=True
+        )
+    )
+    file_type = db.relationship(
+        lambda: PaperFileType,
+        lazy=False,
+        backref=db.backref(
+            'files',
+            cascade='all, delete-orphan',
             lazy=True
         )
     )
