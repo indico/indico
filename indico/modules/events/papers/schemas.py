@@ -9,7 +9,7 @@ from markupsafe import escape
 from marshmallow import post_dump
 from marshmallow.fields import Boolean, Decimal, Enum, Field, Function, Integer, List, Method, Nested, String
 
-from indico.core.marshmallow import mm
+from indico.core.marshmallow import fields, mm
 from indico.modules.events.contributions.schemas import BasicContributionSchema
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
@@ -233,12 +233,10 @@ class PaperDumpSchema(PaperSchema):
 class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFileType
-        # fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
-        #           'filename_template', 'url')
-        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable',
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
                   'filename_template', 'url')
 
-    # is_used = Function(lambda ft: PaperRevision.query.with_parent(ft).has_rows())
+    is_used = fields.Function(lambda ft: PaperFile.query.with_parent(ft).has_rows())
     url = Function(lambda ft: url_for('.api_edit_file_type',
                                              ft.event,
                                              file_type_id=ft.id,
