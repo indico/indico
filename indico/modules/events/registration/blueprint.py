@@ -314,3 +314,6 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_
                  'toggle_text', fields.RHEventRegistrationFormToggleTextState, defaults=defaults, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/move', 'move_text',
                  fields.RHEventRegistrationFormMoveText, defaults=defaults, methods=('POST',))
+
+_bp.add_url_rule('/api/regform-template-list', 'regform_template_list',
+                api_misc.RHListTemplateRegistrationForms, methods=('POST',))

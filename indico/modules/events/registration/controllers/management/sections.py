@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from indico.modules.events.registration.controllers.management import RHEventManageRegFormBase
-from indico.modules.forms.controllers.management.sections import (ManageRegFormSectionBaseMixin,
+from indico.modules.formify.controllers.management.sections import (ManageRegFormSectionBaseMixin,
                                                                          RegistrationFormAddSectionMixin,
                                                                          RegistrationFormModifySectionMixin,
                                                                          RegistrationFormMoveSection,

@@ -17,9 +17,9 @@ from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
-from indico.modules.forms.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.forms.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.formify.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
                                                      get_registered_event_persons, get_ticket_qr_code_data,

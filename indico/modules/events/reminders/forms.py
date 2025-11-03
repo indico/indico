@@ -13,7 +13,7 @@ from wtforms.widgets import TextArea
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.models.events import EventType
-from indico.modules.forms.models.forms import RegistrationForm
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders.models.reminders import ReminderType
 from indico.util.date_time import now_utc

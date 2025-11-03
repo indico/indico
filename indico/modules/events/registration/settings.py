@@ -7,7 +7,7 @@
 
 from indico.core.settings.converters import EnumConverter
 from indico.modules.designer import PageOrientation, PageSize
-from indico.modules.forms.models.items import PersonalDataType
+from indico.modules.formify.models.items import PersonalDataType
 from indico.modules.events.settings import EventSettingsProxy
 
 

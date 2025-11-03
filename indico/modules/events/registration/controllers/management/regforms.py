@@ -32,16 +32,16 @@ from indico.modules.events.registration.views import (WPEventManageRegistrationF
                                                       WPManageRegistration, WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
-from indico.modules.forms.clone import RegistrationFormCloner
-from indico.modules.forms.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
+from indico.modules.formify.clone import RegistrationFormCloner
+from indico.modules.formify.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
                                                                               ManageRegistrationFormsMixin,
                                                                               RegistrationFormCreateMixin,
                                                                               RegistrationFormDeleteMixin,
                                                                               RegistrationFormEditMixin,
                                                                               RegistrationFormModifyMixin)
-from indico.modules.forms.forms import RegistrationFormCreateForm, RegistrationFormCreateFromTemplateForm
-from indico.modules.forms.models.forms import Registration, RegistrationForm, RegistrationState
-from indico.modules.forms.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.formify.forms import RegistrationFormCreateForm, RegistrationFormCreateFromTemplateForm
+from indico.modules.formify.models.forms import Registration, RegistrationForm, RegistrationState
+from indico.modules.formify.models.items import PersonalDataType, RegistrationFormItemType
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
 from indico.web.args import use_kwargs

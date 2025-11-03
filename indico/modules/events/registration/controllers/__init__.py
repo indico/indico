@@ -10,8 +10,8 @@ from sqlalchemy.orm import defaultload
 from webargs.flaskparser import abort
 
 from indico.modules.events.payment import payment_event_settings
-from indico.modules.forms.fields.simple import KEEP_EXISTING_FILE_UUID
-from indico.modules.forms.models.forms import RegistrationForm
+from indico.modules.formify.fields.simple import KEEP_EXISTING_FILE_UUID
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
                                                      get_form_registration_data, load_registration_schema,
                                                      make_registration_schema, modify_registration,

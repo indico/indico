@@ -15,8 +15,8 @@ from indico.core.db import db
 from indico.core.storage.backend import get_storage
 from indico.modules.events import Event
 from indico.modules.events.registration import logger
-from indico.modules.forms.models.form_fields import RegistrationFormField, RegistrationFormFieldData
-from indico.modules.forms.models.forms import RegistrationForm
+from indico.modules.formify.models.form_fields import RegistrationFormField, RegistrationFormFieldData
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.util import close_registration
 from indico.modules.receipts.models.files import ReceiptFile

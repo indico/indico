@@ -1,0 +1,22 @@
+{% extends 'formify/management/_regform_base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block subtitle %}{% endblock %}
+
+{% block content %}
+    <div class="action-box highlight">
+        <div class="section">
+            <div class="icon icon-users"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Create a new registration form by selecting a template form below{% endtrans %}
+                </div>
+                {% trans -%}
+                    To create from a template form, specify the title for your new form and select a template
+                    registration form from the list below to use as the base for your new form.
+                {%- endtrans %}
+            </div>
+        </div>
+    </div>
+    {{ simple_form(form, submit=_('Create'), back_url=url_for('.manage_regform_list', event)) }}
+{% endblock %}

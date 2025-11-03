@@ -10,8 +10,8 @@ from sqlalchemy.orm import joinedload, undefer
 
 from indico.core import signals
 from indico.core.db import db
-from indico.modules.forms.models.form_fields import RegistrationFormFieldData
-from indico.modules.forms.models.items import PersonalDataType, RegistrationFormItem
+from indico.modules.formify.models.form_fields import RegistrationFormFieldData
+from indico.modules.formify.models.items import PersonalDataType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
                                                                      RegistrationVisibility)
 from indico.modules.events.registration.models.tags import RegistrationTag

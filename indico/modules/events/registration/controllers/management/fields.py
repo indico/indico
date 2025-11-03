@@ -8,7 +8,7 @@
 
 from indico.modules.events.registration.controllers.management import RHEventManageRegFormBase
 from indico.modules.events.registration.controllers.management.sections import RHEventManageRegFormSectionBase
-from indico.modules.forms.controllers.management.fields import (ManageRegFormFieldBaseMixin,
+from indico.modules.formify.controllers.management.fields import (ManageRegFormFieldBaseMixin,
                                                                        RegistrationFormAddFieldMixin,
                                                                        RegistrationFormAddTextMixin,
                                                                        RegistrationFormModifyFieldMixin,

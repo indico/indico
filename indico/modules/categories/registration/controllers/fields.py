@@ -15,7 +15,7 @@
 
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase
 from indico.modules.categories.registration.controllers.sections import RHCategoryManageRegFormSectionBase
-from indico.modules.forms.controllers.management.fields import (ManageRegFormFieldBaseMixin,
+from indico.modules.formify.controllers.management.fields import (ManageRegFormFieldBaseMixin,
                                                                        RegistrationFormAddFieldMixin,
                                                                        RegistrationFormAddTextMixin,
                                                                        RegistrationFormModifyFieldMixin,

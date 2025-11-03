@@ -20,7 +20,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.registration.controllers.management import RHEventManageRegFormsBase
-from indico.modules.forms.models.forms import RegistrationForm
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
 from indico.modules.events.util import ZipGeneratorMixin

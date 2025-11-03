@@ -37,7 +37,7 @@
                 <div class="group">
                     <button class="i-button icon-settings"
                             data-title="{% trans %}Manage registration managers{% endtrans %}"
-                            data-href="{{ url_for('event_registration.manage_registration_managers', target) }}"
+                            data-href="{{ url_for('.manage_registration_managers', target) }}"
                             data-ajax-dialog>
                         {%- trans %}Configure{% endtrans -%}
                     </button>
@@ -53,7 +53,7 @@
             {% if event is defined and event.type == 'conference' %}
                 <div class="toolbar">
                     <div class="group">
-                        <a href="{{ url_for('event_registration.manage_participant_list_preview', target) }}" class="i-button icon-list">
+                        <a href="{{ url_for('.manage_participant_list_preview', target) }}" class="i-button icon-list">
                             {%- trans %}Preview as participant{% endtrans -%}
                         </a>
                     </div>
@@ -61,7 +61,7 @@
             {% endif %}
             <div class="toolbar">
                 <div class="group">
-                    <a href="{{ url_for('event_registration.manage_regforms_display', target) }}" class="i-button icon-settings">
+                    <a href="{{ url_for('.manage_regforms_display', target) }}" class="i-button icon-settings">
                         {%- trans %}Customize{% endtrans -%}
                     </a>
                 </div>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="toolbar">
                     <div class="group">
-                        <a href="{{ url_for('event_registration.manage_registration_tags', target) }}" class="i-button icon-settings">
+                        <a href="{{ url_for('.manage_registration_tags', target) }}" class="i-button icon-settings">
                             {%- trans %}Configure{% endtrans -%}
                         </a>
                     </div>

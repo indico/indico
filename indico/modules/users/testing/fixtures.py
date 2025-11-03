@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from indico.modules.forms.models.form_fields import RegistrationFormField, RegistrationFormFieldData
+from indico.modules.formify.models.form_fields import RegistrationFormField, RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 
 
@@ -25,7 +25,7 @@ def dummy_reg_with_file_field(db, dummy_event, dummy_regform, dummy_user, create
         def field_data_with_reproducible_id(*args, **kwargs):
             return RegistrationFormFieldData(*args, **kwargs, id=730)
 
-        with patch('indico.modules.forms.models.form_fields.RegistrationFormFieldData',
+        with patch('indico.modules.formify.models.form_fields.RegistrationFormFieldData',
                    field_data_with_reproducible_id):
             _fill_form_field_with_data(form_field, field_data)
 

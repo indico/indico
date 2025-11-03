@@ -7,9 +7,9 @@
 
 import pytest
 
-from indico.modules.forms.models.form_fields import RegistrationFormField
-from indico.modules.forms.models.forms import RegistrationForm
-from indico.modules.forms.models.items import RegistrationFormSection
+from indico.modules.formify.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.forms import RegistrationForm
+from indico.modules.formify.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.util import create_personal_data_fields
 

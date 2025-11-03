@@ -12,7 +12,7 @@ from indico.web.views import WPJinjaMixin
 
 
 class WPEventManageRegistrationForm(WPEventManagement):
-    template_prefix = 'forms/'
+    template_prefix = 'formify/'
     bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_receipts.js',
                'module_receipts.css', 'module_forms.js', 'module_forms.css')
 

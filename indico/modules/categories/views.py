@@ -110,7 +110,7 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryManageRegistrationForm(WPCategoryManagement):
-    template_prefix = 'forms/'
+    template_prefix = 'formify/'
     bundles = ('module_categories.registration.js', 'module_forms.js', 'module_forms.css')
 
     def __init__(self, rh, category, active_menu_item=None, **kwargs):
