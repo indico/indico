@@ -154,9 +154,8 @@ def create_paper_revision(paper, submitter, files):
 
 def _make_paper_files(files, paper, revision):
     paper_files = []
-    for files_arr in files.values():
-        for file in files_arr:
-            print('filez arr', files_arr)
+    for file_type, files_list in files.items():
+        for file in files_list:
             filename = secure_client_filename(file.filename)
             content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
             paper_files.append(
@@ -168,6 +167,7 @@ def _make_paper_files(files, paper, revision):
                     md5=file.md5,
                     storage_backend=file.storage_backend,
                     storage_file_id=file.storage_file_id,
+                    file_type=file_type,
                     _contribution=paper.contribution,
                 )
             )

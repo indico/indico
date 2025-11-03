@@ -26,6 +26,10 @@ class PaperFileType(BaseFileType):
             {'schema': 'event_paper_reviewing'},
         )
 
+    # relationship backrefs:
+    # - files (PaperFile.file_type)
+    # - review_conditions (EditingReviewCondition.file_types)
+
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the file type."""
         return self.event.log(*args, meta={'paper_file_type_id': self.id}, **kwargs)
