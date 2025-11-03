@@ -39,8 +39,10 @@ import {
   ManagementPageBackButton,
   ListFilter,
 } from 'indico/react/components';
+import {FinalTextArea} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {PluralTranslate, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -49,7 +51,12 @@ import {natSortCompare} from 'indico/utils/sort';
 
 import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
-import {EditableType, GetNextEditableTitles} from '../../models';
+import {
+  EditableType,
+  EditingActionState,
+  EditingReviewAction,
+  GetNextEditableTitles,
+} from '../../models';
 
 import CommentButton from './CommentButton';
 import NextEditable from './NextEditable';
@@ -140,6 +147,7 @@ function EditableListDisplay({
   );
   const [activeRequest, setActiveRequest] = useState(null);
   const [assignmentConflict, setAssignmentConflict] = useState(null);
+  const [openJudgmentModal, setOpenJudgmentModal] = useState(null);
   const [skippedEditables, setSkippedEditables] = useState(0);
 
   const editorOptions = useMemo(
@@ -156,13 +164,19 @@ function EditableListDisplay({
   const judgmentOptions = [
     {
       key: 'accept',
-      value: 'accept',
+      value: EditingReviewAction.accept,
       text: Translate.string('Accept'),
       label: {color: 'green', empty: true, circular: true},
     },
     {
+      key: 'requestUpdate',
+      value: EditingReviewAction.requestUpdate,
+      text: Translate.string('Request changes'),
+      label: {color: 'red', empty: true, circular: true},
+    },
+    {
       key: 'reject',
-      value: 'reject',
+      value: EditingReviewAction.reject,
       text: Translate.string('Reject'),
       label: {color: 'black', empty: true, circular: true},
     },
@@ -621,10 +635,11 @@ function EditableListDisplay({
     checkedEditablesRequest(createCommentURL, data);
   };
 
-  const applyJudgment = async action => {
-    const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
+  const submitJudgment = async values => {
+    const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, values);
     if (rv) {
       setSkippedEditables(checked.length - rv.length);
+      setOpenJudgmentModal(null);
     }
   };
 
@@ -706,7 +721,7 @@ function EditableListDisplay({
                 value={null}
                 selectOnBlur={false}
                 selectOnNavigation={false}
-                onChange={(evt, {value}) => applyJudgment(value)}
+                onChange={(evt, {value}) => setOpenJudgmentModal(value)}
                 trigger={
                   <Button icon loading={activeRequest === 'judgment'}>
                     <Translate>Judge</Translate>
@@ -843,6 +858,19 @@ function EditableListDisplay({
           setAssignmentConflict(null);
         }}
       />
+      {openJudgmentModal && (
+        <JudgmentModal
+          action={openJudgmentModal}
+          numEditables={checkedContribsWithEditables.length}
+          numSkipped={
+            checkedContribsWithEditables.filter(
+              x => x.editable.state === EditingActionState[openJudgmentModal]
+            ).length
+          }
+          onSubmit={submitJudgment}
+          onClose={() => setOpenJudgmentModal(null)}
+        />
+      )}
     </>
   );
 }
@@ -870,4 +898,82 @@ EditableListDisplay.propTypes = {
   eventId: PropTypes.number.isRequired,
   management: PropTypes.bool.isRequired,
   canAssignSelf: PropTypes.bool.isRequired,
+};
+
+function JudgmentModal({action, numEditables, numSkipped, onSubmit, onClose}) {
+  const header = {
+    [EditingReviewAction.accept]: Translate.string('Accept latest revision'),
+    [EditingReviewAction.requestUpdate]: Translate.string('Request changes'),
+    [EditingReviewAction.reject]: Translate.string('Reject latest revision'),
+  }[action];
+
+  const handleSubmit = async values => {
+    await onSubmit({action, ...values});
+  };
+
+  if (numEditables === numSkipped) {
+    return (
+      <Confirm
+        open
+        size="tiny"
+        header={header}
+        content={Translate.string('All editables were skipped due to their status.')}
+        onCancel={onClose}
+        confirmButton={null}
+      />
+    );
+  }
+
+  return (
+    <FinalModalForm
+      id="bulk-judgment"
+      size="small"
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      header={header}
+      submitLabel={Translate.string('Judge')}
+      disabledUntilChange={false}
+    >
+      <Message info>
+        <PluralTranslate count={numEditables}>
+          <Singular>
+            You are about to apply a judgment to <Param name="numEditables" value={numEditables} />{' '}
+            editable.
+          </Singular>
+          <Plural>
+            You are about to apply a judgment to <Param name="numEditables" value={numEditables} />{' '}
+            editables.
+          </Plural>
+        </PluralTranslate>
+      </Message>
+      {numSkipped > 0 && (
+        <Message color="yellow">
+          <Icon name="warning sign" />
+          <PluralTranslate count={numSkipped}>
+            <Singular>
+              <Param name="numSkipped" value={numSkipped} /> editable will be skipped because of its
+              current status.
+            </Singular>
+            <Plural>
+              <Param name="numSkipped" value={numSkipped} /> editables will be skipped because of
+              their current status.
+            </Plural>
+          </PluralTranslate>
+        </Message>
+      )}
+      <FinalTextArea
+        name="comment"
+        label={Translate.string('Comment')}
+        placeholder={Translate.string('Leave a comment for the authors...')}
+      />
+    </FinalModalForm>
+  );
+}
+
+JudgmentModal.propTypes = {
+  action: PropTypes.oneOf(Object.values(EditingReviewAction)).isRequired,
+  numEditables: PropTypes.number.isRequired,
+  numSkipped: PropTypes.number.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

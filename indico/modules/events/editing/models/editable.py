@@ -160,6 +160,10 @@ class Editable(db.Model):
     def last_update_dt(self):
         return self.latest_revision.last_update_dt if self.latest_revision else None
 
+    @property
+    def has_publishable_files(self):
+        return self.latest_revision_with_files.has_publishable_files
+
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
 
