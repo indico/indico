@@ -18,6 +18,7 @@ class WPEventManageRegistrationForm(WPEventManagement):
 
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         self.regform = kwargs.get('regform')
+        self.url_prefix = 'event_registration'
         WPEventManagement.__init__(self, rh, event_, active_menu_item, **kwargs)
 
     @property

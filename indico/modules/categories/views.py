@@ -122,4 +122,4 @@ class WPCategoryManageRegistrationForm(WPCategoryManagement):
             return category.url
         # we don't want template-specific urls since those may be tied
         # to the previous category
-        return url_for('forms.manage_regform_list', category)
+        return url_for('categories.manage_regform_list', category)

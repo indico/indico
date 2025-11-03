@@ -57,17 +57,15 @@ class ManageRegistrationFormsAreaMixin:
 class ManageRegistrationFormsMixin(ManageRegistrationFormsAreaMixin):
     """List all registration forms for a taget event or category."""
 
+    view_class = None
+
     def _process(self):
         regforms = (RegistrationForm.query
                     .with_parent(self.target)
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
-        if self.object_type == 'event':
-            return WPEventManageRegistrationForm.render_template('management/regform_list.html', self.event,
-                                                             target=self.target, regforms=regforms)
-        else:
-            return WPCategoryManageRegistrationForm.render_template('management/regform_list.html', self.category,
-                                                                'registration', target=self.target, regforms=regforms)
+        return self.view_class.render_template('management/regform_list.html', self.target,
+                                                'registration', target=self.target, regforms=regforms)
 
 
 class RegistrationFormCreateMixin(ManageRegistrationFormsAreaMixin):
@@ -97,7 +95,7 @@ class RegistrationFormCreateMixin(ManageRegistrationFormsAreaMixin):
                         LogKind.positive, 'Registration',
                         f'Registration form "{regform.title}" has been created', session.user,
                         data=_get_regform_creation_log_data(regform))
-            return redirect(url_for('forms.manage_regform', regform))
+            return redirect(url_for('.manage_regform', regform))
         if self.object_type == 'event':
             return WPEventManageRegistrationForm.render_template('management/regform_create.html', self.event,
                                                              form=form, target=self.target, regform=None)
@@ -130,7 +128,7 @@ class RegistrationFormEditMixin(ManageRegistrationFormsAreaMixin):
         if form.validate_on_submit():
             update_registration_form_settings(self.regform, form.data, skip={'limit_registrations'})
             flash(_('Registration form has been successfully modified'), 'success')
-            return redirect(url_for('forms.manage_regform', self.regform))
+            return redirect(url_for('.manage_regform', self.regform))
         view_class = (WPCategoryManageRegistrationForm if self.object_type == 'category'
                       else WPEventManageRegistrationForm)
         return view_class.render_template('management/regform_edit.html', self.target, form=form,

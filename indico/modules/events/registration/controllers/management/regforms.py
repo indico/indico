@@ -54,6 +54,8 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHEventManageRegistrationForms(ManageRegistrationFormsMixin, RHEventManageRegFormsBase):
     """List all registrations forms for an event."""
 
+    view_class = WPEventManageRegistrationForm
+
 
 class RHEventRegistrationFormCreate(RegistrationFormCreateMixin, RHEventManageRegFormsBase):
     """Create a new registration form for an event."""
@@ -276,7 +278,7 @@ class RHRegistrationFormOpen(RHEventManageRegFormBase):
             else:
                 log_text = f'Registration form "{self.regform.title}" was reopened'
             self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
-        return redirect(url_for('forms.manage_regform', self.regform))
+        return redirect(url_for('.manage_regform', self.regform))
 
 
 class RHRegistrationFormClose(RHEventManageRegFormBase):
@@ -288,7 +290,7 @@ class RHRegistrationFormClose(RHEventManageRegFormBase):
         logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'
         self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
-        return redirect(url_for('forms.manage_regform', self.regform))
+        return redirect(url_for('.manage_regform', self.regform))
 
 
 class RHRegistrationFormSchedule(RHEventManageRegFormBase):
@@ -358,6 +360,6 @@ class RHRegistrationFormCreateFromTemplate(RHEventManageRegFormsBase):
             new_regform.log(EventLogRealm.management, LogKind.positive, 'Registration',
                             f'Registration form "{new_regform.title}" has been created from {cloned_from_message}',
                             session.user, data=data)
-            return redirect(url_for('forms.manage_regform', new_regform))
+            return redirect(url_for('.manage_regform', new_regform))
         return WPEventManageRegistrationForm.render_template('management/regform_create_from_template.html', self.event,
                                                              form=form, event=self.event)

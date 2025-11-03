@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    {% set back_url = url_for('forms.manage_regform', regform) if regform else url_for('.manage_regform_list', event) %}
+    {% set back_url = url_for('.manage_regform', regform) if regform else url_for('.manage_regform_list', event) %}
     {{ form_header(form) }}
     {{ form_rows(form, skip=form._special_fields) }}
     {% call form_fieldset(_('Price options')) %}

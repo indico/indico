@@ -18,6 +18,8 @@ from indico.modules.forms.controllers.management.regforms import (ManageRegistra
 class RHCategoryManageRegistrationForms(ManageRegistrationFormsMixin, RHCategoryManageRegformsBase):
     """List all registrations forms for a category."""
 
+    view_class = WPCategoryManageRegistrationForm
+
 
 class RHCategoryRegistrationFormCreate(RegistrationFormCreateMixin, RHCategoryManageRegformsBase):
     """Create a new registration form for a category."""

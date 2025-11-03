@@ -11,15 +11,18 @@ from indico.modules.events.registration.controllers.api import checkin_legacy as
 from indico.modules.events.registration.controllers.api import misc as api_misc
 from indico.modules.events.registration.controllers.compat import compat_registration
 from indico.modules.events.registration.controllers.management import (invitations, privacy, regforms, reglists, tags,
-                                                                       tickets)
+                                                                       tickets, fields, sections)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
+defaults = {'object_type': 'event'}
 
 # Management
+_bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHEventManageRegistrationForms,
+                 defaults=defaults)
 _bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', regforms.RHManageRegistrationFormsDisplay,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers', regforms.RHManageRegistrationManagers,
@@ -256,3 +259,58 @@ _compat_bp.add_url_rule('/registration/<path:path>', 'registration', compat_regi
 _compat_bp.add_url_rule('/registration/registrants', 'registrants', make_compat_redirect_func(_bp, 'participant_list'))
 _compat_bp.add_url_rule('!/confRegistrantsDisplay.py/list', 'registrants_modpython',
                         make_compat_redirect_func(_bp, 'participant_list', view_args_conv={'confId': 'event_id'}))
+
+
+# Registration form management
+_bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHEventManageRegistrationForms,
+                 defaults=defaults)
+_bp.add_url_rule('/manage/registration/create', 'create_regform', regforms.RHEventRegistrationFormCreate,
+                  defaults=defaults, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHEventRegistrationFormManage,
+                    defaults=defaults)
+
+# Single registration form management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit', 'edit_regform', regforms.RHEventRegistrationFormEdit,
+                    methods=('GET', 'POST'), defaults=defaults)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform',
+                 regforms.RHEventRegistrationFormDelete,
+                    methods=('POST',), defaults=defaults)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform',
+                 regforms.RHEventRegistrationFormModify,
+                    defaults=defaults)
+
+# Privacy
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'manage_registration_privacy_settings',
+                 privacy.RHEventRegistrationPrivacy, methods=('GET', 'POST'), defaults=defaults)
+
+# Regform edition: sections
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',
+                 sections.RHEventRegistrationFormAddSection, defaults=defaults, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',
+                 sections.RHEventRegistrationFormModifySection, defaults=defaults,
+                 methods=('PATCH', 'DELETE', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/toggle', 'toggle_section',
+                 sections.RHEventRegistrationFormToggleSection, defaults=defaults, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/move', 'move_section',
+                 sections.RHEventRegistrationFormMoveSection, defaults=defaults, methods=('POST',))
+
+# Regform edition: Fields
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
+                 fields.RHEventRegistrationFormAddField, defaults=defaults, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>', 'modify_field',
+                 fields.RHEventRegistrationFormModifyField, defaults=defaults, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
+                 'toggle_field', fields.RHEventRegistrationFormToggleFieldState, defaults=defaults,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
+                 'move_field', fields.RHEventRegistrationFormMoveField, defaults=defaults, methods=('POST',))
+
+# Regform edition: Static text
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text', 'add_text',
+                 fields.RHEventRegistrationFormAddText, defaults=defaults, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>', 'modify_text',
+                 fields.RHEventRegistrationFormModifyText, defaults=defaults, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/toggle',
+                 'toggle_text', fields.RHEventRegistrationFormToggleTextState, defaults=defaults, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/move', 'move_text',
+                 fields.RHEventRegistrationFormMoveText, defaults=defaults, methods=('POST',))

@@ -2,7 +2,7 @@
 {% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows %}
 
 {% block back_button_url -%}
-    {{ url_for('forms.manage_regform', regform) }}
+    {{ url_for('.manage_regform', regform) }}
 {%- endblock %}
 
 {% block subtitle %}
