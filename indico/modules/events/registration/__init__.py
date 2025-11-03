@@ -63,7 +63,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
         yield SideMenuItem('participants', _('Participants'), url_for('event_participation.manage', event),
                            section='organization')
     if event.has_feature('registration'):
-        yield SideMenuItem('registration', _('Registration'), url_for('event_registration.manage_regform_list', event),
+        yield SideMenuItem('registration', _('Registration'), url_for('forms.manage_regform_list', event),
                            section=registration_section)
 
 
@@ -102,8 +102,8 @@ def _inject_event_header(event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.events.registration.models.registrations import Registration
+    from indico.modules.forms.models.forms import RegistrationForm
 
     def _visible_registration(event):
         if not event.has_feature('registration'):
@@ -227,9 +227,10 @@ def _get_management_permissions(sender, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_registration_cloners(sender, **kwargs):
     from indico.modules.events.registration import clone
+    from indico.modules.forms import clone as regform_clone
     yield clone.RegistrationTagCloner
-    yield clone.RegistrationFormCloner
     yield clone.RegistrationCloner
+    yield regform_clone.RegistrationFormCloner
 
 
 class RegistrationFeature(EventFeature):

@@ -11,14 +11,13 @@ from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDi
 from indico.web.views import WPJinjaMixin
 
 
-class WPManageRegistration(WPEventManagement):
-    template_prefix = 'events/registration/'
+class WPEventManageRegistrationForm(WPEventManagement):
+    template_prefix = 'forms/'
     bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_receipts.js',
-               'module_receipts.css')
+               'module_receipts.css', 'module_forms.js', 'module_forms.css')
 
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         self.regform = kwargs.get('regform')
-        self.registration = kwargs.get('registration')
         WPEventManagement.__init__(self, rh, event_, active_menu_item, **kwargs)
 
     @property
@@ -31,6 +30,14 @@ class WPManageRegistration(WPEventManagement):
             if regform and regform.is_participation:
                 return 'participants'
         return 'registration'
+
+
+class WPManageRegistration(WPEventManageRegistrationForm):
+    template_prefix = 'events/registration/'
+
+    def __init__(self, rh, event_, active_menu_item=None, **kwargs):
+        self.registration = kwargs.get('registration')
+        WPEventManageRegistrationForm.__init__(self, rh, event_, active_menu_item, **kwargs)
 
 
 class WPManageRegistrationStats(WPManageRegistration):

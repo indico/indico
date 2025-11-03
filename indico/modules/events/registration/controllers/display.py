@@ -21,11 +21,11 @@ from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
-from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
+from indico.modules.forms.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
                                                                    RegistrationFormItem)
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.forms.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (create_registration, generate_ticket,

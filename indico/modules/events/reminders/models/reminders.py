@@ -20,7 +20,7 @@ from indico.modules.events.contributions.models.persons import ContributionPerso
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.models.events import EventType
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.forms.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, registrations_tags_table
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import get_reminder_email_tpl

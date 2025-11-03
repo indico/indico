@@ -13,10 +13,10 @@ from werkzeug.exceptions import Forbidden, UnprocessableEntity
 from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationForm,
                                                                     RHRegistrationWithdraw)
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.forms import ModificationMode
+from indico.modules.forms.models.form_fields import RegistrationFormField
+from indico.modules.forms.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.modules.forms.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_registration
 from indico.testing.util import extract_emails
