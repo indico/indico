@@ -65,3 +65,8 @@ persons_settings = EventSettingsProxy('persons', {
     'default_search_external': False,  # Enable "Users with no Indico account" by default
     'show_titles': True,  # Whether to show titles for people in the event
 }, converters={'custom_persons_mode': EnumConverter(CustomPersonsMode)})
+
+
+@signals.event.cloned.connect
+def _event_cloned(old_event, new_event, **kwargs):
+    persons_settings.set_multi(new_event, persons_settings.get_all(old_event, no_defaults=True))
