@@ -134,15 +134,6 @@
                 </div>
             </div>
             <div class="toolbar">
-                <!-- TODO: (Ajob) Remove after new button works properly -->
-                <a href="#" class="ui button"
-                    data-title="{% trans title=contribution.title %}Submit paper for &quot;{{ title }}&quot;{% endtrans %}"
-                    data-href="{{ url_for('papers.submit_revision', contribution) }}"
-                    data-redirect-after="{{ url_for('papers.paper_timeline', contribution) }}"
-                    data-confirm-close-unsaved
-                    data-ajax-dialog>
-                    {%- trans %}Submit paper{% endtrans -%}
-                </a>
                 <ind-paper-submission-button
                     event-id="{{ contribution.event_id }}"
                     contribution-id="{{ contribution.id }}"
