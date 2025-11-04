@@ -44,8 +44,10 @@ _bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'dow
                  display.RHDownloadPaperFile)
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
+_bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit-single', 'submit_revision_single',
+                 display.RHSubmitPaperSingle, methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit', 'submit_revision',
-                 display.RHSubmitPaper, methods=('GET', 'POST', 'PUT'))
+                 display.RHSubmitPaper, methods=('GET', 'POST'))
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/upload', 'api_upload',
                  display.RHPapersUploadFile, methods=('POST',))
 
