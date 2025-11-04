@@ -351,12 +351,6 @@ class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
     def _process_DELETE(self):
         if PaperFile.query.with_parent(self.file_type).has_rows():
             raise UserValueError(_('Cannot delete file type which already has files'))
-        if self.file_type.publishable:
-            is_last = not (PaperFileType.query
-                           .with_parent(self.event)
-                           .filter(PaperFileType.publishable, PaperFileType.id != self.file_type.id)
-                           .has_rows())
-            if is_last:
-                raise UserValueError(_('Cannot delete the only publishable file type'))
+
         delete_file_type(self.file_type)
         return '', 204
