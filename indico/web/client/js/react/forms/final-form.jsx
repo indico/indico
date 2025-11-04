@@ -9,7 +9,7 @@ import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
-import {Field, Form as FinalForm, useField} from 'react-final-form';
+import {Field, Form as FinalForm, FormSpy, useField} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
@@ -299,4 +299,16 @@ FinalModalForm.defaultProps = {
   className: null,
   extraActions: null,
   style: null,
+};
+
+export function DebugFormSpy({subscription = {values: true}}) {
+  return (
+    <FormSpy subscription={subscription ?? undefined}>
+      {fprops => <pre>{JSON.stringify(fprops, null, 2)}</pre>}
+    </FormSpy>
+  );
+}
+
+DebugFormSpy.propTypes = {
+  subscription: PropTypes.object,
 };
