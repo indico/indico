@@ -152,27 +152,26 @@ def create_paper_revision(paper, submitter, files):
     return revision
 
 
-def _make_paper_files(files, paper, revision):
-    paper_files = []
-    for file_type, files_list in files.items():
-        for file in files_list:
-            filename = secure_client_filename(file.filename)
-            content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
-            paper_files.append(
-                PaperFile(
-                    filename=filename,
-                    content_type=content_type,
-                    paper_revision=revision,
-                    size=file.size,
-                    md5=file.md5,
-                    storage_backend=file.storage_backend,
-                    storage_file_id=file.storage_file_id,
-                    file_type=file_type,
-                    _contribution=paper.contribution,
-                )
-            )
+def _make_paper_file(file, paper, revision, file_type=None):
+    filename = secure_client_filename(file.filename)
+    content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
+    return PaperFile(
+        filename=filename,
+        content_type=content_type,
+        paper_revision=revision,
+        size=file.size,
+        md5=file.md5,
+        storage_backend=file.storage_backend,
+        storage_file_id=file.storage_file_id,
+        _contribution=paper.contribution,
+        file_type=file_type,
+    )
 
-    return paper_files
+
+def _make_paper_files(files, paper, revision):
+    return [_make_paper_file(f, paper, revision, file_type)
+            for file_type, files_list in files.items()
+            for f in files_list]
 
 
 @no_autoflush
