@@ -32,6 +32,7 @@ interface FileTypeManagerProps {
   getAllURLFn: (params?) => string;
   createURLFn: (params?) => string;
   editURLFn: (params?) => string;
+  allowDeleteLastType?: boolean;
 }
 
 interface FileTypeManagerState {
@@ -70,6 +71,7 @@ export default function FileTypeManager({
   getAllURLFn,
   createURLFn,
   editURLFn,
+  allowDeleteLastType = false,
 }: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {
@@ -124,7 +126,10 @@ export default function FileTypeManager({
   };
 
   const canDelete = fileType =>
-    !fileType.isUsedInCondition && !fileType.isUsed && !isLastPublishable(fileType.id);
+    !fileType.isUsedInCondition &&
+    !fileType.isUsed &&
+    (allowDeleteLastType || !isLastPublishable(fileType.id));
+
   const renderPopupContent = fileType => {
     if (canDelete(fileType)) {
       return null;
