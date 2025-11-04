@@ -5,9 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
+
 from markupsafe import escape
-from marshmallow import post_dump
+from marshmallow import ValidationError, post_dump, validates
 from marshmallow.fields import Boolean, Decimal, Enum, Field, Function, Integer, List, Method, Nested, String
+from sqlalchemy import func
 
 from indico.core.marshmallow import fields, mm
 from indico.modules.events.contributions.schemas import BasicContributionSchema
@@ -23,7 +26,8 @@ from indico.modules.events.papers.models.reviews import PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.modules.users.schemas import BasicUserSchema
-from indico.util.i18n import orig_string
+from indico.util.i18n import _, orig_string
+from indico.util.marshmallow import not_empty
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
@@ -247,6 +251,41 @@ class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
         if many:
             data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
         return data
+
+
+class PaperFileTypeArgs(mm.Schema):
+    class Meta:
+        rh_context = ('event', 'file_type', 'editable_type')
+
+    name = fields.String(required=True, validate=not_empty)
+    filename_template = fields.String(validate=not_empty, allow_none=True)
+    extensions = fields.List(fields.String(validate=not_empty))
+    allow_multiple_files = fields.Boolean()
+    required = fields.Boolean()
+    publishable = fields.Boolean()
+
+    @validates('name')
+    def _check_for_unique_file_type_name(self, name, **kwargs):
+        event = self.context['event']
+        file_type = self.context['file_type']
+        query = PaperFileType.query.with_parent(event).filter(
+            func.lower(PaperFileType.name) == name.lower()
+        )
+        if file_type:
+            query = query.filter(PaperFileType.id != file_type.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+    @validates('filename_template')
+    def _check_for_correct_filename_template(self, template, **kwargs):
+        if template is not None and '.' in template:
+            raise ValidationError(_('Filename template cannot include dots'))
+
+    @validates('extensions')
+    def _check_for_correct_extensions_format(self, extensions, **kwargs):
+        for extension in extensions:
+            if re.match(r'^[*.]+', extension):
+                raise ValidationError(_('Extensions cannot have leading dots'))
 
 
 paper_schema = PaperSchema()
