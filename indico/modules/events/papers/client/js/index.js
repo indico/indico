@@ -155,6 +155,7 @@ customElements.define(
             getAllURLFn={fileTypeURL}
             editURLFn={editFileTypeURL}
             createURLFn={createFileTypeURL}
+            allowDeleteLastType
           />,
           this
         );
