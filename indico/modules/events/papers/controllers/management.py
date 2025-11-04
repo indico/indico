@@ -11,7 +11,6 @@ from werkzeug.exceptions import NotFound
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.editing.controllers.base import TokenAccessMixin
-from indico.modules.events.editing.schemas import EditableFileTypeArgs
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
@@ -20,6 +19,7 @@ from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
                                                 PaperTeamsForm, make_competences_form)
+from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperReview, PaperReviewType
@@ -28,7 +28,7 @@ from indico.modules.events.papers.operations import (close_cfp, create_competenc
                                                      delete_file_type, open_cfp, schedule_cfp, set_deadline,
                                                      set_reviewing_state, update_competences, update_file_type,
                                                      update_team_members)
-from indico.modules.events.papers.schemas import PaperFileTypeSchema
+from indico.modules.events.papers.schemas import PaperFileTypeArgs, PaperFileTypeSchema
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
@@ -327,7 +327,7 @@ class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
 class RHPapersCreateFileType(RHManageEventBase):
     """Create a new file type."""
 
-    @use_rh_args(EditableFileTypeArgs)
+    @use_rh_args(PaperFileTypeArgs)
     def _process(self, data):
         file_type = create_new_file_type(self.event, **data)
         return PaperFileTypeSchema().jsonify(file_type)
@@ -343,18 +343,14 @@ class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
                           .filter_by(id=request.view_args['file_type_id'])
                           .first_or_404())
 
-    @use_rh_args(EditableFileTypeArgs, partial=True)
+    @use_rh_args(PaperFileTypeArgs, partial=True)
     def _process_PATCH(self, data):
         update_file_type(self.file_type, **data)
         return PaperFileTypeSchema().jsonify(self.file_type)
 
     def _process_DELETE(self):
-        # TODO: (Ajob) Fix the revisionfile logic
-        # if EditingRevisionFile.query.with_parent(self.file_type).has_rows():
-        #     raise UserValueError(_('Cannot delete file type which already has files'))
-
-        # if self.file_type.review_conditions:
-        #     raise UserValueError(_('Cannot delete file type which is used in a review condition'))
+        if PaperFile.query.with_parent(self.file_type).has_rows():
+            raise UserValueError(_('Cannot delete file type which already has files'))
         if self.file_type.publishable:
             is_last = not (PaperFileType.query
                            .with_parent(self.event)
