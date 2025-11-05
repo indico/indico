@@ -7,7 +7,7 @@
 
 IndicoUI.Widgets = {
   /**
-        @namespace Generic, resusable, components
+        @namespace Generic, reusable, components
         */
   Generic: {
     /**

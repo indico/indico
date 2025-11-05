@@ -204,7 +204,7 @@ def chmod_umask(path, execute=False):
     # 'others' to access it at all. additionally, the temporary 027
     # umask results in files being created with 640/750 and thus there's
     # no risk of security issues/bugs in case the race condition actually
-    # happens (which is extremely unlikely anyawy)
+    # happens (which is extremely unlikely anyway)
     umask = os.umask(0o027)
     os.umask(umask)
     default = 0o777 if execute else 0o666

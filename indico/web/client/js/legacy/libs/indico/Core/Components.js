@@ -51,7 +51,7 @@ var IndicoUI = {
     element.setStyle('zIndex', this.__globalLayerLevel + 3000);
   },
   /**
-   * Marks a layer level as unused, call this funtion
+   * Marks a layer level as unused, call this function
    * when closing an element
    */
   unAssignLayerLevel: function(element) {

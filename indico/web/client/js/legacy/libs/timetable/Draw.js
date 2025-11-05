@@ -289,7 +289,7 @@ type(
       this.block.set(this._getRightSideDecorators(), this._blockDescription());
 
       // This is a special case, when users shows contribution details it doesn't
-      // apply to poster sessions. Instead add some grpahical elements to indicate
+      // apply to poster sessions. Instead add some graphical elements to indicate
       // that this sessions contains several contributions.
       if (this.detailLevel == 'contribution' && this.eventData.isPoster && this.height > 30) {
         var pileDiv = this.createPileEffect();
@@ -1199,7 +1199,7 @@ type(
         var dayCanvas = Html.div({style: {position: 'relative', height: pixels(h)}}, elements);
 
         // Add a div containing the date
-        var headerStyle = {width: pixels(self.width - 10)}; // substract the padding
+        var headerStyle = {width: pixels(self.width - 10)}; // subtract the padding
         if (self.printableVersion) {
           headerStyle.textAlign = 'center';
           headerStyle.borderBottom = '0';

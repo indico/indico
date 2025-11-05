@@ -84,7 +84,7 @@ import {$T} from 'indico/utils/i18n';
         // a preview hash (since we ensure this in the initial/fake hashchange event on page load)
         history.back();
       } else {
-        // old browsers with no pushState support: the # wil stay which is a bit ugly,
+        // old browsers with no pushState support: the # will stay which is a bit ugly,
         // but let's not break history (we WILL "spam" history though, but that's what you
         // get when using ancient browsers)
         location.hash = '';

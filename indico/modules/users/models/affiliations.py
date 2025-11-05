@@ -124,7 +124,7 @@ def _mappers_configured():
     # a logarithmic-type scale is the most useful. In the end, the best results were obtained by the following
     # reciprocal function:
     #                                           P = 11 - 100/(x + 10)
-    #      where x is the percentage of occurences of an affiliation
+    #      where x is the percentage of occurrences of an affiliation
     # Since x = 100c / N, where c is the count and N is the total number of objects, the formula can be
     # rewritten as:
     #                                           P = 11 - 10N/(10c + N)

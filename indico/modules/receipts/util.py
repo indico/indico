@@ -291,7 +291,7 @@ def _get_default_value(field):
 def get_dummy_preview_data(custom_fields: dict, custom_fields_values: dict | None = None) -> dict:
     """Get dummy preview data for rendering a document template.
 
-    Most document templates are written inthe context of a category, so it is not
+    Most document templates are written in the context of a category, so it is not
     possible to use real event/registration data for previewing it. This function
     serializes dummy data that can be used instead.
     """

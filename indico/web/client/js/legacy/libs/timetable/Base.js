@@ -917,7 +917,7 @@ type(
 
       if (msg == 'OWNER_END_DATE_EXTENDED') {
         // Make sure that something changed, otherwise the
-        // warning will be supressed
+        // warning will be suppressed
         if (endTime != finalTime) {
           // slice(1) to ignore first value
           return concat(entry.slice(1), [endTime, title]);

@@ -61,7 +61,7 @@ def downgrade():
         else:
             # The 'room acls' revision downgrade always creates those attributes, but if the database does
             # not contain any locations, those attributes did not exist before the upgrade step of this
-            # revision and cannot exist when perfoming this downgrade since there is no location to link
+            # revision and cannot exist when performing this downgrade since there is no location to link
             # them to. But when there are no locations no rooms can exist, so these attributes were always
             # unused anyway.
             conn.execute('DELETE FROM roombooking.room_attributes')

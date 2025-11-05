@@ -388,9 +388,9 @@ def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None, ow
     """Create property that overrides an attribute coming from parent.
 
     In order to ensure setter functionality at creation time, ``parent`` must be
-    initialized before the overriden attribute.
+    initialized before the overridden attribute.
 
-    :param attr_name: The name of the attribute to be overriden.
+    :param attr_name: The name of the attribute to be overridden.
     :param parent_name: The name of the attribute from which to override the attribute.
     :param fget: Getter for own property
     :param check_attr_name: The name of the attribute to check; by default this is `attr_name`,

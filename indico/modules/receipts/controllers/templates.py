@@ -49,7 +49,7 @@ class ReceiptAreaMixin:
 
     @property
     def object_type(self):
-        """Figure out whether we're targetting an event or category, based on URL info."""
+        """Figure out whether we're targeting an event or category, based on URL info."""
         return request.view_args['object_type']
 
     @property

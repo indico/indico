@@ -152,7 +152,7 @@ class SettingsProxyBase:
     @property
     def _cache(self):
         if not self.allow_cache_outside_request and not has_request_context():
-            return {}  # new dict everytime, this effectively disables the cache
+            return {}  # new dict every time, this effectively disables the cache
         try:
             return g.settings_cache
         except AttributeError:

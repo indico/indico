@@ -75,7 +75,7 @@ export default class CustomElementBase extends HTMLElement {
    * `.toDateString()` method (it doesn't have to be a `Date` object),
    * it is replaced with an empty string.
    *
-   * The `String` attributes are normal attirbutes, and their value
+   * The `String` attributes are normal attributes, and their value
    * is always string. Any value set on this attribute will be coerced
    * into string.
    *

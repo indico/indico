@@ -47,7 +47,7 @@ class AutoLinkExtension(markdown.extensions.Extension):
 
 
 class AutoLinkInlineProcessor(markdown.inlinepatterns.InlineProcessor):
-    # exclude subsitution within links (nesting)
+    # exclude substitution within links (nesting)
     ANCESTOR_EXCLUDES = ('a',)
 
     def __init__(self, pattern: str, md: markdown.Markdown, url: str):

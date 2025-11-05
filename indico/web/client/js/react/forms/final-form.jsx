@@ -237,7 +237,7 @@ FinalModalForm.propTypes = {
   validate: PropTypes.func,
   /** The size of the modal. */
   size: PropTypes.oneOf(['mini', 'tiny', 'small', 'standard', 'large', 'fullscreen']),
-  /** Whether the modal's content is scolling. */
+  /** Whether the modal's content is scrolling. */
   scrolling: PropTypes.bool,
   /** The header of the modal (typically a title). */
   header: PropTypes.node.isRequired,

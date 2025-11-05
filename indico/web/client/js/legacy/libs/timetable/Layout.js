@@ -156,26 +156,26 @@ type('TimetableLayoutManager', [], {
       }
 
       if (correctlyAssigned(block)) {
-        // The block has already got its prefered position
+        // The block has already got its preferred position
         continue;
       }
 
-      var preferedCol = lastAssigned[getLastAssignedId(block)].col;
-      var existingBlock = assigned[preferedCol];
+      var preferredCol = lastAssigned[getLastAssignedId(block)].col;
+      var existingBlock = assigned[preferredCol];
 
-      // If there's no block on the prefered column
+      // If there's no block on the preferred column
       if (!existingBlock) {
         // if the block starts at the current position, it is safe to move it to a free place
-        // otherwise we can overlap an exisiting one
-        if (block.start == currentPos && preferedCol < _(assigned).size()) {
-          reassign(block, preferedCol);
+        // otherwise we can overlap an existing one
+        if (block.start == currentPos && preferredCol < _(assigned).size()) {
+          reassign(block, preferredCol);
         }
       } else if (
         !exists(existingBlock.sessionId) ||
         !exists(lastAssigned[existingBlock.sessionId]) ||
         numAssignedBlocks(block.sessionId) > numAssignedBlocks(existingBlock.sessionId)
       ) {
-        // The block currently placed in the prefered column has either no prefered column
+        // The block currently placed in the preferred column has either no preferred column
         // or has a preferred column but has fewer previous placed session slots (this
         // gives lower priority).
 
@@ -252,7 +252,7 @@ type('IncrementalLayoutManager', ['TimetableLayoutManager'], {
 
     var algData = {
       grid: [], // Positions of all the time lines
-      assigned: {}, // colums bound to blocks
+      assigned: {}, // columns bound to blocks
       blocks: {}, // Dict of blocks
       active: 0, // number of of active time blocks
       currentGroup: [], // current processed group

@@ -21,7 +21,7 @@ describe('createDateParser', () => {
     ['mm/dd/yyyy', '02/11/2024'],
     ['dd.mm.yyyy.', '11.02.2024.'],
   ])(
-    'Given a format string like %s, when passsed a formatted date like %s, it returns a Date object for that date',
+    'Given a format string like %s, when passed a formatted date like %s, it returns a Date object for that date',
     (formatString, formattedDate) => {
       const parse = createDateParser(formatString);
       const actual = parse(formattedDate);

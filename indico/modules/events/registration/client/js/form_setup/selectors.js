@@ -42,7 +42,7 @@ const isItemStaticText = createSelector(
   item => item.inputType === 'label'
 );
 
-/** Select the correct URL for an item action dependin on whether it's static text or a field. */
+/** Select the correct URL for an item action depending on whether it's static text or a field. */
 export const pickItemURL = createSelector(
   isItemStaticText,
   isStaticText => (textURL, fieldURL) => (isStaticText ? textURL : fieldURL)

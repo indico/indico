@@ -704,7 +704,7 @@ class Registration(db.Model):
         """Update the state of the registration for a given action.
 
         The accepted kwargs are the possible actions. ``True`` means that the
-        action occured and ``False`` that it was reverted.
+        action occurred and ``False`` that it was reverted.
         """
         if sum(action is not None for action in (approved, paid, rejected, withdrawn)) > 1:
             raise Exception('More than one action specified')
@@ -774,7 +774,7 @@ class Registration(db.Model):
     def has_conflict(self):
         """Check if there are other valid registrations for the same user.
 
-        This is intended for cases where this registration is currenly invalid
+        This is intended for cases where this registration is currently invalid
         (rejected or withdrawn) to determine whether it would be acceptable to
         restore it.
         """

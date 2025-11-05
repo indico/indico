@@ -244,7 +244,7 @@ Internal Changes
 - Expose cloning details such as object mappings in the ``event.cloned`` signal (:pr:`6858`)
 - Expose cloning details in the ``contribution.created`` and ``subcontribution.created``
   signals (:pr:`6858`)
-- Add the id and color of registration tags on the Checkin API endpoint for registation
+- Add the id and color of registration tags on the Checkin API endpoint for registration
   data (:pr:`6874`, thanks :user:`duartegalvao`)
 - Allow disabling arbitrary dates in date picker / calendar controls (:pr:`6905`, thanks
   :user:`foxbunny`)
@@ -2912,7 +2912,7 @@ Major Features
   so they can be restricted to be editable/visible only for event
   managers or authors/submitters instad of anyone who can see the
   abstract/contribution
-- Provide new interface to import registations/contributions from a CSV
+- Provide new interface to import registrations/contributions from a CSV
   file (:issue:`3144`)
 - Rework how access/permissions are managed. Now all access and management
   privileges can be assigned from a single place on the protection

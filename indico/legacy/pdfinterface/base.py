@@ -345,8 +345,8 @@ def _do_nothing(canvas, doc):
 class DocTemplateWithTOC(SimpleDocTemplate):
     def __init__(self, indexedFlowable, filename, firstPageNumber=1, include_toc=False, **kw):
         """Toc is the TableOfContents object
-        indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
-            the sub-dictionnary have two key:
+        indexedFlowable is a dict with flowables as key and a dict as value.
+            the sub-dicts have two key:
                 text: the text which will br print in the table
                 level: the level of the entry( modifying the indentation and the police.
         """

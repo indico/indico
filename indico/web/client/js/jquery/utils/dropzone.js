@@ -164,7 +164,7 @@ import 'dropzone/dist/dropzone.css';
     };
 
     // include the csrf token in case the dropzone is submitting data to a
-    // seperate endpoint than the form's action
+    // separate endpoint than the form's action
     if (options.url) {
       options.params = {
         csrf_token: $form.find('#csrf_token').val(),

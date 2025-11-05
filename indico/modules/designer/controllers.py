@@ -111,7 +111,7 @@ class TemplateDesignerMixin:
 
     @property
     def object_type(self):
-        """Figure out whether we're targetting an event or category, based on URL info."""
+        """Figure out whether we're targeting an event or category, based on URL info."""
         return request.view_args['object_type']
 
     @property
@@ -384,7 +384,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
 
         A template can be used as a backside if:
             - frontside != backside
-            - backside does't already have its own backside
+            - backside doesn't already have its own backside
             - it has the same size as the frontside
             - the templates are linked to the same registration form or
               at least one template is not linked to any registration form

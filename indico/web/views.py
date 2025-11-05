@@ -113,7 +113,7 @@ class WPJinjaMixin:
     def render_template(cls, template_name_or_list=None, *wp_args, **context):
         """Render a jinja template inside the WP.
 
-        :param template_name_or_list: the name of the template - if unsed, the
+        :param template_name_or_list: the name of the template - if unset, the
                                       `_template` attribute of the class is used.
                                       can also be a list containing multiple
                                       templates (the first existing one is used)

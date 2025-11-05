@@ -68,7 +68,7 @@ class PaymentPluginMixin:
     def can_be_modified(self, user, event):
         """Check if the user is allowed to enable/disable/modify the payment method.
 
-        :param user: the :class:`.User` repesenting the user
+        :param user: the :class:`.User` representing the user
         :param event: the :class:`Event`
         """
         return event.can_manage(user)

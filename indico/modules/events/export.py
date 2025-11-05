@@ -61,7 +61,7 @@ _skip = object()
 
 class _NoAliasesDumper(yaml.Dumper):
     def ignore_aliases(self, *args, **kwargs):
-        # Never generate `&id...` refs for duplicte data, it's not a huge
+        # Never generate `&id...` refs for duplicate data, it's not a huge
         # space saver, but makes things harder to read.
         return True
 
@@ -943,7 +943,7 @@ class EventImporter:
     def _get_file_storage_path(self, id_, filename, scope, tablename):
         # we use a generic path to store all imported files since we
         # are on the table level here and thus cannot use relationships
-        # and the orignal models' logic to construct paths
+        # and the original models' logic to construct paths
         scope_type, scope_id = self.scope_id_map[scope]
         path_segments = [scope_type, strict_str(scope_id), 'imported', tablename]
         filename = secure_filename(filename, 'file')

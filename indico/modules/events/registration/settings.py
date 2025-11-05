@@ -57,7 +57,7 @@ class RegistrationSettingsProxy(EventSettingsProxy):
             form_columns = self.get(event, 'participant_list_form_columns')
             if columns:
                 # The int values are automatically converted to unicode when saved
-                # as JSON. Do it explicitely so that it keeps working if the
+                # as JSON. Do it explicitly so that it keeps working if the
                 # behavior changes and makes sense with the code above.
                 form_columns[str(form.id)] = columns
             else:

@@ -53,7 +53,7 @@ export default class NonBookablePeriods extends React.Component {
    * 2. After form submission when the data in the local state store is refreshed.
    *
    * The date range items in the 'value' prop will be given an Symbol('id') field,
-   * which will be used internally te track the UI-data association. This is usually
+   * which will be used internally the track the UI-data association. This is usually
    * missing/destroyed in the cases mentioned before.
    *
    * This mutates the objects in-place, and relies on the fact that the rest of the app

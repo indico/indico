@@ -197,7 +197,7 @@ class RHAutoLinkerConfig(RHAdminBase):
 
 
 class RHDataRetentionSettings(RHAdminBase):
-    """Manage minimun and maximum data retention period in the admin area."""
+    """Manage minimum and maximum data retention period in the admin area."""
 
     def _process(self):
         form = DataRetentionSettingsForm(obj=FormDefaults(**data_retention_settings.get_all()))

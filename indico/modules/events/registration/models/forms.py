@@ -539,7 +539,7 @@ class RegistrationForm(db.Model):
         # Exceptional modification permissions on the registration always allows modification
         elif registration.modification_end_dt is not None and not registration.modification_deadline_passed:
             return True
-        # Any other modification requires the registration form's deadline to be unsed or in the future
+        # Any other modification requires the registration form's deadline to be unset or in the future
         elif not self.is_modification_open:
             return False
         # And of course the configured modification restrictions need to be met as well

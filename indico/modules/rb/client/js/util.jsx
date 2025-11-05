@@ -47,7 +47,7 @@ function calculateDefaultEndDate(startDate, type, number, interval) {
     // 5 occurrences
     dt.add(4 * number, 'weeks');
   } else {
-    // 7 occurences
+    // 7 occurrences
     dt.add(6 * number, 'months');
   }
   return isMoment ? dt : serializeDate(dt);

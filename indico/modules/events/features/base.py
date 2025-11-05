@@ -14,7 +14,7 @@ class EventFeature:
 
     To create a new feature, subclass this class and register
     it using the `event.get_feature_definitions` signal.
-    Feature classes are never instatiated.
+    Feature classes are never instantiated.
 
     You have multiple ways of requiring a feature to be enabled:
 

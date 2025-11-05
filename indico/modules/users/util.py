@@ -408,7 +408,7 @@ def merge_users(source, target, force=False):
 
     if target.identities:
         # In case the target user has identities, make sure they aren't pending as
-        # otherwise logging in would fail (a pending user is not suppoed to have an
+        # otherwise logging in would fail (a pending user is not supposed to have an
         # identity)
         target.is_pending = False
 

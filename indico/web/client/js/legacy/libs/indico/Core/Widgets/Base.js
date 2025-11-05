@@ -940,7 +940,7 @@ type(
         }
       }
 
-      // Acvtivate/inactivate the arrows accordingly
+      // Activate/deactivate the arrows accordingly
       this.setScrollArrowState('left', true);
       if (this.rightTabIndex == this.tabs.length - 1) {
         this.setScrollArrowState('right', false);
@@ -981,7 +981,7 @@ type(
         }
       }
 
-      // Acvtivate/inactivate the arrows accordingly
+      // Acvtivate/deactivate the arrows accordingly
       this.setScrollArrowState('right', true);
       if (this.leftTabIndex < 1) {
         this.setScrollArrowState('left', false);

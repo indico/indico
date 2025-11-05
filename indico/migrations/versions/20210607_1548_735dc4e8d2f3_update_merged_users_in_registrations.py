@@ -30,7 +30,7 @@ def upgrade():
         SET user_id = mm.current_user_id
         FROM merge_map mm
         WHERE mm.user_id = r.user_id AND mm.current_user_id != r.user_id AND NOT EXISTS (
-            -- avoid conflcit with existing registration of the target user
+            -- avoid conflict with existing registration of the target user
             SELECT 1
             FROM event_registration.registrations r2
             WHERE r2.registration_form_id = r.registration_form_id AND r2.user_id = mm.current_user_id

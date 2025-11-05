@@ -15,7 +15,7 @@ import {$T} from 'indico/utils/i18n';
    *
    * Performs an ajax request to retrieve the data to check and return a
    * jQuery promise with the a boolean indicating if the data matches or
-   * not. If the ajax request fails, the promise is rejected wit the ajax
+   * not. If the ajax request fails, the promise is rejected with the ajax
    * error. An error flash message is also shown on the page unless the
    * `quiet` option is set to `false` (defaults to `true`).
    */

@@ -275,7 +275,7 @@ class ListGeneratorBase:
     def _split_item_ids(self, item_ids, separator_type=None):
         """Separate the dynamic item ids from the static.
 
-        :param item_ids: The list of ids to be splitted.
+        :param item_ids: The list of ids to be split.
         :param separator_type: The type of the item to base the partitioning on.
                                If the value is 'dynamic', the function will
                                return a tuple where the first element is a list

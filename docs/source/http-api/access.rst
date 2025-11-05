@@ -134,7 +134,7 @@ available, always sign your requests. Since you might want to retrieve only
 public information (instead of everything visible to your Indico user) you
 can add the param *onlypublic=yes* to the query string.
 
-It is also possible to re-use the existing Indico session. This only makes
+It is also possible to reuse the existing Indico session. This only makes
 sense if your browser accesses the API, e.g. because you are developing on
 Indico and want to access the API via an AJAX request. Additionally this method
 of authentication is restricted to GET requests. To use it, add *cookieauth=yes*

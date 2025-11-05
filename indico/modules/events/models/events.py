@@ -686,7 +686,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             # any event that starts on/after the specified date
             return self.start_dt >= from_dt
         elif to_dt is not None:
-            # any event that ends on/before the specifed date
+            # any event that ends on/before the specified date
             return self.end_dt <= to_dt
         else:
             return True
@@ -700,7 +700,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             # any event that starts on/after the specified date
             return cls.start_dt >= from_dt
         elif to_dt is not None:
-            # any event that ends on/before the specifed date
+            # any event that ends on/before the specified date
             return cls.end_dt <= to_dt
         else:
             return True

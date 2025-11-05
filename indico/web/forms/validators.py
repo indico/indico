@@ -364,7 +364,7 @@ class WordCount:
 class IndicoRegexp(Regexp):
     """
     Like the WTForms `Regexp` validator, but supports populating the
-    HTML5 `patttern` attribute (the regex may not use any non-standard
+    HTML5 `pattern` attribute (the regex may not use any non-standard
     Python extensions such as named groups in this case).
     """
 

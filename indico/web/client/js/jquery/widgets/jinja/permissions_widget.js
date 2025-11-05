@@ -33,7 +33,7 @@ import Palette from 'indico/utils/palette';
     },
 
     _update() {
-      // Sort entries aphabetically and by type
+      // Sort entries alphabetically and by type
       this.data = _.chain(this.data)
         .sortBy(item => item[0].name || item[0].id)
         .sortBy(item => item[0]._type)

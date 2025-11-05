@@ -12,7 +12,7 @@ import _ from 'lodash';
 
 (function($) {
   /*
-   * This provides an untility for checkboxes (usually switch widgets) which immediately
+   * This provides a utility for checkboxes (usually switch widgets) which immediately
    * save the state using an AJAX request. The checkbox is disabled during the AJAX request
    * to avoid the user from clicking multiple times and spamming unnecessary AJAX requests.
    *

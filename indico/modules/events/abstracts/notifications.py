@@ -19,8 +19,7 @@ from indico.web.flask.templating import get_template_module
 
 
 class EmailNotificationCondition(Condition):
-    #: Override if you want to customize the text
-    #: that shouls up for "Any"
+    #: Override if you want to customize the text that shows up for "Any"
     any_caption = pgettext('Email notification condition', 'any')
     #: same for text that shows up for "none"
     none_caption = pgettext('Email notification condition', 'none')

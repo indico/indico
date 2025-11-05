@@ -170,7 +170,7 @@ class RHLinkAccount(RH):
     def _process_args(self):
         self.identity_info = load_identity_info()
         if not self.identity_info or self.identity_info['indico_user_id'] is None:
-            # Just redirect to the front page or whereever we wanted to go.
+            # Just redirect to the front page or wherever we wanted to go.
             # Probably someone simply used his browser's back button.
             flash('There is no pending login.', 'warning')
             return multipass.redirect_success()
@@ -247,7 +247,7 @@ class RHRegister(RH):
                 return redirect(url_for('.login'))
             elif info['indico_user_id'] is not None or info['provider'] != self.provider_name:
                 # If we have a matching user id, we shouldn't be on the registration page
-                # If the provider doesn't match it would't be a big deal but the request doesn't make sense
+                # If the provider doesn't match it isn't a big deal but the request doesn't make sense
                 raise BadRequest
         elif not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
@@ -360,7 +360,7 @@ class RHRegister(RH):
     def _create_user(self, data, handler):
         user, identity = register_user(**self._prepare_registration_data(data, handler))
         login_user(user, identity)
-        msg = _('You have sucessfully registered your Indico profile. '
+        msg = _('You have successfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
         db.session.flush()

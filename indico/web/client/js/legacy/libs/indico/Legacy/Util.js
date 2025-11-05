@@ -425,7 +425,7 @@ var IndicoUtil = {
     };
 
     /**
-     * Adds a form input to the list of paramters to check.
+     * Adds a form input to the list of parameters to check.
      *  @param {Html component} component The input component
      *  @param {String} dataType Type of the data: text, int, date, etc
      *  @param {Boolean} allowEmpty True if the component is mandatory
