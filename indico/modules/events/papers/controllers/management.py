@@ -10,7 +10,6 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.editing.controllers.base import TokenAccessMixin
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
@@ -324,7 +323,7 @@ class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
         return jsonify_data(flash=False)
 
 
-class RHPapersCreateFileType(RHManageEventBase):
+class RHPapersCreateFileType(RHManagePapersBase):
     """Create a new file type."""
 
     @use_rh_args(PaperFileTypeArgs)
@@ -333,7 +332,7 @@ class RHPapersCreateFileType(RHManageEventBase):
         return PaperFileTypeSchema().jsonify(file_type)
 
 
-class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
+class RHPapersEditFileType(RHManagePapersBase):
     """Delete/update a file type."""
 
     def _process_args(self):
