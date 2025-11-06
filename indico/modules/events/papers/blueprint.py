@@ -7,7 +7,7 @@
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import api, common, display, frontend, management, paper, templates
+from indico.modules.events.papers.controllers import api, common, display, management, paper, templates
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -55,7 +55,7 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/paper/upload', 'api_upload',
 _bp.add_url_rule('/papers/reviewing/', 'reviewing_area', display.RHReviewingArea)
 
 # Management
-_bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
+_bp.add_url_rule('/manage/papers/', 'management', management.RHPapersManageFileTypes)
 _bp.add_url_rule('/manage/papers/deadlines/<any(judge,content_reviewer,layout_reviewer):role>', 'manage_deadline',
                  management.RHSetDeadline, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,
@@ -91,7 +91,7 @@ _bp.add_url_rule('/manage/papers/open', 'open_cfp', management.RHOpenCFP, method
 _bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, methods=('POST',))
 
 # File types
-_bp.add_url_rule('/manage/papers/types', 'manage_file_types', frontend.RHPapersDashboard)
+_bp.add_url_rule('/manage/papers/types', 'manage_file_types', management.RHPapersManageFileTypes)
 
 # URLs available in both management and display areas
 # Note: When adding a new one here make sure to specify `defaults=defaults`
