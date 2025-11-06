@@ -7,12 +7,14 @@
 
 /* global $T:false, alertPopup:false, handleAjaxError:false, ajaxDialog:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import setupRegformSetup from './form_setup';
 import setupRegformSubmission from './form_submission';
 import ConsentToPublishEditor from './components/ConsentToPublishEditor';
 
-
-(function(global) {
+(function (global) {
   document.addEventListener('DOMContentLoaded', () => {
     const setupRootElement = document.getElementById('registration-form-setup-container');
     if (setupRootElement) {

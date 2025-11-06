@@ -41,7 +41,7 @@ export default function setupRegformSubmission(root) {
 
   const initialData = {
     staticData: {
-      eventId: parseInt(eventId, 10),
+      targetLocator: {event_id: parseInt(eventId, 10)},
       regformId: parseInt(regformId, 10),
       management: JSON.parse(management),
       paid: paid ? JSON.parse(paid) : false,
