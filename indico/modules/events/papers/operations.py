@@ -154,18 +154,19 @@ def create_paper_revision(paper, submitter, files):
 
 def _make_paper_file(file, paper, revision, file_type=None):
     filename = secure_client_filename(file.filename)
-    content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
-    return PaperFile(
+    content_type = mimetypes.guess_type(file.filename)[0] or file.content_type or 'application/octet-stream'
+    paper_file = PaperFile(
+        _contribution=paper.contribution,
         filename=filename,
         content_type=content_type,
         paper_revision=revision,
-        size=file.size,
-        md5=file.md5,
-        storage_backend=file.storage_backend,
-        storage_file_id=file.storage_file_id,
-        _contribution=paper.contribution,
         file_type=file_type,
     )
+
+    with file.open() as f:
+        paper_file.save(f)
+
+    return paper_file
 
 
 def _make_paper_files(files, paper, revision):

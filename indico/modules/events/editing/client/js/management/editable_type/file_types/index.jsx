@@ -28,7 +28,6 @@ export default function FileTypeManagement() {
       <EditableTypeSubPageNav title={Translate.string('File types')} />
       <FileTypeManager
         eventId={eventId}
-        editableType={type}
         getAllURLFn={params => fileTypeURL({type, ...params})}
         editURLFn={params => editFileTypeURL({type, ...params})}
         createURLFn={params => createFileTypeURL({type, ...params})}

@@ -162,4 +162,4 @@ class RHPapersUploadFile(UploadFileMixin, RHPapersBase):
     """Upload a file for peer reviewing."""
 
     def get_file_context(self):
-        return ['event', self.event.id, 'papers', 'uploads']
+        return 'event', self.event.id, 'papers', 'uploads'

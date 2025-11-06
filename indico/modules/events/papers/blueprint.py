@@ -55,7 +55,7 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/paper/upload', 'api_upload',
 _bp.add_url_rule('/papers/reviewing/', 'reviewing_area', display.RHReviewingArea)
 
 # Management
-_bp.add_url_rule('/manage/papers/', 'management', management.RHPapersManageFileTypes)
+_bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
 _bp.add_url_rule('/manage/papers/deadlines/<any(judge,content_reviewer,layout_reviewer):role>', 'manage_deadline',
                  management.RHSetDeadline, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,

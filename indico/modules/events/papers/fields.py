@@ -47,7 +47,7 @@ class PaperEmailSettingsField(JSONField):
 
 
 class PaperFilesField(Dict):
-    def __init__(self, event=None, contrib=None, /, *, allow_claimed_files=False, **kwargs):
+    def __init__(self, event=None, contrib=None, **kwargs):
         self.event = event
         self.contrib = contrib
 
@@ -55,7 +55,7 @@ class PaperFilesField(Dict):
             return self._get_file_types_query(event or ctx['event'])
 
         keys_field = ModelField(PaperFileType, get_query=_get_query)
-        values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
+        values_field = FilesField(required=True)
         super().__init__(keys=keys_field, values=values_field, **kwargs)
 
     def _get_file_types_query(self, event):
