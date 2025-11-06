@@ -16,9 +16,8 @@ import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/reviews';
 
+import FileTypeManager from 'indico/modules/events/editing/management/editable_type/file_types/FileTypeManager';
 import {domReady} from 'indico/utils/domstate';
-
-import FileTypeManager from '../../../editing/client/js/management/editable_type/file_types/FileTypeManager';
 
 import setupReactPaperTimeline from './setup';
 
