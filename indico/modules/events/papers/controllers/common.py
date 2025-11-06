@@ -15,7 +15,7 @@ class RHPapersFileTypes(RHPapersBase):
 
     def _process_args(self):
         RHPapersBase._process_args(self)
-        self.file_types = PaperFileType.query.with_parent(self.event).all()
 
     def _process(self):
-        return PaperFileTypeSchema(many=True).jsonify(self.file_types)
+        file_types = PaperFileType.query.with_parent(self.event).all()
+        return PaperFileTypeSchema(many=True).jsonify(file_types)
