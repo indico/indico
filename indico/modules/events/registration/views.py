@@ -14,7 +14,7 @@ from indico.web.views import WPJinjaMixin
 class WPEventManageRegistrationForm(WPEventManagement):
     template_prefix = 'formify/'
     bundles = ('module_events.registration.js', 'module_events.registration.css', 'module_receipts.js',
-               'module_receipts.css', 'module_forms.js', 'module_forms.css')
+               'module_receipts.css', 'module_formify.js', 'module_formify.css')
 
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         self.regform = kwargs.get('regform')

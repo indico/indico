@@ -5,24 +5,37 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import addFieldURL from 'indico-url:categories.add_field';
-import addSectionURL from 'indico-url:categories.add_section';
-import addTextURL from 'indico-url:categories.add_text';
-import modifyFieldURL from 'indico-url:categories.modify_field';
-import modifySectionURL from 'indico-url:categories.modify_section';
-import modifyTextURL from 'indico-url:categories.modify_text';
-import moveFieldURL from 'indico-url:categories.move_field';
-import moveSectionURL from 'indico-url:categories.move_section';
-import moveTextURL from 'indico-url:categories.move_text';
-import toggleFieldURL from 'indico-url:categories.toggle_field';
-import toggleSectionURL from 'indico-url:categories.toggle_section';
-import toggleTextURL from 'indico-url:categories.toggle_text';
+import categoryAddFieldURL from 'indico-url:categories.add_field';
+import categoryAddSectionURL from 'indico-url:categories.add_section';
+import categoryAddTextURL from 'indico-url:categories.add_text';
+import categoryModifyFieldURL from 'indico-url:categories.modify_field';
+import categoryModifySectionURL from 'indico-url:categories.modify_section';
+import categoryModifyTextURL from 'indico-url:categories.modify_text';
+import categoryMoveFieldURL from 'indico-url:categories.move_field';
+import categoryMoveSectionURL from 'indico-url:categories.move_section';
+import categoryMoveTextURL from 'indico-url:categories.move_text';
+import categoryToggleFieldURL from 'indico-url:categories.toggle_field';
+import categoryToggleSectionURL from 'indico-url:categories.toggle_section';
+import categoryToggleTextURL from 'indico-url:categories.toggle_text';
+
+import eventAddFieldURL from 'indico-url:event_registration.add_field';
+import eventAddSectionURL from 'indico-url:event_registration.add_section';
+import eventAddTextURL from 'indico-url:event_registration.add_text';
+import eventModifyFieldURL from 'indico-url:event_registration.modify_field';
+import eventModifySectionURL from 'indico-url:event_registration.modify_section';
+import eventModifyTextURL from 'indico-url:event_registration.modify_text';
+import eventMoveFieldURL from 'indico-url:event_registration.move_field';
+import eventMoveSectionURL from 'indico-url:event_registration.move_section';
+import eventMoveTextURL from 'indico-url:event_registration.move_text';
+import eventToggleFieldURL from 'indico-url:event_registration.toggle_field';
+import eventToggleSectionURL from 'indico-url:event_registration.toggle_section';
+import eventToggleTextURL from 'indico-url:event_registration.toggle_text';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 
-import {getSectionIdForItem, getURLParams, pickItemURL} from './selectors';
+import {getSectionIdForItem, getURLParams, getURLFromTarget, pickItemURL} from './selectors';
 
 export const LOCK_UI = 'Lock interface';
 export const UNLOCK_UI = 'Unlock interface';
@@ -104,7 +117,7 @@ function _createItem(data) {
 export function saveSectionPosition(sectionId, position, oldPosition) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const url = moveSectionURL(getURLParams(store)(sectionId));
+    const url = getURLFromTarget(store)(eventMoveSectionURL, categoryMoveSectionURL)(getURLParams(store)(sectionId));
     const resp = await lockingAjaxAction(() => indicoAxios.post(url, {endPos: position}))(dispatch);
     if (resp.error) {
       // XXX alternatively we could keep the UI locked and require a refresh after
@@ -120,7 +133,7 @@ export function enableSection(sectionId) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const params = getURLParams(store)(sectionId);
-    const url = toggleSectionURL({...params, enable: 'true'});
+    const url = getURLFromTarget(store)(eventToggleSectionURL, categoryToggleSectionURL)({...params, enable: 'true'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, true));
@@ -133,7 +146,7 @@ export function disableSection(sectionId) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const params = getURLParams(store)(sectionId);
-    const url = toggleSectionURL({...params, enable: 'false'});
+    const url = getURLFromTarget(store)(eventToggleSectionURL, categoryToggleSectionURL)({...params, enable: 'false'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, false));
@@ -145,7 +158,7 @@ export function disableSection(sectionId) {
 export function removeSection(sectionId) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const url = modifySectionURL(getURLParams(store)(sectionId));
+    const url = getURLFromTarget(store)(eventModifySectionURL, categoryModifySectionURL)(getURLParams(store)(sectionId));
     const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
     if (!resp.error) {
       dispatch(_removeSection(sectionId));
@@ -157,7 +170,7 @@ export function removeSection(sectionId) {
 export function updateSection(sectionId, data) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const url = modifySectionURL(getURLParams(store)(sectionId));
+    const url = getURLFromTarget(store)(eventModifySectionURL, categoryModifySectionURL)(getURLParams(store)(sectionId));
     const payload = {changes: data};
     const resp = await submitFormAction(() => indicoAxios.patch(url, payload))(dispatch);
     if (!resp.error) {
@@ -171,7 +184,7 @@ export function updateSection(sectionId, data) {
 export function createSection(data) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const url = addSectionURL(getURLParams(store)());
+    const url = getURLFromTarget(store)(eventAddSectionURL, categoryAddSectionURL)(getURLParams(store)());
     const resp = await submitFormAction(() => indicoAxios.post(url, data))(dispatch);
     if (!resp.error) {
       delete resp.data.items;
@@ -184,7 +197,7 @@ export function createSection(data) {
 export function saveItemPosition(sectionId, itemId, position, oldPosition) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const urlFunc = pickItemURL(store, itemId)(moveTextURL, moveFieldURL);
+    const urlFunc = pickItemURL(store, itemId)(getURLFromTarget(store)(eventMoveTextURL, categoryMoveTextURL), getURLFromTarget(store)(eventMoveFieldURL, categoryMoveFieldURL));
     const url = urlFunc(getURLParams(store)(sectionId, itemId));
     const resp = await lockingAjaxAction(() => indicoAxios.post(url, {endPos: position}))(dispatch);
     if (resp.error) {
@@ -201,7 +214,7 @@ export function enableItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const sectionId = getSectionIdForItem(store, itemId);
-    const urlFunc = pickItemURL(store, itemId)(toggleTextURL, toggleFieldURL);
+    const urlFunc = pickItemURL(store, itemId)(getURLFromTarget(store)(eventToggleTextURL, categoryToggleTextURL), getURLFromTarget(store)(eventToggleFieldURL, categoryToggleFieldURL));
     const params = getURLParams(store)(sectionId, itemId);
     const url = urlFunc({...params, enable: 'true'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
@@ -216,7 +229,7 @@ export function disableItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const sectionId = getSectionIdForItem(store, itemId);
-    const urlFunc = pickItemURL(store, itemId)(toggleTextURL, toggleFieldURL);
+    const urlFunc = pickItemURL(store, itemId)(getURLFromTarget(store)(eventToggleTextURL, categoryToggleTextURL), getURLFromTarget(store)(eventToggleFieldURL, categoryToggleFieldURL));
     const params = getURLParams(store)(sectionId, itemId);
     const url = urlFunc({...params, enable: 'false'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
@@ -231,7 +244,7 @@ export function removeItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const sectionId = getSectionIdForItem(store, itemId);
-    const urlFunc = pickItemURL(store, itemId)(modifyTextURL, modifyFieldURL);
+    const urlFunc = pickItemURL(store, itemId)(getURLFromTarget(store)(eventModifyTextURL, categoryModifyTextURL), getURLFromTarget(store)(eventModifyFieldURL, categoryModifyFieldURL));
     const url = urlFunc(getURLParams(store)(sectionId, itemId));
     const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
     if (!resp.error) {
@@ -245,7 +258,7 @@ export function updateItem(itemId, data) {
   return async (dispatch, getStore) => {
     const store = getStore();
     const sectionId = getSectionIdForItem(store, itemId);
-    const urlFunc = pickItemURL(store, itemId)(modifyTextURL, modifyFieldURL);
+    const urlFunc = pickItemURL(store, itemId)(getURLFromTarget(store)(eventModifyTextURL,categoryModifyTextURL), getURLFromTarget(store)(eventModifyFieldURL, categoryModifyFieldURL));
     const url = urlFunc(getURLParams(store)(sectionId, itemId));
     const payload = {fieldData: data};
     const resp = await submitFormAction(() => indicoAxios.patch(url, payload))(dispatch);
@@ -259,7 +272,7 @@ export function updateItem(itemId, data) {
 export function createItem(sectionId, inputType, data) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const urlFunc = inputType === 'label' ? addTextURL : addFieldURL;
+    const urlFunc = inputType === 'label' ? getURLFromTarget(store)(eventAddTextURL, categoryAddTextURL) : getURLFromTarget(store)(eventAddFieldURL, categoryAddFieldURL);
     const url = urlFunc(getURLParams(store)(sectionId));
     const payload = {fieldData: {...data, input_type: inputType}};
     const resp = await submitFormAction(() => indicoAxios.post(url, payload))(dispatch);
