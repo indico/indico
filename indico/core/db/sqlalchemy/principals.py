@@ -648,26 +648,30 @@ class PrincipalComparator(Comparator):
         raise NotImplementedError
 
     def __eq__(self, other):
-        if other.principal_type == PrincipalType.email:
+       match other.principal_type:
+        case PrincipalType.email:
             criteria = [self.cls.email == other.email]
-        elif other.principal_type == PrincipalType.network:
+        case PrincipalType.network:
             criteria = [self.cls.ip_network_group_id == other.id]
-        elif other.principal_type == PrincipalType.event_role:
+        case PrincipalType.event_role:
             criteria = [self.cls.event_role_id == other.id]
-        elif other.principal_type == PrincipalType.category_role:
+        case PrincipalType.category_role:
             criteria = [self.cls.category_role_id == other.id]
-        elif other.principal_type == PrincipalType.registration_form:
+        case PrincipalType.registration_form:
             criteria = [self.cls.registration_form_id == other.id]
-        elif other.principal_type == PrincipalType.local_group:
+        case PrincipalType.local_group:
             criteria = [self.cls.local_group_id == other.id]
-        elif other.principal_type == PrincipalType.multipass_group:
-            criteria = [self.cls.multipass_group_provider == other.provider,
-                        self.cls.multipass_group_name == other.name]
-        elif other.principal_type == PrincipalType.user:
+        case PrincipalType.multipass_group:
+            criteria = [
+                self.cls.multipass_group_provider == other.provider,
+                self.cls.multipass_group_name == other.name
+            ]
+        case PrincipalType.user:
             criteria = [self.cls.user_id == other.id]
-        else:
-            raise ValueError(f'Unexpected object type {type(other)}: {other}')
-        return db.and_(self.cls.type == other.principal_type, *criteria)
+        case _:
+            raise ValueError(f"Unexpected object type {type(other)}: {other}")
+
+       return db.and_(self.cls.type == other.principal_type, *criteria)
 
 
 def clone_principals(cls, principals, event_role_map=None, regform_map=None):
