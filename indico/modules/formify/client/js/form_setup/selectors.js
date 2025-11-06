@@ -90,10 +90,11 @@ export const getURLFromTarget = createSelector(
     const {targetLocator} = staticData;
 
     if (targetLocator.event_id) {
-      return eventEnpoint
+      return eventEnpoint;
     }
     if (targetLocator.category_id) {
-      return categoryEndpoint
+      return categoryEndpoint;
     }
+    return null;
   }
 )

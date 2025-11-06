@@ -61,8 +61,6 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/display', 'manage_regfo
                  regforms.RHManageRegistrationFormDisplay, methods=('GET', 'POST'))
 
 
-
-
 # Privacy
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'manage_registration_privacy_settings',
                  privacy.RHEventRegistrationPrivacy, methods=('GET', 'POST'), defaults=defaults)

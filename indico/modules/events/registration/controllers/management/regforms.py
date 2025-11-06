@@ -79,7 +79,8 @@ class RHEventRegistrationFormManage(ManageRegistrationFormsAreaMixin, RHEventMan
     """Specific event registration form management."""
 
     def _process(self):
-        return WPEventManageRegistrationForm.render_template('management/regform.html', self.event, regform=self.regform)
+        return WPEventManageRegistrationForm.render_template('management/regform.html', self.event,
+                                                             regform=self.regform)
 
 
 class RHManageRegistrationFormsDisplay(RHEventManageRegFormsBase):
