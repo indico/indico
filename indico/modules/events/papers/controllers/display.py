@@ -12,7 +12,7 @@ from indico.core.errors import NoReportError
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
 from indico.modules.events.papers.fields import PaperFilesField
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.operations import create_new_paper_revision
+from indico.modules.events.papers.operations import create_new_paper
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_user_submittable_contributions)
@@ -48,7 +48,7 @@ class RHSubmitPaperSingle(RHPaperBase):
     }, rh_context=('event', 'contrib'))
     def _process(self, file):
         # Key for files obj is 'None' as there is no FileType for single files
-        create_new_paper_revision(self.contribution, session.user, {None: [file]})
+        create_new_paper(self.contribution, session.user, {None: [file]})
         return jsonify_data(flash=False)
 
 
@@ -74,7 +74,7 @@ class RHSubmitPaper(RHPaperBase):
         'files': PaperFilesField(required=True),
     }, rh_context=('event', 'contrib'))
     def _process(self, files):
-        create_new_paper_revision(self.contribution, session.user, files)
+        create_new_paper(self.contribution, session.user, files)
         return jsonify_data(flash=False)
 
 
