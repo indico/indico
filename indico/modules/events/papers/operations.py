@@ -175,7 +175,7 @@ def _make_paper_files(files, paper, revision):
 
 
 @no_autoflush
-def create_new_paper_revision(contribution, submitter, files):
+def create_new_paper(contribution, submitter, files):
     paper = Paper(contribution=contribution)
     revision = PaperRevision(paper=paper, submitter=submitter)
     _make_paper_files(files, paper, revision)

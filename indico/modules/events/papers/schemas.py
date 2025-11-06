@@ -241,10 +241,7 @@ class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
                   'filename_template', 'url')
 
     is_used = fields.Function(lambda ft: PaperFile.query.with_parent(ft).has_rows())
-    url = Function(lambda ft: url_for('.api_edit_file_type',
-                                             ft.event,
-                                             file_type_id=ft.id,
-                                             _external=True))
+    url = Function(lambda ft: url_for('.api_edit_file_type', ft.event, file_type_id=ft.id, _external=True))
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
@@ -255,7 +252,7 @@ class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
 
 class PaperFileTypeArgs(mm.Schema):
     class Meta:
-        rh_context = ('event', 'file_type', 'editable_type')
+        rh_context = ('event', 'file_type')
 
     name = fields.String(required=True, validate=not_empty)
     filename_template = fields.String(validate=not_empty, allow_none=True)

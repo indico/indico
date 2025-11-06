@@ -354,3 +354,8 @@ class RHPapersEditFileType(TokenAccessMixin, RHManageEventBase):
 
         delete_file_type(self.file_type)
         return '', 204
+
+
+class RHPapersManageFileTypes(RHManagePapersBase):
+    def _process(self):
+        return WPManagePapers.render_template('management/file_types.html', self.event)
