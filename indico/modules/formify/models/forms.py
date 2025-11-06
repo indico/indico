@@ -20,10 +20,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm
-from indico.modules.formify.models.form_fields import RegistrationFormPersonalDataField
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
                                                                      RegistrationState)
+from indico.modules.formify.models.form_fields import RegistrationFormPersonalDataField
+from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_currency, now_utc
 from indico.util.enum import RichIntEnum

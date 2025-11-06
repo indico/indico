@@ -31,17 +31,17 @@ from indico.modules.events.registration.util import close_registration, create_p
 from indico.modules.events.registration.views import (WPEventManageRegistrationForm, WPManageParticipants,
                                                       WPManageRegistration, WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
-from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.formify.clone import RegistrationFormCloner
 from indico.modules.formify.controllers.management.regforms import (ManageRegistrationFormsAreaMixin,
-                                                                              ManageRegistrationFormsMixin,
-                                                                              RegistrationFormCreateMixin,
-                                                                              RegistrationFormDeleteMixin,
-                                                                              RegistrationFormEditMixin,
-                                                                              RegistrationFormModifyMixin)
+                                                                    ManageRegistrationFormsMixin,
+                                                                    RegistrationFormCreateMixin,
+                                                                    RegistrationFormDeleteMixin,
+                                                                    RegistrationFormEditMixin,
+                                                                    RegistrationFormModifyMixin)
 from indico.modules.formify.forms import RegistrationFormCreateForm, RegistrationFormCreateFromTemplateForm
 from indico.modules.formify.models.forms import Registration, RegistrationForm, RegistrationState
 from indico.modules.formify.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
 from indico.web.args import use_kwargs

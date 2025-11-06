@@ -60,10 +60,10 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
+from indico.modules.formify.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.formify.models.items import PersonalDataType, RegistrationFormItemType
 from indico.util.date_time import format_currency, now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext

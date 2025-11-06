@@ -11,11 +11,11 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
-from indico.modules.logs.models.entries import LogKind
-from indico.modules.logs.util import make_diff_log
 from indico.modules.formify import logger
 from indico.modules.formify.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.formify.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.web.util import jsonify_data
 

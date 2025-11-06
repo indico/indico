@@ -11,7 +11,6 @@ from indico.modules.events.registration.controllers.display import RHRegistratio
 from indico.modules.events.registration.controllers.management import RHEventManageRegFormBase
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import update_registration_consent_to_publish
-
 from indico.modules.formify.controllers.management.privacy import RHRegistrationPrivacyMixin
 from indico.web.args import use_kwargs
 

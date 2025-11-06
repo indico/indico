@@ -8,8 +8,7 @@
 import json
 from datetime import timedelta
 
-from wtforms.fields import (BooleanField, DecimalField, IntegerField, SelectField,
-                            StringField, TextAreaField)
+from wtforms.fields import BooleanField, DecimalField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import NumberInput, html_params
 
@@ -17,11 +16,11 @@ from indico.core.config import config
 from indico.modules.events import Event
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.formify.fields.regform import RegformField
 from indico.modules.formify.models.forms import ModificationMode
 from indico.modules.formify.models.items import RegistrationFormItem
-from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
@@ -29,7 +28,7 @@ from indico.web.forms.fields import EmailListField, IndicoEnumSelectField
 from indico.web.forms.fields.datetime import TimeDeltaField
 from indico.web.forms.fields.simple import IndicoParticipantVisibilityField
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import (DataRetentionPeriodValidator, HiddenUnless, IndicoEmail)
+from indico.web.forms.validators import DataRetentionPeriodValidator, HiddenUnless, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget
 
 

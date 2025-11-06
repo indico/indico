@@ -11,8 +11,8 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request, session
-from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, SelectField,
-                            StringField, TextAreaField)
+from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, SelectField, StringField,
+                            TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import NumberInput
 
@@ -33,8 +33,7 @@ from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.fields.sqlalchemy import IndicoQuerySelectMultipleTagField
-from indico.web.forms.validators import (HiddenUnless, LinkedDateTime,
-                                         NoEndpointLinks, NoRelativeURLs)
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, NoEndpointLinks, NoRelativeURLs
 from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 

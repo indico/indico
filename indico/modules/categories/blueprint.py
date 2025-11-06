@@ -31,7 +31,7 @@ from indico.modules.categories.controllers.management import (RHAddCategoryRole,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHRemoveCategoryRoleMember, RHSortSubcategories,
                                                               RHSplitCategory)
-from indico.modules.categories.registration.controllers import regforms, privacy, sections, fields
+from indico.modules.categories.registration.controllers import fields, privacy, regforms, sections
 from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint

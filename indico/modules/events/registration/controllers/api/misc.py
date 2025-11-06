@@ -7,16 +7,14 @@
 
 from operator import itemgetter
 
-from flask import session, jsonify
+from flask import jsonify, session
 from marshmallow import fields
 from sqlalchemy.orm import joinedload
 
-
-from indico.modules.events.controllers.base import RHAuthenticatedEventBase
-from indico.modules.formify.models.forms import RegistrationForm
-from indico.modules.events.controllers.base import RHProtectedEventBase
+from indico.modules.events.controllers.base import RHAuthenticatedEventBase, RHProtectedEventBase
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.util.date_time import format_interval
 from indico.util.iterables import group_list
 from indico.web.args import use_kwargs

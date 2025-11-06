@@ -32,19 +32,17 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
-from indico.modules.formify.fields.accompanying import AccompanyingPersonsField
-from indico.modules.formify.fields.choices import (AccommodationField, ChoiceBaseField,
-                                                               get_field_merged_options)
-from indico.modules.formify.models.form_fields import (RegistrationFormFieldData,
-                                                                   RegistrationFormPersonalDataField)
-from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.formify.models.items import (PersonalDataType, RegistrationFormItemType,
-                                                             RegistrationFormPersonalDataSection)
 from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
                                                                      RegistrationVisibility)
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
+from indico.modules.formify.fields.accompanying import AccompanyingPersonsField
+from indico.modules.formify.fields.choices import AccommodationField, ChoiceBaseField, get_field_merged_options
+from indico.modules.formify.models.form_fields import RegistrationFormFieldData, RegistrationFormPersonalDataField
+from indico.modules.formify.models.forms import RegistrationForm
+from indico.modules.formify.models.items import (PersonalDataType, RegistrationFormItemType,
+                                                 RegistrationFormPersonalDataSection)
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email

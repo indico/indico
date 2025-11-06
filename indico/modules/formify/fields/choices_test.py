@@ -10,9 +10,9 @@ from copy import deepcopy
 import pytest
 from marshmallow import ValidationError
 
+from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.formify.fields.choices import MultiChoiceSetupSchema, _hashable_choice
 from indico.modules.formify.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.registrations import RegistrationData
 
 
 def _id(n):

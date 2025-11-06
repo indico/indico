@@ -7,10 +7,10 @@
 
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase
 from indico.modules.formify.controllers.management.sections import (ManageRegFormSectionBaseMixin,
-                                                                         RegistrationFormAddSectionMixin,
-                                                                         RegistrationFormModifySectionMixin,
-                                                                         RegistrationFormMoveSection,
-                                                                         RegistrationFormToggleSection)
+                                                                    RegistrationFormAddSectionMixin,
+                                                                    RegistrationFormModifySectionMixin,
+                                                                    RegistrationFormMoveSection,
+                                                                    RegistrationFormToggleSection)
 
 
 class RHCategoryManageRegFormSectionBase(ManageRegFormSectionBaseMixin, RHCategoryManageRegFormBase):

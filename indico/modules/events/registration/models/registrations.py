@@ -27,9 +27,9 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.errors import IndicoError
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
-from indico.modules.formify.models.items import PersonalDataType
 from indico.modules.events.registration.wallets.apple import AppleWalletManager
 from indico.modules.events.registration.wallets.google import GoogleWalletManager
+from indico.modules.formify.models.items import PersonalDataType
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import format_currency, now_utc
 from indico.util.decorators import classproperty

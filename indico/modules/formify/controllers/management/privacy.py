@@ -12,10 +12,10 @@ from indico.core.db import db
 from indico.modules.categories.views import WPCategoryManageRegistrationForm
 from indico.modules.events import EventLogRealm
 from indico.modules.events.registration.views import WPEventManageRegistrationForm
-from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
-from indico.modules.logs.util import make_diff_log
 from indico.modules.formify.controllers.management.regforms import ManageRegistrationFormsAreaMixin
 from indico.modules.formify.forms import RegistrationPrivacyForm
+from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 

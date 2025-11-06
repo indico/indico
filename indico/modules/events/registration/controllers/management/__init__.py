@@ -11,9 +11,9 @@ from sqlalchemy.orm import contains_eager, defaultload
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.formify.models.form_fields import RegistrationFormField
 from indico.modules.formify.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import Registration
 
 
 class RHEventManageRegFormsBase(RHManageEventBase):

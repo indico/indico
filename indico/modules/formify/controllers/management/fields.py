@@ -18,14 +18,14 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
 from indico.modules.events.settings import data_retention_settings
-from indico.modules.logs.models.entries import LogKind
-from indico.modules.logs.util import make_diff_log
 from indico.modules.formify import logger
 from indico.modules.formify.controllers.management.sections import ManageRegFormSectionBaseMixin
 from indico.modules.formify.fields import get_field_types
 from indico.modules.formify.models.form_fields import RegistrationFormField
 from indico.modules.formify.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.formify.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import not_empty

@@ -10,8 +10,8 @@ from indico.modules.events.registration.controllers.api import checkin as api_ch
 from indico.modules.events.registration.controllers.api import checkin_legacy as api_checkin_legacy
 from indico.modules.events.registration.controllers.api import misc as api_misc
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (invitations, privacy, regforms, reglists, tags,
-                                                                       tickets, fields, sections)
+from indico.modules.events.registration.controllers.management import (fields, invitations, privacy, regforms, reglists,
+                                                                       sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 

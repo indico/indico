@@ -17,11 +17,10 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
-from indico.modules.formify.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableItemSchema,
-                                                            RegistrationFormBillableField,
-                                                            RegistrationFormBillableItemsField)
-from indico.modules.formify.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.modules.formify.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableItemSchema,
+                                                RegistrationFormBillableField, RegistrationFormBillableItemsField)
+from indico.modules.formify.models.form_fields import RegistrationFormFieldData
 from indico.util.date_time import format_date
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import UUIDString, not_empty

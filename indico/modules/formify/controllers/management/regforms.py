@@ -20,11 +20,11 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.modules.events.registration.util import create_personal_data_fields, get_flat_section_setup_data
 from indico.modules.events.registration.views import WPEventManageRegistrationForm
 from indico.modules.events.settings import data_retention_settings
-from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.formify import logger
 from indico.modules.formify.forms import RegistrationFormCreateForm, RegistrationFormEditForm
 from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.formify.operations import update_registration_form_settings
+from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _, force_locale, orig_string

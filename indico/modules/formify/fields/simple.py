@@ -11,10 +11,10 @@ from decimal import Decimal
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
 
-from indico.modules.formify.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
-                                                            LimitedPlacesBillableFieldDataSchema,
-                                                            RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.modules.files.models.files import File
+from indico.modules.formify.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
+                                                LimitedPlacesBillableFieldDataSchema, RegistrationFormBillableField,
+                                                RegistrationFormFieldBase)
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _

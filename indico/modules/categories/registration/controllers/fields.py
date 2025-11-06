@@ -16,14 +16,14 @@
 from indico.modules.categories.registration.controllers import RHCategoryManageRegFormBase
 from indico.modules.categories.registration.controllers.sections import RHCategoryManageRegFormSectionBase
 from indico.modules.formify.controllers.management.fields import (ManageRegFormFieldBaseMixin,
-                                                                       RegistrationFormAddFieldMixin,
-                                                                       RegistrationFormAddTextMixin,
-                                                                       RegistrationFormModifyFieldMixin,
-                                                                       RegistrationFormModifyTextMixin,
-                                                                       RegistrationFormMoveFieldMixin,
-                                                                       RegistrationFormMoveTextMixin,
-                                                                       RegistrationFormToggleFieldStateMixin,
-                                                                       RegistrationFormToggleTextStateMixin)
+                                                                  RegistrationFormAddFieldMixin,
+                                                                  RegistrationFormAddTextMixin,
+                                                                  RegistrationFormModifyFieldMixin,
+                                                                  RegistrationFormModifyTextMixin,
+                                                                  RegistrationFormMoveFieldMixin,
+                                                                  RegistrationFormMoveTextMixin,
+                                                                  RegistrationFormToggleFieldStateMixin,
+                                                                  RegistrationFormToggleTextStateMixin)
 
 
 class RHCategoryManageRegformFieldBase(ManageRegFormFieldBaseMixin, RHCategoryManageRegFormBase):
