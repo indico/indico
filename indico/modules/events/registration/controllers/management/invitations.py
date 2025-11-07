@@ -5,7 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, jsonify, request, session
+from uuid import uuid4
+
+from flask import flash, jsonify, render_template, request, session
+from markupsafe import Markup
 from marshmallow import fields
 from sqlalchemy.orm import joinedload
 from webargs import validate
@@ -13,6 +16,7 @@ from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import ImportInvitationsForm, InvitationFormExisting, InvitationFormNew
@@ -100,6 +104,35 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
                            num).format(n=num), 'success')
             return jsonify_data(**_get_invitation_data(self.regform))
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
+
+
+class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
+    """Return a preview of an invitation email."""
+
+    @use_kwargs({
+        'email_subject': fields.String(load_default=''),
+        'email_body': fields.String(load_default=''),
+        'first_name': fields.String(load_default=None),
+        'last_name': fields.String(load_default=None),
+    })
+    @no_autoflush
+    def _process(self, email_subject, email_body, first_name, last_name):
+        self.commit = False
+        invitation = RegistrationInvitation(
+            registration_form=self.regform,
+            first_name=first_name or 'Peter',
+            last_name=last_name or 'Higgs',
+            email='test@example.com',
+            affiliation='CERN',
+            uuid=str(uuid4())
+        )
+        rendered_subject = replace_placeholders('registration-invitation-email', email_subject,
+                                                invitation=invitation)
+        rendered_body = replace_placeholders('registration-invitation-email', email_body, invitation=invitation)
+        tpl = get_template_module('emails/custom.html', subject=rendered_subject, body=rendered_body)
+        html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
+                               body=Markup(tpl.get_body()))
+        return jsonify(html=html)
 
 
 class RHPendingInvitationsBase(RHManageRegFormBase):
