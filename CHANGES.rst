@@ -43,6 +43,8 @@ Bugfixes
 - Do not allow selecting fields in disabled sections as a condition (:pr:`7114`)
 - Fix timetable PDF cover page layout to allow proper centering of content (:issue:`7148`,
   :pr:`7149`)
+- Fix the logic to force downloads not being applied for materials hosted on some storage
+  backend setups (:pr:`7164`)
 
 Accessibility
 ^^^^^^^^^^^^^
