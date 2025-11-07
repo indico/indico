@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, request, session
+from flask import redirect, session
+from marshmallow import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
@@ -14,6 +15,8 @@ from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.preview import get_file_previewer
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
+from indico.web.flask.util import should_inline_file
 from indico.web.util import jsonify_template
 
 
@@ -24,12 +27,14 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
         if not self.attachment.can_access(session.user):
             raise Forbidden
 
-    def _process(self):
-        from_preview = request.args.get('from_preview') == '1'
-        force_download = request.args.get('download') == '1'
-
+    @use_kwargs({
+        'preview': fields.Boolean(load_default=False),
+        'from_preview': fields.Boolean(load_default=False),
+        'force_download': fields.Boolean(load_default=False, data_key='download'),
+    }, location='query')
+    def _process(self, preview, from_preview, force_download):
         signals.attachments.attachment_accessed.send(self.attachment, user=session.user, from_preview=from_preview)
-        if request.values.get('preview') == '1':
+        if preview:
             if self.attachment.type != AttachmentType.file:
                 raise BadRequest
             previewer = get_file_previewer(self.attachment.file)
@@ -42,4 +47,5 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
         elif self.attachment.type == AttachmentType.link:
             return redirect(self.attachment.link_url)
         else:
-            return self.attachment.file.send(inline=not force_download)
+            inline = not force_download and should_inline_file(self.attachment.file.content_type)
+            return self.attachment.file.send(inline=inline)

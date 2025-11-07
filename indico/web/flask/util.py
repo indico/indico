@@ -248,6 +248,19 @@ def _is_office_mimetype(mimetype):
     return False
 
 
+def should_inline_file(mimetype, inline=None, *, safe=True):
+    if inline is None:
+        inline = mimetype not in ('text/csv', 'text/xml', 'application/xml')
+    if request.user_agent.platform == 'Android':
+        # Android is just full of fail when it comes to inline content-disposition...
+        inline = False
+    if _is_office_mimetype(mimetype):
+        inline = False
+    if safe and mimetype in ('text/html', 'image/svg+xml'):
+        inline = False
+    return inline
+
+
 def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, inline=None,
               max_age=86400, conditional=False, safe=True, **kwargs):
     """Send a file to the user.
@@ -269,15 +282,7 @@ def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, 
     """
     name = re.sub(r'\s+', ' ', name).strip()  # get rid of crap like linebreaks
     assert '/' in mimetype
-    if inline is None:
-        inline = mimetype not in ('text/csv', 'text/xml', 'application/xml')
-    if request.user_agent.platform == 'Android':
-        # Android is just full of fail when it comes to inline content-disposition...
-        inline = False
-    if _is_office_mimetype(mimetype):
-        inline = False
-    if safe and mimetype in ('text/html', 'image/svg+xml'):
-        inline = False
+    inline = should_inline_file(mimetype, inline, safe=safe)
     if not no_cache:
         kwargs['max_age'] = max_age
     try:
