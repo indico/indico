@@ -9,5 +9,16 @@
 {% endcall %}
 {% call form_footer(form) %}
     <input class="i-button big highlight" type="submit" value="{% trans %}Send{% endtrans %}" data-disabled-until-change>
+    <button type="button" class="i-button big"
+            data-ajax-dialog
+            data-method="POST"
+            data-title="{% trans %}Invitation preview{% endtrans %}"
+            data-href="{{ url_for('.invitation_preview', regform) }}"
+            data-params-selector="#{{ form.email_subject.id }}, #{{ form.email_body.id }}
+                                  {%- if form.first_name and form.last_name -%}
+                                    , #{{ form.first_name.id }}, #{{ form.last_name.id }}
+                                  {%- endif %}">
+        {% trans %}Preview email{% endtrans %}
+    </button>
     <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
 {% endcall %}

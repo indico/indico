@@ -38,6 +38,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit', 'edit_regform', 
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/notification-preview', 'notification_preview',
                  regforms.RHRegistrationFormNotificationPreview, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitation-preview', 'invitation_preview',
+                 invitations.RHRegistrationFormInvitationPreview, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform', regforms.RHRegistrationFormDelete,
                  methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/open', 'open_regform', regforms.RHRegistrationFormOpen,
