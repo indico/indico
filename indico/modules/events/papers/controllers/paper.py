@@ -11,6 +11,7 @@ from itertools import chain
 from operator import attrgetter
 
 from flask import flash, jsonify, request, session
+from marshmallow import fields
 from sqlalchemy.orm import selectinload, subqueryload
 from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
@@ -27,6 +28,7 @@ from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePap
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext, pgettext
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -91,16 +93,22 @@ class RHCustomizePapersList(RHPapersListBase):
 class RHPapersActionBase(RHPapersListBase):
     """Base class for actions on selected papers."""
 
+    _allow_get_all = False
+
     def _get_contrib_query_options(self):
         return ()
 
-    def _process_args(self):
+    @use_kwargs({
+        'contribution_ids': fields.List(fields.Int(), data_key='contribution_id', load_default=lambda: [])
+    })
+    def _process_args(self, contribution_ids):
         RHPapersListBase._process_args(self)
-        ids = request.form.getlist('contribution_id', type=int)
-        self.contributions = (self.list_generator._build_query()
-                              .filter(Contribution.id.in_(ids))
-                              .options(*self._get_contrib_query_options())
-                              .all())
+        query = self.list_generator._build_query().options(*self._get_contrib_query_options())
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by contribution ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            query = query.filter(Contribution.id.in_(contribution_ids))
+        self.contributions = query.all()
 
 
 class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
@@ -127,6 +135,7 @@ class RHExportPapersJSON(RHPapersActionBase):
     """Generate a JSON file with all the paper details."""
 
     ALLOW_LOCKED = True
+    _allow_get_all = True
 
     def _check_access(self):
         RHPapersActionBase._check_access(self)
