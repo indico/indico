@@ -7,6 +7,7 @@
 
 from operator import itemgetter
 
+from marshmallow import EXCLUDE, validate
 from marshmallow.decorators import post_dump
 from marshmallow.fields import String
 from webargs import fields
@@ -18,8 +19,49 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
+from indico.util.marshmallow import (LowercaseString, make_validate_indico_placeholders, no_endpoint_links,
+                                     no_relative_urls, not_empty)
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
+
+
+class InvitationBaseSchema(mm.Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    sender_address = fields.String(required=True, validate=not_empty)
+    subject = fields.String(required=True, validate=[not_empty, validate.Length(max=200)])
+    body = fields.String(required=True, validate=[
+        not_empty,
+        no_relative_urls,
+        no_endpoint_links('event_registration.display_regform', {'invitation'}),
+        make_validate_indico_placeholders('registration-invitation-email', invitation=None),
+    ])
+    skip_moderation = fields.Bool(load_default=False)
+    skip_access_check = fields.Bool(load_default=False)
+    lock_email = fields.Bool(load_default=False)
+    bcc_addresses = fields.List(LowercaseString(validate=validate.Email()), load_default=list)
+    copy_for_sender = fields.Bool(load_default=False)
+
+
+class InvitationNewSchema(InvitationBaseSchema):
+    first_name = fields.String(required=True, validate=not_empty)
+    last_name = fields.String(required=True, validate=not_empty)
+    email = LowercaseString(required=True, validate=[not_empty, validate.Email()])
+    affiliation = fields.String(load_default='')
+
+
+class InvitationExistingSchema(InvitationBaseSchema):
+    users_field = fields.List(
+        fields.String(validate=not_empty),
+        required=True,
+        validate=validate.Length(min=1)
+    )
+
+
+class InvitationImportSchema(InvitationBaseSchema):
+    skip_existing = fields.Bool(load_default=False)
+    source_file = fields.UUID(required=True)
 
 
 class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):
