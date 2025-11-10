@@ -225,6 +225,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         self.field.is_enabled = enabled
+        signals.event.registration_form_field_changed.send(self.field)
         update_regform_item_positions(self.regform)
         db.session.flush()
         logger.info('Field %s modified by %s', self.field, session.user)
@@ -269,6 +270,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
+        signals.event.registration_form_field_changed.send(self.field)
         changes = _fill_form_field_with_data(self.field, field_data)
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
@@ -289,6 +291,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
 
     def _process(self):
         new_position = request.json['endPos'] + 1
+        signals.event.registration_form_field_moved.send(self.field, new_position=new_position)
         old_position = self.field.position
         if new_position == old_position:
             return jsonify()
@@ -317,6 +320,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         field_data = snakify_keys(request.json['fieldData'])
         form_field = RegistrationFormField(parent=self.section, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data)
+        signals.event.registration_form_field_added.send(form_field)
         db.session.add(form_field)
         db.session.flush()
         form_field.log(
@@ -368,6 +372,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         del field_data['input_type']
         form_field = RegistrationFormText(parent=self.section, registration_form=self.regform)
         _fill_form_field_with_data(form_field, field_data, is_static_text=True)
+        signals.event.registration_form_field_added.send(form_field)
         db.session.add(form_field)
         db.session.flush()
         form_field.log(

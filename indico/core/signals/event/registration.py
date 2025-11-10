@@ -72,6 +72,22 @@ Called when a registration form field is removed. The `sender` is the
 `RegistrationFormField` object.
 ''')
 
+registration_form_field_added = _signals.signal('registration-form-field-added', '''
+Called when a registration form field is added. The `sender` is the
+`RegistrationFormField` object.
+''')
+
+registration_form_field_changed = _signals.signal('registration-form-field-changed', '''
+Called when a registration form field is changed. The `sender` is the
+`RegistrationFormField` object.
+''')
+
+registration_form_field_moved = _signals.signal('registration-form-field-moved', '''
+Called when a registration form field is moved. The `sender` is the
+`RegistrationFormField` object.
+The new ``position`` value is passed in the ``new_position`` kwarg.
+''')
+
 is_ticketing_handled = _signals.signal('is-ticketing-handled', '''
 Called when resolving whether Indico should send tickets with e-mails
 or it will be handled by other module. The `sender` is the
