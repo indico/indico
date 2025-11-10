@@ -45,6 +45,8 @@ Bugfixes
   :pr:`7149`)
 - Fix the logic to force downloads not being applied for materials hosted on some storage
   backend setups (:pr:`7164`)
+- Preserve configured registration date formats in Excel exports (:pr:`7157`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -129,11 +129,28 @@ def _prepare_excel_data(data):
     return data
 
 
-def generate_xlsx(headers, rows, tz=None):
+def _strftime_to_excel_number_format(fmt):
+    replacements = (
+        ('%d', 'dd'),
+        ('%m', 'mm'),
+        ('%Y', 'yyyy'),
+        ('%H', 'hh'),
+        ('%I', 'hh'),
+        ('%M', 'mm'),
+        ('%p', 'AM/PM'),
+    )
+    result = fmt
+    for source, target in replacements:
+        result = result.replace(source, target)
+    return result
+
+
+def generate_xlsx(headers, rows, tz=None, column_formats=None):
     """Generate an XLSX file from a list of headers and rows.
 
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
+    :param column_formats: optional mapping of header keys to Excel number formats
     :return: an `io.BytesIO` containing the XLSX data
     """
     workbook_options = {'in_memory': True, 'strings_to_formulas': False, 'strings_to_numbers': False,
@@ -145,6 +162,14 @@ def generate_xlsx(headers, rows, tz=None):
     assert all(len(row) == len(headers) for row in rows)
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})
+        wb_formats = {
+            fmt: workbook.add_format({'num_format': _strftime_to_excel_number_format(fmt)})
+            for fmt in {value for value in column_formats.values() if value}
+        }
+        column_formats_list = [
+            wb_formats.get(column_formats.get(header)) if column_formats else None
+            for header in headers
+        ]
         date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
         datetime_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm'})
         sheet = workbook.add_worksheet()
@@ -152,12 +177,14 @@ def generate_xlsx(headers, rows, tz=None):
             sheet.write(0, col, name, bold)
         for row, values in enumerate(rows, 1):
             for col, data in enumerate(values):
+                cell_format = column_formats_list[col]
                 if isinstance(data, datetime):
-                    sheet.write_datetime(row, col, data.astimezone(tz).replace(tzinfo=None), datetime_format)
+                    sheet.write_datetime(row, col, data.astimezone(tz).replace(tzinfo=None),
+                                         cell_format or datetime_format)
                 elif isinstance(data, date):
-                    sheet.write_datetime(row, col, data, date_format)
+                    sheet.write_datetime(row, col, data, cell_format or date_format)
                 else:
-                    sheet.write(row, col, _prepare_excel_data(data))
+                    sheet.write(row, col, _prepare_excel_data(data), cell_format)
     buf.seek(0)
     return buf
 
@@ -175,14 +202,15 @@ def send_csv(filename, headers, rows, *, include_header=True):
     return send_file(filename, buf, 'text/csv', inline=False)
 
 
-def send_xlsx(filename, headers, rows, tz=None):
+def send_xlsx(filename, headers, rows, *, tz=None, column_formats=None):
     """Send an XLSX file to the client.
 
     :param filename: The name of the CSV file
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
     :param tz: the timezone for the values that are datetime objects
+    :param column_formats: optional mapping of header keys to Excel number formats
     :return: a flask response containing the XLSX data
     """
-    buf = generate_xlsx(headers, rows, tz=tz)
+    buf = generate_xlsx(headers, rows, tz=tz, column_formats=column_formats)
     return send_file(filename, buf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', inline=False)
