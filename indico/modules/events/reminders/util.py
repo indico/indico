@@ -7,8 +7,14 @@
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.models.events import EventType
+from indico.util.caching import memoize_request
 from indico.util.string import html_to_markdown
 from indico.web.flask.templating import get_template_module
+
+
+@memoize_request
+def _get_timetable_entries(event):
+    return event.timetable_entries.filter_by(parent_id=None).all()
 
 
 def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_description, subject, message):
@@ -36,7 +42,7 @@ def get_reminder_email_tpl(event, reminder_type, render_mode, with_agenda, with_
 
     if event.type_ == EventType.lecture:
         with_agenda = False
-    agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
+    agenda = _get_timetable_entries(event) if with_agenda else None
     text_message = str(message)  # Legacy reminder (text/plain email only)
     if text_message and render_mode == RenderMode.html:
         # Standard reminder (text/html -> text/plain)
