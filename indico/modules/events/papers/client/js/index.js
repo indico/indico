@@ -151,6 +151,7 @@ customElements.define(
         ReactDOM.render(
           <FileTypeManager
             eventId={+this.getAttribute('event-id')}
+            hideAccepted={JSON.parse(this.getAttribute('hide-accepted'))}
             getAllURLFn={fileTypeURL}
             editURLFn={editFileTypeURL}
             createURLFn={createFileTypeURL}
