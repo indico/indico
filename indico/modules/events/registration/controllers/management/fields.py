@@ -43,6 +43,20 @@ class GeneralFieldDataSchema(mm.Schema):
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
 
+    @validates('title')
+    @no_autoflush
+    def _check_unique_title_in_section(self, title, **kwargs):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
+        field = self.context['field']
+        query = (db.session.query(db.func.count(RegistrationFormItem.id)).
+                 filter(RegistrationFormItem.parent_id == field.parent_id,
+                        db.func.lower(RegistrationFormItem.title) == title.lower(),
+                        ~RegistrationFormItem.is_deleted))
+        if field.id:
+            query = query.filter(RegistrationFormItem.id != field.id)
+        if query.scalar():
+            raise ValidationError(_('There is already a field in this section with the same title.'))
+
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
         field = self.context['field']
