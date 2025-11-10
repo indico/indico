@@ -130,8 +130,6 @@ def _prepare_excel_data(data):
 
 
 def _strftime_to_excel_number_format(fmt):
-    if not fmt:
-        return None
     replacements = (
         ('%d', 'dd'),
         ('%m', 'mm'),
@@ -204,7 +202,7 @@ def send_csv(filename, headers, rows, *, include_header=True):
     return send_file(filename, buf, 'text/csv', inline=False)
 
 
-def send_xlsx(filename, headers, rows, tz=None, column_formats=None):
+def send_xlsx(filename, headers, rows, *, tz=None, column_formats=None):
     """Send an XLSX file to the client.
 
     :param filename: The name of the CSV file
