@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -46,6 +46,7 @@ const PrincipalListField = props => {
     favoriteUsersController,
     className,
     searchToken,
+    onPrincipalsResolved,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -89,6 +90,13 @@ const PrincipalListField = props => {
   };
 
   const [entries, pendingEntries] = getPrincipalList(value, informationMap);
+
+  useEffect(() => {
+    if (!onPrincipalsResolved) {
+      return;
+    }
+    onPrincipalsResolved(entries);
+  }, [entries, onPrincipalsResolved]);
 
   return (
     <>
@@ -198,6 +206,7 @@ PrincipalListField.propTypes = {
   eventId: PropTypes.number,
   className: PropTypes.string,
   searchToken: PropTypes.string,
+  onPrincipalsResolved: PropTypes.func,
 };
 
 PrincipalListField.defaultProps = {
@@ -210,6 +219,7 @@ PrincipalListField.defaultProps = {
   readOnly: false,
   className: undefined,
   searchToken: null,
+  onPrincipalsResolved: null,
 };
 
 export default React.memo(PrincipalListField);
