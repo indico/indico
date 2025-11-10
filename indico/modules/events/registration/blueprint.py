@@ -150,9 +150,14 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/print/<int:templ
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations',
                  invitations.RHRegistrationFormInvitations)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'invite',
-                 invitations.RHRegistrationFormInvite, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/import', 'import',
-                 invitations.RHRegistrationFormInviteImport, methods=('GET', 'POST'))
+                 invitations.RHRegistrationFormInvite, methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/invite/metadata', 'api_invitations_metadata',
+                 invitations.RHRegistrationFormInviteMetadata)
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/invite/import', 'api_invitations_import',
+                 invitations.RHRegistrationFormImportInvites, methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/import/upload',
+                 'api_invitations_import_upload', invitations.RHRegistrationFormImportInvitesUpload,
+                 methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  invitations.RHRegistrationFormDeleteInvitation, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>/decline',

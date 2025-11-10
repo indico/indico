@@ -12,9 +12,9 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request, session
-from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
-                            StringField, TextAreaField)
-from wtforms.validators import DataRequired, Email, InputRequired, Length, NumberRange, Optional, ValidationError
+from wtforms.fields import (BooleanField, DecimalField, FloatField, HiddenField, IntegerField, SelectField, StringField,
+                            TextAreaField)
+from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import NumberInput, html_params
 
 from indico.core import signals
@@ -25,7 +25,6 @@ from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
-from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
@@ -238,101 +237,6 @@ class RegistrationExceptionalModificationForm(IndicoForm):
     def __init__(self, *args, regform, **kwargs):
         self.timezone = regform.event.timezone
         super().__init__(*args, **kwargs)
-
-
-class InvitationFormBase(IndicoForm):
-    _invitation_fields = ('skip_moderation', 'skip_access_check', 'lock_email')
-    _email_fields = ('email_sender', 'email_subject', 'email_body')
-    email_sender = SelectField(_('Sender'), [DataRequired()])
-    email_subject = StringField(_('Email subject'), [DataRequired()])
-    email_body = TextAreaField(
-        _('Email body'),
-        [DataRequired(), NoRelativeURLs(), NoEndpointLinks('event_registration.display_regform', {'invitation'})],
-        widget=TinyMCEWidget(absolute_urls=True)
-    )
-    skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
-                                   description=_("If enabled, the user's registration will be approved automatically."))
-    skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
-                                     description=_('If enabled, the user will be able to register even if the event '
-                                                   'is access-restricted.'))
-    lock_email = BooleanField(_('Lock email address'), widget=SwitchWidget(),
-                              description=_('If enabled, the email address cannot be changed during registration.'))
-
-    def __init__(self, *args, **kwargs):
-        self.regform = kwargs.pop('regform')
-        event = self.regform.event
-        super().__init__(*args, **kwargs)
-        if not self.regform.moderation_enabled:
-            del self.skip_moderation
-        self.email_sender.choices = list(event.get_allowed_sender_emails().items())
-        self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
-
-    def validate_email_body(self, field):
-        missing = get_missing_placeholders('registration-invitation-email', field.data, invitation=None)
-        if missing:
-            raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
-
-
-class InvitationFormNew(InvitationFormBase):
-    _invitation_fields = ('first_name', 'last_name', 'email', 'affiliation', *InvitationFormBase._invitation_fields)
-    first_name = StringField(_('First name'), [DataRequired()],
-                             description=_('The first name of the user you are inviting.'))
-    last_name = StringField(_('Last name'), [DataRequired()],
-                            description=_('The last name of the user you are inviting.'))
-    email = EmailField(_('Email'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x],
-                       description=_('The invitation will be sent to this address.'))
-    affiliation = StringField(_('Affiliation'),
-                              description=_('The affiliation of the user you are inviting.'))
-
-    @generated_data
-    def users(self):
-        return [{'first_name': self.first_name.data,
-                 'last_name': self.last_name.data,
-                 'email': self.email.data,
-                 'affiliation': self.affiliation.data}]
-
-    def validate_email(self, field):
-        if RegistrationInvitation.query.filter_by(email=field.data).with_parent(self.regform).has_rows():
-            raise ValidationError(_('There is already an invitation with this email address.'))
-        if Registration.query.filter_by(email=field.data, is_active=True).with_parent(self.regform).has_rows():
-            raise ValidationError(_('There is already a registration with this email address.'))
-
-
-class InvitationFormExisting(InvitationFormBase):
-    _invitation_fields = ('users_field', *InvitationFormBase._invitation_fields)
-    users_field = PrincipalListField(_('Users'), [DataRequired()], allow_external_users=True,
-                                     description=_('Select the users to invite.'))
-
-    @generated_data
-    def users(self):
-        return [{'first_name': x.first_name,
-                 'last_name': x.last_name,
-                 'email': x.email.lower(),
-                 'affiliation': x.affiliation}
-                for x in self.users_field.data]
-
-    def validate_users_field(self, field):
-        emails = {x.email.lower() for x in field.data}
-        # invitations
-        existing = {x.email for x in self.regform.invitations} & emails
-        if existing:
-            raise ValidationError(_('There are already invitations for the following email addresses: {emails}')
-                                  .format(emails=', '.join(sorted(existing))))
-        # registrations
-        existing = {x.email for x in self.regform.registrations if x.is_active} & emails
-        if existing:
-            raise ValidationError(_('There are already registrations with the following email addresses: {emails}')
-                                  .format(emails=', '.join(sorted(existing))))
-
-
-class ImportInvitationsForm(InvitationFormBase):
-    _invitation_fields = ('source_file', 'delimiter', 'skip_existing', *InvitationFormBase._invitation_fields)
-    source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
-                            accepted_file_types='.csv')
-    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
-                                      default=CSVFieldDelimiter.comma)
-    skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
-                                 description=_('If enabled, users with existing invitations will be ignored.'))
 
 
 class EmailRegistrantsForm(IndicoForm):
