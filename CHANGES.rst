@@ -63,6 +63,7 @@ Accessibility
 - Fix announcements accessibility (:pr:`7098`, thanks :user:`foxbuny`)
 - Fix conference description color contrast (:pr:`7118`, thanks :user:`foxbunny`)
 - Improve infogrid accessibility (:pr:`7119`, thanks :user:`foxbunny`)
+- Fix footer color contrast (thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
