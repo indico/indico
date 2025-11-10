@@ -32,6 +32,7 @@ interface FileTypeManagerProps {
   getAllURLFn: (params?) => string;
   createURLFn: (params?) => string;
   editURLFn: (params?) => string;
+  hideAccepted?: boolean;
   allowDeleteLastType?: boolean;
 }
 
@@ -71,6 +72,7 @@ export default function FileTypeManager({
   getAllURLFn,
   createURLFn,
   editURLFn,
+  hideAccepted = false,
   allowDeleteLastType = false,
 }: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
@@ -120,6 +122,10 @@ export default function FileTypeManager({
     return null;
   }
 
+  const displayHideAcceptedWarning = hideAccepted && fileTypes.some(ft => ft.publishable);
+  const displayNothingShownWarning =
+    fileTypes?.length && !hideAccepted && !fileTypes.some(ft => ft.publishable);
+
   const isLastPublishable = fileTypeId => {
     const publishable = fileTypes.filter(ft => ft.publishable);
     return publishable.length === 1 && publishable[0].id === fileTypeId;
@@ -149,6 +155,22 @@ export default function FileTypeManager({
       {fileTypes.length === 0 && (
         <Message info>
           <Translate>There are no file types defined for this event</Translate>
+        </Message>
+      )}
+      {displayHideAcceptedWarning && (
+        <Message warning>
+          <Translate>
+            There are publishable file types that will not be displayed due to the 'Hide Accepted'
+            setting being enabled.
+          </Translate>
+        </Message>
+      )}
+      {displayNothingShownWarning && (
+        <Message warning>
+          <Translate>
+            No file types will be shown as there are no publishable file types and the 'Hide
+            Accepted' setting is disabled.
+          </Translate>
         </Message>
       )}
       {fileTypes.map(fileType => (

@@ -1,5 +1,6 @@
 {% extends 'events/papers/management/_base.html' %}
 
 {% block content %}
-    <ind-paper-file-types-management event-id="{{ event.id }}"></ind-paper-file-types-management>
+    <ind-paper-file-types-management event-id="{{ event.id }}" hide-accepted="{{ event.cfp.hide_accepted | tojson }}">
+    </ind-paper-file-types-management>
 {% endblock %}
