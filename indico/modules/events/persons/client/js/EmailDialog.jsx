@@ -57,59 +57,83 @@ RecipientsField.propTypes = {
   recipients: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export function EmailSentMessage({count}) {
+export function EmailSentMessage({count, warningMessage}) {
   return (
-    <Message positive>
-      <PluralTranslate as={Message.Header} count={count}>
-        <Singular>Your email has been sent.</Singular>
-        <Plural>Your emails have been sent.</Plural>
-      </PluralTranslate>
-      <PluralTranslate count={count} as="p">
-        <Singular>
-          <Param name="count" value={count} /> email has been sent.
-        </Singular>
-        <Plural>
-          <Param name="count" value={count} /> emails have been sent.
-        </Plural>
-      </PluralTranslate>
-    </Message>
+    <>
+      <Message positive>
+        <PluralTranslate as={Message.Header} count={count}>
+          <Singular>Your email has been sent.</Singular>
+          <Plural>Your emails have been sent.</Plural>
+        </PluralTranslate>
+        <PluralTranslate count={count} as="p">
+          <Singular>
+            <Param name="count" value={count} /> email has been sent.
+          </Singular>
+          <Plural>
+            <Param name="count" value={count} /> emails have been sent.
+          </Plural>
+        </PluralTranslate>
+      </Message>
+      {warningMessage && <Message warning visible icon="warning sign" content={warningMessage} />}
+    </>
   );
 }
 
-EmailSentMessage.propTypes = {count: PropTypes.number.isRequired};
+EmailSentMessage.propTypes = {
+  count: PropTypes.number.isRequired,
+  warningMessage: PropTypes.node,
+};
+
+EmailSentMessage.defaultProps = {
+  warningMessage: null,
+};
 
 export function EmailDialog({
   onClose,
   onSubmit,
   senders,
   sentEmailsCount,
+  sentEmailsWarning,
   previewURL,
   previewContext,
   placeholders,
   recipients,
   recipientsField,
+  recipientsFirst,
   initialFormValues,
   validate,
+  title,
+  getPreviewPayload,
 }) {
   const [preview, setPreview] = useState(null);
 
-  const togglePreview = async ({body, subject}) => {
+  const togglePreview = async (values, contextOverride = null) => {
+    const {body, subject} = values;
     if (preview) {
       setPreview(undefined);
       return;
     }
-    const {data} = await indicoAxios.post(previewURL, {body, subject, ...previewContext});
+    const payload = {body, subject, ...previewContext, ...(contextOverride || {})};
+    const {data} = await indicoAxios.post(previewURL, payload);
     setPreview(data);
   };
 
   const extraActions = (
     <Form.Field style={{marginRight: 'auto'}}>
       <FormSpy subscription={{values: true}}>
-        {({values}) => (
-          <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
-            {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
-          </Button>
-        )}
+        {({values}) => {
+          const previewData = getPreviewPayload ? getPreviewPayload(values) : null;
+          return (
+            <Button
+              type="button"
+              active={!!preview}
+              disabled={!preview && previewData?.disabled}
+              onClick={() => togglePreview(values, previewData?.context)}
+            >
+              {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
+            </Button>
+          );
+        }}
       </FormSpy>
     </Form.Field>
   );
@@ -146,6 +170,7 @@ export function EmailDialog({
     <>
       {preview && renderPreview()}
       <Form.Field style={{display: preview ? 'none' : 'block'}}>
+        {recipientsFirst && (recipientsField || <RecipientsField recipients={recipients} />)}
         <FinalDropdown
           name="sender_address"
           label={Translate.string('Sender')}
@@ -166,7 +191,7 @@ export function EmailDialog({
             <PlaceholderInfo placeholders={placeholders} defaultOpen />
           </Form.Field>
         )}
-        {recipientsField || <RecipientsField recipients={recipients} />}
+        {!recipientsFirst && (recipientsField || <RecipientsField recipients={recipients} />)}
         <FinalEmailList
           name="bcc_addresses"
           label={Translate.string('BCC addresses')}
@@ -185,7 +210,7 @@ export function EmailDialog({
     <FinalModalForm
       id="send-email"
       size="standard"
-      header={Translate.string('Send email')}
+      header={title || Translate.string('Send email')}
       initialValues={{
         sender_address: senders[0][0],
         subject: '',
@@ -206,7 +231,11 @@ export function EmailDialog({
       validate={validate}
     >
       {({submitSucceeded}) =>
-        submitSucceeded ? <EmailSentMessage count={sentEmailsCount} /> : form
+        submitSucceeded ? (
+          <EmailSentMessage count={sentEmailsCount} warningMessage={sentEmailsWarning} />
+        ) : (
+          form
+        )
       }
     </FinalModalForm>
   );
@@ -224,15 +253,23 @@ EmailDialog.propTypes = {
   recipients: PropTypes.arrayOf(PropTypes.string),
   /** React node to render instead of the default <RecipientsField /> component. */
   recipientsField: PropTypes.node,
+  recipientsFirst: PropTypes.bool,
   initialFormValues: PropTypes.object,
   validate: PropTypes.func,
+  title: PropTypes.string,
+  getPreviewPayload: PropTypes.func,
+  sentEmailsWarning: PropTypes.node,
 };
 
 EmailDialog.defaultProps = {
   previewContext: {},
   initialFormValues: {},
   sentEmailsCount: 0,
+  sentEmailsWarning: null,
   recipients: [],
   recipientsField: null,
+  recipientsFirst: false,
   validate: undefined,
+  title: null,
+  getPreviewPayload: null,
 };

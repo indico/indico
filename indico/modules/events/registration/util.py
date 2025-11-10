@@ -908,7 +908,9 @@ def update_regform_item_positions(regform):
 
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
-                      lock_email):
+                      lock_email, bcc_addresses=None, copy_for_sender=False):
+    if bcc_addresses is None:
+        bcc_addresses = []
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
@@ -920,7 +922,8 @@ def create_invitation(regform, user, email_sender, email_subject, email_body, *,
     )
     regform.invitations.append(invitation)
     db.session.flush()
-    notify_invitation(invitation, email_subject, email_body, email_sender)
+    notify_invitation(invitation, email_subject, email_body, email_sender,
+                      bcc_addresses=bcc_addresses, copy_for_sender=copy_for_sender)
     return invitation
 
 
@@ -951,7 +954,8 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
 
 
 def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *, skip_moderation=True,
-                                skip_access_check=True, skip_existing=False, lock_email=False, delimiter=','):
+                                skip_access_check=True, skip_existing=False, lock_email=False, delimiter=',',
+                                bcc_addresses=None, copy_for_sender=False):
     """Import invitations from a CSV file.
 
     :return: A list of invitations and the number of skipped records which
@@ -990,7 +994,8 @@ def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, e
 
     invitations = [create_invitation(regform, user, email_sender, email_subject, email_body,
                                      skip_moderation=skip_moderation, skip_access_check=skip_access_check,
-                                     lock_email=lock_email)
+                                     lock_email=lock_email, bcc_addresses=bcc_addresses,
+                                     copy_for_sender=copy_for_sender)
                    for user in filtered_records]
     skipped_records = len(user_records) - len(filtered_records)
     return invitations, skipped_records
