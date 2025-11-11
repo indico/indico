@@ -276,6 +276,7 @@ class BookingEditForm extends React.Component {
             <FinalDatePicker
               name="dates"
               asRange
+              required
               onChange={newDates => {
                 if (newDates.startDate !== '__invalid__') {
                   onBookingPeriodChange(newDates, timeSlot, recurrence);
@@ -287,6 +288,7 @@ class BookingEditForm extends React.Component {
           ) : (
             <FinalDateRangePicker
               name="dates"
+              required
               onChange={newDates => {
                 onBookingPeriodChange(newDates, timeSlot, this.clearWeekdays(recurrence.interval));
               }}
