@@ -227,6 +227,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
+        signals.event.registration_form_field_toggled.send(self.field)
         logger.info('Field %s modified by %s', self.field, session.user)
         if enabled:
             self.field.log(
@@ -270,6 +271,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise BadRequest
         field_data['input_type'] = self.field.input_type
         changes = _fill_form_field_with_data(self.field, field_data)
+        signals.event.registration_form_field_changed.send(self.field)
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
@@ -319,6 +321,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
+        signals.event.registration_form_field_added.send(form_field)
         form_field.log(
             EventLogRealm.management, LogKind.positive, 'Registration',
             f'Field "{form_field.title}" in "{self.regform.title}" added', session.user,
@@ -370,6 +373,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         _fill_form_field_with_data(form_field, field_data, is_static_text=True)
         db.session.add(form_field)
         db.session.flush()
+        signals.event.registration_form_field_added.send(form_field)
         form_field.log(
             EventLogRealm.management, LogKind.positive, 'Registration',
             f'Field "{form_field.title}" in "{self.regform.title}" added', session.user,
