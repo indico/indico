@@ -40,6 +40,20 @@ class EmailRolesMetadataMixin:
         })
 
 
+def get_roles_from_person_link(person_link):
+    roles = set()
+    if getattr(person_link, 'is_submitter', False):
+        # ContributionPersonLink has a property that checks the ACL
+        roles.add('submitter')
+    if person_link.is_speaker:
+        roles.add('speaker')
+    if person_link.author_type == AuthorType.primary:
+        roles.add('author')
+    if person_link.author_type == AuthorType.secondary:
+        roles.add('coauthor')
+    return roles
+
+
 class EmailRolesPreviewMixin:
     """Preview an email to abstract/contribution roles."""
 
@@ -52,9 +66,14 @@ class EmailRolesPreviewMixin:
     @use_kwargs({
         'body': fields.String(required=True),
         'subject': fields.String(required=True, validate=validate.Length(max=200)),
+        'recipient_roles': fields.List(
+            fields.String(validate=validate.OneOf(['speaker', 'author', 'coauthor', 'submitter'])),
+            load_default=[]
+        )
     })
-    def _process(self, body, subject):
-        kwargs = self.get_placeholder_kwargs()
+    def _process(self, body, subject, recipient_roles):
+        recipient_roles = frozenset(recipient_roles)
+        kwargs = self.get_placeholder_kwargs(recipient_roles)
         email_body = replace_placeholders('event-persons-email', body, event=self.event,
                                           object_context=self.object_context, **kwargs)
         email_subject = replace_placeholders('event-persons-email', subject, event=self.event,
@@ -75,19 +94,6 @@ class EmailRolesSendMixin:
         # - `kwargs` must contain `person` and `abstract`/`contribution`
         # - `log_metadata` may be a dict of logging metadata
         raise NotImplementedError
-
-    def get_roles_from_person_link(self, person_link):
-        roles = set()
-        if getattr(person_link, 'is_submitter', False):
-            # ContributionPersonLink has a property that checks the ACL
-            roles.add('submitter')
-        if person_link.is_speaker:
-            roles.add('speaker')
-        if person_link.author_type == AuthorType.primary:
-            roles.add('author')
-        if person_link.author_type == AuthorType.secondary:
-            roles.add('coauthor')
-        return roles
 
     @use_kwargs({
         'sender_address': fields.String(required=True, validate=not_empty),
