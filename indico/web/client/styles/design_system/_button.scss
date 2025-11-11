@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'partials/icons';
 @use './variables';
 @use './layout';
 @use './visibility';
@@ -105,6 +106,25 @@
   @extend %button-clear;
   @extend %flex-inline-center;
   padding: 0;
+
+  span {
+    @extend %visually-hidden;
+  }
+}
+
+%button-clear-icon {
+  @extend %button-clear;
+  @extend %flex-inline-center;
+  min-width: 0;
+  padding: 0;
+
+  &::after {
+    @extend %icon;
+    @extend %icon-cross;
+    display: inline-block;
+    width: 1em;
+    aspect-ratio: 1;
+  }
 
   span {
     @extend %visually-hidden;
