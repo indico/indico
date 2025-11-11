@@ -47,6 +47,8 @@ Bugfixes
   backend setups (:pr:`7164`)
 - Preserve configured registration date formats in Excel exports (:pr:`7157`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Fix inconsistent styling of nested lists in minutes and editor output (:issue:`7063`,
+  :pr:`7105`, thanks :user:`AtharvMixraw`)
 
 Accessibility
 ^^^^^^^^^^^^^
