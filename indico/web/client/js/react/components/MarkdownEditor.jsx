@@ -67,6 +67,7 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
   ) : (
     <div styleName="markdown-editor" onDragOver={handleDragOver}>
       <MdEditor
+        htmlClass="editor-output"
         renderHTML={text => (
           <Markdown targetBlank remarkPlugins={[[AutoLinkerPlugin, {rules: data.rules}]]}>
             {text.replace(/\n/gi, '  \n')}
