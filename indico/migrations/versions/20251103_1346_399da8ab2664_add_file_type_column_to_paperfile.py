@@ -34,4 +34,3 @@ def upgrade():
 
 def downgrade():
     op.drop_column('files', 'file_type_id', schema='event_paper_reviewing')
-    # op.drop_column('file_types', 'filename_template', schema='event_paper_reviewing')

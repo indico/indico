@@ -13,9 +13,6 @@ from indico.modules.events.papers.schemas import PaperFileTypeSchema
 class RHPapersFileTypes(RHPapersBase):
     """Return all editing file types defined in the event for the editable type."""
 
-    def _process_args(self):
-        RHPapersBase._process_args(self)
-
     def _process(self):
         file_types = PaperFileType.query.with_parent(self.event).all()
         return PaperFileTypeSchema(many=True).jsonify(file_types)
