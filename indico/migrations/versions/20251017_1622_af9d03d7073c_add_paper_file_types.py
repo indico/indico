@@ -1,4 +1,4 @@
-"""Add paper file types table
+"""Add paper file types
 
 Revision ID: af9d03d7073c
 Revises: 932389d22b1f
@@ -29,11 +29,16 @@ def upgrade():
         sa.Column('filename_template', sa.String(), nullable=True),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
-                                schema='event_paper_reviewing',
+        schema='event_paper_reviewing',
     )
-    op.create_index('ix_uq_file_types_event_id_name_lower', 'file_types',
-                    ['event_id', sa.text('lower(name)')], unique=True, schema='event_paper_reviewing')
+    op.create_index('ix_uq_file_types_event_id_name_lower', 'file_types', ['event_id', sa.text('lower(name)')],
+                    unique=True, schema='event_paper_reviewing')
+    op.add_column('files', sa.Column('file_type_id', sa.Integer(), nullable=True), schema='event_paper_reviewing')
+    op.create_index(None, 'files', ['file_type_id'], schema='event_paper_reviewing')
+    op.create_foreign_key(None, 'files', 'file_types', ['file_type_id'], ['id'], source_schema='event_paper_reviewing',
+                          referent_schema='event_paper_reviewing')
 
 
 def downgrade():
+    op.drop_column('files', 'file_type_id', schema='event_paper_reviewing')
     op.drop_table('file_types', schema='event_paper_reviewing')
