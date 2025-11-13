@@ -37,6 +37,8 @@ Improvements
 - Add new :data:`SMTP_USE_SSL` config option to use always-on TLS (SMTPS) instead of
   STARTTLS when sending emails (:issue:`4347`, :pr:`7177`, thanks :user:`bpedersen2`)
 - Add review count & score standard deviation columns to the abstract list (:pr:`7173`)
+- Refactor the registration invitation dialogs using React and add email previews
+  (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
