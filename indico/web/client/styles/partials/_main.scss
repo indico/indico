@@ -15,6 +15,14 @@
 #global-menu {
   @extend %text-size-reset;
 
+  // Override menu variables for global menu to use inverse (dark) styling
+  --menu-background-color: var(--surface-inverse-color);
+  --menu-text-color: var(--text-inverse-color);
+  --menu-text-hover-color: var(--text-inverse-color);
+  --menu-background-hover-color: var(--surface-highlight-inverse-color);
+  --menu-border: none;
+  --menu-shadow: none;
+
   padding: 0 1.4em;
   background: var(--surface-inverse-color);
   border: none;
@@ -25,6 +33,7 @@
   }
 
   > menu {
+    @extend %menu;
     @extend %flex-row;
   }
 

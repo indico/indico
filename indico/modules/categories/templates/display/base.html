@@ -25,7 +25,7 @@
                 </div>
                 <div class="group">
                     {% block cat_create_event %}
-                        {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
+                        {{ create_event_button(category, classes="highlight", text=_("Create event")) }}
                     {% endblock %}
                 </div>
                 <div class="group">
@@ -48,37 +48,41 @@
                         <div id="category-calendar-link" data-category-id="{{ category.id }}"></div>
                     {% endblock %}
                     {% block cat_view_dropdown %}
-                        <button class="i-button icon-eye arrow js-dropdown"
-                                title="{% trans %}View{% endtrans %}"
-                                data-toggle="dropdown"></button>
-                        <ul class="i-dropdown">
-                            {% if category.is_flat_view_enabled and category.children %}
-                                <li>
-                                    <a href="{{ url_for('.display', category, flat=1) }}">{% trans %}All category events{% endtrans %}</a>
-                                </li>
-                            {% endif %}
-                            <li>
-                                <a href="{{ url_for('.previous_event', category) }}">{% trans %}Previous event{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.closest_event', category) }}">{% trans %}Closest event{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
-                            </li>
-                        </ul>
+                        <ind-with-tooltip>
+                            <ind-menu>
+                                <button class="i-button icon-eye arrow">
+                                    <span data-tip-content="{% trans %}View{% endtrans %}">{% trans %}View{% endtrans %}</span>
+                                </button>
+                                <menu>
+                                    {% if category.is_flat_view_enabled and category.children %}
+                                        <li>
+                                            <a href="{{ url_for('.display', category, flat=1) }}">{% trans %}All category events{% endtrans %}</a>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <a href="{{ url_for('.previous_event', category) }}">{% trans %}Previous event{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.closest_event', category) }}">{% trans %}Closest event{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
+                                    </li>
+                                </menu>
+                            </ind-menu>
+                        </ind-with-tooltip>
                     {% endblock %}
                     {% block cat_manage %}
                         {% if category.can_manage(session.user) %}
