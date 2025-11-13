@@ -45,6 +45,8 @@ Improvements
   section (:pr:`7181`, thanks :user:`tomako`)
 - Add a customizable announcement text on top of the registration form list in
   conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
+- Refactor the registration invitation dialogs using React and add email previews
+  (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
