@@ -124,7 +124,7 @@ export default function FileTypeManager({
 
   const displayHideAcceptedWarning = hideAccepted && fileTypes.some(ft => ft.publishable);
   const displayNothingShownWarning =
-    fileTypes?.length && !hideAccepted && !fileTypes.some(ft => ft.publishable);
+    !!fileTypes?.length && !hideAccepted && !fileTypes.some(ft => ft.publishable);
 
   const isLastPublishable = fileTypeId => {
     const publishable = fileTypes.filter(ft => ft.publishable);
