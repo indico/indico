@@ -131,9 +131,10 @@ class DateRange:
 
     field_flags = {'date_range': True}
 
-    def __init__(self, earliest='today', latest=None):
+    def __init__(self, *, earliest='today', latest=None, always_validate=False):
         self.earliest = earliest
         self.latest = latest
+        self.always_validate = always_validate
         # set to true in get_earliest/get_latest if applicable
         self.earliest_today = False
         self.latest_today = False
@@ -144,7 +145,7 @@ class DateRange:
         field_date = field.data
         earliest_date = self.get_earliest(form, field)
         latest_date = self.get_latest(form, field)
-        if field_date != field.object_data:
+        if self.always_validate or field_date != field.object_data:
             if earliest_date and field_date < earliest_date:
                 if self.earliest_today:
                     msg = _("'{}' can't be in the past").format(field.label)
