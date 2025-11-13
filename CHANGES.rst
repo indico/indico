@@ -57,6 +57,8 @@ Improvements
 - Add placeholders to custom event reminders (:pr:`7115`, thanks :user:`tomako`)
 - Add option to require international phone number format in registration form
   (:pr:`7199`, thanks :user:`openprojects`)
+- Refactor the registration invitation dialogs using React and add email previews
+  (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
