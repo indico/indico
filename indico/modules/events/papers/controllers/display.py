@@ -25,7 +25,7 @@ from indico.web.args import use_rh_kwargs
 from indico.web.util import jsonify_data, jsonify_template
 
 
-class RHSubmitPaperSingle(RHPaperBase):
+class RHSubmitPaperBase(RHPaperBase):
     PAPER_REQUIRED = False
     ALLOW_LOCKED = True
 
@@ -43,6 +43,8 @@ class RHSubmitPaperSingle(RHPaperBase):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
 
+
+class RHSubmitPaperSingle(RHSubmitPaperBase):
     @use_rh_kwargs({
         'file': FileField(required=True),
     }, rh_context=('event', 'contrib'))
@@ -52,24 +54,7 @@ class RHSubmitPaperSingle(RHPaperBase):
         return jsonify_data(flash=False)
 
 
-class RHSubmitPaper(RHPaperBase):
-    PAPER_REQUIRED = False
-    ALLOW_LOCKED = True
-
-    def _check_paper_protection(self):
-        if not RHPaperBase._check_paper_protection(self):
-            return False
-        if not self.contribution.can_submit_proceedings(session.user):
-            return False
-        # this RH is only used for initial submission
-        return self.paper is None
-
-    def _check_access(self):
-        RHPaperBase._check_access(self)
-        if not self.event.cfp.can_submit_proceedings(session.user):
-            raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
-                                                     'Please contact the event organizer for further assistance.')))
-
+class RHSubmitPaper(RHSubmitPaperBase):
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
     }, rh_context=('event', 'contrib'))
