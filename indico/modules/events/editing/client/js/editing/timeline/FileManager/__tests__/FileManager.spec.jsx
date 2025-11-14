@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {shallow, mount} from 'enzyme';
+import {mount} from 'enzyme';
 import mockAxios from 'jest-mock-axios';
 import React from 'react';
 import {act} from 'react-dom/test-utils';
@@ -14,6 +14,8 @@ import * as axiosUtils from 'indico/utils/axios';
 
 import FileManager, {Dropzone} from '..';
 import * as actions from '../actions';
+import {getFiles} from '../selectors';
+import {mapFileTypes} from '../util';
 
 expect.extend({
   toContainFile(received, file) {
@@ -128,6 +130,10 @@ function getDropzoneForFileType(wrapper, id) {
     .find('Dropzone');
 }
 
+function getFileTypeById(wrapper, id) {
+  return wrapper.find('FileType').filterWhere(d => d.prop('fileType').id === id);
+}
+
 async function uploadFile(dropzone, onChange, name, type, deletedFile = null) {
   const uuid = await simulateFileUpload(dropzone, name, type);
   expect(onChange).toHaveBeenCalledWith({2: [uuid]});
@@ -154,10 +160,28 @@ function checkFileEntry(fileEntry, name, icon) {
   expect(fileEntry.find('FileAction').prop('icon')).toEqual(icon);
 }
 
+/** Wrapper to pass a proper `value` to a FileManager so onChange gets called as required */
+// eslint-disable-next-line react/prop-types, no-shadow
+function FileManagerValueWrapper({onChange, fileTypes, files = [], ...rest}) {
+  const [value, setValue] = React.useState(getFiles({fileTypes: mapFileTypes(fileTypes, files)}));
+  return (
+    <FileManager
+      fileTypes={fileTypes}
+      files={files}
+      {...rest}
+      onChange={v => {
+        setValue(v);
+        onChange(v);
+      }}
+      value={value}
+    />
+  );
+}
+
 describe('File manager', () => {
   it('renders OK', () => {
-    const wrapper = shallow(
-      <FileManager
+    const wrapper = mount(
+      <FileManagerValueWrapper
         uploadURL="goes://nowhere"
         downloadURL="goes://nowhere"
         fileTypes={fileTypes}
@@ -180,7 +204,7 @@ describe('File manager', () => {
   it('lets you upload a new file', async () => {
     const onChange = jest.fn();
     const wrapper = mount(
-      <FileManager
+      <FileManagerValueWrapper
         uploadURL="goes://nowhere"
         downloadURL="goes://nowhere"
         fileTypes={[fileTypes[1]]}
@@ -212,21 +236,22 @@ describe('File manager', () => {
 
   it('lets you upload a file, replacing an existing one', async () => {
     const onChange = jest.fn();
+    const existingFiles = [
+      {
+        filename: 'file1.pdf',
+        downloadURL: 'url://file1.pdf',
+        uuid: 'file1',
+        claimed: true,
+        fileType: 2,
+      },
+    ];
     const wrapper = mount(
-      <FileManager
+      <FileManagerValueWrapper
         uploadURL="goes://nowhere"
         downloadURL="goes://nowhere"
         fileTypes={fileTypes}
         onChange={onChange}
-        files={[
-          {
-            filename: 'file1.pdf',
-            downloadURL: 'url://file1.pdf',
-            uuid: 'file1',
-            claimed: true,
-            fileType: 2,
-          },
-        ]}
+        files={existingFiles}
       />
     );
 
@@ -255,7 +280,7 @@ describe('File manager', () => {
   it('modifies an existing file', async () => {
     const onChange = jest.fn();
     const wrapper = mount(
-      <FileManager
+      <FileManagerValueWrapper
         uploadURL="http://upload/endpoint"
         downloadURL="http://download/endpoint"
         fileTypes={fileTypes}
@@ -264,6 +289,7 @@ describe('File manager', () => {
       />
     );
     const dropzone = getDropzoneForFileType(wrapper, 2);
+    expect(getFileTypeById(wrapper, 2).find('Uploads').length).toEqual(0);
 
     const file1 = {type: 'pdf', name: 'test.pdf'};
 
@@ -281,10 +307,12 @@ describe('File manager', () => {
       expect.anything()
     );
 
-    // the internal state is updated
+    // the internal state is updated and results in showing the Upload status
+    wrapper.update();
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({type: actions.START_UPLOADS})
     );
+    expect(getFileTypeById(wrapper, 2).find('Uploads').length).toEqual(1);
 
     expect(onChange).not.toHaveBeenCalled();
 
@@ -322,7 +350,7 @@ describe('File manager', () => {
 
     const onChange = jest.fn();
     const wrapper = mount(
-      <FileManager
+      <FileManagerValueWrapper
         uploadURL="goes://nowhere"
         downloadURL="goes://nowhere"
         fileTypes={[fileTypes[1]]}
