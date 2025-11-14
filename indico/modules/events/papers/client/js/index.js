@@ -7,7 +7,17 @@
 
 /* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false, enableIfChecked:false */
 
+import createFileTypeURL from 'indico-url:papers.api_add_file_type';
+import editFileTypeURL from 'indico-url:papers.api_edit_file_type';
+import fileTypeURL from 'indico-url:papers.api_file_types';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'indico/modules/events/reviews';
+
+import FileTypeManager from 'indico/modules/events/editing/management/editable_type/file_types/FileTypeManager';
+import {domReady} from 'indico/utils/domstate';
 
 import setupReactPaperTimeline from './setup';
 
@@ -132,6 +142,31 @@ import setupReactPaperTimeline from './setup';
     });
   };
 })(window);
+
+customElements.define(
+  'ind-paper-file-types-management',
+  class extends HTMLElement {
+    connectedCallback() {
+      domReady.then(() => {
+        ReactDOM.render(
+          <FileTypeManager
+            eventId={+this.getAttribute('event-id')}
+            hideAccepted={JSON.parse(this.getAttribute('hide-accepted'))}
+            getAllURLFn={fileTypeURL}
+            editURLFn={editFileTypeURL}
+            createURLFn={createFileTypeURL}
+            allowDeleteLastType
+          />,
+          this
+        );
+      });
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
 
 document.addEventListener('DOMContentLoaded', () => {
   setupReactPaperTimeline();

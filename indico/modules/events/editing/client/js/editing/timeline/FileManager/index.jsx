@@ -391,11 +391,11 @@ FileManager.defaultProps = {
 export function FinalFileManager({
   name,
   uploadURL,
-  uploadExistingURL,
+  uploadExistingURL = null,
   fileTypes,
-  files,
-  mustChange,
-  uploadableFiles,
+  files = [],
+  mustChange = false,
+  uploadableFiles = [],
   ...rest
 }) {
   // We do not use FinalField here since the file manager is more "standalone"
@@ -427,11 +427,4 @@ FinalFileManager.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   mustChange: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
-};
-
-FinalFileManager.defaultProps = {
-  uploadExistingURL: null,
-  mustChange: false,
-  files: [],
-  uploadableFiles: [],
 };
