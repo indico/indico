@@ -20,7 +20,7 @@ from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDispla
                                                 WPDisplayReviewingArea)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.util.marshmallow import FileField
+from indico.util.marshmallow import FilesField
 from indico.web.args import use_rh_kwargs
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -46,11 +46,11 @@ class RHSubmitPaperBase(RHPaperBase):
 
 class RHSubmitPaperSingle(RHSubmitPaperBase):
     @use_rh_kwargs({
-        'file': FileField(required=True),
+        'files': FilesField(required=True),
     }, rh_context=('event', 'contrib'))
-    def _process(self, file):
+    def _process(self, files):
         # Key for files obj is 'None' as there is no FileType for single files
-        create_new_paper(self.contribution, session.user, {None: [file]})
+        create_new_paper(self.contribution, session.user, {None: files})
         return jsonify_data(flash=False)
 
 
