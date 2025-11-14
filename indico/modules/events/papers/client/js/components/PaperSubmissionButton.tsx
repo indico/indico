@@ -17,7 +17,6 @@ import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 
 import {FinalFileManager} from 'indico/modules/events/editing/editing/timeline/FileManager';
-import FinalSingleFileManager from 'indico/react/components/files/SingleFileManager';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -35,27 +34,39 @@ export default function PaperSubmissionButton({
 }: PaperSubmissionButtonProps) {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
-  const fileTypes = camelizeKeys(data || []);
-  const isMultiFile = fileTypes.length > 0;
-  const submitRevision = async formData => {
-    try {
-      if (isMultiFile) {
-        await indicoAxios.post(
-          submitRevisionURL({event_id: eventId, contrib_id: contributionId}),
-          formData
-        );
-      } else {
-        await indicoAxios.post(
-          submitRevisionSingleURL({event_id: eventId, contrib_id: contributionId}),
-          formData
-        );
-      }
+  const _fileTypes = camelizeKeys(data || []);
+  const submitRevision = async ({files}) => {
+    let urlFunc, payload;
+    if (_fileTypes.length) {
+      urlFunc = submitRevisionURL;
+      payload = {files};
+    } else {
+      urlFunc = submitRevisionSingleURL;
+      payload = {files: files['-1']};
+    }
 
-      location.href = paperTimelineURL({event_id: eventId, contrib_id: contributionId});
+    try {
+      await indicoAxios.post(urlFunc({event_id: eventId, contrib_id: contributionId}), payload);
     } catch (e) {
       return handleSubmitError(e);
     }
+    location.href = paperTimelineURL({event_id: eventId, contrib_id: contributionId});
   };
+
+  // TODO this could probably be moved into the FileManager to support (via a new prop or passing explicit
+  // `null` fileTypes) the case where no file types should be displayed. in this case the `name` can be
+  // something dummy/empty as it should not be displayed to users
+  const fileTypes = _fileTypes.length
+    ? _fileTypes
+    : [
+        {
+          name: Translate.string('Paper files'),
+          extensions: [],
+          allowMultipleFiles: true,
+          filenameTemplate: null,
+          id: -1,
+        },
+      ];
 
   return (
     <>
@@ -76,27 +87,16 @@ export default function PaperSubmissionButton({
             <Translate as={Modal.Header}>{Translate.string('Submit paper')}</Translate>
             <Modal.Content>
               <Form id="submit-papers-form" onSubmit={handleSubmit}>
-                {fileTypes?.length ? (
-                  <FinalFileManager
-                    name="files"
-                    fileTypes={fileTypes}
-                    files={[]}
-                    uploadURL={apiUploadURL({
-                      event_id: eventId,
-                      contrib_id: contributionId,
-                    })}
-                    mustChange
-                  />
-                ) : (
-                  <FinalSingleFileManager
-                    name="file"
-                    uploadURL={apiUploadURL({
-                      event_id: eventId,
-                      contrib_id: contributionId,
-                    })}
-                    validExtensions={['pdf', 'doc', 'docx', 'odt', 'tex', 'pptx']}
-                  />
-                )}
+                <FinalFileManager
+                  name="files"
+                  fileTypes={fileTypes}
+                  files={[]}
+                  uploadURL={apiUploadURL({
+                    event_id: eventId,
+                    contrib_id: contributionId,
+                  })}
+                  mustChange
+                />
               </Form>
             </Modal.Content>
             <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
