@@ -36,6 +36,7 @@ export const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
   extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
   allowMultipleFiles: PropTypes.bool.isRequired,
+  filenameTemplate: PropTypes.string,
   id: PropTypes.number.isRequired,
 };
 
