@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from babel.dates import get_timezone
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.config import config
@@ -16,13 +16,16 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.logs.forms import ResendEmailPrefaceForm
 from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
                                                 EventLogEntry, EventLogRealm, UserLogEntry, UserLogRealm)
 from indico.modules.logs.util import serialize_log_entry
 from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
+from indico.util.string import strip_tags
 from indico.web.flask.util import url_for
+from indico.web.util import jsonify_data, jsonify_template
 
 
 LOG_PAGE_SIZE = 15
@@ -210,18 +213,45 @@ class RHResendEmail(RHManageEventBase):
             raise BadRequest('Invalid log entry type')
         elif self.entry.data.get('attachments'):
             raise BadRequest('Cannot re-send email with attachments')
-        email = make_email(
-            to_list=self.entry.data['to'],
-            cc_list=self.entry.data.get('cc', []),
-            bcc_list=self.entry.data.get('bcc', []),
-            sender_address=self.entry.data['from'],
-            reply_address=self.entry.data.get('reply_to', []),
-            subject=self.entry.data['subject'],
-            body=self.entry.data['body'],
-            html=self.entry.data['content_type'] == 'text/html',
-            alternatives=self.entry.data.get('alternatives'),
+        elif self.entry.data.get('state') == 'pending':
+            raise BadRequest('Cannot re-send pending emails')
+
+        is_html_email = self.entry.data['content_type'] == 'text/html'
+        form = ResendEmailPrefaceForm(is_html_email=is_html_email)
+        if form.validate_on_submit():
+            subject = self.entry.data['subject']
+            email = self._build_email(form.preface.data, is_html_email)
+            send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
+                       log_metadata=self.entry.meta,
+                       log_summary=f'Resent email: {subject}')
+            flash(_('The email has been re-sent.'), 'success')
+            return jsonify_data()
+
+        return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry)
+
+    def _build_email(self, preface, is_html_email):
+        email_data = self.entry.data
+        body = email_data['body']
+        alternatives = email_data.get('alternatives') or []
+        if preface:
+            if is_html_email:
+                body = f'{preface}{body}'
+                alternatives = [
+                    (f'{strip_tags(preface)}\n\n{alt_body}', mimetype)
+                    for alt_body, mimetype in alternatives if mimetype == 'text/plain'
+                ]
+            else:
+                body = f'{preface}\n\n{body}'
+                alternatives = []
+
+        return make_email(
+            to_list=email_data['to'],
+            cc_list=email_data.get('cc', []),
+            bcc_list=email_data.get('bcc', []),
+            sender_address=email_data['from'],
+            reply_address=email_data.get('reply_to', []),
+            subject=email_data['subject'],
+            body=body,
+            html=is_html_email,
+            alternatives=alternatives
         )
-        send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
-                   log_metadata=self.entry.meta, log_summary=f'Resent email: {self.entry.data['subject']}')
-        flash(_('The email has been re-sent.'), 'success')
-        return redirect(url_for('.event', self.event))
