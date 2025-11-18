@@ -39,6 +39,8 @@ Improvements
 - Add review count & score standard deviation columns to the abstract list (:pr:`7173`)
 - Add min/max date settings to registration form date fields (:pr:`6842`, thanks
   :user:`SegiNyn`)
+- Allow adding a preface when re-sending emails from the event log (:pr:`7172`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
