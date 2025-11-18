@@ -217,23 +217,21 @@ class RHResendEmail(RHManageEventBase):
             raise BadRequest('Cannot re-send pending emails')
 
         is_html_email = self.entry.data['content_type'] == 'text/html'
-        form = ResendEmailPrefaceForm(is_html_email=is_html_email)
+        original_subject = self.entry.data['subject']
+        form = ResendEmailPrefaceForm(subject=original_subject, is_html_email=is_html_email)
         if form.validate_on_submit():
-            subject = self.entry.data['subject']
-            email = self._build_email(form.preface.data, is_html_email)
+            email = self._build_email(form.data, is_html_email)
             send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
-                       log_metadata=self.entry.meta,
-                       log_summary=f'Resent email: {subject}')
+                       log_metadata=self.entry.meta, log_summary=f'Resent email: {original_subject}')
             flash(_('The email has been re-sent.'), 'success')
             return jsonify_data()
-
         return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry)
 
-    def _build_email(self, preface, is_html_email):
+    def _build_email(self, form_data, is_html_email):
         email_data = self.entry.data
         body = email_data['body']
         alternatives = email_data.get('alternatives') or []
-        if preface:
+        if preface := form_data['preface']:
             if is_html_email:
                 body = f'{preface}{body}'
                 alternatives = [
@@ -250,7 +248,7 @@ class RHResendEmail(RHManageEventBase):
             bcc_list=email_data.get('bcc', []),
             sender_address=email_data['from'],
             reply_address=email_data.get('reply_to', []),
-            subject=email_data['subject'],
+            subject=form_data['subject'],
             body=body,
             html=is_html_email,
             alternatives=alternatives
