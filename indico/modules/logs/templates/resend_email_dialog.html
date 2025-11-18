@@ -3,6 +3,9 @@
 
 {{ form_header(form) }}
 
+{# prevent autofocus on the subject line #}
+<input type="hidden" autofocus>
+
 <div class="resend-email-context">
     {% if entry.data.to %}
         {{ form_row_static(_('Recipients'), entry.data.to|join(', ')) }}
@@ -13,7 +16,6 @@
     {% if entry.data.bcc %}
         {{ form_row_static(_('BCC'), entry.data.bcc|join(', ')) }}
     {% endif %}
-    {{ form_row_static(_('Subject'), entry.data.subject) }}
 </div>
 
 {{ form_rows(form) }}

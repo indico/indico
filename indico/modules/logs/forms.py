@@ -5,8 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms import TextAreaField
-from wtforms.validators import Optional
+from wtforms.fields import StringField, TextAreaField
+from wtforms.validators import DataRequired, Optional
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -14,6 +14,7 @@ from indico.web.forms.widgets import TinyMCEWidget
 
 
 class ResendEmailPrefaceForm(IndicoForm):
+    subject = StringField(_('Subject'), [DataRequired()])
     preface = TextAreaField(_('Preface'), [Optional()],
                             description=_('Explain why you are resending this email. '
                                           'The text will be placed before  the original message.'))
