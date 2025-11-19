@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import statistics
 from collections import Counter, defaultdict
 from itertools import chain
 from operator import attrgetter
@@ -453,6 +454,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         if not scores:
             return None
         return sum(scores) / len(scores)
+
+    @property
+    def score_std(self) -> float | None:
+        scores = [x.score for x in self.reviews if x.score is not None]
+        if not scores:
+            return None
+        return statistics.pstdev(scores)
 
     @property
     def track_question_scores(self):

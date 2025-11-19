@@ -96,6 +96,7 @@ class AbstractSchema(mm.SQLAlchemyAutoSchema):
     custom_fields = Nested(ContributionFieldValueSchema, attribute='field_values', many=True)
     files = Nested(AbstractFileSchema, many=True)
     score = Float()
+    score_std = Float()
     comments = Nested(AbstractCommentSchema, many=True)
     reviews = Nested(AbstractReviewSchema, many=True)
 
@@ -111,7 +112,7 @@ class AbstractSchema(mm.SQLAlchemyAutoSchema):
                   'accepted_track', 'submitted_for_tracks', 'reviewed_for_tracks',
                   'duplicate_of', 'merged_into',
                   'persons', 'custom_fields', 'files',
-                  'score', 'comments', 'reviews')
+                  'score', 'score_std', 'comments', 'reviews')
 
 
 abstracts_schema = AbstractSchema(many=True)
