@@ -18,7 +18,8 @@ export default function InviteDialogButton({eventId, regformId, onInvitationsCha
   return (
     <>
       <button type="button" className="i-button icon-user" onClick={() => setOpen(true)}>
-        <Translate>Invite</Translate>
+        {/* i18n: Title of the button to invite users to register */}
+        <Translate context="verb">Invite</Translate>
       </button>
       {open && (
         <InviteDialog

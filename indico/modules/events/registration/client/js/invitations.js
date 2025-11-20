@@ -45,7 +45,7 @@ import InviteDialogButton from './components/InviteDialogButton';
       });
     });
 
-    const handleInvitationsChanged = data => {
+    const onInvitationsChanged = data => {
       renderInvitationPage({
         eventId,
         regformId,
@@ -54,7 +54,7 @@ import InviteDialogButton from './components/InviteDialogButton';
       });
     };
 
-    renderInviteButton({eventId, regformId, onInvitationsChanged: handleInvitationsChanged});
+    renderInviteButton({eventId, regformId, onInvitationsChanged});
     renderInvitationPage({eventId, regformId, hasPendingInvitations, invitations});
   };
 

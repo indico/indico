@@ -97,9 +97,9 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         body = data.pop('body')
 
         if is_existing:
-            identifiers = data.pop('users_field')
+            identifiers = data.pop('users')
             users = self._build_users_from_identifiers(identifiers)
-            field_name = 'users_field'
+            field_name = 'users'
         else:
             users = [self._build_user_from_payload(data)]
             field_name = 'email'
@@ -166,11 +166,11 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
                     allow_emails=False,
                 )
             except ValueError:
-                abort(422, messages={'users_field': [_('Invalid user selection. Please refresh and try again.')]})
+                abort(422, messages={'users': [_('Invalid user selection. Please refresh and try again.')]})
 
             email = getattr(principal, 'email', None)
             if not email:
-                abort(422, messages={'users_field': [_('One of the selected users is missing an email address.')]})
+                abort(422, messages={'users': [_('One of the selected users is missing an email address.')]})
 
             users.append({
                 'first_name': principal.first_name,
