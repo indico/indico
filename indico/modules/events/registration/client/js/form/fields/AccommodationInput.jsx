@@ -13,10 +13,16 @@ import {useSelector} from 'react-redux';
 import {Label} from 'semantic-ui-react';
 
 import {DateRangePicker, RadioButton} from 'indico/react/components';
-import {FinalDateRangePicker} from 'indico/react/components/DateRangePicker';
-import {FinalField} from 'indico/react/forms';
+import {
+  FinalDateRangePicker,
+  validDate,
+  validDateRange,
+} from 'indico/react/components/DateRangePicker';
+import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
+import {formatDate} from 'indico/utils/date_format';
+import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
@@ -168,6 +174,61 @@ AccommodationInputComponent.propTypes = {
   existingValue: PropTypes.shape({choice: PropTypes.string}).isRequired,
 };
 
+function makeAccommodationRangeValidators({
+  required,
+  rangeStartMin,
+  rangeStartMax,
+  rangeEndMin,
+  rangeEndMax,
+}) {
+  const dateFormat = moment.localeData().longDateFormat('L');
+
+  const validators = [
+    validDate(
+      'arrivalDate',
+      required,
+      Translate.string('Please enter the arrival date using the specified format'),
+      Translate.string('Please provide the arrival date')
+    ),
+    validDate(
+      'departureDate',
+      required,
+      Translate.string('Please enter the departure date using the specified format'),
+      Translate.string('Please provide the departure date')
+    ),
+  ];
+
+  if (rangeStartMin && rangeStartMax) {
+    validators.push(
+      validDateRange(
+        rangeStartMin,
+        rangeStartMax,
+        'arrivalDate',
+        Translate.string('Please make sure the arrival date is between {start} and {end}', {
+          start: formatDate(dateFormat, fromISOLocalDate(rangeStartMin)),
+          end: formatDate(dateFormat, fromISOLocalDate(rangeStartMax)),
+        })
+      )
+    );
+  }
+
+  if (rangeEndMin && rangeEndMax) {
+    validators.push(
+      validDateRange(
+        rangeEndMin,
+        rangeEndMax,
+        'departureDate',
+        Translate.string('Please make sure the departure date is between {start} and {end}', {
+          start: formatDate(dateFormat, fromISOLocalDate(rangeEndMin)),
+          end: formatDate(dateFormat, fromISOLocalDate(rangeEndMax)),
+        })
+      )
+    );
+  }
+
+  return validators;
+}
+
 export default function AccommodationInput({
   fieldId,
   htmlId,
@@ -199,6 +260,16 @@ export default function AccommodationInput({
           return isRequired ? Translate.string('You must select an option') : undefined;
         } else if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
           return Translate.string('You must select the arrival and departure date');
+        }
+        if (!value.isNoAccommodation) {
+          const rangeValidators = makeAccommodationRangeValidators({
+            required: true,
+            rangeStartMin: arrival.startDate,
+            rangeStartMax: arrival.endDate,
+            rangeEndMin: departure.startDate,
+            rangeEndMax: departure.endDate,
+          });
+          return v.chain(...rangeValidators)(value);
         }
       }}
       isEqual={_.isEqual}

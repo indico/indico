@@ -49,6 +49,8 @@ Bugfixes
   :user:`duartegalvao, unconventionaldotdev`)
 - Fix inconsistent styling of nested lists in minutes and editor output (:issue:`7063`,
   :pr:`7105`, thanks :user:`AtharvMixraw`)
+- Validate the arrival/departure date in the registration form accommodation field
+  (:issue:`7171`, :pr:`7174`)
 
 Accessibility
 ^^^^^^^^^^^^^
