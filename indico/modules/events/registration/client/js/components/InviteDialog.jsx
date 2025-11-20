@@ -28,7 +28,7 @@ import {indicoAxios} from 'indico/utils/axios';
 function ExistingInviteFields({eventId, favoriteUsersController, onPrincipalsResolved}) {
   return (
     <FinalPrincipalList
-      name="users_field"
+      name="users"
       label={Translate.string('Users')}
       withExternalUsers
       eventId={eventId}
@@ -148,7 +148,7 @@ const modeConfig = {
     label: Translate.string('Indico users'),
     buttonLabel: Translate.string('Indico users'),
     renderFields: props => <ExistingInviteFields {...props} />,
-    extraFields: ['users_field'],
+    extraFields: ['users'],
     getPreviewPayload: (values, resolvedPrincipals) => {
       if (!resolvedPrincipals.length) {
         return {context: {}, disabled: true};
@@ -237,7 +237,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       skip_existing: false,
       copy_for_sender: false,
       bcc_addresses: [],
-      users_field: [],
+      users: [],
       first_name: '',
       last_name: '',
       email: '',
@@ -284,8 +284,8 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         return;
       }
 
-      if (mode === 'existing' && !payload.users_field.length) {
-        return {users_field: Translate.string('Select at least one user.')};
+      if (mode === 'existing' && !payload.users.length) {
+        return {users: Translate.string('Select at least one user.')};
       }
 
       try {

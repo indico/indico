@@ -909,8 +909,6 @@ def update_regform_item_positions(regform):
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
                       lock_email, bcc_addresses=None, copy_for_sender=False):
-    if bcc_addresses is None:
-        bcc_addresses = []
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
