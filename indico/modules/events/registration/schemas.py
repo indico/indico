@@ -7,7 +7,7 @@
 
 from operator import itemgetter
 
-from marshmallow import EXCLUDE, validate
+from marshmallow import validate
 from marshmallow.decorators import post_dump
 from marshmallow.fields import String
 from webargs import fields
@@ -26,9 +26,6 @@ from indico.web.flask.util import url_for
 
 
 class InvitationBaseSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
     sender_address = fields.String(required=True, validate=not_empty)
     subject = fields.String(required=True, validate=[not_empty, validate.Length(max=200)])
     body = fields.String(required=True, validate=[
@@ -52,7 +49,7 @@ class InvitationNewSchema(InvitationBaseSchema):
 
 
 class InvitationExistingSchema(InvitationBaseSchema):
-    users_field = fields.List(
+    users = fields.List(
         fields.String(validate=not_empty),
         required=True,
         validate=validate.Length(min=1)

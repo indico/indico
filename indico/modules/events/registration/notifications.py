@@ -23,13 +23,12 @@ def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresse
     email_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
     email_subject = replace_placeholders('registration-invitation-email', subject, invitation=invitation)
     template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-    bcc = set(bcc_addresses or [])
-    if copy_for_sender and session and session.user and session.user.email:
-        bcc.add(session.user.email)
-    bcc_list = list(bcc) if bcc else None
-    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True,
-                       bcc_list=bcc_list)
     user = session.user if session else None
+    bcc = set(bcc_addresses or [])
+    if copy_for_sender and user:
+        bcc.add(session.user.email)
+    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True,
+                       bcc_list=bcc)
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 

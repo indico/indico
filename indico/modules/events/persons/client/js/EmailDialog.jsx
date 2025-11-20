@@ -57,35 +57,27 @@ RecipientsField.propTypes = {
   recipients: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export function EmailSentMessage({count, warningMessage}) {
+export function EmailSentMessage({count}) {
   return (
-    <>
-      <Message positive>
-        <PluralTranslate as={Message.Header} count={count}>
-          <Singular>Your email has been sent.</Singular>
-          <Plural>Your emails have been sent.</Plural>
-        </PluralTranslate>
-        <PluralTranslate count={count} as="p">
-          <Singular>
-            <Param name="count" value={count} /> email has been sent.
-          </Singular>
-          <Plural>
-            <Param name="count" value={count} /> emails have been sent.
-          </Plural>
-        </PluralTranslate>
-      </Message>
-      {warningMessage && <Message warning visible icon="warning sign" content={warningMessage} />}
-    </>
+    <Message positive>
+      <PluralTranslate as={Message.Header} count={count}>
+        <Singular>Your email has been sent.</Singular>
+        <Plural>Your emails have been sent.</Plural>
+      </PluralTranslate>
+      <PluralTranslate count={count} as="p">
+        <Singular>
+          <Param name="count" value={count} /> email has been sent.
+        </Singular>
+        <Plural>
+          <Param name="count" value={count} /> emails have been sent.
+        </Plural>
+      </PluralTranslate>
+    </Message>
   );
 }
 
 EmailSentMessage.propTypes = {
   count: PropTypes.number.isRequired,
-  warningMessage: PropTypes.node,
-};
-
-EmailSentMessage.defaultProps = {
-  warningMessage: null,
 };
 
 export function EmailDialog({
@@ -232,7 +224,16 @@ export function EmailDialog({
     >
       {({submitSucceeded}) =>
         submitSucceeded ? (
-          <EmailSentMessage count={sentEmailsCount} warningMessage={sentEmailsWarning} />
+          <>
+            <EmailSentMessage count={sentEmailsCount} />
+            <Message
+              icon="warning sign"
+              content={sentEmailsWarning}
+              hidden={!sentEmailsWarning}
+              warning
+              visible
+            />
+          </>
         ) : (
           form
         )
