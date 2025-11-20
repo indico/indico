@@ -10,31 +10,21 @@ from marshmallow import ValidationError
 
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import Registration
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.fixture
-def create_registration(db, dummy_event, dummy_regform, create_user):
-    def _create_registration(user_id):
+def create_registration_for_user(db, dummy_regform, create_user, create_registration):
+    def _create_registration_for_user(user_id):
         user = create_user(user_id)
-        reg = Registration(
-            first_name='Guinea',
-            last_name='Pig',
-            checked_in=True,
-            state=RegistrationState.complete,
-            currency='USD',
-            email=user.email,
-            user=user,
-            registration_form=dummy_regform
-        )
-        dummy_event.registrations.append(reg)
+        reg = create_registration(user, dummy_regform)
         db.session.flush()
         return reg
 
-    return _create_registration
+    return _create_registration_for_user
 
 
 def _assert_occupied_slots(registration, count):
@@ -169,14 +159,15 @@ def test_modifying_registration_field_changed(dummy_event, dummy_regform, create
         validator(create_accompanying_persons(new_num_persons))
 
 
-def test_registration_count_multiple_fields(dummy_regform, create_accompanying_persons_field, create_registration):
+def test_registration_count_multiple_fields(dummy_regform, create_accompanying_persons_field,
+                                            create_registration_for_user):
     assert not dummy_regform.limit_reached
     dummy_regform.registration_limit = 5
     assert not dummy_regform.limit_reached
     dummy_regform.registration_limit = None
 
     _assert_registration_count(dummy_regform, 0)
-    reg_1 = create_registration(1)
+    reg_1 = create_registration_for_user(1)
     assert reg_1.num_accompanying_persons == 0
     _assert_occupied_slots(reg_1, 1)
     _assert_registration_count(dummy_regform, 1)
@@ -196,7 +187,7 @@ def test_registration_count_multiple_fields(dummy_regform, create_accompanying_p
     _assert_occupied_slots(reg_1, 4)
     _assert_registration_count(dummy_regform, 4)
 
-    reg_2 = create_registration(2)
+    reg_2 = create_registration_for_user(2)
     assert reg_2.num_accompanying_persons == 0
     _assert_occupied_slots(reg_2, 1)
     _assert_registration_count(dummy_regform, 5)
