@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useState} from 'react';
 import {AutoSizer, Column, Table} from 'react-virtualized';
 import {Button, Icon, Input} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+
+import AffiliationFormModal from './AffiliationFormModal';
 
 import './AffiliationsDashboard.module.scss';
 
@@ -30,11 +32,13 @@ const DUMMY_AFFILIATIONS = Array.from({length: 100}, (_, index) => {
 });
 
 export default function AffiliationsDashboard(): JSX.Element {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   return (
     <div styleName="affiliations-dashboard">
       <div styleName="top-bar">
         <div styleName="top-bar-actions">
-          <Button primary icon="plus" content={Translate.string('Add')} />
+          <Button primary icon="plus" content={Translate.string('Add')} onClick={() => setIsAddModalOpen(true)} />
           <Button basic icon="filter" content={Translate.string('Filter')} />
         </div>
         <div styleName="search-box">
@@ -70,7 +74,6 @@ export default function AffiliationsDashboard(): JSX.Element {
                 cellRenderer={() => (
                   <div styleName="action-icons">
                     <Icon name="edit" link title={Translate.string('Edit', 'verb')} color="grey" />
-                    <Icon name="sign-in" link title={Translate.string('Merge into')} color="grey" />
                     <Icon name="trash" link title={Translate.string('Delete')} color="grey" />
                   </div>
                 )}
@@ -79,6 +82,16 @@ export default function AffiliationsDashboard(): JSX.Element {
           )}
         </AutoSizer>
       </div>
+      {isAddModalOpen && (
+        <AffiliationFormModal
+          mode="create"
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={async data => {
+            console.log('Affiliation to add:', data);
+            setIsAddModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
