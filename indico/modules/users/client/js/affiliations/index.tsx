@@ -10,18 +10,6 @@ import ReactDOM from 'react-dom';
 
 import AffiliationsDashboard from './AffiliationsDashboard';
 
-const ROOT_ELEMENT_ID = 'affiliations-dashboard-root';
-
-function renderAffiliationsDashboard(): void {
-  const container = document.getElementById(ROOT_ELEMENT_ID);
-
-  if (!container) {
-    return;
-  }
-
-  ReactDOM.render(<AffiliationsDashboard />, container);
-}
-
 declare global {
   interface Window {
     setupAffiliationsDashboards: () => void;
@@ -29,5 +17,11 @@ declare global {
 }
 
 window.setupAffiliationsDashboards = function setupAffiliationsDashboards(): void {
-  renderAffiliationsDashboard();
+  const container = document.getElementById('affiliations-dashboard-container');
+
+  if (!container) {
+    return;
+  }
+
+  ReactDOM.render(<AffiliationsDashboard />, container);
 };

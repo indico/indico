@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {Accordion, Form, Segment} from 'semantic-ui-react';
+import {Accordion, Form} from 'semantic-ui-react';
 
-import {FinalDropdown, FinalInput} from 'indico/react/forms';
+import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {getPluginObjects} from 'indico/utils/plugins';
