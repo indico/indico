@@ -65,6 +65,8 @@ def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
         yield SideMenuItem('admins', _('Admins'), url_for('users.admins'), section='user_management')
         yield SideMenuItem('users', _('Users'), url_for('users.users_admin'), section='user_management')
+        yield SideMenuItem('affiliations', _('Affiliations'), url_for('users.affiliations_dashboard'),
+                           section='customization')
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')

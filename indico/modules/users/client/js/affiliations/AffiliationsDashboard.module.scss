@@ -1,0 +1,97 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.affiliations-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .top-bar-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .search-box {
+    margin-left: auto;
+  }
+
+  .table-wrapper {
+    flex: none;
+    height: 600px;
+    width: 100%;
+    position: relative;
+  }
+
+  .action-icons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    :global(i.icon) {
+      height: auto;
+      line-height: inherit;
+    }
+  }
+
+  :global(.ReactVirtualized__Table__Grid) {
+    outline: none;
+  }
+
+  :global(.ReactVirtualized__Table__headerRow) {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid $pastel-gray;
+    padding: 0 10px;
+  }
+
+  :global(.ReactVirtualized__Table__row) {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid $pastel-gray;
+    padding: 0 10px;
+  }
+
+  :global(.ReactVirtualized__Table__headerTruncatedText) {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  :global(.ReactVirtualized__Table__rowColumn),
+  :global(.ReactVirtualized__Table__headerColumn) {
+    display: block;
+    margin-right: 10px;
+    min-width: 0;
+  }
+
+  :global(.ReactVirtualized__Table__rowColumn) {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  :global(.ReactVirtualized__Table__headerColumn:first-of-type),
+  :global(.ReactVirtualized__Table__rowColumn:first-of-type) {
+    margin-left: 10px;
+  }
+}

@@ -1,0 +1,13 @@
+{% extends 'layout/admin_page.html' %}
+
+{% block page_class %}{{ super() }} ultra-wide{% endblock %}
+
+{% block title %}{% trans %}Affiliations{% endtrans %}{% endblock %}
+
+{% block content %}
+    <div id="affiliations-dashboard-root"></div>
+
+    <script>
+        setupAffiliationsDashboards();
+    </script>
+{% endblock %}

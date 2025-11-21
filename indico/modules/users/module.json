@@ -5,6 +5,7 @@
     "profile_picture": "./ProfilePicture.jsx",
     "personal_data": "./personal_data.js",
     "favorites": "./Favorites.jsx",
-    "data_export": "./DataExport.jsx"
+    "data_export": "./DataExport.jsx",
+    "affiliations_dashboard": "./affiliations/index.tsx"
   }
 }

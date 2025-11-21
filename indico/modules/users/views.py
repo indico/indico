@@ -71,3 +71,8 @@ class WPUserDataExport(WPUser):
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
     bundles = ('module_users.js',)
+
+
+class WPAffiliationsDashboard(WPAdmin):
+    template_prefix = 'users/'
+    bundles = ('module_users.affiliations_dashboard.js', 'module_users.affiliations_dashboard.css')

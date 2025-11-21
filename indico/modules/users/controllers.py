@@ -59,8 +59,8 @@ from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_fo
                                        get_unlisted_events, get_user_by_email, get_user_titles, log_user_update,
                                        merge_users, search_affiliations, search_users, send_avatar, serialize_user,
                                        set_user_avatar)
-from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
-                                        WPUserProfilePic, WPUsersAdmin)
+from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserDashboard, WPUserDataExport,
+                                        WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -752,6 +752,13 @@ class RHUsersAdmin(RHAdminBase):
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
                                             num_reg_requests=num_reg_requests,
                                             has_moderation=multipass.has_moderated_providers)
+
+
+class RHAffiliationsDashboard(RHAdminBase):
+    """Entry point for the Affiliations admin dashboard."""
+
+    def _process(self):
+        return WPAffiliationsDashboard.render_template('affiliations_dashboard.html', 'affiliations')
 
 
 class RHUsersAdminSettings(RHAdminBase):
