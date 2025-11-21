@@ -10,7 +10,8 @@
 .affiliations-dashboard {
   display: flex;
   flex-direction: column;
-  height: auto;
+  height: 100%;
+  min-height: 0;
 
   .top-bar {
     display: flex;
@@ -28,11 +29,11 @@
 
   .search-box {
     margin-left: auto;
+    min-width: 40em;
   }
 
   .table-wrapper {
-    flex: none;
-    height: 600px;
+    flex: 1;
     width: 100%;
     position: relative;
   }
