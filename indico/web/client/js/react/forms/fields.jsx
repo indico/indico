@@ -351,10 +351,30 @@ ComboDropdownAdapter.defaultProps = {
 };
 
 /**
+ * @typedef {({[key: string]: any}) & {
+ *   name: string;
+ *   adapter?: React.ComponentType;
+ *   component?: React.ComponentType;
+ *   description?: React.ReactNode;
+ *   required?: true | false | 'no-validator';
+ *   onChange?: (value: any, previous: any) => void;
+ * }} FinalFieldProps
+ */
+
+/**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
+ * @param {FinalFieldProps} props
  */
-export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
+export function FinalField({
+  name,
+  adapter = FormFieldAdapter,
+  component = undefined,
+  description = null,
+  required = false,
+  onChange = null,
+  ...rest
+}) {
   const extraProps = {};
 
   if (description) {
@@ -415,9 +435,26 @@ FinalField.defaultProps = {
 };
 
 /**
- * Like `FinalField` but with extra features for ``<input>`` fields.
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   type?: 'text'|'email'|'number'|'tel'|'password';
+ *   nullIfEmpty?: boolean;
+ *   noAutoComplete?: boolean;
+ * }} FinalInputProps
  */
-export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...rest}) {
+
+/**
+ * Like `FinalField` but with extra features for ``<input>`` fields.
+ * @param {FinalInputProps} props
+ */
+export function FinalInput({
+  name,
+  label = null,
+  type = 'text',
+  nullIfEmpty = false,
+  noAutoComplete = false,
+  ...rest
+}) {
   const extraProps = {};
 
   if (type === 'number') {
