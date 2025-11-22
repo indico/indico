@@ -45,7 +45,7 @@ export function StringListField({
   };
 
   const handleChange: NonNullable<DropdownProps['onChange']> = (event, {value: newValue}) => {
-    const values = Array.isArray(newValue) ? newValue.filter(Boolean) : [];
+    const values = Array.isArray(newValue) ? (newValue.filter(x => x) as string[]) : [];
     if (values.length && values[values.length - 1] === searchQuery) {
       setSearchQuery('');
     }
