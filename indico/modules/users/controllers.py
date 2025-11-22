@@ -52,7 +52,7 @@ from indico.modules.users.models.export import DataExportOptions, DataExportRequ
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
                                              revoke_admin)
-from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_mastodon_server_name, get_related_categories, get_suggested_categories,
@@ -325,7 +325,69 @@ class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
         res = search_affiliations(q)
-        return AffiliationSchema(many=True).jsonify(res)
+        basic_fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+        return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
+
+
+def _apply_affiliation_data(affiliation, data):
+    for key in ('name', 'alt_names', 'street', 'postcode', 'city', 'country_code', 'meta'):
+        if key not in data:
+            continue
+        value = data[key]
+        if key in {'street', 'postcode', 'city', 'country_code'} and value is None:
+            value = ''
+        elif key == 'alt_names' and value is None:
+            value = []
+        elif key == 'meta' and value is None:
+            value = {}
+        setattr(affiliation, key, value)
+
+
+class RHAffiliationsAPI(RHAdminBase):
+    """List/create affiliations via the admin API."""
+
+    def _process_GET(self):
+        affiliations = (Affiliation.query
+                        .filter(~Affiliation.is_deleted)
+                        .order_by(db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)))
+                        .all())
+        return AffiliationSchema(many=True).jsonify(affiliations)
+
+    @use_kwargs(AffiliationArgs)
+    def _process_POST(self, **data):
+        affiliation = Affiliation()
+        _apply_affiliation_data(affiliation, data)
+        db.session.add(affiliation)
+        db.session.flush()
+        # TODO: Bust search_affiliations cache.
+        return AffiliationSchema().jsonify(affiliation), 201
+
+
+class RHAffiliationAPI(RHAdminBase):
+    """CRUD operations on a single affiliation."""
+
+    def _process_args(self):
+        self.affiliation = Affiliation.get_or_404(request.view_args['affiliation_id'])
+        if self.affiliation.is_deleted:
+            raise NotFound
+
+    def _process_GET(self):
+        return AffiliationSchema().jsonify(self.affiliation)
+
+    @use_kwargs(AffiliationArgs, partial=True)
+    def _process_PATCH(self, **data):
+        if not data:
+            raise BadRequest(_('No changes specified'))
+        _apply_affiliation_data(self.affiliation, data)
+        db.session.flush()
+        # TODO: Bust search_affiliations cache.
+        return AffiliationSchema().jsonify(self.affiliation)
+
+    def _process_DELETE(self):
+        self.affiliation.is_deleted = True
+        db.session.flush()
+        # TODO: Bust search_affiliations cache.
+        return '', 204
 
 
 class RHProfilePicturePage(RHUserBase):

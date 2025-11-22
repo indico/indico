@@ -37,7 +37,7 @@ from indico.modules.users.export import (build_storage_path, get_abstracts, get_
                                          get_subcontributions, get_survey_submissions)
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest
 from indico.modules.users.models.users import NameFormat, UserTitle
-from indico.modules.users.schemas import AffiliationSchema
+from indico.modules.users.schemas import BasicAffiliationSchema
 from indico.util.marshmallow import NoneValueEnumField
 from indico.web.flask.util import url_for
 
@@ -279,7 +279,7 @@ class PersonalDataExportSchema(mm.SQLAlchemyAutoSchema):
 
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
     secondary_emails = fields.Function(lambda user: list(user.secondary_emails))
-    affiliation_link = fields.Nested(AffiliationSchema, exclude=('meta',))
+    affiliation_link = fields.Nested(BasicAffiliationSchema)
     favorite_events = fields.List(fields.Nested(EventExportSchema))
     favorite_categories = fields.List(fields.Nested(CategoryExportSchema))
 
