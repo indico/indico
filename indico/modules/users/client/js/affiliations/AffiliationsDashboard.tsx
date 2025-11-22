@@ -5,15 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import adminAffiliationURL from 'indico-url:users.api_admin_affiliation';
 import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {AutoSizer, Column, Table, TableCellRenderer} from 'react-virtualized';
-import {Button, Icon, Input, Loader, Message} from 'semantic-ui-react';
+import {Button, Confirm, Icon, Input, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
-import {getPluginObjects} from 'indico/utils/plugins';
+import {Param, Translate} from 'indico/react/i18n';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import AffiliationFormDialog from './AffiliationFormDialog';
 import {Affiliation} from './types';
@@ -46,8 +48,25 @@ export default function AffiliationsDashboard(): JSX.Element {
     reFetch,
     lastData,
   } = useIndicoAxios(adminAffiliationsURL({}), {camelize: true});
-  const [tableHeight, setTableHeight] = useState(MIN_TABLE_HEIGHT);
+  const [tableHeight, setTableHeight] = useState<number>(MIN_TABLE_HEIGHT);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
+  const [deleting, setDeleting] = useState<Affiliation | null>(null);
+
+  const handleDelete = async () => {
+    if (deleting === null) {
+      return;
+    }
+
+    try {
+      await indicoAxios.delete(adminAffiliationURL({affiliation_id: deleting.id}));
+      reFetch();
+    } catch (error) {
+      handleAxiosError(error);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -79,13 +98,20 @@ export default function AffiliationsDashboard(): JSX.Element {
         cellRenderer: ({rowData}) => (
           <div styleName="action-icons">
             <AffiliationFormDialog
-              affiliationId={rowData.id}
+              affiliationURL={adminAffiliationURL({affiliation_id: rowData.id})}
               onSuccess={() => reFetch()}
               trigger={
                 <Icon name="edit" link title={Translate.string('Edit', 'verb')} color="grey" />
               }
+              edit
             />
-            <Icon name="trash" link title={Translate.string('Delete')} color="grey" />
+            <Icon
+              name="trash"
+              link
+              title={Translate.string('Delete')}
+              color="grey"
+              onClick={() => setDeleting(rowData)}
+            />
           </div>
         ),
       },
@@ -118,10 +144,14 @@ export default function AffiliationsDashboard(): JSX.Element {
     <div styleName="affiliations-dashboard">
       <div styleName="top-bar">
         <div styleName="top-bar-actions">
-          <AffiliationFormDialog
-            onSuccess={() => reFetch()}
-            trigger={<Button primary icon="plus" content={Translate.string('Add')} />}
-          />
+          <Button.Group>
+            <AffiliationFormDialog
+              affiliationURL={adminAffiliationsURL({})}
+              onSuccess={() => reFetch()}
+              trigger={<Button primary icon="plus" content={Translate.string('Add')} />}
+            />
+            {renderPluginComponents('affiliation-dashboard-extra-actions', {affiliations})}
+          </Button.Group>
           <Button basic icon="filter" content={Translate.string('Filter')} />
         </div>
         <div styleName="search-box">
@@ -170,6 +200,23 @@ export default function AffiliationsDashboard(): JSX.Element {
           }}
         </AutoSizer>
       </div>
+      {deleting && (
+        <Confirm
+          size="tiny"
+          header={Translate.string('Confirm deletion')}
+          content={
+            <Translate as={Modal.Content}>
+              Are you sure you want to delete the affiliation{' '}
+              <Param name="affiliation" wrapper={<strong />} value={deleting.name} />?
+            </Translate>
+          }
+          confirmButton={<Button negative content={Translate.string('Delete')} />}
+          cancelButton={Translate.string('Cancel')}
+          onCancel={() => setDeleting(null)}
+          onConfirm={handleDelete}
+          open
+        />
+      )}
     </div>
   );
 }

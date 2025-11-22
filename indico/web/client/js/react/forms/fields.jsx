@@ -373,15 +373,7 @@ ComboDropdownAdapter.defaultProps = {
  * around the field.
  * @param {FinalFieldProps} props
  */
-export function FinalField({
-  name,
-  adapter = FormFieldAdapter,
-  component = undefined,
-  description = null,
-  required = false,
-  onChange = null,
-  ...rest
-}) {
+export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
   const extraProps = {};
 
   if (description) {
@@ -454,14 +446,7 @@ FinalField.defaultProps = {
  * Like `FinalField` but with extra features for ``<input>`` fields.
  * @param {FinalInputProps} props
  */
-export function FinalInput({
-  name,
-  label = null,
-  type = 'text',
-  nullIfEmpty = false,
-  noAutoComplete = false,
-  ...rest
-}) {
+export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...rest}) {
   const extraProps = {};
 
   if (type === 'number') {

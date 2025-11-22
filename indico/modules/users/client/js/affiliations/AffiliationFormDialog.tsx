@@ -5,71 +5,68 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import adminAffiliationURL from 'indico-url:users.api_admin_affiliation';
-import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
-
 import type {FormApi} from 'final-form';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
+import {Accordion, Form, Loader} from 'semantic-ui-react';
 
-import {getChangedValues, handleSubmitError} from 'indico/react/forms';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {FinalInput, getChangedValues, handleSubmitError} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
+import {getPluginObjects} from 'indico/utils/plugins';
 
-import AffiliationFormModal from './AffiliationFormModal';
+import {FinalStringListField} from './StringListField';
 import {AffiliationFormValues} from './types';
 
-interface AffiliationFormDialogProps {
-  trigger: React.ReactElement;
-  affiliationId?: number;
-  onSuccess: (data: Record<string, unknown>) => void;
-}
+const defaultValues: AffiliationFormValues = {
+  name: '',
+  altNames: [],
+  street: '',
+  postcode: '',
+  city: '',
+  countryCode: '',
+};
+
+const formSections = [
+  {
+    key: 'address',
+    title: Translate.string('Address'),
+    content: {
+      content: (
+        <>
+          <Form.Group widths="equal">
+            <FinalInput name="street" label={Translate.string('Street')} />
+            <FinalInput name="postcode" label={Translate.string('Postal Code')} />
+          </Form.Group>
+          <Form.Group widths="equal">
+            <FinalInput name="city" label={Translate.string('City')} />
+            <FinalInput name="countryCode" label={Translate.string('Country code')} />
+          </Form.Group>
+        </>
+      ),
+    },
+  },
+  ...getPluginObjects('affiliation-form-sections').flat(),
+];
 
 export default function AffiliationFormDialog({
   trigger,
-  affiliationId,
+  affiliationURL,
   onSuccess,
-}: AffiliationFormDialogProps): JSX.Element {
-  const [isOpen, setIsOpen] = useState(false);
-  const [initialValues, setInitialValues] = useState<Partial<AffiliationFormValues> | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const isEdit = typeof affiliationId === 'number';
-
-  const closeDialog = useCallback(() => {
-    setIsOpen(false);
-    setInitialValues(null);
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen || !isEdit) {
-      return;
-    }
-    let active = true;
-    const load = async () => {
-      setIsLoading(true);
-      try {
-        const response = await indicoAxios.get(
-          adminAffiliationURL({affiliation_id: affiliationId})
-        );
-        if (active) {
-          setInitialValues(camelizeKeys(response.data));
-        }
-      } catch (error) {
-        if (active) {
-          handleAxiosError(error);
-          closeDialog();
-        }
-      } finally {
-        if (active) {
-          setIsLoading(false);
-        }
-      }
-    };
-    load();
-    return () => {
-      active = false;
-    };
-  }, [affiliationId, closeDialog, isEdit, isOpen]);
+  edit = false,
+}: {
+  trigger: React.ReactElement;
+  affiliationURL: string;
+  onSuccess: (data: AffiliationFormValues) => void;
+  edit?: boolean;
+}): JSX.Element {
+  const [open, setOpen] = useState<boolean>(false);
+  const {data: initialValues, loading} = useIndicoAxios(affiliationURL, {
+    manual: !open || !edit,
+    camelize: true,
+  });
 
   const handleTriggerClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -79,16 +76,11 @@ export default function AffiliationFormDialog({
       if (event.defaultPrevented || trigger.props.disabled) {
         return;
       }
-      setInitialValues(null);
-      setIsOpen(true);
-      if (!isEdit) {
-        setIsLoading(false);
-      }
+      setOpen(true);
     },
-    [isEdit, trigger]
+    [trigger]
   );
-
-  const clonedTrigger = useMemo(
+  const triggerWithHandler = useMemo(
     () => React.cloneElement(trigger, {onClick: handleTriggerClick}),
     [trigger, handleTriggerClick]
   );
@@ -96,36 +88,52 @@ export default function AffiliationFormDialog({
   const handleSubmit = useCallback(
     async (formData: AffiliationFormValues, form: FormApi<AffiliationFormValues>) => {
       try {
-        const payload = snakifyKeys(isEdit ? getChangedValues(formData, form) : formData);
-        let response;
-        if (isEdit) {
-          response = await indicoAxios.patch(
-            adminAffiliationURL({affiliation_id: affiliationId}),
-            payload
-          );
-        } else {
-          response = await indicoAxios.post(adminAffiliationsURL({}), payload);
-        }
+        const payload = snakifyKeys(edit ? getChangedValues(formData, form) : formData);
+        const submitMethod = edit ? indicoAxios.patch : indicoAxios.post;
+        const response = await submitMethod(affiliationURL, payload);
         onSuccess(camelizeKeys(response.data));
-        closeDialog();
+        setOpen(false);
       } catch (error) {
         return handleSubmitError(error);
       }
     },
-    [affiliationId, closeDialog, isEdit, onSuccess]
+    [affiliationURL, edit, onSuccess]
   );
 
   return (
     <>
-      {clonedTrigger}
-      {isOpen && (
-        <AffiliationFormModal
-          mode={isEdit ? 'edit' : 'create'}
-          initialValues={initialValues || undefined}
-          onClose={closeDialog}
+      {triggerWithHandler}
+      {open && (
+        <FinalModalForm
+          id="affiliation-form-modal"
+          size="small"
+          header={edit ? Translate.string('Edit affiliation') : Translate.string('Add affiliation')}
+          onClose={() => setOpen(false)}
           onSubmit={handleSubmit}
-          loading={isEdit && (isLoading || !initialValues)}
-        />
+          submitLabel={Translate.string('Save')}
+          initialValues={{...defaultValues, ...initialValues}}
+          disabledUntilChange
+        >
+          {edit && (loading || !initialValues) ? (
+            <Loader inline="centered" active />
+          ) : (
+            <>
+              <FinalInput name="name" label={Translate.string('Name')} required />
+              <FinalStringListField
+                name="altNames"
+                label={Translate.string('Alternative names')}
+                placeholder={Translate.string('Type a name and press Enter to add')}
+              />
+              <Accordion
+                exclusive={false}
+                panels={formSections}
+                defaultActiveIndex={[...Array(formSections.length).keys()]}
+                styled
+                fluid
+              />
+            </>
+          )}
+        </FinalModalForm>
       )}
     </>
   );
