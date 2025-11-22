@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {FormApi} from 'final-form';
 import React from 'react';
-import {Accordion, Form} from 'semantic-ui-react';
+import {Accordion, Form, Loader} from 'semantic-ui-react';
 
 import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -14,36 +15,33 @@ import {Translate} from 'indico/react/i18n';
 import {getPluginObjects} from 'indico/utils/plugins';
 
 import {FinalStringListField} from './StringListField';
+import {AffiliationFormValues} from './types';
 
 const defaultValues = {
   name: '',
   altNames: [],
   street: '',
+  postcode: '',
   city: '',
   countryCode: '',
 };
-
-export interface AffiliationFormValues {
-  name: string;
-  altNames: string[];
-  street: string;
-  city: string;
-  countryCode: string;
-}
-
-export interface AffiliationFormModalProps {
-  mode: 'create' | 'edit';
-  initialValues?: Partial<AffiliationFormValues>;
-  onSubmit: (data: AffiliationFormValues) => void | Promise<void>;
-  onClose: () => void;
-}
 
 export default function AffiliationFormModal({
   mode,
   initialValues = {},
   onSubmit,
   onClose,
-}: AffiliationFormModalProps): JSX.Element {
+  loading = false,
+}: {
+  mode: 'create' | 'edit';
+  initialValues?: Partial<AffiliationFormValues>;
+  onSubmit: (
+    data: AffiliationFormValues,
+    form: FormApi<AffiliationFormValues>
+  ) => void | Promise<void>;
+  onClose: () => void;
+  loading?: boolean;
+}): JSX.Element {
   const isEdit = mode === 'edit';
   const header = isEdit
     ? Translate.string('Edit affiliation')
@@ -63,7 +61,7 @@ export default function AffiliationFormModal({
             </Form.Group>
             <Form.Group widths="equal">
               <FinalInput name="city" label={Translate.string('City')} />
-              <FinalInput name="country_code" label={Translate.string('Country')} />
+              <FinalInput name="countryCode" label={Translate.string('Country code')} />
             </Form.Group>
           </>
         ),
@@ -83,20 +81,25 @@ export default function AffiliationFormModal({
       initialValues={{...defaultValues, ...initialValues}}
       disabledUntilChange
     >
-      <FinalInput name="name" label={Translate.string('Name')} required />
-      <FinalStringListField
-        name="altNames"
-        label={Translate.string('Alternative names')}
-        placeholder={Translate.string('Type a name and press Enter to add')}
-        allowSeparators
-      />
-      <Accordion
-        exclusive={false}
-        panels={sections}
-        defaultActiveIndex={[...Array(sections.length).keys()]}
-        styled
-        fluid
-      />
+      {loading ? (
+        <Loader inline="centered" active />
+      ) : (
+        <>
+          <FinalInput name="name" label={Translate.string('Name')} required />
+          <FinalStringListField
+            name="altNames"
+            label={Translate.string('Alternative names')}
+            placeholder={Translate.string('Type a name and press Enter to add')}
+          />
+          <Accordion
+            exclusive={false}
+            panels={sections}
+            defaultActiveIndex={[...Array(sections.length).keys()]}
+            styled
+            fluid
+          />
+        </>
+      )}
     </FinalModalForm>
   );
 }

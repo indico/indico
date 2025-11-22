@@ -5,94 +5,30 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
+
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {AutoSizer, Column, Table, TableCellRenderer} from 'react-virtualized';
-import {Button, Icon, Input} from 'semantic-ui-react';
+import {Button, Icon, Input, Loader, Message} from 'semantic-ui-react';
 
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {getPluginObjects} from 'indico/utils/plugins';
 
-import AffiliationFormModal from './AffiliationFormModal';
+import AffiliationFormDialog from './AffiliationFormDialog';
+import {Affiliation} from './types';
 
 import './AffiliationsDashboard.module.scss';
-
-interface Affiliation {
-  id: number;
-  name: string;
-  altNames: string[];
-  address: string;
-  street: string;
-  postcode: string;
-  city: string;
-  countryCode: string;
-  meta: Record<string, unknown>;
-}
-
-const DUMMY_AFFILIATIONS: Affiliation[] = Array.from({length: 100}, (_, index) => {
-  const id = index + 1;
-  return {
-    id,
-    name: `Affiliation ${id}, the name however can be quite long depending on the institution`,
-    altNames: [
-      `Alias ${id}-A`,
-      `Alias ${id}-B`,
-      `Alias ${id}-C with quite a very long long long name as well, you see`,
-    ],
-    address: `${100 + id} Example Street, City ${id % 10}, Country ${id % 5}`,
-    street: `${100 + id} Example Street`,
-    postcode: `${1000 + id}`,
-    city: `City ${id % 10}`,
-    countryCode: `Country ${id % 5}`,
-    meta: {},
-  };
-});
 
 interface ColumnConfig {
   key: string;
   label?: string;
-  dataKey?: keyof Affiliation | string;
   flex?: number;
   width?: number;
   cellRenderer?: TableCellRenderer;
 }
 
 const MIN_TABLE_HEIGHT = 400;
-
-const baseColumns: ColumnConfig[] = [
-  {
-    key: 'name',
-    dataKey: 'name',
-    label: Translate.string('Name'),
-    flex: 0.65,
-    cellRenderer: ({rowData}) => (
-      <>
-        {rowData.name}&nbsp;
-        <span style={{color: 'gray'}}> ({rowData.altNames.join(', ')})</span>
-      </>
-    ),
-  },
-  {
-    key: 'address',
-    dataKey: 'address',
-    label: Translate.string('Address'),
-    flex: 0.3,
-    cellRenderer: ({rowData}) => (
-      <>
-        {rowData.street}, {rowData.postcode} {rowData.city}, {rowData.countryCode}
-      </>
-    ),
-  },
-  {
-    key: 'actions',
-    width: 120,
-    cellRenderer: () => (
-      <div styleName="action-icons">
-        <Icon name="edit" link title={Translate.string('Edit', 'verb')} color="grey" />
-        <Icon name="trash" link title={Translate.string('Delete')} color="grey" />
-      </div>
-    ),
-  },
-];
 
 function getPluginColumns(): ColumnConfig[] {
   return getPluginObjects('affiliations-dashboard-columns')
@@ -104,10 +40,61 @@ function getPluginColumns(): ColumnConfig[] {
 }
 
 export default function AffiliationsDashboard(): JSX.Element {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const {
+    data: affiliationsData,
+    loading: isLoadingAffiliations,
+    reFetch,
+    lastData,
+  } = useIndicoAxios(adminAffiliationsURL({}), {camelize: true});
   const [tableHeight, setTableHeight] = useState(MIN_TABLE_HEIGHT);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
-  const columns = useMemo(() => [...baseColumns, ...getPluginColumns()], []);
+  const columns = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: Translate.string('Name'),
+        flex: 0.65,
+        cellRenderer: ({rowData}) => (
+          <>
+            {rowData.name}
+            {rowData.altNames?.length ? (
+              <span style={{color: 'gray'}}> ({rowData.altNames.join(', ')})</span>
+            ) : null}
+          </>
+        ),
+      },
+      {
+        key: 'address',
+        label: Translate.string('Address'),
+        flex: 0.3,
+        cellRenderer: ({rowData}) => {
+          const cityLine = [rowData.postcode, rowData.city].filter(Boolean).join(' ').trim();
+          const parts = [rowData.street, cityLine, rowData.countryCode].filter(Boolean);
+          return parts.length ? parts.join(', ') : '-';
+        },
+      },
+      {
+        key: 'actions',
+        width: 120,
+        cellRenderer: ({rowData}) => (
+          <div styleName="action-icons">
+            <AffiliationFormDialog
+              affiliationId={rowData.id}
+              onSuccess={() => reFetch()}
+              trigger={
+                <Icon name="edit" link title={Translate.string('Edit', 'verb')} color="grey" />
+              }
+            />
+            <Icon name="trash" link title={Translate.string('Delete')} color="grey" />
+          </div>
+        ),
+      },
+      ...getPluginColumns(),
+    ],
+    [reFetch]
+  );
+
+  const affiliations: Affiliation[] = affiliationsData || lastData || [];
 
   useEffect(() => {
     function updateHeight() {
@@ -131,11 +118,9 @@ export default function AffiliationsDashboard(): JSX.Element {
     <div styleName="affiliations-dashboard">
       <div styleName="top-bar">
         <div styleName="top-bar-actions">
-          <Button
-            primary
-            icon="plus"
-            content={Translate.string('Add')}
-            onClick={() => setIsAddModalOpen(true)}
+          <AffiliationFormDialog
+            onSuccess={() => reFetch()}
+            trigger={<Button primary icon="plus" content={Translate.string('Add')} />}
           />
           <Button basic icon="filter" content={Translate.string('Filter')} />
         </div>
@@ -153,8 +138,14 @@ export default function AffiliationsDashboard(): JSX.Element {
             const totalFlex = flexColumns.reduce((acc, column) => acc + (column.flex || 1), 0) || 1;
             const remainingWidth = Math.max(width - fixedWidth, 0);
 
-            if (!DUMMY_AFFILIATIONS.length) {
-              return <Translate>No affiliations found.</Translate>;
+            if (!affiliations.length) {
+              return isLoadingAffiliations ? (
+                <Loader inline="centered" active />
+              ) : (
+                <Message info>
+                  <Translate as={Message.Content}>No affiliations found.</Translate>
+                </Message>
+              );
             }
             return (
               <Table
@@ -162,14 +153,14 @@ export default function AffiliationsDashboard(): JSX.Element {
                 height={tableHeight}
                 headerHeight={40}
                 rowHeight={50}
-                rowCount={DUMMY_AFFILIATIONS.length}
-                rowGetter={({index}) => DUMMY_AFFILIATIONS[index]}
+                rowCount={affiliations.length}
+                rowGetter={({index}) => affiliations[index]}
               >
                 {columns.map(column => (
                   <Column
                     key={column.key}
                     label={column.label}
-                    dataKey={column.dataKey || column.key}
+                    dataKey={column.key}
                     width={column.width ?? remainingWidth * ((column.flex || 1) / totalFlex)}
                     cellRenderer={column.cellRenderer}
                   />
@@ -179,16 +170,6 @@ export default function AffiliationsDashboard(): JSX.Element {
           }}
         </AutoSizer>
       </div>
-      {isAddModalOpen && (
-        <AffiliationFormModal
-          mode="create"
-          onClose={() => setIsAddModalOpen(false)}
-          onSubmit={async data => {
-            console.log('Affiliation to add:', data);
-            setIsAddModalOpen(false);
-          }}
-        />
-      )}
     </div>
   );
 }
