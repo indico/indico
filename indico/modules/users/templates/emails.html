@@ -1,5 +1,5 @@
 {% extends 'users/base.html' %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 {% block user_content %}
     <div class="i-box-group vert">
@@ -39,8 +39,19 @@
                         </li>
                     {% endfor %}
                 </ul>
+                {% if 'skip_validation' in form %}
+                    {% call message_box('warning') %}
+                        {% trans %}
+                            You are editing another user as an admin. When adding a secondary email address, a
+                            verification email will be sent to the new email address and the user needs to be logged
+                            in to use the confirmation link in this email. In case they can no longer log in, you need
+                            to use the "Skip email validation" checkbox below to immediately add the address.
+                            When doing so, make sure that the address is correct and belongs to the user.
+                        {% endtrans %}
+                    {% endcall %}
+                {% endif %}
                 {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
-                {{ form_rows(form) }}
+                {{ form_rows(form, orientation='vertical') }}
                 {% call form_footer(form) %}
                     <input class="ui primary button" type="submit" value="{% trans %}Add{% endtrans %}" data-disabled-until-change>
                 {% endcall %}

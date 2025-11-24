@@ -592,23 +592,18 @@ class RHUserEmails(RHUserBase):
             send_email(email_to_send)
 
     def _process(self):
-        form = UserEmailsForm()
-
-        # Only show the checkbox with email verification skip flag if user is admin and editing another user
-        show_skip = session.user.is_admin and session.user != self.user
-        if not show_skip:
-            del form.skip_validation
-
+        form = UserEmailsForm(allow_skip_validation=(session.user.is_admin and session.user != self.user))
         if form.validate_on_submit():
             email = form.email.data
-            skip_validation = getattr(form, 'skip_validation', None) and form.skip_validation.data
-
-            if skip_validation:
-                add_secondary_email(self.user, email, session.user)
+            # Admin flow: skip validation, since the only time an admin needs to add an email to an existing user
+            # is when they cannot login, so they also cannot use the verification link that's usually sent since
+            # it requires being logged in to the account
+            if 'skip_validation' in form and form.skip_validation.data:
+                add_secondary_email(self.user, email, validation_skipped=True)
                 flash(_('The email address {email} has been added to the account.').format(email=email), 'success')
                 return redirect(url_for('.user_emails'))
 
-            # Normal flow: send confirmation
+            # Normal flow: send confirmation email to the new address
             self._send_confirmation(email)
             self.user.log(UserLogRealm.user, LogKind.other, 'Profile', 'Validating new secondary email',
                           session.user, data={'Email': email})
@@ -626,27 +621,26 @@ class RHUserEmailsVerify(RHUserBase):
     def _validate(self, data):
         if not data:
             flash(_('The verification token is invalid or expired.'), 'error')
-            return False, None
+            return False
         user = User.get(data['user_id'])
         if not user or user != self.user:
             flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
-            return False, None
+            return False
         existing = UserEmail.query.filter_by(is_user_deleted=False, email=data['email']).first()
         if existing and not existing.user.is_pending:
             if existing.user == self.user:
                 flash(_('This email address is already attached to your account.'))
             else:
                 flash(_('This email address is already in use by another account.'), 'error')
-            return False, existing.user
-        return True, existing.user if existing else None
+            return False
+        return True
 
     def _process(self):
         token = request.view_args['token']
         data = self.token_storage.get(token)
-        valid, _ = self._validate(data)
-        if valid:
+        if self._validate(data):
             self.token_storage.delete(token)
-            add_secondary_email(self.user, data['email'], session.user)
+            add_secondary_email(self.user, data['email'])
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 

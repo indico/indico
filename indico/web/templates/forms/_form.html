@@ -70,7 +70,7 @@
              class="form-group {{ orientation }}
                     {% if field.errors %}has-error{% endif %}
                     {% if field.flags.initially_hidden %}weak-hidden{% endif %}">
-            {% if not skip_label %}
+            {% if not skip_label and (orientation != 'vertical' or field.widget.input_type != 'checkbox') %}
                 <div class="form-label{% if _is_single_line_field(field) %} form-label-middle{% endif %}
                             {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
                     {%- if field.widget.input_type != 'checkbox' and (not field.widget.input_type or not placeholder) -%}
