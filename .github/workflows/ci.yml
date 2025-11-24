@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps (Python+Node) - edit all occurrences if needed!
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -170,7 +170,7 @@ jobs:
 
     steps:
       # BEGIN common steps (Python only) - edit all occurrences if needed!
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -216,7 +216,7 @@ jobs:
 
     steps:
       # BEGIN common steps (Python only) - edit all occurrences if needed!
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -242,7 +242,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps (Python+Node) - edit all occurrences if needed!
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
