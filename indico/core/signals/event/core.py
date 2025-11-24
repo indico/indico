@@ -30,7 +30,10 @@ A dict of changes is passed in the `changes` kwarg, with ``(old, new)``
 tuples for each change. Note than the `person_links` change may happen
 with `old` and `new` being the same lists for technical reasons. If the
 key is present, it should be assumed that something changed (usually
-the order or some data on the person link).
+the order or some data on the person link). Also for technical reasons,
+this signal may not be triggered for all location changes. It is recommended
+to use `location_changed` instead, and potentially ignore this signal if it
+contains no other changes besides `location_data`.
 ''')
 
 cloned = _signals.signal('cloned', '''
