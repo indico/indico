@@ -8,11 +8,12 @@
 from flask import has_request_context, request, session
 from sqlalchemy.exc import IntegrityError
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
-from indico.modules.users import User, logger, signals
+from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import anonymize_user, merge_users
 
