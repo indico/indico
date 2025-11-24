@@ -32,6 +32,8 @@ Improvements
   :pr:`7100`)
 - Clone persons settings when cloning an event (:pr:`7158`)
 - Clone editable-type-specific settings when cloning an event (:pr:`7158`)
+- Allow admins to add a secondary email address to a user without sending a
+  validation email (:issue:`6872`, :pr:`7116`, thanks :user:`vasiliyk`)
 
 Bugfixes
 ^^^^^^^^

@@ -50,7 +50,8 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
-from indico.modules.users.operations import create_user, delete_or_anonymize_user, grant_admin, revoke_admin
+from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
+                                             revoke_admin)
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
@@ -591,14 +592,25 @@ class RHUserEmails(RHUserBase):
             send_email(email_to_send)
 
     def _process(self):
-        form = UserEmailsForm()
+        form = UserEmailsForm(allow_skip_validation=(session.user.is_admin and session.user != self.user))
         if form.validate_on_submit():
-            self._send_confirmation(form.email.data)
+            email = form.email.data
+            # Admin flow: skip validation, since the only time an admin needs to add an email to an existing user
+            # is when they cannot login, so they also cannot use the verification link that's usually sent since
+            # it requires being logged in to the account
+            if 'skip_validation' in form and form.skip_validation.data:
+                add_secondary_email(self.user, email, validation_skipped=True)
+                flash(_('The email address {email} has been added to the account.').format(email=email), 'success')
+                return redirect(url_for('.user_emails'))
+
+            # Normal flow: send confirmation email to the new address
+            self._send_confirmation(email)
             self.user.log(UserLogRealm.user, LogKind.other, 'Profile', 'Validating new secondary email',
-                          session.user, data={'Email': form.email.data})
+                          session.user, data={'Email': email})
             flash(_('We have sent an email to {email}. Please click the link in that email within 24 hours to '
-                    'confirm your new email address.').format(email=form.email.data), 'success')
+                    'confirm your new email address.').format(email=email), 'success')
             return redirect(url_for('.user_emails'))
+
         return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
 
@@ -609,43 +621,26 @@ class RHUserEmailsVerify(RHUserBase):
     def _validate(self, data):
         if not data:
             flash(_('The verification token is invalid or expired.'), 'error')
-            return False, None
+            return False
         user = User.get(data['user_id'])
         if not user or user != self.user:
             flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
-            return False, None
+            return False
         existing = UserEmail.query.filter_by(is_user_deleted=False, email=data['email']).first()
         if existing and not existing.user.is_pending:
             if existing.user == self.user:
                 flash(_('This email address is already attached to your account.'))
             else:
                 flash(_('This email address is already in use by another account.'), 'error')
-            return False, existing.user
-        return True, existing.user if existing else None
+            return False
+        return True
 
     def _process(self):
         token = request.view_args['token']
         data = self.token_storage.get(token)
-        valid, existing = self._validate(data)
-        if valid:
+        if self._validate(data):
             self.token_storage.delete(token)
-
-            if existing and existing.is_pending:
-                logger.info('Found pending user %s to be merged into %s', existing, self.user)
-
-                # If the pending user has missing names, copy them from the active one
-                # to allow it to be marked as not pending and deleted during the merge.
-                existing.first_name = existing.first_name or self.user.first_name
-                existing.last_name = existing.last_name or self.user.last_name
-
-                merge_users(existing, self.user)
-                flash(_("Merged data from existing '{}' identity").format(existing.email))
-                existing.is_pending = False
-
-            self.user.secondary_emails.add(data['email'])
-            self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added', session.user,
-                          data={'Email': data['email']})
-            signals.users.email_added.send(self.user, email=data['email'], silent=False)
+            add_secondary_email(self.user, data['email'])
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 

@@ -14,7 +14,8 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.logs.models.entries import AppLogEntry, AppLogRealm, LogKind, UserLogRealm
 from indico.modules.users import User, logger
-from indico.modules.users.util import anonymize_user
+from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.util import anonymize_user, merge_users
 
 
 def create_user(email, data, identity=None, settings=None, other_emails=None, from_moderation=True):
@@ -73,6 +74,32 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     user.log(UserLogRealm.user, LogKind.positive, 'User', 'User created', session.user if session else None, data=data)
     db.session.flush()
     return user
+
+
+def add_secondary_email(user, email, *, validation_skipped=False):
+    """Add a secondary email to a user.
+
+    If a pending user exists with the given email, that user is merged into the target
+    user before adding the email.
+
+    :param user: The target `User` to add the secondary email to.
+    :param email: The email address to add as a secondary email.
+    :param validation_skipped: Whether the email was added by an admin w/o validation.
+    """
+    existing = UserEmail.query.filter_by(is_user_deleted=False, email=email).first()
+    if existing and existing.user.is_pending:
+        logger.info('Found pending user %s to be merged into %s', existing.user, user)
+        existing.user.first_name = existing.user.first_name or user.first_name
+        existing.user.last_name = existing.user.last_name or user.last_name
+        merge_users(existing.user, user)
+        existing.user.is_pending = False
+
+    user.secondary_emails.add(email)
+    log_data = {'Email': email}
+    if validation_skipped:
+        log_data['Validation skipped'] = True
+    user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added', session.user, data=log_data)
+    signals.users.email_added.send(user, email=email, silent=False)
 
 
 def delete_or_anonymize_user(user):

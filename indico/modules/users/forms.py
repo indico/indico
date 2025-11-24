@@ -99,6 +99,12 @@ class UserPreferencesForm(IndicoForm):
 
 class UserEmailsForm(IndicoForm):
     email = EmailField(_('Add new email address'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x])
+    skip_validation = BooleanField(_('Skip email validation'))
+
+    def __init__(self, *args, allow_skip_validation=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not allow_skip_validation:
+            del self.skip_validation
 
     def validate_email(self, field):
         conflict = (UserEmail.query
