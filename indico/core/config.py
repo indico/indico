@@ -102,8 +102,8 @@ DEFAULTS = {
     'SMTP_SERVER': ('localhost', 25),
     'SMTP_TIMEOUT': 30,
     'SMTP_USE_CELERY': True,
-    'SMTP_USE_TLS': False,
     'SMTP_USE_SSL': False,
+    'SMTP_USE_TLS': False,
     'SQLALCHEMY_DATABASE_URI': None,
     'SQLALCHEMY_MAX_OVERFLOW': 3,
     'SQLALCHEMY_POOL_RECYCLE': 120,
@@ -315,7 +315,7 @@ class IndicoConfig:
         if self.SMTP_ALLOWED_SENDERS and not self.SMTP_SENDER_FALLBACK:
             raise ValueError('Cannot restrict SMTP senders without a fallback')
         if self.SMTP_USE_TLS and self.SMTP_USE_SSL:
-            raise ValueError('SMTP_USE_TLS(STARTLS) and SMTP_USE_SSL are mutually exclusive')
+            raise ValueError('SMTP_USE_TLS and SMTP_USE_SSL are mutually exclusive')
         if not self.DEBUG and self.LOCAL_PASSWORD_MIN_LENGTH < 8:
             raise ValueError('Minimum password length cannot be less than 8 characters long')
 
