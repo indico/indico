@@ -581,6 +581,14 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     raise ValidationError(_('Arrival/departure date is missing'))
                 if arrival_date > departure_date:
                     raise ValidationError(_("Arrival date can't be set after the departure date."))
+                arrival_date_from = _to_date(self.form_item.data['arrival_date_from'])
+                arrival_date_to = _to_date(self.form_item.data['arrival_date_to'])
+                departure_date_from = _to_date(self.form_item.data['departure_date_from'])
+                departure_date_to = _to_date(self.form_item.data['departure_date_to'])
+                if not (arrival_date_from <= arrival_date <= arrival_date_to):
+                    raise ValidationError(_('Arrival date is not within the required range.'))
+                if not (departure_date_from <= departure_date <= departure_date_to):
+                    raise ValidationError(_('Departure date is not within the required range.'))
 
         def _check_number_of_places(new_data):
             if not new_data:

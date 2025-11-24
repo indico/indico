@@ -206,7 +206,7 @@ DateRangePicker.defaultProps = {
   filter: undefined,
 };
 
-function validDate(key, required, invalidMessage, missingMessage) {
+export function validDate(key, required, invalidMessage, missingMessage) {
   return values => {
     const value = values[key];
     if (!value && required) {
@@ -219,12 +219,15 @@ function validDate(key, required, invalidMessage, missingMessage) {
   };
 }
 
-function validDateRange(min, max, key, message) {
+export function validDateRange(min, max, key, message) {
   const range = new DateRange(min, max);
   return values => {
-    const value = values[key];
+    let value = values[key];
     if (!value || value === INVALID) {
       return;
+    }
+    if (typeof value === 'string') {
+      value = fromISOLocalDate(value);
     }
     if (range.includes(value)) {
       return;

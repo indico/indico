@@ -10,9 +10,12 @@ from copy import deepcopy
 import pytest
 from marshmallow import ValidationError
 
-from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice
+from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice, _to_date
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
+
+
+pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 def _id(n):
@@ -39,6 +42,52 @@ def multi_choice_field():
         'max_choices': None
     }
     return field
+
+
+@pytest.fixture
+def dummy_accommodation_field(dummy_regform):
+    return RegistrationFormField(
+        input_type='accommodation',
+        title='Field',
+        parent=dummy_regform.sections[0],
+        registration_form=dummy_regform,
+        data={
+            'arrival_date_from': '2025-11-20',
+            'arrival_date_to': '2025-11-22',
+            'departure_date_from': '2025-11-22',
+            'departure_date_to': '2025-11-24',
+            'captions': {
+                _id(0): 'No Acc',
+                _id(1): 'Valid Acc',
+                _id(2): 'Disabled Acc',
+            },
+        },
+        versioned_data={
+            'choices': [
+                {
+                    'id': _id(0),
+                    'price': 0,
+                    'is_enabled': True,
+                    'places_limit': 0,
+                    'is_no_accommodation': True,
+                },
+                {
+                    'id': _id(1),
+                    'price': 0,
+                    'is_enabled': True,
+                    'places_limit': 0,
+                    'is_no_accommodation': False,
+                },
+                {
+                    'id': _id(2),
+                    'price': 0,
+                    'is_enabled': False,
+                    'places_limit': 0,
+                    'is_no_accommodation': False,
+                },
+            ]
+        },
+    )
 
 
 def _update_data(data, changes):
@@ -222,3 +271,54 @@ def test_multi_choice_setup_schema_max_choices_validation(max_choices, n_choices
             schema.load(data)
     else:
         schema.load(data)
+
+
+@pytest.mark.parametrize(('value', 'error'), (
+    # valid no accommodation
+    ({'choice': _id(0), 'isNoAccommodation': True}, None),
+    # invalid value for isNoAccommodation
+    ({'choice': _id(0), 'isNoAccommodation': False}, 'Invalid data'),
+    ({'choice': _id(1), 'isNoAccommodation': True}, 'Invalid data'),
+    # XXX: isNoAccommodation defaults to False so we omit it for readability
+    # invalid option
+    ({'choice': _id(9)}, 'Invalid choice'),
+    # disabled option
+    ({'choice': _id(2)}, 'Invalid choice'),
+    # missing dates
+    ({'choice': _id(1)}, 'Arrival/departure date is missing'),
+    ({'choice': _id(1), 'arrivalDate': '2025-11-20'}, 'Arrival/departure date is missing'),
+    ({'choice': _id(1), 'departureDate': '2025-11-22'}, 'Arrival/departure date is missing'),
+    # valid accommodation
+    ({'choice': _id(1), 'arrivalDate': '2025-11-20', 'departureDate': '2025-11-22'}, None),
+    ({'choice': _id(1), 'arrivalDate': '2025-11-22', 'departureDate': '2025-11-22'}, None),
+    # nonsense dates / outside range
+    ({'choice': _id(1), 'arrivalDate': '2025-11-22', 'departureDate': '2025-11-21'},
+     "Arrival date can't be set after the departure date."),
+    ({'choice': _id(1), 'arrivalDate': '2025-11-01', 'departureDate': '2025-11-22'},
+     'Arrival date is not within the required range.'),
+    ({'choice': _id(1), 'arrivalDate': '2025-11-20', 'departureDate': '2025-12-01'},
+     'Departure date is not within the required range.'),
+))
+@pytest.mark.usefixtures('request_context')  # to avoid lazy strings in errors
+def test_accommodation_validators(dummy_accommodation_field, value, error):
+    validators = dummy_accommodation_field.field_impl.get_validators(None)
+
+    def _validate(value):
+        __tracebackhide__ = True
+        for validator in validators:
+            validator(value)
+
+    # the validator takes the data as returned vy the AccommodationSchema.
+    # since we don't use it here, we need to do the relevant parts of it ourselves
+    value.setdefault('isNoAccommodation', False)
+    if arrival_date := value.get('arrivalDate'):
+        value['arrivalDate'] = _to_date(arrival_date)
+    if departure_date := value.get('departureDate'):
+        value['departureDate'] = _to_date(departure_date)
+
+    if error is None:
+        _validate(value)
+    else:
+        with pytest.raises(ValidationError) as exc_info:
+            _validate(value)
+        assert exc_info.value.messages == [error]
