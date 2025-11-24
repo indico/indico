@@ -34,6 +34,8 @@ Improvements
 - Clone editable-type-specific settings when cloning an event (:pr:`7158`)
 - Allow admins to add a secondary email address to a user without sending a
   validation email (:issue:`6872`, :pr:`7116`, thanks :user:`vasiliyk`)
+- Add new :data:`SMTP_USE_SSL` config option to use always-on TLS (SMTPS) instead of
+  STARTTLS when sending emails (:issue:`4347`, :pr:`7177`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^

@@ -583,6 +583,21 @@ Emails
 .. data:: SMTP_USE_TLS
 
     If enabled, STARTTLS will be used to use an encrypted SMTP connection.
+    This setting is mutually exclusive with :data:`SMTP_USE_SSL` (SMTPS).
+
+    Default: ``False``
+
+.. data:: SMTP_USE_SSL
+
+    If enabled, regular TLS (on connect) will be used for the encrypted SMTP
+    connection. This is also known as SMTPS and usually on port 465.
+    This setting is mutually exclusive with :data:`SMTP_USE_TLS` (STARTTLS).
+
+    .. warning::
+
+        Note that the email handler for error log emails is not compatible
+        with this setting, so when using it instead of STARTTLS you may want
+        to tweak your ``logging.yaml`` to not attempt to send emails.
 
     Default: ``False``
 
