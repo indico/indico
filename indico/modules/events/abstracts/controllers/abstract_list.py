@@ -28,7 +28,7 @@ from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
-                                                                 EmailRolesSendMixin)
+                                                                 EmailRolesSendMixin, get_roles_from_person_link)
 from indico.modules.events.persons.util import get_event_person_for_user
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import get_field_values
@@ -322,5 +322,5 @@ class RHAbstractsAPIEmailAbstractRolesSend(EmailRolesSendMixin, RHManageAbstract
             for person_link in abstract.person_links:
                 if person_link.email in seen or person_link.person.user in seen or not person_link.email:
                     continue
-                if self.get_roles_from_person_link(person_link) & roles:
+                if get_roles_from_person_link(person_link) & roles:
                     yield person_link.email, {'abstract': abstract, 'person': person_link}, log_metadata
