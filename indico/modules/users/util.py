@@ -655,6 +655,7 @@ def log_user_update(user, changes, *, from_sync=False, _extra_log_fields=None):
         'synced_fields': 'Synced fields',
         'first_name': {'title': 'First name', 'type': 'string'},
         'last_name': {'title': 'Last name', 'type': 'string'},
+        'email': {'title': 'Email address', 'type': 'string'},
         'address': 'Address',
         'phone': {'title': 'Phone', 'type': 'string'},
         'affiliation': {'title': 'Affiliation', 'type': 'string'},
