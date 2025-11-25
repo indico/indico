@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
+
 from babel.dates import get_timezone
 from flask import flash, jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -23,7 +25,7 @@ from indico.modules.logs.util import serialize_log_entry
 from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
-from indico.util.string import strip_tags
+from indico.util.string import html_to_markdown
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -232,14 +234,19 @@ class RHResendEmail(RHManageEventBase):
         body = email_data['body']
         alternatives = email_data.get('alternatives') or []
         if preface := form_data['preface']:
+            text_separator = '\n\n-------------\n\n'
             if is_html_email:
-                body = f'{preface}{body}'
+                body_pattern = re.compile(r'(<body\b[^>]*>)', flags=re.IGNORECASE)
+                body, replacements = body_pattern.subn(lambda m: f'{m.group(1)}{preface}<hr>', body, count=1)
+                if not replacements:
+                    body = f'{preface}{body}'
+                text_preface = html_to_markdown(preface, inline_links=False).strip()
                 alternatives = [
-                    (f'{strip_tags(preface)}\n\n{alt_body}', mimetype)
+                    (f'{text_preface}{text_separator}{alt_body}', mimetype)
                     for alt_body, mimetype in alternatives if mimetype == 'text/plain'
                 ]
             else:
-                body = f'{preface}\n\n{body}'
+                body = f'{preface}{text_separator}{body}'
                 alternatives = []
 
         return make_email(
