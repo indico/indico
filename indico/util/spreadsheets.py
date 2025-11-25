@@ -145,14 +145,17 @@ def _strftime_to_excel_number_format(fmt):
     return result
 
 
-def generate_xlsx(headers, rows, tz=None, column_formats=None):
+def generate_xlsx(headers, rows, *, tz=None, column_formats=None):
     """Generate an XLSX file from a list of headers and rows.
 
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
+    :param tz: the timezone for the values that are datetime objects
     :param column_formats: optional mapping of header keys to Excel number formats
     :return: an `io.BytesIO` containing the XLSX data
     """
+    if column_formats is None:
+        column_formats = {}
     workbook_options = {'in_memory': True, 'strings_to_formulas': False, 'strings_to_numbers': False,
                         'strings_to_urls': False}
     buf = BytesIO()
