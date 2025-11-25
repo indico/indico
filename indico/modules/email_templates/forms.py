@@ -17,14 +17,14 @@ from indico.web.forms.widgets import TinyMCEWidget
 
 
 class CreateEmailTemplatesForm(IndicoForm):
-    title = StringField(_("Title"), [DataRequired(), Length(max=100)])
-    subject = StringField(_("Subject"), [DataRequired(), Length(max=75)])
-    body = TextAreaField(_("Email body"), [DataRequired(), NoRelativeURLs()],
-                            widget=TinyMCEWidget(absolute_urls=True, images=True))
-    type = SelectField(_("Email type"), [DataRequired()],
+    title = StringField(_('Title'), [DataRequired(), Length(max=100)])
+    subject = StringField(_('Subject'), [DataRequired(), Length(max=75)])
+    body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()],
+                         widget=TinyMCEWidget(absolute_urls=True, images=True))
+    type = SelectField(_('Email type'), [DataRequired()],
                        choices=[('event', _('Event')), ('registration', _('Registration')),
                                 ('reminders', _('Reminders'))])
-    status = SelectField(_("Status"), [HiddenUnless('type', value='registration')],
+    status = SelectField(_('Status'), [HiddenUnless('type', value='registration')],
                          choices=[('pending', _('Pending')), ('approved', _('Approved')), ('rejected', _('Rejected'))])
 
     def __init__(self, *args, **kwargs):

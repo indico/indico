@@ -6,7 +6,8 @@
 # LICENSE file for more details.
 from indico.modules.email_templates.controllers import (RHAddCategoryEmailTemplate, RHAddEventEmailTemplate,
                                                         RHListCategoryEmailTemplates, RHListEventEmailTemplates,
-                                                        RHEditEmailTemplate, RHDeleteEmailTemplate)
+                                                        RHEditEmailTemplate, RHDeleteEmailTemplate,
+                                                        RHCloneEventEmailTemplate, RHCloneCategoryEmailTemplate)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -35,9 +36,9 @@ for object_type in ('event', 'category'):
     _bp.add_url_rule(f'{prefix}/add', 'add_email_template',
                      _dispatch(RHAddEventEmailTemplate, RHAddCategoryEmailTemplate),
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
-    _bp.add_url_rule(f'{prefix}/<int:email_template_id>/edit', 'edit_email_template',
+    _bp.add_url_rule(f'{prefix}/<int:email_template_id>/', 'edit_email_template',
                      RHEditEmailTemplate, defaults={'object_type': object_type}, methods=('GET', 'POST'))
-    _bp.add_url_rule(f'{prefix}/<int:email_template_id>/delete', 'delete_email_template',
+    _bp.add_url_rule(f'{prefix}/<int:email_template_id>', 'delete_email_template',
                      RHDeleteEmailTemplate, defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(f'{prefix}/<int:email_template_id>/clone', 'clone_email_template',
                      _dispatch(RHCloneEventEmailTemplate, RHCloneCategoryEmailTemplate),

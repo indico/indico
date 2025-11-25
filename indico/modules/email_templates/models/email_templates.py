@@ -94,7 +94,6 @@ class EmailTemplate(db.Model):
         )
     )
 
-
     @hybrid_property
     def owner(self):
         return self.event or self.category

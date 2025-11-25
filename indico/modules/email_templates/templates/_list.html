@@ -17,7 +17,7 @@
             <div class="thin toolbar right">
                 <div class="group">
                     <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
-                        data-href=""
+                        data-href="{{ url_for('email_templates.clone_email_template', tpl, target) }}"
                         title="{% trans %}Clone this template{% endtrans %}"
                         data-update="#template-list"
                         {% if event %}
