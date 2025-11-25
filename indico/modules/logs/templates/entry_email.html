@@ -128,7 +128,7 @@
                         class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
                         data-href="{{ url_for('.resend_email', entry) }}"
                         data-title="{% trans %}Re-send email{% endtrans %}"
-                        data-reload-after="success"
+                        data-success-event="indico:logsRefresh"
                         data-ajax-dialog
                         {% if data.state == 'pending' or data.attachments %}disabled{% endif %}
                         {% if data.attachments %}
