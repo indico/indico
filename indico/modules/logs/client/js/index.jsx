@@ -33,6 +33,7 @@ window.addEventListener('load', () => {
     },
     initialData
   );
+  window.addEventListener('indico:logsRefresh', () => store.dispatch(fetchLogEntries()));
   store.dispatch(setInitialRealms(Object.keys(initialData.staticData.realms)));
   store.dispatch(setMetadataQuery(JSON.parse(rootElement.dataset.metadataQuery)));
 

@@ -133,6 +133,21 @@ import {$T} from '../../utils/i18n';
       const reload = $this.data('reload-after');
       const redirect = $this.data('redirect-after');
       const content = $this.data('content');
+      const successEvent = $this.data('success-event');
+
+      function emitSuccessEvent(data) {
+        if (!successEvent || !data || !data.success) {
+          return;
+        }
+        window.dispatchEvent(
+          new CustomEvent(successEvent, {
+            detail: {
+              trigger: $this[0],
+              data,
+            },
+          })
+        );
+      }
 
       if (!$.isPlainObject(params)) {
         throw new Error('Invalid params. Must be valid JSON if set.');
@@ -177,6 +192,7 @@ import {$T} from '../../utils/i18n';
             onClose(data, customData) {
               if (data) {
                 handleFlashes(data, true, $this);
+                emitSuccessEvent(data);
                 if (update) {
                   updateHtml(update, data, replaceUpdate, highlightUpdate);
                 } else if (reload !== undefined && reload !== 'customData') {
@@ -209,6 +225,7 @@ import {$T} from '../../utils/i18n';
               if (successEvt.isDefaultPrevented()) {
                 return;
               }
+              emitSuccessEvent(data);
               if (update) {
                 handleFlashes(data, true, $this);
                 updateHtml(update, data, replaceUpdate, highlightUpdate);
