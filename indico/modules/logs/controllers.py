@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
-
 from babel.dates import get_timezone
 from flask import flash, jsonify, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -236,10 +234,8 @@ class RHResendEmail(RHManageEventBase):
         if preface := form_data['preface']:
             text_separator = '\n\n-------------\n\n'
             if is_html_email:
-                body_pattern = re.compile(r'(<body\b[^>]*>)', flags=re.IGNORECASE)
-                body, replacements = body_pattern.subn(lambda m: f'{m.group(1)}{preface}<hr>', body, count=1)
-                if not replacements:
-                    body = f'{preface}{body}'
+                assert '<body>' in body  # should always be true for HTML emails
+                body = body.replace('<body>', f'<body>{preface}<hr>', 1)
                 text_preface = html_to_markdown(preface, inline_links=False).strip()
                 alternatives = [
                     (f'{text_preface}{text_separator}{alt_body}', mimetype)
