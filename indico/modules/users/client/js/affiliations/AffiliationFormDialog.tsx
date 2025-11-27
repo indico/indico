@@ -29,28 +29,6 @@ const defaultValues: AffiliationFormValues = {
   countryCode: '',
 };
 
-const formSections = [
-  {
-    key: 'address',
-    title: Translate.string('Address'),
-    content: {
-      content: (
-        <>
-          <Form.Group widths="equal">
-            <FinalInput name="street" label={Translate.string('Street')} />
-            <FinalInput name="postcode" label={Translate.string('Postal Code')} />
-          </Form.Group>
-          <Form.Group widths="equal">
-            <FinalInput name="city" label={Translate.string('City')} />
-            <FinalInput name="countryCode" label={Translate.string('Country code')} />
-          </Form.Group>
-        </>
-      ),
-    },
-  },
-  ...getPluginObjects('affiliation-form-sections').flat(),
-];
-
 export default function AffiliationFormDialog({
   trigger,
   affiliationURL,
@@ -61,7 +39,7 @@ export default function AffiliationFormDialog({
   affiliationURL: string;
   onSuccess: (data: AffiliationFormValues) => void;
   edit?: boolean;
-}): JSX.Element {
+}) {
   const [open, setOpen] = useState<boolean>(false);
   const {data: initialValues, loading} = useIndicoAxios(affiliationURL, {
     manual: !open || !edit,
@@ -99,6 +77,32 @@ export default function AffiliationFormDialog({
     },
     [affiliationURL, edit, onSuccess]
   );
+
+  const formSections = [
+    {
+      key: 'address',
+      title: Translate.string('Address'),
+      content: {
+        content: (
+          <>
+            <Form.Group widths="equal">
+              <FinalInput name="street" label={Translate.string('Street')} />
+              <FinalInput name="postcode" label={Translate.string('Postal Code')} />
+            </Form.Group>
+            <Form.Group widths="equal">
+              <FinalInput name="city" label={Translate.string('City')} />
+              <FinalInput
+                name="countryCode"
+                label={Translate.string('Country code')}
+                description={Translate.string('Enter an ISO-3166 two letter country code.')}
+              />
+            </Form.Group>
+          </>
+        ),
+      },
+    },
+    ...getPluginObjects('affiliation-form-sections').flat(),
+  ];
 
   return (
     <>

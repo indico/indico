@@ -10,7 +10,7 @@ import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {AutoSizer, Column, Table, TableCellRenderer} from 'react-virtualized';
-import {Button, Confirm, Icon, Input, Loader, Message, Modal} from 'semantic-ui-react';
+import {Button, Confirm, Icon, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
@@ -18,6 +18,7 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import AffiliationFormDialog from './AffiliationFormDialog';
+import AffiliationListFilter from './AffiliationListFilter';
 import {Affiliation} from './types';
 
 import './AffiliationsDashboard.module.scss';
@@ -41,7 +42,7 @@ function getPluginColumns(): ColumnConfig[] {
     }));
 }
 
-export default function AffiliationsDashboard(): JSX.Element {
+export default function AffiliationsDashboard() {
   const {
     data: affiliationsData,
     loading: isLoadingAffiliations,
@@ -51,6 +52,7 @@ export default function AffiliationsDashboard(): JSX.Element {
   const [tableHeight, setTableHeight] = useState<number>(MIN_TABLE_HEIGHT);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
   const [deleting, setDeleting] = useState<Affiliation | null>(null);
+  const [visibleAffiliations, setVisibleAffiliations] = useState<Affiliation[]>([]);
 
   const handleDelete = async () => {
     if (deleting === null) {
@@ -87,16 +89,22 @@ export default function AffiliationsDashboard(): JSX.Element {
         label: Translate.string('Address'),
         flex: 0.3,
         cellRenderer: ({rowData}) => {
-          const cityLine = [rowData.postcode, rowData.city].filter(Boolean).join(' ').trim();
-          const parts = [rowData.street, cityLine, rowData.countryCode].filter(Boolean);
+          const cityLine = [rowData.postcode, rowData.city]
+            .filter(x => x)
+            .join(' ')
+            .trim();
+          const country = rowData.countryName || rowData.countryCode;
+          const parts = [rowData.street, cityLine, country].filter(x => x);
           return parts.length ? parts.join(', ') : '-';
         },
       },
+      ...getPluginColumns(),
       {
         key: 'actions',
         width: 120,
         cellRenderer: ({rowData}) => (
           <div styleName="action-icons">
+            {renderPluginComponents('affiliation-dashboard-row-actions', {affiliation: rowData})}
             <AffiliationFormDialog
               affiliationURL={adminAffiliationURL({affiliation_id: rowData.id})}
               onSuccess={() => reFetch()}
@@ -115,12 +123,14 @@ export default function AffiliationsDashboard(): JSX.Element {
           </div>
         ),
       },
-      ...getPluginColumns(),
     ],
     [reFetch]
   );
 
-  const affiliations: Affiliation[] = affiliationsData || lastData || [];
+  const affiliations: Affiliation[] = useMemo(
+    () => affiliationsData || lastData || [],
+    [affiliationsData, lastData]
+  );
 
   useEffect(() => {
     function updateHeight() {
@@ -150,55 +160,61 @@ export default function AffiliationsDashboard(): JSX.Element {
               onSuccess={() => reFetch()}
               trigger={<Button primary icon="plus" content={Translate.string('Add')} />}
             />
-            {renderPluginComponents('affiliation-dashboard-extra-actions', {affiliations})}
           </Button.Group>
-          <Button basic icon="filter" content={Translate.string('Filter')} />
+          {renderPluginComponents('affiliation-dashboard-extra-actions', {affiliations})}
         </div>
-        <div styleName="search-box">
-          <Input icon="search" placeholder={Translate.string('Search affiliations...')} fluid />
-        </div>
+        <AffiliationListFilter
+          affiliations={affiliations}
+          onFilteredChange={setVisibleAffiliations}
+        />
       </div>
       <div styleName="table-wrapper" ref={tableWrapperRef}>
-        <AutoSizer disableHeight>
-          {({width}) => {
-            const fixedWidth = columns
-              .filter(column => column.width)
-              .reduce((acc, column) => acc + (column.width || 0), 0);
-            const flexColumns = columns.filter(column => !column.width);
-            const totalFlex = flexColumns.reduce((acc, column) => acc + (column.flex || 1), 0) || 1;
-            const remainingWidth = Math.max(width - fixedWidth, 0);
+        {!affiliations.length ? (
+          isLoadingAffiliations ? (
+            <Loader inline="centered" active />
+          ) : (
+            <Message warning>
+              <Translate as={Message.Content}>No affiliations found.</Translate>
+            </Message>
+          )
+        ) : !visibleAffiliations.length ? (
+          <Message warning>
+            <Translate as={Message.Content}>No affiliations match the current filters.</Translate>
+          </Message>
+        ) : (
+          <AutoSizer disableHeight>
+            {({width}) => {
+              const fixedWidth = columns
+                .filter(column => column.width)
+                .reduce((acc, column) => acc + (column.width || 0), 0);
+              const flexColumns = columns.filter(column => !column.width);
+              const totalFlex =
+                flexColumns.reduce((acc, column) => acc + (column.flex || 1), 0) || 1;
+              const remainingWidth = Math.max(width - fixedWidth, 0);
 
-            if (!affiliations.length) {
-              return isLoadingAffiliations ? (
-                <Loader inline="centered" active />
-              ) : (
-                <Message info>
-                  <Translate as={Message.Content}>No affiliations found.</Translate>
-                </Message>
+              return (
+                <Table
+                  width={width}
+                  height={tableHeight}
+                  headerHeight={40}
+                  rowHeight={50}
+                  rowCount={visibleAffiliations.length}
+                  rowGetter={({index}) => visibleAffiliations[index]}
+                >
+                  {columns.map(column => (
+                    <Column
+                      key={column.key}
+                      label={column.label}
+                      dataKey={column.key}
+                      width={column.width ?? remainingWidth * ((column.flex || 1) / totalFlex)}
+                      cellRenderer={column.cellRenderer}
+                    />
+                  ))}
+                </Table>
               );
-            }
-            return (
-              <Table
-                width={width}
-                height={tableHeight}
-                headerHeight={40}
-                rowHeight={50}
-                rowCount={affiliations.length}
-                rowGetter={({index}) => affiliations[index]}
-              >
-                {columns.map(column => (
-                  <Column
-                    key={column.key}
-                    label={column.label}
-                    dataKey={column.key}
-                    width={column.width ?? remainingWidth * ((column.flex || 1) / totalFlex)}
-                    cellRenderer={column.cellRenderer}
-                  />
-                ))}
-              </Table>
-            );
-          }}
-        </AutoSizer>
+            }}
+          </AutoSizer>
+        )}
       </div>
       {deleting && (
         <Confirm

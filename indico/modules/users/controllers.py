@@ -329,20 +329,6 @@ class RHSearchAffiliations(RH):
         return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
 
 
-def _apply_affiliation_data(affiliation, data):
-    for key in ('name', 'alt_names', 'street', 'postcode', 'city', 'country_code', 'meta'):
-        if key not in data:
-            continue
-        value = data[key]
-        if key in {'street', 'postcode', 'city', 'country_code'} and value is None:
-            value = ''
-        elif key == 'alt_names' and value is None:
-            value = []
-        elif key == 'meta' and value is None:
-            value = {}
-        setattr(affiliation, key, value)
-
-
 class RHAffiliationsAPI(RHAdminBase):
     """List/create affiliations via the admin API."""
 
@@ -356,10 +342,10 @@ class RHAffiliationsAPI(RHAdminBase):
     @use_kwargs(AffiliationArgs)
     def _process_POST(self, **data):
         affiliation = Affiliation()
-        _apply_affiliation_data(affiliation, data)
+        affiliation.populate_from_dict(data)
         db.session.add(affiliation)
         db.session.flush()
-        # TODO: Bust search_affiliations cache.
+        search_affiliations.bump_version()
         return AffiliationSchema().jsonify(affiliation), 201
 
 
@@ -376,17 +362,21 @@ class RHAffiliationAPI(RHAdminBase):
 
     @use_kwargs(AffiliationArgs, partial=True)
     def _process_PATCH(self, **data):
-        if not data:
-            raise BadRequest(_('No changes specified'))
-        _apply_affiliation_data(self.affiliation, data)
+        plugin_changes = any(values_from_signal(
+            signals.plugin.affiliation_update.send(self.affiliation, payload=request.json)
+        ))
+        if data:
+            self.affiliation.populate_from_dict(data)
+        elif not plugin_changes:
+            raise BadRequest('No changes specified')
         db.session.flush()
-        # TODO: Bust search_affiliations cache.
+        search_affiliations.bump_version()
         return AffiliationSchema().jsonify(self.affiliation)
 
     def _process_DELETE(self):
         self.affiliation.is_deleted = True
         db.session.flush()
-        # TODO: Bust search_affiliations cache.
+        search_affiliations.bump_version()
         return '', 204
 
 
