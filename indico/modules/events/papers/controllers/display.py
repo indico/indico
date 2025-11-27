@@ -10,20 +10,22 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
-from indico.modules.events.papers.forms import PaperSubmissionForm
+from indico.modules.events.papers.fields import PaperFilesField
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.papers import Paper
-from indico.modules.events.papers.operations import create_paper_revision
+from indico.modules.events.papers.operations import create_new_paper
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_user_submittable_contributions)
 from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDisplayCallForPapersReact,
                                                 WPDisplayReviewingArea)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.util.marshmallow import FilesField
+from indico.web.args import use_rh_kwargs
+from indico.web.util import jsonify_data, jsonify_template
 
 
-class RHSubmitPaper(RHPaperBase):
+class RHSubmitPaperBase(RHPaperBase):
     PAPER_REQUIRED = False
     ALLOW_LOCKED = True
 
@@ -41,13 +43,24 @@ class RHSubmitPaper(RHPaperBase):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
 
-    def _process(self):
-        form = PaperSubmissionForm()
-        if form.validate_on_submit():
-            paper = Paper(self.contribution)
-            create_paper_revision(paper, session.user, form.files.data)
-            return jsonify_data(flash=False)
-        return jsonify_form(form, form_header_kwargs={'action': request.relative_url}, disable_if_locked=False)
+
+class RHSubmitPaperSingle(RHSubmitPaperBase):
+    @use_rh_kwargs({
+        'files': FilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
+        # Key for files obj is 'None' as there is no FileType for single files
+        create_new_paper(self.contribution, session.user, {None: files})
+        return jsonify_data(flash=False)
+
+
+class RHSubmitPaper(RHSubmitPaperBase):
+    @use_rh_kwargs({
+        'files': PaperFilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
+        create_new_paper(self.contribution, session.user, files)
+        return jsonify_data(flash=False)
 
 
 class RHPaperTimeline(RHPaperBase):
@@ -128,3 +141,10 @@ class RHSelectContribution(RHCallForPapers):
 
     def _process(self):
         return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)
+
+
+class RHPapersUploadFile(UploadFileMixin, RHPapersBase):
+    """Upload a file for peer reviewing."""
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'papers', 'uploads'

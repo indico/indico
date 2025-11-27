@@ -430,6 +430,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - move_requests (EventMoveRequest.event)
     # - note (EventNote.linked_event)
     # - paper_competences (PaperCompetence.event)
+    # - paper_file_types (PaperFileType.event)
     # - paper_review_questions (PaperReviewQuestion.event)
     # - paper_templates (PaperTemplate.event)
     # - persons (EventPerson.event)
