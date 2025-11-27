@@ -229,9 +229,17 @@
                                                 {%- trans %}No track{% endtrans %}
                                             {%- endif -%}
                                         </td>
+                                    {% elif item.id == 'review_count' %}
+                                        <td class="i-table">
+                                            {{- abstract.reviews | length -}}
+                                        </td>
                                     {% elif item.id == 'score' %}
                                         <td class="i-table">
                                             {{- abstract.score | round(1) if abstract.score is not none else '-' }}
+                                        </td>
+                                    {% elif item.id == 'score_std' %}
+                                        <td class="i-table">
+                                            {{- abstract.score_std | round(1) if abstract.score_std is not none else '-' }}
                                         </td>
                                     {% elif item.id == 'submitted_dt' %}
                                         <td class="i-table" data-text="{{ abstract.submitted_dt }}">
