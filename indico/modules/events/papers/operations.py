@@ -397,7 +397,7 @@ def create_new_file_type(event, **data):
     file_type = PaperFileType(event=event)
     file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
-    logger.info('File type %r for %s created by %r', file_type, session.user)
+    logger.info('File type %r created by %r', file_type, session.user)
     file_type.log(EventLogRealm.management, LogKind.positive, 'Papers', f'File type {file_type.name} created',
                   session.user)
     return file_type
