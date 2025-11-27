@@ -17,6 +17,7 @@ interface AffiliationBase {
 
 export interface Affiliation extends AffiliationBase {
   id: number;
+  countryName: string;
   meta: Record<string, unknown>;
 }
 
