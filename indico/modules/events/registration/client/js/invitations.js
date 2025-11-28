@@ -16,6 +16,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import EmailPendingInvitationsButton from './components/EmailPendingInvitationsButton';
 import InvitationList from './components/InvitationList';
+import InviteDialogButton from './components/InviteDialogButton';
 
 (function(global) {
   global.setupInvitationPage = function setupInvitationPage({
@@ -44,25 +45,17 @@ import InvitationList from './components/InvitationList';
       });
     });
 
-    renderInvitationPage({
-      eventId,
-      regformId,
-      hasPendingInvitations,
-      invitations,
-    });
+    const onInvitationsChanged = data => {
+      renderInvitationPage({
+        eventId,
+        regformId,
+        hasPendingInvitations: data.has_pending_invitations,
+        invitations: data.invitation_list,
+      });
+    };
 
-    $('.js-invite-user').ajaxDialog({
-      onClose(data) {
-        if (data) {
-          renderInvitationPage({
-            eventId,
-            regformId,
-            hasPendingInvitations: data.has_pending_invitations,
-            invitations: data.invitation_list,
-          });
-        }
-      },
-    });
+    renderInviteButton({eventId, regformId, onInvitationsChanged});
+    renderInvitationPage({eventId, regformId, hasPendingInvitations, invitations});
   };
 
   function renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations}) {
@@ -85,6 +78,21 @@ import InvitationList from './components/InvitationList';
         eventId={eventId}
         regformId={regformId}
         invitations={camelizeKeys(invitations)}
+      />,
+      container
+    );
+  }
+
+  function renderInviteButton({eventId, regformId, onInvitationsChanged}) {
+    const container = document.getElementById('invite-dialog-button-container');
+    if (!container) {
+      return;
+    }
+    ReactDOM.render(
+      <InviteDialogButton
+        eventId={eventId}
+        regformId={regformId}
+        onInvitationsChanged={onInvitationsChanged}
       />,
       container
     );
