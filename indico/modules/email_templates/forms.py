@@ -22,8 +22,7 @@ class CreateEmailTemplatesForm(IndicoForm):
     body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()],
                          widget=TinyMCEWidget(absolute_urls=True, images=True))
     type = SelectField(_('Email type'), [DataRequired()],
-                       choices=[('event', _('Event')), ('registration', _('Registration')),
-                                ('reminders', _('Reminders'))])
+                       choices=[('registration', _('Registration'))])
     status = SelectField(_('Status'), [HiddenUnless('type', value='registration')],
                          choices=[('pending', _('Pending')), ('approved', _('Approved')), ('rejected', _('Rejected'))])
 

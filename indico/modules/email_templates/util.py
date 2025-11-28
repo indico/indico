@@ -19,3 +19,14 @@ def get_all_templates(obj):
 def get_inherited_templates(obj):
     """Get all templates inherited by a given event/category."""
     return get_all_templates(obj) - set(obj.email_templates)
+
+
+def get_system_templates():
+    """Get all templates hardcoded in the registration module system."""
+    registration_templates = {
+        'registration_creation': 'registration_creation_to_registrant.html',
+        'registration_modification': 'registration_modification_to_registrant.html',
+        'registration_status_update': 'registration_state_update_to_registrant.html',
+        'registration_receipt': 'registration_receipt_created_to_registrant.html'
+    }
+    return registration_templates

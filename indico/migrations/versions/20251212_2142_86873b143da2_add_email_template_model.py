@@ -1,7 +1,7 @@
 """Add email template model
 
 Revision ID: 86873b143da2
-Revises: 6fac01c501b6
+Revises: 932389d22b1f
 Create Date: 2025-09-12 21:42:26.537009
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '86873b143da2'
-down_revision = '6fac01c501b6'
+down_revision = '932389d22b1f'
 branch_labels = None
 depends_on = None
 

@@ -1,3 +1,41 @@
+{% macro _render_system_template(system_tpl_name, target, event=none) -%}
+    {% set tpl_title = system_tpl_name.replace('_',' ').title() %}
+    <tr>
+        <td class="i-table id-column">
+            <i class="designer-template-type-icon icon-mail" title="system"></i>
+        </td>
+        <td>
+            {{ tpl_title }}
+        </td>
+        <td>
+            <div class="thin toolbar right">
+                <div class="group">
+                    <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
+                            data-href="{{ url_for('email_templates.clone_system_email_template', target, email_template_name=system_tpl_name) }}"
+                            title="{% trans %}Clone this template{% endtrans %}"
+                            data-update="#template-list"
+                            {% if event %}
+                            data-method="POST"
+                            data-confirm="{% trans title=tpl_title -%}Are you sure you want to clone template '{{ title }}'? {%- endtrans %}">
+                        {% else %}
+                            data-title="{% trans title=tpl_title %}Clone '{{ title }}' template into a category{% endtrans
+                            %}"
+                            data-ajax-dialog>
+                        {% endif %}
+                    </button>
+                    <a class="i-button icon-eye icon-only text-color borderless"
+                       data-href="{{ url_for('email_templates.view_system_email_template', target, email_template_name=system_tpl_name) }}"
+                       data-title="{% trans %}View template{% endtrans %}"
+                       data-update="#template-list"
+                       data-ajax-dialog
+                       title="{% trans %}View template{% endtrans %}">
+                    </a>
+                </div>
+            </div>
+        </td>
+    </tr>
+{% endmacro -%}
+
 {% macro _render_template(tpl, target, inherited=false, event=none) -%}
     <tr>
         <td class="i-table id-column">
@@ -54,7 +92,20 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_email_template_list(email_templates, target, inherited_templates=[], event=none) -%}
+{% macro render_email_template_list(email_templates, target, inherited_templates=[], system_templates=[], event=none) -%}
+    {% if system_templates %}
+        <section>
+            <h3>{% trans %}System templates{% endtrans %}</h3>
+            <table class="i-table-widget">
+                <tbody>
+                {% for system_tpl_name in system_templates.keys() | sort(attribute='key') | sort(attribute='key') %}
+                    {{ _render_system_template(system_tpl_name, target, event=event) }}
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+
     {% if inherited_templates %}
         <section>
             <h3>{% trans %}Inherited templates{% endtrans %}</h3>
