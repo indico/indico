@@ -30,7 +30,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.files.models.files import File
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
-from indico.util.marshmallow import (LowercaseString, make_validate_indico_placeholders, no_endpoint_links,
+from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.spreadsheets import CSVFieldDelimiter
@@ -324,11 +324,15 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
         'first_name': fields.String(load_default=None),
         'last_name': fields.String(load_default=None),
         'source_file': fields.UUID(load_default=None),
+        'user': Principal(load_default=None),
     })
     @no_autoflush
-    def _process(self, subject, body, first_name, last_name, source_file):
+    def _process(self, subject, body, first_name, last_name, source_file, user):
         self.commit = False
-        if source_file:
+        if user:
+            first_name = user.first_name
+            last_name = user.last_name
+        elif source_file:
             first_name, last_name = self._get_preview_names_from_csv(source_file)
         elif not first_name:
             abort(422, messages={'first_name': ['Missing data']})

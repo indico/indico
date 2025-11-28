@@ -13,7 +13,7 @@ import inviteURL from 'indico-url:event_registration.invite';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Icon, Loader, Message, Popup, Segment} from 'semantic-ui-react';
 
@@ -25,7 +25,7 @@ import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-function ExistingInviteFields({eventId, favoriteUsersController, onPrincipalsResolved}) {
+function ExistingInviteFields({eventId, favoriteUsersController}) {
   return (
     <FinalPrincipalList
       name="users"
@@ -33,7 +33,6 @@ function ExistingInviteFields({eventId, favoriteUsersController, onPrincipalsRes
       withExternalUsers
       eventId={eventId}
       favoriteUsersController={favoriteUsersController}
-      onPrincipalsResolved={onPrincipalsResolved}
       required
     />
   );
@@ -42,7 +41,6 @@ function ExistingInviteFields({eventId, favoriteUsersController, onPrincipalsRes
 ExistingInviteFields.propTypes = {
   eventId: PropTypes.number.isRequired,
   favoriteUsersController: PropTypes.array.isRequired,
-  onPrincipalsResolved: PropTypes.func.isRequired,
 };
 
 function NewInviteFields() {
@@ -149,13 +147,7 @@ const modeConfig = {
     buttonLabel: Translate.string('Indico users'),
     renderFields: props => <ExistingInviteFields {...props} />,
     extraFields: ['users'],
-    getPreviewPayload: (values, resolvedPrincipals) => {
-      if (!resolvedPrincipals.length) {
-        return {context: {}, disabled: true};
-      }
-      const {firstName, lastName} = resolvedPrincipals[0];
-      return {context: {first_name: firstName, last_name: lastName}, disabled: false};
-    },
+    getPreviewPayload: ({users: [user] = []}) => ({context: {user}, disabled: !user}),
   },
   new: {
     label: Translate.string('New user'),
@@ -163,8 +155,8 @@ const modeConfig = {
     renderFields: () => <NewInviteFields />,
     extraFields: ['first_name', 'last_name', 'email', 'affiliation'],
     getPreviewPayload: values => {
-      const firstName = values.first_name?.trim();
-      const lastName = values.last_name?.trim();
+      const firstName = values.first_name.trim();
+      const lastName = values.last_name.trim();
       if (!firstName || !lastName) {
         return {context: {}, disabled: true};
       }
@@ -176,17 +168,10 @@ const modeConfig = {
     buttonLabel: Translate.string('Import CSV'),
     renderFields: props => <ImportInviteFields {...props} />,
     extraFields: ['source_file', 'skip_existing'],
-    getPreviewPayload: values => {
-      const sourceFile = values.source_file;
-      if (!sourceFile) {
-        return {context: {}, disabled: true};
-      }
-
-      return {
-        context: {source_file: sourceFile},
-        disabled: false,
-      };
-    },
+    getPreviewPayload: ({source_file: sourceFile}) => ({
+      context: {source_file: sourceFile},
+      disabled: !sourceFile,
+    }),
   },
 };
 
@@ -203,7 +188,6 @@ const getSkippedWarningMessage = skipped =>
 export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
   const favoriteUsersController = useFavoriteUsers();
   const [mode, setMode] = useState('existing');
-  const [resolvedPrincipals, setResolvedPrincipals] = useState([]);
   const [sentEmailsCount, setSentEmailsCount] = useState(0);
   const [sentEmailsWarning, setSentEmailsWarning] = useState(null);
   const successTimeout = 5000;
@@ -211,12 +195,6 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     inviteMetadataURL({event_id: eventId, reg_form_id: regformId}),
     {camelize: true}
   );
-
-  useEffect(() => {
-    if (mode === 'new') {
-      setResolvedPrincipals([]);
-    }
-  }, [mode]);
 
   const csvDelimiterOptions = useMemo(() => {
     return (metadata?.csvDelimiters || []).map(d => ({value: d.value, text: d.text}));
@@ -246,10 +224,6 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       delimiter: defaultDelimiter,
     };
   }, [metadata, defaultDelimiter]);
-
-  const handlePrincipalsResolved = useCallback(entries => {
-    setResolvedPrincipals(prev => (_.isEqual(prev, entries) ? prev : entries));
-  }, []);
 
   const handleSubmit = useCallback(
     async values => {
@@ -307,15 +281,10 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     [eventId, metadata?.moderationEnabled, mode, onClose, onSuccess, regformId, successTimeout]
   );
 
-  const getPreviewPayload = useCallback(
-    values => modeConfig[mode].getPreviewPayload(values, resolvedPrincipals),
-    [mode, resolvedPrincipals]
-  );
-
   const modeProps = useMemo(() => {
     switch (mode) {
       case 'existing':
-        return {eventId, favoriteUsersController, onPrincipalsResolved: handlePrincipalsResolved};
+        return {eventId, favoriteUsersController};
       case 'import':
         return {
           csvDelimiterOptions,
@@ -325,14 +294,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       default:
         return {};
     }
-  }, [
-    csvDelimiterOptions,
-    eventId,
-    favoriteUsersController,
-    handlePrincipalsResolved,
-    mode,
-    regformId,
-  ]);
+  }, [csvDelimiterOptions, eventId, favoriteUsersController, mode, regformId]);
 
   if (loading || !metadata) {
     return (
@@ -389,7 +351,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       senders={metadata.senders}
       placeholders={metadata.placeholders}
       previewURL={invitationPreviewURL({event_id: eventId, reg_form_id: regformId})}
-      getPreviewPayload={getPreviewPayload}
+      getPreviewPayload={values => modeConfig[mode].getPreviewPayload(values)}
       recipientsField={recipientsField}
       initialFormValues={initialFormValues}
       title={Translate.string('Invite people')}
