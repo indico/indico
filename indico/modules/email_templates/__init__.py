@@ -16,7 +16,7 @@ from indico.web.menu import SideMenuItem
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _event_sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
-        return SideMenuItem('email_templates', _('Email templates'),
+        return SideMenuItem('email_templates', _('Email Templates'),
                             url_for('email_templates.email_template_list', event),
                             section='customization')
 
@@ -24,6 +24,6 @@ def _event_sidemenu_items(sender, event, **kwargs):
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _category_sidemenu_items(sender, category, **kwargs):
     if category.can_manage(session.user):
-        return SideMenuItem('email_templates', _('Email templates'),
+        return SideMenuItem('email_templates', _('Email Templates'),
                             url_for('email_templates.email_template_list', category),
-                            weight=30, icon='user-reading')
+                            weight=50, icon='mail')

@@ -4,14 +4,16 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 from indico.modules.email_templates.controllers import (RHAddCategoryEmailTemplate, RHAddEventEmailTemplate,
                                                         RHListCategoryEmailTemplates, RHListEventEmailTemplates,
                                                         RHEditEmailTemplate, RHDeleteEmailTemplate,
-                                                        RHCloneEventEmailTemplate, RHCloneCategoryEmailTemplate)
+                                                        RHCloneEventEmailTemplate, RHCloneCategoryEmailTemplate,
+                                                        RHCloneEventSystemEmailTemplate,
+                                                        RHCloneCategorySystemEmailTemplate, RHViewEmailTemplate)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
-
 
 _bp = IndicoBlueprint('email_templates', __name__, template_folder='templates',
                       virtual_template_folder='email_templates')
@@ -42,4 +44,9 @@ for object_type in ('event', 'category'):
                      RHDeleteEmailTemplate, defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(f'{prefix}/<int:email_template_id>/clone', 'clone_email_template',
                      _dispatch(RHCloneEventEmailTemplate, RHCloneCategoryEmailTemplate),
+                     defaults={'object_type': object_type}, methods=('GET', 'POST'))
+    _bp.add_url_rule(f'{prefix}/<email_template_name>/view-system-template', 'view_system_email_template',
+                     RHViewEmailTemplate, defaults={'object_type': object_type}, methods=('GET', 'POST'))
+    _bp.add_url_rule(f'{prefix}/<email_template_name>/system-template/clone', 'clone_system_email_template',
+                     _dispatch(RHCloneEventSystemEmailTemplate, RHCloneCategorySystemEmailTemplate),
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))

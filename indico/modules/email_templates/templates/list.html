@@ -8,6 +8,6 @@
 {% block content %}
     <div id="template-list">
         {{ render_email_template_list(target.email_templates, target, inherited_templates=inherited_templates,
-                                      event=event|default(none)) }}
+                                      system_templates=system_templates, event=event|default(none)) }}
     </div>
 {% endblock %}
