@@ -50,27 +50,12 @@ export default function WTFPrincipalListField({
     [inputField]
   );
 
-  const emitPrincipalsResolved = useCallback(
-    entries => {
-      if (!inputField) {
-        return;
-      }
-      const event = new CustomEvent('indico:principal-list-change', {
-        detail: {fieldId, entries},
-        bubbles: true,
-      });
-      inputField.dispatchEvent(event);
-    },
-    [fieldId, inputField]
-  );
-
   return (
     <FormContext.Provider value={formContext}>
       <PrincipalListField
         favoriteUsersController={favoriteUsersController}
         disabled={disabled}
         onChange={onChangePrincipal}
-        onPrincipalsResolved={emitPrincipalsResolved}
         onFocus={() => {}}
         onBlur={() => {}}
         value={value}
