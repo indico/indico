@@ -105,21 +105,19 @@ function ImportInviteFields({csvDelimiterOptions, eventId, regformId}) {
         )}
       </Field>
       <Field name="delimiter" subscription={{value: true}}>
-        {({input: {value: delimiter}}) => {
-          const uploadURL = inviteImportUploadURL({
-            event_id: eventId,
-            reg_form_id: regformId,
-            delimiter,
-          });
-          return (
-            <FinalSingleFileManager
-              name="source_file"
-              uploadURL={uploadURL}
-              validExtensions={['csv']}
-              required
-            />
-          );
-        }}
+        {({input: {value: delimiter}}) => (
+          <FinalSingleFileManager
+            key={delimiter || 'default'} // reset when delimiter changes
+            name="source_file"
+            uploadURL={inviteImportUploadURL({
+              event_id: eventId,
+              reg_form_id: regformId,
+              delimiter,
+            })}
+            validExtensions={['csv']}
+            required
+          />
+        )}
       </Field>
       <FinalCheckbox
         name="skip_existing"

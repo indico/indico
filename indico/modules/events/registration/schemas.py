@@ -25,7 +25,7 @@ from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
 
-class InvitationBaseSchema(mm.Schema):
+class InvitationSchemaBase(mm.Schema):
     sender_address = fields.String(required=True, validate=not_empty)
     subject = fields.String(required=True, validate=[not_empty, validate.Length(max=200)])
     body = fields.String(required=True, validate=[
@@ -41,14 +41,14 @@ class InvitationBaseSchema(mm.Schema):
     copy_for_sender = fields.Bool(load_default=False)
 
 
-class InvitationNewSchema(InvitationBaseSchema):
+class InvitationNewSchema(InvitationSchemaBase):
     first_name = fields.String(required=True, validate=not_empty)
     last_name = fields.String(required=True, validate=not_empty)
     email = LowercaseString(required=True, validate=[not_empty, validate.Email()])
     affiliation = fields.String(load_default='')
 
 
-class InvitationExistingSchema(InvitationBaseSchema):
+class InvitationExistingSchema(InvitationSchemaBase):
     users = fields.List(
         fields.String(validate=not_empty),
         required=True,
@@ -56,7 +56,7 @@ class InvitationExistingSchema(InvitationBaseSchema):
     )
 
 
-class InvitationImportSchema(InvitationBaseSchema):
+class InvitationImportSchema(InvitationSchemaBase):
     skip_existing = fields.Bool(load_default=False)
     source_file = fields.UUID(required=True)
 
