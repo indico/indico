@@ -48,13 +48,13 @@ class GeneralFieldDataSchema(mm.Schema):
     def _check_unique_title_in_section(self, title, **kwargs):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         field = self.context['field']
-        query = (db.session.query(db.func.count(RegistrationFormItem.id)).
-                 filter(RegistrationFormItem.parent_id == field.parent_id,
-                        db.func.lower(RegistrationFormItem.title) == title.lower(),
-                        ~RegistrationFormItem.is_deleted))
+        query = (db.session.query(RegistrationFormItem)
+                 .filter(RegistrationFormItem.parent_id == field.parent.id,
+                         db.func.lower(RegistrationFormItem.title) == title.lower(),
+                         ~RegistrationFormItem.is_deleted))
         if field.id:
             query = query.filter(RegistrationFormItem.id != field.id)
-        if query.scalar():
+        if query.has_rows():
             raise ValidationError(_('There is already a field in this section with the same title.'))
 
     @validates('input_type')
