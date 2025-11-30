@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import hashlib
+import mimetypes
 import re
 import time
 from email.mime.base import MIMEBase
@@ -16,6 +18,8 @@ from flask import g
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.storage.backend import get_storage
+from indico.util.fs import secure_filename
 from indico.util.signals import make_interceptable
 from indico.util.string import truncate
 
@@ -84,6 +88,50 @@ def _log_email(email, event, module, user, meta=None, summary=None):
             for a in email['attachments']
         ),
     }
+    # Optionally persist email attachments
+    if config.EMAIL_LOG_STORE_ATTACHMENTS and email.get('attachments'):
+        try:
+            storage = get_storage(config.ATTACHMENT_STORAGE)
+            stored = []
+            base_path = f'emails/{event.id}'
+
+            for att in email['attachments']:
+                if isinstance(att, MIMEBase):
+                    filename = att.get_filename('unnamed')
+                    content = att.get_payload(decode=True)
+                    ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
+                             or 'application/octet-stream')
+                else:
+                    # tuple: (filename, content[, mimetype])
+                    filename = att[0]
+                    content = att[1]
+                    if isinstance(content, str):
+                        content = content.encode('utf-8')
+                    if len(att) > 2 and att[2]:
+                        ctype = att[2]
+                    else:
+                        ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
+                safe_name = secure_filename(filename or 'attachment', 'file')
+                unique = hashlib.sha256(content).hexdigest()
+                name = f'{base_path}/{unique}-{safe_name}'
+                file_id, checksum = storage.save(name, ctype, filename or safe_name, content)
+                try:
+                    size = storage.getsize(file_id)
+                except Exception:
+                    size = None
+                stored.append({
+                    'filename': filename or safe_name,
+                    'content_type': ctype,
+                    'backend': config.ATTACHMENT_STORAGE,
+                    'file_id': file_id,
+                    'checksum_md5': checksum,
+                    'size': size,
+                })
+            if stored:
+                log_data['stored_attachments'] = stored
+        except Exception:
+            # Do not fail email logging if storage is unavailable; simply skip storing
+            logger.exception('Failed to store email attachments for event %s', event.id)
     return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 

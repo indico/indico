@@ -562,6 +562,14 @@ Emails
 
     Default: ``'indico.vendor.django_mail.backends.smtp.EmailBackend'``
 
+.. data:: EMAIL_LOG_STORE_ATTACHMENTS
+
+    If enabled, the full contents of email attachments are stored in the storage
+    backend when an email is logged in the context of an event. The corresponding
+    email log entry includes metadata for each stored attachment.
+
+    Default: ``False``
+
 .. data:: SMTP_SERVER
 
     The hostname and port of the SMTP server used for sending emails.
