@@ -13,11 +13,11 @@ import submitRevisionSingleURL from 'indico-url:papers.submit_revision_single';
 
 import _ from 'lodash';
 import React, {useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
-import {Button, Form, Modal} from 'semantic-ui-react';
+import {Button} from 'semantic-ui-react';
 
 import {FinalFileManager} from 'indico/modules/events/editing/editing/timeline/FileManager';
-import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+import {handleSubmitError} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -35,6 +35,7 @@ export default function PaperSubmissionButton({
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
   const _fileTypes = camelizeKeys(data || []);
+
   const submitRevision = async ({files}) => {
     let urlFunc, payload;
     if (_fileTypes.length) {
@@ -70,44 +71,28 @@ export default function PaperSubmissionButton({
 
   return (
     <>
-      <FinalForm
-        onSubmit={submitRevision}
-        subscription={{}}
-        initialValuesEqual={_.isEqual}
-        initialValues={{files: {}}}
-      >
-        {({handleSubmit}) => (
-          <Modal
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            closeIcon
-            closeOnDimmerClick={false}
-            closeOnEscape={false}
-          >
-            <Translate as={Modal.Header}>{Translate.string('Submit paper')}</Translate>
-            <Modal.Content>
-              <Form id="submit-papers-form" onSubmit={handleSubmit}>
-                <FinalFileManager
-                  name="files"
-                  fileTypes={fileTypes}
-                  files={[]}
-                  uploadURL={apiUploadURL({
-                    event_id: eventId,
-                    contrib_id: contributionId,
-                  })}
-                  mustChange
-                />
-              </Form>
-            </Modal.Content>
-            <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
-              <FinalSubmitButton form="submit-papers-form" label={Translate.string('Submit')} />
-              <Button onClick={() => setModalOpen(true)}>
-                <Translate>Cancel</Translate>
-              </Button>
-            </Modal.Actions>
-          </Modal>
-        )}
-      </FinalForm>
+      {data && modalOpen ? (
+        <FinalModalForm
+          id="paper-submission-form"
+          onSubmit={submitRevision}
+          initialValuesEqual={_.isEqual}
+          initialValues={{files: {}}}
+          header={<Translate>Submit paper</Translate>}
+          onClose={() => setModalOpen(false)}
+          size="large"
+        >
+          <FinalFileManager
+            name="files"
+            fileTypes={fileTypes}
+            files={[]}
+            uploadURL={apiUploadURL({
+              event_id: eventId,
+              contrib_id: contributionId,
+            })}
+            mustChange
+          />
+        </FinalModalForm>
+      ) : null}
       <Button onClick={() => setModalOpen(true)} primary>
         <Translate>Submit paper</Translate>
       </Button>
