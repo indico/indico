@@ -51,6 +51,7 @@ class GeneralFieldDataSchema(mm.Schema):
         query = (db.session.query(RegistrationFormItem)
                  .filter(RegistrationFormItem.parent_id == field.parent.id,
                          db.func.lower(RegistrationFormItem.title) == title.lower(),
+                         RegistrationFormItem.is_enabled,
                          ~RegistrationFormItem.is_deleted))
         if field.id:
             query = query.filter(RegistrationFormItem.id != field.id)
@@ -232,12 +233,24 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
     """Enable/Disable a field."""
 
     def _process(self):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         enabled = request.args.get('enable') == 'true'
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
+        if enabled:
+            query = (db.session.query(RegistrationFormItem)
+                     .filter(RegistrationFormItem.parent_id == self.field.parent.id,
+                             db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if query.has_rows():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('There is already a field in this section with the same title.'))
+                )
+
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()

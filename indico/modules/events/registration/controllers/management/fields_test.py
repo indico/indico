@@ -35,6 +35,16 @@ class TestGeneralFieldDataSchema:
             schema.load({'input_type': last_name_field.input_type, 'title': first_name_field.title})
         assert exc_info.value.messages == {'title': 'There is already a field in this section with the same title.'}
 
+    def test_add_new_field_with_same_title_but_disabled(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        affiliation_field = next((field for field in pd_section.fields
+                                    if field.personal_data_type == PersonalDataType.affiliation), None)
+        affiliation_field.is_enabled = False
+        db.session.flush()
+        new_affiliation_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_affiliation_field})
+        assert schema.load({'input_type': 'text', 'title': affiliation_field.title})
+
     def test_add_new_field_with_same_title_in_other_section(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
         first_name_field = next((field for field in pd_section.fields
