@@ -37,6 +37,7 @@ export {default as MathJax} from './MathJax';
 export {default as FileSubmission} from './files/FileSubmission';
 export {default as FinalPictureManager} from './pictures/PictureManager';
 export {default as FinalSingleFileManager} from './files/SingleFileManager';
+export {default as FinalSingleFileDrop} from './files/SingleFileDrop';
 export {default as ClipboardButton} from './ClipboardButton';
 export {default as RadioButton} from './RadioButton';
 export {default as RequestConfirm, RequestConfirmDelete} from './RequestConfirm';

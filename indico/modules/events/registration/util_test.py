@@ -23,14 +23,23 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
                                                      get_registered_event_persons, get_ticket_qr_code_data,
-                                                     get_user_data, import_invitations_from_csv,
+                                                     get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration)
 from indico.modules.users.models.users import UserTitle
 from indico.testing.util import assert_json_snapshot
+from indico.util.spreadsheets import CSVFieldDelimiter
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
+
+
+INVITATION_COLUMNS = ['first_name', 'last_name', 'affiliation', 'email']
+
+
+def _import_invitations_from_csv(regform, csv_data, **kwargs):
+    user_records = import_user_records_from_csv(BytesIO(csv_data), INVITATION_COLUMNS)
+    return import_invitations_from_user_records(regform, user_records, **kwargs)
 
 
 @pytest.mark.usefixtures('dummy_regform')
@@ -69,6 +78,32 @@ def test_import_users():
         'phone': '',
         'email': '1337@example.test',
     }
+
+
+@pytest.mark.parametrize('delimiter', [d.delimiter for d in CSVFieldDelimiter])
+def test_import_users_guess_delimiter(delimiter):
+    rows = [
+        delimiter.join(['John', 'Doe', 'ACMEInc', 'john@example.test']),
+        delimiter.join(['Jane', 'Smith', '', 'jane@example.test']),
+    ]
+    csv = '\n'.join(rows).encode()
+
+    columns = ['first_name', 'last_name', 'affiliation', 'email']
+    users = import_user_records_from_csv(BytesIO(csv), columns)
+    assert users == [
+        {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'affiliation': 'ACMEInc',
+            'email': 'john@example.test',
+        },
+        {
+            'first_name': 'Jane',
+            'last_name': 'Smith',
+            'affiliation': '',
+            'email': 'jane@example.test',
+        },
+    ]
 
 
 def test_import_users_error(create_user):
@@ -200,11 +235,12 @@ def test_import_invitations(monkeypatch, dummy_regform, dummy_user):
     # normal import with no conflicts
     csv = b'\n'.join([b'Bob,Doe,ACME Inc.,bdoe@example.test',
                       b'Jane,Smith,ACME Inc.,jsmith@example.test'])
-    invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_sender='noreply@example.test', email_subject='invitation',
-                                                       email_body='Invitation to event',
-                                                       skip_moderation=False, skip_access_check=False,
-                                                       skip_existing=True)
+    invitations, skipped = _import_invitations_from_csv(dummy_regform, csv,
+                                                        email_sender='noreply@example.test',
+                                                        email_subject='invitation',
+                                                        email_body='Invitation to event',
+                                                        skip_moderation=False, skip_access_check=False,
+                                                        skip_existing=True)
     assert len(invitations) == 2
     assert skipped == 0
 
@@ -233,10 +269,11 @@ def test_import_invitations_duplicate_invitation(monkeypatch, dummy_regform, dum
     # duplicate invitation with 'skip_existing=True'
     csv = b'\n'.join([b'Amy,Wang,ACME Inc.,awang@example.test',
                       b'Jane,Smith,ACME Inc.,jsmith@example.test'])
-    invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_sender='noreply@example.test', email_subject='invitation',
-                                                       email_body='Invitation to event',
-                                                       skip_moderation=True, skip_existing=True)
+    invitations, skipped = _import_invitations_from_csv(dummy_regform, csv,
+                                                        email_sender='noreply@example.test',
+                                                        email_subject='invitation',
+                                                        email_body='Invitation to event',
+                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
     assert skipped == 1
 
@@ -260,10 +297,11 @@ def test_import_invitations_duplicate_registration(monkeypatch, dummy_regform):
     # duplicate registration with 'skip_existing=True'
     csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.test',
                       b'Jane,Smith,ACME Inc.,jsmith@example.test'])
-    invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_sender='noreply@example.test', email_subject='invitation',
-                                                       email_body='Invitation to event',
-                                                       skip_moderation=True, skip_existing=True)
+    invitations, skipped = _import_invitations_from_csv(dummy_regform, csv,
+                                                        email_sender='noreply@example.test',
+                                                        email_subject='invitation',
+                                                        email_body='Invitation to event',
+                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
     assert skipped == 1
 
@@ -288,10 +326,11 @@ def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_use
     # duplicate user with 'skip_existing=True'
     csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.test',
                       b'Jane,Smith,ACME Inc.,jsmith@example.test'])
-    invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_sender='noreply@example.test', email_subject='invitation',
-                                                       email_body='Invitation to event',
-                                                       skip_moderation=True, skip_existing=True)
+    invitations, skipped = _import_invitations_from_csv(dummy_regform, csv,
+                                                        email_sender='noreply@example.test',
+                                                        email_subject='invitation',
+                                                        email_body='Invitation to event',
+                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
     assert skipped == 1
 
@@ -326,10 +365,11 @@ def test_import_invitations_error(dummy_regform, dummy_user):
     csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.test'])
 
     with pytest.raises(UserValueError) as e:
-        import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_sender='noreply@example.test', email_subject='invitation',
-                                    email_body='Invitation to event',
-                                    skip_moderation=False, skip_existing=False)
+        _import_invitations_from_csv(dummy_regform, csv,
+                                     email_sender='noreply@example.test',
+                                     email_subject='invitation',
+                                     email_body='Invitation to event',
+                                     skip_moderation=False, skip_existing=False)
     assert 'a registration with this email already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
@@ -337,20 +377,22 @@ def test_import_invitations_error(dummy_regform, dummy_user):
     csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.test'])
 
     with pytest.raises(UserValueError) as e:
-        import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_sender='noreply@example.test', email_subject='invitation',
-                                    email_body='Invitation to event',
-                                    skip_moderation=False, skip_existing=False)
+        _import_invitations_from_csv(dummy_regform, csv,
+                                     email_sender='noreply@example.test',
+                                     email_subject='invitation',
+                                     email_body='Invitation to event',
+                                     skip_moderation=False, skip_existing=False)
     assert 'a registration for this user already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
     # duplicate email (invitation)
     csv = b'\n'.join([b'Bill,Doe,ACME Inc.,bdoe@example.test'])
     with pytest.raises(UserValueError) as e:
-        import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_sender='noreply@example.test', email_subject='invitation',
-                                    email_body='Invitation to event',
-                                    skip_moderation=False, skip_existing=False)
+        _import_invitations_from_csv(dummy_regform, csv,
+                                     email_sender='noreply@example.test',
+                                     email_subject='invitation',
+                                     email_body='Invitation to event',
+                                     skip_moderation=False, skip_existing=False)
     assert 'an invitation for this user already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
