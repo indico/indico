@@ -44,7 +44,7 @@ class InvitationSchemaBase(mm.Schema):
 class InvitationNewSchema(InvitationSchemaBase):
     first_name = fields.String(required=True, validate=not_empty)
     last_name = fields.String(required=True, validate=not_empty)
-    email = LowercaseString(required=True, validate=[not_empty, validate.Email()])
+    email = LowercaseString(required=True, validate=validate.Email())
     affiliation = fields.String(load_default='')
 
 
@@ -56,9 +56,16 @@ class InvitationExistingSchema(InvitationSchemaBase):
     )
 
 
+class InvitationImportRowSchema(mm.Schema):
+    first_name = fields.String(required=True)
+    last_name = fields.String(required=True)
+    affiliation = fields.String(load_default='')
+    email = LowercaseString(required=True)
+
+
 class InvitationImportSchema(InvitationSchemaBase):
     skip_existing = fields.Bool(load_default=False)
-    source_file = fields.UUID(required=True)
+    imported = fields.List(fields.Nested(InvitationImportRowSchema), required=True)
 
 
 class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):

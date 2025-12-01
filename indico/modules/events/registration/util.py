@@ -54,7 +54,7 @@ from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
-from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
+from indico.util.spreadsheets import CSVFieldDelimiter, csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 from indico.web.args import parser
 
@@ -76,17 +76,24 @@ class ActionMenuEntry:
     extra_classes: str = ''
 
 
-def import_user_records_from_csv(fileobj, columns, delimiter=','):
+def import_user_records_from_csv(fileobj, columns, delimiter=None):
     """Parse and do basic validation of user data from a CSV file.
 
     :param fileobj: the CSV file to be read.
     :param columns: A list of column names, 'first_name', 'last_name', & 'email' are compulsory.
-    :param delimiter: the CSV separator.
+    :param delimiter: the CSV separator. Guessed if omitted.
     :return: A list dictionaries each representing one row,
              the keys of which are given by the column names.
     """
     with csv_text_io_wrapper(fileobj) as ftxt:
-        reader = csv.reader(ftxt.read().splitlines(), delimiter=delimiter)
+        content = ftxt.read().splitlines()
+    if not delimiter and content:
+        delimiters = [d.delimiter for d in CSVFieldDelimiter]
+        try:
+            delimiter = csv.Sniffer().sniff(content[0], delimiters=delimiters).delimiter
+        except csv.Error:
+            raise UserValueError(_('Not a valid CSV file.'))
+    reader = csv.reader(content, delimiter=delimiter)
     used_emails = set()
     email_row_map = {}
     user_records = []
@@ -951,17 +958,14 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     ]
 
 
-def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *, skip_moderation=True,
-                                skip_access_check=True, skip_existing=False, lock_email=False, delimiter=',',
-                                bcc_addresses=None, copy_for_sender=False):
-    """Import invitations from a CSV file.
+def import_invitations_from_user_records(regform, user_records, email_sender, email_subject, email_body, *,
+                                         skip_moderation=True, skip_access_check=True, skip_existing=False,
+                                         lock_email=False, bcc_addresses=None, copy_for_sender=False):
+    """Import invitations from a user records list.
 
     :return: A list of invitations and the number of skipped records which
              is zero if skip_existing=False
     """
-    columns = ['first_name', 'last_name', 'affiliation', 'email']
-    user_records = import_user_records_from_csv(fileobj, columns=columns, delimiter=delimiter)
-
     reg_data = (db.session.query(Registration.user_id, Registration.email)
                 .with_parent(regform)
                 .filter(Registration.is_active)

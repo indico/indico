@@ -8,7 +8,7 @@
 from uuid import uuid4
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, fields
+from marshmallow import fields
 from sqlalchemy.orm import joinedload
 from webargs import validate
 from webargs.flaskparser import abort
@@ -18,22 +18,19 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
-from indico.core.storage.backend import StorageError
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.schemas import (InvitationExistingSchema, InvitationImportSchema,
-                                                        InvitationNewSchema, RegistrationInvitationSchema)
-from indico.modules.events.registration.util import (create_invitation, import_invitations_from_csv,
+from indico.modules.events.registration.schemas import (InvitationExistingSchema, InvitationImportRowSchema,
+                                                        InvitationImportSchema, InvitationNewSchema,
+                                                        RegistrationInvitationSchema)
+from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
                                                      import_user_records_from_csv)
 from indico.modules.events.registration.views import WPManageRegistration
-from indico.modules.files.controllers import UploadFileMixin
-from indico.modules.files.models.files import File
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
-from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.util.user import principal_from_identifier
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -80,7 +77,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
     def _process(self):
         is_existing = request.args.get('existing') == '1'
         schema_cls = InvitationExistingSchema if is_existing else InvitationNewSchema
-        data = parser.parse(schema_cls(), unknown=EXCLUDE)
+        data = parser.parse(schema_cls())
 
         skip_moderation = data.pop('skip_moderation', False)
         skip_access_check = data.pop('skip_access_check', False)
@@ -178,7 +175,6 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
                 'email': email.lower(),
                 'affiliation': principal.affiliation,
             })
-
         return users
 
     def _ensure_can_invite_emails(self, emails, field_name):
@@ -220,8 +216,6 @@ class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
             'default_body': default_body,
             'moderation_enabled': self.regform.moderation_enabled,
             'placeholders': [p.serialize() for p in placeholders],
-            'csv_delimiters': [{'value': delim.name, 'text': str(delim.title)} for delim in CSVFieldDelimiter],
-            'default_delimiter': CSVFieldDelimiter.comma.name,
             'csv_upload_url': url_for('.api_invitations_import_upload', self.regform),
         })
 
@@ -231,88 +225,46 @@ class RHRegistrationFormImportInvites(RHManageRegFormBase):
 
     @use_kwargs(InvitationImportSchema)
     def _process(self, sender_address, subject, body, bcc_addresses, copy_for_sender, skip_moderation,
-                 skip_access_check, skip_existing, lock_email, source_file):
+                 skip_access_check, skip_existing, lock_email, imported):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             raise BadRequest('Invalid sender address')
-        skip_moderation = skip_moderation and self.regform.moderation_enabled
 
-        file = File.query.filter_by(uuid=str(source_file)).one_or_none()
-        if (file is None or
-                file.meta.get('regform_id') != self.regform.id or
-                file.meta.get('delimiter') not in CSVFieldDelimiter):
-            raise BadRequest('Invalid uploaded file')
         try:
-            with file.open() as stream:
-                invitations, skipped = import_invitations_from_csv(
-                    self.regform,
-                    stream,
-                    sender_address,
-                    subject,
-                    body,
-                    skip_moderation=skip_moderation,
-                    skip_access_check=skip_access_check,
-                    skip_existing=skip_existing,
-                    lock_email=lock_email,
-                    delimiter=CSVFieldDelimiter[file.meta['delimiter']].delimiter,
-                    bcc_addresses=bcc_addresses,
-                    copy_for_sender=copy_for_sender
-                )
-        except StorageError:
-            db.session.delete(file)
-            db.session.flush()
-            abort(422, messages={'source_file': [_('The uploaded file is no longer available. Please re-upload it.')]})
+            invitations, skipped = import_invitations_from_user_records(
+                self.regform,
+                imported,
+                sender_address,
+                subject,
+                body,
+                skip_moderation=skip_moderation and self.regform.moderation_enabled,
+                skip_access_check=skip_access_check,
+                skip_existing=skip_existing,
+                lock_email=lock_email,
+                bcc_addresses=bcc_addresses,
+                copy_for_sender=copy_for_sender
+            )
         except UserValueError as exc:
-            abort(422, messages={'source_file': [str(exc)]})
-        file.delete(delete_from_db=True)
-        return jsonify_data(skipped=skipped, sent=len(invitations), **_get_invitation_data(self.regform))
+            abort(422, messages={'imported': [str(exc)]})
+        return jsonify(skipped=skipped, sent=len(invitations), **_get_invitation_data(self.regform))
 
 
-class RHRegistrationFormImportInvitesUpload(UploadFileMixin, RHManageRegFormBase):
+class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
     """Upload CSV files that will later be used for invitation import."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.delimiter = None
-        self._preview_sample = None
-
-    @use_kwargs({'delimiter': fields.Enum(CSVFieldDelimiter, load_default=CSVFieldDelimiter.comma)},
-                location='query')
-    def _process_args(self, delimiter):
-        super()._process_args()
-        self.delimiter = delimiter
-
-    def get_file_context(self):
-        return 'event', self.event.id, 'regform', self.regform.id, 'invitation-import'
-
-    def validate_file(self, file):
+    @use_kwargs({'file': fields.Field(required=True)}, location='files')
+    def _process(self, file):
         if not file.filename.lower().endswith('.csv'):
-            return False
-
-        file.stream.seek(0)
+            raise BadRequest('Not a CSV file')
         try:
             rows = import_user_records_from_csv(
                 file.stream,
                 columns=['first_name', 'last_name', 'affiliation', 'email'],
-                delimiter=self.delimiter.delimiter
             )
         except UserValueError as exc:
             abort(422, messages={'file': [str(exc)]})
-        finally:
-            file.stream.seek(0)
-
         if not rows:
             abort(422, messages={'file': [_('The uploaded CSV file is empty')]})
-
-        sample = rows[0]
-        self._preview_sample = {'first_name': sample['first_name'], 'last_name': sample['last_name']}
-        return True
-
-    def get_file_metadata(self):
-        return {
-            'regform_id': self.regform.id,
-            'delimiter': self.delimiter or CSVFieldDelimiter.comma.name,
-            'preview_sample': self._preview_sample,
-        }
+        return InvitationImportRowSchema(many=True).jsonify(rows)
 
 
 class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
@@ -323,17 +275,14 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
         'body': fields.String(load_default=''),
         'first_name': fields.String(load_default=None),
         'last_name': fields.String(load_default=None),
-        'source_file': fields.UUID(load_default=None),
         'user': Principal(load_default=None),
     })
     @no_autoflush
-    def _process(self, subject, body, first_name, last_name, source_file, user):
+    def _process(self, subject, body, first_name, last_name, user):
         self.commit = False
         if user:
             first_name = user.first_name
             last_name = user.last_name
-        elif source_file:
-            first_name, last_name = self._get_preview_names_from_csv(source_file)
         elif not first_name:
             abort(422, messages={'first_name': ['Missing data']})
         elif not last_name:
@@ -352,19 +301,6 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
         rendered_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
         tpl = get_template_module('emails/custom.html', subject=rendered_subject, body=rendered_body)
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
-
-    def _get_preview_names_from_csv(self, source_file):
-        file = File.query.filter_by(uuid=str(source_file)).first()
-        if file is None or file.meta.get('regform_id') != self.regform.id:
-            abort(422, messages={'source_file': ['Invalid uploaded file']})
-
-        sample = file.meta.get('preview_sample')
-        if not sample:
-            abort(422, messages={
-                'source_file': ['The uploaded file is missing preview data.']
-            })
-
-        return sample['first_name'], sample['last_name']
 
 
 class RHPendingInvitationsBase(RHManageRegFormBase):

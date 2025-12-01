@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import inviteImportURL from 'indico-url:event_registration.api_invitations_import';
-import inviteImportUploadURL from 'indico-url:event_registration.api_invitations_import_upload';
 import inviteMetadataURL from 'indico-url:event_registration.api_invitations_metadata';
 import invitationPreviewURL from 'indico-url:event_registration.invitation_preview';
 import inviteURL from 'indico-url:event_registration.invite';
@@ -14,18 +13,19 @@ import inviteURL from 'indico-url:event_registration.invite';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useCallback, useMemo, useState} from 'react';
-import {Field} from 'react-final-form';
-import {Button, Dimmer, Form, Icon, Loader, Message, Popup, Segment} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Icon, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {EmailDialog} from 'indico/modules/events/persons/EmailDialog';
-import {FinalSingleFileManager} from 'indico/react/components';
 import {FinalPrincipalList} from 'indico/react/components/principals/PrincipalListField';
-import {FinalCheckbox, FinalDropdown, FinalInput, handleSubmitError} from 'indico/react/forms';
+import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-function ExistingInviteFields({eventId, favoriteUsersController}) {
+import ImportInvitationsField from './ImportInvitationsField';
+
+function ExistingInviteFields({eventId}) {
+  const favoriteUsersController = useFavoriteUsers();
   return (
     <FinalPrincipalList
       name="users"
@@ -40,7 +40,6 @@ function ExistingInviteFields({eventId, favoriteUsersController}) {
 
 ExistingInviteFields.propTypes = {
   eventId: PropTypes.number.isRequired,
-  favoriteUsersController: PropTypes.array.isRequired,
 };
 
 function NewInviteFields() {
@@ -62,7 +61,7 @@ function NewInviteFields() {
   );
 }
 
-function ImportInviteFields({csvDelimiterOptions, eventId, regformId}) {
+function ImportInviteFields({eventId, regformId}) {
   return (
     <>
       <Message info icon>
@@ -83,42 +82,7 @@ function ImportInviteFields({csvDelimiterOptions, eventId, regformId}) {
           </Translate>
         </Message.Content>
       </Message>
-      <Field name="source_file" subscription={{value: true}}>
-        {({input: {value: sourceFile}}) => (
-          <Popup
-            content={Translate.string('Remove the uploaded CSV before changing the delimiter.')}
-            disabled={!sourceFile}
-            trigger={
-              <div>
-                <FinalDropdown
-                  name="delimiter"
-                  label={Translate.string('CSV delimiter')}
-                  selection
-                  required
-                  options={csvDelimiterOptions}
-                  disabled={!!sourceFile}
-                  placeholder={Translate.string('Select delimiter')}
-                />
-              </div>
-            }
-          />
-        )}
-      </Field>
-      <Field name="delimiter" subscription={{value: true}}>
-        {({input: {value: delimiter}}) => (
-          <FinalSingleFileManager
-            key={delimiter || 'default'} // reset when delimiter changes
-            name="source_file"
-            uploadURL={inviteImportUploadURL({
-              event_id: eventId,
-              reg_form_id: regformId,
-              delimiter,
-            })}
-            validExtensions={['csv']}
-            required
-          />
-        )}
-      </Field>
+      <ImportInvitationsField name="imported" eventId={eventId} regformId={regformId} />
       <FinalCheckbox
         name="skip_existing"
         label={Translate.string('Skip existing invitations')}
@@ -129,12 +93,6 @@ function ImportInviteFields({csvDelimiterOptions, eventId, regformId}) {
 }
 
 ImportInviteFields.propTypes = {
-  csvDelimiterOptions: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   eventId: PropTypes.number.isRequired,
   regformId: PropTypes.number.isRequired,
 };
@@ -165,11 +123,14 @@ const modeConfig = {
     label: Translate.string('Import CSV'),
     buttonLabel: Translate.string('Import CSV'),
     renderFields: props => <ImportInviteFields {...props} />,
-    extraFields: ['source_file', 'skip_existing'],
-    getPreviewPayload: ({source_file: sourceFile}) => ({
-      context: {source_file: sourceFile},
-      disabled: !sourceFile,
-    }),
+    extraFields: ['imported', 'skip_existing'],
+    getPreviewPayload: ({imported}) =>
+      imported
+        ? {
+            context: _.pick(imported[0], ['first_name', 'last_name']),
+            disabled: false,
+          }
+        : {context: {}, disabled: true},
   },
 };
 
@@ -184,7 +145,6 @@ const getSkippedWarningMessage = skipped =>
     : null;
 
 export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
-  const favoriteUsersController = useFavoriteUsers();
   const [mode, setMode] = useState('existing');
   const [sentEmailsCount, setSentEmailsCount] = useState(0);
   const [sentEmailsWarning, setSentEmailsWarning] = useState(null);
@@ -193,12 +153,6 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     inviteMetadataURL({event_id: eventId, reg_form_id: regformId}),
     {camelize: true}
   );
-
-  const csvDelimiterOptions = useMemo(() => {
-    return (metadata?.csvDelimiters || []).map(d => ({value: d.value, text: d.text}));
-  }, [metadata]);
-
-  const defaultDelimiter = metadata?.defaultDelimiter || csvDelimiterOptions[0]?.value || '';
 
   const initialFormValues = useMemo(() => {
     if (!metadata) {
@@ -218,10 +172,9 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       last_name: '',
       email: '',
       affiliation: '',
-      source_file: null,
-      delimiter: defaultDelimiter,
+      imported: [],
     };
-  }, [metadata, defaultDelimiter]);
+  }, [metadata]);
 
   const handleSubmit = useCallback(
     async values => {
@@ -238,8 +191,8 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       ]);
 
       if (mode === 'import') {
-        if (!values.source_file) {
-          return {source_file: Translate.string('Please upload a CSV file.')};
+        if (!values.imported) {
+          return {imported: Translate.string('Please upload a CSV file.')};
         }
         try {
           const {data} = await indicoAxios.post(
@@ -279,21 +232,6 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     [eventId, metadata?.moderationEnabled, mode, onClose, onSuccess, regformId, successTimeout]
   );
 
-  const modeProps = useMemo(() => {
-    switch (mode) {
-      case 'existing':
-        return {eventId, favoriteUsersController};
-      case 'import':
-        return {
-          csvDelimiterOptions,
-          eventId,
-          regformId,
-        };
-      default:
-        return {};
-    }
-  }, [csvDelimiterOptions, eventId, favoriteUsersController, mode, regformId]);
-
   if (loading || !metadata) {
     return (
       <Dimmer active page inverted>
@@ -314,7 +252,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         ))}
       </Button.Group>
       <Segment attached="bottom">
-        <ModeFields {...modeProps} />
+        <ModeFields eventId={eventId} regformId={regformId} />
       </Segment>
       {metadata.moderationEnabled && (
         <FinalCheckbox
