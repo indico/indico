@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime
+from calendar import monthrange
+from datetime import date, datetime
 from decimal import Decimal
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
@@ -181,6 +182,28 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
         '%m.%Y',
         '%Y'
     ]))
+    min_date = fields.Date(allow_none=True)
+    max_date = fields.Date(allow_none=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_min_max_dates(self, data, **kwargs):
+        min_date = data.get('min_date')
+        max_date = data.get('max_date')
+        if min_date and max_date and min_date > max_date:
+            raise ValidationError(_('Maximum date must be greater than the minimum date.'), 'min_date')
+        date_format = data['date_format']
+        if min_date:
+            if '%m' not in date_format and (min_date.month != 1 or min_date.day != 1):
+                raise ValidationError('Minimum date must be yyyy-01-01', 'min_date')
+            elif '%d' not in date_format and min_date.day != 1:
+                raise ValidationError('Minimum date must be yyyy-mm-01', 'min_date')
+        if max_date:
+            if '%m' not in date_format and (max_date.month != 12 or max_date.day != 31):
+                raise ValidationError('Maximum date must be yyyy-12-31', 'max_date')
+            elif '%d' not in date_format:
+                last_day = monthrange(max_date.year, max_date.month)[1]
+                if max_date.day != last_day:
+                    raise ValidationError(f'Maximum date must be yyyy-mm-{last_day:02}', 'max_date')
 
     @pre_load
     def _merge_date_time_formats(self, data, **kwargs):
@@ -198,13 +221,20 @@ class DateField(RegistrationFormFieldBase):
     mm_field_class = fields.String
     setup_schema_base_cls = DateFieldDataSchema
 
-    def validators(self, **kwargs):
+    def get_validators(self, existing_registration):
         def _validate_date(date_string):
+            if not date_string:
+                return True
             try:
-                datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                raise ValidationError(_('Invalid date'))
+                dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S').date()
+                if (min_date := self.form_item.data.get('min_date')) and dt < date.fromisoformat(min_date):
+                    raise ValidationError(_('Date cannot be before {}').format(min_date))
+                if (max_date := self.form_item.data.get('max_date')) and dt > date.fromisoformat(max_date):
+                    raise ValidationError(_('Date cannot be after {}').format(max_date))
+            except ValueError as e:
+                raise ValidationError(_('Invalid date')) from e
             return True
+
         return _validate_date
 
     @classmethod
@@ -217,7 +247,18 @@ class DateField(RegistrationFormFieldBase):
                 data['time_format'] = '12h'
             elif time_date_formats[1] == '%H:%M':
                 data['time_format'] = '24h'
+        data['min_date'] = unversioned_data.get('min_date')
+        data['max_date'] = unversioned_data.get('max_date')
         return data
+
+    @classmethod
+    def process_field_data(cls, data, old_data=None, old_versioned_data=None):
+        unversioned_data, versioned_data = super().process_field_data(data, old_data, old_versioned_data)
+        if min_date := unversioned_data.get('min_date'):
+            unversioned_data['min_date'] = min_date.isoformat()
+        if max_date := unversioned_data.get('max_date'):
+            unversioned_data['max_date'] = max_date.isoformat()
+        return unversioned_data, versioned_data
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         date_string = registration_data.data
