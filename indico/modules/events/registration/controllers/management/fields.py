@@ -20,7 +20,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
+from indico.modules.events.registration.models.items import (RegistrationFormItem, RegistrationFormItemType,
+                                                             RegistrationFormText)
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
@@ -42,6 +43,20 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
+
+    @validates('title')
+    @no_autoflush
+    def _check_unique_title_in_section(self, title, **kwargs):
+        field = self.context['field']
+        query = (RegistrationFormItem.query
+                 .filter(RegistrationFormItem.parent_id == field.parent.id,
+                         db.func.lower(RegistrationFormItem.title) == title.lower(),
+                         RegistrationFormItem.is_enabled,
+                         ~RegistrationFormItem.is_deleted))
+        if field.id:
+            query = query.filter(RegistrationFormItem.id != field.id)
+        if query.has_rows():
+            raise ValidationError(_('There is already a field in this section with the same title.'))
 
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
@@ -224,6 +239,17 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             raise BadRequest
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
+        if enabled:
+            query = (RegistrationFormItem.query
+                     .filter(RegistrationFormItem.parent_id == self.field.parent.id,
+                             db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if query.has_rows():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('There is already a field in this section with the same title.'))
+                )
+
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()

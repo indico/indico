@@ -602,7 +602,7 @@ def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     # Add a new field after registering
     new_multi_choice_field = RegistrationFormField(parent=user_section, registration_form=dummy_regform)
     _fill_form_field_with_data(new_multi_choice_field, {
-        'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
+        'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'New Multi Choice',
         'choices': [
             {'caption': 'A', 'id': 'new:test3', 'is_enabled': True},
         ]

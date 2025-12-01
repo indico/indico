@@ -20,7 +20,7 @@ def dummy_reg_with_file_field(db, dummy_event, dummy_regform, dummy_user, create
 
     def create_file_field():
         field_data = {'title': 'File field', 'input_type': 'file'}
-        form_field = RegistrationFormField(parent_id=dummy_regform.sections[0].id, registration_form=dummy_regform)
+        form_field = RegistrationFormField(parent=dummy_regform.sections[0], registration_form=dummy_regform)
 
         def field_data_with_reproducible_id(*args, **kwargs):
             return RegistrationFormFieldData(*args, **kwargs, id=730)
