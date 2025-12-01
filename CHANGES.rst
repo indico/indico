@@ -37,6 +37,8 @@ Improvements
 - Add new :data:`SMTP_USE_SSL` config option to use always-on TLS (SMTPS) instead of
   STARTTLS when sending emails (:issue:`4347`, :pr:`7177`, thanks :user:`bpedersen2`)
 - Add review count & score standard deviation columns to the abstract list (:pr:`7173`)
+- Add min/max date settings to registration form date fields (:pr:`6842`, thanks
+  :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
