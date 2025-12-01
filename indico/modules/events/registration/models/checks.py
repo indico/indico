@@ -17,12 +17,6 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class CheckType(RichIntEnum):
-    __titles__ = [None, L_('Checked in'), L_('Checked out')]
-    check_in = 1
-    check_out = 2
-
-
 class RegistrationCheckRule(RichIntEnum):
     __titles__ = [None, L_('Once'), L_('Multiple'), L_('Once daily')]
 

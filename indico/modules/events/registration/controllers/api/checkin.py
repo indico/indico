@@ -129,8 +129,11 @@ class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
         'paid': fields.Bool()
     })
     def _process_PATCH(self, checked_in=None, checked_out=None, check_type_id=None, paid=None):
-        if check_type_id is not None and (checked_in is not None or checked_out is not None):
-            check_type = RegistrationCheckType.get_or_404(check_type_id)
+        if checked_in is not None or checked_out is not None:
+            if check_type_id is not None:
+                check_type = RegistrationCheckType.get_or_404(check_type_id)
+            else:
+                check_type = self.event.default_check_type
             is_check_out = checked_out is not None
             action = bool(checked_out) if is_check_out else bool(checked_in)
             try:

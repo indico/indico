@@ -622,8 +622,8 @@ class Registration(db.Model):
         from indico.modules.events.registration.util import create_registration_check
 
         if value is True:
-            result = self.can_perform_check()
-            if result['can_check']:
+            test_perform_check = self.can_perform_check()
+            if test_perform_check['can_check']:
                 create_registration_check(self)
 
     @property
@@ -661,8 +661,8 @@ class Registration(db.Model):
         from indico.modules.events.registration.util import create_registration_check
 
         if value is True:
-            result = self.can_perform_check(is_check_out=True)
-            if result['can_check']:
+            test_perform_check = self.can_perform_check(is_check_out=True)
+            if test_perform_check['can_check']:
                 create_registration_check(self, is_check_out=True)
 
     @property
@@ -921,7 +921,7 @@ class Registration(db.Model):
     def can_perform_check(self, *, check_type=None, is_check_out=False):
         can_check = True
         reason = _('Check can be performed.')
-        event_tz = self.event.tzinfo
+        event_tz = self.event.tzinfo if self.event else config.DEFAULT_TIMEZONE
         if not check_type:
             check_type = self.event.default_check_type if self.event else None
         if not check_type:

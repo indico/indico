@@ -1201,9 +1201,9 @@ def delete_registration_check_type(check_type):
 def create_registration_check(registration, check_type=None, is_check_out=False, checked_by_user=None):
     if not check_type:
         check_type = registration.event.default_check_type
-    result = registration.can_perform_check(check_type=check_type, is_check_out=is_check_out)
-    if not result['can_check']:
-        raise ValueError(result['reason'])
+    test_perform_check = registration.can_perform_check(check_type=check_type, is_check_out=is_check_out)
+    if not test_perform_check['can_check']:
+        raise ValueError(test_perform_check['reason'])
     check = RegistrationCheck(registration=registration, check_type=check_type, is_check_out=is_check_out,
                               checked_by_user=checked_by_user)
     db.session.add(check)

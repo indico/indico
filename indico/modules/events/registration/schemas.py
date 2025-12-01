@@ -127,8 +127,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     def _get_checked_in_dt(self, registration):
         check_type_id = self.context.get('check_type_id')
         if check_type_id is not None:
-            return registration.get_checked_in_dt_for_type(check_type_id)
-        return registration.checked_in_dt
+            return str(registration.get_checked_in_dt_for_type(check_type_id))
+        return str(registration.checked_in_dt)
 
     def _get_checked_out(self, registration):
         check_type_id = self.context.get('check_type_id')
@@ -139,8 +139,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     def _get_checked_out_dt(self, registration):
         check_type_id = self.context.get('check_type_id')
         if check_type_id is not None:
-            return registration.get_checked_out_dt_for_type(check_type_id)
-        return registration.checked_out_dt
+            return str(registration.get_checked_out_dt_for_type(check_type_id))
+        return str(registration.checked_out_dt)
 
     def _get_payment_date(self, registration):
         if registration.is_paid and (transaction := registration.transaction):
