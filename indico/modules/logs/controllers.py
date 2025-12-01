@@ -247,8 +247,8 @@ class RHResendEmail(RHManageEventBase):
 
         return make_email(
             to_list=email_data['to'],
-            cc_list=email_data.get('cc', []),
-            bcc_list=email_data.get('bcc', []),
+            cc_list=email_data['cc'],
+            bcc_list=email_data['bcc'],
             sender_address=email_data['from'],
             reply_address=email_data.get('reply_to', []),
             subject=form_data['subject'],

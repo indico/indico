@@ -20,6 +20,7 @@ export const VIEW_PREV_ENTRY = 'VIEW_PREV_ENTRY';
 export const VIEW_NEXT_ENTRY = 'VIEW_NEXT_ENTRY';
 export const SET_METADATA_QUERY = 'SET_METADATA_QUERY';
 export const SET_INITIAL_REALMS = 'SET_INITIAL_REALMS';
+export const SET_HAS_NEW_ENTRIES = 'SET_HAS_NEW_ENTRIES';
 
 export function setKeyword(keyword) {
   return {type: SET_KEYWORD, keyword};
@@ -43,6 +44,10 @@ export function setMetadataQuery(metadataQuery) {
 
 export function setInitialRealms(initialRealms) {
   return {type: SET_INITIAL_REALMS, initialRealms};
+}
+
+export function setHasNewEntries(hasNewEntries) {
+  return {type: SET_HAS_NEW_ENTRIES, hasNewEntries};
 }
 
 export function clearMetadataQuery() {
@@ -127,6 +132,7 @@ export function fetchFailed() {
 
 export function fetchLogEntries() {
   return async (dispatch, getStore) => {
+    dispatch(setHasNewEntries(false));
     dispatch(fetchStarted());
     const {
       logs: {filters, keyword, currentPage, metadataQuery},

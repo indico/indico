@@ -11,7 +11,7 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import {fetchLogEntries, setMetadataQuery, setInitialRealms} from './actions';
+import {fetchLogEntries, setMetadataQuery, setInitialRealms, setHasNewEntries} from './actions';
 import EventLog from './components/EventLog';
 import reducer from './reducers';
 
@@ -33,7 +33,7 @@ window.addEventListener('load', () => {
     },
     initialData
   );
-  window.addEventListener('indico:logsRefresh', () => store.dispatch(fetchLogEntries()));
+  window.addEventListener('indico:logsRefresh', () => store.dispatch(setHasNewEntries(true)));
   store.dispatch(setInitialRealms(Object.keys(initialData.staticData.realms)));
   store.dispatch(setMetadataQuery(JSON.parse(rootElement.dataset.metadataQuery)));
 
