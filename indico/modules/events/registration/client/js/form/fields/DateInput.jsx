@@ -132,6 +132,12 @@ export default function DateInput({
     if (dateTime && !moment(dateTime, moment.ISO_8601, true).isValid()) {
       return Translate.string('The provided date is invalid.');
     }
+    // deal with incomplete dates (month+year / year-only)
+    if (/^\d{4}-\d{2}$/.test(dateTime)) {
+      dateTime += '-01';
+    } else if (/^\d{4}$/.test(dateTime)) {
+      dateTime += '-01-01';
+    }
     if (minDate && dateTime && dateTime < minDate) {
       return Translate.string('The provided date cannot be earlier than {minDate}.', {minDate});
     }
@@ -249,6 +255,33 @@ export const dateSettingsInitialData = {
   maxDate: null,
 };
 
+const getMinDateFilter = dateFormat => dateStr => {
+  const date = moment(dateStr, moment.ISO_8601, true);
+  if (dateFormat.includes('%d')) {
+    // full date
+    return true;
+  } else if (dateFormat.includes('%m')) {
+    // only year + month
+    return date.isValid() && date.date() === 1;
+  } else {
+    // only year
+    return date.isValid() && date.month() === 0 && date.date() === 1;
+  }
+};
+const getMaxDateFilter = dateFormat => dateStr => {
+  const date = moment(dateStr, moment.ISO_8601, true);
+  if (dateFormat.includes('%d')) {
+    // full date
+    return true;
+  } else if (dateFormat.includes('%m')) {
+    // only year + month
+    return date.isValid() && date.date() === date.endOf('month').date();
+  } else {
+    // only year
+    return date.isValid() && date.month() === 11 && date.date() === 31;
+  }
+};
+
 export function DateSettings() {
   const dateOptions = [
     '%d/%m/%Y',
@@ -272,10 +305,6 @@ export function DateSettings() {
     {key: '12h', value: '12h', text: Translate.string('12 hours')},
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
-  const minYearFormatfilter = d => {
-    const m = moment(d, moment.ISO_8601, true);
-    return m.isValid() && m.month() === 0 && m.date() === 1;
-  };
   return (
     <>
       <Form.Group widths="equal">
@@ -313,21 +342,26 @@ export function DateSettings() {
                   max={maxDate}
                   parse={date => date || null}
                   allowNull
-                  {...(dateFormat === '%Y' ? {filter: minYearFormatfilter} : {})}
+                  filter={getMinDateFilter(dateFormat)}
                 />
               )}
             </Field>
           )}
         </Field>
-        <Field name="minDate" subscription={{value: true}}>
-          {({input: {value: minDate}}) => (
-            <FinalDatePicker
-              name="maxDate"
-              label={Translate.string('Maximum date')}
-              min={minDate}
-              parse={date => date || null}
-              allowNull
-            />
+        <Field name="dateFormat" subscription={{value: true}}>
+          {({input: {value: dateFormat}}) => (
+            <Field name="minDate" subscription={{value: true}}>
+              {({input: {value: minDate}}) => (
+                <FinalDatePicker
+                  name="maxDate"
+                  label={Translate.string('Maximum date')}
+                  min={minDate}
+                  parse={date => date || null}
+                  allowNull
+                  filter={getMaxDateFilter(dateFormat)}
+                />
+              )}
+            </Field>
           )}
         </Field>
       </Form.Group>
@@ -336,30 +370,14 @@ export function DateSettings() {
 }
 
 export function dateSettingsFormValidator({minDate, maxDate, dateFormat}) {
-  if (minDate && maxDate && dateFormat) {
-    if (
-      ['%m/%Y', '%m.%Y'].includes(dateFormat) &&
-      !moment(minDate).add(1, 'month').isSameOrBefore(moment(maxDate))
-    ) {
-      const msg = Translate.string(
-        'The minimum and maximum dates must be at least one month apart for the selected date format.'
-      );
-      return {
-        minDate: msg,
-        maxDate: msg,
-      };
+  if (minDate && dateFormat) {
+    if (!getMinDateFilter(dateFormat)(minDate)) {
+      return {minDate: Translate.string('Invalid minimum date (must be first of the month/year)')};
     }
-    const minDateMoment = moment(minDate, moment.ISO_8601, true);
-    if (
-      dateFormat === '%Y' &&
-      (!minDateMoment.isValid() || minDateMoment.month() !== 0 || minDateMoment.date() !== 1)
-    ) {
-      const msg = Translate.string(
-        'The minimum date must be January 1st for the year only format.'
-      );
-      return {
-        minDate: msg,
-      };
+  }
+  if (maxDate && dateFormat) {
+    if (!getMaxDateFilter(dateFormat)(maxDate)) {
+      return {maxDate: Translate.string('Invalid maximum date (must be last of the month/year)')};
     }
   }
 }

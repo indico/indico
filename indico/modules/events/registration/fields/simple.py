@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from calendar import monthrange
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -191,9 +192,18 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
         if min_date and max_date and min_date > max_date:
             raise ValidationError(_('Maximum date must be greater than the minimum date.'), 'min_date')
         date_format = data['date_format']
-        if min_date and date_format == '%Y':
-            if min_date.month != 1 or min_date.day != 1:
-                raise ValidationError(_('The minimum date must be January 1st for the year only format.'), 'min_date')
+        if min_date:
+            if '%m' not in date_format and (min_date.month != 1 or min_date.day != 1):
+                raise ValidationError('Minimum date must be yyyy-01-01', 'min_date')
+            elif '%d' not in date_format and min_date.day != 1:
+                raise ValidationError('Minimum date must be yyyy-mm-01', 'min_date')
+        if max_date:
+            if '%m' not in date_format and (max_date.month != 12 or max_date.day != 31):
+                raise ValidationError('Maximum date must be yyyy-12-31', 'max_date')
+            elif '%d' not in date_format:
+                last_day = monthrange(max_date.year, max_date.month)[1]
+                if max_date.day != last_day:
+                    raise ValidationError(f'Maximum date must be yyyy-mm-{last_day:02}', 'max_date')
 
     @pre_load
     def _merge_date_time_formats(self, data, **kwargs):
