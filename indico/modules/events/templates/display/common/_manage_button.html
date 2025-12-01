@@ -126,6 +126,7 @@
                     {% for opt in dropdown_options %}
                         <li>
                             {{ _render_dropdown_option(opt, item, item_type) }}
+                            {{ template_hook('manage-button-after-%s'|format(opt), item=item, item_type=item_type) }}
                         </li>
                     {% endfor %}
                 </ul>
