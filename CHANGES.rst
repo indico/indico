@@ -41,6 +41,8 @@ Improvements
   :user:`SegiNyn`)
 - Allow adding a preface when re-sending emails from the event log (:pr:`7172`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Disallow adding multiple fields with the same title in a single registration form
+  section (:pr:`7181`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^
