@@ -6,11 +6,12 @@
 # LICENSE file for more details.
 
 from copy import deepcopy
+from datetime import date
 
 import pytest
 from marshmallow import ValidationError
 
-from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice, _to_date
+from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 
@@ -312,9 +313,9 @@ def test_accommodation_validators(dummy_accommodation_field, value, error):
     # since we don't use it here, we need to do the relevant parts of it ourselves
     value.setdefault('isNoAccommodation', False)
     if arrival_date := value.get('arrivalDate'):
-        value['arrivalDate'] = _to_date(arrival_date)
+        value['arrivalDate'] = date.fromisoformat(arrival_date)
     if departure_date := value.get('departureDate'):
-        value['departureDate'] = _to_date(departure_date)
+        value['departureDate'] = date.fromisoformat(departure_date)
 
     if error is None:
         _validate(value)
