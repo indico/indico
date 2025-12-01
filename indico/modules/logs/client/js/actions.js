@@ -46,8 +46,8 @@ export function setInitialRealms(initialRealms) {
   return {type: SET_INITIAL_REALMS, initialRealms};
 }
 
-export function setHasNewEntries(hasNewEntries) {
-  return {type: SET_HAS_NEW_ENTRIES, hasNewEntries};
+export function setHasNewEntries() {
+  return {type: SET_HAS_NEW_ENTRIES, hasNewEntries: true};
 }
 
 export function clearMetadataQuery() {
@@ -132,7 +132,6 @@ export function fetchFailed() {
 
 export function fetchLogEntries() {
   return async (dispatch, getStore) => {
-    dispatch(setHasNewEntries(false));
     dispatch(fetchStarted());
     const {
       logs: {filters, keyword, currentPage, metadataQuery},

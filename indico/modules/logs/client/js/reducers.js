@@ -39,7 +39,7 @@ export default function logReducer(state = initialState, action) {
         isFetching: false,
       };
     case actions.FETCH_STARTED:
-      return {...state, isFetching: true};
+      return {...state, isFetching: true, hasNewEntries: false};
     case actions.FETCH_FAILED:
       return {...state, isFetching: false};
     case actions.SET_DETAILED_VIEW:
