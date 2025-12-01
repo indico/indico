@@ -20,7 +20,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
+from indico.modules.events.registration.models.items import (RegistrationFormItem, RegistrationFormItemType,
+                                                             RegistrationFormText)
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
@@ -46,9 +47,8 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates('title')
     @no_autoflush
     def _check_unique_title_in_section(self, title, **kwargs):
-        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         field = self.context['field']
-        query = (db.session.query(RegistrationFormItem)
+        query = (RegistrationFormItem.query
                  .filter(RegistrationFormItem.parent_id == field.parent.id,
                          db.func.lower(RegistrationFormItem.title) == title.lower(),
                          RegistrationFormItem.is_enabled,
@@ -233,7 +233,6 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
     """Enable/Disable a field."""
 
     def _process(self):
-        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         enabled = request.args.get('enable') == 'true'
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
@@ -241,7 +240,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         if enabled:
-            query = (db.session.query(RegistrationFormItem)
+            query = (RegistrationFormItem.query
                      .filter(RegistrationFormItem.parent_id == self.field.parent.id,
                              db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
                              RegistrationFormItem.is_enabled,
