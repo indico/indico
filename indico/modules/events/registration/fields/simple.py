@@ -186,13 +186,14 @@ class DateFieldDataSchema(FieldSetupSchemaBase):
 
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max_dates(self, data, **kwargs):
-        if data.get('min_date') and data.get('max_date') and data['min_date'] > data['max_date']:
-            raise ValidationError(_('Maximum date must be greater than the minimum date.'))
+        min_date = data.get('min_date')
+        max_date = data.get('max_date')
+        if min_date and max_date and min_date > max_date:
+            raise ValidationError(_('Maximum date must be greater than the minimum date.'), 'min_date')
         date_format = data['date_format']
-        if (min_date := data.get('min_date')) and date_format == '%Y':
+        if min_date and date_format == '%Y':
             if min_date.month != 1 or min_date.day != 1:
-                raise ValidationError(_('The minimum date must be January 1st for the year only format.'),
-                                        'min_date')
+                raise ValidationError(_('The minimum date must be January 1st for the year only format.'), 'min_date')
 
     @pre_load
     def _merge_date_time_formats(self, data, **kwargs):
@@ -217,9 +218,9 @@ class DateField(RegistrationFormFieldBase):
             try:
                 dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S').date()
                 if (min_date := self.form_item.data.get('min_date')) and dt < date.fromisoformat(min_date):
-                    raise ValidationError(_('Date must be after {}').format(min_date))
+                    raise ValidationError(_('Date cannot be before {}').format(min_date))
                 if (max_date := self.form_item.data.get('max_date')) and dt > date.fromisoformat(max_date):
-                    raise ValidationError(_('Date must be before {}').format(max_date))
+                    raise ValidationError(_('Date cannot be after {}').format(max_date))
             except ValueError as e:
                 raise ValidationError(_('Invalid date')) from e
             return True
