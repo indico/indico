@@ -20,6 +20,7 @@ export const VIEW_PREV_ENTRY = 'VIEW_PREV_ENTRY';
 export const VIEW_NEXT_ENTRY = 'VIEW_NEXT_ENTRY';
 export const SET_METADATA_QUERY = 'SET_METADATA_QUERY';
 export const SET_INITIAL_REALMS = 'SET_INITIAL_REALMS';
+export const SET_HAS_NEW_ENTRIES = 'SET_HAS_NEW_ENTRIES';
 
 export function setKeyword(keyword) {
   return {type: SET_KEYWORD, keyword};
@@ -43,6 +44,10 @@ export function setMetadataQuery(metadataQuery) {
 
 export function setInitialRealms(initialRealms) {
   return {type: SET_INITIAL_REALMS, initialRealms};
+}
+
+export function setHasNewEntries() {
+  return {type: SET_HAS_NEW_ENTRIES, hasNewEntries: true};
 }
 
 export function clearMetadataQuery() {

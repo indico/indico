@@ -17,6 +17,7 @@ const initialState = {
   pages: [],
   totalPageCount: 0,
   currentViewIndex: null,
+  hasNewEntries: false,
 };
 
 export default function logReducer(state = initialState, action) {
@@ -38,13 +39,15 @@ export default function logReducer(state = initialState, action) {
         isFetching: false,
       };
     case actions.FETCH_STARTED:
-      return {...state, isFetching: true};
+      return {...state, isFetching: true, hasNewEntries: false};
     case actions.FETCH_FAILED:
       return {...state, isFetching: false};
     case actions.SET_DETAILED_VIEW:
       return {...state, currentViewIndex: action.currentViewIndex};
     case actions.SET_METADATA_QUERY:
       return {...state, metadataQuery: action.metadataQuery};
+    case actions.SET_HAS_NEW_ENTRIES:
+      return {...state, hasNewEntries: action.hasNewEntries};
     default:
       return state;
   }

@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Param, Translate} from 'indico/react/i18n';
 
-import {clearMetadataQuery} from '../actions';
+import {clearMetadataQuery, fetchLogEntries} from '../actions';
 import LogEntryList from '../containers/LogEntryList';
 
 import Toolbar from './Toolbar';
@@ -39,10 +39,36 @@ function MetadataQueryMessage() {
 
 MetadataQueryMessage.propTypes = {};
 
+function LogsRefreshMessage() {
+  const dispatch = useDispatch();
+  const refreshLogs = () => {
+    dispatch(fetchLogEntries());
+  };
+
+  return (
+    <div className="highlight-message-box">
+      <span className="icon" />
+      <div className="message-text">
+        <Translate>
+          New log entries are available.{' '}
+          <Param name="link" wrapper={<a onClick={refreshLogs} />}>
+            Click here
+          </Param>{' '}
+          to refresh.
+        </Translate>
+      </div>
+    </div>
+  );
+}
+
+LogsRefreshMessage.propTypes = {};
+
 export default function EventLog() {
   const metadataQuery = useSelector(state => state.logs.metadataQuery);
+  const hasNewEntries = useSelector(state => state.logs.hasNewEntries);
   return (
     <>
+      {hasNewEntries && <LogsRefreshMessage />}
       {Object.keys(metadataQuery).length !== 0 && <MetadataQueryMessage />}
       <Toolbar />
       <LogEntryList />

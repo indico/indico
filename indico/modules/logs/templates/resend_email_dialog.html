@@ -1,0 +1,38 @@
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, form_row_static %}
+{% from 'message_box.html' import message_box %}
+
+{{ form_header(form) }}
+
+{# prevent autofocus on the subject line #}
+<input type="hidden" autofocus>
+
+<div class="resend-email-context">
+    {% if entry.data.to %}
+        {{ form_row_static(_('Recipients'), entry.data.to|join(', ')) }}
+    {% endif %}
+    {% if entry.data.cc %}
+        {{ form_row_static(_('CC'), entry.data.cc|join(', ')) }}
+    {% endif %}
+    {% if entry.data.bcc %}
+        {{ form_row_static(_('BCC'), entry.data.bcc|join(', ')) }}
+    {% endif %}
+</div>
+
+{{ form_rows(form) }}
+
+{% call form_row_static(_('Original message')) %}
+    {% if entry.data.content_type == 'text/html' %}
+        <div class="html email-body-preview">
+            {{ entry.data.body | safe }}
+        </div>
+    {% else %}
+        <pre class="mono">{{ entry.data.body }}</pre>
+    {% endif %}
+{% endcall %}
+
+{% call form_footer(form) %}
+    <input type="submit" class="i-button highlight" value="{% trans %}Re-send email{% endtrans %}">
+    <button type="button" class="i-button" data-button-back>
+        {% trans %}Cancel{% endtrans %}
+    </button>
+{% endcall %}
