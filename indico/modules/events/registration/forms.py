@@ -36,7 +36,8 @@ from indico.util.placeholders import get_missing_placeholders, render_placeholde
 from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
+from indico.web.forms.fields import (EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField,
+                                     IndicoMarkdownField, JSONField)
 from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.datetime import TimeDeltaField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -763,3 +764,9 @@ class PublishReceiptForm(IndicoForm):
 
     notify_user = BooleanField(_('Notify users'), widget=SwitchWidget(),
                                description=_('Whether users should be notified about the published receipt'))
+
+
+class MultiFormsAnnouncementForm(IndicoForm):
+    message = IndicoMarkdownField('Message', render_kw={'rows': 10},
+                                  description=_('You can enter an announcement text that is displayed when there are '
+                                                'multiple registration forms for the user to choose from.'))

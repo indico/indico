@@ -29,6 +29,8 @@ _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers'
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/participant-list-preview', 'manage_participant_list_preview',
                  regforms.RHParticipantListPreview)
+_bp.add_url_rule('/manage/registration/description', 'manage_registration_multi_forms_announcement',
+                 regforms.RHManageRegistrationMultiFormsAnnouncement, methods=('GET', 'POST'))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)

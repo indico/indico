@@ -28,6 +28,7 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
+from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.util import (create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, load_registration_schema,
@@ -148,10 +149,12 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                                                   only_in_acl=self.is_restricted_access)
         if len(displayed_regforms) == 1:
             return redirect(url_for('.display_regform', displayed_regforms[0]))
+        multi_forms_announcement = event_registration_settings.get(self.event, 'multi_forms_announcement')
         return self.view_class.render_template('display/regform_list.html', self.event,
                                                regforms=displayed_regforms,
                                                user_registrations=user_registrations,
-                                               is_restricted_access=self.is_restricted_access)
+                                               is_restricted_access=self.is_restricted_access,
+                                               description=multi_forms_announcement)
 
 
 class ParticipantListMixin:

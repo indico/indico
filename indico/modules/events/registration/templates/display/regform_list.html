@@ -10,6 +10,12 @@
     {% trans %}Available forms{% endtrans %}
 {% endblock %}
 
+{% block description %}
+    {% if description %}
+        {{ description | markdown }}
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     {% set any_published_registrations = regforms|selectattr('publish_registration_count')|any %}
     {% if is_restricted_access %}

@@ -23,13 +23,15 @@ from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
-from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
-                                                      RegistrationFormCreateForm, RegistrationFormEditForm,
-                                                      RegistrationFormScheduleForm, RegistrationManagersForm)
+from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
+                                                      ParticipantsDisplayFormColumnsForm, RegistrationFormCreateForm,
+                                                      RegistrationFormEditForm, RegistrationFormScheduleForm,
+                                                      RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import Registration, RegistrationForm, RegistrationState
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationData
 from indico.modules.events.registration.operations import update_registration_form_settings
+from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
                                                      get_flat_section_setup_data)
@@ -408,4 +410,18 @@ class RHManageRegistrationManagers(RHManageRegFormsBase):
         if form.validate_on_submit():
             update_object_principals(self.event, form.managers.data, permission='registration')
             return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHManageRegistrationMultiFormsAnnouncement(RHManageRegFormsBase):
+    """Manage the multi-registration-form announcement text."""
+
+    def _process(self):
+        form = MultiFormsAnnouncementForm(
+            message=event_registration_settings.get(self.event, 'multi_forms_announcement')
+        )
+        if form.validate_on_submit():
+            event_registration_settings.set(self.event, 'multi_forms_announcement', form.message.data)
+            flash(_('The announcement text has been saved'), 'success')
+            return jsonify_data()
         return jsonify_form(form)

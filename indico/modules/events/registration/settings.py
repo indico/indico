@@ -77,3 +77,7 @@ event_badge_settings = EventSettingsProxy('badge', DEFAULT_BADGE_SETTINGS, conve
 event_wallet_settings = EventSettingsProxy('wallet', {
     'google_wallet_class_id': None,
 })
+
+event_registration_settings = EventSettingsProxy('registration', defaults={
+    'multi_forms_announcement': '',
+})
