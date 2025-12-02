@@ -43,6 +43,8 @@ Improvements
   :user:`duartegalvao, unconventionaldotdev`)
 - Disallow adding multiple fields with the same title in a single registration form
   section (:pr:`7181`, thanks :user:`tomako`)
+- Add a customizable announcement text on top of the registration form list in
+  conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^
