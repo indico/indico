@@ -418,10 +418,10 @@ class RHManageRegistrationMultiFormsAnnouncement(RHManageRegFormsBase):
 
     def _process(self):
         form = MultiFormsAnnouncementForm(
-            description=event_registration_settings.get(self.event, 'multi_forms_announcement')
+            message=event_registration_settings.get(self.event, 'multi_forms_announcement')
         )
         if form.validate_on_submit():
-            event_registration_settings.set(self.event, 'multi_forms_announcement', form.description.data)
+            event_registration_settings.set(self.event, 'multi_forms_announcement', form.message.data)
             flash(_('The announcement text has been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)

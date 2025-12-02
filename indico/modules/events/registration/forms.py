@@ -767,6 +767,6 @@ class PublishReceiptForm(IndicoForm):
 
 
 class MultiFormsAnnouncementForm(IndicoForm):
-    description = IndicoMarkdownField('Message', render_kw={'rows': 10},
-                                      description=_('You can enter an announcement text that is displayed when there '
-                                                    'are multiple registration forms for the user to choose from.'))
+    message = IndicoMarkdownField('Message', render_kw={'rows': 10},
+                                  description=_('You can enter an announcement text that is displayed when there are '
+                                                'multiple registration forms for the user to choose from.'))
