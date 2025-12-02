@@ -1,6 +1,7 @@
 {% extends 'events/papers/_base.html' %}
 
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+{% from 'events/contributions/display/_user_contribution_list.html' import render_contribution_list %}
 {% from 'events/papers/display/_common.html' import render_cfp_infoline %}
 {% from 'events/papers/display/_paper_list.html' import render_user_papers_list %}
 {% from 'events/reviews/_common.html' import render_timeline_section %}
@@ -18,8 +19,14 @@
             </section>
         {% endif %}
         {% if contributions or not cfp.can_submit_proceedings(session.user) %}
-            <section class="cfp-infoline-section">
+            <section>
+                <div class="header">
+                    <div class="header-row">
+                        <h3>{% trans %}Papers awaiting my submission{% endtrans %}</h3>
+                    </div>
+                </div>
                 {{ render_cfp_infoline(event, cfp, contributions) }}
+                {{ render_contribution_list(contributions, enable_actions=False) }}
             </section>
         {% endif %}
         {% if event.paper_templates %}
