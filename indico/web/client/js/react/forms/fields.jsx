@@ -579,7 +579,18 @@ FinalRadio.propTypes = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   multiple?: boolean;
+ *   nullIfEmpty?: boolean;
+ *   parse?: (value: any) => any;
+ *   format?: (value: any) => any;
+ * }} FinalDropdownProps
+ */
+
+/**
  * Like `FinalField` but for a dropdown.
+ * @param {FinalDropdownProps} props
  */
 export function FinalDropdown({name, label, multiple, nullIfEmpty, parse, format, ...rest}) {
   const extraProps = {};
