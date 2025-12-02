@@ -45,6 +45,8 @@ Improvements
   section (:pr:`7181`, thanks :user:`tomako`)
 - Add a customizable announcement text on top of the registration form list in
   conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
+- Add a UI for managing predefined affiliations (:pr:`7183`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

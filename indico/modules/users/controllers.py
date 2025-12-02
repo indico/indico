@@ -52,15 +52,16 @@ from indico.modules.users.models.export import DataExportOptions, DataExportRequ
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
                                              revoke_admin)
-from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_mastodon_server_name, get_related_categories, get_suggested_categories,
                                        get_unlisted_events, get_user_by_email, get_user_titles, log_user_update,
                                        merge_users, search_affiliations, search_users, send_avatar, serialize_user,
                                        set_user_avatar)
-from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
-                                        WPUserProfilePic, WPUsersAdmin)
+from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserDashboard, WPUserDataExport,
+                                        WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
+from indico.util.countries import get_countries
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -325,7 +326,66 @@ class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
         res = search_affiliations(q)
-        return AffiliationSchema(many=True).jsonify(res)
+        basic_fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+        return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
+
+
+class RHAffiliationsAPI(RHAdminBase):
+    """List/create affiliations via the admin API."""
+
+    def _process_GET(self):
+        affiliations = (Affiliation.query
+                        .filter(~Affiliation.is_deleted)
+                        .order_by(db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)))
+                        .all())
+        return AffiliationSchema(many=True).jsonify(affiliations)
+
+    @use_kwargs(AffiliationArgs)
+    def _process_POST(self, **data):
+        affiliation = Affiliation()
+        affiliation.populate_from_dict(data)
+        db.session.add(affiliation)
+        db.session.flush()
+        search_affiliations.bump_version()
+        return AffiliationSchema().jsonify(affiliation), 201
+
+
+class RHAffiliationAPI(RHAdminBase):
+    """CRUD operations on a single affiliation."""
+
+    def _process_args(self):
+        self.affiliation = Affiliation.get_or_404(request.view_args['affiliation_id'])
+        if self.affiliation.is_deleted:
+            raise NotFound
+
+    def _process_GET(self):
+        return AffiliationSchema().jsonify(self.affiliation)
+
+    @use_kwargs(AffiliationArgs, partial=True)
+    def _process_PATCH(self, **data):
+        plugin_changes = any(values_from_signal(
+            signals.plugin.affiliation_update.send(self.affiliation, payload=request.json)
+        ))
+        if data:
+            self.affiliation.populate_from_dict(data)
+        elif not plugin_changes:
+            raise BadRequest('No changes specified')
+        db.session.flush()
+        search_affiliations.bump_version()
+        return AffiliationSchema().jsonify(self.affiliation)
+
+    def _process_DELETE(self):
+        self.affiliation.is_deleted = True
+        db.session.flush()
+        search_affiliations.bump_version()
+        return '', 204
+
+
+class RHCountries(RHAdminBase):
+    """Return the available countries for affiliation forms."""
+
+    def _process(self):
+        return jsonify(list(get_countries().items()))
 
 
 class RHProfilePicturePage(RHUserBase):
@@ -747,6 +807,13 @@ class RHUsersAdmin(RHAdminBase):
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
                                             num_reg_requests=num_reg_requests,
                                             has_moderation=multipass.has_moderated_providers)
+
+
+class RHAffiliationsDashboard(RHAdminBase):
+    """Entry point for the Affiliations admin dashboard."""
+
+    def _process(self):
+        return WPAffiliationsDashboard.render_template('affiliations_dashboard.html', 'affiliations')
 
 
 class RHUsersAdminSettings(RHAdminBase):

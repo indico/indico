@@ -21,7 +21,7 @@ from indico.util.marshmallow import ModelField, NoneValueEnumField, not_empty
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Affiliation
-        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+        fields = ('id', 'name', 'alt_names', 'street', 'postcode', 'city', 'country_code', 'meta')
 
     @post_dump
     def add_country_name(self, data, **kwargs):
@@ -37,6 +37,14 @@ class BasicAffiliationSchema(AffiliationSchema):
 
     class Meta(AffiliationSchema.Meta):
         fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code')
+
+
+class AffiliationArgs(AffiliationSchema):
+    class Meta(AffiliationSchema.Meta):
+        fields = ('name', 'alt_names', 'street', 'postcode', 'city', 'country_code', 'meta')
+
+    name = fields.String(required=True, validate=[not_empty])
+    alt_names = fields.List(fields.String(validate=not_empty))
 
 
 class UserSchema(mm.SQLAlchemyAutoSchema):

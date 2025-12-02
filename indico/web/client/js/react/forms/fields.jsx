@@ -351,8 +351,20 @@ ComboDropdownAdapter.defaultProps = {
 };
 
 /**
+ * @typedef {({[key: string]: any}) & {
+ *   name: string;
+ *   adapter?: React.ComponentType;
+ *   component?: React.ComponentType;
+ *   description?: React.ReactNode;
+ *   required?: true | false | 'no-validator';
+ *   onChange?: (value: any, previous: any) => void;
+ * }} FinalFieldProps
+ */
+
+/**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
+ * @param {FinalFieldProps} props
  */
 export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
   const extraProps = {};
@@ -415,7 +427,17 @@ FinalField.defaultProps = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   type?: 'text'|'email'|'number'|'tel'|'password';
+ *   nullIfEmpty?: boolean;
+ *   noAutoComplete?: boolean;
+ * }} FinalInputProps
+ */
+
+/**
  * Like `FinalField` but with extra features for ``<input>`` fields.
+ * @param {FinalInputProps} props
  */
 export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...rest}) {
   const extraProps = {};
@@ -550,7 +572,18 @@ FinalRadio.propTypes = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   multiple?: boolean;
+ *   nullIfEmpty?: boolean;
+ *   parse?: (value: any) => any;
+ *   format?: (value: any) => any;
+ * }} FinalDropdownProps
+ */
+
+/**
  * Like `FinalField` but for a dropdown.
+ * @param {FinalDropdownProps} props
  */
 export function FinalDropdown({name, label, multiple, nullIfEmpty, parse, format, ...rest}) {
   const extraProps = {};

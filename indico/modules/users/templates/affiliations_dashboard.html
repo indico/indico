@@ -1,0 +1,17 @@
+{% extends 'layout/admin_page.html' %}
+
+{% block page %}
+    <div class="full-width-content-wrapper">
+        {{ super() }}
+    </div>
+{% endblock %}
+
+{% block title %}{% trans %}Affiliations{% endtrans %}{% endblock %}
+
+{% block content %}
+    <div id="affiliations-dashboard-container"></div>
+
+    <script>
+        setupAffiliationsDashboards();
+    </script>
+{% endblock %}

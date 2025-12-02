@@ -50,6 +50,7 @@ export default function ListFilter({
   onChangeFilters,
   onChangeSearchText,
   onChangeList,
+  placeholder,
 }) {
   const [internalFilters, setInternalFilters] = useState({});
   const [internalSearchText, setInternalSearchText] = useState('');
@@ -224,7 +225,7 @@ export default function ListFilter({
       </Dropdown>
       <Input
         autoFocus
-        placeholder={Translate.string('Enter #id or search string')}
+        placeholder={placeholder || Translate.string('Enter #id or search string')}
         onChange={(e, {value}) => setSearchText(value)}
         value={searchText}
         style={{width: '14em'}}
@@ -259,7 +260,8 @@ ListFilter.propTypes = {
   searchableFields: PropTypes.func,
   onChangeList: PropTypes.func,
   onChangeFilters: PropTypes.func,
-  onChangeSearchText: PropTypes.string,
+  onChangeSearchText: PropTypes.func,
+  placeholder: PropTypes.string,
 };
 
 ListFilter.defaultProps = {
@@ -270,4 +272,5 @@ ListFilter.defaultProps = {
   onChangeList: undefined,
   onChangeFilters: undefined,
   onChangeSearchText: undefined,
+  placeholder: undefined,
 };
