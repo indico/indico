@@ -79,5 +79,5 @@ event_wallet_settings = EventSettingsProxy('wallet', {
 })
 
 event_registration_settings = EventSettingsProxy('registration', defaults={
-    'description': '',
+    'multi_forms_announcement': '',
 })
