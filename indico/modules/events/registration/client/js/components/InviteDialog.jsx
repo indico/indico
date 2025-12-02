@@ -104,6 +104,7 @@ const modeConfig = {
     renderFields: props => <ExistingInviteFields {...props} />,
     extraFields: ['users'],
     getPreviewPayload: ({users: [user] = []}) => ({context: {user}, disabled: !user}),
+    getCount: ({users}) => users.length,
   },
   new: {
     label: Translate.string('New user'),
@@ -118,6 +119,7 @@ const modeConfig = {
       }
       return {context: {first_name: firstName, last_name: lastName}, disabled: false};
     },
+    getCount: () => 1,
   },
   import: {
     label: Translate.string('Import CSV'),
@@ -131,6 +133,7 @@ const modeConfig = {
             disabled: false,
           }
         : {context: {}, disabled: true},
+    getCount: ({imported}) => imported.length,
   },
 };
 
@@ -178,6 +181,10 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
 
   const handleSubmit = useCallback(
     async values => {
+      const count = modeConfig[mode].getCount(values);
+      if (count === 0) {
+        return {[modeConfig[mode].extraFields[0]]: 'No recipients specified.'};
+      }
       const payload = _.pick(values, [
         'sender_address',
         'subject',
@@ -190,44 +197,19 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         ...modeConfig[mode].extraFields,
       ]);
 
-      if (mode === 'import') {
-        if (!values.imported) {
-          return {imported: Translate.string('Please upload a CSV file.')};
-        }
-        try {
-          const {data} = await indicoAxios.post(
-            inviteImportURL({event_id: eventId, reg_form_id: regformId}),
-            payload
-          );
-          onSuccess(data);
-          setSentEmailsCount(data.sent ?? 0);
-          setSentEmailsWarning(getSkippedWarningMessage(data.skipped ?? 0));
-          setTimeout(() => onClose(), successTimeout);
-        } catch (error) {
-          return handleSubmitError(error);
-        }
-        return;
-      }
-
-      if (mode === 'existing' && !payload.users.length) {
-        return {users: Translate.string('Select at least one user.')};
-      }
-
+      const submitURL = mode === 'import' ? inviteImportURL : inviteURL;
       try {
-        const targetURL = inviteURL({
-          event_id: eventId,
-          reg_form_id: regformId,
-          existing: mode === 'new' ? 0 : 1,
-        });
-        const response = await indicoAxios.post(targetURL, payload);
-        onSuccess(response.data);
-        setSentEmailsCount(response.data.sent ?? 0);
-        setSentEmailsWarning(getSkippedWarningMessage(response.data.skipped ?? 0));
-        setTimeout(() => onClose(), successTimeout);
+        const {data} = await indicoAxios.post(
+          submitURL({event_id: eventId, reg_form_id: regformId}),
+          payload
+        );
+        onSuccess(data);
+        setSentEmailsCount(data.sent);
+        setSentEmailsWarning(getSkippedWarningMessage(data.skipped));
       } catch (error) {
         return handleSubmitError(error);
       }
-      return;
+      setTimeout(() => onClose(), successTimeout);
     },
     [eventId, metadata?.moderationEnabled, mode, onClose, onSuccess, regformId, successTimeout]
   );
