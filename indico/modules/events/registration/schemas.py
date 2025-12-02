@@ -7,8 +7,8 @@
 
 from operator import itemgetter
 
-from marshmallow import validate
-from marshmallow.decorators import post_dump
+from marshmallow import ValidationError, validate
+from marshmallow.decorators import post_dump, pre_load, validates_schema
 from marshmallow.fields import String
 from webargs import fields
 
@@ -19,8 +19,8 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
-from indico.util.marshmallow import (LowercaseString, make_validate_indico_placeholders, no_endpoint_links,
-                                     no_relative_urls, not_empty)
+from indico.util.marshmallow import (LowercaseString, PrincipalList, make_validate_indico_placeholders,
+                                     no_endpoint_links, no_relative_urls, not_empty)
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
@@ -41,31 +41,35 @@ class InvitationSchemaBase(mm.Schema):
     copy_for_sender = fields.Bool(load_default=False)
 
 
-class InvitationNewSchema(InvitationSchemaBase):
+class InvitationUserSchema(mm.Schema):
     first_name = fields.String(required=True, validate=not_empty)
     last_name = fields.String(required=True, validate=not_empty)
+    affiliation = fields.String(load_default='')
     email = LowercaseString(required=True, validate=validate.Email())
-    affiliation = fields.String(load_default='')
 
 
-class InvitationExistingSchema(InvitationSchemaBase):
-    users = fields.List(
-        fields.String(validate=not_empty),
-        required=True,
-        validate=validate.Length(min=1)
-    )
+class NewInvitationSchema(InvitationSchemaBase):
+    user = fields.Nested(InvitationUserSchema, load_default=None)
+    users = PrincipalList(load_default=[])
 
+    @pre_load
+    def _wrap_user(self, data, **kwargs):
+        user_fields = {k: data.pop(k, None) for k in ('first_name', 'last_name', 'affiliation', 'email')}
+        if any(value is not None for value in user_fields.values()):
+            data['user'] = user_fields
+        return data
 
-class InvitationImportRowSchema(mm.Schema):
-    first_name = fields.String(required=True)
-    last_name = fields.String(required=True)
-    affiliation = fields.String(load_default='')
-    email = LowercaseString(required=True)
+    @validates_schema(skip_on_field_errors=True)
+    def _check_user_fields(self, data, **kwargs):
+        has_user = data.get('user') is not None
+        has_users = bool(data.get('users'))
+        if has_user == has_users:
+            raise ValidationError('You must provide either a single user or a list of users.')
 
 
 class InvitationImportSchema(InvitationSchemaBase):
     skip_existing = fields.Bool(load_default=False)
-    imported = fields.List(fields.Nested(InvitationImportRowSchema), required=True)
+    imported = fields.List(fields.Nested(InvitationUserSchema), required=True)
 
 
 class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):

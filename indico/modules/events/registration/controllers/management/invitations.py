@@ -20,9 +20,8 @@ from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.schemas import (InvitationExistingSchema, InvitationImportRowSchema,
-                                                        InvitationImportSchema, InvitationNewSchema,
-                                                        RegistrationInvitationSchema)
+from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
+                                                        NewInvitationSchema, RegistrationInvitationSchema)
 from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
                                                      import_user_records_from_csv)
 from indico.modules.events.registration.views import WPManageRegistration
@@ -31,8 +30,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
-from indico.util.user import principal_from_identifier
-from indico.web.args import parser, use_kwargs
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
@@ -74,42 +72,27 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 class RHRegistrationFormInvite(RHManageRegFormBase):
     """Invite someone to register."""
 
-    def _process(self):
-        is_existing = request.args.get('existing') == '1'
-        schema_cls = InvitationExistingSchema if is_existing else InvitationNewSchema
-        data = parser.parse(schema_cls())
-
-        skip_moderation = data.pop('skip_moderation', False)
-        skip_access_check = data.pop('skip_access_check', False)
-        lock_email = data.pop('lock_email', False)
-
+    @use_kwargs(NewInvitationSchema)
+    def _process(self, sender_address, subject, body, bcc_addresses, copy_for_sender, skip_moderation,
+                 skip_access_check, lock_email, user, users):
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
+            raise BadRequest('Invalid sender address')
         if not self.regform.moderation_enabled:
             skip_moderation = False
 
-        sender_address = data.pop('sender_address')
-        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
-            abort(422, messages={'sender_address': [_('Invalid sender address')]})
-
-        subject = data.pop('subject')
-        body = data.pop('body')
-
-        if is_existing:
-            identifiers = data.pop('users')
-            users = self._build_users_from_identifiers(identifiers)
+        if users:
+            users = InvitationUserSchema(many=True).dump(users)
             field_name = 'users'
         else:
-            users = [self._build_user_from_payload(data)]
+            users = [user]
             field_name = 'email'
 
-        self._ensure_can_invite_emails([user['email'] for user in users], field_name)
+        self._ensure_can_invite_emails([user_['email'] for user_ in users], field_name)
 
-        bcc_addresses = data.pop('bcc_addresses', [])
-        copy_for_sender = data.pop('copy_for_sender', False)
-
-        for user in users:
+        for user_ in users:
             create_invitation(
                 self.regform,
-                user,
+                user_,
                 sender_address,
                 subject,
                 body,
@@ -135,47 +118,6 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
             }
         )
         return jsonify_data(sent=len(users), skipped=0, **_get_invitation_data(self.regform))
-
-    def _build_user_from_payload(self, data):
-        return {
-            'first_name': data.pop('first_name').strip(),
-            'last_name': data.pop('last_name').strip(),
-            'email': data.pop('email').lower(),
-            'affiliation': data.pop('affiliation', ''),
-        }
-
-    def _build_users_from_identifiers(self, identifiers):
-        users = []
-        seen = set()
-        for identifier in identifiers:
-            if identifier in seen:
-                continue
-            seen.add(identifier)
-            try:
-                principal = principal_from_identifier(
-                    identifier,
-                    allow_external_users=True,
-                    event_id=self.event.id,
-                    allow_groups=False,
-                    allow_event_roles=False,
-                    allow_category_roles=False,
-                    allow_registration_forms=False,
-                    allow_emails=False,
-                )
-            except ValueError:
-                abort(422, messages={'users': [_('Invalid user selection. Please refresh and try again.')]})
-
-            email = getattr(principal, 'email', None)
-            if not email:
-                abort(422, messages={'users': [_('One of the selected users is missing an email address.')]})
-
-            users.append({
-                'first_name': principal.first_name,
-                'last_name': principal.last_name,
-                'email': email.lower(),
-                'affiliation': principal.affiliation,
-            })
-        return users
 
     def _ensure_can_invite_emails(self, emails, field_name):
         normalized = {email.lower() for email in emails if email}
@@ -264,7 +206,7 @@ class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
             abort(422, messages={'file': [str(exc)]})
         if not rows:
             abort(422, messages={'file': [_('The uploaded CSV file is empty')]})
-        return InvitationImportRowSchema(many=True).jsonify(rows)
+        return InvitationUserSchema(many=True).jsonify(rows)
 
 
 class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
