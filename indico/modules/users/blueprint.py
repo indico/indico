@@ -9,19 +9,20 @@ from flask import has_request_context, request
 
 from indico.modules.users.api import RHUserAPI
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHAffiliationAPI,
-                                              RHAffiliationsAPI, RHAffiliationsDashboard, RHExportDashboardICS,
-                                              RHExportDashboardICSLegacy, RHPersonalData, RHPersonalDataUpdate,
-                                              RHProfilePictureDisplay, RHProfilePicturePage, RHProfilePicturePreview,
-                                              RHRegistrationRequestList, RHRejectRegistrationRequest,
-                                              RHSaveProfilePicture, RHSearchAffiliations, RHUserBlock, RHUserDashboard,
-                                              RHUserDataExport, RHUserDataExportAPI, RHUserDataExportDownload,
-                                              RHUserDelete, RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
-                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
-                                              RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI, RHUserPreferences,
-                                              RHUserPreferencesMarkdownAPI, RHUserPreferencesMastodonServer,
-                                              RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
-                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
-                                              RHUserSearchInfo, RHUserSearchToken, RHUserSuggestionsRemove)
+                                              RHAffiliationsAPI, RHAffiliationsDashboard, RHCountries,
+                                              RHExportDashboardICS, RHExportDashboardICSLegacy, RHPersonalData,
+                                              RHPersonalDataUpdate, RHProfilePictureDisplay, RHProfilePicturePage,
+                                              RHProfilePicturePreview, RHRegistrationRequestList,
+                                              RHRejectRegistrationRequest, RHSaveProfilePicture, RHSearchAffiliations,
+                                              RHUserBlock, RHUserDashboard, RHUserDataExport, RHUserDataExportAPI,
+                                              RHUserDataExportDownload, RHUserDelete, RHUserEmails, RHUserEmailsDelete,
+                                              RHUserEmailsSetPrimary, RHUserEmailsVerify, RHUserFavorites,
+                                              RHUserFavoritesAPI, RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI,
+                                              RHUserPreferences, RHUserPreferencesMarkdownAPI,
+                                              RHUserPreferencesMastodonServer, RHUsersAdmin, RHUsersAdminCreate,
+                                              RHUsersAdminMerge, RHUsersAdminMergeCheck, RHUsersAdminSettings,
+                                              RHUserSearch, RHUserSearchInfo, RHUserSearchToken,
+                                              RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -97,6 +98,7 @@ _bp.add_url_rule('!/admin/affiliations', 'affiliations_dashboard', RHAffiliation
 _bp.add_url_rule('!/api/admin/affiliations', 'api_admin_affiliations', RHAffiliationsAPI, methods=('GET', 'POST'))
 _bp.add_url_rule('!/api/admin/affiliations/<int:affiliation_id>', 'api_admin_affiliation', RHAffiliationAPI,
                  methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('!/api/countries', 'api_countries', RHCountries)
 
 # Users API
 _bp.add_url_rule('!/api/user/', 'authenticated_user', RHUserAPI)

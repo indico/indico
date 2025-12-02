@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import countriesURL from 'indico-url:users.api_countries';
+
 import type {FormApi} from 'final-form';
 import React, {useCallback, useMemo, useState} from 'react';
-import {Accordion, Form, Input, Loader, type InputProps} from 'semantic-ui-react';
+import {Accordion, Form, Loader} from 'semantic-ui-react';
 
-import {FinalInput, getChangedValues, handleSubmitError} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -19,8 +21,6 @@ import {getPluginObjects} from 'indico/utils/plugins';
 
 import FinalStringListField from './StringListField';
 import {AffiliationFormValues} from './types';
-
-import './AffiliationFormDialog.module.scss';
 
 const isoToFlag = (country: string) =>
   String.fromCodePoint(...country.split('').map(char => char.charCodeAt(0) + 0x1f1a5));
@@ -33,18 +33,6 @@ const defaultValues: AffiliationFormValues = {
   city: '',
   countryCode: '',
 };
-
-function CountryCodeInput({value = '', ...rest}: InputProps) {
-  const code = value.trim().toUpperCase();
-  return (
-    <Input
-      {...rest}
-      value={value}
-      label={code.length === 2 && {basic: true, content: isoToFlag(code)}}
-      labelPosition="right"
-    />
-  );
-}
 
 export default function AffiliationFormDialog({
   trigger,
@@ -62,6 +50,7 @@ export default function AffiliationFormDialog({
     manual: !open || !edit,
     camelize: true,
   });
+  const {data: countries} = useIndicoAxios(countriesURL({}), {manual: !open});
 
   const handleTriggerClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -108,11 +97,19 @@ export default function AffiliationFormDialog({
             </Form.Group>
             <Form.Group widths="equal">
               <FinalInput name="city" label={Translate.string('City')} />
-              <FinalInput
+              <FinalDropdown
                 name="countryCode"
-                label={Translate.string('Country code')}
-                description={Translate.string('Enter an ISO-3166 two letter country code.')}
-                component={CountryCodeInput}
+                label={Translate.string('Country')}
+                fluid
+                selection
+                placeholder={Translate.string('Select a country')}
+                options={(countries ?? []).map(([name, title]) => ({
+                  key: name,
+                  value: name,
+                  text: `${isoToFlag(name)} ${title}`,
+                }))}
+                loading={!countries}
+                disabled={!countries}
               />
             </Form.Group>
           </>
