@@ -17,7 +17,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 import {getPluginObjects} from 'indico/utils/plugins';
 
-import {FinalStringListField} from './StringListField';
+import FinalStringListField from './StringListField';
 import {AffiliationFormValues} from './types';
 
 import './AffiliationFormDialog.module.scss';

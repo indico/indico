@@ -6,21 +6,19 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useMemo, useState} from 'react';
-import {Dropdown, DropdownProps} from 'semantic-ui-react';
+import React, {useState} from 'react';
+import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
-export function StringListField({
+function StringListField({
   value,
   disabled,
   onChange,
-  onBlur,
   onFocus,
-  placeholder,
-  additionLabel,
-  allowSeparators = false,
-  separators = /[,;]+/,
+  onBlur,
+  placeholder = '',
 }: {
   value: string[];
   disabled: boolean;
@@ -28,45 +26,32 @@ export function StringListField({
   onFocus: () => void;
   onBlur: () => void;
   placeholder?: string;
-  additionLabel?: string;
-  allowSeparators?: boolean;
-  separators?: RegExp;
 }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const options = useMemo(() => value.map(text => ({text, value: text})), [value]);
+  const isValid = (v: string) => !!v.trim();
+  const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
-  const setValue = (newValues: string[]) => {
-    const deduped = _.uniq(newValues.filter(Boolean));
-    onChange(deduped);
+  const setValue = (newValue: string[]) => {
+    newValue = _.uniq(newValue.filter(isValid));
+    onChange(newValue);
     onFocus();
     onBlur();
   };
 
-  const handleChange: NonNullable<DropdownProps['onChange']> = (event, {value: newValue}) => {
-    const values = Array.isArray(newValue) ? (newValue.filter(x => x) as string[]) : [];
-    if (values.length && values[values.length - 1] === searchQuery) {
+  const handleChange = (e, {value: newValue}) => {
+    if (newValue.length && newValue[newValue.length - 1] === searchQuery) {
       setSearchQuery('');
     }
-    setValue(values);
+    setValue(newValue);
   };
 
-  const handleSearchChange: NonNullable<DropdownProps['onSearchChange']> = (
-    event,
-    {searchQuery: newSearchQuery}
-  ) => {
-    if (allowSeparators && separators.test(newSearchQuery)) {
-      const entries = newSearchQuery.split(separators).map(part => part.trim());
-      setValue([...value, ...entries.filter(Boolean)]);
-      setSearchQuery(entries.filter(part => part && !value.includes(part)).join(', '));
-    } else {
-      setSearchQuery(newSearchQuery);
-    }
+  const handleSearchChange = (e, {searchQuery: newSearchQuery}) => {
+    setSearchQuery(newSearchQuery);
   };
 
   const handleBlur = () => {
-    const trimmed = searchQuery.trim();
-    if (trimmed) {
-      setValue([...value, trimmed]);
+    if (isValid(searchQuery)) {
+      setValue([...value, searchQuery.trim()]);
       setSearchQuery('');
     }
   };
@@ -75,27 +60,27 @@ export function StringListField({
     <Dropdown
       options={options}
       value={value}
+      searchQuery={searchQuery}
+      disabled={disabled}
+      searchInput={{onFocus, onBlur, type: 'text'}}
       search
-      multiple
       selection
+      multiple
       allowAdditions
       fluid
-      searchQuery={searchQuery}
+      open={!!searchQuery}
       placeholder={placeholder}
-      additionLabel={additionLabel}
-      disabled={disabled}
-      icon=""
+      additionLabel={Translate.string('Add') + ' '} // eslint-disable-line prefer-template
       onChange={handleChange}
       onSearchChange={handleSearchChange}
       onBlur={handleBlur}
-      searchInput={{onFocus, onBlur: handleBlur}}
       selectedLabel={null}
-      closeOnChange
+      icon=""
     />
   );
 }
 
-export function FinalStringListField(props: {
+export default function FinalStringListField(props: {
   name: string;
   label?: string;
   placeholder?: string;
@@ -103,13 +88,5 @@ export function FinalStringListField(props: {
   allowSeparators?: boolean;
   separators?: RegExp;
 }) {
-  return (
-    <FinalField
-      component={StringListField}
-      isEqual={_.isEqual}
-      parse={value => value || []}
-      format={value => value || []}
-      {...props}
-    />
-  );
+  return <FinalField component={StringListField} isEqual={_.isEqual} {...props} />;
 }
