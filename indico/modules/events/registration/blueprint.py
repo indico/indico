@@ -10,8 +10,8 @@ from indico.modules.events.registration.controllers.api import checkin as api_ch
 from indico.modules.events.registration.controllers.api import checkin_legacy as api_checkin_legacy
 from indico.modules.events.registration.controllers.api import misc as api_misc
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (description, fields, invitations, privacy,
-                                                                       regforms, reglists, sections, tags, tickets)
+from indico.modules.events.registration.controllers.management import (fields, invitations, privacy, regforms, reglists,
+                                                                       sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -29,6 +29,8 @@ _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers'
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/participant-list-preview', 'manage_participant_list_preview',
                  regforms.RHParticipantListPreview)
+_bp.add_url_rule('/manage/registration/description', 'manage_registration_multi_forms_announcement',
+                 regforms.RHManageRegistrationMultiFormsAnnouncement, methods=('GET', 'POST'))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
@@ -184,10 +186,6 @@ _bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_regist
                  tags.RHRegistrationTagDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tags/assign', 'manage_registration_tags_assign',
                  tags.RHRegistrationTagsAssign, methods=('POST',))
-
-# Registration form description management
-_bp.add_url_rule('/manage/registration/description', 'manage_registration_description',
-                 description.RHManageRegistrationDescription, methods=('GET', 'POST'))
 
 # Regform edition: sections
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',

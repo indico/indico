@@ -78,6 +78,6 @@ event_wallet_settings = EventSettingsProxy('wallet', {
     'google_wallet_class_id': None,
 })
 
-event_settings = EventSettingsProxy('registration', defaults={
-    'registration_description': ''
+event_registration_settings = EventSettingsProxy('registration', defaults={
+    'description': '',
 })

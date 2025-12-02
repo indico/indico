@@ -97,19 +97,19 @@
                     </div>
                 </div>
             {% endblock %}
-            {% if regforms|length > 1 %}
+            {% if event.type == 'conference' and regforms|length > 1 %}
                 {% block description_section %}
                     <div class="section">
                         <div class="icon icon-textarea"></div>
                         <div class="text">
-                            <div class="label">{% trans %}Registration description{% endtrans %}</div>
-                            {% trans %}Display a text on top of Registration forms{% endtrans %}
+                            <div class="label">{% trans %}Announcement for multiple registration forms{% endtrans %}</div>
+                            {% trans %}Display a text on top of the registration form list{% endtrans %}
                         </div>
                         <div class="toolbar">
                             <div class="group">
                                 <a href="#" id="ngo-quotas" class="i-button icon-settings"
-                                   data-href="{{ url_for('.manage_registration_description', event) }}"
-                                   data-title="{%- trans %}Registration forms description{% endtrans -%}"
+                                   data-href="{{ url_for('.manage_registration_multi_forms_announcement', event) }}"
+                                   data-title="{%- trans %}Edit announcement for multiple registration forms{% endtrans -%}"
                                    data-ajax-dialog>
                                     {%- trans %}Configure{% endtrans -%}
                                 </a>
