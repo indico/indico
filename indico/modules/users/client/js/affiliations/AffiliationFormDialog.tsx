@@ -7,7 +7,7 @@
 
 import type {FormApi} from 'final-form';
 import React, {useCallback, useMemo, useState} from 'react';
-import {Accordion, Form, Loader} from 'semantic-ui-react';
+import {Accordion, Form, Input, Loader, type InputProps} from 'semantic-ui-react';
 
 import {FinalInput, getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -20,6 +20,11 @@ import {getPluginObjects} from 'indico/utils/plugins';
 import {FinalStringListField} from './StringListField';
 import {AffiliationFormValues} from './types';
 
+import './AffiliationFormDialog.module.scss';
+
+const isoToFlag = (country: string) =>
+  String.fromCodePoint(...country.split('').map(char => char.charCodeAt(0) + 0x1f1a5));
+
 const defaultValues: AffiliationFormValues = {
   name: '',
   altNames: [],
@@ -28,6 +33,18 @@ const defaultValues: AffiliationFormValues = {
   city: '',
   countryCode: '',
 };
+
+function CountryCodeInput({value = '', ...rest}: InputProps) {
+  const code = value.trim().toUpperCase();
+  return (
+    <Input
+      {...rest}
+      value={value}
+      label={code.length === 2 && {basic: true, content: isoToFlag(code)}}
+      labelPosition="right"
+    />
+  );
+}
 
 export default function AffiliationFormDialog({
   trigger,
@@ -95,6 +112,7 @@ export default function AffiliationFormDialog({
                 name="countryCode"
                 label={Translate.string('Country code')}
                 description={Translate.string('Enter an ISO-3166 two letter country code.')}
+                component={CountryCodeInput}
               />
             </Form.Group>
           </>
