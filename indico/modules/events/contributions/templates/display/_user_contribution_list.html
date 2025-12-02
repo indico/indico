@@ -14,7 +14,7 @@
 {% macro render_contribution_list(contributions, enable_actions=True) %}
     <div class="i-box no-padding">
         <div class="i-box-content">
-            <ul class="group-list no-content-before with-buttons">
+            <ul class="group-list no-content-before with-buttons" style="margin-top: -10px;">
                 {% for contrib in contributions | sort(attribute='title') %}
                     {{ _render_contribution_row(contrib, enable_actions=enable_actions) }}
                 {%- endfor %}
