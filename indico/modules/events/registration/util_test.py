@@ -80,6 +80,7 @@ def test_import_users():
     }
 
 
+@pytest.mark.usefixtures('db')
 @pytest.mark.parametrize('delimiter', [d.delimiter for d in CSVFieldDelimiter])
 def test_import_users_guess_delimiter(delimiter):
     rows = [
