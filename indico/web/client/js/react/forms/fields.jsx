@@ -351,8 +351,20 @@ ComboDropdownAdapter.defaultProps = {
 };
 
 /**
+ * @typedef {({[key: string]: any}) & {
+ *   name: string;
+ *   adapter?: React.ComponentType;
+ *   component?: React.ComponentType;
+ *   description?: React.ReactNode;
+ *   required?: true | false | 'no-validator';
+ *   onChange?: (value: any, previous: any) => void;
+ * }} FinalFieldProps
+ */
+
+/**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
+ * @param {FinalFieldProps} props
  */
 export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
   const extraProps = {};
