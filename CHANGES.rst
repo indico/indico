@@ -47,6 +47,7 @@ Improvements
   conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
 - Add a button to view related logs to the management view of a registration (:pr:`7186`,
   thanks :user:`vtran99`)
+- Limit the number of evaluations on the PRM (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
