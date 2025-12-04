@@ -37,6 +37,9 @@
                 {{ _render_registration_tags(registration, assigned_tags, all_tags) }}
             </div>
         {% endif %}
+        {% block render_view_logs scoped %}
+            {{ _render_view_logs(registration) }}
+        {% endblock %}
         {{ template_hook('before-registration-summary', registration=registration) }}
         {{ render_registration_summary(registration, from_management=True) }}
         {% call render_invoice(registration, payment_enabled) %}
@@ -381,6 +384,30 @@
                             {% trans %}Close{% endtrans %}
                         </button>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _render_view_logs(registration) %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-content"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Logs{% endtrans %}
+                </div>
+                {% trans -%}
+                    View all logs related to this registration.
+                {%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="{{ url_for('logs.event', registration.event, **{'meta.registration_id': registration.id}) }}"
+                       class="i-button">
+                        {% trans %}View{% endtrans %}
+                    </a>
                 </div>
             </div>
         </div>
