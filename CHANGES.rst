@@ -196,6 +196,7 @@ Improvements
 - Show a warning when bulk registration approval/rejection skips registrations that are not
   pending (:issue:`7197`, :pr:`7205`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add a JSON endpoint that returns the event's program/tracks (:pr:`7207`)
+- Limit the number of evaluations on the PRM (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
