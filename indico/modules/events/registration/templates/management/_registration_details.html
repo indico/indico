@@ -396,7 +396,7 @@
             <div class="icon icon-file-content"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}View logs{% endtrans %}
+                    {% trans %}Logs{% endtrans %}
                 </div>
                 {% trans -%}
                     View all logs related to this registration.
@@ -404,8 +404,9 @@
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a href="{{ url_for('logs.event', registration.event, **{'meta.registration_id': registration.id}) }}">
-                        <button class="i-button">{% trans %}Logs{% endtrans %}</button>
+                    <a href="{{ url_for('logs.event', registration.event, **{'meta.registration_id': registration.id}) }}"
+                       class="i-button">
+                        {% trans %}View{% endtrans %}
                     </a>
                 </div>
             </div>
