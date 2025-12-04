@@ -45,6 +45,8 @@ Improvements
   section (:pr:`7181`, thanks :user:`tomako`)
 - Add a customizable announcement text on top of the registration form list in
   conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
+- Add a button to view related logs to the management view of a registration (:pr:`7186`,
+  thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
