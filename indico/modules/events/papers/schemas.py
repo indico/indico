@@ -37,6 +37,8 @@ class CallForPapersSchema(mm.Schema):
     layout_review_questions = Nested('PaperReviewQuestionSchema', many=True)
     content_review_questions = Nested('PaperReviewQuestionSchema', many=True)
     rating_range = List(Integer())
+    enforce_evaluation_rounds = Boolean()
+    evaluation_rounds = Integer()
 
 
 class PaperEventSchema(mm.SQLAlchemyAutoSchema):
@@ -225,6 +227,7 @@ class PaperSchema(mm.Schema):
         lambda paper, ctx: paper.event.has_feature('editing')
         and 'paper' in editing_settings.get(paper.event, 'editable_types')
     )
+    can_ask_corrections = Function(lambda paper, ctx: paper.can_ask_corrections(ctx.get('user')))
 
 
 class PaperDumpSchema(PaperSchema):
