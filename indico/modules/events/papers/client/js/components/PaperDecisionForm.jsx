@@ -26,6 +26,7 @@ export default function PaperDecisionForm() {
     event: {id: eventId},
     contribution: {id: contributionId},
     state,
+    canAskCorrections,
   } = useSelector(getPaperDetails);
   const isLocked = useSelector(isEventLocked);
   const currentUser = useSelector(getCurrentUser);
@@ -57,7 +58,7 @@ export default function PaperDecisionForm() {
     },
   };
 
-  if (state.name === PaperState.submitted) {
+  if (state.name === PaperState.submitted && canAskCorrections) {
     actionOptions[PaperState.to_be_corrected] = {
       value: 'to_be_corrected',
       text: Translate.string('To be corrected'),

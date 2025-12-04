@@ -51,6 +51,8 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'enforce_judge_deadline': False,
     'enforce_layout_reviewer_deadline': False,
     'enforce_content_reviewer_deadline': False,
+    'enforce_evaluation_rounds': False,
+    'evaluation_rounds': 2,
     'announcement': '',
     'scale_lower': -3,
     'scale_upper': 3,
