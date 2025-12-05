@@ -56,10 +56,12 @@ export default function RevisionSubmissionForm({
 
     try {
       await indicoAxios.post(urlFunc({event_id: eventId, contrib_id: contributionId}), payload);
+      Promise.resolve().then(() => {
+        dispatch(fetchPaperDetails(eventId, contributionId) as unknown as AnyAction);
+      });
     } catch (e) {
       return handleSubmitError(e);
     }
-    dispatch(fetchPaperDetails(eventId, contributionId) as unknown as AnyAction);
   };
 
   // TODO this could probably be moved into the FileManager to support (via a new prop or passing explicit
