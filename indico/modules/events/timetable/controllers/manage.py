@@ -205,10 +205,10 @@ class RHTimetableBreak(RHManageEventBase):
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
-        session_block_specified = 'session_block_id' in data
-        session_block_id = data.pop('session_block_id', None)
+        missing = object()
+        session_block_id = data.pop('session_block', {}).pop('id', missing)
 
-        if session_block_specified:
+        if session_block_id is not missing:
             self._change_parent(session_block_id)
 
         if not data.get('timetable_entry'):
