@@ -22,7 +22,9 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>/comment', 'api_create_comment', a
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>',
                  'api_comment_actions', api.RHCommentActions, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
-_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit', 'api_submit_revision', api.RHSubmitNewRevision,
+_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit-single', 'submit_revision_new_single',
+                 api.RHSubmitRevisionSingle, methods=('POST',))
+_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit', 'submit_revision_new', api.RHSubmitRevision,
                  methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/review/<any(content,layout):review_type>', 'api_create_review',
                  api.RHCreateReview, methods=('POST',))
@@ -45,9 +47,9 @@ _bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'dow
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit-single', 'submit_revision_single',
-                 display.RHSubmitPaperSingle, methods=('POST',))
+                 api.RHSubmitPaperSingle, methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit', 'submit_revision',
-                 display.RHSubmitPaper, methods=('POST',))
+                 api.RHSubmitPaper, methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/upload', 'api_upload',
                  display.RHPapersUploadFile, methods=('POST',))
 

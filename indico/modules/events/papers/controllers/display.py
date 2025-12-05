@@ -10,9 +10,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
-from indico.modules.events.papers.fields import PaperFilesField
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.operations import create_new_paper
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_user_submittable_contributions)
@@ -20,9 +18,7 @@ from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDispla
                                                 WPDisplayReviewingArea)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
-from indico.util.marshmallow import FilesField
-from indico.web.args import use_rh_kwargs
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import jsonify_template
 
 
 class RHSubmitPaperBase(RHPaperBase):
@@ -42,25 +38,6 @@ class RHSubmitPaperBase(RHPaperBase):
         if not self.event.cfp.can_submit_proceedings(session.user):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
-
-
-class RHSubmitPaperSingle(RHSubmitPaperBase):
-    @use_rh_kwargs({
-        'files': FilesField(required=True),
-    }, rh_context=('event', 'contrib'))
-    def _process(self, files):
-        # Key for files obj is 'None' as there is no FileType for single files
-        create_new_paper(self.contribution, session.user, {None: files})
-        return jsonify_data(flash=False)
-
-
-class RHSubmitPaper(RHSubmitPaperBase):
-    @use_rh_kwargs({
-        'files': PaperFilesField(required=True),
-    }, rh_context=('event', 'contrib'))
-    def _process(self, files):
-        create_new_paper(self.contribution, session.user, files)
-        return jsonify_data(flash=False)
 
 
 class RHPaperTimeline(RHPaperBase):
