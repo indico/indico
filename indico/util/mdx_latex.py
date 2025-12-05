@@ -261,7 +261,7 @@ def latex_render_image(src, alt, tmpdir, strict=False):
             raise ImageURLException(f'URL scheme not supported: {src}')
         else:
             try:
-                resp = requests.get(src, verify=False, timeout=5)  # noqa: S501
+                resp = requests.get(src, timeout=5)
             except InvalidURL:
                 raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
