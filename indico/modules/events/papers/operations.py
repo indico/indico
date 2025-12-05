@@ -136,12 +136,7 @@ def close_cfp(event):
 
 def create_paper_revision(paper, submitter, files):
     revision = PaperRevision(paper=paper, submitter=submitter)
-    for f in files:
-        filename = secure_client_filename(f.filename)
-        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision,
-                       _contribution=paper.contribution)
-        pf.save(f.stream)
+    _make_paper_files(files, paper, revision)
     db.session.flush()
     db.session.expire(revision._contribution, ['_paper_last_revision'])
     notify_paper_revision_submission(revision)
