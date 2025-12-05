@@ -1,3 +1,9 @@
+check_types:
+- id: <id>
+  title: Check type (Once)
+default_check_type:
+  id: <id>
+  title: Check type (Once)
 description: ''
 end_dt: <timestamp>
 id: <id>
