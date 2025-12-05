@@ -61,7 +61,7 @@ import {$T} from 'indico/utils/i18n';
             history.replaceState({}, document.title, pageURL);
             history.pushState({}, document.title, location.href + hash);
           }
-          const id = location.hash.split('#preview:')[1];
+          const id = parseInt(location.hash.split('#preview:')[1], 10);
           previewAttachment(id);
         }
       })
