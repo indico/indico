@@ -5,20 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import submitRevisionURL from 'indico-url:papers.api_submit_revision';
-
-import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React from 'react';
+import {useSelector} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
-import {FileSubmission} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-import {fetchPaperDetails} from '../actions';
 import {PaperState} from '../models';
 import {getCurrentUser, getPaperDetails} from '../selectors';
+
+import RevisionSubmissionForm from './RevisionSubmissionForm';
 
 export default function SubmitRevision() {
   const {
@@ -26,41 +23,11 @@ export default function SubmitRevision() {
     event: {id: eventId},
     contribution: {id: contributionId},
   } = useSelector(getPaperDetails);
-  const [files, setFiles] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
   const currentUser = useSelector(getCurrentUser);
-  const dispatch = useDispatch();
 
   if (stateName !== PaperState.to_be_corrected) {
     return null;
   }
-
-  const submitFiles = async () => {
-    setSubmitting(true);
-
-    const headers = {'content-type': 'multipart/form-data'};
-    const formData = new FormData();
-
-    files.forEach(file => {
-      formData.append('files', file);
-    });
-
-    try {
-      await indicoAxios.post(
-        submitRevisionURL({event_id: eventId, contrib_id: contributionId}),
-        formData,
-        {headers}
-      );
-    } catch (e) {
-      handleAxiosError(e);
-      return;
-    } finally {
-      setSubmitting(false);
-    }
-
-    setFiles([]);
-    dispatch(fetchPaperDetails(eventId, contributionId));
-  };
 
   return (
     <div
@@ -74,15 +41,14 @@ export default function SubmitRevision() {
           <Translate>Upload corrected revision</Translate>
         </div>
         <div className="i-box-content">
-          <FileSubmission onChange={newFiles => setFiles(newFiles)} disabled={submitting} />
-          <Button
-            onClick={submitFiles}
-            content={Translate.string('Submit new revision')}
-            style={{marginTop: 10}}
-            disabled={files.length === 0 || submitting}
-            loading={submitting}
-            primary
-          />
+          <RevisionSubmissionForm eventId={eventId} contributionId={contributionId}>
+            <Button
+              type="submit"
+              content={Translate.string('Submit new revision')}
+              style={{marginTop: 10}}
+              primary
+            />
+          </RevisionSubmissionForm>
         </div>
       </div>
     </div>
