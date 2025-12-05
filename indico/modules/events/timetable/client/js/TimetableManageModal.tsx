@@ -186,7 +186,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={snakifyKeys(entry.locationParent)}
         initialValues={initialValues}
         extraOptions={extraOptions}
-        hasParent={'sessionBlockId' in entry}
+        hasParent={isCreatingChild}
       />
     ),
   };
