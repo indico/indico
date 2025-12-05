@@ -356,6 +356,9 @@ class BooleanField(RegistrationFormBillableField):
 class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     mm_field_class = fields.String
+    setup_schema_fields = {
+        'require_international_format': fields.Bool(),
+    }
 
 
 class CountryField(RegistrationFormFieldBase):
