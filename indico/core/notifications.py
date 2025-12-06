@@ -18,7 +18,7 @@ from flask import g
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.core.storage.backend import get_storage
+from indico.core.storage.backend import StorageError, get_storage
 from indico.util.fs import secure_filename
 from indico.util.signals import make_interceptable
 from indico.util.string import truncate
@@ -89,13 +89,13 @@ def _log_email(email, event, module, user, meta=None, summary=None):
         ),
     }
     # Optionally persist email attachments
-    if config.EMAIL_LOG_STORE_ATTACHMENTS and email.get('attachments'):
+    if config.EMAIL_LOG_STORAGE and (attachments := email['attachments']):
         try:
-            storage = get_storage(config.ATTACHMENT_STORAGE)
+            storage = get_storage(config.EMAIL_LOG_STORAGE)
             stored = []
             base_path = f'emails/{event.id}'
 
-            for att in email['attachments']:
+            for att in attachments:
                 if isinstance(att, MIMEBase):
                     filename = att.get_filename('unnamed')
                     content = att.get_payload(decode=True)
@@ -114,24 +114,16 @@ def _log_email(email, event, module, user, meta=None, summary=None):
                 safe_name = secure_filename(filename or 'attachment', 'file')
                 unique = hashlib.sha256(content).hexdigest()
                 name = f'{base_path}/{unique}-{safe_name}'
-                file_id, checksum = storage.save(name, ctype, filename or safe_name, content)
-                try:
-                    size = storage.getsize(file_id)
-                except Exception:
-                    size = None
+                file_id, _checksum = storage.save(name, ctype, filename or safe_name, content)
                 stored.append({
-                    'filename': filename or safe_name,
-                    'content_type': ctype,
                     'backend': config.ATTACHMENT_STORAGE,
                     'file_id': file_id,
-                    'checksum_md5': checksum,
-                    'size': size,
                 })
             if stored:
                 log_data['stored_attachments'] = stored
-        except Exception:
+        except StorageError:
             # Do not fail email logging if storage is unavailable; simply skip storing
-            logger.exception('Failed to store email attachments for event %s', event.id)
+            logger.exception('Failed to store email attachments')
     return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
