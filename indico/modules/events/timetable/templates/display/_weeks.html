@@ -83,6 +83,10 @@
         </span>
         {% if entry.type.name == 'CONTRIBUTION' %}
             {{ _render_contribution(entry.object) }}
+        {% elif entry.type.name == 'SESSION_BLOCK' %}
+            <span class="main">
+                <span class="title">{{ entry.object.full_title }}</span>
+            </span>
         {% else %}
             <span class="main">
                 <span class="title">{{ entry.object.title }}</span>
