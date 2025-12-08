@@ -563,7 +563,7 @@ def _get_acl_data(obj, principal):
     """Helper function to get the necessary data for ACL modifications.
 
     :param obj: A `ProtectionMixin` instance
-    :param principal: A User or GroupProxy uinstance
+    :param principal: A User or GroupProxy instance
     :return: A tuple containing the principal class and the existing
              ACL entry for the given principal if it exists.
     """
@@ -602,13 +602,14 @@ def make_acl_log_fn(obj_type, log_realm=None):
             return
 
         user = session.user if session else None  # allow acl changes outside request context
-        available_permissions = get_available_permissions(obj_type)
+        # `ProtectionMixin` provides only read access without further permissions
+        manager_access = issubclass(obj_type, ProtectionManagersMixin)
+        available_permissions = get_available_permissions(obj_type) if manager_access else {}
 
         def _format_permissions(permissions):
             permissions = set(permissions)
             return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.values()
                                     if p.name in permissions))
-
         data = {}
         if principal.principal_type == PrincipalType.user:
             data['User'] = principal.full_name
@@ -627,16 +628,18 @@ def make_acl_log_fn(obj_type, log_realm=None):
         if entry is None:
             summary = 'ACL entry removed'
             log_kind = LogKind.negative
-            data['Read Access'] = old_data['read_access']
-            data['Manager'] = old_data['full_access']
-            data['Permissions'] = _format_permissions(old_data['permissions'])
+            if manager_access:
+                data['Read Access'] = old_data['read_access']
+                data['Manager'] = old_data['full_access']
+                data['Permissions'] = _format_permissions(old_data['permissions'])
         elif is_new:
             summary = 'ACL entry added'
             log_kind = LogKind.positive
-            data['Read Access'] = entry.read_access
-            data['Manager'] = entry.full_access
-            if entry.permissions:
-                data['Permissions'] = _format_permissions(entry.permissions)
+            if manager_access:
+                data['Read Access'] = entry.read_access
+                data['Manager'] = entry.full_access
+                if entry.permissions:
+                    data['Permissions'] = _format_permissions(entry.permissions)
         elif entry.current_data != old_data:
             summary = 'ACL entry changed'
             log_kind = LogKind.change
@@ -662,23 +665,18 @@ def make_acl_log_fn(obj_type, log_realm=None):
             del user_log_data['User']
             extra_user_log_data, obj_title = _get_hierarchical_log_data(obj)
             user_log_data.update(extra_user_log_data)
-
-            match log_kind:
-                case LogKind.positive:
-                    summary = f'{obj_type.__name__} ACL entry added ({obj_title})'
-                case LogKind.negative:
-                    summary = f'{obj_type.__name__} ACL entry removed ({obj_title})'
-                case LogKind.change:
-                    summary = f'{obj_type.__name__} ACL entry changed ({obj_title})'
-                case _:
-                    assert False  # cannot happen, but would log a wrong summary
+            summary = f'{obj_type.__name__} {summary} ({obj_title})'
             principal.log(UserLogRealm.acl, log_kind, 'Permissions', summary, user, data=user_log_data)
 
     return _log_acl_changes
 
 
 def _get_obj_name(obj):
-    return getattr(obj, 'title', None) or getattr(obj, 'name', None) or str(obj)
+    if name := (getattr(obj, 'title', None) or getattr(obj, 'name', None)):
+        return name
+    if isinstance(obj, db.m.AttachmentFolder):  # default folder for top-level attachments
+        return '/'
+    return str(obj)
 
 
 def _get_hierarchical_log_data(obj):

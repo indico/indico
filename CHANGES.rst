@@ -53,6 +53,7 @@ Improvements
   conferences with multiple registration forms (:pr:`6916`, thanks :user:`openprojects`)
 - Add a button to view related logs to the management view of a registration (:pr:`7186`,
   thanks :user:`vtran99`)
+- Log attachment & menu entry ACL changes to user log (:pr:`7136`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^

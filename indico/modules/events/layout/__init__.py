@@ -9,9 +9,11 @@ from flask import session
 from jinja2.filters import do_filesizeformat
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.settings.converters import EnumConverter
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.models.principals import MenuEntryPrincipal
 from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
@@ -21,6 +23,9 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(MenuEntry), sender=MenuEntry, weak=False)
 
 EVENT_BANNER_WIDTH = 950
 EVENT_LOGO_WIDTH = 200
