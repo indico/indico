@@ -274,7 +274,7 @@ class EventReminder(RenderModeMixin, db.Model):
         This includes both explicit recipients and, if enabled,
         participants/speakers of the event.
         """
-        recipients = {Recipient(email) for email in set(self.recipients)}
+        recipients = {email: Recipient(email) for email in set(self.recipients)}
         if self.send_to_participants:
             regs_query = (self.event.registrations
                           .join(Registration.registration_form)
@@ -295,11 +295,13 @@ class EventReminder(RenderModeMixin, db.Model):
                                   .filter(registrations_tags_table.c.registration_tag_id.in_(tag_ids)))
                 regs_query = regs_query.filter(Registration.id.in_(tags_query))
 
-            recipients.update(Recipient(reg.email, reg.first_name, reg.last_name) for reg in regs_query)
+            recipients.update({reg.email: Recipient(reg.email, reg.first_name, reg.last_name) for reg in regs_query})
 
         if self.send_to_speakers:
-            recipients.update(Recipient(person_link.email, person_link.first_name, person_link.last_name)
-                              for person_link in self.event.person_links)
+            recipients.update({
+                person_link.email: Recipient(person_link.email, person_link.first_name, person_link.last_name)
+                for person_link in self.event.person_links
+            })
 
             # contribution/sub-contribution speakers are present only in meetings and conferences
             if self.event.type != EventType.lecture:
@@ -326,12 +328,12 @@ class EventReminder(RenderModeMixin, db.Model):
                     .all()
                 )
 
-                recipients.update(Recipient(speaker.email, speaker.first_name, speaker.last_name)
-                                  for speaker in contrib_speakers)
-                recipients.update(Recipient(speaker.email, speaker.first_name, speaker.last_name)
-                                  for speaker in subcontrib_speakers)
+                recipients.update({speaker.email: Recipient(speaker.email, speaker.first_name, speaker.last_name)
+                                   for speaker in contrib_speakers})
+                recipients.update({speaker.email: Recipient(speaker.email, speaker.first_name, speaker.last_name)
+                                   for speaker in subcontrib_speakers})
 
-        return {r for r in recipients if r.email}  # just in case there was an empty email address somewhere
+        return {r for r in recipients.values() if r.email}  # just in case there was an empty email address somewhere
 
     @hybrid_property
     def is_start_time_relative(self):
