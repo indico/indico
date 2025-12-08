@@ -181,7 +181,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 class RHTimetableBreakCreate(RHManageEventBase):
     @use_rh_args(BreakSchema)
     def _process_POST(self, data: Break):
-        session_block_id = data.pop('session_block_id', None)
+        session_block_id = data.pop('session_block', {}).pop('id', None)
         session_block = SessionBlock.get(session_block_id) if session_block_id else None
         data['location_data'] = (
             self._get_inherited_location(location_parent=session_block)
