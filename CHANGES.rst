@@ -7,6 +7,12 @@ Version 3.3.9
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an open redirect which could help making harmful URLs look more trustworthy by linking
+  to Indico and having it redirect the user to a malicious site
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
