@@ -12,7 +12,7 @@ import editableURL from 'indico-url:event_editing.editable';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, Loader, Step} from 'semantic-ui-react';
+import {Icon, Loader, Message, Step} from 'semantic-ui-react';
 
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import {
@@ -81,6 +81,15 @@ export default function Paper({eventId, contributionId}) {
 
   return (
     <>
+      {paper.event.cfp.enforceEvaluationRounds && (
+        <Message warning>
+          <Icon name="warning sign" />
+          <Translate>
+            The Peer Review has been limited to{' '}
+            <Param name="rounds" value={paper.event.cfp.evaluationRounds} /> rounds of evaluation.
+          </Translate>
+        </Message>
+      )}
       <TimelineHeader
         contribution={contribution}
         state={state}
