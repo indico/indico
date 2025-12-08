@@ -92,6 +92,7 @@ Accessibility
 - Improve infogrid accessibility (:pr:`7119`, thanks :user:`foxbunny`)
 - Improve dropdown accessibility in category list toolbar (:pr:`7069`,
   thanks :user:`foxbunny`)
+- Fix footer color contrast (:pr:`7095`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
