@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.9-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 13:57+0200\n"
+"POT-Creation-Date: 2025-12-08 14:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,7 +349,8 @@ msgstr ""
 #: indico/modules/events/surveys/templates/management/edit_survey.html
 #: indico/modules/events/templates/forms/event_creation_form.html
 #: indico/modules/events/templates/forms/session_block_form.html indico/modules/events/templates/reviews/forms.html
-#: indico/modules/events/timetable/templates/timetable_pdf_export.html indico/modules/oauth/templates/app_new.html
+#: indico/modules/events/timetable/templates/timetable_pdf_export.html
+#: indico/modules/logs/templates/resend_email_dialog.html indico/modules/oauth/templates/app_new.html
 #: indico/modules/oauth/templates/authorize.html indico/modules/users/templates/users_admin_create.html
 #: indico/modules/vc/templates/attach_room.html indico/modules/vc/templates/manage_event_create_room.html
 #: indico/web/templates/forms/form_common_fields_first.html indico/web/util.py
@@ -1497,8 +1498,8 @@ msgstr ""
 
 #: indico/modules/auth/controllers.py
 msgid ""
-"You have sucessfully registered your Indico profile. Check <a href=\"{url}\">your profile</a> for further details and"
-" settings."
+"You have successfully registered your Indico profile. Check <a href=\"{url}\">your profile</a> for further details "
+"and settings."
 msgstr ""
 
 #: indico/modules/auth/controllers.py
@@ -2084,7 +2085,8 @@ msgstr ""
 msgid "Roles"
 msgstr ""
 
-#: indico/modules/categories/__init__.py indico/modules/logs/__init__.py indico/modules/logs/templates/logs.html
+#: indico/modules/categories/__init__.py indico/modules/events/registration/templates/management/_registration_details.html
+#: indico/modules/logs/__init__.py indico/modules/logs/templates/logs.html
 msgid "Logs"
 msgstr ""
 
@@ -2699,7 +2701,6 @@ msgstr ""
 #: indico/modules/categories/templates/display/base.html indico/modules/categories/templates/management/_events_list.html
 #: indico/modules/categories/templates/management/content.html indico/modules/events/__init__.py
 #: indico/modules/events/templates/forms/event_creation_form.html
-#: indico/modules/events/templates/management/_create_event_button.html
 msgid "Create event"
 msgstr ""
 
@@ -2716,6 +2717,7 @@ msgid "Parent category"
 msgstr ""
 
 #: indico/modules/categories/templates/display/base.html
+#: indico/modules/events/registration/templates/management/_registration_details.html
 msgid "View"
 msgstr ""
 
@@ -4990,7 +4992,7 @@ msgid "Send to co-authors"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py indico/modules/events/agreements/forms.py
-#: indico/modules/events/registration/forms.py
+#: indico/modules/events/registration/forms.py indico/modules/logs/templates/resend_email_dialog.html
 msgid "CC"
 msgstr ""
 
@@ -5000,7 +5002,8 @@ msgstr ""
 
 #: indico/modules/events/abstracts/forms.py indico/modules/events/registration/forms.py
 #: indico/modules/events/registration/templates/management/email_preview.html indico/modules/events/reminders/forms.py
-#: indico/modules/events/reminders/templates/preview.html indico/modules/logs/templates/entry_email.html
+#: indico/modules/events/reminders/templates/preview.html indico/modules/logs/forms.py
+#: indico/modules/logs/templates/entry_email.html
 msgid "Subject"
 msgstr ""
 
@@ -5168,7 +5171,15 @@ msgid "Submitted type"
 msgstr ""
 
 #: indico/modules/events/abstracts/lists.py
+msgid "Number of reviews"
+msgstr ""
+
+#: indico/modules/events/abstracts/lists.py
 msgid "Score"
+msgstr ""
+
+#: indico/modules/events/abstracts/lists.py
+msgid "Score standard deviation"
 msgstr ""
 
 #: indico/modules/events/abstracts/lists.py
@@ -8117,10 +8128,6 @@ msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/timeline.py
 msgid "You cannot perform this action on this revision"
-msgstr ""
-
-#: indico/modules/events/editing/controllers/backend/timeline.py
-msgid "Editable already exists"
 msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/timeline.py
@@ -11811,6 +11818,7 @@ msgid "Beware, addresses in this field will receive one mail per registrant."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py indico/modules/events/reminders/templates/edit_reminder.html
+#: indico/modules/logs/templates/resend_email_dialog.html
 msgid "Recipients"
 msgstr ""
 
@@ -12076,6 +12084,12 @@ msgstr ""
 msgid "Whether users should be notified about the published receipt"
 msgstr ""
 
+#: indico/modules/events/registration/forms.py
+msgid ""
+"You can enter an announcement text that is displayed when there are multiple registration forms for the user to "
+"choose from."
+msgstr ""
+
 #: indico/modules/events/registration/lists.py
 msgid "Registration Date"
 msgstr ""
@@ -12206,6 +12220,10 @@ msgid "You declined the invitation to register."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
+msgid "There is already a field in this section with the same title."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
 msgid "Retention period cannot be longer than that of the registration form"
 msgstr ""
 
@@ -12293,6 +12311,10 @@ msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
 msgid "Registrations for {} have been scheduled"
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/regforms.py
+msgid "The announcement text has been saved"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
@@ -12483,6 +12505,14 @@ msgid "Arrival date can't be set after the departure date."
 msgstr ""
 
 #: indico/modules/events/registration/fields/choices.py
+msgid "Arrival date is not within the required range."
+msgstr ""
+
+#: indico/modules/events/registration/fields/choices.py
+msgid "Departure date is not within the required range."
+msgstr ""
+
+#: indico/modules/events/registration/fields/choices.py
 msgid "Not enough rooms in '{0}'"
 msgstr ""
 
@@ -12492,6 +12522,18 @@ msgstr ""
 
 #: indico/modules/events/registration/fields/sessions.py
 msgid "Please select at least {min} sessions."
+msgstr ""
+
+#: indico/modules/events/registration/fields/simple.py
+msgid "Maximum date must be greater than the minimum date."
+msgstr ""
+
+#: indico/modules/events/registration/fields/simple.py
+msgid "Date cannot be before {}"
+msgstr ""
+
+#: indico/modules/events/registration/fields/simple.py
+msgid "Date cannot be after {}"
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
@@ -13621,6 +13663,10 @@ msgstr ""
 msgid "Set the modification deadline"
 msgstr ""
 
+#: indico/modules/events/registration/templates/management/_registration_details.html
+msgid "View all logs related to this registration."
+msgstr ""
+
 #: indico/modules/events/registration/templates/management/_reglist.html
 #, python-format
 msgid "Filtering is enabled. Displaying %(filtered_registrations)s out of %(total_registrations)s registrants."
@@ -13972,6 +14018,18 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Create tags to mark and filter registrations"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html
+msgid "Announcement for multiple registration forms"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html
+msgid "Display a text on top of the registration form list"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html
+msgid "Edit announcement for multiple registration forms"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_list.html
@@ -16061,6 +16119,10 @@ msgid "Skip to main content"
 msgstr ""
 
 #: indico/modules/events/templates/display/conference.html
+msgid "Conference information"
+msgstr ""
+
+#: indico/modules/events/templates/display/conference.html
 msgid "Date/Time"
 msgstr ""
 
@@ -16070,6 +16132,11 @@ msgstr ""
 
 #: indico/modules/events/templates/display/conference.html
 msgid "Ends"
+msgstr ""
+
+#: indico/modules/events/templates/display/conference.html
+#, python-format
+msgid "All times are in %(display_tz)s"
 msgstr ""
 
 #: indico/modules/events/templates/display/conference.html
@@ -17208,6 +17275,14 @@ msgstr ""
 msgid "The email has been re-sent."
 msgstr ""
 
+#: indico/modules/logs/forms.py
+msgid "Preface"
+msgstr ""
+
+#: indico/modules/logs/forms.py
+msgid "Explain why you are resending this email. The text will be placed before the original message."
+msgstr ""
+
 #: indico/modules/logs/models/entries.py indico/web/views.py
 msgid "Management"
 msgstr ""
@@ -17263,16 +17338,9 @@ msgctxt "status"
 msgid "Failed"
 msgstr ""
 
-#: indico/modules/logs/templates/entry_email.html
+#: indico/modules/logs/templates/entry_email.html indico/modules/logs/templates/resend_email_dialog.html
 msgid "Re-send email"
 msgstr ""
-
-#: indico/modules/logs/templates/entry_email.html
-#, python-format
-msgid "Do you really want to re-send this email to %(count)s recipient?"
-msgid_plural "Do you really want to re-send this email to %(count)s recipients?"
-msgstr[0] ""
-msgstr[1] ""
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "Re-sending emails with attachments is not supported."
@@ -17284,6 +17352,14 @@ msgstr ""
 
 #: indico/modules/logs/templates/entry_simple.html
 msgid "No data to display"
+msgstr ""
+
+#: indico/modules/logs/templates/resend_email_dialog.html
+msgid "BCC"
+msgstr ""
+
+#: indico/modules/logs/templates/resend_email_dialog.html
+msgid "Original message"
 msgstr ""
 
 #: indico/modules/networks/__init__.py indico/modules/networks/templates/networks.html
@@ -18427,6 +18503,10 @@ msgid "Invalid Mastodon server URL."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+msgid "The email address {email} has been added to the account."
+msgstr ""
+
+#: indico/modules/users/controllers.py
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within 24 hours to confirm your new email "
 "address."
@@ -18446,10 +18526,6 @@ msgstr ""
 
 #: indico/modules/users/controllers.py
 msgid "This email address is already in use by another account."
-msgstr ""
-
-#: indico/modules/users/controllers.py
-msgid "Merged data from existing '{}' identity"
 msgstr ""
 
 #: indico/modules/users/controllers.py
@@ -18648,6 +18724,10 @@ msgstr ""
 
 #: indico/modules/users/forms.py
 msgid "Add new email address"
+msgstr ""
+
+#: indico/modules/users/forms.py
+msgid "Skip email validation"
 msgstr ""
 
 #: indico/modules/users/forms.py
@@ -18983,6 +19063,14 @@ msgstr ""
 
 #: indico/modules/users/templates/emails.html
 msgid "Set as primary"
+msgstr ""
+
+#: indico/modules/users/templates/emails.html
+msgid ""
+"You are editing another user as an admin. When adding a secondary email address, a verification email will be sent to"
+" the new email address and the user needs to be logged in to use the confirmation link in this email. In case they "
+"can no longer log in, you need to use the \"Skip email validation\" checkbox below to immediately add the address. "
+"When doing so, make sure that the address is correct and belongs to the user."
 msgstr ""
 
 #: indico/modules/users/templates/registration_requests.html indico/modules/users/templates/users_admin.html

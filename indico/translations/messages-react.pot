@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-10-25 13:57+0200\n"
+"POT-Creation-Date: 2025-12-25 14:51+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -101,6 +101,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/management/client/js/EventMove.jsx
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx
@@ -142,6 +143,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewComment.jsx
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewTags.jsx
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx
 #: indico/modules/events/editing/client/js/management/ManageService.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
@@ -239,6 +241,8 @@ msgid "Select all"
 msgstr ""
 
 #: indico/modules/categories/client/js/components/CalendarLegend.jsx
+#: indico/web/client/js/react/components/DatePicker.jsx
+#: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Clear"
 msgstr ""
 
@@ -903,11 +907,24 @@ msgid "Request approval"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "Request changes"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
 msgid "Upload files"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewTags.jsx
+msgid "No tags"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewTags.jsx
+msgid "Save tags"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewTags.jsx
+msgid "Edit tags"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/StateIndicator.jsx
@@ -1309,6 +1326,34 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "Force assignments"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "Accept latest revision"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "Reject latest revision"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "All editables were skipped due to their status."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "You are about to apply a judgment to {numEditables} editable."
+msgid_plural "You are about to apply a judgment to {numEditables} editables."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "{numSkipped} editable will be skipped because of its current status."
+msgid_plural "{numSkipped} editables will be skipped because of their current status."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "Leave a comment for the authors..."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx
@@ -2464,6 +2509,30 @@ msgid "Total: {price}"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please enter the arrival date using the specified format"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please provide the arrival date"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please enter the departure date using the specified format"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please provide the departure date"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please make sure the arrival date is between {start} and {end}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Please make sure the departure date is between {start} and {end}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "You must select an option"
 msgstr ""
 
@@ -2633,6 +2702,14 @@ msgid "The provided date is invalid."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "The provided date cannot be earlier than {minDate}."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "The provided date cannot be later than {maxDate}."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
 msgid "12 hours"
 msgstr ""
 
@@ -2646,6 +2723,22 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
 msgid "Time format"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "Minimum date"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "Maximum date"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "Invalid minimum date (must be first of the month/year)"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgid "Invalid maximum date (must be last of the month/year)"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
@@ -3141,6 +3234,10 @@ msgstr ""
 msgid ""
 "Log entries are currently filtered by URL. {link}Click here{/link} to "
 "disable the filter."
+msgstr ""
+
+#: indico/modules/logs/client/js/components/EventLog.jsx
+msgid "New log entries are available. {link}Click here{/link} to refresh."
 msgstr ""
 
 #: indico/modules/logs/client/js/components/Filter.jsx
