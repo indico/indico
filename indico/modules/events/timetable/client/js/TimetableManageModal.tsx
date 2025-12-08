@@ -117,16 +117,18 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     minStartDt: useSelector(selectors.getEventStartDt),
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
-  let initialDuration = entry.duration * 60;
+  let initialStartDt = entry.startDt.format();
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
     extraOptions.maxEndDt = moment(parent.startDt).add(parent.duration, 'minutes');
 
-    initialDuration = Math.min(
-      initialDuration,
-      moment(extraOptions.maxEndDt).diff(moment(entry.startDt), 'seconds')
-    );
+    initialStartDt = moment
+      .min(
+        moment(initialStartDt),
+        moment(extraOptions.maxEndDt).subtract(entry.duration, 'minutes')
+      )
+      .format();
   }
 
   const initialValues: DraftEntry = {
@@ -139,8 +141,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     location_data: snakifyKeys(entry.locationData) || {inheriting: false},
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
-    start_dt: entry.startDt.format(),
-    duration: initialDuration, // Minutes to seconds
+    start_dt: initialStartDt,
+    duration: entry.duration * 60, // Minutes to seconds
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
     code: entry.code,
