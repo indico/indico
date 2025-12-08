@@ -9,9 +9,10 @@ from flask import request, session
 from webargs import fields, validate
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.papers.controllers.base import RHPaperBase, RHSubmitRevisionBase
+from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.controllers.display import RHSubmitPaperBase
 from indico.modules.events.papers.fields import PaperFilesField
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
                                                          PaperReviewType, PaperTypeProxy)
@@ -103,7 +104,24 @@ class RHJudgePaper(RHPaperBase):
         return '', 204
 
 
+class RHSubmitRevisionBase(RHPaperBase):
+    ALLOW_LOCKED = True
+
+    def _check_paper_protection(self):
+        if not RHPaperBase._check_paper_protection(self):
+            return False
+        if not self.contribution.can_submit_proceedings(session.user) and not self.event.cfp.is_manager(session.user):
+            return False
+        return self.contribution.paper.state == PaperRevisionState.to_be_corrected
+
+
 class RHSubmitRevisionSingle(RHSubmitRevisionBase):
+    def _check_paper_protection(self):
+        if not RHSubmitRevisionBase._check_paper_protection(self):
+            return False
+
+        return not bool(PaperFileType.query.with_parent(self.event).first())
+
     @use_rh_kwargs({
         'files': FilesField(required=True),
     }, rh_context=('event', 'contrib'))
@@ -113,6 +131,12 @@ class RHSubmitRevisionSingle(RHSubmitRevisionBase):
 
 
 class RHSubmitRevision(RHSubmitRevisionBase):
+    def _check_paper_protection(self):
+        if not RHSubmitRevisionBase._check_paper_protection(self):
+            return False
+
+        return bool(PaperFileType.query.with_parent(self.event).first())
+
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
     }, rh_context=('event', 'contrib'))
@@ -122,6 +146,12 @@ class RHSubmitRevision(RHSubmitRevisionBase):
 
 
 class RHSubmitPaperSingle(RHSubmitPaperBase):
+    def _check_paper_protection(self):
+        if not RHSubmitPaperBase._check_paper_protection(self):
+            return False
+
+        return not bool(PaperFileType.query.with_parent(self.event).first())
+
     @use_rh_kwargs({
         'files': FilesField(required=True),
     }, rh_context=('event', 'contrib'))
@@ -132,6 +162,12 @@ class RHSubmitPaperSingle(RHSubmitPaperBase):
 
 
 class RHSubmitPaper(RHSubmitPaperBase):
+    def _check_paper_protection(self):
+        if not RHSubmitPaperBase._check_paper_protection(self):
+            return False
+
+        return bool(PaperFileType.query.with_parent(self.event).first())
+
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
     }, rh_context=('event', 'contrib'))

@@ -11,7 +11,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers.base import ManageEventMixin
-from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.util import check_event_locked
 
 
@@ -86,14 +85,3 @@ class RHPaperBase(RHPapersBase):
         privileges than the generic "can access".
         """
         return self.contribution.can_access(session.user)
-
-
-class RHSubmitRevisionBase(RHPaperBase):
-    ALLOW_LOCKED = True
-
-    def _check_paper_protection(self):
-        if not RHPaperBase._check_paper_protection(self):
-            return False
-        if not self.contribution.can_submit_proceedings(session.user) and not self.event.cfp.is_manager(session.user):
-            return False
-        return self.contribution.paper.state == PaperRevisionState.to_be_corrected

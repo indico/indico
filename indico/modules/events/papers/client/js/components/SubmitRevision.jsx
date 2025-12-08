@@ -7,9 +7,9 @@
 
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Button} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {PaperState} from '../models';
@@ -42,9 +42,9 @@ export default function SubmitRevision() {
         </div>
         <div className="i-box-content">
           <RevisionSubmissionForm eventId={eventId} contributionId={contributionId}>
-            <Button
+            <FinalSubmitButton
               type="submit"
-              content={Translate.string('Submit new revision')}
+              label={Translate.string('Submit new revision')}
               style={{marginTop: 10}}
               primary
             />
