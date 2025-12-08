@@ -672,9 +672,9 @@ def make_acl_log_fn(obj_type, log_realm=None):
 
 
 def _get_obj_name(obj):
-    if name := getattr(obj, 'title', None) or getattr(obj, 'name', None):
+    if name := (getattr(obj, 'title', None) or getattr(obj, 'name', None)):
         return name
-    if isinstance(obj, db.m.AttachmentFolder):  # default 'root' folder
+    if isinstance(obj, db.m.AttachmentFolder):  # default folder for top-level attachments
         return '/'
     return str(obj)
 
