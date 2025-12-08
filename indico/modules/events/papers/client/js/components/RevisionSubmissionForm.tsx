@@ -56,7 +56,7 @@ export default function RevisionSubmissionForm({
 
     try {
       await indicoAxios.post(urlFunc({event_id: eventId, contrib_id: contributionId}), payload);
-      Promise.resolve().then(() => {
+      _.defer(() => {
         dispatch(fetchPaperDetails(eventId, contributionId) as unknown as AnyAction);
       });
     } catch (e) {
@@ -71,7 +71,7 @@ export default function RevisionSubmissionForm({
     ? _fileTypes
     : [
         {
-          name: Translate.string('Revision files'),
+          name: '', // Needs to be added empty as it is required
           extensions: [],
           allowMultipleFiles: true,
           filenameTemplate: null,
