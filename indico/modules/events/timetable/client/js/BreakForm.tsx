@@ -9,6 +9,7 @@ import locationParentURL from 'indico-url:contributions.api_contribs_location_pa
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakEditURL from 'indico-url:timetable.tt_break_rest';
 
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
@@ -62,18 +63,24 @@ export function BreakFormFields({
       {initialValues.start_dt ? (
         <>
           <Field name="duration" subscription={{value: true}}>
-            {() => (
+            {({input: {value: duration}}) => (
               <FinalDateTimePicker
                 name="start_dt"
-                label={Translate.string('Start time')}
-                required
+                label={Translate.string('Start date')}
                 minStartDt={minStartDt}
-                maxEndDt={maxEndDt}
+                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
+                required
               />
             )}
           </Field>
           <Field name="start_dt" subscription={{value: true}}>
-            {() => <FinalDuration name="duration" label={Translate.string('Duration')} />}
+            {({input: {value: startDt}}) => (
+              <FinalDuration
+                name="duration"
+                label={Translate.string('Duration')}
+                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
+              />
+            )}
           </Field>
         </>
       ) : (

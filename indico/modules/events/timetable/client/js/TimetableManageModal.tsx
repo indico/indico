@@ -113,6 +113,21 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     hasPredefinedAffiliations: true,
     nameFormat: 'first_last',
   };
+  const extraOptions = {
+    minStartDt: useSelector(selectors.getEventStartDt),
+    maxEndDt: useSelector(selectors.getEventEndDt),
+  };
+  let initialDuration = entry.duration * 60;
+
+  if (parent) {
+    extraOptions.minStartDt = moment(parent.startDt);
+    extraOptions.maxEndDt = moment(parent.startDt).add(parent.duration, 'minutes');
+
+    initialDuration = Math.min(
+      initialDuration,
+      moment(extraOptions.maxEndDt).diff(moment(entry.startDt), 'seconds')
+    );
+  }
 
   const initialValues: DraftEntry = {
     title: entry.title,
@@ -125,7 +140,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
     start_dt: entry.startDt.format(),
-    duration: entry.duration * 60, // Minutes to seconds
+    duration: initialDuration, // Minutes to seconds
     session_id: entry.sessionId,
     board_number: entry.boardNumber,
     code: entry.code,
@@ -148,11 +163,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const sessionValues: Session[] = Object.values(sessions);
 
-  const extraOptions = {
-    minStartDt: useSelector(selectors.getEventStartDt),
-    maxEndDt: useSelector(selectors.getEventEndDt),
-  };
-
   const forms: {[key in EntryType]: React.ReactElement} = {
     [EntryType.Contribution]: (
       <ContributionFormFields
@@ -161,6 +171,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         personLinkFieldParams={personLinkFieldParams}
         extraOptions={extraOptions}
         locationParent={snakifyKeys(entry.locationParent)}
+        sessionBlock={parent}
       />
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
