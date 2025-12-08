@@ -145,7 +145,7 @@ class ReminderForm(IndicoForm):
         if self._reminder_type == ReminderType.custom and self.recipients.data:
             if RecipientFirstNamePlaceholder.is_in(field.data) or RecipientLastNamePlaceholder.is_in(field.data):
                 raise ValidationError(_('Recipient-specific placeholders are not valid '
-                                        'when email addresses entered manually.'))
+                                        'when email addresses are entered manually.'))
 
     def validate_subject(self, field):
         self._validate_recipient_placeholders(field)

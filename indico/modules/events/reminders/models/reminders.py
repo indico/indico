@@ -274,7 +274,7 @@ class EventReminder(RenderModeMixin, db.Model):
         This includes both explicit recipients and, if enabled,
         participants/speakers of the event.
         """
-        recipients = {Recipient(email) for email in self.recipients}
+        recipients = {Recipient(email) for email in set(self.recipients)}
         if self.send_to_participants:
             regs_query = (self.event.registrations
                           .join(Registration.registration_form)
