@@ -365,10 +365,9 @@ class PhoneField(RegistrationFormFieldBase):
         def _validate_international_phone(value):
             if not value or not self.form_item.data.get('require_international_format'):
                 return
-            cleaned_value = value.replace(' ', '').replace('(', '').replace(')', '').replace('-', '')
             # Check if the phone number starts with + followed by country code (1-9) and then 1-14 more digits
             international_phone_pattern = re.compile(r'^\+[1-9]\d{1,14}$')
-            if not international_phone_pattern.match(cleaned_value):
+            if not international_phone_pattern.match(re.sub(r'[\s()\-]', '', value)):  # Remove spaces and ()
                 raise ValidationError(_('Please enter a valid phone number with international prefix '
                                         '(e.g., +41 22 123 4567)'))
         return _validate_international_phone
