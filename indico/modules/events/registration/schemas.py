@@ -50,7 +50,7 @@ class InvitationUserSchema(mm.Schema):
 
 class NewInvitationSchema(InvitationSchemaBase):
     user = fields.Nested(InvitationUserSchema, load_default=None)
-    users = PrincipalList(load_default=[])
+    users = PrincipalList(load_default=lambda: [])
 
     @pre_load
     def _wrap_user(self, data, **kwargs):
