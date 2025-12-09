@@ -95,21 +95,22 @@ def _log_email(email, event, module, user, meta=None, summary=None):
         base_path = f'emails/{event.id}'
 
         for att in attachments:
-            if isinstance(att, MIMEBase):
-                filename = att.get_filename('unnamed')
-                content = att.get_payload(decode=True)
-                ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
-                         or 'application/octet-stream')
-            else:
-                # tuple: (filename, content[, mimetype])
-                filename = att[0]
-                content = att[1]
-                if isinstance(content, str):
-                    content = content.encode('utf-8')
-                if len(att) > 2 and att[2]:
-                    ctype = att[2]
-                else:
-                    ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
+            match att:
+                case MIMEBase():
+                    filename = att.get_filename('unnamed')
+                    content = att.get_payload(decode=True)
+                    ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
+                             or 'application/octet-stream')
+                case (filename, content, *rest):
+                    if isinstance(content, str):
+                        content = content.encode('utf-8')
+                    if rest and rest[0]:
+                        ctype = rest[0]
+                    else:
+                        ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
+                case _:
+                    logger.error('Unexpected email attachment: %s', att)
+
             safe_name = secure_filename(filename or 'attachment', 'file')
             unique = hashlib.sha256(content).hexdigest()
             name = f'{base_path}/{unique}-{safe_name}'
