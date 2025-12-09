@@ -26,7 +26,7 @@ def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresse
     user = session.user if session else None
     bcc = set(bcc_addresses or [])
     if copy_for_sender and user:
-        bcc.add(session.user.email)
+        bcc.add(user.email)
     email = make_email(invitation.email, sender_address=sender_address, template=template, html=True,
                        bcc_list=bcc)
     send_email(email, invitation.registration_form.event, 'Registration', user)
