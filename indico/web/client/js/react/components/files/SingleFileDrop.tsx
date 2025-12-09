@@ -110,6 +110,7 @@ function SingleFileDrop<Value = unknown>({
   onFocus,
   onBlur,
   disabled = false,
+  required = false,
   dropzoneOptions = {},
   setValidationError,
   onDropAccepted,
@@ -119,6 +120,7 @@ function SingleFileDrop<Value = unknown>({
   onFocus: () => void;
   onBlur: () => void;
   disabled?: boolean;
+  required?: boolean;
   dropzoneOptions?: Partial<DropzoneOptions>;
   setValidationError?: (message?: string) => void;
   onDropAccepted: DropAcceptedHandler<Value>;
@@ -206,7 +208,8 @@ function SingleFileDrop<Value = unknown>({
     ...restDropzoneOptions,
   });
 
-  const fileAction = !disabled && dropState.file ? {onClick: reset, icon: 'undo'} : null;
+  const fileAction =
+    !disabled && dropState.file && !required ? {onClick: reset, icon: 'undo'} : null;
 
   const file = buildFile(dropState);
 
