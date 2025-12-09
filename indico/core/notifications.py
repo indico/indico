@@ -120,7 +120,7 @@ def _log_email(email, event, module, user, meta=None, summary=None):
                 logger.exception('Could not store email attachment')
                 continue
             stored.append({
-                'backend': config.ATTACHMENT_STORAGE,
+                'backend': config.EMAIL_LOG_STORAGE,
                 'file_id': file_id,
             })
         if stored:
