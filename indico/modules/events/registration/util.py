@@ -87,7 +87,9 @@ def import_user_records_from_csv(fileobj, columns, delimiter=None):
     """
     with csv_text_io_wrapper(fileobj) as ftxt:
         content = ftxt.read().splitlines()
-    if not delimiter and content:
+    if not content:
+        return []
+    if not delimiter:
         delimiters = [d.delimiter for d in CSVFieldDelimiter]
         try:
             delimiter = csv.Sniffer().sniff(content[0], delimiters=delimiters).delimiter
