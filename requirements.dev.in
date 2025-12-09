@@ -6,7 +6,6 @@ freezegun
 hatchling
 hatch-requirements-txt
 isort
-migra
 plantweb
 pygments
 pytest-cov
@@ -16,6 +15,7 @@ pytest-redis
 pytest-snapshot
 pytest
 responses
+results
 ruff
 sphinx-autobuild
 sphinx-issues
