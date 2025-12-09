@@ -54,6 +54,7 @@ class NewInvitationSchema(InvitationSchemaBase):
 
     @pre_load
     def _wrap_user(self, data, **kwargs):
+        data = data.copy()
         user_fields = {k: data.pop(k, None) for k in ('first_name', 'last_name', 'affiliation', 'email')}
         if any(value is not None for value in user_fields.values()):
             data['user'] = user_fields
