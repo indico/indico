@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from uuid import uuid4
-
 from flask import jsonify, request, session
 from marshmallow import fields
 from sqlalchemy.orm import joinedload
@@ -19,7 +17,8 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
+from indico.modules.events.registration.models.invitations import (InvitationState, MockRegistrationInvitation,
+                                                                   RegistrationInvitation)
 from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
                                                         NewInvitationSchema, RegistrationInvitationSchema)
 from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
@@ -221,7 +220,6 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
     })
     @no_autoflush
     def _process(self, subject, body, first_name, last_name, user):
-        self.commit = False
         if user:
             first_name = user.first_name
             last_name = user.last_name
@@ -230,14 +228,7 @@ class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
         elif not last_name:
             abort(422, messages={'last_name': ['Missing data']})
 
-        invitation = RegistrationInvitation(
-            registration_form=self.regform,
-            first_name=first_name,
-            last_name=last_name,
-            email='',
-            affiliation='',
-            uuid=str(uuid4())
-        )
+        invitation = MockRegistrationInvitation(self.regform, first_name, last_name)
         rendered_subject = replace_placeholders('registration-invitation-email', subject,
                                                 invitation=invitation)
         rendered_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
