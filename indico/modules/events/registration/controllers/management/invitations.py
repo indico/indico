@@ -190,7 +190,7 @@ class RHRegistrationFormImportInvites(RHManageRegFormBase):
 
 
 class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
-    """Upload CSV files that will later be used for invitation import."""
+    """Process a CSV file into invitation user records."""
 
     @use_kwargs({'file': fields.Field(required=True)}, location='files')
     def _process(self, file):
