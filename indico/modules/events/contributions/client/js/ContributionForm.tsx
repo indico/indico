@@ -15,6 +15,7 @@ import contributionURL from 'indico-url:contributions.api_manage_contrib';
 import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import _ from 'lodash';
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
@@ -33,7 +34,6 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
-import {toMoment} from 'indico/utils/date';
 
 interface CustomField {
   id: number;
@@ -64,7 +64,6 @@ interface ContributionFormFieldsProps {
   locationParent?: Record<string, any>;
   personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
-  sessionBlock?: Record<string, any>;
   customFields?: CustomField[];
   extraOptions?: Record<string, any>;
   [key: string]: any; // Allow additional props
@@ -75,7 +74,6 @@ export function ContributionFormFields({
   locationParent = {inheriting: false},
   personLinkFieldParams = {},
   initialValues = {},
-  sessionBlock = null,
   customFields = [],
   extraOptions = {},
 }: ContributionFormFieldsProps) {
@@ -131,6 +129,7 @@ export function ContributionFormFields({
   );
 
   const {minStartDt, maxEndDt} = extraOptions;
+
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
@@ -142,11 +141,8 @@ export function ContributionFormFields({
               <FinalDateTimePicker
                 name="start_dt"
                 label={Translate.string('Start date')}
-                minStartDt={minStartDt || (sessionBlock && toMoment(sessionBlock.startDt))}
-                maxEndDt={
-                  maxEndDt ||
-                  (sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second'))
-                }
+                minStartDt={minStartDt}
+                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
                 required
               />
             )}
@@ -156,9 +152,7 @@ export function ContributionFormFields({
               <FinalDuration
                 name="duration"
                 label={Translate.string('Duration')}
-                max={
-                  sessionBlock && toMoment(sessionBlock.endDt).diff(toMoment(startDt), 'seconds')
-                }
+                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
               />
             )}
           </Field>
