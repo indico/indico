@@ -55,6 +55,8 @@ Improvements
   thanks :user:`vtran99`)
 - Log attachment & menu entry ACL changes to user log (:pr:`7136`, thanks :user:`tomako`)
 - Add placeholders to custom event reminders (:pr:`7115`, thanks :user:`tomako`)
+- Add option to require international phone number format in registration form
+  (:pr:`7199`, thanks :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^
