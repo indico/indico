@@ -92,7 +92,7 @@ def import_user_records_from_csv(fileobj, columns, delimiter=None):
     if not delimiter:
         delimiters = [d.delimiter for d in CSVFieldDelimiter]
         try:
-            delimiter = csv.Sniffer().sniff(content[0], delimiters=delimiters).delimiter
+            delimiter = csv.Sniffer().sniff('\n'.join(content[:10]), delimiters=delimiters).delimiter
         except csv.Error:
             raise UserValueError(_('Not a valid CSV file.'))
     reader = csv.reader(content, delimiter=delimiter)

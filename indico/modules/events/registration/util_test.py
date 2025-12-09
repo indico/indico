@@ -117,7 +117,7 @@ def test_import_users_error(create_user):
                       b'Buggy,Entry,ACME Inc.,CEO,'])
 
     with pytest.raises(UserValueError) as e:
-        import_user_records_from_csv(BytesIO(csv), columns)
+        import_user_records_from_csv(BytesIO(csv), columns, delimiter=',')
     assert 'malformed' in str(e.value)
     assert 'Row 2' in str(e.value)
 
