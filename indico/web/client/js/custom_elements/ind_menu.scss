@@ -7,72 +7,24 @@
 
 @use 'design_system';
 @use 'partials/icons';
+@use 'partials/custom_elements/ind_menu';
 
 ind-menu {
-  --time-menu-animation: 0.2s;
-  --length-menu-travel: -0.4em;
+  @extend %menu-root;
 
-  position: relative;
-  display: inline-flex;
-
-  > menu {
-    @extend %popup-positioned-target;
-    min-width: var(--anchor-width, 100%);
-    width: max-content;
-    z-index: 1;
+  > :is(menu, ul) {
+    @extend %menu-list;
   }
 
-  > menu :is(li, a) {
-    width: 100%;
+  &:not(:has([aria-expanded='true'])) > :is(menu, ul) {
+    @extend %menu-collapsed;
   }
 
-  &:not([open]) > menu:not([data-position-check]) {
-    display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+  &:has([aria-expanded='true']) > :is(menu, ul) {
+    @extend %menu-expanded;
   }
 
-  > menu[data-position-check] {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  > button::after {
-    @extend %icon;
-    @extend %icon-arrow-down;
-    display: block; // XXX: Required for transform to work
-  }
-
-  > button[aria-expanded='true']::after {
-    transform: rotateX(-180deg);
-  }
-
-  &[open] > button[aria-expanded='true'] + menu {
-    animation: menu-slide-down var(--time-menu-animation);
-  }
-}
-
-@keyframes menu-slide-down {
-  from {
-    display: block;
-    opacity: 0;
-    transform: translateY(var(--length-menu-travel));
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes menu-slide-up {
-  from {
-    display: block;
-    opacity: 1;
-    transform: none;
-  }
-
-  to {
-    display: none;
-    opacity: 0;
-    transform: translateY(var(--length-menu-travel));
+  > button {
+    @extend %menu-button;
   }
 }

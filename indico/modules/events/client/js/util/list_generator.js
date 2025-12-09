@@ -8,7 +8,7 @@
 /* eslint-disable import/unambiguous */
 /* global setupSearchBox, handleRowSelection, setupTableSorter, handleAjaxError */
 
-(function(global) {
+(function() {
   function colorizeFilter(filter) {
     const dropdown = filter.find('.i-dropdown');
     filter.toggleClass('active highlight', dropdown.find(':checked').length > 0);
@@ -35,7 +35,7 @@
     });
   }
 
-  global.handleRowSelection = function(trigger) {
+  window.handleRowSelection = function(trigger) {
     const $obj = $('table.i-table input.select-row').on('change', function() {
       $(this).closest('tr').toggleClass('selected', this.checked);
       $('.js-requires-selected-row').toggleClass(
@@ -49,7 +49,7 @@
     }
   };
 
-  global.setupTableSorter = function() {
+  window.setupTableSorter = function() {
     $('.list .tablesorter').tablesorter({
       cssAsc: 'header-sort-asc',
       cssDesc: 'header-sort-desc',
@@ -61,7 +61,7 @@
     });
   };
 
-  global.setupListFilter = function() {
+  window.setupListFilter = function() {
     const visibleItems = $('#visible-items');
     const hasColumnSelector = !!$('#visible-items').length;
 
@@ -163,7 +163,7 @@
     });
   };
 
-  global.setupListGenerator = function(filterConfig) {
+  window.setupListGenerator = function(filterConfig) {
     let applySearchFilters;
     if (filterConfig) {
       applySearchFilters = setupSearchBox(filterConfig);
@@ -226,11 +226,11 @@
     return applySearchFilters;
   };
 
-  global.getSelectedRows = function() {
+  window.getSelectedRows = function() {
     return $('.list input:checkbox:checked')
       .map(function() {
         return $(this).val();
       })
       .get();
   };
-})(window);
+})();

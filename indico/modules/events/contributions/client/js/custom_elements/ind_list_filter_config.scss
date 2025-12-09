@@ -1,0 +1,162 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base' as *;
+@use 'partials/toolbars' as *;
+@use 'partials/labels' as *;
+@use 'partials/icons';
+@use 'partials/custom_elements/ind_menu';
+@use 'design_system';
+
+ind-list-filter-config {
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+  }
+}
+
+// Individual filter item styles
+ind-list-filter {
+  @extend %menu-root;
+
+  display: flex;
+  align-items: stretch;
+
+  width: 14.2em;
+
+  .title-wrapper {
+    @extend %button;
+
+    flex-grow: 1;
+
+    border-radius: var(--control-border-radius) 0 0 var(--control-border-radius);
+
+    text-align: left;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .title {
+    flex-grow: 1;
+  }
+
+  .ations {
+    display: contents;
+  }
+
+  .actions > button {
+    @extend %button-icon-only;
+
+    & > span {
+      @extend %visually-hidden;
+    }
+  }
+
+  .toggle-visibility {
+    appearance: none;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2em;
+  }
+
+  .toggle-visibility::before {
+    @extend %icon;
+  }
+
+  .toggle-visibility + span {
+    @extend %visually-hidden;
+  }
+
+  &[visible] .toggle-visibility::before {
+    @extend %icon-eye;
+  }
+
+  &:not([visible]) .toggle-visibility::before {
+    @extend %icon-eye-blocked;
+    // FIXME: Update the color when 7125 is merged
+    color: var(--active-color);
+  }
+
+  .filters {
+    @extend %menu-list;
+    @extend %menu;
+  }
+
+  .filters label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+  }
+
+  .filters label:hover {
+    background: var(--control-clickable-surface-focus-color);
+  }
+
+  .filters input[type='checkbox'] {
+    @extend %checkbox;
+    margin-right: 0.5em;
+  }
+
+  .filter-trigger {
+    @extend %button;
+    @extend %menu-button;
+
+    aspect-ratio: 1;
+
+    border-radius: 0 var(--control-border-radius) var(--control-border-radius) 0;
+
+    cursor: pointer;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-filter;
+    }
+  }
+
+  .filter-trigger span {
+    @extend %visually-hidden;
+  }
+
+  .filter-trigger:not([aria-expanded='true'])+ .filters {
+    @extend %menu-collapsed;
+  }
+
+  .filter-trigger[aria-expanded='true']+ .filters {
+    @extend %menu-expanded;
+  }
+
+  &[filter-only]:is(:hover, :focus-visible) :is(.filter-trigger, .title-wrapper) {
+    @extend %button-hover;
+  }
+
+  &[filter-only]:is(:active) :is(.filter-trigger, .title-wrapper) {
+    @extend %button-pressed-state;
+  }
+
+  &[active] .filter-trigger {
+    border-color: var(--control-alt-border-color);
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+  }
+
+  &[active]:is(:hover, :focus-visible) .filter-trigger {
+    background: var(--control-alt-clickable-surface-focus-color);
+    color: var(--control-alt-text-color);
+  }
+
+  &:not([visible]):not([filter-only]) .title-wrapper {
+    background: var(--control-shaded-surface-shading);
+  }
+
+  &:not([visible]):not([filter-only]):is(:hover, :has(.toggle-visibility:is(:hover, :focus-visible))) .title-wrapper {
+    background: var(--control-shaded-surface-focus-shading);
+  }
+}

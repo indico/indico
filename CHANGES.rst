@@ -94,6 +94,7 @@ Accessibility
 - Improve dropdown accessibility in category list toolbar (:pr:`7069`,
   thanks :user:`foxbunny`)
 - Fix footer color contrast (:pr:`7095`, thanks :user:`foxbunny`)
+- Improve contribution filter list accessibility (:pr:`7200`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -103,6 +104,9 @@ Internal Changes
 - Refactor conference page theme CSS to allow easier theming using CSS variables
   (:pr:`7110`, thanks :user:`foxbunny`)
 - Add clear button to optional date picker fields (:pr:`7151`, thanks :user:`foxbunny`)
+- Extract expandable element and popup-trigger bheaviors into a new behaviors
+  subdirectory so that behaviors themselves can be shared among custom elements
+  (:pr:`7200`, thanks :user:`foxbunny`)
 
 
 Version 3.3.8
