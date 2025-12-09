@@ -14,11 +14,12 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
-from indico.modules.events.reminders.models.reminders import EventReminder, ReminderType
+from indico.modules.events.reminders.models.reminders import EventReminder, Recipient, ReminderType
 from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
+from indico.util.placeholders import replace_placeholders
 from indico.util.string import PlainText, RichMarkup
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
@@ -155,6 +156,12 @@ class RHPreviewReminder(RHRemindersBase):
         else:
             message = RichMarkup(message)
         with self.event.force_event_locale():
+            if reminder_type == ReminderType.custom:
+                recipient = Recipient(session.user.email, session.user.first_name, session.user.last_name)
+                subject = replace_placeholders('event-reminder-email', subject,
+                                               recipient=recipient, event=self.event)
+                message = replace_placeholders('event-reminder-email', message,
+                                               recipient=recipient, event=self.event)
             html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, reminder_type, render_mode,
                                                                     include_summary, include_description,
                                                                     escape(subject), message)

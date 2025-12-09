@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from dataclasses import dataclass
+
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -26,8 +28,16 @@ from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoIntEnum
+from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
+
+
+@dataclass(frozen=True)
+class Recipient:
+    email: str
+    first_name: str = ''
+    last_name: str = ''
 
 
 class ReminderType(IndicoIntEnum):
@@ -264,7 +274,7 @@ class EventReminder(RenderModeMixin, db.Model):
         This includes both explicit recipients and, if enabled,
         participants/speakers of the event.
         """
-        recipients = set(self.recipients)
+        recipients = {email: Recipient(email) for email in set(self.recipients)}
         if self.send_to_participants:
             regs_query = (self.event.registrations
                           .join(Registration.registration_form)
@@ -285,10 +295,13 @@ class EventReminder(RenderModeMixin, db.Model):
                                   .filter(registrations_tags_table.c.registration_tag_id.in_(tag_ids)))
                 regs_query = regs_query.filter(Registration.id.in_(tags_query))
 
-            recipients.update(reg.email for reg in regs_query)
+            recipients.update({reg.email: Recipient(reg.email, reg.first_name, reg.last_name) for reg in regs_query})
 
         if self.send_to_speakers:
-            recipients.update(person_link.email for person_link in self.event.person_links)
+            recipients.update({
+                person_link.email: Recipient(person_link.email, person_link.first_name, person_link.last_name)
+                for person_link in self.event.person_links
+            })
 
             # contribution/sub-contribution speakers are present only in meetings and conferences
             if self.event.type != EventType.lecture:
@@ -315,11 +328,12 @@ class EventReminder(RenderModeMixin, db.Model):
                     .all()
                 )
 
-                recipients.update(speaker.email for speaker in contrib_speakers)
-                recipients.update(speaker.email for speaker in subcontrib_speakers)
+                recipients.update({speaker.email: Recipient(speaker.email, speaker.first_name, speaker.last_name)
+                                   for speaker in contrib_speakers})
+                recipients.update({speaker.email: Recipient(speaker.email, speaker.first_name, speaker.last_name)
+                                   for speaker in subcontrib_speakers})
 
-        recipients.discard('')  # just in case there was an empty email address somewhere
-        return recipients
+        return {r for r in recipients.values() if r.email}
 
     @hybrid_property
     def is_start_time_relative(self):
@@ -373,10 +387,6 @@ class EventReminder(RenderModeMixin, db.Model):
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
-        with self.event.force_event_locale():
-            html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type, self.render_mode,
-                                                                    self.include_summary, self.include_description,
-                                                                    self.subject, self.message)
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
@@ -384,10 +394,29 @@ class EventReminder(RenderModeMixin, db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         sender = self.event.get_verbose_email_sender(self.reply_to_address)
-        alternatives = [(text_email_tpl.get_body(), 'text/plain')] if html_email_tpl and text_email_tpl else None
+        html_email_tpl = text_email_tpl = None
         for recipient in recipients:
             with self.event.force_event_locale():
-                email = self._make_email(sender, recipient, html_email_tpl or text_email_tpl, attachments,
+                if self.reminder_type == ReminderType.custom:
+                    subject = replace_placeholders('event-reminder-email', self.subject,
+                                                   recipient=recipient, event=self.event)
+                    message = replace_placeholders('event-reminder-email', self.message,
+                                                   recipient=recipient, event=self.event)
+                else:
+                    subject = self.subject
+                    message = self.message
+                # Get the email template only if necessary
+                # * standard reminder: it's always the same so it is needed to get only once
+                # * custom reminder: it is needed only if the content is really customized (i.e. using placeholders)
+                if subject != self.subject or message != self.message or not (html_email_tpl or text_email_tpl):
+                    html_email_tpl, text_email_tpl = get_reminder_email_tpl(self.event, self.reminder_type,
+                                                                            self.render_mode,
+                                                                            self.include_summary,
+                                                                            self.include_description,
+                                                                            subject, message)
+                alternatives = ([(text_email_tpl.get_body(), 'text/plain')]
+                                if html_email_tpl and text_email_tpl else None)
+                email = self._make_email(sender, recipient.email, html_email_tpl or text_email_tpl, attachments,
                                          html=bool(html_email_tpl), alternatives=alternatives)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
