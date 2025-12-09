@@ -398,7 +398,7 @@ export function DayTimetable({
                         top: draftEntry.y,
                         height: minutesToPixels(draftEntry.duration),
                       }
-                    : {}),
+                    : {display: 'none'}),
                 }}
               >
                 {draftEntry
