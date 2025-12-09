@@ -27,9 +27,10 @@ export default function PhoneInput({
 
     // Check if the phone number starts with + followed by digits
     const internationalPhonePattern = /^\+[1-9]\d{1,14}$/;
-
     if (!internationalPhonePattern.test(value.replace(/[\s()-]/g, ''))) {
-      return 'Please enter a valid phone number with international prefix (e.g., +41 22 123 4567)';
+      return Translate.string(
+        'Please use the international phone number format (e.g. +41 1234567)'
+      );
     }
     return undefined;
   };
@@ -50,7 +51,7 @@ export function PhoneSettings() {
   return (
     <FinalCheckbox
       name="requireInternationalFormat"
-      label={Translate.string('Require international format (e.g., +41 22 123 4567)')}
+      label={Translate.string('Require international format (e.g. +41 1234567)')}
     />
   );
 }
