@@ -90,40 +90,41 @@ def _log_email(email, event, module, user, meta=None, summary=None):
     }
     # Optionally persist email attachments
     if config.EMAIL_LOG_STORAGE and (attachments := email['attachments']):
-        try:
-            storage = get_storage(config.EMAIL_LOG_STORAGE)
-            stored = []
-            base_path = f'emails/{event.id}'
+        storage = get_storage(config.EMAIL_LOG_STORAGE)
+        stored = []
+        base_path = f'emails/{event.id}'
 
-            for att in attachments:
-                if isinstance(att, MIMEBase):
-                    filename = att.get_filename('unnamed')
-                    content = att.get_payload(decode=True)
-                    ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
-                             or 'application/octet-stream')
+        for att in attachments:
+            if isinstance(att, MIMEBase):
+                filename = att.get_filename('unnamed')
+                content = att.get_payload(decode=True)
+                ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
+                         or 'application/octet-stream')
+            else:
+                # tuple: (filename, content[, mimetype])
+                filename = att[0]
+                content = att[1]
+                if isinstance(content, str):
+                    content = content.encode('utf-8')
+                if len(att) > 2 and att[2]:
+                    ctype = att[2]
                 else:
-                    # tuple: (filename, content[, mimetype])
-                    filename = att[0]
-                    content = att[1]
-                    if isinstance(content, str):
-                        content = content.encode('utf-8')
-                    if len(att) > 2 and att[2]:
-                        ctype = att[2]
-                    else:
-                        ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
-                safe_name = secure_filename(filename or 'attachment', 'file')
-                unique = hashlib.sha256(content).hexdigest()
-                name = f'{base_path}/{unique}-{safe_name}'
+                    ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
+            safe_name = secure_filename(filename or 'attachment', 'file')
+            unique = hashlib.sha256(content).hexdigest()
+            name = f'{base_path}/{unique}-{safe_name}'
+            try:
                 file_id, _checksum = storage.save(name, ctype, filename or safe_name, content)
-                stored.append({
-                    'backend': config.ATTACHMENT_STORAGE,
-                    'file_id': file_id,
-                })
-            if stored:
-                log_data['stored_attachments'] = stored
-        except StorageError:
-            # Do not fail email logging if storage is unavailable; simply skip storing
-            logger.exception('Failed to store email attachments')
+            except StorageError:
+                # Do not fail email logging if storage is unavailable; simply skip storing
+                logger.exception('Could not store email attachment')
+                continue
+            stored.append({
+                'backend': config.ATTACHMENT_STORAGE,
+                'file_id': file_id,
+            })
+        if stored:
+            log_data['stored_attachments'] = stored
     return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
