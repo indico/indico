@@ -219,7 +219,13 @@ export function EmailDialog({
       }}
       initialValuesEqual={_.isEqual}
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={async (...args) => {
+        const resp = await onSubmit(...args);
+        if (resp) {
+          setPreview(null);
+        }
+        return resp;
+      }}
       submitLabel={Translate.string('Send')}
       extraActions={({submitSucceeded}) => !submitSucceeded && extraActions}
       disabledUntilChange={false}
