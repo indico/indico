@@ -7,6 +7,8 @@
 
 @use 'base/palette' as *;
 
+$teal-shadow: rgba($dark-teal, 0.5);
+
 .wrapper {
   position: relative;
   display: flex;
@@ -71,22 +73,33 @@
   border: none;
   padding: 0;
   outline: none;
+  font-size: 1rem;
+}
 
-  &.draft {
-    pointer-events: none;
-    color: $white;
-    text-shadow: 0 0 5px rgba($dark-teal, 0.25);
-    // background: rgba($teal, 0.8);
-    background: rgba(red, 0.8);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba($white, 0.2);
-  }
+.draft {
+  @extend .entry;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  color: $white;
+  // Creates outline effect for better readability
+  text-shadow: -1px -1px 2px $teal-shadow, 1px -1px 2px $teal-shadow,
+    -1px 1px 2px $teal-shadow, 1px 1px 2px $teal-shadow;
+  background: rgba($teal, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba($white, 0.2);
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  line-height: 1rem;
+  transition: 0.05s;
 }
 
 .drag-handle {
   text-align: left;
-  font-size: 15px;
   width: 100%;
   flex-grow: 1;
   -webkit-user-select: none;

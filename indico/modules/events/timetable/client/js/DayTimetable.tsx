@@ -18,6 +18,7 @@ import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
+import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
   getGroup,
@@ -108,7 +109,6 @@ export function DayTimetable({
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const eventEndDt = useSelector(selectors.getEventEndDt);
   const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
@@ -236,6 +236,42 @@ export function DayTimetable({
     dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }
 
+  function calculateDraftChangeObj(clientY: number): {
+    startDt?: Moment;
+    duration?: number;
+    y?: number;
+  } | null {
+    const minDraftDuration = 10;
+    const rect = calendarRef.current.getBoundingClientRect();
+    const minutesDelta =
+      Math.round(pixelsToMinutes(clientY - rect.top - draggingStartPos) / GRID_SIZE_MINUTES) *
+      GRID_SIZE_MINUTES;
+
+    let duration = Math.max(Math.abs(minutesDelta), minDraftDuration);
+    let startDt = moment(dt)
+      .startOf('days')
+      .add(minHour, 'hours')
+      .add(pixelsToMinutes(draggingStartPos), 'minutes');
+
+    if (minutesDelta <= -minDraftDuration) {
+      // Dragging up
+      const y = Math.max(
+        minutesToPixels(
+          Math.round(pixelsToMinutes(clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
+        ),
+        limitTop
+      );
+      duration = Math.min(duration, pixelsToMinutes(draggingStartPos - limitTop));
+      startDt = moment(startDt).subtract(duration, 'minutes');
+
+      return {startDt, duration, y};
+    } else {
+      // Dragging down
+      duration = Math.min(duration, pixelsToMinutes(limitBottom - draggingStartPos));
+      return {startDt, duration, y: draggingStartPos};
+    }
+  }
+
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
       mouseEventRef.current = event;
@@ -282,47 +318,15 @@ export function DayTimetable({
     }
 
     function onMouseMove(event: MouseEvent) {
-      const minDurationMinutes = 10;
-
       if (!isDragging || !draftEntry) {
         return;
       }
 
-      const rect = calendarRef.current.getBoundingClientRect();
-      const minutesDelta =
-        Math.round(
-          pixelsToMinutes(event.clientY - rect.top - draggingStartPos) / GRID_SIZE_MINUTES
-        ) * GRID_SIZE_MINUTES;
+      const draftChangeObj = calculateDraftChangeObj(event.clientY);
 
-      if (Math.abs(minutesDelta) < minDurationMinutes) {
-        return;
+      if (draftChangeObj) {
+        dispatch(actions.setDraftEntry({...draftEntry, ...draftChangeObj}));
       }
-
-      let draftEntryChangeObj: {startDt?: Moment; duration?: number; y?: number} = {};
-
-      if (draggingStartPos + minutesDelta > draggingStartPos) {
-        const maxAllowedDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
-        const duration = Math.min(minutesDelta, maxAllowedDuration);
-        const startDt = moment(dt)
-          .startOf('days')
-          .add(minHour, 'hours')
-          .add(pixelsToMinutes(draggingStartPos), 'minutes');
-        draftEntryChangeObj = {startDt, duration, y: draggingStartPos};
-      } else {
-        const y = minutesToPixels(
-          Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
-            GRID_SIZE_MINUTES
-        );
-        // TODO: (Ajob) Add duration limit
-        const duration = Math.abs(minutesDelta);
-        const startDt = moment(dt)
-          .startOf('days')
-          .add(minHour, 'hours')
-          .add(pixelsToMinutes(draggingStartPos) - duration, 'minutes');
-        draftEntryChangeObj = {startDt, duration, y};
-      }
-
-      dispatch(actions.setDraftEntry({...draftEntry, ...draftEntryChangeObj}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
@@ -386,15 +390,25 @@ export function DayTimetable({
             <div ref={calendarRef} style={{background: limitsGradient}}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
-              {draftEntry && (
-                <DraggableEntry
-                  id="draft"
-                  width="100%"
-                  title="New entry"
-                  maxColumn={0}
-                  {...draftEntry}
-                />
-              )}
+              <div
+                styleName="draft"
+                style={{
+                  ...(draftEntry
+                    ? {
+                        top: draftEntry.y,
+                        height: minutesToPixels(draftEntry.duration),
+                      }
+                    : {}),
+                }}
+              >
+                {draftEntry
+                  ? formatTimeRange(
+                      'en',
+                      draftEntry.startDt,
+                      moment(draftEntry.startDt).add(draftEntry.duration, 'minutes')
+                    )
+                  : null}
+              </div>
               {!isDragging && draftEntry && (
                 <TimetableManageModal
                   eventId={eventId}
