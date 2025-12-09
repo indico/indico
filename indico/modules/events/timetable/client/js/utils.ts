@@ -150,7 +150,6 @@ export const mapTTDataToEntry = (
     keywords,
     sessionId,
     sessionTitle,
-    sessionBlockId,
   } = data;
 
   const mappedObj = {
@@ -174,13 +173,9 @@ export const mapTTDataToEntry = (
     maxColumn: 0,
     children: [],
     sessionId: sessionId || null,
-    sessionBlockId: sessionBlockId || null,
     sessionTitle: sessionTitle || '',
     colors: mapTTEntryColor(data, sessions),
     ...(sessionId && {sessionId}),
-    ...(sessionBlockId && {
-      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
-    }),
     ...(parent && {
       parent: {
         id: parent.id,
@@ -188,6 +183,7 @@ export const mapTTDataToEntry = (
         colors: parent.colors,
         title: parent.title,
       },
+      sessionBlockId: parent.id,
     }),
   };
 
