@@ -20,7 +20,7 @@ import {
 import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 function RecipientsField({recipients}) {
   return (
@@ -106,8 +106,14 @@ export function EmailDialog({
       return;
     }
     const payload = {body, subject, ...previewContext, ...(contextOverride || {})};
-    const {data} = await indicoAxios.post(previewURL, payload);
-    setPreview(data);
+    let resp;
+    try {
+      resp = await indicoAxios.post(previewURL, payload);
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setPreview(resp.data);
   };
 
   const extraActions = (
