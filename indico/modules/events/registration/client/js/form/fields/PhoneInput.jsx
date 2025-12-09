@@ -21,7 +21,9 @@ export default function PhoneInput({
   requireInternationalFormat,
 }) {
   const validateInternationalPhone = value => {
-    if (!value || !requireInternationalFormat) return undefined;
+    if (!value || !requireInternationalFormat) {
+      return undefined;
+    }
 
     // Check if the phone number starts with + followed by digits
     const internationalPhonePattern = /^\+[1-9]\d{1,14}$/;

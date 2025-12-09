@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
 from calendar import monthrange
 from datetime import date, datetime
 from decimal import Decimal
@@ -357,8 +358,20 @@ class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     mm_field_class = fields.String
     setup_schema_fields = {
-        'require_international_format': fields.Bool(),
+        'require_international_format': fields.Bool(load_default=False),
     }
+
+    def get_validators(self, existing_registration):
+        def _validate_international_phone(value):
+            if not value or not self.form_item.data.get('require_international_format'):
+                return
+            cleaned_value = value.replace(' ', '').replace('(', '').replace(')', '').replace('-', '')
+            # Check if the phone number starts with + followed by country code (1-9) and then 1-14 more digits
+            international_phone_pattern = re.compile(r'^\+[1-9]\d{1,14}$')
+            if not international_phone_pattern.match(cleaned_value):
+                raise ValidationError(_('Please enter a valid phone number with international prefix '
+                                        '(e.g., +41 22 123 4567)'))
+        return _validate_international_phone
 
 
 class CountryField(RegistrationFormFieldBase):
