@@ -5,19 +5,23 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import mimetypes
 import re
 import time
 from email.mime.base import MIMEBase
 from functools import wraps
 from types import GeneratorType
+from uuid import uuid4
 
 from flask import g
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.storage.backend import StorageError, get_storage
+from indico.util.fs import secure_filename
 from indico.util.signals import make_interceptable
-from indico.util.string import truncate
+from indico.util.string import crc32, truncate
 
 
 logger = Logger.get('emails')
@@ -84,6 +88,50 @@ def _log_email(email, event, module, user, meta=None, summary=None):
             for a in email['attachments']
         ),
     }
+    # Optionally persist email attachments
+    if config.EMAIL_LOG_STORAGE and (attachments := email['attachments']):
+        stored_attachments = g.setdefault('stored_email_attachments', {})
+        unique_id = g.setdefault('stored_email_attachments_uuid', uuid4().hex)
+        storage = get_storage(config.EMAIL_LOG_STORAGE)
+        stored = []
+        base_path = f'emails/{event.id}'
+
+        for att in attachments:
+            match att:
+                case MIMEBase():
+                    filename = att.get_filename('unnamed')
+                    content = att.get_payload(decode=True)
+                    ctype = (att.get_content_type() or mimetypes.guess_type(filename or '')[0]
+                             or 'application/octet-stream')
+                case (filename, content, *rest):
+                    if isinstance(content, str):
+                        content = content.encode('utf-8')
+                    if rest and rest[0]:
+                        ctype = rest[0]
+                    else:
+                        ctype = mimetypes.guess_type(filename or '')[0] or 'application/octet-stream'
+                case _:
+                    logger.error('Unexpected email attachment: %s', att)
+
+            safe_name = secure_filename(filename or 'attachment', 'file')
+            contenthash = crc32(content)
+            name = f'{base_path}/{contenthash}-{unique_id}-{safe_name}'
+            if not (file_id := stored_attachments.get(name)):
+                try:
+                    file_id, _checksum = storage.save(name, ctype, filename or safe_name, content)
+                except StorageError:
+                    # Do not fail email logging if storage is unavailable; simply skip storing
+                    logger.exception('Could not store email attachment')
+                    continue
+                stored_attachments[name] = file_id
+            stored.append({
+                'storage_backend': config.EMAIL_LOG_STORAGE,
+                'storage_file_id': file_id,
+                'filename': filename,
+                'content_type': ctype,
+            })
+        if stored:
+            log_data['stored_attachments'] = stored
     return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
