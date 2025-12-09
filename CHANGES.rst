@@ -54,7 +54,7 @@ Improvements
 - Add a button to view related logs to the management view of a registration (:pr:`7186`,
   thanks :user:`vtran99`)
 - Log attachment & menu entry ACL changes to user log (:pr:`7136`, thanks :user:`tomako`)
-- Add placeholders to event reminders (:pr:`7115`, thanks :user:`tomako`)
+- Add placeholders to custom event reminders (:pr:`7115`, thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^

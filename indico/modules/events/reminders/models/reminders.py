@@ -333,7 +333,7 @@ class EventReminder(RenderModeMixin, db.Model):
                 recipients.update({speaker.email: Recipient(speaker.email, speaker.first_name, speaker.last_name)
                                    for speaker in subcontrib_speakers})
 
-        return {r for r in recipients.values() if r.email}  # just in case there was an empty email address somewhere
+        return {r for r in recipients.values() if r.email}
 
     @hybrid_property
     def is_start_time_relative(self):
