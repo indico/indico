@@ -125,8 +125,10 @@ def _log_email(email, event, module, user, meta=None, summary=None):
                     continue
                 stored_attachments[name] = file_id
             stored.append({
-                'backend': config.EMAIL_LOG_STORAGE,
-                'file_id': file_id,
+                'storage_backend': config.EMAIL_LOG_STORAGE,
+                'storage_file_id': file_id,
+                'filename': filename,
+                'content_type': ctype,
             })
         if stored:
             log_data['stored_attachments'] = stored
