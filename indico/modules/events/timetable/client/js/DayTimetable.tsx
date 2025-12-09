@@ -116,7 +116,9 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
-  const [isDragging, setIsDragging] = useState(false);
+
+  const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
+  const isDragging = draggingStartPos !== null;
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -267,7 +269,7 @@ export function DayTimetable({
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
 
-      setIsDragging(true);
+      setDraggingStartPos(y);
       dispatch(
         actions.setDraftEntry({
           startDt: moment.max(startDt, dt),
@@ -285,30 +287,53 @@ export function DayTimetable({
       if (!isDragging || !draftEntry) {
         return;
       }
-      const rect = calendarRef.current.getBoundingClientRect();
-      const currentDragDuration = Math.max(
-        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
-          GRID_SIZE_MINUTES,
-        minDurationMinutes
-      );
-      const maxAllowedDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
-      const draftDuration = Math.min(currentDragDuration, maxAllowedDuration);
 
-      if (draftEntry.duration !== draftDuration) {
-        dispatch(actions.setDraftEntry({...draftEntry, duration: draftDuration}));
+      const rect = calendarRef.current.getBoundingClientRect();
+      const minutesDelta =
+        Math.round(
+          pixelsToMinutes(event.clientY - rect.top - draggingStartPos) / GRID_SIZE_MINUTES
+        ) * GRID_SIZE_MINUTES;
+
+      if (Math.abs(minutesDelta) < minDurationMinutes) {
+        return;
       }
+
+      let draftEntryChangeObj: {startDt?: Moment; duration?: number; y?: number} = {};
+
+      if (draggingStartPos + minutesDelta > draggingStartPos) {
+        const maxAllowedDuration = eventEndDt.diff(draftEntry.startDt, 'minutes');
+        const duration = Math.min(minutesDelta, maxAllowedDuration);
+        const startDt = moment(dt)
+          .startOf('days')
+          .add(minHour, 'hours')
+          .add(pixelsToMinutes(draggingStartPos), 'minutes');
+        draftEntryChangeObj = {startDt, duration, y: draggingStartPos};
+      } else {
+        const y = minutesToPixels(
+          Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
+            GRID_SIZE_MINUTES
+        );
+        // TODO: (Ajob) Add duration limit
+        const duration = Math.abs(minutesDelta);
+        const startDt = moment(dt)
+          .startOf('days')
+          .add(minHour, 'hours')
+          .add(pixelsToMinutes(draggingStartPos) - duration, 'minutes');
+        draftEntryChangeObj = {startDt, duration, y};
+      }
+
+      dispatch(actions.setDraftEntry({...draftEntry, ...draftEntryChangeObj}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setIsDragging(false);
         dispatch(actions.setDraftEntry(null));
       }
     }
 
     function onMouseUp() {
       if (isDragging && draftEntry) {
-        setIsDragging(false);
+        setDraggingStartPos(null);
       }
     }
 

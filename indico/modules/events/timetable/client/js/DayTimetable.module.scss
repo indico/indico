@@ -76,7 +76,8 @@
     pointer-events: none;
     color: $white;
     text-shadow: 0 0 5px rgba($dark-teal, 0.25);
-    background: rgba($teal, 0.8);
+    // background: rgba($teal, 0.8);
+    background: rgba(red, 0.8);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     border: 1px solid rgba($white, 0.2);

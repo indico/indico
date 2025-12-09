@@ -28,6 +28,7 @@ export default {
   ) => {
     switch (action.type) {
       case actions.SET_DRAFT_ENTRY:
+        console.log('min ', action.data?.startDt?.minutes(), ' d ', action.data?.duration);
         return {...state, draftEntry: action.data};
       case actions.SET_TIMETABLE_DATA: {
         const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
