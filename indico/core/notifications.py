@@ -5,13 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import hashlib
 import mimetypes
 import re
 import time
 from email.mime.base import MIMEBase
 from functools import wraps
 from types import GeneratorType
+from uuid import uuid4
 
 from flask import g
 
@@ -21,7 +21,7 @@ from indico.core.logger import Logger
 from indico.core.storage.backend import StorageError, get_storage
 from indico.util.fs import secure_filename
 from indico.util.signals import make_interceptable
-from indico.util.string import truncate
+from indico.util.string import crc32, truncate
 
 
 logger = Logger.get('emails')
@@ -90,6 +90,8 @@ def _log_email(email, event, module, user, meta=None, summary=None):
     }
     # Optionally persist email attachments
     if config.EMAIL_LOG_STORAGE and (attachments := email['attachments']):
+        stored_attachments = g.setdefault('stored_email_attachments', {})
+        unique_id = g.setdefault('stored_email_attachments_uuid', uuid4().hex)
         storage = get_storage(config.EMAIL_LOG_STORAGE)
         stored = []
         base_path = f'emails/{event.id}'
@@ -112,14 +114,16 @@ def _log_email(email, event, module, user, meta=None, summary=None):
                     logger.error('Unexpected email attachment: %s', att)
 
             safe_name = secure_filename(filename or 'attachment', 'file')
-            unique = hashlib.sha256(content).hexdigest()
-            name = f'{base_path}/{unique}-{safe_name}'
-            try:
-                file_id, _checksum = storage.save(name, ctype, filename or safe_name, content)
-            except StorageError:
-                # Do not fail email logging if storage is unavailable; simply skip storing
-                logger.exception('Could not store email attachment')
-                continue
+            contenthash = crc32(content)
+            name = f'{base_path}/{contenthash}-{unique_id}-{safe_name}'
+            if not (file_id := stored_attachments.get(name)):
+                try:
+                    file_id, _checksum = storage.save(name, ctype, filename or safe_name, content)
+                except StorageError:
+                    # Do not fail email logging if storage is unavailable; simply skip storing
+                    logger.exception('Could not store email attachment')
+                    continue
+                stored_attachments[name] = file_id
             stored.append({
                 'backend': config.EMAIL_LOG_STORAGE,
                 'file_id': file_id,
