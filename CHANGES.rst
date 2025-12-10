@@ -21,6 +21,8 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
+- Include attachments when re-sending emails from the event log (:pr:`7203`, thanks
+  :user:`Moliholy, unconventionaldotdev`)
 - Disallow comments/judgments on outdated editables (:pr:`7067`)
 - Log original email content (with placeholders) when emailing registrants or
   sending invitations (:pr:`7093`)
