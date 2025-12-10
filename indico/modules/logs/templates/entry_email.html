@@ -124,6 +124,9 @@
                 {% trans %}Actions{% endtrans %}
             </td>
             <td class="i-table value">
+                {%- set supports_attachments = (
+                    data.get('attachments', [])|length == data.get('stored_attachments', [])|length
+                ) -%}
                 <button type="button"
                         class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
                         data-href="{{ url_for('.resend_email', entry) }}"

@@ -29,10 +29,7 @@ class EventLogRendererBase:
         :param entry: A :class:`.EventLogEntry`
         """
         template = f'{cls.plugin.name}:{cls.template_name}' if cls.plugin is not None else cls.template_name
-        data = cls.get_data(entry)
-        supports_attachments = len(data.get('attachments', [])) == len(data.get('stored_attachments', []))
-        return render_template(template, entry=entry, data=data, supports_attachments=supports_attachments,
-                               **cls.template_kwargs)
+        return render_template(template, entry=entry, data=cls.get_data(entry), **cls.template_kwargs)
 
     @classmethod
     def get_data(cls, entry):
