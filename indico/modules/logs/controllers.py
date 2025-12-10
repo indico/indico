@@ -248,13 +248,11 @@ class RHResendEmail(RHManageEventBase):
                 alternatives = []
 
         # Rebuild attachments from storage if available
-        stored_atts = email_data.get('stored_attachments') or []
-        if stored_atts:
-            for item in stored_atts:
-                storage = get_storage(item['storage_backend'])
-                with storage.open(item['storage_file_id']) as fd:
-                    content = fd.read()
-                attachments.append((item['filename'], content, item['content_type']))
+        for att in email_data.get('stored_attachments', []):
+            storage = get_storage(att['storage_backend'])
+            with storage.open(att['storage_file_id']) as fd:
+                content = fd.read()
+            attachments.append((att['filename'], content, att['content_type']))
 
         return make_email(
             to_list=email_data['to'],
