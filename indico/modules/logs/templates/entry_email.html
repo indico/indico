@@ -124,14 +124,17 @@
                 {% trans %}Actions{% endtrans %}
             </td>
             <td class="i-table value">
+                {%- set supports_attachments = (
+                    data.get('attachments', [])|length == data.get('stored_attachments', [])|length
+                ) -%}
                 <button type="button"
                         class="i-button {% if data.state == 'failed' %}highlight{% endif %} icon-mail"
                         data-href="{{ url_for('.resend_email', entry) }}"
                         data-title="{% trans %}Re-send email{% endtrans %}"
                         data-success-event="indico:logsRefresh"
                         data-ajax-dialog
-                        {% if data.state == 'pending' or data.attachments %}disabled{% endif %}
-                        {% if data.attachments %}
+                        {% if data.state == 'pending' or not supports_attachments %}disabled{% endif %}
+                        {% if not supports_attachments %}
                             title="{%- trans -%}Re-sending emails with attachments is not supported.{%- endtrans -%}"
                         {% elif data.state == 'pending' %}
                             title="{%- trans -%}This email has not been sent yet.{%- endtrans -%}"

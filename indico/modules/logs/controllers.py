@@ -13,6 +13,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.core.notifications import make_email, send_email
+from indico.core.storage.backend import get_storage
 from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -211,7 +212,7 @@ class RHResendEmail(RHManageEventBase):
     def _process(self):
         if self.entry.type != 'email':
             raise BadRequest('Invalid log entry type')
-        elif self.entry.data.get('attachments'):
+        elif self.entry.data.get('attachments') and not self.entry.data.get('stored_attachments'):
             raise BadRequest('Cannot re-send email with attachments')
         elif self.entry.data.get('state') == 'pending':
             raise BadRequest('Cannot re-send pending emails')
@@ -245,6 +246,14 @@ class RHResendEmail(RHManageEventBase):
                 body = f'{preface}{text_separator}{body}'
                 alternatives = []
 
+        # Rebuild attachments from storage if available
+        attachments = []
+        for att in email_data.get('stored_attachments', []):
+            storage = get_storage(att['storage_backend'])
+            with storage.open(att['storage_file_id']) as fd:
+                content = fd.read()
+            attachments.append((att['filename'], content, att['content_type']))
+
         return make_email(
             to_list=email_data['to'],
             cc_list=email_data['cc'],
@@ -254,5 +263,6 @@ class RHResendEmail(RHManageEventBase):
             subject=form_data['subject'],
             body=body,
             html=is_html_email,
-            alternatives=alternatives
+            alternatives=alternatives,
+            attachments=attachments,
         )

@@ -59,6 +59,9 @@ Improvements
   (:pr:`7199`, thanks :user:`openprojects`)
 - Refactor the registration invitation dialogs using React and add email previews
   (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
+- Add setting :data:`EMAIL_LOG_STORAGE` to permanently store email attachments and
+  allow re-sending emails with attachments from the event log (:pr:`7182`, :pr:`7203`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
