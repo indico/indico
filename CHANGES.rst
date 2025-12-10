@@ -21,8 +21,6 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Include attachments when re-sending emails from the event log (:pr:`7203`, thanks
-  :user:`Moliholy, unconventionaldotdev`)
 - Disallow comments/judgments on outdated editables (:pr:`7067`)
 - Log original email content (with placeholders) when emailing registrants or
   sending invitations (:pr:`7093`)
@@ -61,6 +59,8 @@ Improvements
   (:pr:`7199`, thanks :user:`openprojects`)
 - Refactor the registration invitation dialogs using React and add email previews
   (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
+- Include attachments when re-sending emails from the event log (:pr:`7203`, :pr:`7182`
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

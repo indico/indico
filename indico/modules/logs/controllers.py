@@ -212,7 +212,8 @@ class RHResendEmail(RHManageEventBase):
     def _process(self):
         if self.entry.type != 'email':
             raise BadRequest('Invalid log entry type')
-        elif self.entry.data.get('attachments') and not config.EMAIL_LOG_STORAGE:
+        elif ((self.entry.data.get('attachments') and not config.EMAIL_LOG_STORAGE)
+              or not self.entry.data.get('stored_attachments')):
             raise BadRequest('Cannot re-send email with attachments')
         elif self.entry.data.get('state') == 'pending':
             raise BadRequest('Cannot re-send pending emails')
@@ -258,13 +259,7 @@ class RHResendEmail(RHManageEventBase):
                 except StorageError:
                     # Do not fail resending if an attachment cannot be retrieved
                     continue
-                filename = item.get('filename') or 'attachment'
-                ctype = item.get('content_type')
-                if ctype:
-                    att = (filename, content, ctype)
-                else:
-                    att = (filename, content)
-                attachments.append(att)
+                attachments.append((item['filename'], content, item['content_type']))
 
         return make_email(
             to_list=email_data['to'],
