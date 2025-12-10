@@ -128,7 +128,8 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             if self.entry.is_page and self.entry.page.html != form.html.data:
                 changes['html'] = (self.entry.page.html, form.html.data)
                 self.entry.page.html = form.html.data
-            update_read_permissions(self.entry, form)
+            if 'acl' in form:
+                update_read_permissions(self.entry, form)
 
             self.entry.log(EventLogRealm.management, LogKind.change, 'Menu',
                            f'Menu entry changed: {self.entry.log_title}', session.user,
