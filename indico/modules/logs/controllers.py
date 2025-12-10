@@ -232,7 +232,6 @@ class RHResendEmail(RHManageEventBase):
         email_data = self.entry.data
         body = email_data['body']
         alternatives = email_data.get('alternatives') or []
-        attachments = []
         if preface := form_data['preface']:
             text_separator = '\n\n-------------\n\n'
             if is_html_email:
@@ -248,6 +247,7 @@ class RHResendEmail(RHManageEventBase):
                 alternatives = []
 
         # Rebuild attachments from storage if available
+        attachments = []
         for att in email_data.get('stored_attachments', []):
             storage = get_storage(att['storage_backend'])
             with storage.open(att['storage_file_id']) as fd:
@@ -264,5 +264,5 @@ class RHResendEmail(RHManageEventBase):
             body=body,
             html=is_html_email,
             alternatives=alternatives,
-            attachments=attachments
+            attachments=attachments,
         )
