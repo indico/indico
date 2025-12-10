@@ -7,6 +7,7 @@
 
 from flask import render_template
 
+from indico.core.config import config
 from indico.modules.logs.util import render_changes
 
 
@@ -29,7 +30,10 @@ class EventLogRendererBase:
         :param entry: A :class:`.EventLogEntry`
         """
         template = f'{cls.plugin.name}:{cls.template_name}' if cls.plugin is not None else cls.template_name
-        return render_template(template, entry=entry, data=cls.get_data(entry), **cls.template_kwargs)
+        data = cls.get_data(entry)
+        supports_attachments = bool(data.get('attachments')) and config.EMAIL_LOG_STORAGE
+        return render_template(template, entry=entry, data=data, supports_attachments=supports_attachments,
+                               **cls.template_kwargs)
 
     @classmethod
     def get_data(cls, entry):

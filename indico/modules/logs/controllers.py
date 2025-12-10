@@ -13,6 +13,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.core.notifications import make_email, send_email
+from indico.core.storage.backend import StorageError, get_storage
 from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -211,7 +212,7 @@ class RHResendEmail(RHManageEventBase):
     def _process(self):
         if self.entry.type != 'email':
             raise BadRequest('Invalid log entry type')
-        elif self.entry.data.get('attachments'):
+        elif self.entry.data.get('attachments') and not config.EMAIL_LOG_STORAGE:
             raise BadRequest('Cannot re-send email with attachments')
         elif self.entry.data.get('state') == 'pending':
             raise BadRequest('Cannot re-send pending emails')
@@ -231,6 +232,7 @@ class RHResendEmail(RHManageEventBase):
         email_data = self.entry.data
         body = email_data['body']
         alternatives = email_data.get('alternatives') or []
+        attachments = []
         if preface := form_data['preface']:
             text_separator = '\n\n-------------\n\n'
             if is_html_email:
@@ -245,6 +247,25 @@ class RHResendEmail(RHManageEventBase):
                 body = f'{preface}{text_separator}{body}'
                 alternatives = []
 
+        # Rebuild attachments from storage if available
+        stored_atts = email_data.get('stored_attachments') or []
+        if stored_atts:
+            for item in stored_atts:
+                try:
+                    storage = get_storage(item['storage_backend'])
+                    with storage.open(item['storage_file_id']) as fd:
+                        content = fd.read()
+                except StorageError:
+                    # Do not fail resending if an attachment cannot be retrieved
+                    continue
+                filename = item.get('filename') or 'attachment'
+                ctype = item.get('content_type')
+                if ctype:
+                    att = (filename, content, ctype)
+                else:
+                    att = (filename, content)
+                attachments.append(att)
+
         return make_email(
             to_list=email_data['to'],
             cc_list=email_data['cc'],
@@ -254,5 +275,6 @@ class RHResendEmail(RHManageEventBase):
             subject=form_data['subject'],
             body=body,
             html=is_html_email,
-            alternatives=alternatives
+            alternatives=alternatives,
+            attachments=attachments
         )
