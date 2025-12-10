@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, jsonify, request, session
+from flask import jsonify, request, session
 from marshmallow import fields
 from sqlalchemy.orm import joinedload
 from webargs import validate
@@ -13,22 +13,26 @@ from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.forms import ImportInvitationsForm, InvitationFormExisting, InvitationFormNew
-from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.schemas import RegistrationInvitationSchema
-from indico.modules.events.registration.util import create_invitation, import_invitations_from_csv
+from indico.modules.events.registration.models.invitations import (InvitationState, MockRegistrationInvitation,
+                                                                   RegistrationInvitation)
+from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
+                                                        NewInvitationSchema, RegistrationInvitationSchema)
+from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
+                                                     import_user_records_from_csv)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.logs import EventLogRealm, LogKind
-from indico.util.i18n import ngettext
-from indico.util.marshmallow import (LowercaseString, make_validate_indico_placeholders, no_endpoint_links,
+from indico.util.i18n import _
+from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
-from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.flask.util import url_for
+from indico.web.util import jsonify_data
 
 
 def _has_pending_invitations(invitations):
@@ -67,39 +71,169 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 class RHRegistrationFormInvite(RHManageRegFormBase):
     """Invite someone to register."""
 
+    @use_kwargs(NewInvitationSchema)
+    def _process(self, sender_address, subject, body, bcc_addresses, copy_for_sender, skip_moderation,
+                 skip_access_check, lock_email, user, users):
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
+            raise BadRequest('Invalid sender address')
+        if not self.regform.moderation_enabled:
+            skip_moderation = False
+
+        if users:
+            users = InvitationUserSchema(many=True).dump(users)
+            field_name = 'users'
+        else:
+            users = [user]
+            field_name = 'email'
+
+        self._ensure_can_invite_emails([user_['email'] for user_ in users], field_name)
+
+        for user_ in users:
+            create_invitation(
+                self.regform,
+                user_,
+                sender_address,
+                subject,
+                body,
+                skip_moderation=skip_moderation,
+                skip_access_check=skip_access_check,
+                lock_email=lock_email,
+                bcc_addresses=bcc_addresses,
+                copy_for_sender=copy_for_sender,
+            )
+
+        self.regform.log(
+            EventLogRealm.management, LogKind.other, 'Registration', 'Invitations sent', session.user,
+            data={
+                'Sender': sender_address,
+                'BCC addresses': bcc_addresses,
+                'CC to sender': copy_for_sender,
+                'Subject': subject,
+                'Body': body,
+                'Skip moderation': skip_moderation,
+                'Skip access check': skip_access_check,
+                'Lock email': lock_email,
+                '_html_fields': ['Body'],
+            }
+        )
+        return jsonify_data(sent=len(users), skipped=0, **_get_invitation_data(self.regform))
+
+    def _ensure_can_invite_emails(self, emails, field_name):
+        normalized = {email.lower() for email in emails if email}
+        invitation_emails = {inv.email.lower() for inv in self.regform.invitations}
+        registration_emails = {
+            reg.email.lower()
+            for reg in self.regform.registrations
+            if reg.is_active and reg.email
+        }
+
+        conflicts = invitation_emails & normalized
+        if conflicts:
+            abort(422, messages={
+                field_name: [_('There are already invitations for the following email addresses: {emails}')
+                             .format(emails=', '.join(sorted(conflicts)))]
+            })
+
+        conflicts = registration_emails & normalized
+        if conflicts:
+            abort(422, messages={
+                field_name: [_('There are already registrations with the following email addresses: {emails}')
+                             .format(emails=', '.join(sorted(conflicts)))]
+            })
+
+
+class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
+    """Provide metadata required to render the invitation dialog."""
+
     def _process(self):
         with self.event.force_event_locale():
             tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
-            defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
-        form_cls = InvitationFormExisting if request.args.get('existing') == '1' else InvitationFormNew
-        form = form_cls(obj=defaults, regform=self.regform)
-        skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
-        skip_access_check = form.skip_access_check.data
-        lock_email = form.lock_email.data
-        if form.validate_on_submit():
-            email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
-            for user in form.users.data:
-                create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
-                                  skip_moderation=skip_moderation, skip_access_check=skip_access_check,
-                                  lock_email=lock_email)
-            self.regform.log(
-                EventLogRealm.management, LogKind.other, 'Registration', 'Invitations sent', session.user,
-                data={
-                    'Sender': email_sender,
-                    'Subject': form.email_subject.data,
-                    'Body': form.email_body.data,
-                    'Skip moderation': skip_moderation,
-                    'Skip access check': skip_access_check,
-                    'Lock email': lock_email,
-                    '_html_fields': ['Body'],
-                }
+            default_body = tpl.get_html_body()
+            default_subject = tpl.get_subject()
+        placeholders = get_sorted_placeholders('registration-invitation-email', invitation=None)
+        return jsonify({
+            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'default_subject': default_subject,
+            'default_body': default_body,
+            'moderation_enabled': self.regform.moderation_enabled,
+            'placeholders': [p.serialize() for p in placeholders],
+            'csv_upload_url': url_for('.api_invitations_import_upload', self.regform),
+        })
+
+
+class RHRegistrationFormImportInvites(RHManageRegFormBase):
+    """Import invitations from a CSV file using the REST API."""
+
+    @use_kwargs(InvitationImportSchema)
+    def _process(self, sender_address, subject, body, bcc_addresses, copy_for_sender, skip_moderation,
+                 skip_access_check, skip_existing, lock_email, imported):
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
+            raise BadRequest('Invalid sender address')
+
+        try:
+            invitations, skipped = import_invitations_from_user_records(
+                self.regform,
+                imported,
+                sender_address,
+                subject,
+                body,
+                skip_moderation=skip_moderation and self.regform.moderation_enabled,
+                skip_access_check=skip_access_check,
+                skip_existing=skip_existing,
+                lock_email=lock_email,
+                bcc_addresses=bcc_addresses,
+                copy_for_sender=copy_for_sender
             )
-            num = len(form.users.data)
-            flash(ngettext('The invitation has been sent.',
-                           '{n} invitations have been sent.',
-                           num).format(n=num), 'success')
-            return jsonify_data(**_get_invitation_data(self.regform))
-        return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
+        except UserValueError as exc:
+            abort(422, messages={'imported': [str(exc)]})
+        return jsonify(skipped=skipped, sent=len(invitations), **_get_invitation_data(self.regform))
+
+
+class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
+    """Process a CSV file into invitation user records."""
+
+    @use_kwargs({'file': fields.Field(required=True)}, location='files')
+    def _process(self, file):
+        if not file.filename.lower().endswith('.csv'):
+            raise BadRequest('Not a CSV file')
+        try:
+            rows = import_user_records_from_csv(
+                file.stream,
+                columns=['first_name', 'last_name', 'affiliation', 'email'],
+            )
+        except UserValueError as exc:
+            abort(422, messages={'file': [str(exc)]})
+        if not rows:
+            abort(422, messages={'file': [_('The uploaded CSV file is empty')]})
+        return InvitationUserSchema(many=True).jsonify(rows)
+
+
+class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
+    """Return a preview of an invitation email."""
+
+    @use_kwargs({
+        'subject': fields.String(load_default=''),
+        'body': fields.String(load_default=''),
+        'first_name': fields.String(load_default=None),
+        'last_name': fields.String(load_default=None),
+        'user': Principal(load_default=None),
+    })
+    @no_autoflush
+    def _process(self, subject, body, first_name, last_name, user):
+        if user:
+            first_name = user.first_name
+            last_name = user.last_name
+        elif not first_name:
+            abort(422, messages={'first_name': ['Missing data']})
+        elif not last_name:
+            abort(422, messages={'last_name': ['Missing data']})
+
+        invitation = MockRegistrationInvitation(self.regform, first_name, last_name)
+        rendered_subject = replace_placeholders('registration-invitation-email', subject,
+                                                invitation=invitation)
+        rendered_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
+        tpl = get_template_module('emails/custom.html', subject=rendered_subject, body=rendered_body)
+        return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
 class RHPendingInvitationsBase(RHManageRegFormBase):
@@ -196,44 +330,6 @@ class RHRegistrationFormRemindersPreview(RHPendingInvitationsBase):
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
                                   email_body=email_body)
         return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
-
-
-class RHRegistrationFormInviteImport(RHManageRegFormBase):
-    """Import invitations from a CSV file."""
-
-    def _format_flash_message(self, sent, skipped):
-        sent_msg = ngettext('One invitation has been sent.', '{n} invitations have been sent.', sent).format(n=sent)
-        if not skipped:
-            return sent_msg
-        skipped_msg = ngettext('One invitation was skipped.',
-                               '{n} invitations were skipped.', skipped).format(n=skipped)
-        return f'{sent_msg} {skipped_msg}'
-
-    def _process(self):
-        with self.event.force_event_locale():
-            tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
-            defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
-        form = ImportInvitationsForm(obj=defaults, regform=self.regform)
-        if form.validate_on_submit():
-            skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
-            skip_access_check = form.skip_access_check.data
-            skip_existing = form.skip_existing.data
-            lock_email = form.lock_email.data
-            delimiter = form.delimiter.data.delimiter
-            email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
-            invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
-                                                               email_sender, form.email_subject.data,
-                                                               form.email_body.data,
-                                                               skip_moderation=skip_moderation,
-                                                               skip_access_check=skip_access_check,
-                                                               skip_existing=skip_existing,
-                                                               lock_email=lock_email,
-                                                               delimiter=delimiter)
-            sent = len(invitations)
-            flash(self._format_flash_message(sent, skipped), 'success' if sent > 0 else 'warning')
-            return jsonify_data(**_get_invitation_data(self.regform))
-        return jsonify_template('events/registration/management/import_invitations.html', form=form,
-                                regform=self.regform)
 
 
 class RHRegistrationFormInvitationBase(RHManageRegFormBase):

@@ -18,13 +18,17 @@ from indico.util.signals import make_interceptable, values_from_signal
 from indico.web.flask.templating import get_template_module
 
 
-def notify_invitation(invitation, email_subject, email_body, sender_address):
+def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresses=None, copy_for_sender=False):
     """Send a notification about a new registration invitation."""
-    email_body = replace_placeholders('registration-invitation-email', email_body, invitation=invitation)
-    email_subject = replace_placeholders('registration-invitation-email', email_subject, invitation=invitation)
+    email_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
+    email_subject = replace_placeholders('registration-invitation-email', subject, invitation=invitation)
     template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True)
     user = session.user if session else None
+    bcc = set(bcc_addresses or [])
+    if copy_for_sender and user:
+        bcc.add(user.email)
+    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True,
+                       bcc_list=bcc)
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 

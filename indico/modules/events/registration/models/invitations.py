@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import uuid
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -137,3 +138,23 @@ class RegistrationInvitation(db.Model):
     def __repr__(self):
         full_name = f'{self.first_name} {self.last_name}'
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state', _text=full_name)
+
+
+class MockRegistrationInvitation:
+    """Mock invitation class for email previews."""
+
+    def __init__(self, regform, first_name, last_name):
+        self.registration_form = regform
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = ''
+        self.affiliation = ''
+        self.uuid = uuid.UUID(int=0)
+
+    @locator_property
+    def locator(self):
+        raise NotImplementedError
+
+    @locator.uuid
+    def locator(self):
+        return dict(self.registration_form.locator, invitation=self.uuid)
