@@ -13,7 +13,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.core.notifications import make_email, send_email
-from indico.core.storage.backend import StorageError, get_storage
+from indico.core.storage.backend import get_storage
 from indico.modules.admin import RHAdminBase
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -212,8 +212,7 @@ class RHResendEmail(RHManageEventBase):
     def _process(self):
         if self.entry.type != 'email':
             raise BadRequest('Invalid log entry type')
-        elif ((self.entry.data.get('attachments') and not config.EMAIL_LOG_STORAGE)
-              or not self.entry.data.get('stored_attachments')):
+        elif self.entry.data.get('attachments') or not self.entry.data.get('stored_attachments'):
             raise BadRequest('Cannot re-send email with attachments')
         elif self.entry.data.get('state') == 'pending':
             raise BadRequest('Cannot re-send pending emails')
@@ -252,13 +251,9 @@ class RHResendEmail(RHManageEventBase):
         stored_atts = email_data.get('stored_attachments') or []
         if stored_atts:
             for item in stored_atts:
-                try:
-                    storage = get_storage(item['storage_backend'])
-                    with storage.open(item['storage_file_id']) as fd:
-                        content = fd.read()
-                except StorageError:
-                    # Do not fail resending if an attachment cannot be retrieved
-                    continue
+                storage = get_storage(item['storage_backend'])
+                with storage.open(item['storage_file_id']) as fd:
+                    content = fd.read()
                 attachments.append((item['filename'], content, item['content_type']))
 
         return make_email(
