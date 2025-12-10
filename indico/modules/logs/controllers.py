@@ -212,7 +212,7 @@ class RHResendEmail(RHManageEventBase):
     def _process(self):
         if self.entry.type != 'email':
             raise BadRequest('Invalid log entry type')
-        elif self.entry.data.get('attachments') or not self.entry.data.get('stored_attachments'):
+        elif self.entry.data.get('attachments') and not self.entry.data.get('stored_attachments'):
             raise BadRequest('Cannot re-send email with attachments')
         elif self.entry.data.get('state') == 'pending':
             raise BadRequest('Cannot re-send pending emails')
