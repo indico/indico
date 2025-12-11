@@ -8,7 +8,7 @@
 /* eslint-disable import/unambiguous */
 /* global setupListGenerator:false, getSelectedRows:false, handleSelectedRowHighlight:false,
           setupTableSorter:false, ajaxDialog:false, handleAjaxError:false, confirmPrompt:false,
-          build_url:false */
+          build_url:false, handleFlashes:false */
 
 import {showUserSearch} from 'indico/react/components/principals/imperative';
 import {$T} from 'indico/utils/i18n';
@@ -96,12 +96,16 @@ import {$T} from 'indico/utils/i18n';
         complete: IndicoUI.Dialogs.Util.progress(),
         error: handleAjaxError,
         success(data) {
-          if (data) {
-            $('.list-content').html(data.html);
-            handleSelectedRowHighlight(true);
-            handleRegListRowSelection();
-            setupTableSorter();
+          if (!data) {
+            return;
           }
+          if (data.flashed_messages) {
+            handleFlashes(data);
+          }
+          $('.list-content').html(data.html);
+          handleSelectedRowHighlight(true);
+          handleRegListRowSelection();
+          setupTableSorter();
         },
       });
     });

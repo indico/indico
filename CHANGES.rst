@@ -64,6 +64,8 @@ Improvements
   thanks :user:`Moliholy, unconventionaldotdev`)
 - Show confirmation dialog when sending invitations (:pr:`7204`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Show a warning when bulk registration approval/rejection skips registrations that are not
+  pending (:issue:`7197`, :pr:`7205`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
