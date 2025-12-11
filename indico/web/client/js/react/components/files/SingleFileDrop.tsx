@@ -113,6 +113,7 @@ function SingleFileDrop<Value = unknown>({
   required = false,
   dropzoneOptions = {},
   setValidationError,
+  validationError,
   onDropAccepted,
   onDropRejected,
 }: {
@@ -123,6 +124,7 @@ function SingleFileDrop<Value = unknown>({
   required?: boolean;
   dropzoneOptions?: Partial<DropzoneOptions>;
   setValidationError?: (message?: string) => void;
+  validationError?: string | null;
   onDropAccepted: DropAcceptedHandler<Value>;
   onDropRejected?: DropRejectedHandler<Value>;
 }) {
@@ -232,7 +234,7 @@ function SingleFileDrop<Value = unknown>({
       dropzone={dropzone}
       file={file}
       fileAction={fileAction}
-      errors={dropState.errors}
+      errors={[...(dropState.errors || []), ...(validationError ? [validationError] : [])]}
     />
   );
 }
@@ -257,6 +259,7 @@ export default function FinalSingleFileDrop({
           name={name}
           component={SingleFileDrop}
           setValidationError={setValidationError}
+          fieldNeedsValidationError
           {...rest}
         />
       )}

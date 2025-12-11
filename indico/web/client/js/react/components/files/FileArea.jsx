@@ -138,7 +138,7 @@ export function FileArea({
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        {errors && (
+        {!!errors?.length && (
           <Message negative>
             <Message.Header>
               <Translate>There were some problems with your file</Translate>
