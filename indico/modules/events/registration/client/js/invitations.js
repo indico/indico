@@ -11,6 +11,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -24,6 +25,7 @@ import InviteDialogButton from './components/InviteDialogButton';
     regformId,
     hasPendingInvitations,
     invitations,
+    searchToken,
   }) {
     $('#invitation-list-container').on('indico:confirmed', '.js-invitation-action', function(evt) {
       evt.preventDefault();
@@ -54,7 +56,7 @@ import InviteDialogButton from './components/InviteDialogButton';
       });
     };
 
-    renderInviteButton({eventId, regformId, onInvitationsChanged});
+    renderInviteButton({eventId, regformId, onInvitationsChanged, searchToken});
     renderInvitationPage({eventId, regformId, hasPendingInvitations, invitations});
   };
 
@@ -83,17 +85,19 @@ import InviteDialogButton from './components/InviteDialogButton';
     );
   }
 
-  function renderInviteButton({eventId, regformId, onInvitationsChanged}) {
+  function renderInviteButton({eventId, regformId, onInvitationsChanged, searchToken}) {
     const container = document.getElementById('invite-dialog-button-container');
     if (!container) {
       return;
     }
     ReactDOM.render(
-      <InviteDialogButton
-        eventId={eventId}
-        regformId={regformId}
-        onInvitationsChanged={onInvitationsChanged}
-      />,
+      <UserSearchTokenContext.Provider value={searchToken}>
+        <InviteDialogButton
+          eventId={eventId}
+          regformId={regformId}
+          onInvitationsChanged={onInvitationsChanged}
+        />
+      </UserSearchTokenContext.Provider>,
       container
     );
   }

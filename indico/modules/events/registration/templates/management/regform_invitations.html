@@ -49,6 +49,7 @@
             regformId: {{ regform.id | tojson }},
             hasPendingInvitations: {{ has_pending_invitations | tojson }},
             invitations: {{ invitations_list | tojson }},
+            searchToken: {{ make_user_search_token() | tojson }},
         });
     </script>
 {% endblock %}
