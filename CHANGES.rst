@@ -83,6 +83,8 @@ Bugfixes
   :pr:`7105`, thanks :user:`AtharvMixraw`)
 - Validate the arrival/departure date in the registration form accommodation field
   (:issue:`7171`, :pr:`7174`)
+- Show a warning when bulk registration approval/rejection skips registrations that are not
+  pending (:issue:`7197`, :pr:`7205`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
