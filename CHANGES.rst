@@ -39,7 +39,7 @@ Improvements
 - Log local group membership changes of users (:pr:`7122`, thanks :user:`tomako`)
 - Warn when downloading files from an editable not assigned to you (:issue:`7131`,
   :pr:`7132`)
-- Add URL args to set the default view and date of the cataegory calendar view
+- Add URL args to set the default view and date of the category calendar view
   (:pr:`7144`)
 - Allow changing review tags in the editing timeline (:issue:`7133`, :pr:`7134`)
 - Add an option to request changes in bulk on the editable list (:issue:`7062`,
@@ -120,7 +120,7 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Allow plugins to store custom annotations/metadata on attachments, and indicate that
-  it has been converted from antoher attachment (:pr:`7108`)
+  it has been converted from another attachment (:pr:`7108`)
 - Refactor conference page theme CSS to allow easier theming using CSS variables
   (:pr:`7110`, thanks :user:`foxbunny`)
 - Add clear button to optional date picker fields (:pr:`7151`, thanks :user:`foxbunny`)
