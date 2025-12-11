@@ -110,6 +110,7 @@ export default function ImportInvitationsField({
     <>
       <FinalSingleFileDrop
         name={name}
+        label={Translate.string('CSV file')}
         onDropAccepted={onDropAccepted}
         onDropRejected={onDropRejected}
         dropzoneOptions={{accept: ['.csv']}}
