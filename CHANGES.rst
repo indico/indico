@@ -62,6 +62,8 @@ Improvements
 - Add setting :data:`EMAIL_LOG_STORAGE` to permanently store email attachments and
   allow re-sending emails with attachments from the event log (:pr:`7182`, :pr:`7203`,
   thanks :user:`Moliholy, unconventionaldotdev`)
+- Show confirmation dialog when sending invitations (:pr:`7204`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

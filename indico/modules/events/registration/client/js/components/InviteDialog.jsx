@@ -10,16 +10,18 @@ import inviteMetadataURL from 'indico-url:event_registration.api_invitations_met
 import invitationPreviewURL from 'indico-url:event_registration.invitation_preview';
 import inviteURL from 'indico-url:event_registration.invite';
 
+import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {Button, Dimmer, Form, Icon, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {EmailDialog} from 'indico/modules/events/persons/EmailDialog';
+import {RequestConfirm} from 'indico/react/components';
 import {FinalPrincipalList} from 'indico/react/components/principals/PrincipalListField';
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
-import {Translate, PluralTranslate} from 'indico/react/i18n';
+import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import ImportInvitationsField from './ImportInvitationsField';
@@ -151,6 +153,8 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
   const [mode, setMode] = useState('existing');
   const [sentEmailsCount, setSentEmailsCount] = useState(0);
   const [sentEmailsWarning, setSentEmailsWarning] = useState(null);
+  const [pendingEmails, setPendingEmails] = useState(0);
+  const confirmationResolver = useRef(null);
   const successTimeout = 5000;
   const {data: metadata, loading} = useIndicoAxios(
     inviteMetadataURL({event_id: eventId, reg_form_id: regformId}),
@@ -179,12 +183,34 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     };
   }, [metadata]);
 
+  const requestConfirmation = useCallback(count => {
+    return new Promise(resolve => {
+      confirmationResolver.current = resolve;
+      setPendingEmails(count);
+    });
+  }, []);
+
+  const handleConfirmRequest = useCallback(async () => {
+    confirmationResolver.current?.(true);
+  }, []);
+
+  const handleCloseConfirmation = useCallback(() => {
+    setPendingEmails(0);
+    confirmationResolver.current?.(false);
+  }, []);
+
   const handleSubmit = useCallback(
     async values => {
       const count = modeConfig[mode].getCount(values);
       if (count === 0) {
         return {[modeConfig[mode].extraFields[0]]: 'No recipients specified.'};
       }
+      const confirmed = await requestConfirmation(count);
+      if (!confirmed) {
+        // Abort submission quietly so the form stays open without flashing an error.
+        return {[FORM_ERROR]: null};
+      }
+
       const payload = _.pick(values, [
         'sender_address',
         'subject',
@@ -211,7 +237,16 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       }
       setTimeout(() => onClose(), successTimeout);
     },
-    [eventId, metadata?.moderationEnabled, mode, onClose, onSuccess, regformId, successTimeout]
+    [
+      eventId,
+      metadata?.moderationEnabled,
+      mode,
+      onClose,
+      onSuccess,
+      regformId,
+      requestConfirmation,
+      successTimeout,
+    ]
   );
 
   if (loading || !metadata) {
@@ -263,20 +298,44 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
   );
 
   return (
-    <EmailDialog
-      onSubmit={handleSubmit}
-      onClose={onClose}
-      senders={metadata.senders}
-      placeholders={metadata.placeholders}
-      previewURL={invitationPreviewURL({event_id: eventId, reg_form_id: regformId})}
-      getPreviewPayload={values => modeConfig[mode].getPreviewPayload(values)}
-      recipientsField={recipientsField}
-      initialFormValues={initialFormValues}
-      title={Translate.string('Invite people')}
-      sentEmailsCount={sentEmailsCount}
-      sentEmailsWarning={sentEmailsWarning}
-      recipientsFirst
-    />
+    <>
+      <EmailDialog
+        onSubmit={handleSubmit}
+        onClose={onClose}
+        senders={metadata.senders}
+        placeholders={metadata.placeholders}
+        previewURL={invitationPreviewURL({event_id: eventId, reg_form_id: regformId})}
+        getPreviewPayload={values => modeConfig[mode].getPreviewPayload(values)}
+        recipientsField={recipientsField}
+        initialFormValues={initialFormValues}
+        title={Translate.string('Invite people')}
+        sentEmailsCount={sentEmailsCount}
+        sentEmailsWarning={sentEmailsWarning}
+        recipientsFirst
+      />
+      <RequestConfirm
+        open={pendingEmails > 0}
+        onClose={handleCloseConfirmation}
+        requestFunc={handleConfirmRequest}
+        header={PluralTranslate.string(
+          'Send invitation email?',
+          'Send invitation emails?',
+          pendingEmails
+        )}
+        confirmText={PluralTranslate.string('Send invitation', 'Send invitations', pendingEmails)}
+      >
+        <PluralTranslate count={pendingEmails}>
+          <Singular>
+            You are about to send <Param name="count" value={pendingEmails} /> invitation. Do you
+            want to proceed?
+          </Singular>
+          <Plural>
+            You are about to send <Param name="count" value={pendingEmails} /> invitations. Do you
+            want to proceed?
+          </Plural>
+        </PluralTranslate>
+      </RequestConfirm>
+    </>
   );
 }
 
