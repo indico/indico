@@ -244,7 +244,7 @@ export default function ContributionEntry({
   return (
     <div
       role="button"
-      styleName={`entry ${id === 'draft' ? 'draft' : ''} ${renderChildren ? '' : 'simple'}`}
+      styleName={`entry ${renderChildren ? '' : 'simple'}`}
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
