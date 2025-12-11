@@ -12,6 +12,14 @@ Security fixes
 
 - Fix an open redirect which could help making harmful URLs look more trustworthy by linking
   to Indico and having it redirect the user to a malicious site
+- Fix an XSS vulnerability with HTML materials when stored on S3 with certain
+  configuration settings
+
+.. note::
+
+    Anyone running Indico using the "standard" setup from our installation guide
+    or without storing files on S3 (using the ``storage_s3`` plugin) is completely
+    unaffected by this problem.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
