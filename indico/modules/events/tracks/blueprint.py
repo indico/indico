@@ -7,7 +7,8 @@
 
 from indico.modules.events.tracks.controllers import (RHCreateTrack, RHCreateTrackGroup, RHDeleteTrack,
                                                       RHDeleteTrackGroup, RHDisplayTracks, RHEditProgram, RHEditTrack,
-                                                      RHEditTrackGroup, RHManageTracks, RHSortTracks, RHTracksPDF)
+                                                      RHEditTrackGroup, RHManageTracks, RHSortTracks, RHTracksJSON,
+                                                      RHTracksPDF)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -30,6 +31,7 @@ _bp.add_url_rule('/manage/track-groups/<int:track_group_id>', 'delete_track_grou
 
 _bp.add_url_rule('/program', 'program', RHDisplayTracks)
 _bp.add_url_rule('/program.pdf', 'program_pdf', RHTracksPDF)
+_bp.add_url_rule('/program.json', 'program_json', RHTracksJSON)
 
 
 _compat_bp = IndicoBlueprint('compat_tracks', __name__, url_prefix='/event/<int:event_id>')

@@ -19,6 +19,7 @@ from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.tracks.operations import (create_track, create_track_group, delete_track, delete_track_group,
                                                      update_program, update_track, update_track_group)
+from indico.modules.events.tracks.schemas import ProgramSchema
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPDisplayTracks, WPManageTracks
 from indico.util.i18n import _
@@ -150,6 +151,11 @@ class RHTracksPDF(RHDisplayEventBase):
     def _process(self):
         pdf = ProgrammeToPDF(self.event)
         return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+
+
+class RHTracksJSON(RHDisplayEventBase):
+    def _process(self):
+        return ProgramSchema().jsonify(self.event)
 
 
 class RHCreateTrackGroup(RHManageEventBase):
