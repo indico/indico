@@ -317,8 +317,12 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         open={pendingEmails > 0}
         onClose={handleCloseConfirmation}
         requestFunc={handleConfirmRequest}
-        header={Translate.string('Send invitation emails?')}
-        confirmText={Translate.string('Send invitations')}
+        header={PluralTranslate.string(
+          'Send invitation email?',
+          'Send invitation emails?',
+          pendingEmails
+        )}
+        confirmText={PluralTranslate.string('Send invitation', 'Send invitations', pendingEmails)}
       >
         <PluralTranslate count={pendingEmails}>
           <Singular>
