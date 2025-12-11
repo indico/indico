@@ -681,7 +681,7 @@ class RHRegistrationUploadPicture(UploadRegistrationPictureMixin, RHRegistration
 
 def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):
     if registration.state != RegistrationState.pending:
-        return
+        return False
     if approve:
         registration.update_state(approved=True)
     else:
@@ -692,6 +692,7 @@ def _modify_registration_status(registration, approve, rejection_reason='', atta
                                      from_management=True)
     status = 'approved' if approve else 'rejected'
     logger.info('Registration %s was %s by %s', registration, status, session.user)
+    return True
 
 
 class RHRegistrationApprove(RHManageRegistrationBase):
@@ -826,13 +827,32 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
+def _bulk_modify_registration_status(registrations, approve, rejection_reason='', attach_rejection_reason=False):
+    num_modified = 0
+    num_skipped = 0
+    for registration in registrations:
+        if _modify_registration_status(registration, approve, rejection_reason, attach_rejection_reason):
+            num_modified += 1
+        else:
+            num_skipped += 1
+    return num_modified, num_skipped
+
+
 class RHRegistrationsApprove(RHRegistrationsActionBase):
     """Accept selected registrations from registration list."""
 
     def _process(self):
-        for registration in self.registrations:
-            _modify_registration_status(registration, approve=True)
-        flash(_('The selected registrations were successfully approved.'), 'success')
+        num_approved, num_skipped = _bulk_modify_registration_status(self.registrations, approve=True)
+        if num_approved:
+            flash(ngettext('{num} registration was successfully approved.',
+                           '{num} registrations were successfully approved.',
+                           num_approved).format(num=num_approved),
+                  'success')
+        if num_skipped:
+            flash(ngettext('{num} registration was not pending and has been skipped.',
+                           '{num} registrations were not pending and have been skipped.',
+                           num_skipped).format(num=num_skipped),
+                  'warning')
         return jsonify_data(**self.list_generator.render_list())
 
 
@@ -843,10 +863,22 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
         message = _('Rejecting these registrations will trigger a notification email for each registrant.')
         if form.validate_on_submit():
-            for registration in self.registrations:
-                _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data,
-                                            attach_rejection_reason=form.attach_rejection_reason.data)
-            flash(_('The selected registrations were successfully rejected.'), 'success')
+            num_rejected, num_skipped = _bulk_modify_registration_status(
+                self.registrations,
+                approve=False,
+                rejection_reason=form.rejection_reason.data,
+                attach_rejection_reason=form.attach_rejection_reason.data
+            )
+            if num_rejected:
+                flash(ngettext('{num} registration was successfully rejected.',
+                           '{num} registrations were successfully rejected.',
+                           num_rejected).format(num=num_rejected),
+                  'success')
+            if num_skipped:
+                flash(ngettext('{num} registration was not pending and has been skipped.',
+                           '{num} registrations were not pending and have been skipped.',
+                           num_skipped).format(num=num_skipped),
+                  'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
