@@ -20,6 +20,7 @@ body {
   --surface-highlight-color: #c4c4c4;
   --surface-highlight-inverse-color: var(--text-secondary-color);
   --surface-disabled-color: #f9f9f9;
+  --surface-disabled-secondary-color: #efefef;
   --surface-disabled-inverse-color: #757575;
   --border-default-color: #5a5a5a;
   --border-disabled-color: #c4c4c4;
@@ -59,9 +60,23 @@ body {
   --control-border-radius: 0.3em;
   --control-border: var(--control-border-width) solid
     var(--control-border-color);
-  --control-padding: 0.5em 1em;
+  --control-padding: 0.5em 0.7em;
   --control-internal-gap: 0.2em;
   --control-raised-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
+  --control-shaded-surface-shading: repeating-linear-gradient(
+    -45deg,
+    var(--surface-disabled-color),
+    var(--surface-disabled-color) 0.5em,
+    var(--surface-disabled-secondary-color) 0.5em,
+    var(--surface-disabled-secondary-color) 1em
+  );
+  --control-shaded-surface-focus-shading: repeating-linear-gradient(
+    -45deg,
+    var(--control-clickable-surface-focus-color),
+    var(--control-clickable-surface-focus-color) 0.5em,
+    var(--control-clickable-surface-color) 0.5em,
+    var(--control-clickable-surface-color) 1em
+  );
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);

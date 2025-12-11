@@ -1,0 +1,88 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+
+%menu-root {
+  --time-menu-animation: 0.2s;
+  --length-menu-travel: -0.4em;
+
+  position: relative;
+  display: inline-flex;
+}
+
+%menu-list {
+  @extend %popup-positioned-target;
+  min-width: var(--anchor-width, 100%);
+  width: max-content;
+  z-index: 1;
+
+  &[data-position-check] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :is(li, a) {
+    width: 100%;
+  }
+}
+
+%menu-collapsed {
+  &:not([data-position-check]) {
+    display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+  }
+}
+
+%menu-expanded {
+  animation: menu-slide-down var(--time-menu-animation);
+}
+
+%menu-button {
+  &::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    display: block; // XXX: Required for transform to work
+  }
+
+  &[aria-expanded='true']::after {
+    transform: rotateX(-180deg);
+  }
+}
+
+%menu-button-expanded {
+  &::after {
+    transform: rotateX(-180deg);
+  }
+}
+
+@keyframes menu-slide-down {
+  from {
+    display: block;
+    opacity: 0;
+    transform: translateY(var(--length-menu-travel));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-slide-up {
+  from {
+    display: block;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    display: none;
+    opacity: 0;
+    transform: translateY(var(--length-menu-travel));
+  }
+}
