@@ -129,7 +129,7 @@ const modeConfig = {
     renderFields: props => <ImportInviteFields {...props} />,
     extraFields: ['imported', 'skip_existing'],
     getPreviewPayload: ({imported}) =>
-      imported
+      imported.length
         ? {
             context: _.pick(imported[0], ['first_name', 'last_name']),
             disabled: false,
