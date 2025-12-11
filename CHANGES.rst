@@ -5,7 +5,7 @@ Changelog
 Version 3.3.9
 -------------
 
-*Unreleased*
+*Released on December 11, 2025*
 
 Security fixes
 ^^^^^^^^^^^^^^
