@@ -5,12 +5,15 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 import pytest
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.util.date_time import now_utc
 
 
 @pytest.fixture
@@ -32,3 +35,22 @@ def create_timetable_entry(db):
         return entry
 
     return _create_timetable_entry
+
+
+@pytest.fixture
+def create_break(db, create_timetable_entry):
+    """Return a callable that lets you create a break."""
+
+    def _create_break(event, title, duration, start_dt, **kwargs):
+        break_ = Break(title=title, duration=duration, **kwargs)
+        db.session.add(break_)
+        db.session.flush()
+        create_timetable_entry(event, break_, start_dt)
+        return break_
+
+    return _create_break
+
+
+@pytest.fixture
+def dummy_break(create_break, dummy_event):
+    return create_break(dummy_event, 'Dummy break', timedelta(minutes=5), now_utc(False))
