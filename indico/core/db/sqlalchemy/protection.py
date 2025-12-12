@@ -690,7 +690,7 @@ def _get_hierarchical_log_data(obj):
         segments.append(_get_obj_name(obj))
         if isinstance(obj, db.m.Category) and 'Category path' not in data:
             data['Category path'] = sep.join(obj.chain_titles)
-        obj = obj.protection_parent
+        obj = obj.protection_parent if not isinstance(obj, db.m.SubContribution) else obj.contribution
         if obj is None or stop:
             break
         if isinstance(obj, stop_types):

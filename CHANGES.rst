@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix error when adding a user to a material ACL in a subcontribution (:pr:`7209`)
 
 Accessibility
 ^^^^^^^^^^^^^
