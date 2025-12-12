@@ -136,9 +136,10 @@ class FieldPlaceholder(ParametrizedPlaceholder):
     def iter_param_info(cls, regform, registration):
         own_placeholder_types = {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name,
                                  PersonalDataType.picture}
-        for field in sorted(regform.active_fields, key=lambda x: (x.parent.position, x.position)):
-            if field.personal_data_type in own_placeholder_types:
-                continue
-            for key, description in field.field_impl.iter_placeholder_info():
-                name = str(field.id) if key is None else f'{field.id}:{key}'
-                yield name, description
+        if regform:
+            for field in sorted(regform.active_fields, key=lambda x: (x.parent.position, x.position)):
+                if field.personal_data_type in own_placeholder_types:
+                    continue
+                for key, description in field.field_impl.iter_placeholder_info():
+                    name = str(field.id) if key is None else f'{field.id}:{key}'
+                    yield name, description
