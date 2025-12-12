@@ -281,6 +281,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.category)
     # - designer_templates (DesignerTemplate.category)
+    # - email_templates (EmailTemplate.category)
     # - event_move_requests (EventMoveRequest.category)
     # - events (Event.category)
     # - favorite_of (User.favorite_categories)

@@ -418,6 +418,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - editing_file_types (EditingFileType.event)
     # - editing_review_conditions (EditingReviewCondition.event)
     # - editing_tags (EditingTag.event)
+    # - email_templates (EmailTemplate.event)
     # - favorite_of (User.favorite_events)
     # - layout_images (ImageFile.event)
     # - legacy_contribution_mappings (LegacyContributionMapping.event)
