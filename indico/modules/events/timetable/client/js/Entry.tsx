@@ -29,7 +29,7 @@ import {
 } from './utils';
 
 import './DayTimetable.module.scss';
-import './ContributionEntry.module.scss';
+import './Entry.module.scss';
 
 interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
   id: string;
@@ -178,6 +178,8 @@ export default function ContributionEntry({
   renderChildren = renderChildren && _children.length > 0;
 
   const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
+  const minHeight = minutesToPixels(5);
+  const height = minutesToPixels(Math.max(duration, minHeight)) - 1;
 
   style = {
     ...style,
@@ -185,11 +187,11 @@ export default function ContributionEntry({
     top: y,
     left: offset,
     width: `calc(${width} - 6px)`,
-    height: minutesToPixels(Math.max(duration, minutesToPixels(5)) - 1),
+    height,
     textAlign: 'left',
-    zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
+    zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
-    filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
+    boxShadow: selected || isDragging ? `0 0 0 4px rgba(0,0,0,0.1)` : undefined,
     ...styleColors,
   };
 
@@ -258,8 +260,7 @@ export default function ContributionEntry({
         styleName="drag-handle"
         style={{
           cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
-          display: 'flex',
-          padding: 0,
+          borderLeftColor: selected || isDragging ? `${colors.color}66` : `${styleColors.color}33`,
         }}
         ref={setNodeRef}
         {...listeners}
@@ -272,14 +273,7 @@ export default function ContributionEntry({
           type={type}
         />
         {type === EntryType.SessionBlock && (
-          <div
-            ref={setDroppableNodeRef}
-            style={{
-              flexGrow: 1,
-              position: 'relative',
-              borderRadius: 6,
-            }}
-          >
+          <div ref={setDroppableNodeRef} styleName="children-wrapper">
             {children.length
               ? children.map(child => (
                   <DraggableEntry
@@ -311,100 +305,53 @@ export default function ContributionEntry({
 
 export function EntryTitle({
   title,
-  duration,
   timeRange,
   type,
-}: {
-  title: string;
-  duration: number;
-  timeRange: string;
-  type: EntryType;
-}) {
-  const iconName = getIconByEntryType(type);
-
-  const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
-
-  if (duration <= 12) {
-    return <TinyTitle title={title} timeRange={timeRange} icon={icon} />;
-  } else if (duration <= 20) {
-    return <SmallTitle title={title} timeRange={timeRange} icon={icon} />;
-  }
-  return <LongTitle title={title} timeRange={timeRange} icon={icon} duration={duration} />;
-}
-
-function TinyTitle({
-  title,
-  timeRange,
-  icon,
-}: {
-  title: string;
-  timeRange: string;
-  icon: React.ReactNode | null;
-}) {
-  return (
-    <div styleName="title-wrapper tiny">
-      {icon}
-      <span styleName="title">{title}</span>, {timeRange}
-    </div>
-  );
-}
-
-function SmallTitle({
-  title,
-  timeRange,
-  icon,
-}: {
-  title: string;
-  timeRange: string;
-  icon: React.ReactNode | null;
-}) {
-  return (
-    <div styleName="title-wrapper small">
-      {icon}
-      <span styleName="title">{title}</span>, {timeRange}
-    </div>
-  );
-}
-
-function LongTitle({
-  title,
-  timeRange,
-  icon,
   duration,
 }: {
   title: string;
   timeRange: string;
-  icon: React.ReactNode | null;
-  duration: number;
+  type: EntryType;
+  duration?: number;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [lines, setLines] = useState<number>(1);
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!ref.current && duration) {
       return;
     }
     const lineHeight = parseInt(getComputedStyle(ref.current).lineHeight, 10);
-    setLines(Math.floor((minutesToPixels(duration - 1) - 9) / lineHeight) - 1);
+    setLines(Math.floor((minutesToPixels(duration - 1) - 9) / lineHeight) - 2);
   }, [duration]);
+
+  // TODO: (Ajob) This formula still breaks and the -19 is wonky, doesn't work in some cases...
+  const verticalPadding = Math.min(Math.max((minutesToPixels(duration) - 1 - 19) / 2, 0), 5);
 
   return (
     <div
       ref={ref}
-      styleName="title-wrapper long"
+      styleName="title-wrapper"
       style={{
-        padding: '4px 8px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        display: 'flex',
-        flexDirection: 'column',
+        lineClamp: lines,
+        WebkitLineClamp: lines,
+        padding: `${verticalPadding}px 5px`,
+        ...(verticalPadding <= 0 ? {alignSelf: 'center'} : {}),
       }}
     >
-      <div styleName="multiline-ellipsis" style={{lineClamp: lines, WebkitLineClamp: lines}}>
-        {icon}
-        <span styleName="title">{title}</span>
+      <div styleName="title-overflow-wrapper">
+        <Icon name={getIconByEntryType(type)} />
+        <span
+          styleName="title"
+          style={{
+            lineClamp: lines,
+            WebkitLineClamp: lines,
+          }}
+        >
+          {title}
+        </span>
       </div>
-      <div styleName="time">{timeRange}</div>
+      <span styleName="time">{timeRange}</span>
     </div>
   );
 }

@@ -5,22 +5,70 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
+.entry {
+  color: white;
+  border-radius: 3px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: unset;
+  padding: 0;
+  outline: none;
+  font-size: 0.9rem;
 
-.entry-title {
-  height: 100%;
+  &.simple {
+    max-width: unset;
+  }
+
+  .children-wrapper {
+    flex-grow: 1;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    min-width: 50%;
+  }
 }
 
-.compact-title {
-  position: absolute;
-  top: -23px;
-  width: 13em;
-  height: 20px;
-  background-color: rgba($light-gray, 0.9);
-  color: $black;
-  padding: 0.3em;
-  border-radius: 5px 5px 0 0;
+.title-wrapper {
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+
+  .title-overflow-wrapper {
+    display: flex;
+    gap: 5px;
+
+    .title {
+      display: -webkit-box;
+      font-weight: bold;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+  }
+
+  .time {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+    margin-left: 2px;
+    white-space: nowrap;
+  }
+}
+
+.drag-handle {
+  box-sizing: border-box;
+  text-align: left;
+  width: 100%;
+  flex-grow: 1;
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-left: 5px solid transparent;
 }

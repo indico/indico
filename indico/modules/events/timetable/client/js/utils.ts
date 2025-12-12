@@ -192,9 +192,9 @@ export const mapTTDataToEntry = (
 
 export function getIconByEntryType(type: EntryType) {
   return {
-    [EntryType.Break]: 'coffee',
-    [EntryType.Contribution]: 'file alternate outline',
-    [EntryType.SessionBlock]: 'calendar alternate outline',
+    [EntryType.Break]: 'clock outline',
+    [EntryType.Contribution]: 'file outline',
+    [EntryType.SessionBlock]: 'calendar outline',
   }[type] as SemanticICONS;
 }
 

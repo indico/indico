@@ -7,6 +7,8 @@
 
 @use 'base/palette' as *;
 
+@import './Entry.module';
+
 $teal-shadow: rgba($dark-teal, 0.5);
 
 // Add vertical scroll to Indico sidebar, but only on the timetable management page
@@ -68,19 +70,6 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   }
 }
 
-.entry {
-  color: white;
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  cursor: unset;
-  border: none;
-  padding: 0;
-  outline: none;
-  font-size: 1rem;
-}
-
 .draft {
   @extend .entry;
   position: absolute;
@@ -95,20 +84,12 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba($white, 0.2);
-  padding: 4px 8px;
+  padding: 2px 4px;
   display: flex;
   flex-direction: column;
   font-weight: bold;
   line-height: 1rem;
   transition: 0.05s;
-}
-
-.drag-handle {
-  text-align: left;
-  width: 100%;
-  flex-grow: 1;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .resize-handle {

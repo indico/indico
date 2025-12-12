@@ -12,6 +12,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
 import './DayTimetable.module.scss';
+import './Entry.module.scss';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
