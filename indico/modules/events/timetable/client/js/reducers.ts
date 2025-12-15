@@ -375,6 +375,43 @@ export default {
           };
         }
       }
+      case actions.DELETE_SESSION: {
+        // Remove all entries belonging to the session being deleted &
+        // unschedule all contributions linked to it
+        const contribsToUnschedule = [];
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            dayEntries.filter(e => {
+              if (e.type === EntryType.SessionBlock && e.sessionId === action.sessionId) {
+                for (const child of e.children) {
+                  if (child.type === EntryType.Contribution) {
+                    contribsToUnschedule.push({...child, sessionId: null});
+                  }
+                }
+              }
+
+              return e.sessionId !== action.sessionId;
+            }),
+          ])
+        );
+        const newUnscheduled = [
+          ...state.changes[state.currentChangeIdx].unscheduled,
+          ...contribsToUnschedule,
+        ];
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'delete-session',
+              unscheduled: newUnscheduled,
+            },
+          ],
+        };
+      }
       case actions.UNDO_CHANGE:
         return {
           ...state,
