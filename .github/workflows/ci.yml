@@ -43,7 +43,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         with:
           path: node_modules
@@ -260,7 +260,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         with:
           path: node_modules
