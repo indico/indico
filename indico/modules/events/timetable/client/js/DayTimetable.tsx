@@ -106,6 +106,8 @@ export function DayTimetable({
   scrollPosition = 0,
 }: DayTimetableProps) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const eventStartDt = useSelector(selectors.getEventStartDt);
+  const eventEndDt = useSelector(selectors.getEventEndDt);
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -174,7 +176,18 @@ export function DayTimetable({
     offset
   ) {
     const [newLayout, newUnscheduled, startDt] =
-      layoutAfterUnscheduledDrop(dt, unscheduled, entries, who, over, delta, mouse, offset) || [];
+      layoutAfterUnscheduledDrop(
+        dt,
+        unscheduled,
+        entries,
+        who,
+        over,
+        delta,
+        mouse,
+        offset,
+        eventStartDt,
+        eventEndDt
+      ) || [];
     if (!newLayout) {
       return;
     }
@@ -201,7 +214,9 @@ export function DayTimetable({
         delta,
         mouse,
         offset,
-        calendar
+        calendar,
+        eventStartDt,
+        eventEndDt
       ) || [];
     if (!newLayout) {
       return;
