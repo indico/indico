@@ -41,6 +41,7 @@ const processSessions = (sessions: Session[]) => {
 
 export function SessionSelect({sessions, ...rest}: SessionSelectProps) {
   const sessionOptions = processSessions(sessions || []);
+  const initialValue = sessionOptions.length === 1 ? sessionOptions[0].value : undefined;
 
   return (
     <FinalDropdown
@@ -52,6 +53,7 @@ export function SessionSelect({sessions, ...rest}: SessionSelectProps) {
       search={false}
       multiple={false}
       disabled={!sessions.length}
+      initialValue={initialValue}
       {...rest}
     />
   );
