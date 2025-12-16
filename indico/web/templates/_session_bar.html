@@ -84,7 +84,7 @@
                                 </label>
                             {% endif %}
                             <label>
-                                <input type="radio" name="tz_mode" value="custom"
+                                <input type="radio" name="tz_mode" value="custom" id="tz-mode-custom"
                                     {{ 'checked' if timezone_data.tz_mode == 'custom' }}
                                     aria-label="{% trans %}Use a custom timezone{% endtrans %}">
                                 <span>{% trans %}Custom{% endtrans %}</span>

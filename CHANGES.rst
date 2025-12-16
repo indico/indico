@@ -16,6 +16,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix error when adding a user to a material ACL in a subcontribution (:pr:`7209`)
+- Fix timezone selector behaving incorrectly when choosing a custom timezone (:pr:`7214`)
 
 Accessibility
 ^^^^^^^^^^^^^
