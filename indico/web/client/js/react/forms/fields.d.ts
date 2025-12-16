@@ -14,6 +14,7 @@ interface SharedFieldProps {
   autoFocus?: boolean;
   required?: boolean | 'no-validator';
   disabled?: boolean;
+  initialValue?: any;
 }
 
 interface FinalFieldProps extends SharedFieldProps {
