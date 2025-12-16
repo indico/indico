@@ -26,6 +26,30 @@ export const getLatestChange = (state: ReduxState) =>
 // You should not use this selector directly, use makeIsSelectedSelector instead
 // to check if an entry is selected
 export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
+// TODO(tomas): This is inefficient, but it'll go away when we refactor the whole redux state
+export const getSelectedEntry = createSelector(
+  [getDayEntries, getSelectedId],
+  (entries, selectedId) => {
+    if (!selectedId) {
+      return null;
+    }
+    for (const dayEntries of Object.values(entries)) {
+      for (const entry of dayEntries) {
+        if (entry.id === selectedId) {
+          return entry;
+        }
+        if (entry.type === 'block') {
+          for (const subEntry of entry.children) {
+            if (subEntry.id === selectedId) {
+              return subEntry;
+            }
+          }
+        }
+      }
+    }
+  }
+);
+
 export const getCurrentDate = (state: ReduxState) => state.navigation.currentDate;
 
 export const makeIsSelectedSelector = () =>
