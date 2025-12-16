@@ -17,6 +17,7 @@ Bugfixes
 
 - Fix error when adding a user to a material ACL in a subcontribution (:pr:`7209`)
 - Fix timezone selector behaving incorrectly when choosing a custom timezone (:pr:`7214`)
+- Fix error when using shibboleth for authentication (:issue:`7213`, :pr:`7215`)
 
 Accessibility
 ^^^^^^^^^^^^^
