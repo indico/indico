@@ -9,6 +9,11 @@
 
 $teal-shadow: rgba($dark-teal, 0.5);
 
+// Add vertical scroll to Indico sidebar, but only on the timetable management page
+body:has(:global(#timetable-container)) :global(.menu-column) {
+  overflow-y: scroll;
+}
+
 .wrapper {
   position: relative;
   display: flex;
