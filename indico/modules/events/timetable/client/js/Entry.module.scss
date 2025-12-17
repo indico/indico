@@ -7,7 +7,7 @@
 
 .entry {
   color: white;
-  border-radius: 3px;
+  border-radius: 4px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -16,31 +16,40 @@
   outline: none;
   font-size: 0.9rem;
 
-  &.simple {
-    max-width: unset;
-  }
-
   .children-wrapper {
     flex-grow: 1;
     height: 100%;
     width: 100%;
     position: relative;
-    min-width: 50%;
+    border-left: 6px solid transparent;
+    background-size: 12px 12px;
+    background-position: -5px -5px;
+    border-radius: 4px;
+
+    .time {
+      display: none;
+    }
   }
 }
 
 .title-wrapper {
   overflow: hidden;
-  line-height: 1rem;
+  line-height: 1.2rem;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
+  padding: 10px;
+  max-height: 100%;
 
   .title-overflow-wrapper {
     display: flex;
     gap: 5px;
+
+    :global(.icon) {
+      font-size: 0.95rem;
+    }
 
     .title {
       display: -webkit-box;
@@ -71,4 +80,30 @@
   align-items: flex-start;
   gap: 10px;
   border-left: 5px solid transparent;
+  container-type: size;
+}
+
+@container (width < 250px) {
+  .children-wrapper {
+    display: none;
+  }
+}
+
+@container (width < 160px) {
+  .title-wrapper .time {
+    display: none;
+  }
+}
+
+@container (height <= 50px) {
+  .title-wrapper {
+    padding-block: 0;
+    align-self: center;
+  }
+}
+
+@container ((height <= 34px)) {
+  .title-wrapper {
+    max-height: 1.2rem;
+  }
 }

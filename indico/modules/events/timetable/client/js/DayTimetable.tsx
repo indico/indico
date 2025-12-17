@@ -51,8 +51,6 @@ interface DayTimetableProps {
   scrollPosition: number;
 }
 
-const TABLE_MARGIN_TOP = 10;
-
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
 
@@ -380,7 +378,6 @@ export function DayTimetable({
 
   const restrictToCalendar = useMemo(() => {
     const limitsDelta: [number, number] = [limitTop, DAY_SIZE - limitBottom];
-    limitsDelta[1] += TABLE_MARGIN_TOP;
     return createRestrictToCalendar(calendarRef, limitsDelta);
   }, [limitTop, limitBottom]);
 
@@ -446,20 +443,12 @@ interface TimeGutterProps {
   maxHour: number;
 }
 
-export function Lines({
-  minHour = 0,
-  maxHour = 23,
-  first = true,
-}: {
-  minHour?: number;
-  maxHour?: number;
-  first?: boolean;
-}) {
+export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
   const oneHour = minutesToPixels(60);
 
   return (
-    <div styleName={`lines ${first ? 'first' : ''}`}>
-      {Array.from({length: maxHour - minHour + 1}, (_, i) => (
+    <div styleName="lines">
+      {Array.from({length: maxHour - minHour + 1}, (_val, i) => (
         <div key={i} style={{height: oneHour}} styleName="line" />
       ))}
     </div>
@@ -471,10 +460,11 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
 
   return (
     <div styleName="time-gutter">
-      <div style={{height: 10}} />
-      {Array.from({length: maxHour - minHour + 1}, (_, i) => (
-        <TimeSlot key={i} height={oneHour} time={`${(minHour + i) % 24}:00`} />
-      ))}
+      {Array.from({length: maxHour - minHour + 1}, (_val, i) => {
+        const time = (minHour + i) % 12 || 12;
+        const suffix = i + minHour >= 12 ? 'PM' : 'AM';
+        return <TimeSlot key={i} height={oneHour} time={`${time} ${suffix}`} />;
+      })}
     </div>
   );
 }
@@ -482,7 +472,7 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
 function TimeSlot({height, time}: {height: number; time: string}) {
   return (
     <div styleName="time-slot" style={{height}}>
-      <div>{time}</div>
+      {time}
     </div>
   );
 }
@@ -493,7 +483,7 @@ function DnDCalendar({children}: {children: React.ReactNode}) {
   });
 
   return (
-    <div ref={setNodeRef} styleName="calendar" style={{marginTop: TABLE_MARGIN_TOP}}>
+    <div ref={setNodeRef} styleName="calendar">
       {children}
     </div>
   );

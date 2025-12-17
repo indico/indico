@@ -126,7 +126,6 @@ interface _EntryProps {
   setDuration: (duration: number) => void;
   onMouseUp?: () => void;
   setChildDuration?: (id: string) => (duration: number) => void;
-  renderChildren?: boolean;
   children?: ContribEntry[];
   parent?: BlockEntry | null;
   parentEndDt?: string;
@@ -161,7 +160,6 @@ export default function ContributionEntry({
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
-  renderChildren = true,
 }: DraggableContribEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const resizeStartRef = useRef<number | null>(null);
@@ -175,7 +173,6 @@ export default function ContributionEntry({
         // zIndex: 70,
       }
     : {};
-  renderChildren = renderChildren && _children.length > 0;
 
   const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
   const minHeight = minutesToPixels(5);
@@ -246,7 +243,7 @@ export default function ContributionEntry({
   return (
     <div
       role="button"
-      styleName={`entry ${renderChildren ? '' : 'simple'}`}
+      styleName="entry"
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
@@ -273,20 +270,25 @@ export default function ContributionEntry({
           type={type}
         />
         {type === EntryType.SessionBlock && (
-          <div ref={setDroppableNodeRef} styleName="children-wrapper">
-            {children.length
-              ? children.map(child => (
-                  <DraggableEntry
-                    key={child.id}
-                    setDuration={_children ? setChildDurations[child.id] : null}
-                    blockRef={blockRef}
-                    parentEndDt={moment(startDt)
-                      .add(deltaMinutes + duration, 'minutes')
-                      .format()}
-                    {...child}
-                  />
-                ))
-              : null}
+          <div
+            ref={setDroppableNodeRef}
+            styleName="children-wrapper"
+            style={{
+              backgroundImage: `radial-gradient(${colors.color}11 1px, transparent 0)`,
+              backgroundColor: `${colors.color}11`,
+            }}
+          >
+            {children.map(child => (
+              <DraggableEntry
+                key={child.id}
+                setDuration={_children ? setChildDurations[child.id] : null}
+                blockRef={blockRef}
+                parentEndDt={moment(startDt)
+                  .add(deltaMinutes + duration, 'minutes')
+                  .format()}
+                {...child}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -325,9 +327,6 @@ export function EntryTitle({
     setLines(Math.floor((minutesToPixels(duration - 1) - 9) / lineHeight) - 2);
   }, [duration]);
 
-  // TODO: (Ajob) This formula still breaks and the -19 is wonky, doesn't work in some cases...
-  const verticalPadding = Math.min(Math.max((minutesToPixels(duration) - 1 - 19) / 2, 0), 5);
-
   return (
     <div
       ref={ref}
@@ -335,8 +334,6 @@ export function EntryTitle({
       style={{
         lineClamp: lines,
         WebkitLineClamp: lines,
-        padding: `${verticalPadding}px 5px`,
-        ...(verticalPadding <= 0 ? {alignSelf: 'center'} : {}),
       }}
     >
       <div styleName="title-overflow-wrapper">

@@ -23,42 +23,31 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
 }
 
 .time-gutter {
-  max-width: 50px;
-  padding-right: 10px;
   user-select: none;
+  border-right: 1px solid $raincloud-gray;
 
   .time-slot {
-    div {
-      position: relative;
-      top: -8px;
-    }
+    text-align: center;
+    padding: 10px 10px 0 10px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: $dark-gray;
+    white-space: nowrap;
+    position: relative;
   }
 }
 
 .lines {
   pointer-events: none;
 
-  .line::after {
+  .line:not(:first-child)::after {
     position: absolute;
-    border-bottom: 1px solid #d4d4d5;
+    border-bottom: 1px solid $raincloud-gray;
     content: '';
-    width: 100%;
+    width: calc(100% + 70px);
+    left: -70px;
   }
-
-  &.first {
-    .line::after {
-      left: -10px;
-      width: calc(10px + 100%);
-    }
-  }
-}
-
-.dragging::before {
-  content: attr(data-dragging);
-}
-
-.dragging {
-  background-color: paleturquoise;
 }
 
 .calendar {
@@ -66,7 +55,7 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   width: 100%;
 
   &.day:not(:last-child) {
-    border-right: 1px solid #d4d4d5;
+    border-right: 1px solid $raincloud-gray;
   }
 }
 
