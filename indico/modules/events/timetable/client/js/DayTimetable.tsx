@@ -240,14 +240,11 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
-    const [newLayout, movedEntry, blockId] = layoutAfterDropOnBlock(
-      entries,
-      who,
-      over,
-      delta,
-      mouse,
-      calendar
-    );
+    const [newLayout, movedEntry, blockId] =
+      layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar) || [];
+    if (!newLayout) {
+      return;
+    }
     dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }
 
