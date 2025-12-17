@@ -292,7 +292,7 @@ export default {
             {
               entries: newEntries,
               change: 'delete',
-              unscheduled: [state.changes[state.currentChangeIdx].unscheduled, ...contribs],
+              unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, ...contribs],
             },
           ],
         };
