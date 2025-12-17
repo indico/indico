@@ -344,6 +344,7 @@ export function DayTimetable({
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         dispatch(actions.setDraftEntry(null));
+        setDraggingStartPos(null);
       }
     }
 
@@ -426,6 +427,7 @@ export function DayTimetable({
                   eventId={eventId}
                   onClose={() => {
                     dispatch(actions.setDraftEntry(null));
+                    setDraggingStartPos(null);
                   }}
                   entry={draftEntry}
                 />
