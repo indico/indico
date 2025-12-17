@@ -64,7 +64,15 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>();
   const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
 
-  const contribs = useSelector(selectors.getUnscheduled);
+  const contribs = useSelector(selectors.getUnscheduled).toSorted((c1, c2) => {
+    // sort by sessionId then by title
+    const c1SessionId = c1.sessionId ?? Number.MAX_SAFE_INTEGER;
+    const c2SessionId = c2.sessionId ?? Number.MAX_SAFE_INTEGER;
+    if (c1SessionId !== c2SessionId) {
+      return c1SessionId - c2SessionId;
+    }
+    return c1.title.localeCompare(c2.title);
+  });
   const sessions = useSelector(selectors.getSessions);
   const prevSessions = useRef(sessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
