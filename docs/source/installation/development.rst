@@ -14,14 +14,7 @@ Do not use the default NodeJS packages from your Linux distribution as they are 
 an outdated npm version.
 
 Since only the latest Linux distributions include Python 3.12 in their package managers, we recommend installing
-`pyenv <https://github.com/pyenv/pyenv-installer>`_ and then install the latest Python 3.12 version using
-``pyenv install 3.12``.
-
-.. tip::
-
-    You can run ``pyenv doctor`` once you installed and enabled pyenv in order to see whether all dependencies are
-    met. There's a good chance that you need to install some additional system packages beyond those listed below, and using
-    this tool will tell you what exactly you need.
+`uv <https://docs.astral.sh/uv/>`_.
 
 RPM-based distributions (Alma, Rocky, Fedora)
 +++++++++++++++++++++++++++++++++++++++++++++
@@ -74,13 +67,7 @@ developers keep all their code inside a ``dev`` or ``code`` dir. We will assume 
 We will need a virtualenv where to run Indico::
 
     cd ~/dev/indico
-    pyenv local 3.12
-    python -m venv env
-
-.. note::
-
-    After setting the version with pyenv, it's a good idea to use ``python -V`` to ensure you are really running that
-    particular Python version; depending on the shell you may need to restart your shell first.
+    uv venv --python=3.12
 
 
 .. _cloning:
@@ -116,7 +103,7 @@ unnecessarily. This is why we advise that you include a fake SMTP server in your
 `Maildump <https://github.com/ThiefMaster/maildump>`_ does exactly this and runs on Python. It should be quite simple
 to set up::
 
-    python -m venv maildump
+    uv venv --seed maildump
     ./maildump/bin/pip install -U pip setuptools wheel
     ./maildump/bin/pip install maildump
     ./maildump/bin/maildump -p /tmp/maildump.pid
@@ -157,11 +144,11 @@ Configuring
 
 Let's get into the Indico virtualenv::
 
-    source ./env/bin/activate
-    pip install -U pip setuptools wheel
+    source .venv/bin/activate
+    uv pip install -U pip setuptools wheel
 
     cd src
-    pip install -e '.[dev]'
+    uv pip install -e '.[dev]'
     npm ci
 
 Then, follow the instructions given by the wizard::
