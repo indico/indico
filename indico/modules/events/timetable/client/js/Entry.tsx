@@ -320,7 +320,7 @@ export function EntryTitle({
   const [lines, setLines] = useState<number>(1);
 
   useEffect(() => {
-    if (!ref.current && duration) {
+    if (!ref.current || !duration) {
       return;
     }
     const lineHeight = parseInt(getComputedStyle(ref.current).lineHeight, 10);

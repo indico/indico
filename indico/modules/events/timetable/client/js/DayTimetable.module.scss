@@ -7,7 +7,7 @@
 
 @use 'base/palette' as *;
 
-@import './Entry.module';
+@use './Entry.module';
 
 $teal-shadow: rgba($dark-teal, 0.5);
 

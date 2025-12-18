@@ -448,7 +448,7 @@ export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
 
   return (
     <div styleName="lines">
-      {Array.from({length: maxHour - minHour + 1}, (_val, i) => (
+      {Array.from({length: maxHour - minHour + 1}, (__, i) => (
         <div key={i} style={{height: oneHour}} styleName="line" />
       ))}
     </div>
@@ -460,7 +460,7 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
 
   return (
     <div styleName="time-gutter">
-      {Array.from({length: maxHour - minHour + 1}, (_val, i) => {
+      {Array.from({length: maxHour - minHour + 1}, (__, i) => {
         const time = (minHour + i) % 12 || 12;
         const suffix = i + minHour >= 12 ? 'PM' : 'AM';
         return <TimeSlot key={i} height={oneHour} time={`${time} ${suffix}`} />;
