@@ -39,9 +39,9 @@ export const getSelectedEntry = createSelector(
           return entry;
         }
         if (entry.type === 'block') {
-          for (const subEntry of entry.children) {
-            if (subEntry.id === selectedId) {
-              return subEntry;
+          for (const child of entry.children) {
+            if (child.id === selectedId) {
+              return child;
             }
           }
         }
