@@ -7,6 +7,8 @@
 
 @use 'base/palette' as *;
 
+@use './Entry.module';
+
 $teal-shadow: rgba($dark-teal, 0.5);
 
 // Add vertical scroll to Indico sidebar, but only on the timetable management page
@@ -21,42 +23,31 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
 }
 
 .time-gutter {
-  max-width: 50px;
-  padding-right: 10px;
   user-select: none;
+  border-right: 1px solid $raincloud-gray;
 
   .time-slot {
-    div {
-      position: relative;
-      top: -8px;
-    }
+    text-align: center;
+    padding: 10px 10px 0 10px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: $dark-gray;
+    white-space: nowrap;
+    position: relative;
   }
 }
 
 .lines {
   pointer-events: none;
 
-  .line::after {
+  .line:not(:first-child)::after {
     position: absolute;
-    border-bottom: 1px solid #d4d4d5;
+    border-bottom: 1px solid $raincloud-gray;
     content: '';
-    width: 100%;
+    width: calc(100% + 70px);
+    left: -70px;
   }
-
-  &.first {
-    .line::after {
-      left: -10px;
-      width: calc(10px + 100%);
-    }
-  }
-}
-
-.dragging::before {
-  content: attr(data-dragging);
-}
-
-.dragging {
-  background-color: paleturquoise;
 }
 
 .calendar {
@@ -64,21 +55,8 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   width: 100%;
 
   &.day:not(:last-child) {
-    border-right: 1px solid #d4d4d5;
+    border-right: 1px solid $raincloud-gray;
   }
-}
-
-.entry {
-  color: white;
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  cursor: unset;
-  border: none;
-  padding: 0;
-  outline: none;
-  font-size: 1rem;
 }
 
 .draft {
@@ -95,20 +73,12 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba($white, 0.2);
-  padding: 4px 8px;
+  padding: 2px 4px;
   display: flex;
   flex-direction: column;
   font-weight: bold;
   line-height: 1rem;
   transition: 0.05s;
-}
-
-.drag-handle {
-  text-align: left;
-  width: 100%;
-  flex-grow: 1;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .resize-handle {

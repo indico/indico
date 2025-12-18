@@ -5,22 +5,108 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
+.entry {
+  color: white;
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: unset;
+  padding: 0;
+  outline: none;
+  font-size: 0.9rem;
 
-.entry-title {
-  height: 100%;
+  .children-wrapper {
+    flex-grow: 1;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    border-left: 6px solid transparent;
+    background-size: 12px 12px;
+    background-position: -5px -5px;
+    border-radius: 4px;
+
+    .time {
+      display: none;
+    }
+  }
 }
 
-.compact-title {
-  position: absolute;
-  top: -23px;
-  width: 13em;
-  height: 20px;
-  background-color: rgba($light-gray, 0.9);
-  color: $black;
-  padding: 0.3em;
-  border-radius: 5px 5px 0 0;
+.title-wrapper {
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 1.2rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px;
+  max-height: 100%;
+
+  .title-overflow-wrapper {
+    display: flex;
+    gap: 5px;
+
+    :global(.icon) {
+      font-size: 0.95rem;
+    }
+
+    .title {
+      // -webkit-box, line-clamp and -webkit-lineclamp are necessary because it is currently the
+      // only way to support multiline ellipsis. See following two links that provide more context:
+      // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/line-clamp
+      // https://connect.mozilla.org/t5/discussions/the-use-of-webkit-box-orient/m-p/71929
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      font-weight: bold;
+      overflow: hidden;
+      word-break: break-word;
+    }
+  }
+
+  .time {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+    margin-left: 2px;
+    white-space: nowrap;
+  }
+}
+
+.drag-handle {
+  box-sizing: border-box;
+  text-align: left;
+  width: 100%;
+  flex-grow: 1;
+  user-select: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-left: 5px solid transparent;
+  container-type: size;
+}
+
+@container (width < 250px) {
+  .children-wrapper {
+    display: none;
+  }
+}
+
+@container (width < 160px) {
+  .title-wrapper .time {
+    display: none;
+  }
+}
+
+@container (height <= 50px) {
+  .title-wrapper {
+    padding-block: 0;
+    align-self: center;
+  }
+}
+
+@container (height <= 34px) {
+  .title-wrapper {
+    max-height: 1.2rem;
+  }
 }
