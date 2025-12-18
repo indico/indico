@@ -16,8 +16,7 @@ import {formatTimeRange} from './i18n';
 import {Colors, EntryType} from './types';
 import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
-import './ContributionEntry.module.scss';
-import './UnscheduledContributionEntry.module.scss';
+import './Entry.module.scss';
 
 export function DraggableUnscheduledContributionEntry({
   id,
@@ -55,7 +54,6 @@ export function DraggableUnscheduledContributionEntry({
   }
 
   let style: React.CSSProperties = {
-    fontSize: 15,
     ...colors,
   };
 
@@ -133,8 +131,6 @@ export function UnscheduledContributionEntry({
   const style = {
     border: '2px solid transparent',
     ...colors,
-    fontSize: 15,
-    borderRadius: 8,
     cursor: isDragging ? 'grabbing' : 'grab',
     userSelect: 'none' as const,
     height: minutesToPixels(Math.max(duration, minutesToPixels(10)) - 1),

@@ -10,22 +10,24 @@
 // Separate variables to allow customization.
 $primary-color: $dark-blue;
 $bg-color: $white;
-$toolbar-bg-color: $pastel-gray;
+$toolbar-bg-color: $raincloud-gray;
 
 .toolbar {
   position: sticky;
   top: 0;
   background-color: $bg-color;
   z-index: 100;
+  border-bottom: 2px solid rgba($raincloud-gray, 0.8);
 
   :global(.ui.menu) {
     height: 46px;
     display: flex;
     align-items: center;
     margin: 0;
+    border: 0;
 
     &.actions-bar {
-      box-shadow: 0 10px 10px -10px rgba($pastel-gray, 0.8);
+      box-shadow: 0 10px 10px -10px rgba($raincloud-gray, 0.8);
       padding: 0;
     }
 
