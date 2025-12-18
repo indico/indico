@@ -8,7 +8,7 @@
 import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
-import {DEFAULT_CONTRIB_COLORS} from './colors';
+import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {ReduxState, Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
@@ -130,7 +130,12 @@ export const getIsExpanded = createSelector(
 
 function appendSessionAttributes(entries: any[], sessions: Record<string, Session>) {
   return entries.map(e => {
-    const {isPoster = false, colors = DEFAULT_CONTRIB_COLORS} = sessions[e.sessionId] || {};
-    return e.sessionId ? {...e, isPoster, colors} : e;
+    if (!e.sessionId) {
+      return e;
+    }
+    const session = sessions[e.sessionId];
+    const isPoster = session.isPoster;
+    const colors = ENTRY_COLORS_BY_BACKGROUND[session.colors.backgroundColor];
+    return {...e, isPoster, colors};
   });
 }
