@@ -8,8 +8,8 @@
 import {Colors, HexColor} from './types';
 
 export const DEFAULT_CONTRIB_COLORS: Colors = {
-  color: '#ffffff',
-  backgroundColor: '#5b1aff',
+  color: '#3d242a',
+  backgroundColor: '#f2bfcc',
 };
 
 export const DEFAULT_BREAK_COLORS: Colors = {
