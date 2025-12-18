@@ -52,9 +52,13 @@
     }
 
     .title {
+      // -webkit-box, line-clamp and -webkit-lineclamp are necessary because it is currently the
+      // only way to support multiline ellipsis. See following two links that provide more context:
+      // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/line-clamp
+      // https://connect.mozilla.org/t5/discussions/the-use-of-webkit-box-orient/m-p/71929
       display: -webkit-box;
-      font-weight: bold;
       -webkit-box-orient: vertical;
+      font-weight: bold;
       overflow: hidden;
       word-break: break-word;
     }
