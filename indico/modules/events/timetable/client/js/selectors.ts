@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {ReduxState, Session} from './types';
+import {EntryType, ReduxState, Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -38,7 +38,7 @@ export const getSelectedEntry = createSelector(
         if (entry.id === selectedId) {
           return entry;
         }
-        if (entry.type === 'block') {
+        if (entry.type === EntryType.SessionBlock) {
           for (const child of entry.children) {
             if (child.id === selectedId) {
               return child;

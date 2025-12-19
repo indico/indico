@@ -101,8 +101,6 @@ function GlobalEvents() {
               dispatch(actions.unscheduleEntry(selectedEntry, eventId));
               break;
             }
-            default:
-              break;
           }
         }
       }
