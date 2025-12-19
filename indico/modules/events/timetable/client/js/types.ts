@@ -137,6 +137,12 @@ export function isChildEntry(entry: Entry): entry is ChildEntry {
   return !!entry['sessionBlockId'];
 }
 
+export function assertIsBlockEntry(entry: Entry): asserts entry is BlockEntry {
+  if (entry.type !== EntryType.SessionBlock) {
+    throw new Error('Expected a BlockEntry');
+  }
+}
+
 // Request objects (lowercase)
 
 export interface LocationParentObj {
