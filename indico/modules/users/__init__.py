@@ -47,6 +47,7 @@ user_settings = UserSettingsProxy('users', {
 
 user_management_settings = SettingsProxy('user_management', {
     'notify_account_creation': False,
+    'notify_account_creation_emails': [],
     'email_blacklist': [],
     'allow_personal_tokens': True,
     'mandatory_fields_account_request': [],
@@ -96,12 +97,18 @@ def _registration_requested(req, **kwargs):
 @signals.users.registered.connect
 def _registered(user, identity, from_moderation, **kwargs):
     from indico.modules.users.util import get_admin_emails
-    if (from_moderation or identity is None or identity.provider != 'indico' or
-            not user_management_settings.get('notify_account_creation')):
+    if from_moderation or identity is None or identity.provider != 'indico':
         return
+
+    recipients = set(user_management_settings.get('notify_account_creation_emails'))
+    if user_management_settings.get('notify_account_creation'):
+        recipients.update(get_admin_emails())
+    if not recipients:
+        return
+
     with force_locale(None):
         tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
-        email = make_email(get_admin_emails(), template=tpl)
+        email = make_email(recipients, template=tpl)
     send_email(email)
 
 
