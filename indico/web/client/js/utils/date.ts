@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import _ from 'lodash';
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 import 'moment-timezone';
 
 export function toMoment(dt, format, strict = false) {
@@ -356,4 +359,43 @@ export class SparseDateRange {
     }
     return closestRange.clamp(date);
   }
+}
+
+export function getDisabledHours(dt: Moment, minStartDt?: Moment, maxEndDt?: Moment): number[] {
+  // Get the disabled hours for the selected date
+  // For example, if the start time is 9:30, disable all hours before 9
+  // If the end time is 17:00, disable all hours after 17
+  const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
+  const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
+  const minHour = shouldFilterStart ? minStartDt.hour() : 0;
+  const maxHour = shouldFilterEnd ? maxEndDt.hour() : 23;
+  const allHours = [...Array(24).keys()];
+
+  return allHours.filter(h => h < minHour || h > maxHour);
+}
+
+export function getDisabledMinutes(
+  hour: number,
+  dt: Moment,
+  minStartDt?: Moment,
+  maxEndDt?: Moment
+): number[] {
+  // Get the disabled minutes for the selected date and hour
+  // For example, if the start time is 9:30 and `hour` is 9, disable all minutes before 30
+  // If the end time is 17:15 and `hour` is 17, disable all minutes after 15
+  const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
+  const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
+  const minHour = shouldFilterStart ? minStartDt.hour() : 0;
+  const maxHour = shouldFilterEnd ? maxEndDt.hour() : 23;
+  const minMinute = shouldFilterStart ? minStartDt.minute() : 0;
+  const maxMinute = shouldFilterEnd ? maxEndDt.minute() : 59;
+  const allMinutes = [...Array(60).keys()];
+
+  return allMinutes.filter(
+    m =>
+      hour < minHour ||
+      hour > maxHour ||
+      (hour === minHour && m < minMinute) ||
+      (hour === maxHour && m > maxMinute)
+  );
 }
