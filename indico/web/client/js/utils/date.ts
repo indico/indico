@@ -361,10 +361,18 @@ export class SparseDateRange {
   }
 }
 
+/**
+ * Get the disabled hours for a date given start and end constraints
+ * This is used by the time picker to disable hours that are outside the event times
+ *
+ * See tests for examples
+ *
+ * @param {Moment} dt - The date for which to get the disabled hours
+ * @param {Moment} minStartDt - The start constraint (typically the event start time)
+ * @param {Moment} maxEndDt - The end constraint (typically the event end time minus the entry duration)
+ * @returns {number[]} - An array of disabled hours (0-23)
+ */
 export function getDisabledHours(dt: Moment, minStartDt?: Moment, maxEndDt?: Moment): number[] {
-  // Get the disabled hours for the selected date
-  // For example, if the start time is 9:30, disable all hours before 9
-  // If the end time is 17:00, disable all hours after 17
   const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
   const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
   const minHour = shouldFilterStart ? minStartDt.hour() : 0;
@@ -374,15 +382,24 @@ export function getDisabledHours(dt: Moment, minStartDt?: Moment, maxEndDt?: Mom
   return allHours.filter(h => h < minHour || h > maxHour);
 }
 
+/**
+ * Get the disabled minutes for a given hour and date given start and end constraints
+ * This is used by the time picker to disable minutes that are outside the event times
+ *
+ * See tests for examples
+ *
+ * @param hour - The hour for which to get the disabled minutes
+ * @param dt - The date for which to get the disabled minutes
+ * @param minStartDt - The start constraint (typically the event start time)
+ * @param maxEndDt - The end constraint (typically the event end time minus the entry duration)
+ * @returns {number[]} - An array of disabled minutes (0-59)
+ */
 export function getDisabledMinutes(
   hour: number,
   dt: Moment,
   minStartDt?: Moment,
   maxEndDt?: Moment
 ): number[] {
-  // Get the disabled minutes for the selected date and hour
-  // For example, if the start time is 9:30 and `hour` is 9, disable all minutes before 30
-  // If the end time is 17:15 and `hour` is 17, disable all minutes after 15
   const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
   const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
   const minHour = shouldFilterStart ? minStartDt.hour() : 0;
