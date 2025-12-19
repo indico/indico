@@ -318,6 +318,7 @@ export class SparseDateRange {
     return undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
   get isInvalid() {
     // Multi-range can never be invalid
     return false;
