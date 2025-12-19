@@ -80,7 +80,7 @@ def _require_encoding(encoding):
 
 def prepare_db(empty=False, root_path=None, verbose=True, force=False):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
-    if not _require_pg_version(13, force=force):
+    if not _require_pg_version(14, force=force):
         return False
     if not _require_encoding('UTF8'):
         return False

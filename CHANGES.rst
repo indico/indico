@@ -27,7 +27,9 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Require at least Postgres 14 during new installations. This check can be forced on
+  older Postgres versions (even though they are end-of-life), but we make no guarantees
+  that nothing is broken (:pr:`7232`)
 
 
 Version 3.3.9
