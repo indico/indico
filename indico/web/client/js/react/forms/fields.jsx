@@ -16,7 +16,7 @@ import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'seman
 
 import Checkbox from 'indico/react/components/Checkbox';
 import DatePicker from 'indico/react/components/DatePicker';
-import {toMoment} from 'indico/utils/date';
+import {toMoment, getDisabledHours, getDisabledMinutes} from 'indico/utils/date';
 
 import formatters from './formatters';
 import parsers from './parsers';
@@ -442,49 +442,8 @@ function DateTimePickerComponent({
   const handleTimeChange = newTime =>
     onChange(`${dateValue}T${moment(newTime).format('HH:mm:00')}`);
 
-  function getDisabledHours() {
-    // Get the disabled hours for the selected date
-    // For example, if the start time is 9:30, disable all hours before 9
-    // If the end time is 17:00, disable all hours after 17
-    const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
-    const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
-    if (!shouldFilterStart && !shouldFilterEnd) {
-      return [];
-    }
-
-    let disabledHours = [...Array(24).keys()];
-    if (shouldFilterStart) {
-      disabledHours = disabledHours.filter(h => h < minStartDt.hour());
-    }
-    if (shouldFilterEnd) {
-      disabledHours = disabledHours.filter(h => h > maxEndDt.hour());
-    }
-    return disabledHours;
-  }
-
-  function getDisabledMinutes(hour) {
-    // Get the disabled minutes for the selected date and hour
-    // For example, if the start time is 9:30 and `hour` is 9, disable all minutes before 30
-    // If the end time is 17:15 and `hour` is 17, disable all minutes after 15
-    const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
-    const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
-    if (!shouldFilterStart && !shouldFilterEnd) {
-      return [];
-    }
-
-    let disabledMinutes = [...Array(60).keys()];
-    if (shouldFilterStart) {
-      disabledMinutes = disabledMinutes.filter(
-        m => hour < minStartDt.hour() || (hour === minStartDt.hour() && m < minStartDt.minute())
-      );
-    }
-    if (shouldFilterEnd) {
-      disabledMinutes = disabledMinutes.filter(
-        m => hour > maxEndDt.hour() || (hour === maxEndDt.hour() && m > maxEndDt.minute())
-      );
-    }
-    return disabledMinutes;
-  }
+  const _getDisabledHours = () => getDisabledHours(dt, minStartDt, maxEndDt);
+  const _getDisabledMinutes = hour => getDisabledMinutes(hour, dt, minStartDt, maxEndDt);
 
   return (
     <Form.Group>
@@ -506,8 +465,8 @@ function DateTimePickerComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           disabled={disabled}
-          disabledHours={getDisabledHours}
-          disabledMinutes={getDisabledMinutes}
+          disabledHours={_getDisabledHours}
+          disabledMinutes={_getDisabledMinutes}
         />
       </Form.Field>
     </Form.Group>
