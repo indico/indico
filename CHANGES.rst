@@ -10,7 +10,8 @@ Version 3.3.10
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Allow sending account-creation notifications to a configurable email list. (:issue:`7166`,
+  :pr:`7233`, thanks :user:`duartegalvao`)
 
 Bugfixes
 ^^^^^^^^
