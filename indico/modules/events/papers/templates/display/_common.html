@@ -1,54 +1,18 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro render_cfp_infoline(event, cfp, contributions) %}
-    <div class="action-box highlight">
-        <div class="section">
-            {% set is_authorized = cfp.is_authorized_submitter(session.user) %}
-            {% set can_submit = cfp.can_submit_proceedings(session.user) %}
-            <div class="text">
-                <div class="label">
-                    {%- if cfp.is_open %}
-                        {%- trans %}The call for papers is open{% endtrans -%}
-                    {% elif is_authorized %}
-                        {%- trans %}You have been authorized to submit papers{% endtrans -%}
-                    {% else %}
-                        <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
-                    {% endif -%}
-                </div>
-                {%- if can_submit %}
-                    <div>
-                        {% if contributions|length == 1 %}
-                            {% set contrib = contributions|first %}
-                            {% set contrib_title -%}
-                                <strong>{{ '#%d: %s' | format(contrib.friendly_id, contrib.title) | truncate(65) }}</strong>
-                            {%- endset %}
-                            {%- trans %}You can submit your paper for {{ contrib_title }}{% endtrans -%}
-                        {% else %}
-                            {%- trans %}You can submit a paper{% endtrans -%}
-                        {% endif %}
-                    </div>
+    {%- call message_box('info') %}
+        {% set is_authorized = cfp.is_authorized_submitter(session.user) %}
+        <div class="text">
+            <div class="label">
+                {%- if cfp.is_open %}
+                    {%- trans %}The call for papers is open{% endtrans -%}
+                {% elif is_authorized %}
+                    {%- trans %}You have been authorized to submit papers{% endtrans -%}
+                {% else %}
+                    <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
                 {% endif -%}
             </div>
-            {%- if can_submit %}
-                <div class="toolbar">
-                    {% if contributions|length == 1 %}
-                        {% set contrib = contributions|first %}
-                        <button class="i-button highlight"
-                                data-title="{% trans %}Submit new paper{% endtrans %}"
-                                data-href="{{ url_for('papers.submit_revision', contrib) }}"
-                                data-redirect-after="{{ url_for('papers.paper_timeline', contrib) }}"
-                                data-confirm-close-unsaved
-                                data-ajax-dialog>
-                            {%- trans %}Submit paper{% endtrans -%}
-                        </button>
-                    {% else %}
-                        <button class="i-button highlight"
-                                data-title="{% trans %}Select contribution{% endtrans %}"
-                                data-href="{{ url_for('papers.select_contribution', event) }}"
-                                data-ajax-dialog>
-                            {%- trans %}Submit paper{% endtrans -%}
-                        </button>
-                    {% endif %}
-                </div>
-            {% endif %}
         </div>
-    </div>
+    {%- endcall %}
 {% endmacro %}
