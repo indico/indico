@@ -373,11 +373,13 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               },
             },
       },
-      minimizer: [
-        new TerserPlugin({
-          extractComments: false,
-        }),
-      ],
+      minimizer: process.env.NO_TERSER
+        ? []
+        : [
+            new TerserPlugin({
+              extractComments: false,
+            }),
+          ],
     },
   };
 }
