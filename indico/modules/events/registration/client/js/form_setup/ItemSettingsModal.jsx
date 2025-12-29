@@ -51,6 +51,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   const isUnsupportedField = !(inputType in fieldRegistry);
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
+  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
 
   const handleSubmit = async (formData, form) => {
     const data = getValuesForFields(formData, form);
@@ -212,6 +213,38 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               </FormSpy>
             </Fieldset>
           )}
+          <Fieldset
+            legend={
+              <div
+                style={{cursor: 'pointer', userSelect: 'none'}}
+                onClick={() => setAdvancedSettingsOpen(open => !open)}
+              >
+                <Translate>Advanced settings</Translate>
+                <div className="group right">
+                  <span className={advancedSettingsOpen ? 'icon-expand' : 'icon-next'} />
+                </div>
+              </div>
+            }
+            compact
+          >
+            {advancedSettingsOpen && (
+              <FinalInput
+                name="internalName"
+                type="text"
+                label={Translate.string('Internal name')}
+                disabled={itemData.fieldIsPersonalData}
+                nullIfEmpty
+                validate={val => {
+                  if (val && val !== val.toLowerCase()) {
+                    return Translate.string('Only lowercase letters are allowed.');
+                  }
+                }}
+                description={Translate.string(
+                  'Use for identifying the same field across events regardless of the title.'
+                )}
+              />
+            )}
+          </Fieldset>
           {isUnsupportedField && (
             <Message visible warning>
               Unknown input type: {inputType}.<br />

@@ -392,7 +392,7 @@ def create_personal_data_fields(regform):
         if pd_type not in missing:
             continue
         field = RegistrationFormPersonalDataField(registration_form=regform, personal_data_type=pd_type,
-                                                  is_required=pd_type.is_required)
+                                                  is_required=pd_type.is_required, internal_name=pd_type.name)
         for key, value in data.items():
             setattr(field, key, value)
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
