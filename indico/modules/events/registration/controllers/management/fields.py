@@ -48,15 +48,16 @@ class GeneralFieldDataSchema(mm.Schema):
     @no_autoflush
     def _check_unique_title_in_section(self, title, **kwargs):
         field = self.context['field']
-        query = (RegistrationFormItem.query
-                 .filter(RegistrationFormItem.parent_id == field.parent.id,
-                         db.func.lower(RegistrationFormItem.title) == title.lower(),
-                         RegistrationFormItem.is_enabled,
-                         ~RegistrationFormItem.is_deleted))
-        if field.id:
-            query = query.filter(RegistrationFormItem.id != field.id)
-        if query.has_rows():
-            raise ValidationError(_('There is already a field in this section with the same title.'))
+        if field.is_enabled is not False:  # None means new field
+            query = (RegistrationFormItem.query
+                     .filter(RegistrationFormItem.parent_id == field.parent.id,
+                             db.func.lower(RegistrationFormItem.title) == title.lower(),
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if field.id:
+                query = query.filter(RegistrationFormItem.id != field.id)
+            if query.has_rows():
+                raise ValidationError(_('There is already a field in this section with the same title.'))
 
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
