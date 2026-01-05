@@ -51,6 +51,7 @@ Bugfixes
 - Fix recurrence information not being correctly included in room booking ical export
   (:pr:`7255`)
 - Fix weird indentation on list items in markdown field preview (:pr:`7260`)
+- Fix unique title validation for disabled regform fields (:pr:`7277`)
 
 Accessibility
 ^^^^^^^^^^^^^
