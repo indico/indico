@@ -27,7 +27,7 @@ class EventStartDatePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, event, **kwargs):
-        return format_date(event.start_dt_local)
+        return format_date(event.start_dt, timezone=event.timezone)
 
 
 class EventStartTimePlaceholder(Placeholder):
@@ -36,7 +36,7 @@ class EventStartTimePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, event, **kwargs):
-        return format_time(event.start_dt_local)
+        return format_time(event.start_dt, timezone=event.timezone)
 
 
 class EventLinkPlaceholder(ParametrizedPlaceholder):
