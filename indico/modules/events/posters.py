@@ -44,6 +44,8 @@ class PosterPDF(DesignerPDFBase):
             if placeholder:
                 if placeholder.group == 'event':
                     text = placeholder.render(self.event)
+                elif placeholder.group == 'fixed':
+                    text = placeholder.render(item)
                 else:
                     continue
             elif item.get('text') is not None:
