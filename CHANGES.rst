@@ -19,6 +19,7 @@ Bugfixes
 - Fix timezone selector behaving incorrectly when choosing a custom timezone (:pr:`7214`)
 - Fix error when using shibboleth for authentication (:issue:`7213`, :pr:`7215`)
 - Fix error when sending scheduled reminders using an event time placeholder (:pr:`7238`)
+- Fix rendering static text/images in poster templates (:pr:`7239`)
 
 Accessibility
 ^^^^^^^^^^^^^
