@@ -27,6 +27,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
+from indico.modules.users import User
+from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.web.flask.stats import request_stats_request_started
@@ -73,6 +75,12 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
         _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
 
 
+def _get_user_by_email_or_id(email_or_id: int | str) -> User | None:
+    if isinstance(email_or_id, int):
+        return User.get(email_or_id)
+    return get_user_by_email(email_or_id)
+
+
 def _make_shell_context():
     context = {}
     info = [cformat('%{white!}Available objects')]
@@ -114,6 +122,7 @@ def _make_shell_context():
     add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
                    doc='like datetime() but converted from localtime to utc')
     add_to_context(Event.get, 'E', doc='get event by id')
+    add_to_context(_get_user_by_email_or_id, 'U', doc='get user by email or id')
     # Stuff from plugins
     signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
     return context, info
