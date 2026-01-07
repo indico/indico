@@ -7,12 +7,15 @@
 
 import datetime
 import itertools
+import json
 import os
 import re
 import sys
+from collections import Counter
 from contextlib import ExitStack
 from functools import partial
 from operator import attrgetter, itemgetter
+from pathlib import Path
 
 import click
 import sqlalchemy.orm
@@ -94,8 +97,8 @@ def _make_shell_context():
                  'undefer_group', 'load_only')
     add_to_context_multi([getattr(datetime, attr) for attr in datetime_attrs] +
                          [getattr(sqlalchemy.orm, attr) for attr in orm_attrs] +
-                         [flag_modified] +
-                         [itertools, re, sys, os],
+                         [flag_modified, Path, Counter] +
+                         [itertools, re, sys, os, json],
                          color='yellow')
     # Models
     info.append(cformat('*** %{magenta!}Models%{reset} ***'))
