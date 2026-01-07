@@ -420,5 +420,9 @@ class EventReminder(RenderModeMixin, db.Model):
                                          html=bool(html_email_tpl), alternatives=alternatives)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the event reminder."""
+        return self.event.log(*args, meta={'reminder_id': self.id}, **kwargs)
+
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'scheduled_dt', is_sent=False)
