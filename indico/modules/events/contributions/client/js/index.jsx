@@ -27,6 +27,8 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import './MyContributions';
+import './FavoriteContributionIcon';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 

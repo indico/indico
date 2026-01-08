@@ -46,6 +46,11 @@
                                 span_class='speaker-item-inline', title=contrib.event.show_titles) }}
             </div>
         {%- endif %}
+        {% if contrib.favorite_count -%}
+            <div class="contrib-favorites icon-star">
+                {{ contrib.favorite_count }}
+            </div>
+        {%- endif %}
         {% if contrib.start_dt_display -%}
             <div class="contrib-time icon-time">
                 {{ contrib.start_dt_display|format_datetime(format='short', timezone=timezone) }}

@@ -7,7 +7,7 @@
 
 from functools import partial
 
-from indico.modules.events.contributions.controllers import display, management
+from indico.modules.events.contributions.controllers import api, display, management
 from indico.modules.events.contributions.controllers.compat import compat_contribution, compat_subcontribution
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -154,6 +154,8 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics', display.RHContributionExportToICAL)
 _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  display.RHSubcontributionDisplay)
+
+_bp.add_url_rule('/api/contributions/mine', 'api_my_contributions', api.RHAPIMyContributions, methods=('GET',))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<int:event_id>')

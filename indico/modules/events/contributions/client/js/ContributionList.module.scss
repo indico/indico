@@ -1,0 +1,76 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+:global(.ui.button).submit-button {
+  margin-top: 15px;
+}
+
+:global(.ui.list).contrib-list {
+  :global(.item).contrib-item {
+    margin: 0 -10px;
+
+    .list-flex {
+      display: flex;
+      justify-content: start;
+      margin: 7px 0;
+    }
+
+    .detail {
+      margin-top: 7px;
+      width: 350px;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: $dark-gray;
+    }
+
+    .delete-button {
+      align-self: center;
+      margin-left: auto;
+    }
+  }
+}
+
+.empty {
+  margin: 5px;
+}
+
+:global(.ui.inline.loader.active).contrib-loader {
+  margin: 10px 50%;
+  width: auto;
+}
+
+.contribution-container {
+  margin-top: 15px;
+}
+
+.date-span {
+  width: 15%;
+  margin-right: 7px;
+  font-size: 1em;
+  margin-bottom: 7px;
+  color: $dark-gray;
+}
+
+.date-span-time {
+  display: inline-block;
+  margin-top: 7px;
+}
+
+.contribution-name-box {
+  width: 75%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+  a {
+    margin-right: 5px;
+  }
+}
