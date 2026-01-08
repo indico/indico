@@ -395,6 +395,15 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         return db.column_property(query, deferred=True)
 
     @declared_attr
+    def favorite_count(cls):
+        from indico.modules.users.models.favorites import favorite_contribution_table
+        query = (db.select([db.func.count(favorite_contribution_table.c.user_id)])
+                 .where(favorite_contribution_table.c.target_id == cls.id)
+                 .correlate_except(favorite_contribution_table)
+                 .scalar_subquery())
+        return db.column_property(query, deferred=True)
+
+    @declared_attr
     def _paper_revision_count(cls):
         query = (db.select([db.func.count(PaperRevision.id)])
                  .where(PaperRevision._contribution_id == cls.id)

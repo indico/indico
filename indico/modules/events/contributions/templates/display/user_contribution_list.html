@@ -1,20 +1,12 @@
 {% extends 'events/display/conference/base.html' %}
-{% from 'events/contributions/display/_user_contribution_list.html' import render_contribution_section %}
 
 {% block title -%}
     {{- page_title -}}
 {%- endblock %}
 
 {% block content -%}
-    {{ render_contribution_section(contributions.speaker, title=_('Speaker')) }}
-    {{ render_contribution_section(contributions.primary, title=_('Author')) }}
-    {{ render_contribution_section(contributions.secondary, title=_('Co-author')) }}
-    {{ render_contribution_section(contributions.submitter, title=_('Submitter')) }}
-    {% if event.type != 'conference' -%}
-        <p>
-            <a href="{{ event.url }}" class="i-button">
-                {%- trans %}Back to the event{% endtrans -%}
-            </a>
-        </p>
-    {%- endif %}
+    <ind-my-contributions
+        user-id="{{ user_id }}"
+        event-id="{{ event.id }}"
+    ></ind-my-contributions>
 {%- endblock %}
