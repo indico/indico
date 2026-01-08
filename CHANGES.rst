@@ -10,7 +10,7 @@ Version 3.3.10
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Log changes to event reminders in the event log (:pr:`7242`)
 
 Bugfixes
 ^^^^^^^^

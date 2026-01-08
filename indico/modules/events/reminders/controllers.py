@@ -17,6 +17,7 @@ from indico.modules.events.reminders.forms import ReminderForm
 from indico.modules.events.reminders.models.reminders import EventReminder, Recipient, ReminderType
 from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.modules.events.reminders.views import WPReminders
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.placeholders import replace_placeholders
@@ -60,6 +61,14 @@ class RHDeleteReminder(RHSpecificReminderBase):
         if self.reminder.is_sent:
             flash(_('Sent reminders cannot be deleted.'), 'error')
         else:
+            self.reminder.log(
+                EventLogRealm.management,
+                LogKind.negative,
+                'Reminder',
+                'Event reminder modified',
+                session.user,
+                data={'Time': self.reminder.scheduled_dt.isoformat()},
+            )
             db.session.delete(self.reminder)
             logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
             flash(_('The reminder at {} has been deleted.')
@@ -99,6 +108,14 @@ class RHEditReminder(RHSpecificReminderBase):
                 flash(_('This reminder has already been sent and cannot be modified anymore.'), 'error')
                 return redirect(url_for('.edit', reminder))
             form.populate_obj(reminder, existing_only=True)
+            reminder.log(
+                EventLogRealm.management,
+                LogKind.change,
+                'Reminder',
+                'Event reminder modified',
+                session.user,
+                data={'Time': reminder.scheduled_dt.isoformat()},
+            )
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
@@ -128,6 +145,14 @@ class RHAddReminder(RHRemindersBase):
             form.populate_obj(reminder, existing_only=True)
             db.session.add(reminder)
             db.session.flush()
+            reminder.log(
+                EventLogRealm.management,
+                LogKind.positive,
+                'Reminder',
+                'Event reminder added',
+                session.user,
+                data={'Time': reminder.scheduled_dt.isoformat()},
+            )
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
