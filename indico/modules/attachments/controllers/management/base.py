@@ -83,7 +83,7 @@ class ManageAttachmentsMixin:
 class AddAttachmentEditorMixin:
     """Upload image attachment from editor."""
 
-    @use_kwargs({'upload': fields.Field(required=True)}, location='files')
+    @use_kwargs({'upload': fields.Raw(required=True)}, location='files')
     def _process(self, upload):
         if not validate_upload_file_size(upload):
             raise UnprocessableEntity

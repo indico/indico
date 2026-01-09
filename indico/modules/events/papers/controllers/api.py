@@ -111,7 +111,7 @@ class RHSubmitNewRevision(RHPaperBase):
             return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
-    @use_kwargs({'files': fields.List(fields.Field(), required=True)}, location='files')
+    @use_kwargs({'files': fields.List(fields.Raw(), required=True)}, location='files')
     def _process(self, files):
         if not validate_upload_file_size(*files):
             raise UnprocessableEntity

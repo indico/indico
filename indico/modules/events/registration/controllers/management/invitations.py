@@ -192,7 +192,7 @@ class RHRegistrationFormImportInvites(RHManageRegFormBase):
 class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
     """Process a CSV file into invitation user records."""
 
-    @use_kwargs({'file': fields.Field(required=True)}, location='files')
+    @use_kwargs({'file': fields.Raw(required=True)}, location='files')
     def _process(self, file):
         if not file.filename.lower().endswith('.csv'):
             raise BadRequest('Not a CSV file')

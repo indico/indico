@@ -30,7 +30,7 @@ class UploadFileMixin:
     to specify how the file gets stored.
     """
 
-    @use_kwargs({'file': fields.Field(required=True)}, location='files')
+    @use_kwargs({'file': fields.Raw(required=True)}, location='files')
     def _process(self, file):
         if not validate_upload_file_size(file):
             abort(422, messages={'file': [_('The uploaded file is too large')]})

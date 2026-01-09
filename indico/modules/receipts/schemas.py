@@ -159,7 +159,7 @@ class TransactionSchema(mm.SQLAlchemyAutoSchema):
         model = PaymentTransaction
         fields = ('status', '_status', 'amount', 'currency', 'provider', 'timestamp', 'data')
 
-    amount = fields.Number(required=True)
+    amount = fields.Decimal(required=True)
     _status = fields.String(attribute='status.name', data_key='status', dump_only=True)
     status = fields.String(load_only=True)
     data = fields.Dict(allow_none=True)
@@ -171,8 +171,8 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'friendly_id', 'submitted_dt', 'base_price', 'total_price', 'currency', 'formatted_price',
                   'state', 'field_data', 'personal_data', 'transaction')
 
-    base_price = fields.Number(required=True)
-    total_price = fields.Number(required=True)
+    base_price = fields.Decimal(required=True)
+    total_price = fields.Decimal(required=True)
     currency = fields.String(required=True)
     formatted_price = fields.String(required=True)
     state = fields.String(required=True)
