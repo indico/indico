@@ -38,7 +38,7 @@ markupsafe
 marshmallow-dataclass
 marshmallow-oneofschema
 marshmallow-sqlalchemy
-marshmallow
+marshmallow<4  # major changes -> later: https://marshmallow.readthedocs.io/en/latest/upgrading.html#upgrading-4-0
 packaging
 pillow
 prompt-toolkit

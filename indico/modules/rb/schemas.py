@@ -10,7 +10,7 @@ from operator import itemgetter
 from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates, validates_schema
-from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
+from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Pluck, String
 from sqlalchemy import func
 
 from indico.core.config import config
@@ -157,12 +157,12 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
 
 
 class ReservationLinkedObjectDataSchema(mm.Schema):
-    id = Number()
+    id = fields.Integer()
     title = Method('_get_title')
     url = Function(lambda obj: obj.url)
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
-    own_room_id = Number()
+    own_room_id = fields.Integer()
     own_room_name = Function(lambda obj: (obj.own_room.name if obj.own_room else obj.own_room_name) or None)
     start_dt = DateTime()
     end_dt = DateTime()
@@ -174,7 +174,7 @@ class ReservationLinkedObjectDataSchema(mm.Schema):
 
 
 class ReservationUserEventSchema(mm.Schema):
-    id = Number()
+    id = fields.Integer()
     title = String()
     url = String()
     start_dt = DateTime()
@@ -182,7 +182,7 @@ class ReservationUserEventSchema(mm.Schema):
 
 
 class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
-    id = Number()
+    id = fields.Integer()
     type = fields.Enum(LinkType, attribute='link_type')
     object = Nested(ReservationLinkedObjectDataSchema,
                     only=('url', 'title', 'event_title', 'event_url', 'start_dt', 'end_dt'))
