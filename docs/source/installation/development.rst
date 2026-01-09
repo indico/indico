@@ -103,7 +103,7 @@ unnecessarily. This is why we advise that you include a fake SMTP server in your
 `Maildump <https://github.com/ThiefMaster/maildump>`_ does exactly this and runs on Python. It should be quite simple
 to set up::
 
-    uvx --with setuptools maildump
+    uvx --with setuptools maildump -p /tmp/maildump.pid
 
 You'll then be able to access the message log at `<http://localhost:1080>`_.
 
