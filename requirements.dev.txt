@@ -46,7 +46,7 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.6.9
+coverage[toml]==7.6.9
     # via pytest-cov
 docker==7.1.0
     # via -r requirements.dev.in
@@ -119,7 +119,7 @@ port-for==0.7.4
     # via pytest-redis
 psutil==6.1.0
     # via mirakuru
-psycopg==3.3.2
+psycopg[pool]==3.3.2
     # via results
 psycopg-pool==3.3.0
     # via psycopg
@@ -139,7 +139,7 @@ pytest==8.3.4
     #   pytest-snapshot
 pytest-cov==6.0.0
     # via -r requirements.dev.in
-pytest-localserver==0.9.0.post0
+pytest-localserver[smtp]==0.9.0.post0
     # via -r requirements.dev.in
 pytest-mock==3.14.0
     # via -r requirements.dev.in
@@ -249,7 +249,7 @@ watchfiles==1.0.0
     #   sphinx-autobuild
 websockets==14.1
     # via sphinx-autobuild
-werkzeug==3.1.4
+werkzeug==3.1.5
     # via
     #   -c requirements.txt
     #   flask
