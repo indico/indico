@@ -249,7 +249,7 @@ watchfiles==1.0.0
     #   sphinx-autobuild
 websockets==14.1
     # via sphinx-autobuild
-werkzeug==3.1.4
+werkzeug==3.1.5
     # via
     #   -c requirements.txt
     #   flask
