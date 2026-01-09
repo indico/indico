@@ -7,6 +7,20 @@ Version 3.3.10
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix potential SSRF issues by disallowing outgoing requests to private/internal/local
+  IP addresses when the URL is user-provided.
+
+.. note::
+
+    There was only one place where this would have allowed returning data retrieved from
+    such a URL to the client, and this was only accessible to authenticated users with
+    event management privileges. Also, this vulnerability is only problematic if sensitive
+    information is accessible via an unauthenticated HTTP GET request (e.g. in AWS cloud
+    environments).
+
 Improvements
 ^^^^^^^^^^^^
 
@@ -32,6 +46,9 @@ Internal Changes
 - Require at least Postgres 14 during new installations. This check can be forced on
   older Postgres versions (even though they are end-of-life), but we make no guarantees
   that nothing is broken (:pr:`7232`)
+- Disallow server-side requests to private, loopback, reserved and link-local IP ranges in
+  places where the URL is user-provided (Mastodon URL check, LaTeX image retrieval, static
+  site generation) (:pr:`7244`)
 
 
 Version 3.3.9

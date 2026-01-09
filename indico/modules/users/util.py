@@ -43,6 +43,7 @@ from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.network import make_validate_request_url_hook, validate_request_url
 from indico.util.signals import make_interceptable
 from indico.util.string import crc32, remove_accents
 from indico.web.flask.util import send_file, url_for
@@ -595,7 +596,8 @@ def get_mastodon_server_name(url):
         return None
 
     try:
-        resp = requests.get(f'{server_url}/api/v2/instance')
+        validate_request_url(server_url)
+        resp = requests.get(f'{server_url}/api/v2/instance', **make_validate_request_url_hook())
         resp.raise_for_status()
         data = resp.json()
     except (requests.RequestException, requests.JSONDecodeError):

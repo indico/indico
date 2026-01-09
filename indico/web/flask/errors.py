@@ -19,6 +19,7 @@ from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import redirect_to_login
 from indico.util.i18n import _
+from indico.util.network import InsecureRequestError
 from indico.web.errors import _need_json_response, render_error
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.util import ExpectedError
@@ -103,6 +104,11 @@ def handle_indico_exception(exc):
 @errors_bp.app_errorhandler(DatabaseError)
 def handle_databaseerror(exc):
     return handle_exception(exc, _('There was a database error while processing your request.'))
+
+
+@errors_bp.app_errorhandler(InsecureRequestError)
+def handle_insecurerequesterror(exc):
+    return render_error(exc, _('Disallowed URL'), str(exc), 400)
 
 
 @errors_bp.app_errorhandler(Exception)

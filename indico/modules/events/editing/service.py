@@ -19,8 +19,8 @@ from indico.modules.events.editing.models.revisions import RevisionType
 from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision, reset_editable
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingRevisionSignedSchema,
                                                    ServiceActionResultSchema, ServiceActionSchema,
-                                                   ServiceCreateEditableResultSchema, ServiceReviewEditableSchema,
-                                                   ServiceUserSchema)
+                                                   ServiceCreateEditableResultSchema, ServiceInfoSchema,
+                                                   ServiceReviewEditableSchema, ServiceUserSchema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users import User
 from indico.util.caching import memoize_redis
@@ -43,6 +43,8 @@ class ServiceRequestFailed(Exception):
 @memoize_redis(30)
 def check_service_url(url):
     try:
+        # XXX this does not use `validate_request_url` on purpose, since someone may be hosting
+        # an openreferee implementation locally
         resp = requests.get(url + '/info', allow_redirects=False)
         resp.raise_for_status()
         if resp.status_code != 200:
@@ -52,7 +54,9 @@ def check_service_url(url):
         return {'info': None, 'error': _('Connection failed')}
     except requests.RequestException as exc:
         return {'info': None, 'error': str(ServiceRequestFailed(exc))}
-    if not all(x in info for x in ('name', 'version')):
+    try:
+        info = ServiceInfoSchema().load(info)
+    except ValidationError:
         return {'error': _('Invalid response')}
     return {'error': None, 'info': info}
 

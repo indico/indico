@@ -87,6 +87,8 @@ from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
 
+from indico.util.network import InsecureRequestError, make_validate_request_url_hook, validate_request_url
+
 
 __version__ = '2.1'
 
@@ -261,13 +263,16 @@ def latex_render_image(src, alt, tmpdir, strict=False):
             raise ImageURLException(f'URL scheme not supported: {src}')
         else:
             try:
-                resp = requests.get(src, timeout=5)
+                validate_request_url(src)
+                resp = requests.get(src, timeout=5, **make_validate_request_url_hook())
             except InvalidURL:
                 raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
                 raise ImageURLException(f'Problem downloading image ({src})')
             except requests.TooManyRedirects:
                 raise ImageURLException(f'Too many redirects downloading image ({src})')
+            except InsecureRequestError:
+                raise ImageURLException(f'Disallowed URL ({src})')
             extension = None
 
             if resp.status_code != 200:

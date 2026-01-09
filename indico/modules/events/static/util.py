@@ -16,9 +16,12 @@ from flask import current_app, g, request
 from flask_webpackext import current_webpack
 from flask_webpackext.manifest import JinjaManifestEntry
 from pywebpack import Manifest
+from requests.exceptions import RequestException
 
 from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
+from indico.modules.events.static import logger
+from indico.util.network import InsecureRequestError, make_validate_request_url_hook, validate_request_url
 from indico.web.flask.util import endpoint_for_url
 
 
@@ -45,7 +48,14 @@ def rewrite_static_url(path):
 
 def _create_data_uri(url, filename):
     """Create a data url that contains the file in question."""
-    response = requests.get(url, verify=False)  # noqa: S501
+    try:
+        validate_request_url(url)
+        response = requests.get(url, **make_validate_request_url_hook())
+    except InsecureRequestError:
+        logger.warning('Requesting %s triggered insecure request error', url)
+        return url
+    except RequestException:
+        return url
     if response.status_code != 200:
         # couldn't access the file
         return url
@@ -109,7 +119,7 @@ def rewrite_css_urls(event, css):
             else:
                 return f"url('../../../{rewritten_url}')"
 
-    indico_path = urlsplit(config.BASE_URL).path
+    indico_path = urlsplit(config.BASE_URL).path or '/'
     new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE)
     return new_css, used_urls, used_images
 
