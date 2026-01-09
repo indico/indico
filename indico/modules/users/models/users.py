@@ -23,6 +23,7 @@ from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
@@ -812,7 +813,8 @@ class User(PersonMixin, db.Model):
             signals.users.email_added.send(self, email=email, silent=silent)
 
         self.make_email_primary(email)
-        if self.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
+        if (not config.DISABLE_GRAVATAR and
+                self.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon)):
             update_gravatars.delay(self)
         return True
 

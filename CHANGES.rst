@@ -30,6 +30,8 @@ Improvements
 - Support markdown in survey introduction text (:pr:`7260`)
 - Add Content-Security-Policy support (opt-in via the :data:`CSP_ENABLED` setting)
   (:issue:`5486`, :pr:`7257`)
+- Allow admins to disable Gravatar/Identicon profile pictures via the :data:`DISABLE_GRAVATAR`
+  config option (:issue:`7210`, :pr:`7251`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
