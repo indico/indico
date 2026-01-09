@@ -145,7 +145,6 @@ Configuring
 Let's get into the Indico virtualenv::
 
     source .venv/bin/activate
-    uv pip install -U pip setuptools wheel
 
     cd src
     uv pip install -e '.[dev]'
