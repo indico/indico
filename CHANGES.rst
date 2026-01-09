@@ -25,6 +25,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Log changes to event reminders in the event log (:pr:`7242`)
+- Allow sending account creation notifications to specific email addresses (:issue:`7166`,
+  :pr:`7233`, thanks :user:`duartegalvao`)
 
 Bugfixes
 ^^^^^^^^

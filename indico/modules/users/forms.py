@@ -21,8 +21,8 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField,
-                                     PrincipalField, PrincipalListField)
+from indico.web.forms.fields import (EmailListField, IndicoEnumSelectField, IndicoSelectMultipleCheckboxField,
+                                     MultiStringField, PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, MastodonServer
 from indico.web.forms.widgets import SwitchWidget
@@ -136,9 +136,20 @@ class MergeForm(IndicoForm):
 
 
 class AdminUserSettingsForm(IndicoForm):
-    notify_account_creation = BooleanField(_('Registration notifications'), widget=SwitchWidget(),
+    _fieldsets = [
+        (_('Account creation notifications'), ('notify_account_creation', 'notify_account_creation_emails')),
+        (_('Miscellaneous'), ('email_blacklist', 'allow_personal_tokens', 'mandatory_fields_account_request',
+                              'only_predefined_affiliations'))
+    ]
+
+    notify_account_creation = BooleanField(_('Notify all admins'), widget=SwitchWidget(),
                                            description=_('Send an email to all administrators whenever someone '
                                                          'registers a new local account.'))
+    notify_account_creation_emails = EmailListField(
+        _('Notify emails'),
+        description=_('List of email addresses that receive a notification whenever a new local account is created. '
+                      'One email address per line.')
+    )
     email_blacklist = MultiStringField(_('Email blacklist'), field=('email_blacklist', _('email')),
                                        unique=True, flat=True,
                                        description=_('Prevent users from creating Indico accounts with these email '
