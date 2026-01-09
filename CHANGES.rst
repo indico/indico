@@ -34,6 +34,7 @@ Bugfixes
 - Fix error when using shibboleth for authentication (:issue:`7213`, :pr:`7215`)
 - Fix error when sending scheduled reminders using an event time placeholder (:pr:`7238`)
 - Fix rendering static text/images in poster templates (:pr:`7239`)
+- Do not revert to defaults when disabling all optional event cloners (:issue:`6833`, :pr:`7245`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -14,7 +14,7 @@ from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
-from wtforms.fields import IntegerField, URLField
+from wtforms.fields import HiddenField, IntegerField, URLField
 from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
@@ -344,6 +344,7 @@ class CloneRepeatabilityForm(IndicoForm):
 
 class CloneContentsForm(CloneRepeatabilityForm):
     selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
+    selected_items_set = HiddenField()
     refresh_users = BooleanField(_('Refresh user information'),
                                  description=_('When checked, names and affiliations of users in the cloned event will '
                                                'be synchronized with their Indico user profiles.'))
@@ -355,9 +356,11 @@ class CloneContentsForm(CloneRepeatabilityForm):
 
         if set_defaults:
             default_category = kwargs['category']['id'] if 'category' in kwargs else None
+            current_select_items = request.form.getlist('selected_items')
             form_params = {
                 'repeatability': request.form.get('repeatability', kwargs.pop('repeatability', None)),
-                'selected_items': (request.form.getlist('selected_items') or default_selected_items),
+                'selected_items': (current_select_items if 'selected_items_set' in request.form else
+                                   (current_select_items or default_selected_items)),
                 'refresh_users': 'refresh_users' in request.form if 'selected_items' in request.form else True,
                 'category': request.form.get('category', default_category),
                 'csrf_token': request.form.get('csrf_token')
