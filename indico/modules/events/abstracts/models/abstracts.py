@@ -409,6 +409,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def edit_track_mode(self):
         if not inspect(self).persistent:
             return EditTrackMode.both
+        elif self.state == AbstractState.invited:
+            return EditTrackMode.both
         elif self.state not in {AbstractState.submitted, AbstractState.withdrawn}:
             return EditTrackMode.none
         elif (self.public_state in (AbstractPublicState.awaiting, AbstractPublicState.withdrawn) and
