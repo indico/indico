@@ -153,7 +153,7 @@
 {# Renders a form with the most common default markup #}
 {% macro simple_form(form, fields=none, submit=none, back=none, back_url=none, back_button=true,
                      disabled_until_change=true, disabled_fields=(), form_header_kwargs={}, skip_labels=false,
-                     save_reminder=false, footer_align_right=false, disable_if_locked=true, message=none) %}
+                     save_reminder=false, footer_align_right=false, disable_if_locked=true, message=none, fieldsets=none) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
     {{ form_header(form, disable_if_locked=disable_if_locked, **form_header_kwargs) }}
@@ -162,6 +162,12 @@
     {% endif %}
     {% if caller is defined %}
         {{ caller() }}
+    {% elif fieldsets is not none %}
+        {% for legend, fieldset_fields in fieldsets %}
+            {% call form_fieldset(legend) %}
+                {{ form_rows(form, fields=fieldset_fields, disable=disabled_fields, skip_labels=skip_labels) }}
+            {% endcall %}
+        {% endfor %}
     {% else %}
         {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
     {% endif %}

@@ -757,7 +757,7 @@ class RHUsersAdminSettings(RHAdminBase):
         if form.validate_on_submit():
             user_management_settings.set_multi(form.data)
             return jsonify_data(flash=False)
-        return jsonify_form(form)
+        return jsonify_form(form, fieldsets=form._fieldsets)
 
 
 class RHUsersAdminCreate(RHAdminBase):

@@ -136,11 +136,17 @@ class MergeForm(IndicoForm):
 
 
 class AdminUserSettingsForm(IndicoForm):
+    _fieldsets = [
+        (_('Account creation notifications'), ('notify_account_creation', 'notify_account_creation_emails')),
+        (_('Miscellaneous'), ('email_blacklist', 'allow_personal_tokens', 'mandatory_fields_account_request',
+                              'only_predefined_affiliations'))
+    ]
+
     notify_account_creation = BooleanField(_('Notify all admins'), widget=SwitchWidget(),
                                            description=_('Send an email to all administrators whenever someone '
                                                          'registers a new local account.'))
     notify_account_creation_emails = EmailListField(
-        _('Registration notifications'),
+        _('Notify emails'),
         description=_('List of email addresses that receive a notification whenever a new local account is created. '
                       'One email address per line.')
     )
