@@ -48,6 +48,7 @@ ignore = [
     'RUF022',  # autofix messes up our formatting instead of just sorting
     'RUF027',  # also triggers on i18n functions -> too noisy for now
     'RUF052',  # we often use underscore-prefixed variables in tests and to cache regexps in function definitions
+    'RUF067',  # we often have code in __init__.py
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
     'D1',      # we have way too many missing docstrings :(
@@ -167,7 +168,7 @@ parenthesize-tuple-in-subscript = true
 # allow long lines in migrations (only do that for raw SQL please)
 'indico/migrations/versions/*.py' = ['E501', 'D400']
 # allow stuff that's useful in tests
-'indico/*_test.py' = ['E221', 'E241', 'E272', 'N802', 'S105', 'S106', 'PLC1901']
+'indico/*_test.py' = ['E221', 'E241', 'E272', 'N802', 'S105', 'S106', 'PLC1901', 'ISC004']
 # sphinx config has many commented-out variables with no space after `#`
 'docs/source/conf.py' = ['E265']
 # legacy code with camelCase
@@ -186,4 +187,4 @@ parenthesize-tuple-in-subscript = true
 # latex generation is much more readable without curly braces used for formatting
 'indico/util/mdx_latex.py' = ['UP031']
 # vendored code - don't care about most stuff in there
-'indico/vendor/*.py' = ['N', 'F841', 'UP', 'D', 'PIE', 'TID252', 'TRY', 'RUF059']
+'indico/vendor/*.py' = ['N', 'F841', 'UP', 'D', 'PIE', 'TID252', 'TRY', 'RUF059', 'FURB']
