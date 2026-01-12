@@ -38,6 +38,8 @@ Bugfixes
 - Fix rendering static text/images in poster templates (:pr:`7239`)
 - Do not revert to defaults when disabling all optional event cloners (:issue:`6833`, :pr:`7245`)
 - Fix changing tracks for invited abstracts (:issue:`7061`, :pr:`7240`)
+- Disallow local account passwords longer than 72 characters instead of truncating them
+  (:pr:`7254`)
 
 Accessibility
 ^^^^^^^^^^^^^
