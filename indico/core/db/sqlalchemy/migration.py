@@ -97,7 +97,7 @@ def prepare_db(empty=False, root_path=None, verbose=True, force=False):
         plugin_msg = cformat('%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} '
                              'plugin to HEAD%{reset}')
         for plugin in plugin_engine.get_active_plugins().values():
-            if not os.path.exists(plugin.alembic_versions_path):
+            if not plugin.alembic_versions_path.exists():
                 continue
             if verbose:
                 print(plugin_msg.format(plugin.name))
