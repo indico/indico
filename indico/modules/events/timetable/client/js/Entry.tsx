@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -19,7 +21,15 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ReduxState, ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {
+  ReduxState,
+  ContribEntry,
+  EntryType,
+  BlockEntry,
+  BaseEntry,
+  ScheduledMixin,
+  Entry,
+} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
@@ -27,6 +37,7 @@ import {
   snapMinutes,
   formatBlockTitle,
   getIconByEntryType,
+  getDateKey,
 } from './utils';
 
 import './DayTimetable.module.scss';
