@@ -8,6 +8,9 @@
     {%- set favicon_url = indico_config.FAVICON_URL or (indico_config.IMAGES_BASE_URL + '/indico.ico') %}
     <link rel="shortcut icon" type="image/x-icon" href="{{ favicon_url }}">
 
+    <script>
+        window.IndicoCSPNonce = {{ get_csp_nonce()|tojson }};
+    </script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=current_locale) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=current_locale) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>

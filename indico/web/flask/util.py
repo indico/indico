@@ -8,10 +8,11 @@
 import inspect
 import os
 import re
+import secrets
 from importlib import import_module
 from urllib.parse import urlsplit
 
-from flask import Blueprint, current_app, g, redirect, request
+from flask import Blueprint, current_app, g, has_request_context, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
 from flask.helpers import get_root_path
@@ -377,3 +378,16 @@ class XAccelMiddleware:
         for base, uri in self.mapping:
             if path.startswith(str(base + '/')):
                 return uri + path[len(base):]
+
+
+def get_csp_nonce(*, init=True):
+    if not has_request_context():
+        return None
+    if not init or 'csp_nonce' in g:
+        return g.get('csp_nonce')
+    # I think this is safe because custom headers cannot be sent in a regular request from a browser,
+    # so you cannot combine this with HTML injection to get XSS. Being able to override the nonce is
+    # necessary due to the ajax-form stuff we have, since custom fields often come with JS code to
+    # initialize them, which of course needs to match the page's current nonce instead of a new one.
+    # This could be avoided by using custom elements for all these fields instead of a JS function call...
+    return g.setdefault('csp_nonce', request.headers.get('X-Indico-CSP-Nonce') or secrets.token_urlsafe(32))

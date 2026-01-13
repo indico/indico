@@ -53,7 +53,8 @@ from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
                                          natsort, plusdelta, subclassof, underline)
-from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
+from indico.web.flask.util import (ListConverter, XAccelMiddleware, discover_blueprints, get_csp_nonce, url_for,
+                                   url_rule_to_js)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
@@ -221,6 +222,7 @@ def setup_jinja(app):
     app.add_template_global(get_request_stats)
     app.add_template_global(_get_indico_version(), 'indico_version')
     app.add_template_global(make_user_search_token)
+    app.add_template_global(get_csp_nonce)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
@@ -338,6 +340,7 @@ def add_handlers(app):
     app.before_request(canonicalize_url)
     app.before_request(reject_nuls)
     app.after_request(inject_current_url)
+    app.after_request(inject_csp)
     app.register_blueprint(errors_bp)
 
 
@@ -397,6 +400,16 @@ def inject_current_url(response):
     except UnicodeEncodeError:
         return response
     response.headers['X-Indico-URL'] = url
+    return response
+
+
+def inject_csp(response):
+    # unsafe-eval is currently needed because of webpack's script-loader which we need for legacy JS
+    sources = ['self', 'unsafe-eval']
+    if nonce := get_csp_nonce(init=False):
+        sources.append(f'nonce-{nonce}')
+    sources = ' '.join(f"'{x}'" for x in sources)
+    response.headers['Content-Security-Policy'] = f'script-src {sources}'
     return response
 
 
