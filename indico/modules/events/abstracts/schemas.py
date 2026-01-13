@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow.fields import Float, Nested
+from marshmallow.fields import Float, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.models.abstracts import Abstract
@@ -95,6 +95,7 @@ class AbstractSchema(mm.SQLAlchemyAutoSchema):
     persons = Nested(AbstractPersonLinkSchema, attribute='person_links', many=True)
     custom_fields = Nested(ContributionFieldValueSchema, attribute='field_values', many=True)
     files = Nested(AbstractFileSchema, many=True)
+    reviewer_proposals = String()
     score = Float()
     score_std = Float()
     comments = Nested(AbstractCommentSchema, many=True)
@@ -111,7 +112,7 @@ class AbstractSchema(mm.SQLAlchemyAutoSchema):
                   'submitted_contrib_type', 'accepted_contrib_type',
                   'accepted_track', 'submitted_for_tracks', 'reviewed_for_tracks',
                   'duplicate_of', 'merged_into',
-                  'persons', 'custom_fields', 'files',
+                  'persons', 'custom_fields', 'files', 'reviewer_proposals',
                   'score', 'score_std', 'comments', 'reviews')
 
 

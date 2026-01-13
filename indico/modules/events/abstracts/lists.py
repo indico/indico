@@ -50,6 +50,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             'accepted_contrib_type': {'title': _('Accepted type'), 'filter_choices': type_empty | type_choices},
             'submitted_contrib_type': {'title': _('Submitted type'), 'filter_choices': type_empty | type_choices},
             'review_count': {'title': _('Number of reviews')},
+            'reviewer_proposals': {'title': _('Reviewer proposals')},
             'score': {'title': _('Score')},
             'score_std': {'title': _('Score standard deviation')},
             'submitted_dt': {'title': _('Submission date')},

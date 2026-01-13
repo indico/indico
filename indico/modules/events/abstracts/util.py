@@ -88,6 +88,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'submitted_contrib_type': ('Submitted type',
                                    lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None),
         'review_count': ('Number of reviews', lambda x: len(x.reviews)),
+        'reviewer_proposals': ('Reviewer proposals', lambda x: x.reviewer_proposals),
         'score': ('Score', lambda x: round(x.score, 1) if x.score is not None else None),
         'score_std': ('Score standard deviation',
                       lambda x: round(x.score_std, 1) if x.score_std is not None else None),

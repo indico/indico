@@ -451,6 +451,27 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.mixed
 
     @property
+    def reviewer_proposals(self) -> str:
+        proposals = defaultdict(int)
+        for x in self.reviews:
+            match x.proposed_action:
+                case AbstractAction.accept:
+                    proposals['a'] += 1
+                case AbstractAction.reject:
+                    proposals['r'] += 1
+                case AbstractAction.change_tracks:
+                    proposals['c'] += 1
+                case AbstractAction.duplicate:
+                    proposals['d'] += 1
+                case AbstractAction.merge:
+                    proposals['m'] += 1
+                case _:
+                    raise ValueError(f'Unrecognized action: {x.proposed_action}')
+        proposals_order = ['a', 'r', 'c', 'd', 'm']
+        sorted_proposals = {k: proposals[k] for k in proposals_order if proposals[k] != 0}
+        return ', '.join([f'{k}: {v}' for k, v in sorted_proposals.items()])
+
+    @property
     def score(self):
         scores = [x.score for x in self.reviews if x.score is not None]
         if not scores:

@@ -233,6 +233,10 @@
                                         <td class="i-table">
                                             {{- abstract.reviews | length -}}
                                         </td>
+                                    {% elif item.id == 'reviewer_proposals' %}
+                                        <td class="i-table">
+                                            {{- abstract.reviewer_proposals or '-' }}
+                                        </td>
                                     {% elif item.id == 'score' %}
                                         <td class="i-table">
                                             {{- abstract.score | round(1) if abstract.score is not none else '-' }}
