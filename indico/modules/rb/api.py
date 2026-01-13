@@ -25,7 +25,6 @@ from indico.modules.rb.util import rb_check_user_access
 from indico.modules.users import User
 from indico.util.date_time import utc_to_server
 from indico.web.http_api import HTTPAPIHook
-from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
@@ -308,14 +307,15 @@ def _ical_serialize_repeatability(data):
     start_dt_utc = data['startDT'].astimezone(pytz.utc)
     end_dt_utc = data['endDT'].astimezone(pytz.utc)
     week_days = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
-    recur = ical.vRecur()
+    recur = icalendar.vRecur()
     recur['until'] = end_dt_utc
-    if data['repeat_frequency'] == RepeatFrequency.DAY:
+    assert isinstance(data['repeat_frequency'], str)
+    if data['repeat_frequency'] == 'DAY':
         recur['freq'] = 'daily'
-    elif data['repeat_frequency'] == RepeatFrequency.WEEK:
+    elif data['repeat_frequency'] == 'WEEK':
         recur['freq'] = 'weekly'
         recur['interval'] = data['repeat_interval']
-    elif data['repeat_frequency'] == RepeatFrequency.MONTH:
+    elif data['repeat_frequency'] == 'MONTH':
         recur['freq'] = 'monthly'
         recur['byday'] = f'{start_dt_utc.day // 7}{week_days[start_dt_utc.weekday()]}'
     return recur
