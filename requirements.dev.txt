@@ -50,7 +50,7 @@ coverage==7.13.1
     # via pytest-cov
 docker==7.1.0
     # via -r requirements.dev.in
-docutils==0.21.2
+docutils==0.22.4
     # via
     #   plantweb
     #   sphinx
@@ -175,8 +175,6 @@ responses==0.25.8
 results==1.4.1767098839
     # via -r requirements.dev.in
 roman-numerals==4.1.0
-    # via roman-numerals-py
-roman-numerals-py==4.1.0
     # via sphinx
 ruff==0.14.11
     # via -r requirements.dev.in
@@ -187,7 +185,7 @@ six==1.17.0
     #   python-dateutil
 snowballstemmer==3.0.1
     # via sphinx
-sphinx==8.2.3
+sphinx==9.1.0
     # via
     #   -r requirements.dev.in
     #   sphinx-autobuild
@@ -202,7 +200,7 @@ sphinx-issues==5.0.1
     # via -r requirements.dev.in
 sphinx-reredirects==1.1.0
     # via -r requirements.dev.in
-sphinx-rtd-theme==3.0.2
+sphinx-rtd-theme==3.1.0
     # via -r requirements.dev.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -224,7 +222,7 @@ sqlparse==0.5.5
     # via -r requirements.dev.in
 starlette==0.51.0
     # via sphinx-autobuild
-tomlkit==0.13.3
+tomlkit==0.14.0
     # via -r requirements.dev.in
 trove-classifiers==2026.1.12.15
     # via hatchling
