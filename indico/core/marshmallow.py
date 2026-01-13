@@ -105,6 +105,11 @@ class _IndicoSQLAlchemyAutoSchemaOpts(SQLAlchemyAutoSchemaOpts):
         super().__init__(meta, **kwargs)
         self.model_converter = getattr(meta, 'model_converter', IndicoModelConverter)
         self.include_relationships = getattr(meta, 'include_relationships', True)
+        # XXX: The behavior checking this was previously broken and apparently always
+        # considered enabled, but after https://github.com/marshmallow-code/marshmallow-sqlalchemy/pull/644
+        # it turned off which broke some schemas. If you ever feel the need to touch this for whatever
+        # reason, make sure to run the tests of the citadel plugin.
+        self.include_fk = getattr(meta, 'include_fk', True)
 
 
 class IndicoSQLAlchemyAutoSchema(MSQLASQLAlchemyAutoSchema, IndicoSchema):
