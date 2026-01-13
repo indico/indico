@@ -8,10 +8,11 @@
 import os
 import sys
 from functools import partial
+from pathlib import Path
 
 import alembic.command
 import click
-from flask import current_app
+from flask import current_app, g
 from flask.cli import with_appcontext
 from flask_migrate.cli import db as flask_migrate_cli
 
@@ -124,6 +125,9 @@ def _safe_downgrade(*args, **kwargs):
 
 
 def _call_with_plugins(*args, **kwargs):
+    # flask-migrate expects these
+    g.directory = None
+    g.x_arg = []
     func = kwargs.pop('_func')
     ctx = click.get_current_context()
     all_plugins = ctx.parent.params['all_plugins']
@@ -138,10 +142,10 @@ def _call_with_plugins(*args, **kwargs):
     if plugins is None:
         func(*args, **kwargs)
     else:
-        PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
+        PluginScriptDirectory.dir = Path(current_app.root_path) / 'core' / 'plugins' / 'alembic'
         alembic.command.ScriptDirectory = PluginScriptDirectory
         for plugin in plugins:
-            if not os.path.exists(plugin.alembic_versions_path):
+            if not plugin.alembic_versions_path.exists():
                 click.secho(f"skipping plugin '{plugin.name}' (no migrations folder)", fg='cyan')
                 continue
             click.secho(f"executing command for plugin '{plugin.name}'", fg='cyan', bold=True)

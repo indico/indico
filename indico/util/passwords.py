@@ -28,7 +28,10 @@ class BCryptPassword:
             return False
         if not isinstance(value, str):
             raise TypeError(f'password must be str, not {type(value)}')
-        return bcrypt.checkpw(value.encode(), self.hash.encode())
+        # we truncate to avoid bcrypt failing loudly (it previously truncated).
+        # our secure password check considers such a password bad and forces the
+        # user to change it nonetheless
+        return bcrypt.checkpw(value.encode()[:72], self.hash.encode())
 
     def __ne__(self, other):
         return not (self == other)
@@ -187,6 +190,9 @@ def validate_secure_password(context, password, *, username='', emails=frozenset
 
     if len(password) < config.LOCAL_PASSWORD_MIN_LENGTH:
         return _('Passwords must be at least {} characters long.').format(config.LOCAL_PASSWORD_MIN_LENGTH)
+
+    if len(password.encode()) > 72:  # encode to bytes since that's what bcrypt checks
+        return _('Passwords cannot be longer than 72 characters')
 
     if re.search(r'[i1|]nd[1i|]c[o0]', password.lower()):
         return _('Passwords may not contain the word "indico" or variations.')

@@ -8,6 +8,7 @@
 import errno
 import json
 import os
+from pathlib import Path
 
 from flask import g, session
 from flask_babel import Domain
@@ -103,7 +104,7 @@ class IndicoPlugin(Plugin):
         called anymore.
         """
         assert self.configurable or not self.settings_form, 'Non-configurable plugin cannot have a settings form'
-        self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
+        self.alembic_versions_path = Path(self.root_path) / 'migrations'
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
         self._import_models()
