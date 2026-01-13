@@ -40,6 +40,8 @@ Bugfixes
 - Fix changing tracks for invited abstracts (:issue:`7061`, :pr:`7240`)
 - Disallow local account passwords longer than 72 characters instead of truncating them
   (:pr:`7254`)
+- Fix recurrence information not being correctly included in room booking ical export
+  (:pr:`7255`)
 
 Accessibility
 ^^^^^^^^^^^^^
