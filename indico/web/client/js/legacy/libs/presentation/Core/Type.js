@@ -35,7 +35,7 @@ function mixinType(target, mixins) {
   var code = target.prototype;
   var mixs = target.mixins;
   iterate(mixins, function(mixinName) {
-    var mixinCode = eval(mixinName);
+    const mixinCode = window[mixinName];
     enumerate(mixinCode.prototype, function(value, key) {
       if (!exists(code[key]) || code[key] === Object.prototype[key]) {
         code[key] = value;
