@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_inherited_templates
+from indico.modules.email_templates.util import get_all_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
@@ -248,6 +249,8 @@ class EmailRegistrantsForm(IndicoForm):
     cc_addresses = EmailListField(_('CC'),
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
+    templates = SelectField(_('Templates'), choices=[('', _('Select templates'))],
+                            render_kw={'onchange': 'applyTemplate()'}, validate_choice=False)
     subject = StringField(_('Subject'), [DataRequired(), Length(max=200)])
     body = TextAreaField(
         _('Email body'),
@@ -268,6 +271,11 @@ class EmailRegistrantsForm(IndicoForm):
         super().__init__(*args, **kwargs)
         self.sender_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
+        if templates := get_all_templates(event):
+            self.templates.choices = EmailRegistrantsForm.templates.kwargs['choices'] + [
+                (f'{template.subject}\n{template.body}', template.title) for template in templates
+                if template.type.startswith('registration')
+            ]
 
     def validate_body(self, field):
         missing = get_missing_placeholders('registration-email', field.data, regform=self.regform, registration=None)
