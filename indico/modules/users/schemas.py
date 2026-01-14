@@ -11,13 +11,11 @@ from marshmallow.fields import List, String
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
-from indico.modules.events.contributions import Contribution
 from indico.modules.users import User, user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.countries import get_country
 from indico.util.marshmallow import ModelField, NoneValueEnumField, not_empty
-from indico.web.flask.util import url_for
 
 
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
@@ -128,15 +126,3 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
     location = fields.String(attribute='event.location.venue_name')
     chain_titles = fields.List(fields.String(), attribute='category.chain_titles')
     label_markup = fields.Function(lambda e: e.get_label_markup('mini'))
-
-
-class FavoriteContributionSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Contribution
-        fields = ('id', 'title', 'description', 'friendly_id', 'code',
-                  'start_dt', 'end_dt', 'url', 'edit_url')
-
-    edit_url = fields.Function(lambda c, ctx: (url_for(
-        '.manage_update_contrib', standalone=True, user_id=ctx['user'].id,
-        contrib_id=c.id, event_id=ctx['event'].id
-    ) if 'user' in ctx and c.can_edit(ctx['user']) else None))

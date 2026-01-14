@@ -73,13 +73,7 @@ export function ContributionList({
                           </a>
                           <br />
                           <TooltipIfTruncated>
-                            <span styleName="detail">
-                              {contribution.description ? (
-                                contribution.description
-                              ) : (
-                                <Translate>Unlisted</Translate>
-                              )}
-                            </span>
+                            <span styleName="detail">{contribution.description ?? ''}</span>
                           </TooltipIfTruncated>
                         </span>
                         {actionsElement && actionsElement(contribution)}

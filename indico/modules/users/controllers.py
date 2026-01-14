@@ -54,7 +54,7 @@ from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
                                              revoke_admin)
 from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema,
-                                          FavoriteContributionSchema, FavoriteEventSchema, UserPersonalDataSchema)
+                                          FavoriteEventSchema, UserPersonalDataSchema)
 from indico.modules.users.util import (GravatarError, get_avatar_url_from_name, get_gravatar_for_user,
                                        get_linked_events, get_mastodon_server_name, get_related_categories,
                                        get_suggested_categories, get_unlisted_events, get_user_by_email,
@@ -657,41 +657,6 @@ class RHUserFavoritesEventAPI(RHUserBase):
                 # Deleted in another transaction
                 db.session.rollback()
             signals.users.favorite_event_removed.send(self.user, event=self.event)
-        return jsonify(success=True)
-
-
-class RHUserFavoritesContributionAPI(RHUserBase):
-    def _process_args(self):
-        RHUserBase._process_args(self)
-        self.contribution = (
-            Contribution.get_or_404(request.view_args['contrib_id']) if 'contrib_id' in request.view_args else None
-        )
-        self.event_id = request.view_args.get('event_id')
-
-    def _process_GET(self):
-        if self.contribution is None:
-            return jsonify({c.id: FavoriteContributionSchema().dump(c)
-                            for c in self.user.favorite_contributions
-                            if (self.event_id is None or c.event_id == self.event_id) and not c.is_deleted})
-        return jsonify(self.contribution in self.user.favorite_contributions)
-
-    def _process_PUT(self):
-        if self.contribution not in self.user.favorite_contributions:
-            if not self.contribution.can_access(self.user):
-                raise Forbidden
-            self.user.favorite_contributions.add(self.contribution)
-            # signals.users.favorite_contribution_added.send(self.user, contribution=self.contribution)
-        return jsonify(success=True)
-
-    def _process_DELETE(self):
-        if self.contribution in self.user.favorite_contributions:
-            self.user.favorite_contributions.discard(self.contribution)
-            try:
-                db.session.flush()
-            except StaleDataError:
-                # Deleted in another transaction
-                db.session.rollback()
-            # signals.users.favorite_contribution_removed.send(self.user, contribution=self.contribution)
         return jsonify(success=True)
 
 

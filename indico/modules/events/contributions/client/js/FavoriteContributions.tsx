@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contributionFavoriteURL from 'indico-url:users.user_favorites_contribution_api';
+import contributionFavoriteURL from 'indico-url:contributions.favorite_contributions_api';
 
 import _ from 'lodash';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -31,9 +31,7 @@ export function FavoriteContributions({eventId}: FavoriteContributionsProps) {
 
   const getFavoriteContributions = useCallback(async () => {
     try {
-      const res = await indicoAxios.get(
-        contributionFavoriteURL(eventId !== undefined ? {event_id: eventId} : {})
-      );
+      const res = await indicoAxios.get(contributionFavoriteURL({event_id: eventId}));
       setFavoriteContributions(res.data);
     } catch (error) {
       handleAxiosError(error);
@@ -48,7 +46,7 @@ export function FavoriteContributions({eventId}: FavoriteContributionsProps) {
 
   const deleteFavoriteContribution = async (id: number) => {
     try {
-      await indicoAxios.delete(contributionFavoriteURL({contrib_id: id}));
+      await indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId}));
     } catch (error) {
       handleAxiosError(error);
       return;
