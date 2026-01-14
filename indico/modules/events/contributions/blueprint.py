@@ -155,7 +155,11 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics
 _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  display.RHSubcontributionDisplay)
 
-_bp.add_url_rule('/api/contributions/mine', 'api_my_contributions', api.RHAPIMyContributions, methods=('GET',))
+_bp.add_url_rule('/api/contributions/mine', 'my_contributions_api', api.RHAPIMyContributions)
+_bp.add_url_rule('/api/contributions/favorite', 'favorite_contributions_api',
+                    api.RHFavoriteContributionsAPI)
+_bp.add_url_rule('/api/contributions/favorite/<int:contrib_id>', 'favorite_contributions_api',
+                    api.RHFavoriteContributionsAPI, methods=('GET', 'PUT', 'DELETE'))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<int:event_id>')

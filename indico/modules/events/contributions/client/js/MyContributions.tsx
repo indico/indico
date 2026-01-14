@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import myContributionsURL from 'indico-url:contributions.api_my_contributions';
+import myContributionsURL from 'indico-url:contributions.my_contributions_api';
 
 import React from 'react';
 import ReactDOM from 'react-dom';

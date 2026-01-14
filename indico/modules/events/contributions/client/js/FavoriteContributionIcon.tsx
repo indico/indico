@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contributionURL from 'indico-url:users.user_favorites_contribution_api';
+import contributionURL from 'indico-url:contributions.favorite_contributions_api';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -16,11 +16,15 @@ import './FavoriteContributionIcon.module.scss';
 
 interface FavoriteContributionIconProps {
   contributionId: number;
+  eventId: number;
 }
 
-export default function FavoriteContributionIcon({contributionId}: FavoriteContributionIconProps) {
+export default function FavoriteContributionIcon({
+  contributionId,
+  eventId,
+}: FavoriteContributionIconProps) {
   const [favorited, toggleFavorite, loading, saving] = useTogglableValue(
-    contributionURL({contrib_id: contributionId})
+    contributionURL({contrib_id: contributionId, event_id: eventId})
   );
 
   return (
@@ -39,6 +43,7 @@ customElements.define(
       ReactDOM.render(
         <FavoriteContributionIcon
           contributionId={JSON.parse(this.getAttribute('contribution-id'))}
+          eventId={JSON.parse(this.getAttribute('event-id'))}
         />,
         this
       );
