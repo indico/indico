@@ -404,6 +404,10 @@ def inject_current_url(response):
 
 
 def inject_csp(response):
+    if 'Content-Security-Policy' in response.headers:
+        # do not inject a default CSP if one was already set explicitly, e.g. in plugins that
+        # want to apply a more restricted one in some areas
+        return response
     # unsafe-eval is currently needed because of webpack's script-loader which we need for legacy JS
     sources = ['self', 'unsafe-eval']
     if nonce := get_csp_nonce(init=False):
