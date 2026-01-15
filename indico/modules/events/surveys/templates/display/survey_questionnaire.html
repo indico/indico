@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block description %}
-    {{ survey.introduction }}
+    {{ survey.introduction | markdown }}
 {% endblock %}
 
 {% block content %}

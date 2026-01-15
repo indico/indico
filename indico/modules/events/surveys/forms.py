@@ -8,7 +8,7 @@
 from datetime import time
 
 from markupsafe import escape
-from wtforms.fields import BooleanField, IntegerField, StringField, TextAreaField
+from wtforms.fields import BooleanField, IntegerField, StringField
 from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.core.db import db
@@ -25,7 +25,8 @@ class SurveyForm(IndicoForm):
                             'new_submission_emails')
 
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
-    introduction = TextAreaField(_('Introduction'), description=_('An introduction to be displayed before the survey'))
+    introduction = IndicoMarkdownField(_('Introduction'), editor=True,
+                                       description=_('An introduction to be displayed before the survey.'))
     anonymous = BooleanField(_('Anonymous submissions'), widget=SwitchWidget(),
                              description=_('User information will not be attached to submissions'))
     require_user = BooleanField(_('Only logged-in users'), [HiddenUnless('anonymous')], widget=SwitchWidget(),

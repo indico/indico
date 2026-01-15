@@ -27,6 +27,7 @@ Improvements
 - Log changes to event reminders in the event log (:pr:`7242`)
 - Allow sending account creation notifications to specific email addresses (:issue:`7166`,
   :pr:`7233`, thanks :user:`duartegalvao`)
+- Support markdown in survey introduction text (:pr:`7260`)
 
 Bugfixes
 ^^^^^^^^
@@ -42,6 +43,7 @@ Bugfixes
   (:pr:`7254`)
 - Fix recurrence information not being correctly included in room booking ical export
   (:pr:`7255`)
+- Fix weird indentation on list items in markdown field preview (:pr:`7260`)
 
 Accessibility
 ^^^^^^^^^^^^^

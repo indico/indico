@@ -102,6 +102,15 @@ $display-preview-bg-color: white;
     p {
       white-space: pre-line;
     }
+
+    ul,
+    ol {
+      margin-left: 3em;
+    }
+
+    :is(ul, ol) :is(ul, ol) {
+      margin-left: 1.2em;
+    }
   }
 }
 

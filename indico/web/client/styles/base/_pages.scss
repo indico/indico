@@ -107,6 +107,15 @@
       color: $dark-gray;
       font-size: 1.2em;
       margin-top: $separator-margin;
+
+      ul,
+      ol {
+        margin-left: 3em;
+      }
+
+      :is(ul, ol) :is(ul, ol) {
+        margin-left: 1.2em;
+      }
     }
 
     .page-info {
