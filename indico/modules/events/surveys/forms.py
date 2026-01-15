@@ -26,7 +26,7 @@ class SurveyForm(IndicoForm):
 
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
     introduction = IndicoMarkdownField(_('Introduction'), editor=True,
-                                       description=_('An introduction to be displayed before the survey.'))
+                                       description=_('An introduction to be displayed before the survey'))
     anonymous = BooleanField(_('Anonymous submissions'), widget=SwitchWidget(),
                              description=_('User information will not be attached to submissions'))
     require_user = BooleanField(_('Only logged-in users'), [HiddenUnless('anonymous')], widget=SwitchWidget(),
