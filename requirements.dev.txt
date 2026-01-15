@@ -32,7 +32,7 @@ charset-normalizer==3.4.4
     # via
     #   -c requirements.txt
     #   requests
-click==8.3.1
+click==8.2.1
     # via
     #   -c requirements.txt
     #   flask
