@@ -47,7 +47,8 @@
             </div>
         {%- endif %}
         {% if contrib.favorite_count -%}
-            <div class="contrib-favorites icon-star">
+            <div class="contrib-favorites icon-star" data-title 
+                title="{% trans count=contrib.favorite_count %}One person has favorited this contribution.{% pluralize %}{{ count }} people have favorited this contribution.{% endtrans %}">
                 {{ contrib.favorite_count }}
             </div>
         {%- endif %}
