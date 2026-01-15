@@ -4,8 +4,6 @@ import {useDispatch, useSelector} from 'react-redux/es';
 import {ThunkDispatch} from 'redux-thunk';
 import {Icon} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
-
 import * as actions from './actions';
 import * as selectors from './selectors';
 import {ReduxState, BlockEntry, Entry, EntryType} from './types';
@@ -20,25 +18,19 @@ interface EntryMoveButtonsProps {
   sessionBlockId?: string;
 }
 
-export function EntryMoveButtons({
-  id: _id,
-  startDt,
-  duration: _duration,
-  sessionBlockId,
-}: EntryMoveButtonsProps) {
+export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryMoveButtonsProps) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
+  const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
   const currentDateEntries = entries[dtKey];
-  const entry = (
-    sessionBlockId
-      ? (currentDateEntries.find(e => e.id === sessionBlockId) as BlockEntry).children
-      : currentDateEntries
-  ).find(e => e.id === _id);
-  const filteredEntries = (
-    sessionBlockId ? currentDateEntries.filter(e => e.id === sessionBlockId) : currentDateEntries
-  ).filter(e => e.id !== _id);
+  const parent = sessionBlockId
+    ? (currentDateEntries.find(e => e.id === sessionBlockId) as BlockEntry)
+    : null;
+  const entry = (parent ? (parent?.children ?? []) : currentDateEntries).find(e => e.id === id);
+  const filteredEntries = (parent ? (parent?.children ?? []) : currentDateEntries).filter(
+    e => e.id !== id
+  );
 
   const _getMovedChildrenByDelta = (parentEntry: BlockEntry, delta: number) =>
     parentEntry?.children.map(child => ({
@@ -77,10 +69,12 @@ export function EntryMoveButtons({
   };
 
   const moveUp = e => {
+    e.stopPropagation();
+
     let newStartDt: Moment | null = null;
 
     for (const fe of filteredEntries) {
-      if (fe.id === _id) {
+      if (fe.id === id) {
         continue;
       }
 
@@ -98,20 +92,20 @@ export function EntryMoveButtons({
     }
 
     _moveEntry(entry, newStartDt);
-
-    e.stopPropagation();
   };
 
   const moveDown = e => {
+    e.stopPropagation();
+
     let newStartDt: Moment | null = null;
 
     for (const fe of filteredEntries) {
-      if (fe.id === _id) {
+      if (fe.id === id) {
         continue;
       }
 
       const feStart = moment(fe.startDt);
-      const targetEnd = moment(startDt).add(_duration, 'minutes');
+      const targetEnd = moment(startDt).add(duration, 'minutes');
 
       if (feStart.isSame(targetEnd)) {
         _swapEntries(entry, fe);
@@ -119,22 +113,20 @@ export function EntryMoveButtons({
       }
 
       if (feStart.isAfter(targetEnd) && (!newStartDt || feStart.isBefore(newStartDt))) {
-        newStartDt = moment(feStart).subtract(_duration, 'minutes');
+        newStartDt = moment(feStart).subtract(duration, 'minutes');
       }
     }
 
     _moveEntry(entry, newStartDt);
-
-    e.stopPropagation();
   };
 
   return (
     <div styleName="mv-buttons-wrapper">
-      <button type="button" title={Translate.string('Move up')} onClick={moveUp}>
+      <button type="button" onClick={moveUp}>
         <Icon name="chevron up" />
       </button>
       <button type="button">
-        <Icon name="chevron down" title={Translate.string('Move down')} onClick={moveDown} />
+        <Icon name="chevron down" onClick={moveDown} />
       </button>
     </div>
   );
