@@ -101,15 +101,21 @@
   position: absolute;
   top: 0;
   right: 0;
+  height: 100%;
+   // Minimum height of every entry, with additional room for bigger entries
+  max-height: 40px;
   padding-inline: 10px;
   display: flex;
   align-items: center;
   gap: 2px;
   z-index: 2;
-  height: 100%;
-  max-height: 40px; // Minimum height of every entry, with additional room for bigger entries
   overflow: hidden;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 4px;
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: 0;
+  border-top: 0;
 
   button {
     background-color: rgba(0, 0, 0, 0.3);
