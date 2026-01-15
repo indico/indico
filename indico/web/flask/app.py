@@ -428,6 +428,8 @@ def make_app(testing=False, config_override=None):
         configure_db(app)
         mm.init_app(app)  # must be called after `configure_db`!
         limiter.init_app(app)
+        # unregister request-level limit check: https://github.com/alisaifee/flask-limiter/issues/489
+        app.before_request_funcs[None].remove(limiter._check_request_limit)
         extend_url_map(app)
         add_handlers(app)
         setup_request_stats(app)
