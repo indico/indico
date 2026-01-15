@@ -5,30 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
-
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
+import {EntryMoveButtons} from './EntryMoveButtons';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {
-  ReduxState,
-  ContribEntry,
-  EntryType,
-  BlockEntry,
-  BaseEntry,
-  ScheduledMixin,
-  Entry,
-} from './types';
+import {ReduxState, ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
@@ -36,7 +27,6 @@ import {
   snapMinutes,
   formatBlockTitle,
   getIconByEntryType,
-  getDateKey,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -304,93 +294,6 @@ export default function ContributionEntry({
         setGlobalDuration={_setDuration}
         setIsResizing={setIsResizing}
       />
-    </div>
-  );
-}
-
-export function EntryMoveButtons({
-  id: _id,
-  startDt,
-  duration: _duration,
-  sessionBlockId,
-}: {
-  id: string;
-  startDt: Moment;
-  duration: number;
-  sessionBlockId?: string;
-}) {
-  const dispatch = useDispatch();
-  const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
-  const currentDate = useSelector(selectors.getCurrentDate);
-  const dtKey = getDateKey(currentDate);
-  const currentDateEntries = entries[dtKey];
-  const entry = (
-    sessionBlockId
-      ? (currentDateEntries.find(e => e.id === sessionBlockId) as BlockEntry).children
-      : currentDateEntries
-  ).find(e => e.id === _id);
-  const filteredEntries = (
-    sessionBlockId ? currentDateEntries.filter(e => e.id === sessionBlockId) : currentDateEntries
-  ).filter(e => e.id !== _id);
-
-  const moveUp = e => {
-    const newStartDt = filteredEntries.reduce((prev: Moment | null, curr: Entry) => {
-      if (curr.id === _id) {
-        return prev;
-      }
-
-      const currEnd = moment(curr.startDt).add(curr.duration, 'minutes');
-      const targetStart = moment(startDt);
-      const prevStart = prev ? moment(prev) : null;
-
-      if (currEnd.isBefore(targetStart) && (!prevStart || currEnd.isAfter(prevStart))) {
-        return currEnd;
-      }
-      return prev;
-    }, null);
-
-    const newEntry = {...entry, startDt: newStartDt};
-
-    if (newStartDt) {
-      dispatch(actions.updateEntry(entry.type, newEntry, dtKey));
-    }
-
-    e.stopPropagation();
-  };
-
-  const moveDown = e => {
-    const newStartDt = filteredEntries.reduce((prev: Moment | null, curr: Entry) => {
-      if (curr.id === _id) {
-        return prev;
-      }
-
-      const currStart = moment(curr.startDt);
-      const targetEnd = moment(startDt).add(_duration, 'minutes');
-      const prevStart = prev ? moment(prev) : null;
-
-      if (currStart.isAfter(targetEnd) && (!prevStart || currStart.isAfter(prevStart))) {
-        return moment(currStart).subtract(_duration, 'minutes');
-      }
-      return prev;
-    }, null);
-
-    const newEntry = {...entry, startDt: newStartDt};
-
-    if (newStartDt) {
-      dispatch(actions.updateEntry(entry.type, newEntry, dtKey));
-    }
-
-    e.stopPropagation();
-  };
-
-  return (
-    <div styleName="mv-buttons-wrapper">
-      <button type="button" title={Translate.string('Move up')} onClick={moveUp}>
-        <Icon name="chevron up" />
-      </button>
-      <button type="button">
-        <Icon name="chevron down" title={Translate.string('Move down')} onClick={moveDown} />
-      </button>
     </div>
   );
 }
