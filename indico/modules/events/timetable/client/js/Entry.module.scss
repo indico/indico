@@ -121,8 +121,8 @@
 
   button {
     background-color: rgba(255, 255, 255, 0.7);
-    border: none;
     color: $black;
+    border: none;
     border-radius: 2px;
     width: 1.2rem;
     height: 1.1rem;
@@ -134,14 +134,9 @@
     cursor: pointer;
     transition: 0.1s;
 
-    &:hover {
-      background-color: white;
-    }
-
     &:disabled {
-      background-color: rgba(0, 0, 0, 0.1);
-      cursor: not-allowed;
-      color: rgba(255, 255, 255, 0.5);
+      display: none;
+      // cursor: not-allowed;
     }
 
     :global(.icon) {
