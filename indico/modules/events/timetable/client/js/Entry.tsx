@@ -175,7 +175,7 @@ export default function ContributionEntry({
     position: 'absolute',
     top: y,
     left: offset,
-    width: `calc(${width} - ${parent ? 20 : 6}px)`,
+    width: `calc(${width} - ${parent ? 60 : 6}px)`,
     height,
     textAlign: 'left',
     zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
