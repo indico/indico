@@ -17,7 +17,7 @@ import {Button, Icon, List, Loader, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {UserSearch} from 'indico/react/components/principals/Search';
-import {useFavoriteUsers} from 'indico/react/hooks';
+import {useFavoriteUsers, useIndicoAxiosWithMutation} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -56,34 +56,23 @@ FavoriteManager.defaultProps = {
 };
 
 function FavoriteCatManager({userId}) {
-  const [favoriteCats, setFavoriteCats] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const getFavoriteCats = useCallback(async () => {
-    let res;
-    try {
-      res = await indicoAxios.get(categoryFavoriteURL(userId !== null ? {user_id: userId} : {}));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setFavoriteCats(res.data);
-    setLoading(false);
-  }, [userId]);
-
-  useEffect(() => {
-    getFavoriteCats();
-  }, [getFavoriteCats]);
+  const {
+    data: favoriteCats,
+    loading,
+    mutate,
+  } = useIndicoAxiosWithMutation(categoryFavoriteURL(userId !== null ? {user_id: userId} : {}));
 
   const deleteFavoriteCat = async id => {
     try {
-      await indicoAxios.delete(categoryFavoriteURL({category_id: id}));
+      await mutate(indicoAxios.delete(categoryFavoriteURL({category_id: id})), oldData =>
+        _.omit(oldData, id)
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setFavoriteCats(values => _.omit(values, id));
   };
+
   return (
     <div className="column col-50">
       <div className="i-box just-group-list">
