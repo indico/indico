@@ -39,6 +39,39 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
     e => e.id !== id
   );
 
+  // TODO: (Ajob) Evaluate if we want to disable support for moving entries within groups
+  //              (overlapping directly/indirectly). If so we can sort the entries instead
+  //              and calculate overlap to disable the buttons accordingly. Still would work
+  //              for above/below calculation.
+  const _getAdjacentEntries = () => {
+    let above: Entry | null = null;
+    let below: Entry | null = null;
+    const targetStart = moment(startDt);
+    const targetEnd = moment(startDt).add(duration, 'minutes');
+
+    for (const fe of filteredEntries) {
+      if (fe.id === id) {
+        continue;
+      }
+
+      const feStart = moment(fe.startDt);
+      const feEnd = moment(feStart).add(fe.duration, 'minutes');
+
+      if (
+        targetStart.isSameOrAfter(feEnd) &&
+        (!above || feEnd.isAfter(moment(above.startDt).add(above.duration, 'minutes')))
+      ) {
+        above = fe;
+      } else if (targetEnd.isSameOrBefore(feStart) && (!below || feStart.isBefore(below.startDt))) {
+        below = fe;
+      }
+    }
+
+    return [above, below];
+  };
+
+  const [above, below] = _getAdjacentEntries();
+
   const _getMovedChildrenByDelta = (parentEntry: BlockEntry, delta: number) =>
     parentEntry?.children.map(child => ({
       ...child,
@@ -78,63 +111,53 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const moveUp = e => {
     e.stopPropagation();
 
-    let newStartDt: Moment | null = null;
+    const targetStart = moment(startDt);
 
-    for (const fe of filteredEntries) {
-      if (fe.id === id) {
-        continue;
-      }
-
-      const feEnd = moment(fe.startDt).add(fe.duration, 'minutes');
-      const targetStart = moment(startDt);
-
-      if (feEnd.isSame(targetStart)) {
-        _swapEntries(fe, entry);
-        return;
-      }
-
-      if (targetStart.isAfter(feEnd) && (!newStartDt || feEnd.isAfter(newStartDt))) {
-        newStartDt = moment(feEnd);
-      }
+    if (!above) {
+      // TODO: (Ajob) Consider implementing snapping to top of calendar
+      return;
     }
 
-    _moveEntry(entry, newStartDt);
+    const aboveEnd = moment(above.startDt).add(above.duration, 'minutes');
+
+    if (aboveEnd.isSame(targetStart)) {
+      _swapEntries(above, entry);
+      return;
+    }
+
+    _moveEntry(entry, aboveEnd);
   };
 
   const moveDown = e => {
     e.stopPropagation();
+    console.log('below', below?.title);
 
-    let newStartDt: Moment | null = null;
+    const targetEnd = moment(startDt).add(duration, 'minutes');
 
-    for (const fe of filteredEntries) {
-      if (fe.id === id) {
-        continue;
-      }
-
-      const feStart = moment(fe.startDt);
-      const targetEnd = moment(startDt).add(duration, 'minutes');
-
-      if (feStart.isSame(targetEnd)) {
-        _swapEntries(entry, fe);
-        return;
-      }
-
-      if (feStart.isAfter(targetEnd) && (!newStartDt || feStart.isBefore(newStartDt))) {
-        newStartDt = moment(feStart).subtract(duration, 'minutes');
-      }
+    if (!below) {
+      // TODO: (Ajob) Consider implementing snapping to bottom of calendar
+      console.log('nothing below');
+      return;
     }
 
-    _moveEntry(entry, newStartDt);
+    if (below.startDt.isSame(targetEnd)) {
+      _swapEntries(entry, below);
+      return;
+    }
+
+    _moveEntry(entry, moment(below.startDt).subtract(duration, 'minutes'));
   };
 
   return (
-    <div styleName="mv-buttons-wrapper">
-      <button type="button" onClick={moveUp}>
-        <Icon name="chevron up" />
-      </button>
-      <button type="button">
-        <Icon name="chevron down" onClick={moveDown} />
-      </button>
-    </div>
+    (above || below) && (
+      <div styleName="mv-buttons-wrapper">
+        <button type="button" onClick={moveUp} disabled={!above}>
+          <Icon name="chevron up" />
+        </button>
+        <button type="button" onClick={moveDown} disabled={!below}>
+          <Icon name="chevron down" />
+        </button>
+      </div>
+    )
   );
 }
