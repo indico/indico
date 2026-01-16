@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .entry {
   color: white;
   border-radius: 4px;
@@ -118,9 +120,9 @@
   border-top: 0;
 
   button {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.7);
     border: none;
-    color: white;
+    color: $black;
     border-radius: 2px;
     width: 1.2rem;
     height: 1.1rem;
@@ -130,9 +132,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: 0.1s;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: white;
     }
 
     &:disabled {
