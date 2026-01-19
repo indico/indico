@@ -10,8 +10,6 @@ from datetime import timedelta
 
 import limits
 from flask import has_request_context, request
-from flask_limiter import Limiter
-from limits import parse_many
 
 from indico.util.signals import make_interceptable
 
@@ -24,11 +22,11 @@ class IndicoRedisStorage(limits.storage.RedisStorage):
 
 
 class RateLimit:
-    def __init__(self, limiter, key_func, scope, limits):
+    def __init__(self, limiter, key_func, scope, definition):
         self.limiter = limiter
         self.key_func = key_func
         self.scope = scope
-        self.limits = limits
+        self.limits = definition
 
     def _get_args(self, args):
         # scope args go directly the redis keys and are separated by slashes,
@@ -97,7 +95,7 @@ class RateLimit:
         return f'<RateLimit({self.scope}): {limits}>'
 
 
-def make_rate_limiter(scope, limits, *, by_ip=True):
+def make_rate_limiter(scope, definition, *, by_ip=True):
     """Create a rate limiter.
 
     Multiple limits can be separated with a semicolon; in that case
@@ -105,8 +103,8 @@ def make_rate_limiter(scope, limits, *, by_ip=True):
     a somewhat strict limit, but then a higher limit over a longer period
     of time to allow for bursts.
     """
-    limits = list(parse_many(limits)) if limits is not None else None
-    return RateLimit(limiter, limiter._key_func if by_ip else None, scope, limits)
+    definition = list(limits.parse_many(definition)) if definition is not None else None
+    return RateLimit(limiter, _limiter_key if by_ip else None, scope, definition)
 
 
 @make_interceptable
@@ -114,4 +112,12 @@ def _limiter_key():
     return request.remote_addr if has_request_context() else 'dummy.ip'
 
 
-limiter = Limiter(key_func=_limiter_key, strategy='moving-window')
+class IndicoLimiterExtension:
+    def init_app(self, app):
+        storage = limits.storage.storage_from_string(app.config['RATELIMIT_STORAGE_URI'])
+        self.limiter = limits.strategies.MovingWindowRateLimiter(storage)
+        assert 'indico_limiter' not in app.extensions
+        app.extensions['indico_limiter'] = self
+
+
+limiter = IndicoLimiterExtension()
