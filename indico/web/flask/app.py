@@ -422,6 +422,8 @@ def inject_csp(response):
     ]
     if config.CSP_REPORT_URI:
         csp_directives.append(f'report-uri {config.CSP_REPORT_URI}')
+        csp_directives.append('report-to default')
+        response.headers['Reporting-Endpoints'] = f'default="{config.CSP_REPORT_URI}"'
     csp_header = (
         'Content-Security-Policy-Report-Only' if config.CSP_ENABLED == 'report-only' else 'Content-Security-Policy'
     )
