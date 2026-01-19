@@ -404,6 +404,8 @@ def inject_current_url(response):
 
 
 def inject_csp(response):
+    if not config.CSP_ENABLED:
+        return response
     if 'Content-Security-Policy' in response.headers:
         # do not inject a default CSP if one was already set explicitly, e.g. in plugins that
         # want to apply a more restricted one in some areas
@@ -412,8 +414,18 @@ def inject_csp(response):
     sources = ['self', 'unsafe-eval']
     if nonce := get_csp_nonce(init=False):
         sources.append(f'nonce-{nonce}')
+    sources.extend(config.CSP_SCRIPT_SOURCES)
     sources = ' '.join(f"'{x}'" for x in sources)
-    response.headers['Content-Security-Policy'] = f'script-src {sources}'
+    csp_directives = [
+        f'script-src {sources}',
+        *config.CSP_DIRECTIVES,
+    ]
+    if config.CSP_REPORT_URI:
+        csp_directives.append(f'report-uri {config.CSP_REPORT_URI}')
+    csp_header = (
+        'Content-Security-Policy-Report-Only' if config.CSP_ENABLED == 'report-only' else 'Content-Security-Policy'
+    )
+    response.headers[csp_header] = '; '.join(csp_directives)
     return response
 
 

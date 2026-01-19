@@ -821,6 +821,42 @@ Security
 
     Default: ``None``
 
+.. data:: CSP_ENABLED
+
+    Specifies whether a ``Content-Security-Policy`` header should be sent. This
+    can also be set to ``'report-only'`` to use ``Content-Security-Policy-Report-Only``
+    instead (only useful when a :data:`CSP_REPORT_URI` is set or when using your
+    browser's dev tools console to look for errors).
+
+    Default: ``False`` (may change in a future release)
+
+.. data:: CSP_REPORT_URI
+
+    Specifies the URL to which CSP violations should be reported. When using
+    `Sentry`_, you can use the "Report URI" which you can find in your project
+    settings under "Security Headers".
+
+    Default: ``None``
+
+.. data:: CSP_SCRIPT_SOURCES
+
+    By default only ``script-src`` values needed for Indico to work are included.
+    If you embed external scripts from other hosts, you may need to include them
+    here or they will not work (use your browser's dev tools to check for log
+    messages related to CSP violations). Note that you MUST NOT add any ``nonce``
+    values there, as this would make the whole policy useless (knowing the nonce
+    in advance means you can set it on any maliciously injected script).
+
+    Default: ``set()``
+
+.. data:: CSP_DIRECTIVES
+
+    Specify custom top-level CSP directives. This can include any CSP directive besides
+    ``script-src`` which is already handled by Indico itself (use :data:`CSP_SCRIPT_SOURCES`
+    if you need to add custom values there).
+
+    Default: ``set()``
+
 
 Storage
 -------
