@@ -17,6 +17,8 @@ import {ContributionList} from './ContributionList';
 import {FavoriteContributions} from './FavoriteContributions';
 import {Contribution} from './types';
 
+import './MyContributions.module.scss';
+
 interface MyContributionsProps {
   eventId: number;
 }
@@ -33,6 +35,7 @@ function editContribution(contribution: Contribution) {
     return (
       <a
         href="#"
+        styleName="edit-button"
         className="icon-edit js-edit-contribution"
         title={Translate.string('Edit this contribution')}
         data-title={`${Translate.string('Edit contribution')} '${contribution.title}'`}
