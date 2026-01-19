@@ -100,7 +100,6 @@ flask==3.1.2
     #   flask-babel
     #   flask-caching
     #   flask-cors
-    #   flask-limiter
     #   flask-marshmallow
     #   flask-migrate
     #   flask-multipass
@@ -114,8 +113,6 @@ flask-babel==4.0.0
 flask-caching==2.3.1
     # via -r requirements.in
 flask-cors==6.0.2
-    # via -r requirements.in
-flask-limiter==4.1.1
     # via -r requirements.in
 flask-marshmallow==1.3.0
     # via -r requirements.in
@@ -179,7 +176,7 @@ jsonschema-specifications==2025.9.1
 kombu==5.6.2
     # via celery
 limits==5.6.0
-    # via flask-limiter
+    # via -r requirements.in
 lxml==6.0.2
     # via
     #   -r requirements.in
@@ -215,8 +212,6 @@ matplotlib-inline==0.2.1
     # via ipython
 mypy-extensions==1.1.0
     # via typing-inspect
-ordered-set==4.1.0
-    # via flask-limiter
 packaging==25.0
     # via
     #   -r requirements.in
@@ -349,7 +344,6 @@ typeguard==4.4.4
 typing-extensions==4.15.0
     # via
     #   alembic
-    #   flask-limiter
     #   limits
     #   referencing
     #   typeguard

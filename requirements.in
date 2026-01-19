@@ -15,7 +15,6 @@ feedgen
 flask-babel
 flask-caching
 flask-cors
-flask-limiter
 flask-marshmallow
 flask-migrate
 flask-multipass
@@ -32,6 +31,7 @@ ipython
 itsdangerous
 jinja2
 jsonschema
+limits
 lxml[html5]
 markdown
 markupsafe
