@@ -1,5 +1,5 @@
 import {AxiosRequestConfig} from 'axios';
-import {useState, useCallback, useEffect, useRef} from 'react';
+import {useState, useCallback, useEffect, useRef, useMemo} from 'react';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 
@@ -38,14 +38,6 @@ export function useIndicoAxiosWithMutation<T>(
     reFetch,
   } = useIndicoAxios(axiosConfig, hookConfig);
   const patchedDataRef = useRef(patchedData);
-
-  useEffect(() => {
-    setPatchedData(data);
-  }, [data]);
-
-  useEffect(() => {
-    patchedDataRef.current = patchedData;
-  }, [patchedData]);
 
   const mutate = useCallback(
     async <R>(
@@ -96,14 +88,30 @@ export function useIndicoAxiosWithMutation<T>(
     [reFetch, axiosConfig, patchedData, mutating]
   );
 
-  return {
-    data: patchedData,
-    response,
-    loading: fetching && !mutating,
-    error,
-    reFetch,
-    mutate,
-    mutating,
-    mutationError,
-  };
+  useEffect(() => {
+    // while mutating, don't update patchedData based on the value of data
+    if (fetching || mutating) {
+      return;
+    }
+    setPatchedData(data);
+  }, [data, fetching, mutating]);
+
+  useEffect(() => {
+    patchedDataRef.current = patchedData;
+  }, [patchedData]);
+
+  return useMemo(
+    () => ({
+      data: patchedData,
+      response,
+      loading: fetching && !mutating,
+      fetching,
+      error,
+      reFetch,
+      mutate,
+      mutating,
+      mutationError,
+    }),
+    [patchedData, response, fetching, error, reFetch, mutate, mutating, mutationError]
+  );
 }
