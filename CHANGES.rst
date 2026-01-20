@@ -28,6 +28,8 @@ Improvements
 - Allow sending account creation notifications to specific email addresses (:issue:`7166`,
   :pr:`7233`, thanks :user:`duartegalvao`)
 - Support markdown in survey introduction text (:pr:`7260`)
+- Add Content-Security-Policy support (opt-in via the :data:`CSP_ENABLED` setting)
+  (:issue:`5486`, :pr:`7257`)
 
 Bugfixes
 ^^^^^^^^
