@@ -1081,8 +1081,8 @@ def clone_registration_form(regform):
     :return: The cloned registration form
     """
     from indico.modules.events.cloning import get_attrs_to_clone
-    from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.events.registration.clone import RegistrationFormCloner
+    from indico.modules.events.registration.models.forms import RegistrationForm
 
     attrs = get_attrs_to_clone(RegistrationForm,
                                # registration form open times probably not needed
