@@ -33,8 +33,8 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
-from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
-                                                     get_flat_section_setup_data, clone_registration_form)
+from indico.modules.events.registration.util import (clone_registration_form, close_registration,
+                                                     create_personal_data_fields, get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.settings import data_retention_settings
