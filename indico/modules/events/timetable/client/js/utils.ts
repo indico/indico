@@ -15,7 +15,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS} from './colors';
 import {BlockEntry, Colors, Entry, EntryType, HexColor, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
@@ -95,13 +95,6 @@ export function mapTTEntryColor(dbEntry: any, sessions: Record<string, Session> 
   if (type === EntryType.SessionBlock) {
     return sessions[sessionId].colors ?? fallbackColor;
   }
-
-  if (sessionId) {
-    const session = sessions[sessionId];
-    console.assert(session, `Session ${dbEntry.sessionId} not found for entry ${dbEntry.id}`);
-    return ENTRY_COLORS_BY_BACKGROUND[session.colors.backgroundColor];
-  }
-
   return fallbackColor;
 }
 
