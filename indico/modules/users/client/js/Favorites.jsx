@@ -11,7 +11,7 @@ import eventFavoriteURL from 'indico-url:users.user_favorites_event_api';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState, useCallback} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button, Icon, List, Loader, Popup} from 'semantic-ui-react';
 
@@ -138,33 +138,23 @@ FavoriteCatManager.defaultProps = {
 };
 
 function FavoriteEventManager({userId}) {
-  const [favoriteEvents, setFavoriteEvents] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const getFavoriteEvents = useCallback(async () => {
-    let res;
-    try {
-      res = await indicoAxios.get(eventFavoriteURL(userId !== null ? {user_id: userId} : {}));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setFavoriteEvents(res.data);
-    setLoading(false);
-  }, [userId]);
-
-  useEffect(() => {
-    getFavoriteEvents();
-  }, [getFavoriteEvents]);
+  const {
+    data: favoriteEvents,
+    loading,
+    mutate,
+  } = useIndicoAxiosWithMutation({
+    url: eventFavoriteURL(userId !== null ? {user_id: userId} : {}),
+  });
 
   const deleteFavoriteEvent = async id => {
     try {
-      await indicoAxios.delete(eventFavoriteURL({event_id: id}));
+      await mutate(indicoAxios.delete(eventFavoriteURL({event_id: id})), oldData =>
+        _.omit(oldData, id)
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setFavoriteEvents(values => _.omit(values, id));
   };
 
   return (
