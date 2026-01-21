@@ -184,5 +184,6 @@ def serialize_log_entry(entry, tzinfo):
         'user': {
             'fullName': entry.user.full_name if entry.user else None,
             'avatarURL': entry.user.avatar_url if entry.user else None
-        }
+        },
+        'detailsLink': entry.object_details
     }

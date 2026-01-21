@@ -5,6 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from collections.abc import Callable
+from dataclasses import dataclass
+
 from sqlalchemy.dialects.postgresql import JSON, JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -17,6 +20,14 @@ from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+from indico.web.flask.util import url_for
+
+
+@dataclass(frozen=True)
+class LogDetailsSource:
+    title: str
+    get_obj: Callable[[int], db.Model | None]
+    get_url: Callable[[db.Model], str]
 
 
 class EventLogRealm(RichIntEnum):
@@ -197,6 +208,26 @@ class EventLogEntry(LogEntryBase):
     @locator_property
     def locator(self):
         return dict(self.event.locator, log_entry_id=self.id)
+
+    @property
+    def object_details(self):
+        from indico.modules.events.registration.models.registrations import Registration
+        details_mapping = {
+            'registration_id': LogDetailsSource(
+                                _('Registration details'),
+                                lambda id: Registration.get(id, is_deleted=False),
+                                lambda reg: url_for('event_registration.registration_details', reg)
+                                ),
+            # add similar definitions for other objects where this may be useful
+        }
+        if len(self.meta) != 1:
+            return
+        key, id = list(self.meta.items())[0]
+        if not (spec := details_mapping.get(key)):
+            return
+        if not (obj := spec.get_obj(id)):
+            return
+        return {'title': spec.title, 'url': spec.get_url(obj)}
 
 
 class CategoryLogEntry(LogEntryBase):
