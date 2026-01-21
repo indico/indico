@@ -86,7 +86,7 @@ function GlobalEvents() {
         if (selectedEntry) {
           dispatch(actions.deselectEntry());
         }
-      } else if (e.key === 'Delete') {
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedEntry) {
           switch (selectedEntry.type) {
             case EntryType.Break: {
