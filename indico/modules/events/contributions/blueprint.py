@@ -140,6 +140,7 @@ _bp.add_url_rule('/manage/contributions/fields/description', 'manage_description
 _bp.add_url_rule('/contributions/', 'contribution_list', display.RHContributionList)
 _bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', display.RHContributionsExportToPDF)
 _bp.add_url_rule('/contributions/mine', 'my_contributions', display.RHMyContributions)
+_bp.add_url_rule('/contributions/my_timetable', 'my_timetable', display.RHMyTimetable)
 _bp.add_url_rule('/contributions/authors', 'author_list', display.RHAuthorList)
 _bp.add_url_rule('/contributions/speakers', 'speaker_list', display.RHSpeakerList)
 _bp.add_url_rule('/contributions/customize', 'customize_contribution_list', display.RHContributionListFilter,

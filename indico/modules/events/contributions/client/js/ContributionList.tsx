@@ -18,7 +18,7 @@ import {Contribution, ContributionRecord} from './types';
 interface ContributionList {
   loading?: boolean;
   contributions: ContributionRecord | null;
-  title: string;
+  title?: string;
   emptyText?: string;
   actionsElement?: (contribution: Contribution) => React.ReactNode;
   hideWhenEmpty?: boolean;
@@ -38,11 +38,13 @@ export function ContributionList({
 
   return (
     <section>
-      <div className="header">
-        <div className="header-row">
-          <h3>{title}</h3>
+      {title && (
+        <div className="header">
+          <div className="header-row">
+            <h3>{title}</h3>
+          </div>
         </div>
-      </div>
+      )}
       <div styleName="contribution-container">
         <div className="i-box just-group-list">
           <div className="i-box-content">

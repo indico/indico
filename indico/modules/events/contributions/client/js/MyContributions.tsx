@@ -14,7 +14,6 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
 import {ContributionList} from './ContributionList';
-import {FavoriteContributions} from './FavoriteContributions';
 import {Contribution} from './types';
 
 import './MyContributions.module.scss';
@@ -54,8 +53,7 @@ export function MyContributions({eventId}: MyContributionsProps) {
   });
 
   return (
-    <div>
-      <FavoriteContributions eventId={eventId} />
+    <>
       {Object.entries(SECTIONS).map(([section, title]) => (
         <ContributionList
           key={section}
@@ -66,7 +64,7 @@ export function MyContributions({eventId}: MyContributionsProps) {
           hideWhenEmpty
         />
       ))}
-    </div>
+    </>
   );
 }
 
