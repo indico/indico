@@ -62,6 +62,31 @@ class RegistrationFormCloner(EventCloner):
         if self._has_content(target_event):
             return [_('The target event already has registration forms')]
 
+    @classmethod
+    @no_autoflush
+    def clone_single_regform(cls, old_form, title=None):
+        """Clone a single registration form within the same event.
+
+        :param old_form: The registration form to clone
+        :param title: The title for the cloned form (defaults to 'Copy of <old title>')
+        :return: The cloned registration form
+        """
+        attrs = get_attrs_to_clone(RegistrationForm,
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
+        new_form = RegistrationForm(
+            event=old_form.event,
+            title=title or f'Copy of {old_form.title}',
+            **{attr: getattr(old_form, attr) for attr in attrs if attr != 'title'}
+        )
+        cloner = cls(old_form.event)
+        cloner._field_data_map = {}
+        cloner._item_map = {}
+        cloner._clone_form_items(old_form, new_form, clone_all_revisions=False)
+        db.session.add(new_form)
+        db.session.flush()
+        signals.event.registration.after_registration_form_clone.send(old_form, new_form=new_form)
+        return new_form
+
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         # if the registration cloner is also enabled, we have to keep

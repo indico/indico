@@ -323,10 +323,11 @@ class RHRegistrationFormClone(RHManageRegFormBase):
 
     def _process(self):
         form = clone_registration_form(self.regform)
-        flash(_('Registration form cloned. You can now modify it.'), 'success')
-        logger.info('Registration form %s cloned by %s', self.regform, session.user)
+        flash(_('Registration form cloned'), 'success')
+        logger.info('Registration form %r cloned into %r by %r', self.regform, form, session.user)
         log_text = f'Registration form cloned from "{self.regform.title}"'
-        self.regform.log(EventLogRealm.managment, LogKind.positive, 'Registration', log_text, session.user)
+        form.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
+                 meta={'source_registration_form_id': self.regform.id})
         return redirect(url_for('.manage_regform', form))
 
 
