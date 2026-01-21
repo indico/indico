@@ -100,6 +100,9 @@ import {$T} from 'indico/utils/i18n';
         type: options.method,
         url: options.url,
         data: $.isFunction(options.data) ? options.data() : options.data,
+        headers: {
+          'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+        },
         cache: false, // IE caches GET AJAX requests. WTF.
         complete: IndicoUI.Dialogs.Util.progress(),
         error(xhr) {
@@ -351,6 +354,9 @@ import {$T} from 'indico/utils/i18n';
           url: action,
           dataType: 'json',
           data: options.getExtraData.call(this, options.trigger),
+          headers: {
+            'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+          },
           beforeSubmit() {
             const evt = $.Event('ajaxForm:validateBeforeSubmit');
             $this.trigger(evt);

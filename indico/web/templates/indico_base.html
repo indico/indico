@@ -24,6 +24,9 @@
     {% block extra_meta_tags %}
     {% endblock %}
 
+    <script>
+        window.IndicoCSPNonce = {{ get_csp_nonce()|tojson }};
+    </script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=current_locale) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=current_locale) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>

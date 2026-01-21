@@ -243,6 +243,12 @@ class CustomizationLoader(BaseLoader):
         return rv
 
     def get_source(self, environment, template):
+        source, filename, uptodate = self._do_get_source(environment, template)
+        if template.endswith('.html'):
+            source = source.replace('<script>', '<script nonce="{{ get_csp_nonce() }}">')
+        return source, filename, uptodate
+
+    def _do_get_source(self, environment, template):
         path = posixpath.join(*split_template_path(template))
         if template[0] == '~':
             return self._get_fallback(environment, template[1:], path[1:], customization_ignored=True)
