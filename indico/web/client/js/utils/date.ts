@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import _ from 'lodash';
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 import 'moment-timezone';
 
 export function toMoment(dt, format, strict = false) {
@@ -286,4 +289,60 @@ export class OpenDateRange extends DateRange {
     const end = this.end ?? Infinity;
     return new Date(Math.min(end, Math.max(start, date)));
   }
+}
+
+/**
+ * Get the disabled hours for a date given start and end constraints
+ * This is used by the time picker to disable hours that are outside the event times
+ *
+ * See tests for examples
+ *
+ * @param {Moment} dt - The date for which to get the disabled hours
+ * @param {Moment} minStartDt - The start constraint (typically the event start time)
+ * @param {Moment} maxEndDt - The end constraint (typically the event end time minus the entry duration)
+ * @returns {number[]} - An array of disabled hours (0-23)
+ */
+export function getDisabledHours(dt: Moment, minStartDt?: Moment, maxEndDt?: Moment): number[] {
+  const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
+  const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
+  const minHour = shouldFilterStart ? minStartDt.hour() : 0;
+  const maxHour = shouldFilterEnd ? maxEndDt.hour() : 23;
+  const allHours = [...Array(24).keys()];
+
+  return allHours.filter(h => h < minHour || h > maxHour);
+}
+
+/**
+ * Get the disabled minutes for a given hour and date given start and end constraints
+ * This is used by the time picker to disable minutes that are outside the event times
+ *
+ * See tests for examples
+ *
+ * @param hour - The hour for which to get the disabled minutes
+ * @param dt - The date for which to get the disabled minutes
+ * @param minStartDt - The start constraint (typically the event start time)
+ * @param maxEndDt - The end constraint (typically the event end time minus the entry duration)
+ * @returns {number[]} - An array of disabled minutes (0-59)
+ */
+export function getDisabledMinutes(
+  hour: number,
+  dt: Moment,
+  minStartDt?: Moment,
+  maxEndDt?: Moment
+): number[] {
+  const shouldFilterStart = minStartDt && minStartDt.isSame(dt, 'day');
+  const shouldFilterEnd = maxEndDt && maxEndDt.isSame(dt, 'day');
+  const minHour = shouldFilterStart ? minStartDt.hour() : 0;
+  const maxHour = shouldFilterEnd ? maxEndDt.hour() : 23;
+  const minMinute = shouldFilterStart ? minStartDt.minute() : 0;
+  const maxMinute = shouldFilterEnd ? maxEndDt.minute() : 59;
+  const allMinutes = [...Array(60).keys()];
+
+  return allMinutes.filter(
+    m =>
+      hour < minHour ||
+      hour > maxHour ||
+      (hour === minHour && m < minMinute) ||
+      (hour === maxHour && m > maxMinute)
+  );
 }

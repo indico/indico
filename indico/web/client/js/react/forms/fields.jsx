@@ -16,7 +16,7 @@ import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'seman
 
 import Checkbox from 'indico/react/components/Checkbox';
 import DatePicker from 'indico/react/components/DatePicker';
-import {toMoment} from 'indico/utils/date';
+import {toMoment, getDisabledHours, getDisabledMinutes} from 'indico/utils/date';
 
 import formatters from './formatters';
 import parsers from './parsers';
@@ -436,10 +436,14 @@ function DateTimePickerComponent({
   maxEndDt,
 }) {
   const [dateValue, timeValue] = value.split('T');
+  const dt = moment(value);
 
   const handleDateChange = newDate => onChange(`${newDate || ''}T${timeValue}`);
   const handleTimeChange = newTime =>
     onChange(`${dateValue}T${moment(newTime).format('HH:mm:00')}`);
+
+  const _getDisabledHours = () => getDisabledHours(dt, minStartDt, maxEndDt);
+  const _getDisabledMinutes = hour => getDisabledMinutes(hour, dt, minStartDt, maxEndDt);
 
   return (
     <Form.Group>
@@ -461,27 +465,8 @@ function DateTimePickerComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           disabled={disabled}
-          disabledHours={
-            minStartDt || maxEndDt
-              ? () =>
-                  [...Array(24).keys()].filter(
-                    h => (minStartDt && h < minStartDt.hour()) || (maxEndDt && h > maxEndDt.hour())
-                  )
-              : undefined
-          }
-          disabledMinutes={
-            minStartDt || maxEndDt
-              ? h =>
-                  [...Array(60).keys()].filter(
-                    m =>
-                      (minStartDt &&
-                        (h < minStartDt.hour() ||
-                          (h === minStartDt.hour() && m < minStartDt.minute()))) ||
-                      (maxEndDt &&
-                        (h > maxEndDt.hour() || (h === maxEndDt.hour() && m > maxEndDt.minute())))
-                  )
-              : undefined
-          }
+          disabledHours={_getDisabledHours}
+          disabledMinutes={_getDisabledMinutes}
         />
       </Form.Field>
     </Form.Group>
