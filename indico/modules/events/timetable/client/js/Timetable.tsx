@@ -8,11 +8,13 @@
 import moment from 'moment';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {EntryType, ReduxState} from './types';
 import {getDateKey, minutesToPixels} from './utils';
 
 import './timetable.scss';
@@ -69,8 +71,9 @@ export default function Timetable() {
 }
 
 function GlobalEvents() {
-  const dispatch = useDispatch();
-  const selectedId = useSelector(selectors.getSelectedId);
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const eventId = useSelector(selectors.getEventId);
+  const selectedEntry = useSelector(selectors.getSelectedEntry);
 
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
@@ -80,15 +83,32 @@ function GlobalEvents() {
         dispatch(actions.redoChange());
       } else if (e.key === 'Escape') {
         // deselect selected entry
-        if (selectedId) {
+        if (selectedEntry) {
           dispatch(actions.deselectEntry());
+        }
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedEntry) {
+          switch (selectedEntry.type) {
+            case EntryType.Break: {
+              dispatch(actions.deleteBreak(selectedEntry, eventId));
+              break;
+            }
+            case EntryType.SessionBlock: {
+              dispatch(actions.deleteBlock(selectedEntry, eventId));
+              break;
+            }
+            case EntryType.Contribution: {
+              dispatch(actions.unscheduleEntry(selectedEntry, eventId));
+              break;
+            }
+          }
         }
       }
     }
 
     function onScroll() {
       // deselect selected entry
-      if (selectedId) {
+      if (selectedEntry) {
         dispatch(actions.deselectEntry());
       }
     }
@@ -99,7 +119,7 @@ function GlobalEvents() {
       document.removeEventListener('keydown', onKeydown);
       document.removeEventListener('scroll', onScroll, true);
     };
-  }, [dispatch, selectedId]);
+  }, [dispatch, eventId, selectedEntry]);
 
   return null;
 }
