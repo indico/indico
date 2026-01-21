@@ -531,6 +531,7 @@ function layoutAfterDropOnCalendar(
 
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
+    delete draftEntry.sessionId;
     delete draftEntry.parent;
   }
 
