@@ -22,7 +22,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
-from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
+from indico.modules.events.contributions.views import (WPAuthorList, WPContributions, WPMyContributions, WPMyTimetable,
+                                                       WPSpeakerList)
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.events import EventType
@@ -98,6 +99,21 @@ class RHMyContributions(RHDisplayProtectionBase):
 
     def _process(self):
         return WPMyContributions.render_template('display/user_contribution_list.html', self.event,
+                                                 user_id=session.user.id)
+
+
+class RHMyTimetable(RHDisplayProtectionBase):
+    """Display list of contributions added to the user's timetable."""
+
+    MENU_ENTRY_NAME = 'my_timetable'
+
+    def _check_access(self):
+        RHDisplayProtectionBase._check_access(self)
+        if not session.user:
+            raise Forbidden
+
+    def _process(self):
+        return WPMyTimetable.render_template('display/user_timetable.html', self.event,
                                                  user_id=session.user.id)
 
 

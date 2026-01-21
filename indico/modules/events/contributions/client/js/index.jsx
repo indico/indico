@@ -28,7 +28,8 @@ import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
 import './MyContributions';
-import './FavoriteContributionIcon';
+import './MyTimetable';
+import './ScheduleContributionIcon';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 

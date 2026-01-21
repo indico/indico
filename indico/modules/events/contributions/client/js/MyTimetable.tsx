@@ -9,7 +9,8 @@ import contributionFavoriteURL from 'indico-url:contributions.favorite_contribut
 
 import _ from 'lodash';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Icon, Popup} from 'semantic-ui-react';
+import ReactDOM from 'react-dom';
+import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -17,22 +18,22 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ContributionList} from './ContributionList';
 import {Contribution, ContributionRecord} from './types';
 
-import './FavoriteContributions.module.scss';
+import './MyTimetable.module.scss';
 
-interface FavoriteContributionsProps {
+interface MyTimetableProps {
   eventId: number;
 }
 
-export function FavoriteContributions({eventId}: FavoriteContributionsProps) {
-  const [favoriteContributions, setFavoriteContributions] = useState<ContributionRecord | null>(
+export function MyTimetable({eventId}: MyTimetableProps) {
+  const [scheduledContributions, setScheduledContributions] = useState<ContributionRecord | null>(
     null
   );
   const [loading, setLoading] = useState(true);
 
-  const getFavoriteContributions = useCallback(async () => {
+  const getMyTimetable = useCallback(async () => {
     try {
       const res = await indicoAxios.get(contributionFavoriteURL({event_id: eventId}));
-      setFavoriteContributions(res.data);
+      setScheduledContributions(res.data);
     } catch (error) {
       handleAxiosError(error);
       return;
@@ -41,39 +42,41 @@ export function FavoriteContributions({eventId}: FavoriteContributionsProps) {
   }, [eventId]);
 
   useEffect(() => {
-    getFavoriteContributions();
-  }, [getFavoriteContributions]);
+    getMyTimetable();
+  }, [getMyTimetable]);
 
-  const deleteFavoriteContribution = async (id: number) => {
+  const removeScheduledContribution = async (id: number) => {
     try {
       await indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId}));
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setFavoriteContributions(values => _.omit(values, id));
+    setScheduledContributions(values => _.omit(values, id));
   };
 
   return (
     <ContributionList
-      title={Translate.string('Favorites')}
       loading={loading}
-      contributions={favoriteContributions}
-      emptyText={Translate.string('You have not marked any contribution as favorite.')}
+      contributions={scheduledContributions}
+      emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
-        <Popup
-          trigger={
-            <Icon
-              styleName="delete-button"
-              name="close"
-              onClick={() => deleteFavoriteContribution(contribution.id)}
-              link
-            />
-          }
-          content={Translate.string('Remove from favorites')}
-          position="bottom center"
+        <Icon
+          styleName="delete-button"
+          name="close"
+          onClick={() => removeScheduledContribution(contribution.id)}
+          link
         />
       )}
     />
   );
 }
+
+customElements.define(
+  'ind-my-timetable',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(<MyTimetable eventId={JSON.parse(this.getAttribute('event-id'))} />, this);
+    }
+  }
+);

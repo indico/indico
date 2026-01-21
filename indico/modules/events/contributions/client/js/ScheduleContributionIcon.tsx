@@ -11,27 +11,33 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {useTogglableValue} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 
-import './FavoriteContributionIcon.module.scss';
-
-interface FavoriteContributionIconProps {
+interface ScheduleContributionIconProps {
   contributionId: number;
   eventId: number;
 }
 
-export default function FavoriteContributionIcon({
+export default function ScheduleContributionIcon({
   contributionId,
   eventId,
-}: FavoriteContributionIconProps) {
-  const [favorited, toggleFavorite, loading, saving] = useTogglableValue(
+}: ScheduleContributionIconProps) {
+  const [scheduled, toggleScheduled, loading, saving] = useTogglableValue(
     contributionURL({contrib_id: contributionId, event_id: eventId})
   );
 
   return (
-    <i
-      styleName={`toggle-button ${loading ? 'hidden' : saving ? '' : 'clickable'}`}
-      className={`icon-star${favorited ? '' : '-empty'}`}
-      onClick={saving || loading ? undefined : toggleFavorite}
+    <button
+      type="button"
+      disabled={saving || loading}
+      className={`i-button icon-calendar-${scheduled ? 'check' : 'plus'}-o ${scheduled ? 'highlight' : ''}`}
+      onClick={saving || loading ? undefined : toggleScheduled}
+      data-title
+      title={
+        scheduled
+          ? Translate.string('This contribution has been added to your timetable. Click to remove.')
+          : Translate.string('Add this contribution to your timetable.')
+      }
     />
   );
 }
@@ -41,7 +47,7 @@ customElements.define(
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(
-        <FavoriteContributionIcon
+        <ScheduleContributionIcon
           contributionId={JSON.parse(this.getAttribute('contribution-id'))}
           eventId={JSON.parse(this.getAttribute('event-id'))}
         />,

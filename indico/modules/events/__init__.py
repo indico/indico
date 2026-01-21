@@ -177,6 +177,7 @@ def _extend_event_menu(sender, **kwargs):
 
     def _my_conference_visible(event):
         return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
+                                 get_menu_entry_by_name('my_timetable', event).is_visible or
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
     def _visible_privacy_information(event):
