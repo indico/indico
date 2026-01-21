@@ -373,7 +373,7 @@ wallet-py3k==0.0.4
     # via -r requirements.in
 wcwidth==0.2.14
     # via prompt-toolkit
-weasyprint==66.0
+weasyprint==65.1
     # via -r requirements.in
 webargs==8.7.1
     # via -r requirements.in

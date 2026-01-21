@@ -62,7 +62,7 @@ terminaltables
 translitcodec
 ua-parser
 wallet-py3k
-weasyprint
+weasyprint!=66  # broken flexbox in our receipt template, fixed in the latest version
 webargs
 werkzeug
 wtforms[email]
