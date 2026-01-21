@@ -41,7 +41,7 @@
     "leaflet": "^1.8.0",
     "leaflet-draw": "^1.0.4",
     "leaflet.markercluster": "^1.5.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mathjax": "^3.2.2",
     "mathjax-full": "^3.2.2",
     "mdast-util-find-and-replace": "^3.0.1",
