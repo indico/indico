@@ -6,7 +6,8 @@
         <td>
             <strong>{{ tpl.title }}</strong>
             <div>
-                {{ tpl.type.replace('_', ' ').title() }} {% if tpl.type == 'registration_state_update' %} · {{ tpl.rules['status'].title() }}{% endif %}
+                {{ tpl.type.title }}{% if tpl.notification_type %} · {{ tpl.notification_type.title }} {% if tpl.notification_type.name == 'registration_state_update' %} · {{ tpl.rules['status'].title() }}{%
+                endif %}{% endif %}
             </div>
         </td>
 
@@ -21,11 +22,9 @@
             <div class="thin toolbar right">
                 <div class="group">
                     {% if tpl.is_default(target) %}
-                        {# FIXME: MOVE this CSS #}
-                        <span class="i-button icon icon-circle-small borderless" style="color: #4CAF50; pointer-events: none; cursor: default;" title="Active"></span>
+                        <span class="i-button icon icon-circle-small borderless accept" title="{% trans %}Active{% endtrans %}"></span>
                     {% else %}
-                        <span class="i-button icon icon-circle-small borderless"
-                              style="pointer-events: none; cursor: default;" title="Inactive"></span>
+                        <span class="i-button icon icon-circle-small borderless disabled" title="{% trans %}Inactive{% endtrans %}"></span>
                     {% endif %}
                     <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
                         data-href="{{ url_for('email_templates.clone_email_template', tpl, target) }}"
@@ -82,13 +81,21 @@
     <section class="custom-template-list">
         <div class="flexrow f-a-center f-j-space-between">
             <h3>{% trans %}Custom templates{% endtrans %}</h3>
-            <button class="i-button highlight icon-plus hide-if-locked"
-                    data-href="{{ url_for('email_templates.add_email_template', target) }}"
-                    data-title="{% trans %}Add a new email template{% endtrans %}"
-                    data-update="#template-list"
-                    data-ajax-dialog>
-                {% trans 'Custom template' %}Add new{% endtrans %}
-            </button>
+            <ind-menu class="create-event-button">
+                <button class="i-button highlight icon-plus dropdown">{% trans 'Custom template' %}Add new{% endtrans %}</button>
+                <menu>
+                    <li><a href
+                           data-href="{{ url_for('email_templates.add_email_template', target, email_template_type='registration') }}"
+                           data-title="{% trans %}Add a new registration email template{% endtrans %}"
+                           data-update="#template-list" data-ignore-href
+                           data-ajax-dialog>{% trans %}Registration{% endtrans %}</a></li>
+                    <li><a href
+                        data-href="{{ url_for('email_templates.add_email_template', target, email_template_type='invitation') }}"
+                        data-title="{% trans %}Add a new invitation email template{% endtrans %}"
+                        data-update="#template-list" data-ignore-href
+                        data-ajax-dialog>{% trans %}Invitation{% endtrans %}</a></li>
+                </menu>
+            </ind-menu>
         </div>
         {% if email_templates %}
             <table class="i-table-widget">

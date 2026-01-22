@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2025 CERN
+# Copyright (C) 2002 - 2026 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -9,10 +9,28 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.logs import CategoryLogRealm, EventLogRealm
+from indico.util.enum import RichIntEnum
+from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.placeholders import replace_placeholders
 from indico.util.string import format_repr
+
+
+class EmailTemplateType(RichIntEnum):
+    __titles__ = [None, L_('Registration'), L_('Invitation')]
+    registration = 1
+    invitation = 2
+
+
+class RegistrationNotificationType(RichIntEnum):
+    __titles__ = [None, L_('Registration Creation'), L_('Registration State Update'), L_('Registration Modification'),
+                  L_('Registration Receipt Creation')]
+    registration_creation = 1
+    registration_state_update = 2
+    registration_modification = 3
+    registration_receipt_creation = 4
 
 
 class EmailTemplate(db.Model):
@@ -24,14 +42,12 @@ class EmailTemplate(db.Model):
         primary_key=True
     )
     type = db.Column(
-        db.String,
+        PyIntEnum(EmailTemplateType),
         nullable=False
     )
-    # FIXME: NOT USED
-    status = db.Column(
-        db.String,
-        nullable=False,
-        default=''
+    notification_type = db.Column(
+        PyIntEnum(RegistrationNotificationType),
+        nullable=True
     )
     title = db.Column(
         db.String,
@@ -72,12 +88,6 @@ class EmailTemplate(db.Model):
         nullable=False,
         default=True
     )
-    # FIXME: NOT USED
-    is_system_template = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     category = db.relationship(
         'Category',
         lazy=True,
@@ -117,17 +127,23 @@ class EmailTemplate(db.Model):
     def is_default(self, obj):
         # FIXME: Might involve too many queries while listing?
         from indico.modules.email_templates.util import get_email_template
-        return self == get_email_template(obj, template_type=self.type,
+        return self == get_email_template(obj, notification_type=self.notification_type,
                                           status=self.rules.get('status') if self.rules else None)
 
-    def get_subject(self, registration):
-        subject = replace_placeholders('registration-email', self.subject, regform=registration.registration_form,
-                                       registration=registration)
+    def get_subject(self, registration=None, invitation=None):
+        if self.type == EmailTemplateType.registration:
+            subject = replace_placeholders('registration-email', self.subject, regform=registration.registration_form,
+                                           registration=registration)
+        else:
+            subject = replace_placeholders('registration-invitation-email', self.subject, invitation=invitation)
         return f'[Indico] {subject}'
 
-    def get_body(self, registration):
-        return replace_placeholders('registration-email', self.body, regform=registration.registration_form,
-                                    registration=registration)
+    def get_body(self, registration=None, invitation=None):
+        if self.type == EmailTemplateType.registration:
+            return replace_placeholders('registration-email', self.body, regform=registration.registration_form,
+                                        registration=registration)
+        else:
+            return replace_placeholders('registration-invitation-email', self.body, invitation=invitation)
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the receipt template."""

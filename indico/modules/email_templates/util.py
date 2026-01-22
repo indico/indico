@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2025 CERN
+# Copyright (C) 2002 - 2026 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -8,7 +8,7 @@
 from sqlalchemy import or_
 
 from indico.modules.categories import Category
-from indico.modules.email_templates.models.email_templates import EmailTemplate
+from indico.modules.email_templates.models.email_templates import EmailTemplate, RegistrationNotificationType
 from indico.modules.events import Event
 
 
@@ -37,7 +37,7 @@ def get_inherited_templates(obj):
     return get_all_templates(obj) - set(obj.email_templates)
 
 
-def get_email_template(obj, *, template_type, status=None):
+def get_email_template(obj, *, notification_type, status=None):
     """
     Return the most specific active email template, or None.
 
@@ -52,11 +52,12 @@ def get_email_template(obj, *, template_type, status=None):
         event = None
         category = obj
     category_ids = [c['id'] for c in category.chain]
-    query = EmailTemplate.query.filter(EmailTemplate.is_active.is_(True), EmailTemplate.type == template_type)
+    query = EmailTemplate.query.filter(EmailTemplate.is_active.is_(True),
+                                       EmailTemplate.notification_type == notification_type)
     if event:
         query = query.filter(or_(EmailTemplate.event == event, EmailTemplate.category_id.in_(category_ids)))
     else:
         query = query.filter(EmailTemplate.category_id.in_(category_ids))
-    if template_type == 'registration_state_update' and status is not None:
+    if notification_type == RegistrationNotificationType.registration_state_update and status is not None:
         query = query.filter(EmailTemplate.rules['status'].astext == status)
     return query.order_by(EmailTemplate.event_id.is_(None), EmailTemplate.category_id.desc()).first()

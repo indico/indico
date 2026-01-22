@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2025 CERN
+# Copyright (C) 2002 - 2026 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -16,11 +16,12 @@ from indico.modules.categories import Category
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.designer.forms import CloneTemplateForm
 from indico.modules.email_templates.forms import CreateEmailTemplatesForm, EditEmailTemplatesForm
-from indico.modules.email_templates.models.email_templates import EmailTemplate
+from indico.modules.email_templates.models.email_templates import EmailTemplate, EmailTemplateType
 from indico.modules.email_templates.util import get_inherited_templates
 from indico.modules.email_templates.views import WPCategoryManagementEmailTemplate, WPEventManagementEmailTemplate
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.util import check_event_locked
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -105,15 +106,19 @@ class EmailTemplateListMixin(TargetFromURLMixin):
 
 
 class AddEmailTemplateMixin(TargetFromURLMixin):
+    def _process_args(self):
+        self.email_template_type = EmailTemplateType.get(request.args['email_template_type'])
+        super()._process_args()
+
     def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
 
     def _process(self):
-        form = CreateEmailTemplatesForm(target=self.target)
+        form = CreateEmailTemplatesForm(target=self.target, email_template_type=self.email_template_type)
         if form.validate_on_submit():
             new_email_tpl = EmailTemplate(**self.target_dict)
-            new_email_tpl.rules = {'status': form.status.data}
+            new_email_tpl.rules = {'status': form.status.data.name if form.status and form.status.data else None}
             form.populate_obj(new_email_tpl)
             flash(_("Added a new email template '{}'").format(new_email_tpl.title), 'success')
             return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
@@ -144,9 +149,11 @@ class RHModifyEmailTemplateBase(SpecificEmailTemplateMixin, RHProtected):
 
 class RHEditEmailTemplate(RHModifyEmailTemplateBase):
     def _process(self):
-        form = EditEmailTemplatesForm(target=self.target, obj=self.email_tpl)
+        form = EditEmailTemplatesForm(target=self.target, obj=self.email_tpl, email_template_type=self.email_tpl.type,
+                                      status=RegistrationState.get(self.email_tpl.rules.get('status')))
         if form.validate_on_submit():
-            self.email_tpl.rules = {'status': form.status.data}
+            self.email_tpl.rules = {'notification': form.notification_type.data,
+                                    'status': form.status.data.name if form.status and form.status.data else None}
             form.populate_obj(self.email_tpl)
             flash(_("Edited email template '{}'").format(self.email_tpl.title), 'success')
             return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
@@ -177,7 +184,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
     def is_active(self):
         email_templates = [email_tpl for email_tpl in self.target.email_templates
-                           if email_tpl.type == self.email_tpl.type]
+                           if email_tpl.notification_type == self.email_tpl.notification_type]
         if status := self.email_tpl.rules.get('status'):
             email_templates = [email_tpl for email_tpl in email_templates
                                if email_tpl.rules and email_tpl.rules.get('status') == status]
@@ -191,8 +198,8 @@ class CloneTemplateMixin(TargetFromURLMixin):
         new_email_tpl = EmailTemplate(title=title, type=self.email_tpl.type, **target_dict)
         new_email_tpl.subject = self.email_tpl.subject
         new_email_tpl.body = self.email_tpl.body
-        new_email_tpl.is_system_template = self.email_tpl.is_system_template
         new_email_tpl.is_active = self.is_active()
+        new_email_tpl.notification_type = self.email_tpl.notification_type
         new_email_tpl.rules = deepcopy(self.email_tpl.rules)
         message = _("Created copy of template '{}'").format(self.email_tpl.title)
         if target_dict != self.target_dict:

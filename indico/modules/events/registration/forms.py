@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_inherited_templates
+from indico.modules.email_templates.models.email_templates import EmailTemplateType
 from indico.modules.email_templates.util import get_all_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
@@ -274,7 +275,7 @@ class EmailRegistrantsForm(IndicoForm):
         if templates := get_all_templates(event):
             self.templates.choices = EmailRegistrantsForm.templates.kwargs['choices'] + [
                 (f'{template.subject}\n{template.body}', template.title) for template in templates
-                if template.type.startswith('registration')
+                if template.type == EmailTemplateType.registration
             ]
 
     def validate_body(self, field):

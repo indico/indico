@@ -11,7 +11,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.notifications import make_email, send_email
 from indico.modules.core.settings import core_settings
-from indico.modules.email_templates.models.email_templates import EmailTemplate
+from indico.modules.email_templates.models.email_templates import EmailTemplate, RegistrationNotificationType
 from indico.modules.email_templates.util import get_email_template
 from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.registration.models.registrations import RegistrationState
@@ -84,7 +84,8 @@ def _notify_registration(registration, template, *, to_managers=False, attach_re
 
 def notify_registration_creation(registration, *, from_management=False, notify_user=True):
     if notify_user:
-        email_tpl = get_email_template(registration.event, template_type='registration_creation')
+        email_tpl = get_email_template(registration.event,
+                                       notification_type=RegistrationNotificationType.registration_creation)
         email_tpl = email_tpl or 'registration_creation_to_registrant.html'
         _notify_registration(registration, email_tpl,
                              allow_session_locale=(not from_management), include_pictures=True)
@@ -105,7 +106,8 @@ def notify_registration_modification(registration, *, from_management=False, not
 
 
 def notify_registration_state_update(registration, *, attach_rejection_reason=False, from_management=False):
-    email_tpl = get_email_template(registration.event, template_type='registration_state_update',
+    email_tpl = get_email_template(registration.event,
+                                   notification_type=RegistrationNotificationType.registration_state_update,
                                    status=registration.state.name)
     email_tpl = email_tpl or 'registration_state_update_to_registrant.html'
     _notify_registration(registration, email_tpl, attach_rejection_reason=attach_rejection_reason,
@@ -116,7 +118,8 @@ def notify_registration_state_update(registration, *, attach_rejection_reason=Fa
 
 def notify_registration_receipt_created(registration, receipt, notify_user=True):
     if notify_user:
-        email_tpl = get_email_template(registration.event, template_type='registration_receipt_creation')
+        email_tpl = get_email_template(registration.event,
+                                       notification_type=RegistrationNotificationType.registration_receipt_creation)
         email_tpl = email_tpl or 'registration_receipt_created_to_registrant.html'
         _notify_registration(registration, email_tpl, receipt=receipt)
     if registration.registration_form.organizer_notifications_enabled:
