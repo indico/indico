@@ -326,8 +326,9 @@ class RHRegistrationFormClone(RHManageRegFormBase):
         flash(_('Registration form cloned'), 'success')
         logger.info('Registration form %r cloned into %r by %r', self.regform, form, session.user)
         log_text = f'Registration form cloned from "{self.regform.title}"'
-        form.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
-                 meta={'source_registration_form_id': self.regform.id})
+        # form.log() already adds registration_form_id to meta, so we need to merge metadata
+        form.event.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
+                       meta={'registration_form_id': form.id, 'source_registration_form_id': self.regform.id})
         return redirect(url_for('.manage_regform', form))
 
 
