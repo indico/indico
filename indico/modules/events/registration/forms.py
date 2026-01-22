@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_inherited_templates
+from indico.modules.email_templates.models.email_templates import EmailTemplateType
 from indico.modules.email_templates.util import get_all_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
@@ -242,8 +243,10 @@ class RegistrationExceptionalModificationForm(IndicoForm):
 
 class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation', 'skip_access_check', 'lock_email')
-    _email_fields = ('email_sender', 'email_subject', 'email_body')
+    _email_fields = ('email_sender', 'email_templates', 'email_subject', 'email_body')
     email_sender = SelectField(_('Sender'), [DataRequired()])
+    email_templates = SelectField(_('Templates'), choices=[('', _('Select templates'))],
+                                  render_kw={'onchange': 'applyTemplate()'}, validate_choice=False)
     email_subject = StringField(_('Email subject'), [DataRequired()])
     email_body = TextAreaField(
         _('Email body'),
@@ -266,6 +269,11 @@ class InvitationFormBase(IndicoForm):
             del self.skip_moderation
         self.email_sender.choices = list(event.get_allowed_sender_emails().items())
         self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
+        if templates := get_all_templates(event):
+            self.email_templates.choices = InvitationFormBase.email_templates.kwargs['choices'] + [
+                (f'{template.subject}\n{template.body}', template.title) for template in templates
+                if template.type == EmailTemplateType.invitation
+            ]
 
     def validate_email_body(self, field):
         missing = get_missing_placeholders('registration-invitation-email', field.data, invitation=None)
@@ -365,7 +373,7 @@ class EmailRegistrantsForm(IndicoForm):
         if templates := get_all_templates(event):
             self.templates.choices = EmailRegistrantsForm.templates.kwargs['choices'] + [
                 (f'{template.subject}\n{template.body}', template.title) for template in templates
-                if template.type.startswith('registration')
+                if template.type == EmailTemplateType.registration
             ]
 
     def validate_body(self, field):

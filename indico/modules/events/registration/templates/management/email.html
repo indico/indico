@@ -40,11 +40,11 @@
         {% endif %}
 
         function applyTemplate() {
-            let stored_templates = document.getElementById("templates");
-            const val = stored_templates.value
+            let templates = document.getElementById('templates');
+            const val = templates.value
             const subject = val.slice(0, val.indexOf('\n'))
             const body = val.slice(val.indexOf('\n'))
-            document.getElementById("subject").value = subject
+            document.getElementById('subject').value = subject
             let tinymceEditor = _.last(Object.values(tinymce.get()));
             tinymceEditor.setContent(body);
         }
