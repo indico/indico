@@ -132,10 +132,7 @@ def _get_db_context(verbose, plugin_dir=None):
 
 def _prepare_dbs(verbose, plugin_dir=None):
     click.secho('Begin setting up test DBs...', fg='cyan')
-    if plugin_dir is not None:
-        test_env = _get_test_environment(plugin_dir=plugin_dir)
-    else:
-        test_env = _get_test_environment()
+    test_env = _get_test_environment(plugin_dir=plugin_dir)
     try:
         if 'PGUSER' not in os.environ:
             _run(['createuser', PG_USER])
@@ -201,9 +198,6 @@ def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
 
 def _get_revision_filenames(plugin_dir=None):
     migrations_dir = _get_migrations_dir(plugin_dir)
-    if plugin_dir:
-        return sorted(f for f in listdir(migrations_dir)
-                      if REGEX_REV_FILENAME.match(f))
     return sorted(f for f in listdir(migrations_dir) if REGEX_REV_FILENAME.match(f))
 
 
