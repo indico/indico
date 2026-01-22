@@ -9,9 +9,11 @@ from wtforms import BooleanField, StringField, TextAreaField
 from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
 
+from indico.modules.email_templates.models.email_templates import EmailTemplateType, RegistrationNotificationType
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.fields import IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, NoRelativeURLs
 from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
@@ -21,12 +23,10 @@ class CreateEmailTemplatesForm(IndicoForm):
     subject = StringField(_('Subject'), [DataRequired(), Length(max=75)])
     body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()],
                          widget=TinyMCEWidget(absolute_urls=True, images=True))
-    type = SelectField(_('Email Notification type'), [DataRequired()],
-                       choices=[('registration_creation', _('Registration Creation')),
-                                ('registration_state_update', _('Registration State Update')),
-                                ('registration_modification', _('Registration Modification')),
-                                ('registration_receipt_creation', _('Registration Receipt Creation'))])
-    status = SelectField(_('Status'), [DataRequired(), HiddenUnless('type', value='registration_state_update')],
+    notification_type = IndicoEnumSelectField(_('Email Notification type'), enum=RegistrationNotificationType, none='')
+    status = SelectField(_('Status'), [DataRequired(),
+                                       HiddenUnless('notification_type',
+                                                    value=RegistrationNotificationType.registration_state_update)],
                          choices=[('pending', _('Pending')), ('complete', _('Approved')), ('rejected', _('Rejected'))])
     is_active = BooleanField(_('Is Active'), widget=SwitchWidget(), default=True,
                              description=_('Allow users to disable some email templates, '
@@ -35,12 +35,18 @@ class CreateEmailTemplatesForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.target = kwargs['target']
-        self.body.description = (render_placeholder_info('registration-email', regform=None, registration=None))
+        self.email_template_type = kwargs['email_template_type']
+        if self.email_template_type == EmailTemplateType.registration:
+            self.body.description = render_placeholder_info('registration-email', regform=None, registration=None)
+        else:
+            self.body.description = render_placeholder_info('registration-invitation-email', invitation=None)
+            del self.notification_type
 
     def validate_is_active(self, field):
         if not field.data:
             return
-        email_templates = [email_tpl for email_tpl in self.target.email_templates if email_tpl.type == self.type.data]
+        email_templates = [email_tpl for email_tpl in self.target.email_templates
+                           if email_tpl.notification_type == self.notification_type.data]
         if status := self.status.data:
             email_templates = [email_tpl for email_tpl in email_templates
                                if email_tpl.rules and email_tpl.rules.get('status') == status]
@@ -48,6 +54,10 @@ class CreateEmailTemplatesForm(IndicoForm):
             email_tpl = email_templates.pop()
             raise ValidationError(_("There's already an active {} template with same notification rule")
                                   .format(email_tpl.title))
+
+    @generated_data
+    def type(self):
+        return self.email_template_type
 
 
 class EditEmailTemplatesForm(CreateEmailTemplatesForm):
