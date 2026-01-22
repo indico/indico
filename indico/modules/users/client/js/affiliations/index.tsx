@@ -10,18 +10,11 @@ import ReactDOM from 'react-dom';
 
 import AffiliationsDashboard from './AffiliationsDashboard';
 
-declare global {
-  interface Window {
-    setupAffiliationsDashboards: () => void;
+customElements.define(
+  'ind-affiliations-dashboard',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(<AffiliationsDashboard />, this);
+    }
   }
-}
-
-window.setupAffiliationsDashboards = function setupAffiliationsDashboards(): void {
-  const container = document.getElementById('affiliations-dashboard-container');
-
-  if (!container) {
-    return;
-  }
-
-  ReactDOM.render(<AffiliationsDashboard />, container);
-};
+);

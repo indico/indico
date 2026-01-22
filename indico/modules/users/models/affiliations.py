@@ -12,6 +12,7 @@ from sqlalchemy.orm import column_property, mapper
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.searchable import make_fts_index
+from indico.modules.logs import AppLogEntry
 from indico.util.string import format_repr
 
 
@@ -100,6 +101,10 @@ class Affiliation(db.Model):
         if existing:
             return existing
         return cls(**affiliation_data)
+
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the affiliation."""
+        return AppLogEntry.log(*args, meta={'affiliation_id': self.id}, **kwargs)
 
 
 define_unaccented_lowercase_index(Affiliation.searchable_names, Affiliation.__table__,

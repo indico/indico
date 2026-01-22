@@ -108,8 +108,7 @@ modifying the contents of ``data``.
 
 affiliation_update = _signals.signal('affiliation-update', '''
 Called from RHAffiliationAPI when processing updates. The sender is the
-Affiliation being updated and the raw request JSON is passed via ``payload``.
-Return a truthy value to indicate that plugin-specific changes were applied.
+Affiliation being updated and the update dict is passed via ``payload``.
 ''')
 
 schema_post_load = _signals.signal('schema-post-load', '''

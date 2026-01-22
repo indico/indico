@@ -41,7 +41,8 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import serialize_event_for_ical
-from indico.modules.logs.models.entries import LogKind, UserLogRealm
+from indico.modules.logs.models.entries import AppLogRealm, LogKind, UserLogRealm
+from indico.modules.logs.util import make_diff_log
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
@@ -340,12 +341,14 @@ class RHAffiliationsAPI(RHAdminBase):
                         .all())
         return AffiliationSchema(many=True).jsonify(affiliations)
 
-    @use_kwargs(AffiliationArgs)
-    def _process_POST(self, **data):
+    @use_args(AffiliationArgs)
+    def _process_POST(self, data):
         affiliation = Affiliation()
         affiliation.populate_from_dict(data)
         db.session.add(affiliation)
         db.session.flush()
+        affiliation.log(AppLogRealm.admin, LogKind.positive, 'Affiliation',
+                         f'Affiliation "{affiliation.name}" created', session.user)
         search_affiliations.bump_version()
         return AffiliationSchema().jsonify(affiliation), 201
 
@@ -353,30 +356,42 @@ class RHAffiliationsAPI(RHAdminBase):
 class RHAffiliationAPI(RHAdminBase):
     """CRUD operations on a single affiliation."""
 
-    def _process_args(self):
-        self.affiliation = Affiliation.get_or_404(request.view_args['affiliation_id'])
-        if self.affiliation.is_deleted:
-            raise NotFound
+    @use_kwargs({
+        'affiliation': ModelField(Affiliation, filter_deleted=True, required=True, data_key='affiliation_id')
+    }, location='view_args')
+    def _process_args(self, affiliation):
+        RHAdminBase._process_args(self)
+        self.affiliation = affiliation
 
     def _process_GET(self):
         return AffiliationSchema().jsonify(self.affiliation)
 
-    @use_kwargs(AffiliationArgs, partial=True)
-    def _process_PATCH(self, **data):
-        plugin_changes = any(values_from_signal(
-            signals.plugin.affiliation_update.send(self.affiliation, payload=request.json)
-        ))
-        if data:
-            self.affiliation.populate_from_dict(data)
-        elif not plugin_changes:
-            raise BadRequest('No changes specified')
+    @use_args(AffiliationArgs, partial=True)
+    def _process_PATCH(self, data):
+        signals.plugin.affiliation_update.send(self.affiliation, payload=data)
+        if not data:
+            return '', 204
+        changes = self.affiliation.populate_from_dict(data)
         db.session.flush()
+        log_fields = {
+            'name': 'Name',
+            'alt_names': 'Alternative names',
+            'street': 'Street',
+            'postcode': 'Postcode',
+            'city': 'City',
+            'country_code': 'Country',
+        }
+        self.affiliation.log(AppLogRealm.admin, LogKind.change, 'Affiliation',
+                                f'Affiliation "{self.affiliation.name}" modified', session.user,
+                                data={'Changes': make_diff_log(changes, log_fields)})
         search_affiliations.bump_version()
-        return AffiliationSchema().jsonify(self.affiliation)
+        return '', 204
 
     def _process_DELETE(self):
         self.affiliation.is_deleted = True
         db.session.flush()
+        self.affiliation.log(AppLogRealm.admin, LogKind.negative, 'Affiliation',
+                             f'Affiliation "{self.affiliation.name}" deleted', session.user)
         search_affiliations.bump_version()
         return '', 204
 

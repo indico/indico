@@ -32,6 +32,8 @@ Improvements
   (:issue:`5486`, :pr:`7257`)
 - Allow admins to disable Gravatar/Identicon profile pictures via the :data:`DISABLE_GRAVATAR`
   config option (:issue:`7210`, :pr:`7251`, thanks :user:`duartegalvao, unconventionaldotdev`)
+- Add a UI for managing predefined affiliations (:pr:`7183`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -138,8 +140,6 @@ Improvements
 - Show a warning when bulk registration approval/rejection skips registrations that are not
   pending (:issue:`7197`, :pr:`7205`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add a JSON endpoint that returns the event's program/tracks (:pr:`7207`)
-- Add a UI for managing predefined affiliations (:pr:`7183`,
-  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

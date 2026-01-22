@@ -51,7 +51,9 @@ export default function AffiliationsDashboard() {
   } = useIndicoAxios(adminAffiliationsURL({}), {camelize: true});
   const [tableHeight, setTableHeight] = useState<number>(MIN_TABLE_HEIGHT);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
+  const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<Affiliation | null>(null);
+  const [editing, setEditing] = useState<Affiliation | null>(null);
   const [visibleAffiliations, setVisibleAffiliations] = useState<Affiliation[]>([]);
 
   const handleDelete = async () => {
@@ -105,13 +107,15 @@ export default function AffiliationsDashboard() {
         cellRenderer: ({rowData}) => (
           <div styleName="action-icons">
             {renderPluginComponents('affiliation-dashboard-row-actions', {affiliation: rowData})}
-            <AffiliationFormDialog
-              affiliationURL={adminAffiliationURL({affiliation_id: rowData.id})}
-              onSuccess={() => reFetch()}
-              trigger={
-                <Icon name="edit" link title={Translate.string('Edit', 'verb')} color="grey" />
-              }
-              edit
+            <Icon
+              name="edit"
+              link
+              title={Translate.string('Edit', 'verb')}
+              color="grey"
+              onClick={() => {
+                setAdding(false);
+                setEditing(rowData);
+              }}
             />
             <Icon
               name="trash"
@@ -124,7 +128,7 @@ export default function AffiliationsDashboard() {
         ),
       },
     ],
-    [reFetch]
+    []
   );
 
   const affiliations: Affiliation[] = useMemo(
@@ -154,13 +158,15 @@ export default function AffiliationsDashboard() {
     <div styleName="affiliations-dashboard">
       <div styleName="top-bar">
         <div styleName="top-bar-actions">
-          <Button.Group>
-            <AffiliationFormDialog
-              affiliationURL={adminAffiliationsURL({})}
-              onSuccess={() => reFetch()}
-              trigger={<Button primary icon="plus" content={Translate.string('Add')} />}
-            />
-          </Button.Group>
+          <Button
+            primary
+            icon="plus"
+            content={Translate.string('Add')}
+            onClick={() => {
+              setEditing(null);
+              setAdding(true);
+            }}
+          />
           {renderPluginComponents('affiliation-dashboard-extra-actions', {affiliations})}
         </div>
         <AffiliationListFilter
@@ -216,6 +222,19 @@ export default function AffiliationsDashboard() {
           </AutoSizer>
         )}
       </div>
+      <AffiliationFormDialog
+        affiliationURL={
+          editing ? adminAffiliationURL({affiliation_id: editing.id}) : adminAffiliationsURL({})
+        }
+        initialValues={editing ?? undefined}
+        onSuccess={() => reFetch()}
+        onClose={() => {
+          setEditing(null);
+          setAdding(false);
+        }}
+        open={adding || !!editing}
+        edit={!!editing}
+      />
       {deleting && (
         <Confirm
           size="tiny"
