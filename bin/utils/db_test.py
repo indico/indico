@@ -411,8 +411,8 @@ def main(nb_scripts, verbose, plugin_dir):
     else:
         click.secho('Running db tests for Indico', fg='white', bold=True)
         _check_history(nb_scripts)
-        # with _get_db_context(verbose) as (db_conn, dbdiff_conn):
-        #     _check_script_idempotence(db_conn, dbdiff_conn, nb_scripts)
+        with _get_db_context(verbose) as (db_conn, dbdiff_conn):
+            _check_script_idempotence(db_conn, dbdiff_conn, nb_scripts)
 
 
 if __name__ == '__main__':
