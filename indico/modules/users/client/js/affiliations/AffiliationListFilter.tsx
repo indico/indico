@@ -17,7 +17,6 @@ import {Affiliation} from './types';
 interface FilterableAffiliation {
   id: number;
   countryCode: string;
-  searchableId: number;
   searchableFields: string[];
   affiliation: Affiliation;
 }
@@ -96,7 +95,6 @@ export default function AffiliationListFilter({
         return {
           id: affiliation.id,
           countryCode: affiliation.countryCode,
-          searchableId: affiliation.id,
           searchableFields,
           affiliation,
         };
@@ -143,7 +141,6 @@ export default function AffiliationListFilter({
   const filteredAffiliations = useMemo(() => {
     const trimmedSearch = searchText.trim();
     const normalizedSearch = trimmedSearch.toLowerCase();
-    const idMatch = trimmedSearch.match(/^#(\d+)$/);
 
     return filterableAffiliations
       .filter(entry => {
@@ -161,10 +158,6 @@ export default function AffiliationListFilter({
 
         if (!normalizedSearch) {
           return true;
-        }
-
-        if (idMatch) {
-          return entry.searchableId === Number(idMatch[1]);
         }
 
         return entry.searchableFields.some(field => field.toLowerCase().includes(normalizedSearch));
@@ -193,7 +186,6 @@ export default function AffiliationListFilter({
       filters={filters}
       searchText={searchText}
       filterOptions={filterOptions}
-      searchableId={entry => entry.searchableId}
       searchableFields={entry => entry.searchableFields}
       onChangeFilters={setFilters}
       onChangeSearchText={setSearchText}
