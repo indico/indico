@@ -50,16 +50,6 @@ def _indent(msg, level=4):
     return indentation + msg.replace('\n', '\n' + indentation)
 
 
-@contextmanager
-def _chdir(path):
-    cwd = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(cwd)
-
-
 def _validate_plugin_dir(ctx, param, plugin_dir: Path):
     if not plugin_dir:
         return None
@@ -89,10 +79,6 @@ def _get_test_environment(plugin_dir=None):
 
 def _set_alembic_version_test_db_env(plugin):
     os.environ['ALEMBIC_VERSION_TEST_DB'] = f'alembic_version_plugin_{plugin}'
-
-
-def _remove_alembic_version_test_db_env():
-    os.environ.pop('ALEMBIC_VERSION_TEST_DB', None)
 
 
 def _build_db_uri(dbname):
@@ -398,21 +384,24 @@ def main(nb_scripts, verbose, plugin_dir):
     configuration should be done using the various environment variables like
     PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
     """
-    if plugin_dir and not plugin_dir.samefile(os.getcwd()):
-        with _chdir(plugin_dir):
-            plugin = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
-            assert len(plugin) == 1
-            _set_alembic_version_test_db_env(plugin[0])
-            click.secho(f'Running db tests for plugin {plugin[0]}', fg='white', bold=True)
-            _check_history(nb_scripts, plugin_dir)
-            with _get_db_context(verbose, plugin_dir) as (db_conn, dbdiff_conn):
-                _check_script_idempotence(db_conn, dbdiff_conn, nb_scripts, plugin_dir)
-            _remove_alembic_version_test_db_env()
-    else:
+    if not plugin_dir:
         click.secho('Running db tests for Indico', fg='white', bold=True)
-        _check_history(nb_scripts)
-        with _get_db_context(verbose) as (db_conn, dbdiff_conn):
-            _check_script_idempotence(db_conn, dbdiff_conn, nb_scripts)
+        _check(nb_scripts, verbose)
+    else:
+        os.chdir(plugin_dir)
+        plugin_name = next((x.parent.name for x in plugin_dir.glob('*/__init__.py')), None)
+        if not plugin_name:
+            raise ClickException(click.style('Expected exactly one plugin in plugin dir', fg='red'))
+        _set_alembic_version_test_db_env(plugin_name)
+        click.secho(f'Running db tests for plugin "{plugin_name}"', fg='white', bold=True)
+        _check(nb_scripts, verbose, plugin_dir)
+
+
+def _check(nb_scripts=0, verbose=False, plugin_dir=None):
+    _check_history(nb_scripts, plugin_dir)
+    with _get_db_context(verbose, plugin_dir) as (db_conn, dbdiff_conn):
+        _check_script_idempotence(db_conn, dbdiff_conn, nb_scripts, plugin_dir)
+
 
 
 if __name__ == '__main__':
