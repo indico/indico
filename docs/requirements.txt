@@ -37,12 +37,13 @@ jinja2==3.1.6
     #   flask
     #   flask-babel
     #   sphinx
+    #   sphinxcontrib-mermaid
 markupsafe==3.0.3
     # via
     #   flask
     #   jinja2
     #   werkzeug
-packaging==25.0
+packaging==26.0
     # via sphinx
 plantweb==1.3.0
     # via -r docs/requirements.in
@@ -86,7 +87,7 @@ sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-mermaid==1.2.3
+sphinxcontrib-mermaid==2.0.0
     # via -r docs/requirements.in
 sphinxcontrib-qthelp==2.0.0
     # via sphinx
