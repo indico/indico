@@ -231,21 +231,19 @@ ProfilePicture.defaultProps = {
   gravatarEnabled: true,
 };
 
-window.setupPictureSelection = function setupPictureSelection(
-  userId,
-  email,
-  source,
-  gravatarEnabled
-) {
-  document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(
-      <ProfilePicture
-        userId={userId}
-        email={email}
-        source={source}
-        gravatarEnabled={gravatarEnabled}
-      />,
-      document.querySelector('#profile-picture-selection')
-    );
-  });
-};
+customElements.define(
+  'ind-profile-picture-selection',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <ProfilePicture
+          userId={JSON.parse(this.getAttribute('user-id'))}
+          email={this.getAttribute('email')}
+          source={this.getAttribute('source')}
+          gravatarEnabled={JSON.parse(this.getAttribute('gravatar-enabled'))}
+        />,
+        this
+      );
+    }
+  }
+);
