@@ -81,7 +81,9 @@ export default function ListFilter({
   };
 
   const setFilters = value => {
-    localStorage.setItem(name, JSON.stringify(value));
+    if (name) {
+      localStorage.setItem(name, JSON.stringify(value));
+    }
     if (onChangeFilters) {
       onChangeFilters(value);
       return;
@@ -132,6 +134,9 @@ export default function ListFilter({
 
   // get filters from the local storage
   useEffect(() => {
+    if (!name) {
+      return;
+    }
     const storedFilters = JSON.parse(localStorage.getItem(name)) || {};
     setFilters(_.pickBy(storedFilters, (__, key) => optionsMap.has(key)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,7 +249,7 @@ export default function ListFilter({
 }
 
 ListFilter.propTypes = {
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   list: PropTypes.array.isRequired,
   filters: PropTypes.objectOf(PropTypes.objectOf(optionSchema)),
   searchText: PropTypes.string,
@@ -265,6 +270,7 @@ ListFilter.propTypes = {
 };
 
 ListFilter.defaultProps = {
+  name: null,
   filters: undefined,
   searchText: undefined,
   searchableId: undefined,

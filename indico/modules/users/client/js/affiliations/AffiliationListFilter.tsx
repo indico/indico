@@ -181,7 +181,6 @@ export default function AffiliationListFilter({
 
   return (
     <ListFilter
-      name="affiliations-dashboard-list-filter"
       list={filterableAffiliations}
       filters={filters}
       searchText={searchText}

@@ -45,7 +45,7 @@ function getPluginColumns(): ColumnConfig[] {
 export default function AffiliationsDashboard() {
   const {
     data: affiliationsData,
-    loading: isLoadingAffiliations,
+    loading,
     reFetch,
     lastData,
   } = useIndicoAxios(adminAffiliationsURL({}), {camelize: true});
@@ -175,14 +175,12 @@ export default function AffiliationsDashboard() {
         />
       </div>
       <div styleName="table-wrapper" ref={tableWrapperRef}>
-        {!affiliations.length ? (
-          isLoadingAffiliations ? (
-            <Loader inline="centered" active />
-          ) : (
-            <Message warning>
-              <Translate as={Message.Content}>No affiliations found.</Translate>
-            </Message>
-          )
+        {loading ? (
+          <Loader inline="centered" active />
+        ) : !affiliations.length ? (
+          <Message warning>
+            <Translate as={Message.Content}>No affiliations found.</Translate>
+          </Message>
         ) : !visibleAffiliations.length ? (
           <Message warning>
             <Translate as={Message.Content}>No affiliations match the current filters.</Translate>
