@@ -115,12 +115,12 @@ class RHSubmitRevisionBase(RHPaperBase):
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
 
-class RHSubmitRevisionSingle(RHSubmitRevisionBase):
+class RHSubmitRevisionUntyped(RHSubmitRevisionBase):
     def _check_paper_protection(self):
         if not RHSubmitRevisionBase._check_paper_protection(self):
             return False
 
-        return not bool(PaperFileType.query.with_parent(self.event).first())
+        return not PaperFileType.query.with_parent(self.event).has_rows()
 
     @use_rh_kwargs({
         'files': FilesField(required=True),
@@ -135,7 +135,7 @@ class RHSubmitRevision(RHSubmitRevisionBase):
         if not RHSubmitRevisionBase._check_paper_protection(self):
             return False
 
-        return bool(PaperFileType.query.with_parent(self.event).first())
+        return PaperFileType.query.with_parent(self.event).has_rows()
 
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
@@ -150,7 +150,7 @@ class RHSubmitPaperSingle(RHSubmitPaperBase):
         if not RHSubmitPaperBase._check_paper_protection(self):
             return False
 
-        return not bool(PaperFileType.query.with_parent(self.event).first())
+        return not PaperFileType.query.with_parent(self.event).has_rows()
 
     @use_rh_kwargs({
         'files': FilesField(required=True),

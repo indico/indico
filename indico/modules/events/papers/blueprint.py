@@ -23,7 +23,7 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/commen
                  'api_comment_actions', api.RHCommentActions, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit-single', 'submit_revision_new_single',
-                 api.RHSubmitRevisionSingle, methods=('POST',))
+                 api.RHSubmitRevisionUntyped, methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit', 'submit_revision_new', api.RHSubmitRevision,
                  methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/review/<any(content,layout):review_type>', 'api_create_review',
