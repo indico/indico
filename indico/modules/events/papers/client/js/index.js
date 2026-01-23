@@ -15,7 +15,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import FileTypeManager from 'indico/modules/events/editing/management/editable_type/file_types/FileTypeManager';
-import {domReady} from 'indico/utils/domstate';
 
 import 'indico/modules/events/reviews';
 
@@ -147,19 +146,17 @@ customElements.define(
   'ind-paper-file-types-management',
   class extends HTMLElement {
     connectedCallback() {
-      domReady.then(() => {
-        ReactDOM.render(
-          <FileTypeManager
-            eventId={+this.getAttribute('event-id')}
-            hideAccepted={JSON.parse(this.getAttribute('hide-accepted'))}
-            getAllURLFn={fileTypeURL}
-            editURLFn={editFileTypeURL}
-            createURLFn={createFileTypeURL}
-            allowDeleteLastType
-          />,
-          this
-        );
-      });
+      ReactDOM.render(
+        <FileTypeManager
+          eventId={+this.getAttribute('event-id')}
+          hideAccepted={JSON.parse(this.getAttribute('hide-accepted'))}
+          getAllURLFn={fileTypeURL}
+          editURLFn={editFileTypeURL}
+          createURLFn={createFileTypeURL}
+          allowDeleteLastType
+        />,
+        this
+      );
     }
 
     disconnectedCallback() {
