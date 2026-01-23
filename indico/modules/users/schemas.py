@@ -45,6 +45,7 @@ class AffiliationArgs(AffiliationSchema):
 
     name = fields.String(required=True, validate=[not_empty])
     alt_names = fields.List(fields.String(validate=not_empty))
+    meta = fields.Dict(keys=fields.Str())
 
 
 class UserSchema(mm.SQLAlchemyAutoSchema):

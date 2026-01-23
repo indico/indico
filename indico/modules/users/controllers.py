@@ -380,6 +380,7 @@ class RHAffiliationAPI(RHAdminBase):
             'postcode': 'Postcode',
             'city': 'City',
             'country_code': 'Country',
+            'meta': 'Metadata',
         }
         self.affiliation.log(AppLogRealm.admin, LogKind.change, 'Affiliation',
                                 f'Affiliation "{self.affiliation.name}" modified', session.user,

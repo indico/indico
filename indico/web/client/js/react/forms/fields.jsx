@@ -498,7 +498,16 @@ FinalInput.defaultProps = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   nullIfEmpty?: boolean;
+ *   action?: React.ReactNode;
+ * }} FinalTextAreaProps
+ */
+
+/**
  * Like `FinalField` but with extra features for ``<textarea>`` fields.
+ * @param {FinalTextAreaProps} props
  */
 export function FinalTextArea({name, label, nullIfEmpty, action, ...rest}) {
   return (

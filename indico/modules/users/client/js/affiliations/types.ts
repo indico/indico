@@ -12,13 +12,13 @@ interface AffiliationBase {
   postcode: string;
   city: string;
   countryCode: string;
+  meta: Record<string, unknown>;
   [key: string]: unknown;
 }
 
 export interface Affiliation extends AffiliationBase {
   id: number;
   countryName: string;
-  meta: Record<string, unknown>;
 }
 
 export type AffiliationFormValues = AffiliationBase;

@@ -11,7 +11,13 @@ import type {FormApi} from 'final-form';
 import React, {useCallback} from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
 
-import {FinalDropdown, FinalInput, getChangedValues, handleSubmitError} from 'indico/react/forms';
+import {
+  FinalDropdown,
+  FinalInput,
+  FinalTextArea,
+  getChangedValues,
+  handleSubmitError,
+} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -32,6 +38,34 @@ const defaultValues: AffiliationFormValues = {
   postcode: '',
   city: '',
   countryCode: '',
+  meta: {},
+};
+
+const formatMetaValue = (value: unknown) =>
+  typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+
+const parseMetaValue = (value: string) => {
+  if (!value) {
+    return {};
+  }
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+};
+
+const validateMetaValue = (value: unknown) => {
+  if (!value || Array.isArray(value)) {
+    return Translate.string('Enter a JSON object');
+  }
+  if (typeof value === 'string') {
+    try {
+      JSON.parse(value);
+    } catch (error) {
+      return error.message;
+    }
+  }
 };
 
 export default function AffiliationFormDialog({
@@ -71,6 +105,7 @@ export default function AffiliationFormDialog({
     {
       key: 'address',
       title: Translate.string('Address'),
+      active: true,
       content: {
         content: (
           <>
@@ -100,6 +135,25 @@ export default function AffiliationFormDialog({
       },
     },
     ...getPluginObjects('affiliation-form-sections').flat(),
+    {
+      key: 'advanced',
+      title: Translate.string('Advanced'),
+      content: {
+        content: (
+          <FinalTextArea
+            name="meta"
+            label={Translate.string('Metadata (JSON)')}
+            placeholder={Translate.string('Enter a JSON object')}
+            className="mono"
+            format={formatMetaValue}
+            formatOnBlur={false}
+            parse={parseMetaValue}
+            validate={validateMetaValue}
+            rows={4}
+          />
+        ),
+      },
+    },
   ];
 
   if (!open) {
@@ -123,13 +177,7 @@ export default function AffiliationFormDialog({
         label={Translate.string('Alternative names')}
         placeholder={Translate.string('Type a name and press Enter to add')}
       />
-      <Accordion
-        exclusive={false}
-        panels={formSections}
-        defaultActiveIndex={[...Array(formSections.length).keys()]}
-        styled
-        fluid
-      />
+      <Accordion exclusive={false} panels={formSections} styled fluid />
     </FinalModalForm>
   );
 }
