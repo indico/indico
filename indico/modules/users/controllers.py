@@ -333,7 +333,8 @@ class RHProfilePicturePage(RHUserBase):
 
     def _process(self):
         return WPUserProfilePic.render_template('profile_picture.html', 'profile_picture',
-                                                user=self.user, source=self.user.picture_source.name)
+                                                user=self.user, source=self.user.picture_source.name,
+                                                gravatar_enabled=not config.DISABLE_GRAVATAR)
 
 
 class RHProfilePicturePreview(RHUserBase):
@@ -355,9 +356,11 @@ class RHProfilePicturePreview(RHUserBase):
             metadata = self.user.picture_metadata
             return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                              no_cache=True, inline=True)
-        else:
+        elif not config.DISABLE_GRAVATAR:
             gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
             return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
+        else:
+            raise NotFound
 
 
 class RHProfilePictureDisplay(RH):
@@ -384,6 +387,8 @@ class RHSaveProfilePicture(RHUserBase):
         'source': fields.Enum(ProfilePictureSource, required=True)
     })
     def _process(self, source):
+        if source.is_gravatar and config.DISABLE_GRAVATAR:
+            raise UserValueError('Gravatar has been disabled by the system administrators.')
         self.user.picture_source = source
 
         if source == ProfilePictureSource.standard:
@@ -666,7 +671,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
             self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Primary email updated',
                           session.user, data={'Old': old, 'New': email})
             db.session.commit()
-            if self.user.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
+            if not config.DISABLE_GRAVATAR and self.user.picture_source.is_gravatar:
                 update_gravatars.delay(self.user)
             flash(_('Your primary email was updated successfully.'), 'success')
             if 'email' in self.user.synced_fields:

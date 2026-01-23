@@ -9,16 +9,14 @@
                 </div>
             </div>
             <div class="i-box-content">
+                <ind-profile-picture-selection
+                    user-id="{{ (user.id if user != session.user else none) | tojson }}"
+                    email="{{ user.email }}"
+                    source="{{ source }}"
+                    gravatar-enabled="{{ gravatar_enabled | tojson | forceescape }}"
+                ></ind-profile-picture-selection>
                 <div id="profile-picture-selection"></div>
             </div>
         </div>
     </div>
-
-    <script>
-        setupPictureSelection(
-            {{ (user.id if user != session.user else none) | tojson }},
-            {{ user.email | tojson }},
-            {{ source | tojson }}
-        );
-    </script>
 {% endblock %}

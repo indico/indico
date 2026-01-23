@@ -57,6 +57,7 @@ DEFAULTS = {
     'DEFAULT_LOCALE': 'en_GB',
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
+    'DISABLE_GRAVATAR': False,
     'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
     'EMAIL_LOG_STORAGE': None,
     'ENABLE_APPLE_WALLET': False,

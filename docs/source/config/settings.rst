@@ -1061,6 +1061,14 @@ System
 
     Default: ``False``
 
+.. data:: DISABLE_GRAVATAR
+
+    Completely disables the Gravatar integration. When enabled, users will no
+    longer see Gravatar or Identicon options on the profile-picture page and
+    Indico will not try to fetch updates from gravatar.com.
+
+    Default: ``False``
+
 .. data:: ALLOW_ADMIN_USER_DELETION
 
     Whether to allow administrators to permanently delete users from the

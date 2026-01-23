@@ -121,7 +121,7 @@ const formDecorator = createDecorator({
   updates: value => (value === null ? {} : {source: 'custom'}),
 });
 
-function ProfilePicture({userId, email, source}) {
+function ProfilePicture({userId, email, source, gravatarEnabled}) {
   const [previewFile, setPreviewFile] = useState(null);
   const [hasPreview, setHasPreview] = useState(source === 'custom');
 
@@ -183,18 +183,22 @@ function ProfilePicture({userId, email, source}) {
                   text={Translate.string('System-assigned icon')}
                   source="standard"
                 />
-                <ProfilePictureCard
-                  image={previewURL({...userIdArgs, source: 'identicon'})}
-                  text="Identicon"
-                  source="identicon"
-                  email={email}
-                />
-                <ProfilePictureCard
-                  image={previewURL({...userIdArgs, source: 'gravatar'})}
-                  text="Gravatar"
-                  source="gravatar"
-                  email={email}
-                />
+                {gravatarEnabled && (
+                  <>
+                    <ProfilePictureCard
+                      image={previewURL({...userIdArgs, source: 'identicon'})}
+                      text="Identicon"
+                      source="identicon"
+                      email={email}
+                    />
+                    <ProfilePictureCard
+                      image={previewURL({...userIdArgs, source: 'gravatar'})}
+                      text="Gravatar"
+                      source="gravatar"
+                      email={email}
+                    />
+                  </>
+                )}
                 <ProfilePictureCard
                   image={hasPreview ? getPreview() : null}
                   text={Translate.string('Custom picture')}
@@ -219,17 +223,27 @@ ProfilePicture.propTypes = {
   userId: PropTypes.number,
   email: PropTypes.string.isRequired,
   source: PropTypes.string.isRequired,
+  gravatarEnabled: PropTypes.bool,
 };
 
 ProfilePicture.defaultProps = {
   userId: null,
+  gravatarEnabled: true,
 };
 
-window.setupPictureSelection = function setupPictureSelection(userId, email, source) {
-  document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(
-      <ProfilePicture userId={userId} email={email} source={source} />,
-      document.querySelector('#profile-picture-selection')
-    );
-  });
-};
+customElements.define(
+  'ind-profile-picture-selection',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <ProfilePicture
+          userId={JSON.parse(this.getAttribute('user-id'))}
+          email={this.getAttribute('email')}
+          source={this.getAttribute('source')}
+          gravatarEnabled={JSON.parse(this.getAttribute('gravatar-enabled'))}
+        />,
+        this
+      );
+    }
+  }
+);
