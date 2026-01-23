@@ -387,8 +387,7 @@ class RHSaveProfilePicture(RHUserBase):
         'source': fields.Enum(ProfilePictureSource, required=True)
     })
     def _process(self, source):
-        if (source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon) and
-                config.DISABLE_GRAVATAR):
+        if source.is_gravatar and config.DISABLE_GRAVATAR:
             raise UserValueError('Gravatar has been disabled by the system administrators.')
         self.user.picture_source = source
 
@@ -672,8 +671,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
             self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Primary email updated',
                           session.user, data={'Old': old, 'New': email})
             db.session.commit()
-            if (not config.DISABLE_GRAVATAR and
-                    self.user.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon)):
+            if not config.DISABLE_GRAVATAR and self.user.picture_source.is_gravatar:
                 update_gravatars.delay(self.user)
             flash(_('Your primary email was updated successfully.'), 'success')
             if 'email' in self.user.synced_fields:

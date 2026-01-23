@@ -28,7 +28,7 @@ def update_gravatars(user=None):
         return
     if user is not None:
         # explicitly scheduled update (after an email change)
-        if user.picture_source not in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
+        if not user.picture_source.is_gravatar:
             return
         users = [user]
     else:
