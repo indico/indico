@@ -50,6 +50,7 @@ export default function ListFilter({
   onChangeFilters,
   onChangeSearchText,
   onChangeList,
+  placeholder,
 }) {
   const [internalFilters, setInternalFilters] = useState({});
   const [internalSearchText, setInternalSearchText] = useState('');
@@ -80,7 +81,9 @@ export default function ListFilter({
   };
 
   const setFilters = value => {
-    localStorage.setItem(name, JSON.stringify(value));
+    if (name) {
+      localStorage.setItem(name, JSON.stringify(value));
+    }
     if (onChangeFilters) {
       onChangeFilters(value);
       return;
@@ -131,6 +134,9 @@ export default function ListFilter({
 
   // get filters from the local storage
   useEffect(() => {
+    if (!name) {
+      return;
+    }
     const storedFilters = JSON.parse(localStorage.getItem(name)) || {};
     setFilters(_.pickBy(storedFilters, (__, key) => optionsMap.has(key)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -224,7 +230,7 @@ export default function ListFilter({
       </Dropdown>
       <Input
         autoFocus
-        placeholder={Translate.string('Enter #id or search string')}
+        placeholder={placeholder || Translate.string('Enter #id or search string')}
         onChange={(e, {value}) => setSearchText(value)}
         value={searchText}
         style={{width: '14em'}}
@@ -243,7 +249,7 @@ export default function ListFilter({
 }
 
 ListFilter.propTypes = {
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   list: PropTypes.array.isRequired,
   filters: PropTypes.objectOf(PropTypes.objectOf(optionSchema)),
   searchText: PropTypes.string,
@@ -259,10 +265,12 @@ ListFilter.propTypes = {
   searchableFields: PropTypes.func,
   onChangeList: PropTypes.func,
   onChangeFilters: PropTypes.func,
-  onChangeSearchText: PropTypes.string,
+  onChangeSearchText: PropTypes.func,
+  placeholder: PropTypes.string,
 };
 
 ListFilter.defaultProps = {
+  name: null,
   filters: undefined,
   searchText: undefined,
   searchableId: undefined,
@@ -270,4 +278,5 @@ ListFilter.defaultProps = {
   onChangeList: undefined,
   onChangeFilters: undefined,
   onChangeSearchText: undefined,
+  placeholder: undefined,
 };

@@ -434,7 +434,17 @@ FinalField.defaultProps = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   type?: 'text'|'email'|'number'|'tel'|'password';
+ *   nullIfEmpty?: boolean;
+ *   noAutoComplete?: boolean;
+ * }} FinalInputProps
+ */
+
+/**
  * Like `FinalField` but with extra features for ``<input>`` fields.
+ * @param {FinalInputProps} props
  */
 export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...rest}) {
   const extraProps = {};
@@ -488,7 +498,16 @@ FinalInput.defaultProps = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   nullIfEmpty?: boolean;
+ *   action?: React.ReactNode;
+ * }} FinalTextAreaProps
+ */
+
+/**
  * Like `FinalField` but with extra features for ``<textarea>`` fields.
+ * @param {FinalTextAreaProps} props
  */
 export function FinalTextArea({name, label, nullIfEmpty, action, ...rest}) {
   return (
@@ -569,7 +588,18 @@ FinalRadio.propTypes = {
 };
 
 /**
+ * @typedef {FinalFieldProps & {
+ *   label?: string;
+ *   multiple?: boolean;
+ *   nullIfEmpty?: boolean;
+ *   parse?: (value: any) => any;
+ *   format?: (value: any) => any;
+ * }} FinalDropdownProps
+ */
+
+/**
  * Like `FinalField` but for a dropdown.
+ * @param {FinalDropdownProps} props
  */
 export function FinalDropdown({name, label, multiple, nullIfEmpty, parse, format, ...rest}) {
   const extraProps = {};
