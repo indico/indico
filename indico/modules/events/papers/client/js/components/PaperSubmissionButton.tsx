@@ -51,7 +51,10 @@ export default function PaperSubmissionButton({
     } catch (e) {
       return handleSubmitError(e);
     }
+
     location.href = paperTimelineURL({event_id: eventId, contrib_id: contributionId});
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => null);
   };
 
   // TODO this could probably be moved into the FileManager to support (via a new prop or passing explicit
@@ -79,7 +82,7 @@ export default function PaperSubmissionButton({
           initialValues={{files: {}}}
           header={<Translate>Submit paper</Translate>}
           onClose={() => setModalOpen(false)}
-          size="large"
+          size={fileTypes.length > 1 ? 'large' : 'small'}
         >
           <FinalFileManager
             name="files"

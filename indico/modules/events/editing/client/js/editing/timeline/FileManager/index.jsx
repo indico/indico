@@ -108,7 +108,7 @@ export function Dropzone({
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
+      <div className={`file-manager-dropzone ${isDragActive ? 'active' : ''}`}>
         <Icon color="grey" size="big" name={showNewFileIcon ? 'plus circle' : 'exchange'} />
       </div>
     </div>
@@ -151,7 +151,7 @@ function FileType({
   };
 
   return (
-    <div styleName="file-type">
+    <div className="file-manager-file-type">
       <h3>
         {fileType.name}
         {fileType.required && (

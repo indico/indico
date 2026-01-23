@@ -14,10 +14,10 @@ import fileTypeURL from 'indico-url:papers.api_file_types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import 'indico/modules/events/reviews';
-
 import FileTypeManager from 'indico/modules/events/editing/management/editable_type/file_types/FileTypeManager';
 import {domReady} from 'indico/utils/domstate';
+
+import 'indico/modules/events/reviews';
 
 import setupReactPaperTimeline from './setup';
 
