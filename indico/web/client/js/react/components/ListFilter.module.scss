@@ -12,6 +12,12 @@
 
 .filters-menu {
   max-width: 15em;
+
+  :global(.ui.dropdown.item > .menu.left) {
+    left: auto !important;
+    right: 100% !important;
+    margin-right: 0 !important;
+  }
 }
 
 .active-filters {
@@ -19,6 +25,14 @@
   flex-direction: column;
   margin: 0.4em;
   gap: 0.4em;
+}
+
+.options-search {
+  padding: 0.4em 0.6em 0.2em;
+
+  :global(.ui.input) {
+    width: 100%;
+  }
 }
 
 :global(.ui.label).filter {
