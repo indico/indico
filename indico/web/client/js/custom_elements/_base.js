@@ -13,6 +13,14 @@ function toKebabCase(propertyName) {
 }
 
 export default class CustomElementBase extends HTMLElement {
+  static fromBehavior(Behavior) {
+    return class extends CustomElementBase {
+      setup() {
+        Behavior.setup(this);
+      }
+    };
+  }
+
   static setValue = (element, value) => {
     // This is a hack to bypass the setter that React adds to the
     // value property. Apparently, modifying a value before firing

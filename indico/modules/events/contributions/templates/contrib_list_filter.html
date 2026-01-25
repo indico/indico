@@ -1,103 +1,117 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, filter_choices, active_filters, clickable=true) %}
-    <div class="label-group list-column">
-        <div class="i-label title-wrapper"
-             data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}"
-             {% if not clickable %}data-only-filter{% endif %}>
+{% macro _render_column_selector(item_id, item, filter_choices, active_filters, clickable=true, visible=false) %}
+    <ind-list-filter
+        field-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}"
+        {% if not clickable %}filter-only{% endif %}
+        {% if visible %}visible{% endif %}
+    >
+        <div class="title-wrapper" data-main-trigger>
             <div class="title">{{ item.title }}</div>
             {% if clickable %}
                 <div class="actions">
-                    <span class="visibility icon-eye"></span>
+                    <label>
+                        <input type="checkbox" class="toggle-visibility" {% if visible %}checked{% endif %}>
+                        <span>{% trans title=item.title %}Toggle visibility of {{ title }}{% endtrans %}</span>
+                    </label>
                 </div>
             {% endif %}
         </div>
         {% if filter_choices %}
-            <div class="i-label filter">
-                <a class="icon-filter" data-toggle="dropdown"></a>
-                <ul class="i-dropdown" style="display: none">
-                    {% for value, caption in filter_choices.items() %}
-                        <li>
+            <button type="button" class="filter-trigger" aria-expanded="false">
+                <span>{% trans title=item.title %}Filter by {{ title }}{% endtrans %}</span>
+            </button>
+            <menu class="filters" role="menu">
+                {% for value, caption in filter_choices.items() %}
+                    <li role="menuitemcheckbox">
+                        <label>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
-                                   id="field-{{ item_id }}-option-{{ value }}"
-                                   {% if value in active_filters.get(item_id|string, []) %} checked {% endif %}>
-                            <label for="field-{{ item_id }}-option-{{ value }}">
-                                {{ caption }}
-                            </label>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+                                    {% if value in active_filters.get(item_id|string, []) %} checked {% endif %}>
+                            <span>{{caption}}</span>
+                        </label>
+                    </li>
+                {% endfor %}
+            </menu>
         {% endif %}
-    </div>
+    </ind-list-filter>
 {% endmacro %}
 
-<div class="action-box">
-    <div class="section">
-        <div class="icon icon-wrench"></div>
-        <div class="text">
-            <div class="label">{% trans %}Customize contribution list{% endtrans %}</div>
-            <div>
-                {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
-                {%- trans -%}
-                    Change the configuration of the contribution list by applying filtering ({{ filter_icon }}) options.
-                {%- endtrans -%}
+<ind-list-filter-config>
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-wrench"></div>
+            <div class="text">
+                <div class="label">{% trans %}Customize contribution list{% endtrans %}</div>
+                <div>
+                    {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
+                    {%- trans -%}
+                        Change the configuration of the contribution list by applying filtering ({{ filter_icon }}) options.
+                    {%- endtrans -%}
+                </div>
+            </div>
+            <div class="toolbar">
+                {% if management %}
+                    <button class="i-button icon-checkbox-checked arrow left icon-only"
+                            aria-hidden="true" data-toggle="dropdown"></button>
+                    <ul class="i-dropdown">
+                        <li>
+                            <a href="#" id="list-filter-select-all">
+                                {% trans 'Selection' %}All{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="list-filter-select-none">
+                                {% trans 'Selection' %}None{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+                <button class="i-button reset-btn icon-close warning" type="button">
+                    {%- trans %}Clear filters{% endtrans -%}
+                </button>
             </div>
         </div>
-        <div class="toolbar">
-            <button class="i-button icon-checkbox-checked arrow left icon-only"
-                    aria-hidden="true" data-toggle="dropdown"></button>
-            <ul class="i-dropdown">
-                <li><a href="#" id="list-filter-select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
-                <li><a href="#" id="list-filter-select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
-            </ul>
-            <button class="i-button js-reset-btn icon-close warning" type="button">
-                {%- trans %}Clear filters{% endtrans -%}
-            </button>
+    </div>
+    <div class="success-message-box clear-filters-message" style="display: none;">
+        <div class="message-text">
+            {%- trans -%}All filters have been cleared.{%- endtrans -%}
         </div>
     </div>
-</div>
-<div class="success-message-box js-clear-filters-message" style="display: none;">
-    <div class="message-text">
-        {%- trans -%}All filters have been cleared.{%- endtrans -%}
-    </div>
-</div>
-<form class="list-filter" method="POST">
-    <div class="list-filter-content">
-    <input id="visible-items" type="hidden" name="visible_items"
-        value="{{ visible_items | tojson | forceescape }}">
-        <h3>{% trans %}Available filtering options{% endtrans %}</h3>
-        <div class="flexrow f-wrap">
-            {% for item_id, item in static_items.items() if has_types or item_id != 'type' %}
-                {% set filter_choices = item.get('filter_choices') %}
-                {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('items', {}), clickable=management) }}
-            {% endfor %}
-        </div>
-        {% if contrib_fields %}
-            <h3>{% trans %}Available filters for custom fields{% endtrans %}</h3>
-            <div class="flexrow f-wrap">
-                {% for field in contrib_fields %}
-                    {{ _render_column_selector(field.id, field, field.filter_choices, active_filters=filters.get('fields', {})) }}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if extra_filters %}
-            <h3>{% trans %}Extra filters{% endtrans %}</h3>
-            <div class="flexrow f-wrap">
-                {% for item_id, item in extra_filters.items() %}
+    <form class="list-filter" method="POST">
+        <div class="list-filter-content">
+        <input type="hidden" name="visible_items"
+            value="{{ visible_items | tojson | forceescape }}"
+            data-fields="{{ static_items.keys() | list | tojson | forceescape }}">
+            <h3>{% trans %}Available filtering options{% endtrans %}</h3>
+            <div class="filter-row">
+                {% for item_id, item in static_items.items() if has_types or item_id != 'type' %}
                     {% set filter_choices = item.get('filter_choices') %}
-                    {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('extra', {}), clickable=false) }}
+                    {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('items', {}), clickable=management, visible=item_id in visible_items) }}
                 {% endfor %}
             </div>
-        {% endif %}
-    </div>
-    <div class="bottom-buttons">
-        <input class="i-button big highlight" type="submit" data-disabled-until-change
-               value="{% trans 'Filters' %}Apply{% endtrans %}">
-        <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
-    </div>
-</form>
-<script>
-    setupListFilter();
-</script>
+            {% if contrib_fields %}
+                <h3>{% trans %}Available filters for custom fields{% endtrans %}</h3>
+                <div class="filter-row">
+                    {% for field in contrib_fields %}
+                        {{ _render_column_selector(field.id, field, field.filter_choices, active_filters=filters.get('fields', {})) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if extra_filters %}
+                <h3>{% trans %}Extra filters{% endtrans %}</h3>
+                <div class="filter-row">
+                    {% for item_id, item in extra_filters.items() %}
+                        {% set filter_choices = item.get('filter_choices') %}
+                        {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('extra', {}), clickable=false) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="bottom-buttons">
+            <input class="i-button big highlight" type="submit" data-disabled-until-change
+                value="{% trans 'Filters' %}Apply{% endtrans %}">
+            <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+        </div>
+    </form>
+</ind-list-filter-config>

@@ -14,6 +14,11 @@
   box-shadow: inset 0.2em 0.2em 0.2em rgba(0, 0, 0, 0.3);
 }
 
+%button-hover {
+  color: var(--button-text-color); // XXX: needed for when using links as buttons
+  background-color: var(--button-surface-hover-color);
+}
+
 %button-base {
   --button-border-color: var(--control-border-color);
   --button-text-color: var(--control-text-color);
@@ -30,10 +35,9 @@
   line-height: 1.1;
   font-weight: bold;
 
-  &:focus,
+  &:focus-visible,
   &:hover {
-    color: var(--button-text-color); // XXX: needed for when using links as buttons
-    background-color: var(--button-surface-hover-color);
+    @extend %button-hover;
   }
 
   &:active {
