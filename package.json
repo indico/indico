@@ -99,6 +99,7 @@
     "ua-parser-js": "^1.0.2",
     "underscore": "^1.13.4",
     "updated-jqplot": "1.0.9-2",
+    "use-context-selector": "^2.0.0",
     "vanderlee-colorpicker": "^1.2.16"
   },
   "devDependencies": {
@@ -113,6 +114,7 @@
     "@babel/register": "^7.17.7",
     "@biomejs/biome": "2.2.2",
     "@types/jest": "^29.5.3",
+    "@types/lodash": "^4.17.20",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.17.0",

@@ -302,6 +302,38 @@ def serialize_contribution(contribution):
             'title': contribution.title}
 
 
+# TODO: This is only temporary to get unscheduled contributions working
+# before we rewrite the timetable serializer
+def _serialize_contribution(contribution):
+    data = {
+        'id': f'c{contribution.id}',
+        'uniqueId': contribution.id
+    }
+    if contribution.session:
+        data.update({'color': '#' + contribution.session.background_color,
+                     'textColor': '#' + contribution.session.text_color})
+    data.update({'entryType': 'Contribution',
+                 '_type': 'ContribSchEntry',
+                 '_fossil': 'contribSchEntryDisplay',
+                 'contributionId': contribution.id,
+                 'attachments': [],
+                 'description': contribution.description,
+                 'duration': contribution.duration_display.seconds / 60,
+                 'pdf': url_for('contributions.export_pdf', contribution),
+                 'presenters': [],
+                 'code': contribution.code,
+                 'sessionCode': None,
+                 'sessionId': contribution.session.id if contribution.session else None,
+                 'sessionSlotId': None,
+                 'sessionSlotEntryId': None,
+                 'title': contribution.title,
+                 'url': url_for('contributions.display_contribution', contribution),
+                 'friendlyId': contribution.friendly_id,
+                 'references': [],
+                 'board_number': contribution.board_number})
+    return data
+
+
 def serialize_day_update(event, day, block=None, session_=None):
     serializer = TimetableSerializer(event, management=True)
     timetable = serializer.serialize_session_timetable(session_) if session_ else serializer.serialize_timetable()
@@ -325,13 +357,16 @@ def serialize_entry_update(entry, session_=None):
 
 
 def serialize_event_info(event):
+    from indico.modules.events.contributions import Contribution
     return {'_type': 'Conference',
             'id': str(event.id),
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,
             'isConference': event.type_ == EventType.conference,
-            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions}}
+            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
+            'contributions': [_serialize_contribution(c)
+                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
 
 
 def serialize_session(sess):

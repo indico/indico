@@ -1,0 +1,474 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import _ from 'lodash';
+import moment from 'moment';
+
+import * as actions from './actions';
+import {Action} from './actions';
+import {layout, layoutDays} from './layout';
+import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
+import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
+import {setCurrentDateLocalStorage} from './utils';
+
+export default {
+  entries: (
+    state: Entries = {
+      draftEntry: null,
+      changes: [],
+      currentChangeIdx: 0,
+      selectedId: null,
+      draggedIds: new Set(),
+    },
+    action: actions.Action
+  ) => {
+    switch (action.type) {
+      case actions.SET_DRAFT_ENTRY:
+        return {...state, draftEntry: action.data};
+      case actions.SET_TIMETABLE_DATA: {
+        const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
+        return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
+      }
+      case actions.CHANGE_ENTRY_LAYOUT: {
+        const date = action.date;
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            day === date ? action.entries : dayEntries,
+          ])
+        );
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'move',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.CREATE_ENTRY: {
+        const {
+          entry,
+          entry: {startDt},
+        } = action;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+
+        const dayKey = moment(startDt).format('YYYYMMDD');
+        const dayEntries = newEntries[dayKey];
+
+        if (isChildEntry(entry)) {
+          const newDayEntries = newEntries[dayKey].map(e => {
+            if (e.id === entry.sessionBlockId && e.type === EntryType.SessionBlock) {
+              return {
+                ...e,
+                children: [...e.children, entry],
+              };
+            }
+            return e;
+          });
+          newEntries[dayKey] = layout(newDayEntries);
+        } else {
+          newEntries[dayKey] = layout([...dayEntries, entry]);
+        }
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'create',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.UPDATE_ENTRY: {
+        const {
+          entry,
+          entryType,
+          entry: {startDt},
+          currentDay,
+        } = action;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const currentDayKey = currentDay;
+        const dayEntries = [...newEntries[currentDayKey]];
+        const newDayKey = moment(startDt).format('YYYYMMDD');
+
+        if (currentDayKey !== newDayKey) {
+          newEntries[newDayKey] = layout([...newEntries[newDayKey], entry]);
+          newEntries[currentDayKey] = layout([...dayEntries.filter(e => e.id !== entry.id)]);
+        } else {
+          newEntries[newDayKey] = layout(
+            newEntries[newDayKey].map(e => {
+              if (isChildEntry(entry) && entry.sessionBlockId === e.id) {
+                if (e.type !== EntryType.SessionBlock) {
+                  return e;
+                }
+                return {
+                  ...e,
+                  children: e.children.map(child => (child.id === entry.id ? entry : child)),
+                };
+              }
+              return e.id === entry.id && e.type === entryType ? entry : e;
+            })
+          );
+        }
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'update',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.RESIZE_ENTRY: {
+        const {date, duration, entry} = action;
+        let newDayEntries;
+
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
+          const parent = state.changes[state.currentChangeIdx].entries[date].find(
+            e => e.id === sessionBlockId
+          );
+          if (!parent) {
+            return state;
+          }
+          newDayEntries = layout(
+            state.changes[state.currentChangeIdx].entries[date].map(e => {
+              if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
+                return {
+                  ...e,
+                  children: e.children.map(child => {
+                    if (child.id === entry.id) {
+                      return {
+                        ...child,
+                        duration: moment(e.startDt)
+                          .add(duration, 'minutes')
+                          .isBefore(moment(child.startDt).add(e.duration, 'minutes'))
+                          ? duration
+                          : e.duration,
+                      };
+                    }
+                    return child;
+                  }),
+                };
+              }
+              return e;
+            })
+          );
+        } else {
+          newDayEntries = layout(
+            state.changes[state.currentChangeIdx].entries[date].map(e =>
+              e.id === entry.id ? {...e, duration} : e
+            )
+          );
+        }
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            day === date ? newDayEntries : dayEntries,
+          ])
+        );
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'resize',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.SELECT_ENTRY:
+        return {...state, selectedId: action.id};
+      case actions.DESELECT_ENTRY:
+        return {...state, selectedId: null};
+      case actions.DELETE_BREAK: {
+        const {entry} = action;
+        const {id} = entry;
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [
+                  day,
+                  dayEntries.map(e => {
+                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
+                      return {
+                        ...e,
+                        children: e.children.filter(child => child.id !== id),
+                      };
+                    }
+                    return e;
+                  }),
+                ]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'delete',
+                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+              },
+            ],
+          };
+        } else {
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'delete',
+                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+              },
+            ],
+          };
+        }
+      }
+      case actions.DELETE_BLOCK: {
+        const {id} = action.entry;
+        let block = null;
+        for (const dayEntries of Object.values(state.changes[state.currentChangeIdx].entries)) {
+          block = dayEntries.find(e => e.id === id);
+          if (block) {
+            break;
+          }
+        }
+
+        if (!block) {
+          return state;
+        }
+
+        const contribs = (block as BlockEntry).children
+          .filter(e => e.type === 'contrib')
+          .map(({startDt, ...rest}) => rest);
+        const newEntries = layoutDays(
+          Object.fromEntries(
+            Object.entries(state.changes[state.currentChangeIdx].entries).map(
+              ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
+            )
+          )
+        );
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'delete',
+              unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, ...contribs],
+            },
+          ],
+        };
+      }
+      case actions.SCHEDULE_ENTRY: {
+        const date = action.date;
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            day === date ? action.entries : dayEntries,
+          ])
+        );
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'resize',
+              unscheduled: action.unscheduled,
+            },
+          ],
+        };
+      }
+      case actions.UNSCHEDULE_ENTRY: {
+        const {entry} = action;
+        const {id} = entry;
+        if (isChildEntry(entry)) {
+          const sessionBlockId = entry.sessionBlockId;
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [
+                  day,
+                  dayEntries.map(e => {
+                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
+                      return {
+                        ...e,
+                        children: e.children.filter(child => child.id !== id),
+                      };
+                    }
+                    return e;
+                  }),
+                ]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'unschedule',
+                unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, action.entry],
+              },
+            ],
+          };
+        } else {
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'unschedule',
+                unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, action.entry],
+              },
+            ],
+          };
+        }
+      }
+      case actions.DELETE_SESSION: {
+        // Remove all entries belonging to the session being deleted &
+        // unschedule all contributions linked to it
+        const contribsToUnschedule = [];
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            dayEntries.filter(e => {
+              if (e.type === EntryType.SessionBlock && e.sessionId === action.sessionId) {
+                for (const child of e.children) {
+                  if (child.type === EntryType.Contribution) {
+                    contribsToUnschedule.push({...child, sessionId: null});
+                  }
+                }
+              }
+
+              return e.sessionId !== action.sessionId;
+            }),
+          ])
+        );
+        const newUnscheduled = [
+          ...state.changes[state.currentChangeIdx].unscheduled,
+          ...contribsToUnschedule,
+        ];
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'delete-session',
+              unscheduled: newUnscheduled,
+            },
+          ],
+        };
+      }
+      case actions.UNDO_CHANGE:
+        return {
+          ...state,
+          currentChangeIdx: Math.max(0, state.currentChangeIdx - 1),
+        };
+      case actions.REDO_CHANGE:
+        return {
+          ...state,
+          currentChangeIdx: Math.min(state.changes.length - 1, state.currentChangeIdx + 1),
+        };
+      default:
+        return state;
+    }
+  },
+  sessions: (state = [], action: Action) => {
+    switch (action.type) {
+      case actions.SET_SESSION_DATA:
+        return preprocessSessionData(action.data);
+      case actions.EDIT_SESSION:
+        return {
+          ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
+          ...preprocessSessionData({[action.session.id]: {...action.session}}),
+        };
+      case actions.DELETE_SESSION: {
+        return _.omit(state, action.sessionId);
+      }
+      case actions.CREATE_SESSION:
+        return {
+          ...state,
+          // @ts-expect-error some TS mess with ids to fix later...
+          ...preprocessSessionData({[action.session.id]: {...action.session, isPoster: false}}),
+        };
+      default:
+        return state;
+    }
+  },
+  navigation: (state: any, action: Action) => {
+    state = {isExpanded: false, ...state};
+    switch (action.type) {
+      case actions.SET_CURRENT_DATE:
+        setCurrentDateLocalStorage(action.date, action.eventId);
+        return {...state, currentDate: action.date};
+      case actions.TOGGLE_EXPAND:
+        return {...state, isExpanded: !state.isExpanded};
+      case actions.TOGGLE_DRAFT:
+        return {...state, isDraft: !state.isDraft};
+      default:
+        return state;
+    }
+  },
+  display: (state = {showUnscheduled: false}, action: Action) => {
+    switch (action.type) {
+      case actions.TOGGLE_SHOW_UNSCHEDULED:
+        return {...state, showUnscheduled: !state.showUnscheduled};
+      default:
+        return state;
+    }
+  },
+};
