@@ -111,7 +111,8 @@ class ContributionListGenerator(ListGeneratorBase):
                          subqueryload('person_links'),
                          db.undefer('subcontribution_count'),
                          db.undefer('attachment_count'),
-                         db.undefer('is_scheduled')))
+                         db.undefer('is_scheduled'),
+                         db.undefer('favorite_count')))
 
     def _build_registration_query(self, is_speaker=False):
         registration_join_criteria = [

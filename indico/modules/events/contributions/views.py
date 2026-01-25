@@ -29,6 +29,10 @@ class WPMyContributions(WPContributionsDisplayBase):
     menu_entry_name = 'my_contributions'
 
 
+class WPMyTimetable(WPContributionsDisplayBase):
+    menu_entry_name = 'my_timetable'
+
+
 class WPContributions(WPContributionsDisplayBase):
     menu_entry_name = 'contributions'
 

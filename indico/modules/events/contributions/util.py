@@ -30,6 +30,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import track_time_changes
+from indico.modules.users.models.favorites import favorite_contribution_table
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper
@@ -267,6 +268,15 @@ def user_has_contributions(event, user):
 def get_contributions_for_user(event, user):
     """Get all contributions for a user in the given event."""
     return _query_contributions_for_user(event, user).all()
+
+
+def user_has_scheduled_contributions(event, user):
+    """Return True if a user has added any contributions to their timetable in the given event."""
+    return db.session.scalars(
+        db.select(db.func.count(favorite_contribution_table.c.target_id))
+        .join(Contribution, Contribution.id == favorite_contribution_table.c.target_id)
+        .where(Contribution.event_id == event.id, favorite_contribution_table.c.user_id == user.id)
+    ).first()
 
 
 def serialize_contribution_for_ical(contrib):
