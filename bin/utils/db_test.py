@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # This file is part of Indico.
-# Copyright (C) 2002 - 2025 CERN
+# Copyright (C) 2002 - 2026 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -40,7 +40,7 @@ PG_USER = os.environ.get('PGUSER') or 'indicotest'
 
 REGEX_REV_FILENAME = re.compile(r'\d{8}_\d{4}_(\S{12})_.*\.py$')
 REGEX_REV_CODE_HASH = re.compile(r'revision\s*=\s*[\'"](\S+)[\'"]')
-REGEX_DOCSTRING_HASH = re.compile(r'Revision\s*ID:\s*(\S+)')
+REGEX_REV_DOCSTRING_HASH = re.compile(r'Revision\s*ID:\s*(\S+)')
 REGEX_ADD_COLUMN = re.compile(r'op\.add_column\([^\)]*?sa\.Column\((?P<body>.*?)schema', re.DOTALL)
 REGEX_NON_NULLABLE = re.compile(r'nullable\s*=\s*False')
 REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
@@ -48,7 +48,7 @@ REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
 
 # -- Top-level checks --------------------------------------------------------------------------------------------------
 
-def _check(nb_scripts=0, verbose=False, plugin_dir=None):
+def _check(nb_scripts=0, plugin_dir=None, verbose=False):
     _check_history(plugin_dir, verbose)
     _check_contents(plugin_dir, verbose)
     _check_scripts(nb_scripts, plugin_dir, verbose)
@@ -56,7 +56,7 @@ def _check(nb_scripts=0, verbose=False, plugin_dir=None):
 
 def _check_history(plugin_dir=None, verbose=False):
     click.secho('Checking Alembic revision history consistency:')
-    revisions_dir = _get_revisions_dir(plugin_dir)
+    revisions_dir = _get_alembic_revisions_dir(plugin_dir)
     script_dir = ScriptDirectory(ALEMBIC_TESTENV_DIR, version_locations=[revisions_dir])
     revisions = script_dir.walk_revisions()
     revisions = list(reversed(list(revisions)))
@@ -70,7 +70,7 @@ def _check_history(plugin_dir=None, verbose=False):
 def _check_contents(plugin_dir=None, verbose=False):
     """Check that the content of the revision file is correct."""
     click.secho('Checking Alembic revision contents:')
-    rev_files = _get_revision_files(plugin_dir)[::-1]
+    rev_files = _get_alembic_revision_files(plugin_dir)[::-1]
     # TODO: Why limit it to nb_scripts? This check is quick anyway.
     # if nb_scripts:
     #     rev_files = rev_files[:nb_scripts]
@@ -92,7 +92,7 @@ def _check_scripts(nb_scripts=0, plugin_dir=None, verbose=False):
     click.secho('Checking Alembic revision scripts (newer to older):')
     with _get_db_context(verbose) as (db_conn, dbdiff_conn):
         config = _get_alembic_config(db_conn, plugin_dir=plugin_dir)
-        revisions_dir = _get_revisions_dir(plugin_dir)
+        revisions_dir = _get_alembic_revisions_dir(plugin_dir)
         scripts = ScriptDirectory(ALEMBIC_INI_FILE, version_locations=[revisions_dir]).walk_revisions()
         scripts = list(scripts)[:nb_scripts] if nb_scripts else list(scripts)
         _check_script_idempotence(scripts, db_conn, dbdiff_conn, config)
@@ -116,7 +116,7 @@ def _check_no_unreachable_revisions(migrations, plugin_dir=None):
     Unreachable Alembic revision files are those whose `down_revision` point to
     a revision not in the history.
     """
-    rev_files = _get_revision_files(plugin_dir)
+    rev_files = _get_alembic_revision_files(plugin_dir)
     if len(migrations) < len(rev_files):
         for filename in rev_files[len(migrations):]:
             click.secho(_indent(f'Revision file {filename.name} is orphaned'), fg='red')
@@ -132,7 +132,7 @@ def _check_revision_file_order(migrations, plugin_dir=None):
     any Alembic revision file is out of order, the expected solution is to modify
     the datetime segment of the filename.
     """
-    rev_files = _get_revision_files(plugin_dir)
+    rev_files = _get_alembic_revision_files(plugin_dir)
     # TODO: Why limit it to nb_scripts? This check is quick anyway.
     # if nb_scripts:
     #     migrations = migrations[-nb_scripts:]
@@ -152,7 +152,7 @@ def _check_consistent_revision_hash(content, file_name, file_path):
     """Check that the alembic revision hash in the code matches the one in the docstring."""
     file_name_hash = REGEX_REV_FILENAME.findall(file_name)[0]
     code_hash = REGEX_REV_CODE_HASH.findall(content)[0]
-    docstring_hash = REGEX_DOCSTRING_HASH.findall(content)[0]
+    docstring_hash = REGEX_REV_DOCSTRING_HASH.findall(content)[0]
     if file_name_hash != code_hash or docstring_hash != code_hash:
         click.secho(_indent(f'Revision hash does not match the hash in the docstring in {file_path}.'), fg='red')
         raise ClickException(click.style('Mismatch in revision hash found', fg='red'))
@@ -204,9 +204,10 @@ def _check_script_idempotence(scripts, db_conn, dbdiff_conn, config):
 def _get_db_context(verbose=False):
     # XXX: This is necessary because results dbdiff fails to properly sort functions when producing SQL diffs.
     #      Remove once this is fixed: https://github.com/djrobstep/migra/issues/196.
-    def prepare_diff_db(dbdiff_connection):
-        CreateSchema('indico').execute(dbdiff_connection)
-        create_unaccent_function(dbdiff_connection)
+    # TODO: Open this issue in https://github.com/djrobstep/results
+    def prepare_diff_db(dbdiff_conn):
+        CreateSchema('indico').execute(dbdiff_conn)
+        create_unaccent_function(dbdiff_conn)
         create_array_append_function(dbdiff_conn)
         create_array_is_unique_function(dbdiff_conn)
         create_array_to_string_function(dbdiff_conn)
@@ -239,6 +240,19 @@ def _connect_dbs():
         db_eng.dispose()
         dbdiff_conn.close()
         dbdiff_eng.dispose()
+
+
+def _build_db_uri(dbname):
+    pghost = os.environ.get('PGHOST')
+    pgport = os.environ.get('PGPORT')
+    parts = ['postgresql://']
+    parts += [PG_USER, ':@']
+    if pghost:
+        parts += [pghost]
+        if pgport:
+            parts += [':', pgport]
+    parts += ['/', dbname]
+    return ''.join(parts)
 
 
 # -- DB helper functions -----------------------------------------------------------------------------------------------
