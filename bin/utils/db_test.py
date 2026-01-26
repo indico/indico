@@ -12,7 +12,6 @@ import subprocess
 import sys
 import traceback
 from contextlib import contextmanager
-from os import listdir
 from pathlib import Path
 from subprocess import PIPE
 
@@ -57,8 +56,8 @@ def _check(nb_scripts=0, verbose=False, plugin_dir=None):
 
 def _check_history(plugin_dir=None, verbose=False):
     click.secho('Checking Alembic revision history consistency:')
-    migrations_dir = _get_migrations_dir(plugin_dir)
-    script_dir = ScriptDirectory(ALEMBIC_TESTENV_DIR, version_locations=[migrations_dir])
+    revisions_dir = _get_revisions_dir(plugin_dir)
+    script_dir = ScriptDirectory(ALEMBIC_TESTENV_DIR, version_locations=[revisions_dir])
     revisions = script_dir.walk_revisions()
     revisions = list(reversed(list(revisions)))
     if verbose:
@@ -71,18 +70,16 @@ def _check_history(plugin_dir=None, verbose=False):
 def _check_contents(plugin_dir=None, verbose=False):
     """Check that the content of the revision file is correct."""
     click.secho('Checking Alembic revision contents:')
-    file_names = _get_revision_filenames(plugin_dir)[::-1]
+    rev_files = _get_revision_files(plugin_dir)[::-1]
     # TODO: Why limit it to nb_scripts? This check is quick anyway.
     # if nb_scripts:
     #     rev_files = rev_files[:nb_scripts]
     if verbose:
-        click.secho(_indent(f'{len(file_names)} revision files found'), fg='cyan')
-    migrations_dir = _get_migrations_dir(plugin_dir)
-    for file_name in file_names:
-        file_path = migrations_dir / file_name
-        content = file_path.read_text()
-        _check_consistent_revision_hash(content, file_name, file_path)
-        _check_server_default_in_non_nullable_column(content, file_path)
+        click.secho(_indent(f'{len(rev_files)} revision files found'), fg='cyan')
+    for rev_file in rev_files:
+        content = rev_file.read_text()
+        _check_consistent_revision_hash(content, rev_file.name, rev_file)
+        _check_server_default_in_non_nullable_column(content, rev_file)
     click.secho(_indent('Revision hashes are consistent'), fg='green')
     click.secho(_indent('No server defaults missing'), fg='green')
 
@@ -95,8 +92,8 @@ def _check_scripts(nb_scripts=0, plugin_dir=None, verbose=False):
     click.secho('Checking Alembic revision scripts (newer to older):')
     with _get_db_context(plugin_dir, verbose) as (db_conn, dbdiff_conn):
         config = _get_alembic_config(db_conn, plugin_dir=plugin_dir)
-        migrations_dir = _get_migrations_dir(plugin_dir)
-        scripts = ScriptDirectory(ALEMBIC_INI_FILE, version_locations=[migrations_dir]).walk_revisions()
+        revisions_dir = _get_revisions_dir(plugin_dir)
+        scripts = ScriptDirectory(ALEMBIC_INI_FILE, version_locations=[revisions_dir]).walk_revisions()
         scripts = list(scripts)[:nb_scripts] if nb_scripts else list(scripts)
         _check_script_idempotence(scripts, db_conn, dbdiff_conn, config)
 
@@ -119,10 +116,10 @@ def _check_no_unreachable_revisions(migrations, plugin_dir=None):
     Unreachable Alembic revision files are those whose `down_revision` point to
     a revision not in the history.
     """
-    filenames = _get_revision_filenames(plugin_dir)
-    if len(migrations) < len(filenames):
-        for filename in filenames[len(migrations):]:
-            click.secho(_indent(f'Revision file {filename} is orphaned'), fg='red')
+    rev_files = _get_revision_files(plugin_dir)
+    if len(migrations) < len(rev_files):
+        for filename in rev_files[len(migrations):]:
+            click.secho(_indent(f'Revision file {filename.name} is orphaned'), fg='red')
         raise ClickException(click.style('Orphaned revisions found', fg='red'))
     click.secho(_indent('No orphaned revision was found'), fg='green')
 
@@ -135,18 +132,18 @@ def _check_revision_file_order(migrations, plugin_dir=None):
     any Alembic revision file is out of order, the expected solution is to modify
     the datetime segment of the filename.
     """
-    filenames = _get_revision_filenames(plugin_dir)
+    rev_files = _get_revision_files(plugin_dir)
     # TODO: Why limit it to nb_scripts? This check is quick anyway.
     # if nb_scripts:
     #     migrations = migrations[-nb_scripts:]
-    #     filenames = filenames[-nb_scripts:]
-    for migration, filename in zip(migrations, filenames, strict=True):
-        filename_rev = REGEX_REV_FILENAME.findall(filename)[0]
+    #     rev_file = rev_file[-nb_scripts:]
+    for migration, rev_file in zip(migrations, rev_files, strict=True):
+        filename_rev = REGEX_REV_FILENAME.findall(rev_file.name)[0]
         if migration.revision != filename_rev:
-            click.secho(
-                _indent(f'Revision {filename_rev} is out of order. Expected {migration.revision} instead.'), fg='red')
-            raise ClickException(click.style('Revision files seem out of order.', fg='red'))
-    click.secho(_indent('Revision history files are properly sorted'), fg='green')
+            click.secho(_indent(f'File for revision {filename_rev} is out of order'), fg='yellow')
+            click.secho(_indent(f'Expected {migration.revision} instead'), fg='yellow')
+            raise ClickException(click.style('Revision files are out of order.', fg='red'))
+    click.secho(_indent('All revision history files are sorted'), fg='green')
 
 
 # -- Check contents operations -----------------------------------------------------------------------------------------
@@ -301,24 +298,24 @@ def _sync_dbs(base_db_conn, target_db_conn):
 
 # -- Alembic helper functions ------------------------------------------------------------------------------------------
 
-def _get_migrations_dir(plugin_dir=None):
+def _get_revisions_dir(plugin_dir=None):
     if plugin_dir:
         return next(plugin_dir.glob('*/migrations'))
     # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
     return Path(os.getcwd()) / 'indico' / 'migrations' / 'versions'
 
 
+def _get_revision_files(plugin_dir=None):
+    revisions_dir = _get_revisions_dir(plugin_dir)
+    return sorted(entry for entry in revisions_dir.iterdir() if REGEX_REV_FILENAME.match(entry.name))
+
+
 def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
     """Configure alembic for running against revisions."""
     config = alembic.config.Config(ALEMBIC_INI_FILE, attributes={'connection': db_conn}, stdout=stdout)
     config.set_main_option('script_location', str(ALEMBIC_TESTENV_DIR))
-    config.set_main_option('version_locations', str(_get_migrations_dir(plugin_dir)))
+    config.set_main_option('version_locations', str(_get_revisions_dir(plugin_dir)))
     return config
-
-
-def _get_revision_filenames(plugin_dir=None):
-    migrations_dir = _get_migrations_dir(plugin_dir)
-    return sorted(f for f in listdir(migrations_dir) if REGEX_REV_FILENAME.match(f))
 
 
 # -- Environment helper functions --------------------------------------------------------------------------------------
@@ -382,7 +379,7 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
     if not plugin_dir:
         return None
     if not list(plugin_dir.glob('*/migrations')):
-        raise click.BadParameter(f'no migrations folder found in "{plugin_dir}".')
+        raise click.BadParameter(f'no migrations/ folder found in "{plugin_dir}".')
     return plugin_dir
 
 
