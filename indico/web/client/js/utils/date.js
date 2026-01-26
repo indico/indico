@@ -191,10 +191,35 @@ export function toDateString(date) {
 }
 
 export function toOptionalDate(dateString) {
-  const date = new Date(dateString);
-  if (!date.getTime()) {
+  /**
+   * This function parses a date string into a Date object.
+   * Since the string is representing a date, but Date will use the
+   * local timezone when creating the object, we need to ensure
+   * there are no time shifts due to timezone differences.
+   */
+  if (!dateString) {
     return;
   }
+
+  if (dateString instanceof Date) {
+    return dateString;
+  }
+
+  const formats = [
+    'YYYY-MM-DD', // ISO date format
+    'ddd MMM DD YYYY', // toDateString() format
+  ];
+
+  // Parses the date string with each format, returning the first valid one
+  const parsedDate = formats
+    .map(format => moment(dateString, format))
+    .find(date => date.isValid());
+
+  if (!parsedDate) {
+    return;
+  }
+
+  const date = new Date(parsedDate.year(), parsedDate.month(), parsedDate.date());
   date.setHours(0, 0, 0, 0);
   return date;
 }
