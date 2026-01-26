@@ -57,8 +57,7 @@ def _check(nb_scripts=0, verbose=False, plugin_dir=None):
 
 def _check_history(nb_scripts=0, plugin_dir=None):
     click.secho('Checking Alembic revision history consistency:')
-    # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
-    migrations_dir = os.path.join(plugin_dir or os.getcwd(), _get_migrations_dir(plugin_dir))
+    migrations_dir = _get_migrations_dir(plugin_dir)
     script_dir = ScriptDirectory(ALEMBIC_TESTENV_DIR, version_locations=[migrations_dir])
     revisions = script_dir.walk_revisions()
     revisions = list(reversed(list(revisions)))
@@ -73,8 +72,9 @@ def _check_contents(nb_scripts=0, plugin_dir=None):
     file_names = _get_revision_filenames(plugin_dir)[::-1]
     if nb_scripts:
         file_names = file_names[:nb_scripts]
+    migrations_dir = _get_migrations_dir(plugin_dir)
     for file_name in file_names:
-        file_path = Path(_get_migrations_dir(plugin_dir)) / file_name
+        file_path = migrations_dir / file_name
         content = file_path.read_text()
         _check_consistent_revision_hash(content, file_name, file_path)
         _check_server_default_in_non_nullable_column(content, file_path)
@@ -298,19 +298,19 @@ def _sync_dbs(base_db_conn, target_db_conn):
 
 def _get_migrations_dir(plugin_dir=None):
     if plugin_dir:
-        return os.path.join(os.getcwd(), list(plugin_dir.glob('*/migrations'))[0])
-    return os.path.join(os.getcwd(), 'indico/migrations/versions')
+        return next(plugin_dir.glob('*/migrations'))
+    # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
+    return Path(os.getcwd()) / 'indico' / 'migrations' / 'versions'
 
 
 def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
     """Configure alembic for running against revisions."""
     config = alembic.config.Config(ALEMBIC_INI_FILE, attributes={'connection': db_conn}, stdout=stdout)
     config.set_main_option('script_location', str(ALEMBIC_TESTENV_DIR))
-    config.set_main_option('version_locations', _get_migrations_dir(plugin_dir))
+    config.set_main_option('version_locations', str(_get_migrations_dir(plugin_dir)))
     return config
 
 
-# TODO: Return Path object instead of str
 def _get_revision_filenames(plugin_dir=None):
     migrations_dir = _get_migrations_dir(plugin_dir)
     return sorted(f for f in listdir(migrations_dir) if REGEX_REV_FILENAME.match(f))
