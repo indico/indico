@@ -33,8 +33,8 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
-from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
-                                                     get_flat_section_setup_data)
+from indico.modules.events.registration.util import (clone_registration_form, close_registration,
+                                                     create_personal_data_fields, get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.settings import data_retention_settings
@@ -316,6 +316,20 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         self.regform.log(EventLogRealm.management, LogKind.negative, 'Registration',
                          f'Registration form "{self.regform.title}" was deleted', session.user)
         return redirect(url_for('.manage_regform_list', self.event))
+
+
+class RHRegistrationFormClone(RHManageRegFormBase):
+    """Clone a registration form."""
+
+    def _process(self):
+        form = clone_registration_form(self.regform)
+        flash(_('Registration form cloned'), 'success')
+        logger.info('Registration form %r cloned into %r by %r', self.regform, form, session.user)
+        log_text = f'Registration form cloned from "{self.regform.title}"'
+        # form.log() already adds registration_form_id to meta, so we need to merge metadata
+        form.event.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
+                       meta={'registration_form_id': form.id, 'source_registration_form_id': self.regform.id})
+        return redirect(url_for('.manage_regform', form))
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):
