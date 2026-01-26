@@ -145,7 +145,7 @@ class RHSubmitRevision(RHSubmitRevisionBase):
         return jsonify_data(flash=False)
 
 
-class RHSubmitPaperSingle(RHSubmitPaperBase):
+class RHSubmitPaperUntyped(RHSubmitPaperBase):
     def _check_paper_protection(self):
         if not RHSubmitPaperBase._check_paper_protection(self):
             return False
