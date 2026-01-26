@@ -11,7 +11,7 @@
   margin-top: auto;
 }
 
-:global(.file-manager-dropzone) {
+.dropzone {
   width: 100%;
   border: 2px dashed $gray;
   border-radius: 3px;
@@ -38,13 +38,17 @@
   flex-wrap: wrap;
   gap: 0.9em;
 
-  :global(.file-manager-file-type) {
+  .file-type {
     display: flex;
     flex-direction: column;
     border: 1px solid $gray;
     border-radius: 3px;
     padding: 1em;
     width: 31%;
+
+    h3 {
+      margin-bottom: 0;
+    }
 
     .file-requirements {
       font-style: italic;
@@ -65,10 +69,6 @@
         margin: 0;
       }
     }
-  }
-
-  :global(.file-manager-file-type) h3 {
-    margin-bottom: 0;
   }
 }
 
