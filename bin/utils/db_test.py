@@ -90,7 +90,7 @@ def _check_scripts(nb_scripts=0, plugin_dir=None, verbose=False):
     :param nb_scripts: Number of revision scripts to check.
     """
     click.secho('Checking Alembic revision scripts (newer to older):')
-    with _get_db_context(plugin_dir, verbose) as (db_conn, dbdiff_conn):
+    with _get_db_context(verbose) as (db_conn, dbdiff_conn):
         config = _get_alembic_config(db_conn, plugin_dir=plugin_dir)
         revisions_dir = _get_revisions_dir(plugin_dir)
         scripts = ScriptDirectory(ALEMBIC_INI_FILE, version_locations=[revisions_dir]).walk_revisions()
@@ -142,7 +142,7 @@ def _check_revision_file_order(migrations, plugin_dir=None):
         if migration.revision != filename_rev:
             click.secho(_indent(f'File for revision {filename_rev} is out of order'), fg='yellow')
             click.secho(_indent(f'Expected {migration.revision} instead'), fg='yellow')
-            raise ClickException(click.style('Revision files are out of order.', fg='red'))
+            raise ClickException(click.style('Revision files are out of order', fg='red'))
     click.secho(_indent('All revision history files are sorted'), fg='green')
 
 
@@ -155,7 +155,7 @@ def _check_consistent_revision_hash(content, file_name, file_path):
     docstring_hash = REGEX_DOCSTRING_HASH.findall(content)[0]
     if file_name_hash != code_hash or docstring_hash != code_hash:
         click.secho(_indent(f'Revision hash does not match the hash in the docstring in {file_path}.'), fg='red')
-        raise ClickException(click.style('Mismatch in revision hash found.', fg='red'))
+        raise ClickException(click.style('Mismatch in revision hash found', fg='red'))
 
 
 def _check_server_default_in_non_nullable_column(content, file_path):
@@ -164,7 +164,7 @@ def _check_server_default_in_non_nullable_column(content, file_path):
         body = match.group('body')
         if REGEX_NON_NULLABLE.search(body) and not REGEX_SERVER_DEFAULT.search(body):
             click.secho(_indent(f'Non-nullable column has no server_default set in {file_path}.'), fg='red')
-            raise ClickException(click.style('Missing server default in non-nullable column.', fg='red'))
+            raise ClickException(click.style('Missing server default in non-nullable column', fg='red'))
 
 
 # -- Check script operations -------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ def _check_script_idempotence(scripts, db_conn, dbdiff_conn, config):
 # -- DB context functions ----------------------------------------------------------------------------------------------
 
 @contextmanager
-def _get_db_context(plugin_dir=None, verbose=False):
+def _get_db_context(verbose=False):
     # XXX: This is necessary because results dbdiff fails to properly sort functions when producing SQL diffs.
     #      Remove once this is fixed: https://github.com/djrobstep/migra/issues/196.
     def prepare_diff_db(dbdiff_connection):
@@ -213,7 +213,7 @@ def _get_db_context(plugin_dir=None, verbose=False):
 
     try:
         click.secho(_indent('Setting up test DBs...'), fg='cyan')
-        _prepare_dbs(plugin_dir, verbose)
+        _prepare_dbs(verbose)
         with _connect_dbs() as (db_conn, dbdiff_conn):
             prepare_diff_db(dbdiff_conn)
             yield (db_conn, dbdiff_conn)
@@ -243,8 +243,7 @@ def _connect_dbs():
 
 # -- DB helper functions -----------------------------------------------------------------------------------------------
 
-def _prepare_dbs(plugin_dir=None, verbose=False):
-    test_env = _get_test_environment(plugin_dir=plugin_dir)
+def _prepare_dbs(verbose=False):
     try:
         if 'PGUSER' not in os.environ:
             _run(['createuser', PG_USER])
@@ -254,7 +253,7 @@ def _prepare_dbs(plugin_dir=None, verbose=False):
         _run(['psql', DB_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
         _run(['psql', DBDIFF_NAME, '-c', 'CREATE EXTENSION unaccent;'])
         _run(['psql', DBDIFF_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
-        _run(['indico', 'db', 'prepare'], env=test_env)
+        _run(['indico', 'db', 'prepare'])
     except Exception as e:
         if verbose:
             click.secho(_indent(f'Failed to set up test DBs due to: {e}'), fg='red')
@@ -298,76 +297,67 @@ def _sync_dbs(base_db_conn, target_db_conn):
 
 # -- Alembic helper functions ------------------------------------------------------------------------------------------
 
-def _get_revisions_dir(plugin_dir=None):
+def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
+    """Configure alembic for running against revisions."""
+    config = alembic.config.Config(ALEMBIC_INI_FILE, attributes={'connection': db_conn}, stdout=stdout)
+    config.set_main_option('script_location', str(ALEMBIC_TESTENV_DIR))
+    config.set_main_option('version_locations', str(_get_alembic_revisions_dir(plugin_dir)))
+    return config
+
+
+def _get_alembic_revisions_dir(plugin_dir=None):
     if plugin_dir:
         return next(plugin_dir.glob('*/migrations'))
     # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
     return Path(os.getcwd()) / 'indico' / 'migrations' / 'versions'
 
 
-def _get_revision_files(plugin_dir=None):
-    revisions_dir = _get_revisions_dir(plugin_dir)
+def _get_alembic_revision_files(plugin_dir=None):
+    revisions_dir = _get_alembic_revisions_dir(plugin_dir)
     return sorted(entry for entry in revisions_dir.iterdir() if REGEX_REV_FILENAME.match(entry.name))
-
-
-def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
-    """Configure alembic for running against revisions."""
-    config = alembic.config.Config(ALEMBIC_INI_FILE, attributes={'connection': db_conn}, stdout=stdout)
-    config.set_main_option('script_location', str(ALEMBIC_TESTENV_DIR))
-    config.set_main_option('version_locations', str(_get_revisions_dir(plugin_dir)))
-    return config
 
 
 # -- Environment helper functions --------------------------------------------------------------------------------------
 
-def _get_test_environment(plugin_dir=None):
+def _set_test_environment(plugin_name=None, verbose=False):
+    if verbose:
+        click.secho('Setting up test environment variables...', fg='cyan')
     # Minimal indico.conf settings
-    plugins = [x.parent.name for x in plugin_dir.glob('*/__init__.py')] if plugin_dir else []
     indico_conf = {
         'SECRET_KEY': '*' * 16,
         'BASE_URL': 'http://localhost/',
         'CELERY_BROKER': 'redis://127.0.0.1:6379/0',
         'REDIS_CACHE_URL': 'redis://127.0.0.1:6379/1',
         'DEBUG': True,
-        'PLUGINS': plugins,
+        'PLUGINS': [plugin_name] if plugin_name else [],
         'SQLALCHEMY_DATABASE_URI': _build_db_uri(DB_NAME)
     }
-    return {
-        'INDICO_CONFIG': '/dev/null',
-        'INDICO_CONF_OVERRIDE': repr(indico_conf),
-        'INDICO_ALWAYS_DOWNGRADE': 'yes'
-    }
+    os.environ['INDICO_CONFIG'] = '/dev/null'
+    os.environ['INDICO_CONF_OVERRIDE'] = repr(indico_conf)
+    os.environ['INDICO_ALWAYS_DOWNGRADE'] = 'yes'
+    if plugin_name:
+        os.environ['ALEMBIC_VERSION_TEST_DB'] = f'alembic_version_plugin_{plugin_name}'
 
 
-def _build_db_uri(dbname):
-    pghost = os.environ.get('PGHOST')
-    pgport = os.environ.get('PGPORT')
-    parts = ['postgresql://']
-    parts += [PG_USER, ':@']
-    if pghost:
-        parts += [pghost]
-        if pgport:
-            parts += [':', pgport]
-    parts += ['/', dbname]
-    return ''.join(parts)
+# -- Misc helper functions ---------------------------------------------------------------------------------------------
 
+def _get_plugin_name(plugin_dir):
+    # TODO: Is this the best way to get the plugin name?
+    packages = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
+    if not packages:
+        raise ClickException(click.style(f'No plugin package found in {plugin_dir}', fg='red'))
+    if len(packages) > 1:
+        raise ClickException(click.style(f'More than one plugin package in {plugin_dir}', fg='red'))
+    return packages[0]
 
-def _set_alembic_version_test_db_env(plugin):
-    os.environ['ALEMBIC_VERSION_TEST_DB'] = f'alembic_version_plugin_{plugin}'
-
-
-# -- helper functions --------------------------------------------------------------------------------------------------
 
 def _indent(msg, level=4):
     indentation = level * ' '
     return indentation + msg.replace('\n', '\n' + indentation)
 
 
-def _run(cmd, input_='', env=None):
-    kwargs = {}
-    if env:
-        kwargs['env'] = os.environ | env
-    with subprocess.Popen(cmd, **kwargs, stdin=PIPE, stdout=PIPE, stderr=PIPE) as pipes:
+def _run(cmd, input_=''):
+    with subprocess.Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE) as pipes:
         stdout, stderr = pipes.communicate(input=input_)
         if pipes.returncode != 0:
             error = stderr.decode('unicode_escape').strip()
@@ -378,8 +368,12 @@ def _run(cmd, input_='', env=None):
 def _validate_plugin_dir(ctx, param, plugin_dir: Path):
     if not plugin_dir:
         return None
-    if not list(plugin_dir.glob('*/migrations')):
-        raise click.BadParameter(f'no migrations/ folder found in "{plugin_dir}".')
+    try:
+        plugin_name = _get_plugin_name(plugin_dir)
+    except ClickException as e:
+        raise click.BadParameter(str(e))
+    if not (plugin_dir / plugin_name / 'migrations').is_dir():
+        raise click.BadParameter(f'No migrations/ folder found in "{plugin_dir}"')
     return plugin_dir
 
 
@@ -390,7 +384,7 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
               help='Number of scripts to check from the most recent (0 checks all)')
 @click.option('-v', '--verbose', 'verbose', is_flag=True, default=False, show_default=True,
               help='Print debug information.')
-@click.option('-p', '--plugin-dir', 'plugin_dir', help='Path to an indico plugin', required=False,
+@click.option('-p', '--plugin-dir', 'plugin_dir', help='Path to an indico plugin directory', required=False,
               type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
               callback=_validate_plugin_dir)
 def main(nb_scripts, verbose, plugin_dir):
@@ -403,17 +397,11 @@ def main(nb_scripts, verbose, plugin_dir):
     configuration should be done using the various environment variables like
     PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
     """
-    if not plugin_dir:
-        click.secho('Running DB checks for Indico', fg='cyan', bold=True)
-        _check(nb_scripts, verbose)
-    else:
-        os.chdir(plugin_dir)
-        plugin_name = next((x.parent.name for x in plugin_dir.glob('*/__init__.py')), None)
-        if not plugin_name:
-            raise ClickException(click.style('Expected exactly one plugin in plugin dir', fg='red'))
-        _set_alembic_version_test_db_env(plugin_name)
-        click.secho(f'Running DB checks for plugin "{plugin_name}"', fg='cyan', bold=True)
-        _check(nb_scripts, verbose, plugin_dir)
+    plugin_name = _get_plugin_name(plugin_dir) if plugin_dir else None
+    target = 'Indico' if not plugin_name else f'plugin "{plugin_name}"'
+    click.secho(f'Running DB checks for {target}', fg='blue', bold=True)
+    _set_test_environment(plugin_name, verbose)
+    _check(nb_scripts, plugin_dir, verbose)
 
 
 if __name__ == '__main__':
