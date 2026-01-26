@@ -50,28 +50,33 @@ REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
 # -- Top-level checks --------------------------------------------------------------------------------------------------
 
 def _check(nb_scripts=0, verbose=False, plugin_dir=None):
-    _check_history(nb_scripts, plugin_dir)
-    _check_contents(nb_scripts, plugin_dir)
+    _check_history(plugin_dir, verbose)
+    _check_contents(plugin_dir, verbose)
     _check_scripts(nb_scripts, plugin_dir, verbose)
 
 
-def _check_history(nb_scripts=0, plugin_dir=None):
+def _check_history(plugin_dir=None, verbose=False):
     click.secho('Checking Alembic revision history consistency:')
     migrations_dir = _get_migrations_dir(plugin_dir)
     script_dir = ScriptDirectory(ALEMBIC_TESTENV_DIR, version_locations=[migrations_dir])
     revisions = script_dir.walk_revisions()
     revisions = list(reversed(list(revisions)))
+    if verbose:
+        click.secho(_indent(f'{len(revisions)} revisions found'), fg='cyan')
     _check_single_revision_head(script_dir)
     _check_no_unreachable_revisions(revisions, plugin_dir)
     _check_revision_file_order(revisions, plugin_dir)
 
 
-def _check_contents(nb_scripts=0, plugin_dir=None):
+def _check_contents(plugin_dir=None, verbose=False):
     """Check that the content of the revision file is correct."""
     click.secho('Checking Alembic revision contents:')
     file_names = _get_revision_filenames(plugin_dir)[::-1]
-    if nb_scripts:
-        file_names = file_names[:nb_scripts]
+    # TODO: Why limit it to nb_scripts? This check is quick anyway.
+    # if nb_scripts:
+    #     rev_files = rev_files[:nb_scripts]
+    if verbose:
+        click.secho(_indent(f'{len(file_names)} revision files found'), fg='cyan')
     migrations_dir = _get_migrations_dir(plugin_dir)
     for file_name in file_names:
         file_path = migrations_dir / file_name
