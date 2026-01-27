@@ -8,7 +8,7 @@
 from datetime import timedelta
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates, validates_schema
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validates, validates_schema
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -43,6 +43,15 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
+    internal_name = fields.String(allow_none=True)
+
+    @pre_load
+    def _avoid_resetting_advanced_settings(self, data, **kwargs):
+        # fields of collapsed (hidden) advanced settings are not in the payload
+        field = self.context['field']
+        if 'internal_name' not in data and field.internal_name:
+            data['internal_name'] = field.internal_name
+        return data
 
     @validates('title')
     @no_autoflush
@@ -96,6 +105,29 @@ class GeneralFieldDataSchema(mm.Schema):
             elif not max_retention_period and retention_period > timedelta(3650):
                 raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty '
                                         'for indefinite.'))
+
+    @validates('internal_name')
+    @no_autoflush
+    def _check_internal_name(self, internal_name, **kwargs):
+        field = self.context['field']
+        if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.name:
+            raise ValidationError(_('Changing internal name for personal data field is not allowed.'))
+        if internal_name is None:
+            return
+        if internal_name != internal_name.strip():
+            raise ValidationError(_('Leading and trailing whitespaces are not allowed.'))
+        if field.is_enabled is not False:  # None for new field
+            # unique on form
+            query = (RegistrationFormItem.query
+                     .filter(RegistrationFormItem.parent_id == field.parent.id,
+                             RegistrationFormItem.internal_name == internal_name,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if field.id:
+                query = query.filter(RegistrationFormItem.id != field.id)
+            if same_field := query.first():
+                raise ValidationError(_('The field "{}" on this form has the same internal name.')
+                                      .format(same_field.title))
 
     @validates('show_if_id')
     @no_autoflush
@@ -240,6 +272,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         if enabled:
+            # check unique title in section
             query = (RegistrationFormItem.query
                      .filter(RegistrationFormItem.parent_id == self.field.parent.id,
                              db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
@@ -248,6 +281,16 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             if query.has_rows():
                 raise NoReportError.wrap_exc(
                     BadRequest(_('There is already a field in this section with the same title.'))
+                )
+            # check unique internal name in from
+            query = (RegistrationFormItem.query
+                     .filter(RegistrationFormItem.parent_id == self.field.parent.id,
+                             RegistrationFormItem.internal_name == self.field.internal_name,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if same_field := query.first():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('The field "{}" on this form has the same internal name.').format(same_field.title))
                 )
 
         self.field.is_enabled = enabled
