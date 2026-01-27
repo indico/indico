@@ -6,9 +6,11 @@
 # LICENSE file for more details.
 
 from indico.util.mimetypes import register_custom_mimetypes
+from indico.util.network import patch_socket_getaddrinfo
 
 
 __version__ = '3.3.10-dev'
 PREFERRED_PYTHON_VERSION_SPEC = '~=3.12.2'
 
 register_custom_mimetypes()
+patch_socket_getaddrinfo()
