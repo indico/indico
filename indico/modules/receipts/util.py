@@ -149,8 +149,8 @@ def _format_placeholders(value, **kwargs):
 def _format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=None):
     """A wrapper around date_time.format_interval that accepts both `format` and `skeleton`.
 
-    The `format` parameter is kept for backwards compatibility with existing
-    document templates which use `format_interval`. Prefer using the `skeleton`
+    The `format` parameter is kept for backwards compatibility with existing document
+    templates which use `format_interval(format=...)`. Prefer using the `skeleton`
     parameter instead.
     """
     return format_interval(start_dt, end_dt, format or skeleton, locale=locale)
