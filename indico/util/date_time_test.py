@@ -116,10 +116,9 @@ def test_convert_py_weekdays_to_js(py_weekdays, expected_js_weekdays):
 
 @pytest.mark.parametrize(('skeleton', 'expected'), (
     ('HHmm', '13:30–14:30'),  # noqa: RUF001
-    ('ymd HHmm', '8 Feb 2021, 13:30:00 – 8 Feb 2021, 14:30:00'),  # noqa: RUF001
+    ('short', '13:30–14:30'),  # noqa: RUF001
 ))
 def test_format_interval(skeleton, expected):
     start_dt = as_utc(datetime(2021, 2, 8, 12, 30)).astimezone(timezone('Europe/Zurich'))
     end_dt = as_utc(datetime(2021, 2, 8, 13, 30)).astimezone(timezone('Europe/Zurich'))
     assert format_interval(start_dt, end_dt, skeleton, locale='en_GB') == expected
-    assert format_interval(start_dt, end_dt, skeleton=skeleton, locale='en_GB') == expected
