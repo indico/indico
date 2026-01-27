@@ -153,6 +153,7 @@ def _format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=Non
     templates which use `format_interval(format=...)`. Prefer using the `skeleton`
     parameter instead.
     """
+    assert not (format and skeleton), 'Cannot specify both format and skeleton'
     return format_interval(start_dt, end_dt, format or skeleton, locale=locale)
 
 
