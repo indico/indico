@@ -215,6 +215,10 @@ jobs:
         env:
           PGPORT: ${{ job.services.postgres.ports[5432] }}
 
+      - name: Run db_script tests
+        run: |
+          bin/utils/db_test.py -v
+
   test-python-nodb:
     name: test-python-${{ matrix.name }}-nodb
     runs-on: ubuntu-22.04

@@ -41,8 +41,9 @@ SQL_FUNCTION_TEXT_ARRAY_TO_STRING = '''
 
 
 def upgrade():
-    op.execute(SQL_FUNCTION_TEXT_ARRAY_APPEND)
-    op.execute(SQL_FUNCTION_TEXT_ARRAY_TO_STRING)
+    # TODO Remove the comment below
+    # op.execute(SQL_FUNCTION_TEXT_ARRAY_APPEND)
+    # op.execute(SQL_FUNCTION_TEXT_ARRAY_TO_STRING)
     op.add_column('affiliations', sa.Column('alt_names', postgresql.ARRAY(sa.String()),
                                             nullable=False, server_default='{}'), schema='indico')
     op.alter_column('affiliations', 'alt_names', server_default=None, schema='indico')
@@ -59,7 +60,8 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_index('ix_affiliations_searchable_names_unaccent', table_name='affiliations', schema='indico')
-    op.drop_column('affiliations', 'alt_names', schema='indico')
+    # TODO Remove the comment below
+    # op.drop_index('ix_affiliations_searchable_names_unaccent', table_name='affiliations', schema='indico')
+    # op.drop_column('affiliations', 'alt_names', schema='indico')
     op.execute('DROP FUNCTION indico.text_array_append(arr text[], item text)')
     op.execute('DROP FUNCTION indico.text_array_to_string(arr text[], sep text)')

@@ -56,7 +56,7 @@ def upgrade():
 
 def downgrade():
     op.rename_table('reservation_occurrence_links', 'reservation_links', schema='roombooking')
-    op.add_column('reservations', sa.Column('link_id', sa.Integer(), nullable=True), schema='roombooking')
+    op.add_column('reservations', sa.Column('link_id', sa.Integer(), nullable=True, index=True), schema='roombooking')
     op.create_foreign_key(None, 'reservations', 'reservation_links', ['link_id'], ['id'],
                           source_schema='roombooking', referent_schema='roombooking')
 
