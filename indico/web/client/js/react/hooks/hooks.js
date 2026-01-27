@@ -14,8 +14,8 @@ import PropTypes from 'prop-types';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 
-import {handleAxiosError, indicoAxios} from '../utils/axios';
-import {camelizeKeys} from '../utils/case';
+import {handleAxiosError, indicoAxios} from '../../utils/axios';
+import {camelizeKeys} from '../../utils/case';
 
 const useAxios = makeUseAxios({
   axios: indicoAxios,
