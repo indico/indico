@@ -153,10 +153,7 @@ def _format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=Non
     document templates which use `format_interval`. Prefer using the `skeleton`
     parameter instead.
     """
-    if format:
-        skeleton = format
-
-    return format_interval(start_dt, end_dt, skeleton, locale=locale)
+    return format_interval(start_dt, end_dt, format or skeleton, locale=locale)
 
 
 def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
