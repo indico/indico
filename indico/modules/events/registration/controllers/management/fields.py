@@ -125,8 +125,9 @@ class GeneralFieldDataSchema(mm.Schema):
                              ~RegistrationFormItem.is_deleted))
             if field.id:
                 query = query.filter(RegistrationFormItem.id != field.id)
-            if query.has_rows():
-                raise ValidationError(_('There is already a field on this form with the same internal name.'))
+            if same_field := query.first():
+                raise ValidationError(_('The field "{}" on this form has the same internal name.')
+                                      .format(same_field.title))
 
     @validates('show_if_id')
     @no_autoflush
@@ -287,9 +288,9 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                              RegistrationFormItem.internal_name == self.field.internal_name,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted))
-            if query.has_rows():
+            if same_field := query.first():
                 raise NoReportError.wrap_exc(
-                    BadRequest(_('There is already a field on this form with the same internal name.'))
+                    BadRequest(_('The field "{}" on this form has the same internal name.').format(same_field.title))
                 )
 
         self.field.is_enabled = enabled
