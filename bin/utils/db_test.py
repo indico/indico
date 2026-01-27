@@ -323,7 +323,7 @@ def _get_alembic_revisions_dir(plugin_dir=None):
     if plugin_dir:
         return next(plugin_dir.glob('*/migrations'))
     # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
-    return Path(os.getcwd()) / 'indico' / 'migrations' / 'versions'
+    return Path(INDICO_DIR) / 'indico' / 'migrations' / 'versions'
 
 
 def _get_alembic_revision_files(plugin_dir=None):
@@ -411,6 +411,7 @@ def main(nb_scripts, verbose, plugin_dir):
     configuration should be done using the various environment variables like
     PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
     """
+    plugin_dir = None if plugin_dir == INDICO_DIR else plugin_dir
     plugin_name = _get_plugin_name(plugin_dir) if plugin_dir else None
     target = 'Indico' if not plugin_name else f'plugin "{plugin_name}"'
     click.secho(f'Running DB checks for {target}', fg='blue', bold=True)
