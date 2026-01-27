@@ -5,3 +5,8 @@
         </table>
     </td>
 </tr>
+{% block entry_details_footer %}
+    {% if entry.user_backref_name == 'event_log_entries' %}
+        <tr><td>{{ entry.registration_details_link() }}</td></tr>
+    {% endif %}
+{% endblock %}

@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from markupsafe import Markup
 from sqlalchemy.dialects.postgresql import JSON, JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -17,6 +18,7 @@ from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+from indico.web.flask.util import url_for
 
 
 class EventLogRealm(RichIntEnum):
@@ -197,6 +199,16 @@ class EventLogEntry(LogEntryBase):
     @locator_property
     def locator(self):
         return dict(self.event.locator, log_entry_id=self.id)
+
+    def registration_details_link(self):
+        from indico.modules.events.registration.models.registrations import Registration
+        registration_id = self.meta.get('registration_id')
+        if registration_id:
+            if registration := (Registration.query.filter(Registration.id == registration_id,
+                                                          ~Registration.is_deleted).first()):
+                return (Markup('<p><a href="{}">Go to registration details</a></p>').
+                        format(url_for('event_registration.registration_details', registration)))
+        return ''
 
 
 class CategoryLogEntry(LogEntryBase):
