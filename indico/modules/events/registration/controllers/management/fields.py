@@ -127,19 +127,6 @@ class GeneralFieldDataSchema(mm.Schema):
                 query = query.filter(RegistrationFormItem.id != field.id)
             if query.has_rows():
                 raise ValidationError(_('There is already a field on this form with the same internal name.'))
-            # same type accross events/forms
-            query = (RegistrationFormItem.query
-                     .filter(RegistrationFormItem.internal_name == internal_name,
-                             RegistrationFormItem.registration_form_id != field.registration_form.id,
-                             RegistrationFormItem.input_type != field.input_type,
-                             RegistrationFormItem.is_enabled,
-                             ~RegistrationFormItem.is_deleted))
-            if field.id:
-                query = query.filter(RegistrationFormItem.id != field.id)
-            query = query.signal_query('check-registration-form-field-internal-name', field=field)
-            if query.has_rows():
-                raise ValidationError(_('A field with the same internal name on another form uses '
-                                        'a different input type which is not allowed.'))
 
     @validates('show_if_id')
     @no_autoflush
@@ -303,19 +290,6 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             if query.has_rows():
                 raise NoReportError.wrap_exc(
                     BadRequest(_('There is already a field on this form with the same internal name.'))
-                )
-            # same type accross events/forms
-            query = (RegistrationFormItem.query
-                     .filter(RegistrationFormItem.internal_name == self.field.internal_name,
-                             RegistrationFormItem.registration_form_id != self.field.registration_form.id,
-                             RegistrationFormItem.input_type != self.field.input_type,
-                             RegistrationFormItem.is_enabled,
-                             ~RegistrationFormItem.is_deleted)
-                     .signal_query('check-registration-form-field-internal-name', field=self.field))
-            if query.has_rows():
-                raise NoReportError.wrap_exc(
-                    BadRequest(_('A field with the same internal name on another form uses '
-                                 'a different input type which is not allowed.'))
                 )
 
         self.field.is_enabled = enabled
