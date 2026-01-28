@@ -30,6 +30,7 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
   const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
+  const isOverlapping = !useSelector(selectors.getCurrentDayEntriesWithoutOverlap).includes(id);
   const currentDateEntries = entries[dtKey];
   const parent = sessionBlockId
     ? (currentDateEntries.find(e => e.id === sessionBlockId) as BlockEntry)
@@ -38,6 +39,8 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const filteredEntries = (parent ? (parent?.children ?? []) : currentDateEntries).filter(
     e => e.id !== id
   );
+  const targetStart = moment(startDt);
+  const targetEnd = moment(startDt).add(duration, 'minutes');
 
   // TODO: (Ajob) Evaluate if we want to disable support for moving entries within groups
   //              (overlapping directly/indirectly). If so we can sort the entries instead
@@ -46,8 +49,6 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const _getAdjacentEntries = () => {
     let above: Entry | null = null;
     let below: Entry | null = null;
-    const targetStart = moment(startDt);
-    const targetEnd = moment(startDt).add(duration, 'minutes');
 
     for (const fe of filteredEntries) {
       if (fe.id === id) {
@@ -70,7 +71,8 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
     return [above, below];
   };
 
-  const [above, below] = _getAdjacentEntries();
+  const [above, below] = isOverlapping ? [null, null] : _getAdjacentEntries();
+  const canMove = above || below;
 
   const _getMovedChildrenByDelta = (parentEntry: BlockEntry, delta: number) =>
     parentEntry?.children.map(child => ({
@@ -111,10 +113,7 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const moveUp = e => {
     e.stopPropagation();
 
-    const targetStart = moment(startDt);
-
     if (!above) {
-      // TODO: (Ajob) Consider implementing snapping to top of calendar
       return;
     }
 
@@ -130,13 +129,8 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
 
   const moveDown = e => {
     e.stopPropagation();
-    console.log('below', below?.title);
-
-    const targetEnd = moment(startDt).add(duration, 'minutes');
 
     if (!below) {
-      // TODO: (Ajob) Consider implementing snapping to bottom of calendar
-      console.log('nothing below');
       return;
     }
 
@@ -145,11 +139,13 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
       return;
     }
 
-    _moveEntry(entry, moment(below.startDt).subtract(duration, 'minutes'));
+    const newStartDt = moment(below.startDt).subtract(duration, 'minutes');
+
+    _moveEntry(entry, newStartDt);
   };
 
   return (
-    (above || below) && (
+    canMove && (
       <div styleName="mv-buttons-wrapper">
         <button type="button" onClick={moveUp} disabled={!above}>
           <Icon name="chevron up" />
