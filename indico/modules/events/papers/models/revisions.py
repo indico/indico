@@ -13,6 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalRevisionMixin
 from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, PaperReviewType
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import pgettext
@@ -162,6 +163,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         return self.get_timeline()
 
     @property
+    @memoize_request
     def publishable_files(self):
         return [paper_file for paper_file in self.files if not paper_file.file_type or paper_file.file_type.publishable]
 
