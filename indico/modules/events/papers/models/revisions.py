@@ -165,7 +165,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     @property
     @memoize_request
     def publishable_files(self):
-        return [paper_file for paper_file in self.files if not paper_file.file_type or paper_file.file_type.publishable]
+        return [pf for pf in self.files if not pf.file_type or pf.file_type.publishable]
 
     @paper.setter
     def paper(self, paper):
@@ -221,5 +221,5 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
                 return bool(content_review)
 
     def get_spotlight_file(self):
-        pdf_files = [paper_file for paper_file in self.publishable_files if paper_file.content_type == 'application/pdf']
+        pdf_files = [pf for pf in self.publishable_files if pf.content_type == 'application/pdf']
         return pdf_files[0] if len(pdf_files) == 1 else None
