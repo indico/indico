@@ -5,15 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from markupsafe import escape
-from marshmallow import post_dump
-from marshmallow.fields import Boolean, Decimal, Enum, Field, Function, Integer, List, Method, Nested, String
+import re
 
-from indico.core.marshmallow import mm
+from markupsafe import escape
+from marshmallow import ValidationError, post_dump, validates
+from marshmallow.fields import Boolean, Decimal, Enum, Field, Function, Integer, List, Method, Nested, String
+from sqlalchemy import func
+
+from indico.core.marshmallow import fields, mm
 from indico.modules.events.contributions.schemas import BasicContributionSchema
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.models.events import Event
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
@@ -22,8 +26,10 @@ from indico.modules.events.papers.models.reviews import PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.modules.users.schemas import BasicUserSchema
-from indico.util.i18n import orig_string
+from indico.util.i18n import _, orig_string
+from indico.util.marshmallow import not_empty
 from indico.util.mimetypes import icon_from_mimetype
+from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
 
@@ -226,6 +232,57 @@ class PaperDumpSchema(PaperSchema):
 
     class Meta(PaperSchema.Meta):
         fields = ('is_in_final_state', 'contribution', 'revisions', 'state')
+
+
+class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = PaperFileType
+        fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
+                  'filename_template', 'url')
+
+    is_used = fields.Function(lambda ft: PaperFile.query.with_parent(ft).has_rows())
+    url = Function(lambda ft: url_for('.api_edit_file_type', ft.event, file_type_id=ft.id, _external=True))
+
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=lambda ft: natural_sort_key(ft['name']))
+        return data
+
+
+class PaperFileTypeArgs(mm.Schema):
+    class Meta:
+        rh_context = ('event', 'file_type')
+
+    name = fields.String(required=True, validate=not_empty)
+    filename_template = fields.String(validate=not_empty, allow_none=True)
+    extensions = fields.List(fields.String(validate=not_empty))
+    allow_multiple_files = fields.Boolean()
+    required = fields.Boolean()
+    publishable = fields.Boolean()
+
+    @validates('name')
+    def _check_for_unique_file_type_name(self, name, **kwargs):
+        event = self.context['event']
+        file_type = self.context['file_type']
+        query = PaperFileType.query.with_parent(event).filter(
+            func.lower(PaperFileType.name) == name.lower()
+        )
+        if file_type:
+            query = query.filter(PaperFileType.id != file_type.id)
+        if query.has_rows():
+            raise ValidationError(_('Name must be unique'))
+
+    @validates('filename_template')
+    def _check_for_correct_filename_template(self, template, **kwargs):
+        if template is not None and '.' in template:
+            raise ValidationError(_('Filename template cannot include dots'))
+
+    @validates('extensions')
+    def _check_for_correct_extensions_format(self, extensions, **kwargs):
+        for extension in extensions:
+            if re.match(r'^[*.]+', extension):
+                raise ValidationError(_('Extensions cannot have leading dots'))
 
 
 paper_schema = PaperSchema()

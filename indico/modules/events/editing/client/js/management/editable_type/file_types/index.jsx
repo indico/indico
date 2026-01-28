@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
+import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
+import fileTypeURL from 'indico-url:event_editing.api_file_types';
+
 import React from 'react';
 import {useParams} from 'react-router-dom';
 
@@ -22,7 +26,12 @@ export default function FileTypeManagement() {
   return (
     <>
       <EditableTypeSubPageNav title={Translate.string('File types')} />
-      <FileTypeManager eventId={eventId} editableType={type} />
+      <FileTypeManager
+        eventId={eventId}
+        getAllURLFn={params => fileTypeURL({type, ...params})}
+        editURLFn={params => editFileTypeURL({type, ...params})}
+        createURLFn={params => createFileTypeURL({type, ...params})}
+      />
     </>
   );
 }

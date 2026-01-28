@@ -5,13 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
-import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
-import fileTypesURL from 'indico-url:event_editing.api_file_types';
-
-import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';
-import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Loader,
+  Message,
+  Segment,
+  Popup,
+  Label,
+  SemanticICONS,
+} from 'semantic-ui-react';
 
 import {RequestConfirmDelete, TooltipIfTruncated} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
@@ -19,13 +23,25 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import {EditableType} from '../../../models';
-
 import FileTypeModal from './FileTypeModal';
 
 import './FileTypeManager.module.scss';
 
-const initialState = {
+interface FileTypeManagerProps {
+  eventId: number;
+  getAllURLFn: (params?) => string;
+  createURLFn: (params?) => string;
+  editURLFn: (params?) => string;
+  hideAccepted?: boolean;
+  allowDeleteLastType?: boolean;
+}
+
+interface FileTypeManagerState {
+  fileType: string;
+  operation: 'add' | 'edit' | 'delete';
+}
+
+const initialState: FileTypeManagerState = {
   fileType: null,
   operation: null,
 };
@@ -45,30 +61,31 @@ function fileTypesReducer(state, action) {
   }
 }
 
-function StatusIcon({active, icon, text}) {
+function StatusIcon({active, icon, text}: {active: boolean; icon: SemanticICONS; text: string}) {
   return (
     <Icon size="small" color={active ? 'blue' : 'grey'} name={icon} title={active ? text : ''} />
   );
 }
 
-StatusIcon.propTypes = {
-  active: PropTypes.bool.isRequired,
-  icon: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-};
-
-export default function FileTypeManager({eventId, editableType}) {
+export default function FileTypeManager({
+  eventId,
+  getAllURLFn,
+  createURLFn,
+  editURLFn,
+  hideAccepted = false,
+  allowDeleteLastType = false,
+}: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {
     data,
     loading: isLoadingFileTypes,
     reFetch,
     lastData,
-  } = useIndicoAxios(fileTypesURL({event_id: eventId, type: editableType}), {camelize: true});
+  } = useIndicoAxios(getAllURLFn({event_id: eventId}), {camelize: true});
 
   const createFileType = async formData => {
     try {
-      await indicoAxios.post(createFileTypeURL({event_id: eventId, type: editableType}), formData);
+      await indicoAxios.post(createURLFn({event_id: eventId}), formData);
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
@@ -76,7 +93,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const editFileType = async (fileTypeId, fileTypeData) => {
-    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURLFn({event_id: eventId, file_type_id: fileTypeId});
 
     try {
       await indicoAxios.patch(url, fileTypeData);
@@ -87,7 +104,7 @@ export default function FileTypeManager({eventId, editableType}) {
   };
 
   const deleteFileType = async fileTypeId => {
-    const url = editFileTypeURL({event_id: eventId, file_type_id: fileTypeId, type: editableType});
+    const url = editURLFn({event_id: eventId, file_type_id: fileTypeId});
 
     try {
       await indicoAxios.delete(url);
@@ -105,13 +122,20 @@ export default function FileTypeManager({eventId, editableType}) {
     return null;
   }
 
+  const displayHideAcceptedWarning = hideAccepted && fileTypes.some(ft => ft.publishable);
+  const displayNothingShownWarning =
+    !!fileTypes?.length && !hideAccepted && !fileTypes.some(ft => ft.publishable);
+
   const isLastPublishable = fileTypeId => {
     const publishable = fileTypes.filter(ft => ft.publishable);
     return publishable.length === 1 && publishable[0].id === fileTypeId;
   };
 
   const canDelete = fileType =>
-    !fileType.isUsedInCondition && !fileType.isUsed && !isLastPublishable(fileType.id);
+    !fileType.isUsedInCondition &&
+    !fileType.isUsed &&
+    (allowDeleteLastType || !isLastPublishable(fileType.id));
+
   const renderPopupContent = fileType => {
     if (canDelete(fileType)) {
       return null;
@@ -131,6 +155,22 @@ export default function FileTypeManager({eventId, editableType}) {
       {fileTypes.length === 0 && (
         <Message info>
           <Translate>There are no file types defined for this event</Translate>
+        </Message>
+      )}
+      {displayHideAcceptedWarning && (
+        <Message warning>
+          <Translate>
+            There are publishable file types that will not be displayed due to the 'Hide Accepted'
+            setting being enabled.
+          </Translate>
+        </Message>
+      )}
+      {displayNothingShownWarning && (
+        <Message warning>
+          <Translate>
+            No file types will be shown as there are no publishable file types and the 'Hide
+            Accepted' setting is disabled.
+          </Translate>
         </Message>
       )}
       {fileTypes.map(fileType => (
@@ -228,8 +268,3 @@ export default function FileTypeManager({eventId, editableType}) {
     </div>
   );
 }
-
-FileTypeManager.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  editableType: PropTypes.oneOf(Object.values(EditableType)).isRequired,
-};

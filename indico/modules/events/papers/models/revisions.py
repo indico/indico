@@ -13,6 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalRevisionMixin
 from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, PaperReviewType
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import pgettext
@@ -161,6 +162,11 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def timeline(self):
         return self.get_timeline()
 
+    @property
+    @memoize_request
+    def publishable_files(self):
+        return [pf for pf in self.files if not pf.file_type or pf.file_type.publishable]
+
     @paper.setter
     def paper(self, paper):
         self._contribution = paper.contribution
@@ -215,5 +221,5 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
                 return bool(content_review)
 
     def get_spotlight_file(self):
-        pdf_files = [paper_file for paper_file in self.files if paper_file.content_type == 'application/pdf']
+        pdf_files = [pf for pf in self.publishable_files if pf.content_type == 'application/pdf']
         return pdf_files[0] if len(pdf_files) == 1 else None

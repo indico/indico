@@ -7,7 +7,7 @@
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import api, display, management, paper, templates
+from indico.modules.events.papers.controllers import api, common, display, management, paper, templates
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -22,12 +22,21 @@ _bp.add_url_rule('/papers/api/<int:contrib_id>/comment', 'api_create_comment', a
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>',
                  'api_comment_actions', api.RHCommentActions, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
-_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit', 'api_submit_revision', api.RHSubmitNewRevision,
+_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit-single', 'submit_revision_new_single',
+                 api.RHSubmitRevisionUntyped, methods=('POST',))
+_bp.add_url_rule('/papers/api/<int:contrib_id>/paper/submit', 'submit_revision_new', api.RHSubmitRevision,
                  methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/review/<any(content,layout):review_type>', 'api_create_review',
                  api.RHCreateReview, methods=('POST',))
 _bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit',
                  'api_update_review', api.RHUpdateReview, methods=('POST',))
+
+_bp.add_url_rule('/papers/api/file-types/', 'api_file_types',
+                 common.RHPapersFileTypes)
+_bp.add_url_rule('/papers/api/file-types/', 'api_add_file_type',
+                 management.RHPapersCreateFileType, methods=('POST',))
+_bp.add_url_rule('/papers/api/file-types/<int:file_type_id>', 'api_edit_file_type',
+                 management.RHPapersEditFileType, methods=('PATCH', 'DELETE'))
 
 # Display pages
 _bp.add_url_rule('/papers/', 'call_for_papers', display.RHCallForPapers)
@@ -37,8 +46,12 @@ _bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'dow
                  display.RHDownloadPaperFile)
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
+_bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit-single', 'submit_revision_single',
+                 api.RHSubmitPaperUntyped, methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit', 'submit_revision',
-                 display.RHSubmitPaper, methods=('GET', 'POST'))
+                 api.RHSubmitPaper, methods=('POST',))
+_bp.add_url_rule('/contributions/<int:contrib_id>/paper/upload', 'api_upload',
+                 display.RHPapersUploadFile, methods=('POST',))
 
 # Reviewing area
 _bp.add_url_rule('/papers/reviewing/', 'reviewing_area', display.RHReviewingArea)
@@ -78,6 +91,9 @@ _bp.add_url_rule('/manage/papers/schedule', 'schedule_cfp', management.RHSchedul
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/open', 'open_cfp', management.RHOpenCFP, methods=('POST',))
 _bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, methods=('POST',))
+
+# File types
+_bp.add_url_rule('/manage/papers/types', 'manage_file_types', management.RHPapersManageFileTypes)
 
 # URLs available in both management and display areas
 # Note: When adding a new one here make sure to specify `defaults=defaults`

@@ -46,6 +46,10 @@
     padding: 1em;
     width: 31%;
 
+    h3 {
+      margin-bottom: 0;
+    }
+
     .file-requirements {
       font-style: italic;
       color: $gray;
@@ -65,10 +69,6 @@
         margin: 0;
       }
     }
-  }
-
-  .file-type h3 {
-    margin-bottom: 0;
   }
 }
 

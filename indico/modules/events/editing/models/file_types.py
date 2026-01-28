@@ -14,34 +14,13 @@ from indico.modules.events.editing.models.editable import EditableType
 from indico.util.string import format_repr
 
 
-class EditingFileType(db.Model):
+class BaseFileType(db.Model):
     __tablename__ = 'file_types'
-
-    @declared_attr
-    def __table_args__(cls):
-        return (
-            db.Index(
-                'ix_uq_file_types_event_id_type_name_lower',
-                cls.event_id,
-                cls.type,
-                db.func.lower(cls.name),
-                unique=True,
-            ),
-            {'schema': 'event_editing'},
-        )
+    __abstract__ = True
 
     id = db.Column(
         db.Integer,
         primary_key=True
-    )
-    event_id = db.Column(
-        db.ForeignKey('events.events.id'),
-        index=True,
-        nullable=False
-    )
-    type = db.Column(
-        PyIntEnum(EditableType),
-        nullable=False
     )
     name = db.Column(
         db.String,
@@ -72,15 +51,50 @@ class EditingFileType(db.Model):
         nullable=True
     )
 
-    event = db.relationship(
-        'Event',
-        lazy=True,
-        backref=db.backref(
-            'editing_file_types',
-            cascade='all, delete-orphan',
-            lazy=True
+    @declared_attr
+    def event_id(cls):
+        return db.Column(
+            db.ForeignKey('events.events.id'),
+            index=True,
+            nullable=False
         )
+
+    @declared_attr
+    def event(cls):
+        return db.relationship(
+            'Event',
+            lazy=True,
+            backref=db.backref(
+                cls.event_backref_name,
+                cascade='all, delete-orphan',
+                lazy=True
+            )
+        )
+
+    def __repr__(self):
+        return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
+                           publishable=False, filename_template=None, _text=self.name)
+
+
+class EditingFileType(BaseFileType):
+    event_backref_name = 'editing_file_types'
+    type = db.Column(
+        PyIntEnum(EditableType),
+        nullable=False
     )
+
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            db.Index(
+                'ix_uq_file_types_event_id_type_name_lower',
+                cls.event_id,
+                cls.type,
+                db.func.lower(cls.name),
+                unique=True,
+            ),
+            {'schema': 'event_editing'},
+        )
 
     # relationship backrefs:
     # - files (EditingRevisionFile.file_type)
@@ -89,7 +103,3 @@ class EditingFileType(db.Model):
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the file type."""
         return self.event.log(*args, meta={'editing_file_type_id': self.id}, **kwargs)
-
-    def __repr__(self):
-        return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
-                           publishable=False, filename_template=None, _text=self.name)

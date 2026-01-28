@@ -7,22 +7,25 @@
 
 from flask import request, session
 from webargs import fields, validate
-from werkzeug.exceptions import Forbidden, UnprocessableEntity
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
+from indico.modules.events.papers.controllers.display import RHSubmitPaperBase
+from indico.modules.events.papers.fields import PaperFilesField
+from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
                                                          PaperReviewType, PaperTypeProxy)
 from indico.modules.events.papers.models.revisions import PaperRevisionState
-from indico.modules.events.papers.operations import (create_comment, create_paper_revision, create_review,
-                                                     delete_comment, judge_paper, reset_paper_state, update_comment,
-                                                     update_review)
+from indico.modules.events.papers.operations import (create_comment, create_new_paper, create_paper_revision,
+                                                     create_review, delete_comment, judge_paper, reset_paper_state,
+                                                     update_comment, update_review)
 from indico.modules.events.papers.schemas import PaperSchema
 from indico.modules.events.papers.util import is_type_reviewing_possible
-from indico.modules.files.util import validate_upload_file_size
 from indico.util.i18n import _
-from indico.util.marshmallow import max_words, not_empty
-from indico.web.args import parser, use_kwargs
+from indico.util.marshmallow import FilesField, max_words, not_empty
+from indico.web.args import parser, use_kwargs, use_rh_kwargs
+from indico.web.util import jsonify_data
 
 
 class RHPaperDetails(RHPaperBase):
@@ -101,7 +104,7 @@ class RHJudgePaper(RHPaperBase):
         return '', 204
 
 
-class RHSubmitNewRevision(RHPaperBase):
+class RHSubmitRevisionBase(RHPaperBase):
     ALLOW_LOCKED = True
 
     def _check_paper_protection(self):
@@ -111,12 +114,66 @@ class RHSubmitNewRevision(RHPaperBase):
             return False
         return self.contribution.paper.state == PaperRevisionState.to_be_corrected
 
-    @use_kwargs({'files': fields.List(fields.Raw(), required=True)}, location='files')
+
+class RHSubmitRevisionUntyped(RHSubmitRevisionBase):
+    def _check_paper_protection(self):
+        if not RHSubmitRevisionBase._check_paper_protection(self):
+            return False
+
+        return not PaperFileType.query.with_parent(self.event).has_rows()
+
+    @use_rh_kwargs({
+        'files': FilesField(required=True),
+    }, rh_context=('event', 'contrib'))
     def _process(self, files):
-        if not validate_upload_file_size(*files):
-            raise UnprocessableEntity
+        create_paper_revision(self.paper, session.user, {None: files})
+        return jsonify_data(flash=False)
+
+
+class RHSubmitRevision(RHSubmitRevisionBase):
+    def _check_paper_protection(self):
+        if not RHSubmitRevisionBase._check_paper_protection(self):
+            return False
+
+        return PaperFileType.query.with_parent(self.event).has_rows()
+
+    @use_rh_kwargs({
+        'files': PaperFilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
         create_paper_revision(self.paper, session.user, files)
-        return '', 204
+        return jsonify_data(flash=False)
+
+
+class RHSubmitPaperUntyped(RHSubmitPaperBase):
+    def _check_paper_protection(self):
+        if not RHSubmitPaperBase._check_paper_protection(self):
+            return False
+
+        return not PaperFileType.query.with_parent(self.event).has_rows()
+
+    @use_rh_kwargs({
+        'files': FilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
+        # Key for files obj is 'None' as there is no FileType for single files
+        create_new_paper(self.contribution, session.user, {None: files})
+        return jsonify_data(flash=False)
+
+
+class RHSubmitPaper(RHSubmitPaperBase):
+    def _check_paper_protection(self):
+        if not RHSubmitPaperBase._check_paper_protection(self):
+            return False
+
+        return bool(PaperFileType.query.with_parent(self.event).first())
+
+    @use_rh_kwargs({
+        'files': PaperFilesField(required=True),
+    }, rh_context=('event', 'contrib'))
+    def _process(self, files):
+        create_new_paper(self.contribution, session.user, files)
+        return jsonify_data(flash=False)
 
 
 def _parse_review_args(event, review_type):

@@ -1,0 +1,21 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.single-file-type-form {
+  :global(.file-manager-file-type) {
+    width: 100%;
+    border: none;
+    padding: 0;
+
+    :global(.file-manager-dropzone) {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
