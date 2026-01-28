@@ -191,10 +191,31 @@ export function toDateString(date) {
 }
 
 export function toOptionalDate(dateString) {
-  const date = new Date(dateString);
-  if (!date.getTime()) {
+  if (!dateString) {
     return;
   }
+
+  if (dateString instanceof Date) {
+    return dateString;
+  }
+
+  // List of formats to try parsing the date string with
+  const formats = [
+    'YYYY-MM-DD', // ISO date
+    'ddd MMM DD YYYY', // toDateString() format
+    undefined, // Default parsing
+  ];
+
+  // Try parsing the date string with each format, returning the first valid one
+  const parsedDate = formats
+    .map(format => moment(dateString, format, format !== undefined))
+    .find(date => date.isValid());
+
+  if (!parsedDate) {
+    return;
+  }
+
+  const date = new Date(parsedDate.year(), parsedDate.month(), parsedDate.date());
   date.setHours(0, 0, 0, 0);
   return date;
 }

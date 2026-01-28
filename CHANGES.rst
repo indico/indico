@@ -1967,6 +1967,7 @@ Bugfixes
   :pr:`4996`, thanks :user:`vasantvohra`)
 - Do not check for event access when using a registration link with a registration token
   (:issue:`4991`, :pr:`4997`, thanks :user:`vasantvohra`)
+- Fix DatePicker selector on different timezones (:issue:`7273`, :pr:`7280`, thanks :user:`jbtwist`)
 
 
 Version 3.0rc1
