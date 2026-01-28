@@ -22,11 +22,17 @@ import {natSortCompare} from 'indico/utils/sort';
   const _categories = {};
 
   global.setupCategoryMoveButton = function setupCategoryMoveButton(parentCategoryId) {
+    console.log('[setupCategoryMoveButton] Called with parentCategoryId:', parentCategoryId);
     if (parentCategoryId) {
       _fetchSourceCategory(parentCategoryId);
     }
     $('.js-move-category').on('click', function() {
       const $this = $(this);
+      console.log('[setupCategoryMoveButton] Move button clicked:', {
+        categoryId: $this.data('categoryId'),
+        parentCategoryId,
+        href: $this.data('href'),
+      });
       _moveCategories(
         [$this.data('categoryId')],
         _categories[parentCategoryId],
@@ -347,63 +353,72 @@ import {natSortCompare} from 'indico/utils/sort';
     const sourceId = _.isObject(source) ? source.category.id : source;
     const data = {category_id: ids};
 
-    $('<div>').categorynavigator({
-      category: source,
-      confirmation: true,
-      openInDialog: true,
-      actionButtonText: $T.gettext('Move here'),
-      dialogTitle: $T.ngettext('Move category', 'Move categories', ids.length),
-      dialogSubtitle: $T
-        .ngettext(
-          'Select new category parent for the category',
-          'Select new category parent for {0} selected categories',
-          ids.length
-        )
-        .format(ids.length),
-      actionOn: {
-        categoriesWithoutCategoryManagementRights: {
-          disabled: true,
-        },
-        categoriesDescendingFrom: {
-          disabled: true,
-          ids,
-        },
-        categories: {
-          disabled: true,
-          groups: [
-            {
-              ids: [sourceId],
-              message: $T.ngettext(
+    console.log('[_moveCategories] Moving categories:', {
+      ids,
+      source,
+      sourceId,
+      endpoint,
+    });
+
+    console.log('[_moveCategories] Dispatching showcategorynavigator event');
+    window.dispatchEvent(
+      new CustomEvent('showcategorynavigator', {
+        detail: {
+          category: sourceId,
+          confirmation: true,
+          openInDialog: true,
+          actionButtonText: $T.gettext('Move here'),
+          dialogTitle: $T.ngettext('Move category', 'Move categories', ids.length),
+          dialogSubtitle: $T
+            .ngettext(
+              'Select new category parent for the category',
+              'Select new category parent for {0} selected categories',
+              ids.length
+            )
+            .format(ids.length),
+          shouldDisableAction(category) {
+            // Can't manage this category
+            if (!category.can_manage) {
+              return $T.gettext('You do not have management rights for this category');
+            }
+            // Can't move into descendants
+            if (category.parent_path && category.parent_path.some(p => ids.includes(p.id))) {
+              return $T.gettext('Cannot move a category into one of its descendants');
+            }
+            // Already in this category
+            if (category.id === sourceId) {
+              return $T.ngettext(
                 'The category is already here',
                 'The selected categories are already here',
                 ids.length
-              ),
-            },
-            {
-              ids,
-              message: $T.ngettext(
+              );
+            }
+            // Can't move into itself
+            if (ids.includes(category.id)) {
+              return $T.ngettext(
                 'This is the category you are trying to move',
                 'This is one of the categories you are trying to move',
                 ids.length
-              ),
-            },
-          ],
-        },
-      },
-      onAction(category) {
-        $.ajax({
-          url: endpoint,
-          type: 'POST',
-          data: $.extend({target_category_id: category.id}, data),
-          error: handleAjaxError,
-          success(data) {
-            if (data.success) {
-              location.reload();
+              );
             }
+            return null;
           },
-        });
-      },
-    });
+          onAction(category) {
+            $.ajax({
+              url: endpoint,
+              type: 'POST',
+              data: $.extend({target_category_id: category.id}, data),
+              error: handleAjaxError,
+              success(data) {
+                if (data.success) {
+                  location.reload();
+                }
+              },
+            });
+          },
+        },
+      })
+    );
   }
 
   function setupRolesToggle() {

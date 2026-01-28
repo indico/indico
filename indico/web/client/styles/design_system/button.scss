@@ -10,16 +10,19 @@
 @use './layout';
 @use './visibility';
 
+body {
+  --button-border-color: var(--control-border-color);
+  --button-text-color: var(--control-text-color);
+  --button-surface-color: var(--control-clickable-surface-color);
+  --button-surface-hover-color: var(--control-clickable-surface-focus-color);
+  --button-font-weight: bold;
+}
+
 %button-pressed-state {
   box-shadow: inset 0.2em 0.2em 0.2em rgba(0, 0, 0, 0.3);
 }
 
 %button-base {
-  --button-border-color: var(--control-border-color);
-  --button-text-color: var(--control-text-color);
-  --button-surface-color: var(--control-clickable-surface-color);
-  --button-surface-hover-color: var(--control-clickable-surface-focus-color);
-
   @extend %flex-inline-center;
   gap: var(--control-internal-gap);
   padding: var(--control-padding);
@@ -28,7 +31,7 @@
   color: var(--button-text-color);
   background: var(--button-surface-color);
   line-height: 1.1;
-  font-weight: bold;
+  font-weight: var(--button-font-weight);
 
   &:focus,
   &:hover {

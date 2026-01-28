@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* eslint-disable import/unambiguous */
-/* global build_url:false, handleAjaxError:false */
+/* global build_url:false, handleAjaxError:false, $T:false */
 
 (function(global) {
   global.setupCategoryPickerWidget = function setupCategoryPickerWidget(options) {
@@ -28,15 +28,16 @@
     const $dialogTrigger = $(`#categorynav-button-${options.fieldId}`);
     let hiddenData = $field.val() ? JSON.parse($field.val()) : {};
     let navigatorCategory = options.navigatorCategoryId;
-    const actionOn = {};
 
-    if (options.requireEventCreationRights) {
-      actionOn.categoriesWithoutEventCreationRights = {disabled: true};
-    }
-
-    if (options.requireCategoryManagementRights) {
-      actionOn.categoriesWithoutCategoryManagementRights = {disabled: true};
-    }
+    const shouldDisableAction = category => {
+      if (options.requireEventCreationRights && !category.can_create_events) {
+        return $T.gettext('You cannot create events in this category');
+      }
+      if (options.requireCategoryManagementRights && !category.can_manage) {
+        return $T.gettext('You do not have management rights for this category');
+      }
+      return null;
+    };
 
     if (hiddenData) {
       $categoryTitle.text(hiddenData.title);
@@ -64,26 +65,38 @@
 
     $dialogTrigger.on('click', evt => {
       evt.preventDefault();
-      $('<div>').categorynavigator({
-        category: navigatorCategory,
-        openInDialog: true,
-        actionOn,
-        onAction(category) {
-          const event = $.Event('indico:categorySelected');
-          const dfd = $.Deferred();
-          updateWarningVisibility(category);
-          $categoryTitle.text(category.title);
-          hiddenData = {id: category.id, title: category.title};
-          navigatorCategory = category.id;
-          $field.val(JSON.stringify(hiddenData)).trigger('change').trigger(event, [category, dfd]);
-          // jquery events are not compatible with normal DOM events, so we also trigger a normal
-          // one so modern code can react to it
-          $field[0].dispatchEvent(new Event('change', {bubbles: true}));
-          if (event.isDefaultPrevented()) {
-            return dfd;
-          }
-        },
-      });
+      // Extract category ID - navigatorCategory can be a number or an object
+      const categoryId =
+        typeof navigatorCategory === 'number'
+          ? navigatorCategory
+          : (navigatorCategory?.category?.id ?? 0);
+      window.dispatchEvent(
+        new CustomEvent('showcategorynavigator', {
+          detail: {
+            category: categoryId,
+            openInDialog: true,
+            shouldDisableAction,
+            onAction(category) {
+              const event = $.Event('indico:categorySelected');
+              const dfd = $.Deferred();
+              updateWarningVisibility(category);
+              $categoryTitle.text(category.title);
+              hiddenData = {id: category.id, title: category.title};
+              navigatorCategory = category.id;
+              $field
+                .val(JSON.stringify(hiddenData))
+                .trigger('change')
+                .trigger(event, [category, dfd]);
+              // jquery events are not compatible with normal DOM events, so we also trigger a normal
+              // one so modern code can react to it
+              $field[0].dispatchEvent(new Event('change', {bubbles: true}));
+              if (event.isDefaultPrevented()) {
+                return dfd;
+              }
+            },
+          },
+        })
+      );
     });
 
     function updateWarningVisibility(category) {

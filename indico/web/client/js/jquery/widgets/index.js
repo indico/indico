@@ -8,7 +8,6 @@
 import './clearableinput';
 import './ajaxcheckbox';
 import './ajaxqbubble';
-import './categorynavigator';
 import './colorpicker';
 import './dropdown';
 import './dttbutton';

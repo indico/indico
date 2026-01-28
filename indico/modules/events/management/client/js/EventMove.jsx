@@ -31,31 +31,34 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
       dialogTitle = Translate.string('Move event');
     }
 
-    $('<div>').categorynavigator({
-      category: initialCategoryId,
-      openInDialog: true,
-      dialogTitle,
-      dialogSubtitle: bulk
-        ? Translate.string('Select destination category for the selected events')
-        : Translate.string('Select destination category for the event'),
-      actionOn: {
-        categoriesWithoutEventProposalOrCreationRights: {
-          disabled: true,
+    window.dispatchEvent(
+      new CustomEvent('showcategorynavigator', {
+        detail: {
+          category: initialCategoryId,
+          openInDialog: true,
+          dialogTitle,
+          dialogSubtitle: bulk
+            ? Translate.string('Select destination category for the selected events')
+            : Translate.string('Select destination category for the event'),
+          shouldDisableAction(category) {
+            if (!category.can_create_events && !category.can_propose_events) {
+              return Translate.string('You cannot create or propose events in this category');
+            }
+            if (currentCategoryId && category.id === currentCategoryId) {
+              return Translate.string('The event is already in this category');
+            }
+            return null;
+          },
+          onAction(category) {
+            setTargetCategory({
+              id: category.id,
+              path: category.path.map(x => x.title),
+              moderated: !category.can_create_events,
+            });
+          },
         },
-        categories: {
-          disabled: true,
-          ids: currentCategoryId ? [currentCategoryId] : [],
-          message: Translate.string('The event is already in this category'),
-        },
-      },
-      onAction(category) {
-        setTargetCategory({
-          id: category.id,
-          path: category.path.map(x => x.title),
-          moderated: !category.can_create_events,
-        });
-      },
-    });
+      })
+    );
   };
 
   const eventCount = bulk ? getEventCount() : 1;

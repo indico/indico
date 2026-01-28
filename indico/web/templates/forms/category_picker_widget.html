@@ -27,6 +27,7 @@
             {%- trans %}Choose category{% endtrans -%}
         </button>
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
+        <ind-category-navigator></ind-category-navigator>
     </div>
 {% endblock %}
 

@@ -30,6 +30,17 @@
   font-weight: bold;
 }
 
+@font-face {
+  font-family: 'Roboto';
+  src: url('static:fonts/roboto/Roboto-Light-webfont.eot');
+  src: url('static:fonts/roboto/Roboto-Light-webfont.eot?#iefix') format('embedded-opentype'),
+    url('static:fonts/roboto/Roboto-Light-webfont.woff') format('woff'),
+    url('static:fonts/roboto/Roboto-Light-webfont.ttf') format('truetype'),
+    url('static:fonts/roboto/Roboto-Light-webfont.svg#Roboto') format('svg');
+  font-style: normal;
+  font-weight: 300;
+}
+
 // Roboto Light
 @font-face {
   font-family: 'Roboto Light';

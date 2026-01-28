@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import './ind_bypass_block_links.js';
+import './ind_category_navigator';
 import './ind_combobox';
 import './ind_date_picker';
 import './ind_menu.js';
