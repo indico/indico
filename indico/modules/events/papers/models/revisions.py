@@ -222,5 +222,5 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         return [paper_file for paper_file in self.files if not paper_file.file_type or paper_file.file_type.publishable]
 
     def get_spotlight_file(self):
-        pdf_files = [paper_file for paper_file in self.files if paper_file.content_type == 'application/pdf']
+        pdf_files = [paper_file for paper_file in self.publishable_files if paper_file.content_type == 'application/pdf']
         return pdf_files[0] if len(pdf_files) == 1 else None
