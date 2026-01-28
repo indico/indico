@@ -64,5 +64,12 @@ PGPASSWORD=indico psql -h postgres -U indico -d indico -c "CREATE EXTENSION IF N
 # Initialize database if needed
 indico db prepare || true
 
+# Build webpack assets if manifest doesn't exist
+if [ ! -f /opt/indico/indico/web/static/dist/manifest.json ]; then
+echo "Building webpack assets..."
+cd /opt/indico
+./bin/maintenance/build-assets.py indico --dev
+fi
+
 # Start Indico
 exec indico run -h 0.0.0.0 -p 8000 -q --enable-evalex

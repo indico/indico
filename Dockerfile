@@ -21,9 +21,6 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN pip install -e '.[dev]'
 
-# Patch to disable URL validation for Docker
-RUN sed -i 's/if url_root != config.BASE_URL:/if False and url_root != config.BASE_URL:/' /opt/indico/indico/web/flask/app.py
-
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 
