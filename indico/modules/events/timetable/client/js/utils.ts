@@ -257,25 +257,36 @@ export function sortEntriesByStartDt(entries: Entry[]): Entry[] {
   return [...entries].sort((a, b) => moment(a.startDt).diff(moment(b.startDt)));
 }
 
+/**
+ * Computes the IDs of entries that have overlapping time ranges.
+ * @param entries List of entries to check for overlaps
+ * @returns A set of entry IDs that overlap with at least one other entry
+ */
 export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
   if (!entries || entries.length <= 1) {
     return new Set<string>();
   }
 
   const entriesSchedule: {time: number; type: 'start' | 'end'; id: string}[] = [];
+  const overlaps = new Set<string>();
+  const active = new Set<string>();
+
   for (const e of entries) {
     const start = +e.startDt;
     const end = start + (e.duration || 0) * 60 * 1000;
     entriesSchedule.push({time: start, type: 'start', id: e.id});
     entriesSchedule.push({time: end, type: 'end', id: e.id});
+    // Children are checked for overlap in their own scope
+    if (e.type === EntryType.SessionBlock && (e as BlockEntry).children?.length) {
+      computeOverlappingEntryIds(e.children).forEach(id => {
+        overlaps.add(id);
+      });
+    }
   }
 
   entriesSchedule.sort(
     (a, b) => a.time - b.time || (a.type === 'end' && b.type === 'start' ? -1 : 1)
   );
-
-  const active = new Set<string>();
-  const overlaps = new Set<string>();
 
   for (const e of entriesSchedule) {
     if (e.type === 'start') {
@@ -293,3 +304,15 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
 
   return overlaps;
 }
+
+/**
+ * Flattens a list of entries to include children of block entries
+ * @param entries List of entries to flatten
+ * @returns A flattened list of entries including children of block entries
+ */
+export const flattenEntries = (entries: Entry[]): Entry[] => {
+  return entries.reduce(
+    (acc, curr) => [...acc, curr, ...((curr as BlockEntry)?.children ?? [])],
+    []
+  );
+};
