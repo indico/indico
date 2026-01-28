@@ -26,7 +26,6 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.python import PythonLexer
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import or_
-from weasyprint import CSS, HTML, default_url_fetcher
 from webargs.flaskparser import abort
 from werkzeug.exceptions import UnprocessableEntity
 
@@ -174,6 +173,7 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
 
     More info on fetchers: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#url-fetchers
     """
+    from weasyprint import default_url_fetcher
     allow_external_urls = receipts_settings.get('allow_external_urls')
 
     def _fetcher(url: str) -> dict:
@@ -237,6 +237,7 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     :param css: CSS stylesheet to include
     :return: a the rendered PDF blob
     """
+    from weasyprint import CSS, HTML
     css_url_fetcher = sandboxed_url_fetcher(event)
     html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
     try:

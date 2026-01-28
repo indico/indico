@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: indico
+      POSTGRES_USER: indico
+      POSTGRES_PASSWORD: indico
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    command: postgres -c shared_preload_libraries=pg_trgm
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  maildump:
+    image: python:3.12-slim
+    command: sh -c "pip install maildump setuptools && maildump --smtp-ip 0.0.0.0 --http-ip 0.0.0.0"
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  indico:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      INDICO_DB_URI: postgresql://indico:indico@postgres/indico
+      INDICO_REDIS_CACHE_URL: redis://redis:6379/1
+    volumes:
+      - ./indico:/opt/indico/indico
+      - ./bin:/opt/indico/bin
+      - indico_data:/opt/indico/data
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
+  indico_data:

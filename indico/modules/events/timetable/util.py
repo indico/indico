@@ -15,7 +15,6 @@ from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import contains_eager, joinedload, subqueryload, undefer
-from weasyprint import CSS, HTML
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -457,6 +456,7 @@ class TimetableExportProgramConfig:
 
 
 def create_pdf(html, css, event) -> BytesIO:
+    from weasyprint import CSS, HTML
     css_url_fetcher = sandboxed_url_fetcher(event)
     html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
     css = CSS(string=css, url_fetcher=css_url_fetcher)

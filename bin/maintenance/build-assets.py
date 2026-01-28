@@ -173,7 +173,11 @@ def build_indico(dev, clean, watch, url_root):
         _clean(webpack_build_config)
     force_url_map = ['--force'] if clean or not dev else []
     url_map_path = webpack_build_config['build']['urlMapPath']
-    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path, *force_url_map])
+    env = os.environ.copy()
+    # Ensure library paths are set for WeasyPrint on macOS
+    if 'DYLD_FALLBACK_LIBRARY_PATH' in env:
+        env['DYLD_LIBRARY_PATH'] = env.get('DYLD_LIBRARY_PATH', '') + ':' + env['DYLD_FALLBACK_LIBRARY_PATH']
+    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path, *force_url_map], env=env)
     args = _get_webpack_args(dev, watch)
     try:
         subprocess.check_call(['npx', 'webpack', *args])
@@ -229,8 +233,12 @@ def build_plugin(plugin_dir: Path, dev, clean, watch, url_root):
     dump_plugin_args = ['--plugin', webpack_build_config['plugin']]
     for name in _get_plugin_build_deps(plugin_dir):
         dump_plugin_args += ['--plugin', name]
+    env = os.environ.copy()
+    # Ensure library paths are set for WeasyPrint on macOS
+    if 'DYLD_FALLBACK_LIBRARY_PATH' in env:
+        env['DYLD_LIBRARY_PATH'] = env.get('DYLD_LIBRARY_PATH', '') + ':' + env['DYLD_FALLBACK_LIBRARY_PATH']
     subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path,
-                           *dump_plugin_args, *force_url_map])
+                           *dump_plugin_args, *force_url_map], env=env)
     webpack_config_file = plugin_dir / 'webpack.config.mjs'
     if not webpack_config_file.exists():
         webpack_config_file = 'plugin.webpack.config.mjs'

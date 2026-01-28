@@ -148,7 +148,7 @@ idna==3.11
     # via
     #   email-validator
     #   requests
-importlib-metadata==8.7.1
+importlib-metadata>=6.0,<=8.7.1
     # via flask-pluginengine
 indico-fonts==1.2
     # via -r requirements.in
@@ -389,7 +389,7 @@ werkzeug==3.1.5
     #   -r requirements.in
     #   flask
     #   flask-cors
-wrapt==2.0.1
+wrapt>=1.0.0,<=2.0.1
     # via deprecated
 wtforms==3.2.1
     # via
