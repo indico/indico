@@ -72,8 +72,10 @@ click-repl==0.3.0
     # via celery
 colorclass==2.2.2
     # via -r requirements.in
-cryptography==46.0.3
-    # via authlib
+cryptography==46.0.4
+    # via
+    #   authlib
+    #   google-auth
 cssselect2==0.8.0
     # via weasyprint
 decorator==5.2.1
@@ -132,9 +134,9 @@ flask-wtf==1.2.2
     # via -r requirements.in
 fonttools==4.61.1
     # via weasyprint
-google-auth==2.47.0
+google-auth==2.48.0
     # via -r requirements.in
-greenlet==3.3.0
+greenlet==3.3.1
     # via sqlalchemy
 hiredis==3.3.0
     # via redis
@@ -262,7 +264,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
 pynpm==0.3.0
     # via pywebpack
-pypdf==6.6.0
+pypdf==6.6.2
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
@@ -371,7 +373,7 @@ vine==5.1.0
     #   kombu
 wallet-py3k==0.0.4
     # via -r requirements.in
-wcwidth==0.3.1
+wcwidth==0.5.0
     # via prompt-toolkit
 weasyprint==65.1
     # via -r requirements.in
