@@ -3,10 +3,10 @@
         <div class="flexrow">
             {% set spotlight_file = paper.last_revision.get_spotlight_file() %}
             {% if spotlight_file %}
-                {% set only_spotlight = paper.last_revision.files | length == 1 %}
+                {% set only_spotlight = paper.last_revision.publishable_files | length == 1 %}
                 {{ _render_spotlight_file(spotlight_file, full_width=only_spotlight and not contribution_page) }}
                 {% if not only_spotlight %}
-                    {{ _render_paper_files(paper.last_revision.files, spotlight_file) }}
+                    {{ _render_paper_files(paper.last_revision.publishable_files, spotlight_file) }}
                 {% endif %}
             {% else %}
                 <div class="paper-files-list flexrow f-a-baseline">
@@ -19,7 +19,7 @@
                         {% endif %}
                         {%- trans %}Paper files:{% endtrans -%}
                     </div>
-                    {{ _render_paper_files(paper.last_revision.files, full_width=true) }}
+                    {{ _render_paper_files(paper.last_revision.publishable_files, full_width=true) }}
                 </div>
             {% endif %}
         </div>

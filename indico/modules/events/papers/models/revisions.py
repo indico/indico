@@ -160,6 +160,10 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     @property
     def timeline(self):
         return self.get_timeline()
+    
+    @property
+    def publishable_files(self):
+        return self.get_publishable_files()
 
     @paper.setter
     def paper(self, paper):
@@ -213,6 +217,9 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
                 return bool(layout_review)
             elif user in self._contribution.paper_content_reviewers:
                 return bool(content_review)
+
+    def get_publishable_files(self):
+        return [paper_file for paper_file in self.files if not paper_file.file_type or paper_file.file_type.publishable]
 
     def get_spotlight_file(self):
         pdf_files = [paper_file for paper_file in self.files if paper_file.content_type == 'application/pdf']
