@@ -17,6 +17,7 @@ import {
   minutesToPixels,
   sortEntriesByStartDt,
   computeOverlappingEntryIds,
+  flattenEntries,
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -169,7 +170,10 @@ export const getCurrentDayEntriesWithoutOverlap = createSelector(
   getCurrentDayEntriesSorted,
   entries => {
     const overlaps = computeOverlappingEntryIds(entries);
-    return entries.filter(e => !overlaps.has(e.id)).map(e => e.id);
+
+    return flattenEntries(entries)
+      .map(e => e.id)
+      .filter(id => !overlaps.has(id));
   }
 );
 

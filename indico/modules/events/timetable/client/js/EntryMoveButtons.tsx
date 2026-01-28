@@ -30,7 +30,8 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
   const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
-  const isOverlapping = !useSelector(selectors.getCurrentDayEntriesWithoutOverlap).includes(id);
+  const entriesWithoutOverlap = useSelector(selectors.getCurrentDayEntriesWithoutOverlap);
+  const isOverlapping = !entriesWithoutOverlap.includes(id);
   const currentDateEntries = entries[dtKey];
   const parent = sessionBlockId
     ? (currentDateEntries.find(e => e.id === sessionBlockId) as BlockEntry)
@@ -66,6 +67,19 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
       } else if (targetEnd.isSameOrBefore(feStart) && (!below || feStart.isBefore(below.startDt))) {
         below = fe;
       }
+    }
+
+    const aboveShouldSwap =
+      above && moment(above.startDt).add(above.duration, 'minutes').isSame(targetStart);
+    const belowShouldSwap = below && moment(below.startDt).isSame(targetEnd);
+
+    // Ensure that we only consider non-overlapping entries for swaps
+    if (aboveShouldSwap && !entriesWithoutOverlap.includes(above.id)) {
+      above = null;
+    }
+
+    if (belowShouldSwap && !entriesWithoutOverlap.includes(below.id)) {
+      below = null;
     }
 
     return [above, below];
