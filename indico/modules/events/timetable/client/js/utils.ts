@@ -252,3 +252,44 @@ export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
 }
+
+export function sortEntriesByStartDt(entries: Entry[]): Entry[] {
+  return [...entries].sort((a, b) => moment(a.startDt).diff(moment(b.startDt)));
+}
+
+export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
+  if (!entries || entries.length <= 1) {
+    return new Set<string>();
+  }
+
+  const entriesSchedule: {time: number; type: 'start' | 'end'; id: string}[] = [];
+  for (const e of entries) {
+    const start = +e.startDt;
+    const end = start + (e.duration || 0) * 60 * 1000;
+    entriesSchedule.push({time: start, type: 'start', id: e.id});
+    entriesSchedule.push({time: end, type: 'end', id: e.id});
+  }
+
+  entriesSchedule.sort(
+    (a, b) => a.time - b.time || (a.type === 'end' && b.type === 'start' ? -1 : 1)
+  );
+
+  const active = new Set<string>();
+  const overlaps = new Set<string>();
+
+  for (const e of entriesSchedule) {
+    if (e.type === 'start') {
+      if (active.size > 0) {
+        overlaps.add(e.id);
+        for (const id of active) {
+          overlaps.add(id);
+        }
+      }
+      active.add(e.id);
+    } else {
+      active.delete(e.id);
+    }
+  }
+
+  return overlaps;
+}
