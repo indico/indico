@@ -9,8 +9,16 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {EntryType, ReduxState, Session} from './types';
-import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
+import {BlockEntry, EntryType, ReduxState, Session} from './types';
+import {
+  DAY_SIZE,
+  getDiffInDays,
+  getDateKey,
+  minutesToPixels,
+  sortEntriesByStartDt,
+  computeOverlappingEntryIds,
+  flattenEntries,
+} from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -110,6 +118,33 @@ export const getCurrentDayEntries = createSelector(
   getDayEntries,
   getCurrentDate,
   (entries, currentDate) => entries[getDateKey(currentDate)]
+);
+
+export const getCurrentDayEntriesSorted = createSelector(
+  getCurrentDayEntries,
+  entries =>
+    sortEntriesByStartDt(
+      [...entries].map(e => {
+        if (e.type === EntryType.SessionBlock && e?.children?.length) {
+          return {
+            ...e,
+            children: sortEntriesByStartDt(e.children),
+          } as BlockEntry;
+        }
+        return e;
+      })
+    )
+);
+
+export const getCurrentDayEntriesWithoutOverlap = createSelector(
+  getCurrentDayEntriesSorted,
+  entries => {
+    const overlaps = computeOverlappingEntryIds(entries);
+
+    return flattenEntries(entries)
+      .map(e => e.id)
+      .filter(id => !overlaps.has(id));
+  }
 );
 
 export const getUnscheduled = createSelector(
