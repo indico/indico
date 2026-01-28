@@ -43,10 +43,6 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   const targetStart = moment(startDt);
   const targetEnd = moment(startDt).add(duration, 'minutes');
 
-  // TODO: (Ajob) Evaluate if we want to disable support for moving entries within groups
-  //              (overlapping directly/indirectly). If so we can sort the entries instead
-  //              and calculate overlap to disable the buttons accordingly. Still would work
-  //              for above/below calculation.
   const _getAdjacentEntries = () => {
     let above: Entry | null = null;
     let below: Entry | null = null;
