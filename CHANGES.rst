@@ -34,7 +34,7 @@ Improvements
   config option (:issue:`7210`, :pr:`7251`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add a UI for managing predefined affiliations (:pr:`7183`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
-- Add support for configurable file types in Paper Peer Reviewing (:pr:`7156`)
+- Add support for configurable file types in Paper Peer Reviewing (:issue:`7162`, :pr:`7156`)
 
 Bugfixes
 ^^^^^^^^
