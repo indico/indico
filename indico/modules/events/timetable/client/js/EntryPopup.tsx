@@ -152,7 +152,7 @@ function EntryPopupContent({
   const onExpand = (e: MouseEvent) => {
     e.stopPropagation();
     onClose();
-    dispatch(actions.expandSessionBlock(entry.id));
+    dispatch(actions.setExpandedSessionBlock(entry.id));
   };
 
   const locationArray = _getOrderedLocationArray();

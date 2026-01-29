@@ -311,7 +311,9 @@ export function toggleDraft(): ToggleDraftAction {
   return {type: TOGGLE_DRAFT};
 }
 
-export function expandSessionBlock(sessionBlockId: string | null): SetExpandedSessionBlockIdAction {
+export function setExpandedSessionBlock(
+  sessionBlockId: string | null
+): SetExpandedSessionBlockIdAction {
   return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId};
 }
 

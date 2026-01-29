@@ -8,16 +8,56 @@
 import moment, {Moment} from 'moment';
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon, Menu} from 'semantic-ui-react';
+import {Button, Header, Icon, Label, Menu} from 'semantic-ui-react';
 
 import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
+import {ReduxState} from './types';
 import {getDiffInDays} from './utils';
 
 import './Toolbar.module.scss';
+
+function SessionBlockToolbar() {
+  const dispatch = useDispatch();
+  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const {title, colors, sessionId} = expandedSessionBlock ?? {};
+  // (Ajob) Did not want to use sessionTitle property to get title, as
+  //        it would not change when a session is changed in the future due
+  //        to it simply being an appended value.
+  const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+
+  if (!expandedSessionBlock) {
+    return null;
+  }
+
+  const sessionColors = {
+    backgroundColor: `${colors.backgroundColor}55`,
+    color: colors.color,
+  };
+
+  return (
+    <Menu tabular styleName="timetable-bar block">
+      <Label size="small" styleName="session" style={{...sessionColors}}>
+        {session.title}
+      </Label>
+      <Header as="h3" styleName="header">
+        <span>{title}</span>
+      </Header>
+      <Button
+        basic
+        size="mini"
+        onClick={() => dispatch(actions.setExpandedSessionBlock(null))}
+        styleName="close-btn"
+      >
+        <Icon name="close" />
+        <Translate>Close session block view</Translate>
+      </Button>
+    </Menu>
+  );
+}
 
 export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
@@ -32,7 +72,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
-  const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
+  const currentEntries = useSelector(selectors.getCurrentEntries);
+  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const currentDayIdx = getDiffInDays(eventStart, currentDate);
@@ -85,7 +126,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
       : moment(currentDate)
           .endOf('day')
           .subtract(19 * 60 + 59, 'seconds');
-    const currentDayEntryEndDts = currentDayEntries.map(e =>
+    const currentDayEntryEndDts = currentEntries.map(e =>
       moment(e.startDt).add(e.duration, 'minutes')
     );
     const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
@@ -157,7 +198,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
                          Evaluate necessity then remove or fix */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
       </Menu>
-      {numDays > 1 && (
+      {expandedSessionBlock && <SessionBlockToolbar />}
+      {!expandedSessionBlock && numDays > 1 && (
         <Menu tabular styleName="timetable-bar">
           {numDays > 2 && (
             <Menu.Item
