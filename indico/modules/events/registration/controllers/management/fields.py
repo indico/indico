@@ -48,6 +48,10 @@ class GeneralFieldDataSchema(mm.Schema):
     @no_autoflush
     def _check_unique_title_in_section(self, title, **kwargs):
         field = self.context['field']
+        if field.id and not field.is_enabled:
+            # When editing an existing field that's disabled, do not check for uniqueness.
+            # field.is_enabled is None for a new field (not flushed to the DB yet so no defaults set)
+            return
         query = (RegistrationFormItem.query
                  .filter(RegistrationFormItem.parent_id == field.parent.id,
                          db.func.lower(RegistrationFormItem.title) == title.lower(),
