@@ -87,25 +87,6 @@ export const getSessionById = createSelector(
   (sessions, id) => sessions[id]
 );
 
-export const getCurrentLimits = createSelector(
-  getCurrentDate,
-  getEventStartDt,
-  getEventEndDt,
-  (currentDate: Moment, startDt: Moment, endDt: Moment): [number, number] => {
-    const limits: [number, number] = [0, DAY_SIZE];
-
-    if (startDt.isSame(currentDate, 'day')) {
-      limits[0] = minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes());
-    }
-
-    if (endDt.isSame(currentDate, 'day')) {
-      limits[1] = minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes());
-    }
-
-    return limits;
-  }
-);
-
 export const getCurrentDayEntries = createSelector(
   getDayEntries,
   getCurrentDate,
@@ -123,6 +104,36 @@ export const getExpandedSessionBlock = createSelector(
   (sessionBlockId, entries) =>
     entries.find(entry => entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) ??
     null
+);
+
+export const getCurrentLimits = createSelector(
+  getCurrentDate,
+  getEventStartDt,
+  getEventEndDt,
+  getExpandedSessionBlock,
+  (
+    currentDate: Moment,
+    startDt: Moment,
+    endDt: Moment,
+    sessionBlock: BlockEntry
+  ): [number, number] => {
+    const limits: [number, number] = [0, DAY_SIZE];
+
+    if (sessionBlock) {
+      startDt = moment(sessionBlock.startDt);
+      endDt = moment(sessionBlock.startDt).add(sessionBlock.duration, 'minutes');
+    }
+
+    if (startDt.isSame(currentDate, 'day')) {
+      limits[0] = minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes());
+    }
+
+    if (endDt.isSame(currentDate, 'day')) {
+      limits[1] = minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes());
+    }
+
+    return limits;
+  }
 );
 
 export const getCurrentEntries = createSelector(
