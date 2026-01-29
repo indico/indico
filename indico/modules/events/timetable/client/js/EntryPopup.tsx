@@ -148,6 +148,13 @@ function EntryPopupContent({
     deleteEntry();
   };
 
+  // Only for Session Blocks
+  const onExpand = (e: MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+    dispatch(actions.expandSessionBlock(entry.id));
+  };
+
   const locationArray = _getOrderedLocationArray();
   let presenters;
   if (type !== EntryType.Break) {
@@ -253,15 +260,9 @@ function EntryPopupContent({
       <Card.Content styleName="actions" textAlign="right">
         {type === EntryType.SessionBlock && (
           <>
-            {/* TODO: (Ajob) Evaluate this feature */}
             <ActionPopup
-              content={<Translate>Edit session protection</Translate>}
-              trigger={<Button disabled basic icon="shield" />}
-            />
-            {/* TODO: (Ajob) Evaluate this feature */}
-            <ActionPopup
-              content={<Translate>Edit session</Translate>}
-              trigger={<Button disabled basic icon="calendar alternate outline" />}
+              content={<Translate>Go to session block timetable</Translate>}
+              trigger={<Button basic icon="expand" onClick={onExpand} />}
             />
             <ActionPopup
               content={<Translate>Add new child</Translate>}

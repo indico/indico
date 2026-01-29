@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {EntryType, ReduxState, Session} from './types';
+import {BlockEntry, EntryType, ReduxState, Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -110,6 +110,25 @@ export const getCurrentDayEntries = createSelector(
   getDayEntries,
   getCurrentDate,
   (entries, currentDate) => entries[getDateKey(currentDate)]
+);
+
+export const getExpandedSessionBlockId = createSelector(
+  getNavigation,
+  navigation => navigation.expandedSessionBlockId
+);
+
+export const getExpandedSessionBlock = createSelector(
+  getExpandedSessionBlockId,
+  getCurrentDayEntries,
+  (sessionBlockId, entries) =>
+    entries.find(entry => entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) ??
+    null
+);
+
+export const getCurrentEntries = createSelector(
+  getCurrentDayEntries,
+  getExpandedSessionBlock,
+  (entries, sessionBlock: BlockEntry) => sessionBlock?.children ?? entries
 );
 
 export const getUnscheduled = createSelector(
