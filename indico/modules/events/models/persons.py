@@ -167,7 +167,25 @@ class EventPerson(PersonMixin, db.Model):
         nullable=False,
         default=False
     )
+    speaker_photo_file_id = db.Column(
+        db.Integer,
+        db.ForeignKey('indico.files.id'),
+        nullable=True,
+    )
+    speaker_description = db.Column(
+        db.Text,
+        nullable=True,
+    )
 
+    speaker_photo = db.relationship(
+        'File',
+        lazy=False,
+        backref=db.backref(
+            'speaker_photos',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
     event = db.relationship(
         'Event',
         lazy=True,

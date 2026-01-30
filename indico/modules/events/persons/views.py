@@ -12,3 +12,9 @@ class WPManagePersons(WPEventManagement):
     template_prefix = 'events/persons/'
     sidemenu_option = 'persons'
     bundles = ('module_events.persons.js',)
+
+
+class WPManageSpeakers(WPEventManagement):
+    template_prefix = 'events/persons/'
+    sidemenu_option = 'speakers'
+    bundles = ('module_events.persons.js', 'module_events.persons.css')

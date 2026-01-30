@@ -1,0 +1,9 @@
+{% extends 'events/management/base.html' if event.type == 'lecture' else 'events/management/full_width_base.html' %}
+
+{% block title %}
+    {% trans %}Speakers{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <ind-speakers event-id="{{event.id}}"></ind-speakers>
+{% endblock %}

@@ -122,3 +122,13 @@ class EventPersonUpdateSchema(EventPersonSchema):
         restricted = user_management_settings.get('only_predefined_affiliations')
         if restricted and data.get('affiliation') and not data.get('affiliation_link'):
             raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')
+
+
+class SpeakerSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventPerson
+        fields = ('id', 'email', 'name', 'first_name', 'last_name', 'speaker_photo_url', 'speaker_description',
+                  'avatar_url')
+
+    avatar_url = fields.String(attribute='user.avatar_url')
+    speaker_photo_url = fields.String(attribute='speaker_photo.signed_download_url', default=None)

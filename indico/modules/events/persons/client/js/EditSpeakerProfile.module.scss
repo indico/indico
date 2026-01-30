@@ -5,6 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'indico/react/components/AffiliationPopup';
-import './EditEventPerson';
-import './Speakers';
+.centered-field {
+  div {
+    justify-content: center;
+  }
+}
+
+.image-button {
+  padding: 0 !important;
+  margin: 0 0 1em 0 !important;
+}
+
+.invisible {
+  display: none;
+}
