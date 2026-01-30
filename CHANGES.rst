@@ -54,6 +54,8 @@ Bugfixes
 - Fix unique title validation for disabled regform fields (:pr:`7277`)
 - Fix DatePicker min/max limits being affected by client timezone (:issue:`7273`, :pr:`7280`,
   thanks :user:`jbtwist`)
+- Fix validation error when choosing exactly the maximum date in a regform date field
+  (:pr:`7288`)
 
 Accessibility
 ^^^^^^^^^^^^^

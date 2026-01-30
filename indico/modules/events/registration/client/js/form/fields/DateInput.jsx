@@ -138,6 +138,8 @@ export default function DateInput({
     } else if (/^\d{4}$/.test(dateTime)) {
       dateTime += '-01-01';
     }
+    // get rid of the time suffix, it breaks the string-based comparison
+    dateTime = dateTime.replace(/T\d{2}:\d{2}:\d{2}$/, '');
     if (minDate && dateTime && dateTime < minDate) {
       return Translate.string('The provided date cannot be earlier than {minDate}.', {minDate});
     }
