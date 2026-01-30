@@ -365,7 +365,7 @@ export function DayTimetable({
       calendar.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour, limits]);
 
   useEffect(() => {
     if (wrapperRef.current) {
