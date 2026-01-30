@@ -53,6 +53,11 @@ interface DayTimetableProps {
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  // (Ajob) In session block view, children become top-level entries
+  const parent = useSelector(selectors.getExpandedSessionBlock);
+  const parentEndDt = parent
+    ? moment(parent.startDt).add(parent.duration, 'minutes').format()
+    : null;
 
   const setDurations = useMemo(() => {
     const obj = {};
@@ -87,7 +92,12 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
             {...entry}
           />
         ) : (
-          <DraggableEntry key={entry.id} setDuration={setDurations[entry.id]} {...entry} />
+          <DraggableEntry
+            key={entry.id}
+            setDuration={setDurations[entry.id]}
+            parentEndDt={parentEndDt}
+            {...entry}
+          />
         )
       )}
     </>
