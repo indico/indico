@@ -9,3 +9,4 @@ import './impersonation';
 import './session_bar';
 import './session_expiry';
 import './top_bars';
+import './DeletionDialog';
