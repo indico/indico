@@ -752,3 +752,17 @@ class RHCategoryClosestEvent(RHCategoryRelativeEventBase):
         filter_ = True
         order = db.func.abs(db.func.extract('epoch', now_utc() - Event.start_dt)), Event.id
         return filter_, order
+
+
+class RHFibonacci(RH):
+    def fibonacci(self, n, call_count):
+        call_count[0] += 1
+        if n <= 1:
+            return n
+        return self.fibonacci(n - 1, call_count) + self.fibonacci(n - 2, call_count)
+
+    def _process(self):
+        n = int(request.args.get('n', 15))
+        call_count = [0]
+        result = self.fibonacci(n, call_count)
+        return jsonify_data(n=n, result=result, call_count=call_count[0], flash=False)

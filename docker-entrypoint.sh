@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
 
-# Create necessary directories
-mkdir -p /opt/indico/data/log /opt/indico/data/cache /opt/indico/data/tmp /opt/indico/data/archive
+POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-indico}
 
-# Check if config exists
+# Create directories
+mkdir -p /opt/indico/data/{log,cache,tmp,archive}
+
+# Create Indico configuration
 if [ ! -f /opt/indico/indico.conf ]; then
-    echo "Creating default Indico configuration..."
     cat > /opt/indico/indico.conf <<EOF
 SQLALCHEMY_DATABASE_URI = '${INDICO_DB_URI}'
 REDIS_CACHE_URL = '${INDICO_REDIS_CACHE_URL}'
@@ -21,11 +23,13 @@ LOG_DIR = '/opt/indico/data/log'
 LOGGING_CONFIG_FILE = '/opt/indico/logging-docker.yaml'
 NO_REPLY_EMAIL = 'noreply@localhost'
 SUPPORT_EMAIL = 'support@localhost'
+SMTP_SERVER = ('${INDICO_SMTP_SERVER}', ${INDICO_SMTP_PORT})
+SMTP_USE_TLS = False
 DEBUG = True
 EOF
 fi
 
-# Create simplified logging config for Docker
+# Create logging configuration
 if [ ! -f /opt/indico/logging-docker.yaml ]; then
     cat > /opt/indico/logging-docker.yaml <<'EOF'
 version: 1
@@ -34,8 +38,6 @@ root:
   handlers: [console]
 loggers:
   indico:
-    handlers: [console]
-  celery:
     handlers: [console]
 handlers:
   console:
@@ -47,29 +49,22 @@ formatters:
 EOF
 fi
 
-# Set config path
 export INDICO_CONFIG=/opt/indico/indico.conf
 
-# Wait for postgres
-until PGPASSWORD=indico psql -h postgres -U indico -d indico -c '\q' 2>/dev/null; do
+# Wait for PostgreSQL
+until PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U indico -d indico -c '\q' 2>/dev/null; do
   echo "Waiting for PostgreSQL..."
   sleep 1
 done
 
-# Create extensions
-echo "Creating PostgreSQL extensions..."
-PGPASSWORD=indico psql -h postgres -U indico -d indico -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;" || true
-PGPASSWORD=indico psql -h postgres -U indico -d indico -c "CREATE EXTENSION IF NOT EXISTS unaccent;" || true
-
-# Initialize database if needed
+# Initialize database
+PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U indico -d indico -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;" 2>/dev/null || true
+PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U indico -d indico -c "CREATE EXTENSION IF NOT EXISTS unaccent;" 2>/dev/null || true
 indico db prepare || true
 
-# Build webpack assets if manifest doesn't exist
-if [ ! -f /opt/indico/indico/web/static/dist/manifest.json ]; then
-echo "Building webpack assets..."
-cd /opt/indico
-./bin/maintenance/build-assets.py indico --dev
-fi
-
-# Start Indico
-exec indico run -h 0.0.0.0 -p 8000 -q --enable-evalex
+echo "Starting Indico without instrumentation..."
+exec python3 -c "
+from indico.web.flask.app import make_app
+app = make_app()
+app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
+"
