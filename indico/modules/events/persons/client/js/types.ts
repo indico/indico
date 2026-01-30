@@ -5,6 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'indico/react/components/AffiliationPopup';
-import './EditEventPerson';
-import './Speakers';
+export interface Speaker {
+  id: number;
+  email: string;
+  name: string;
+  first_name: string;
+  last_name: string;
+  speaker_description: string | null;
+  speaker_photo_url: string | null;
+  avatar_url: string;
+}
