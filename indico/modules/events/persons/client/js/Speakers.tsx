@@ -28,9 +28,10 @@ import {
   EditSpeakerFormData,
   EditSpeakerProfile,
 } from 'indico/modules/events/persons/EditSpeakerProfile';
+import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import {Speaker} from './types';
 import './Speakers.module.scss';
@@ -81,7 +82,7 @@ export function Speakers({eventId}: {eventId: number}) {
         ]);
         reFetch();
       } catch (e) {
-        handleAxiosError(e);
+        return handleSubmitError(e);
       }
     },
     [selectedSpeaker, eventId, reFetch]
