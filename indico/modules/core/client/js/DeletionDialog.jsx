@@ -47,7 +47,14 @@ const DeleteDialog = ({
   }, [open]);
 
   return (
-    <Modal size="small" open={open} onClose={onClose} closeIcon={!isDeleting}>
+    <Modal
+      size="small"
+      open={open}
+      onClose={onClose}
+      closeIcon={!isDeleting}
+      closeOnEscape={!isDeleting}
+      closeOnDimmerClick={!isDeleting}
+    >
       <Modal.Header>{title}</Modal.Header>
       <Modal.Content>
         <Message negative icon>
