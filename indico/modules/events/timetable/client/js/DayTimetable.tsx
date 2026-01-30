@@ -127,6 +127,8 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
+  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const isDragging = draggingStartPos !== null;
@@ -184,25 +186,31 @@ export function DayTimetable({
     mouse: MousePosition,
     offset
   ) {
-    const [newLayout, newUnscheduled, startDt] =
-      layoutAfterUnscheduledDrop(
-        dt,
-        unscheduled,
-        entries,
-        who,
-        over,
-        delta,
-        mouse,
-        offset,
-        eventStartDt,
-        eventEndDt
-      ) || [];
-    if (!newLayout) {
-      return;
+    const sessionBlockId = expandedSessionBlock?.id;
+
+    if (sessionBlockId) {
+      handleUnscheduledDropOnBlock(who, {...over, id: sessionBlockId}, delta, mouse, offset, over);
+    } else {
+      const [newLayout, newUnscheduled, startDt] =
+        layoutAfterUnscheduledDrop(
+          dt,
+          unscheduled,
+          currentDayEntries,
+          who,
+          over,
+          delta,
+          mouse,
+          offset,
+          eventStartDt,
+          eventEndDt
+        ) || [];
+      if (!newLayout) {
+        return;
+      }
+      // TODO(tomas): use something better than 'unscheduled-' prefix
+      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
     }
-    // TODO(tomas): use something better than 'unscheduled-' prefix
-    const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-    dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
   }
 
   function handleUnscheduledDropOnBlock(
@@ -217,7 +225,7 @@ export function DayTimetable({
       layoutAfterUnscheduledDropOnBlock(
         dt,
         unscheduled,
-        entries,
+        currentDayEntries,
         who,
         over,
         delta,
@@ -238,8 +246,34 @@ export function DayTimetable({
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
+    const sessionBlockId = expandedSessionBlock?.id;
+    if (sessionBlockId) {
+      const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+        currentDayEntries,
+        who,
+        {...over, id: sessionBlockId},
+        delta,
+        mouse,
+        over
+      );
+      dispatch(
+        actions.changeEntryLayout(
+          movedEntry,
+          newLayout,
+          getDateKey(dt),
+          expandedSessionBlock?.objId
+        )
+      );
+    } else {
+      const [newLayout, movedEntry] = layoutAfterDropOnCalendar(
+        currentDayEntries,
+        who,
+        over,
+        delta,
+        mouse
+      );
+      dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
+    }
   }
 
   function handleDropOnBlock(
