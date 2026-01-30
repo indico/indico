@@ -119,17 +119,25 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   };
 
   const addNewEntry = () => {
-    const minDt =
-      currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day').hour(8);
-    const maxDt = reachedLastDay
-      ? moment(eventEnd).subtract(defaultContributionDuration, 'minutes')
-      : moment(currentDate)
-          .endOf('day')
-          .subtract(19 * 60 + 59, 'seconds');
-    const currentDayEntryEndDts = currentEntries.map(e =>
+    let minDt, maxDt;
+
+    if (expandedSessionBlock) {
+      // Adding entry inside a session block
+      minDt = moment(expandedSessionBlock.startDt);
+      maxDt = moment(expandedSessionBlock.startDt).add(expandedSessionBlock.duration, 'minutes');
+    } else {
+      minDt = currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day').hour(8);
+      maxDt = reachedLastDay
+        ? moment(eventEnd).subtract(defaultContributionDuration, 'minutes')
+        : moment(currentDate)
+            .endOf('day')
+            .subtract(19 * 60 + 59, 'seconds');
+    }
+
+    const currentEntryEndDts = currentEntries.map(e =>
       moment(e.startDt).add(e.duration, 'minutes')
     );
-    const newDt = moment.min(maxDt, moment.max(minDt, ...currentDayEntryEndDts));
+    const newDt = moment.min(maxDt, moment.max(minDt, ...currentEntryEndDts));
     const draftEntry = {
       startDt: newDt,
       duration: defaultContributionDuration,
