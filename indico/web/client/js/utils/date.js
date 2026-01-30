@@ -211,9 +211,7 @@ export function toOptionalDate(dateString) {
   ];
 
   // Parses the date string with each format, returning the first valid one
-  const parsedDate = formats
-    .map(format => moment(dateString, format))
-    .find(date => date.isValid());
+  const parsedDate = formats.map(format => moment(dateString, format)).find(date => date.isValid());
 
   if (!parsedDate) {
     return;
