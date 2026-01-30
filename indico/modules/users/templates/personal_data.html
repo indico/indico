@@ -35,7 +35,7 @@
                                                delete-url="{{ url_for('users.user_delete', user) }}"
                                                redirect-url="{{ url_for('users.users_admin') }}">
                                 {% trans %}Once deleted, the following will happen:{% endtrans %}
-                                <div class="vertical-padding-medium">
+                                <div class="user-deletion-warnings">
                                     <ul class="ui list">
                                         <li class="item">
                                             <i class="minus circle icon"></i>

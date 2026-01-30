@@ -186,7 +186,12 @@
   font-size: 1.05em;
 }
 
-.vertical-padding-medium {
+.user-deletion-warnings {
   padding-top: 15px;
   padding-bottom: 15px;
+
+  > ul > li::before {
+    /* hide fake list bullet from SUI */
+    display: none;
+  }
 }

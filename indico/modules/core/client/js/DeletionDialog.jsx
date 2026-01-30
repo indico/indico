@@ -68,7 +68,13 @@ const DeleteDialog = ({
         </Message>
         <div dangerouslySetInnerHTML={{__html: childrenHTML}} />
         <div>
-          <Translate as="p">Are you sure you want to delete {recordName}?</Translate>
+          <Translate as="p">
+            Are you sure you want to delete{' '}
+            <Param name="recordName" wrapper={<strong />}>
+              {recordName}
+            </Param>
+            ?
+          </Translate>
         </div>
       </Modal.Content>
       <Modal.Actions>
