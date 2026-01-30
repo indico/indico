@@ -1,0 +1,17 @@
+{% extends 'events/management/full_width_base.html' %}
+{% from 'events/timetable/_timetable.html' import render_timetable %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+
+{%- block banner -%}{%- endblock -%}
+{%- block title -%}{%- endblock -%}
+
+{% block content %}
+    <div id="timetable-container"
+         data-timetable-data="{{ timetable_data | tojson | forceescape }}"
+         data-event-info="{{ event_info | tojson | forceescape }}"
+         data-custom-links="{{ custom_links | tojson | forceescape }}"
+         data-search-token="{{ make_user_search_token() }}"></div>
+    <script>
+        setupTimetable();
+    </script>
+{% endblock %}

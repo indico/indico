@@ -10,6 +10,7 @@ import re
 from datetime import datetime, time, timedelta
 from uuid import UUID
 
+import pytz
 import yaml
 from dateutil import parser, relativedelta
 from marshmallow import Schema, ValidationError, fields
@@ -450,6 +451,34 @@ class HumanizedDate(fields.Field):
             today = now_utc(False)
             number = int(m.group('number'))
             return today + relativedelta.relativedelta(**{HUMANIZED_UNIT_MAP[unit]: number})
+
+
+class EventTimezoneDateTimeField(fields.DateTime):
+    """Marshmallow field for dealing with dates in the event's timezone.
+
+    The event should be passed in the schema's context as 'event'.
+    Since times in Indico typically have a granularity of minutes, any time
+    that contains seconds (or microseconds) will be rejected.
+    """
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        new_value = value.astimezone(self.context['event'].tzinfo).replace(tzinfo=None)
+        return super()._serialize(new_value, attr, obj, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if value is None:
+            return None
+        dt = super()._deserialize(value, attr, data, **kwargs)
+        if dt.second or dt.microsecond:
+            raise self.make_error('invalid', input=value, obj_type=self.OBJ_TYPE)
+        event_tz = self.context['event'].tzinfo
+        if dt.tzinfo is None:
+            localized = event_tz.localize(dt)
+        else:
+            localized = dt.astimezone(event_tz)
+        return localized.astimezone(pytz.utc)
 
 
 class FilesField(ModelList):

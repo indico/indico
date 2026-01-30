@@ -14,7 +14,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events import EventLogRealm
-from indico.modules.events.sessions.operations import update_session_block
+from indico.modules.events.sessions.operations import create_session_block, update_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -39,7 +39,7 @@ def _get_object_info(entry):
     return object_type, object_title
 
 
-def create_break_entry(event, data, session_block=None):
+def create_break_entry(event, data, session_block=None, extend_parent=True):
     break_ = Break()
     entry_data = {'object': break_,
                   'start_dt': data.pop('start_dt')}
@@ -47,7 +47,14 @@ def create_break_entry(event, data, session_block=None):
     #      due to the break having no valid `location_parent`
     break_.populate_from_dict(data, track_changes=False)
     parent = session_block.timetable_entry if session_block else None
-    return create_timetable_entry(event, entry_data, parent=parent, extend_parent=True)
+    return create_timetable_entry(event, entry_data, parent=parent, extend_parent=extend_parent)
+
+
+def create_session_block_entry(session_, data, extend_parent=True):
+    start_dt = data.pop('start_dt')
+    block = create_session_block(session_=session_, data=data)
+    entry_data = {'object': block, 'start_dt': start_dt}
+    return create_timetable_entry(session_.event, entry_data, extend_parent=extend_parent)
 
 
 def update_break_entry(break_, data):
@@ -56,15 +63,6 @@ def update_break_entry(break_, data):
         update_timetable_entry(break_.timetable_entry, {'start_dt': start_dt})
     break_.populate_from_dict(data)
     db.session.flush()
-
-
-def create_session_block_entry(session_, data):
-    from indico.modules.events.sessions.operations import create_session_block
-
-    start_dt = data.pop('start_dt')
-    block = create_session_block(session_=session_, data=data)
-    entry_data = {'object': block, 'start_dt': start_dt}
-    return create_timetable_entry(session_.event, entry_data, extend_parent=True)
 
 
 def create_timetable_entry(event, data, parent=None, extend_parent=False):

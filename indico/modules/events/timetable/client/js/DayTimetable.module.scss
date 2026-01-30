@@ -1,0 +1,95 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+@use './Entry.module';
+
+$teal-shadow: rgba($dark-teal, 0.5);
+
+// Add vertical scroll to Indico sidebar, but only on the timetable management page
+body:has(:global(#timetable-container)) :global(.menu-column) {
+  overflow-y: scroll;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.time-gutter {
+  user-select: none;
+  border-right: 1px solid $raincloud-gray;
+
+  .time-slot {
+    text-align: center;
+    padding: 10px 10px 0 10px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: $dark-gray;
+    white-space: nowrap;
+    position: relative;
+  }
+}
+
+.lines {
+  pointer-events: none;
+
+  .line:not(:first-child)::after {
+    position: absolute;
+    border-bottom: 1px solid $raincloud-gray;
+    content: '';
+    width: calc(100% + 70px);
+    left: -70px;
+  }
+}
+
+.calendar {
+  position: relative;
+  width: 100%;
+
+  &.day:not(:last-child) {
+    border-right: 1px solid $raincloud-gray;
+  }
+}
+
+.draft {
+  @extend .entry;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  color: $white;
+  // Creates outline effect for better readability
+  text-shadow: -1px -1px 2px $teal-shadow, 1px -1px 2px $teal-shadow,
+    -1px 1px 2px $teal-shadow, 1px 1px 2px $teal-shadow;
+  background: rgba($teal, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba($white, 0.2);
+  padding: 2px 4px;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  line-height: 1rem;
+  transition: 0.05s;
+}
+
+.resize-handle {
+  position: absolute;
+  cursor: ns-resize;
+  width: 100%;
+  height: 4px;
+  bottom: 0;
+  z-index: 10;
+
+  &.block {
+    z-index: 9;
+  }
+}
