@@ -47,6 +47,7 @@ import {$T} from 'indico/utils/i18n';
         $state.after(totalDurationDisplay);
         totalDurationDisplay = null;
       }
+      $filterPlaceholder.hide();
       return;
     }
 
