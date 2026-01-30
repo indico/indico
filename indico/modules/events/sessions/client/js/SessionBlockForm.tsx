@@ -11,6 +11,7 @@ import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
+import {Field} from 'react-final-form';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
 import {LocationParentObj} from 'indico/modules/events/timetable/types';
@@ -52,13 +53,17 @@ export function SessionBlockFormFields({
         description={Translate.string('Title of the session block')}
         autoFocus
       />
-      <FinalDateTimePicker
-        name="start_dt"
-        label={Translate.string('Start time')}
-        required
-        minStartDt={minStartDt}
-        maxEndDt={maxEndDt}
-      />
+      <Field name="duration" subscription={{value: true}}>
+        {({input: {value: duration}}) => (
+          <FinalDateTimePicker
+            name="start_dt"
+            label={Translate.string('Start time')}
+            required
+            minStartDt={minStartDt}
+            maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
+          />
+        )}
+      </Field>
       <FinalDuration name="duration" label={Translate.string('Duration')} required />
       <FinalSessionBlockPersonLinkField
         name="person_links"
