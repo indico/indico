@@ -148,6 +148,7 @@ def handler(prefix, path):
     typeMap = {}
     status_code = None
     is_response = False
+    cached = False
     try:
         used_session = None
         if cookieAuth:
@@ -217,8 +218,9 @@ def handler(prefix, path):
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
+                cached = True
+        g.current_api_user = user
         if result is None:
-            g.current_api_user = user
             # Perform the actual exporting
             res = hook(user)
             if isinstance(res, current_app.response_class):
@@ -252,9 +254,13 @@ def handler(prefix, path):
             # XXX do we even need this?
             db.session.rollback()
 
-        # Log successful POST api requests
-        if error is None and request.method == 'POST':
-            logger.info('API request: %s?%s', path, query)
+        # Log successful api requests
+        if error is None:
+            log_path = f'{path}?{query}' if query else path
+            if cached:
+                logger.info('%s %s [IP=%s] (cached)', request.method, log_path, request.remote_addr)
+            else:
+                logger.info('%s %s [IP=%s]', request.method, log_path, request.remote_addr)
         if is_response:
             return result
         serializer = Serializer.create(dformat, query_params=queryParams, pretty=pretty, typeMap=typeMap,
