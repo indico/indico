@@ -56,7 +56,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Improve accessibility of the category page search box (:pr:`6869`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -359,6 +359,11 @@ Bugfixes
 - Fix error when searching in user logs (:issue:`6933`, :pr:`6936`)
 - Fix room booking prompt during event creation not showing up (:pr:`6941`)
 - Fix AM/PM indicator based on event language in PDF timetable (:pr:`6888`)
+
+Accessibility
+^^^^^^^^^^^^^
+
+- Nothing so far
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
