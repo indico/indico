@@ -200,6 +200,7 @@ class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
             rows = import_user_records_from_csv(
                 file.stream,
                 columns=['first_name', 'last_name', 'affiliation', 'email'],
+                check_email_dns=False
             )
         except UserValueError as exc:
             abort(422, messages={'file': [str(exc)]})
