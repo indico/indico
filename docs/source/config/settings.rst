@@ -363,7 +363,10 @@ Customization
 
     .. code-block:: python
 
-        CUSTOM_COUNTRIES = {'KP': 'North Korea'}
+        CUSTOM_COUNTRIES = {
+            'KP': 'North Korea',
+            'AQ': None,  # Remove Antarctica from the list
+        }
 
     Default: ``{}``
 

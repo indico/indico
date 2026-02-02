@@ -28,7 +28,12 @@ def get_countries(locale=None):
 def _get_countries(locale):
     _countries = {country.alpha_2: getattr(country, 'common_name', country.name) for country in pycountry.countries}
     _countries = {code: locale.territories.get(code, name) for code, name in _countries.items()}
-    _countries.update(config.CUSTOM_COUNTRIES)
+    for code, name in config.CUSTOM_COUNTRIES.items():
+        if name is None:
+            _countries.pop(code, None)
+        else:
+            _countries[code] = name
+
     return ImmutableDict(sorted(_countries.items(), key=lambda item: str_to_ascii(remove_accents(item[1]))))
 
 
