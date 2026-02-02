@@ -189,7 +189,18 @@ export function DayTimetable({
     const sessionBlockId = expandedSessionBlock?.id;
 
     if (sessionBlockId) {
-      handleUnscheduledDropOnBlock(who, {...over, id: sessionBlockId}, delta, mouse, offset, over);
+      const {startDt: sbStartDt} = expandedSessionBlock;
+      const sbEndDt = moment(sbStartDt).add(expandedSessionBlock.duration, 'minutes');
+      handleUnscheduledDropOnBlock(
+        who,
+        {...over, id: sessionBlockId},
+        delta,
+        mouse,
+        offset,
+        over,
+        sbStartDt,
+        sbEndDt
+      );
     } else {
       const [newLayout, newUnscheduled, startDt] =
         layoutAfterUnscheduledDrop(
@@ -219,7 +230,9 @@ export function DayTimetable({
     delta: Transform,
     mouse: MousePosition,
     offset,
-    calendar: Over
+    calendar: Over,
+    minStartDt: Moment = eventStartDt,
+    maxEndDt: Moment = eventEndDt
   ) {
     const [newLayout, newUnscheduled, startDt, blockId] =
       layoutAfterUnscheduledDropOnBlock(
@@ -232,8 +245,8 @@ export function DayTimetable({
         mouse,
         offset,
         calendar,
-        eventStartDt,
-        eventEndDt
+        minStartDt,
+        maxEndDt
       ) || [];
     if (!newLayout) {
       return;
