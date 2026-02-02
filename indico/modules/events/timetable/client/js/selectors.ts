@@ -168,7 +168,12 @@ export const showUnscheduled = createSelector(
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
-  staticData => staticData.defaultContribDurationMinutes
+  getSessions,
+  getExpandedSessionBlock,
+  (staticData, sessions, expandedSessionBlock) => {
+    const session = sessions[expandedSessionBlock?.sessionId];
+    return session?.defaultContribDurationMinutes || staticData.defaultContribDurationMinutes;
+  }
 );
 
 export const getEventLocationParent = createSelector(
