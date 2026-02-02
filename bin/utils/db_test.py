@@ -71,9 +71,6 @@ def _check_contents(plugin_dir=None, verbose=False):
     """Check that the content of the revision file is correct."""
     click.secho('Checking Alembic revision contents:')
     rev_files = _get_alembic_revision_files(plugin_dir)[::-1]
-    # TODO: Why limit it to nb_scripts? This check is quick anyway.
-    # if nb_scripts:
-    #     rev_files = rev_files[:nb_scripts]
     if verbose:
         click.secho(_indent(f'{len(rev_files)} revision files found'), fg='cyan')
     for rev_file in rev_files:
@@ -133,10 +130,6 @@ def _check_revision_file_order(migrations, plugin_dir=None):
     the datetime segment of the filename.
     """
     rev_files = _get_alembic_revision_files(plugin_dir)
-    # TODO: Why limit it to nb_scripts? This check is quick anyway.
-    # if nb_scripts:
-    #     migrations = migrations[-nb_scripts:]
-    #     rev_file = rev_file[-nb_scripts:]
     for migration, rev_file in zip(migrations, rev_files, strict=True):
         filename_rev = REGEX_REV_FILENAME.findall(rev_file.name)[0]
         if migration.revision != filename_rev:
@@ -411,7 +404,8 @@ def main(nb_scripts, verbose, plugin_dir):
     configuration should be done using the various environment variables like
     PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
     """
-    plugin_dir = None if plugin_dir == INDICO_DIR else plugin_dir
+    if plugin_dir == INDICO_DIR:
+        raise ClickException(click.style(f'Plugin directory cannot be the indico directory: {plugin_dir}.', fg='red'))
     plugin_name = _get_plugin_name(plugin_dir) if plugin_dir else None
     target = 'Indico' if not plugin_name else f'plugin "{plugin_name}"'
     click.secho(f'Running DB checks for {target}', fg='blue', bold=True)
