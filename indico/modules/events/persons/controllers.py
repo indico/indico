@@ -295,7 +295,22 @@ class RHSpeakers(RHPersonsBase):
 class RHAPISpeakersList(RHProtectedEventBase):
     def _process(self):
         matches = (EventPerson.query
-                   .filter(EventPerson.event_id == self.event.id)
+                   .join(ContributionPersonLink, ContributionPersonLink.person_id == EventPerson.id, isouter=True)
+                   .join(
+                       Contribution,
+                       and_(
+                            ContributionPersonLink.contribution_id == Contribution.id,
+                            Contribution.is_deleted.is_(False)
+                        )
+                    )
+                   .filter(
+                        EventPerson.event_id == self.event.id,
+                        or_(
+                            EventPerson.contribution_links.any(
+                                ContributionPersonLink.is_speaker.is_(True),
+                            )
+                        )
+                    )
                    .all())
         return SpeakerSchema().dump(matches, many=True)
 
