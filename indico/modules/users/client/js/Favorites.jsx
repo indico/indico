@@ -60,6 +60,7 @@ function FavoriteCatManager({userId}) {
     data: favoriteCats,
     loading,
     mutate,
+    mutating,
   } = useIndicoAxiosWithMutation(categoryFavoriteURL(userId !== null ? {user_id: userId} : {}));
 
   const deleteFavoriteCat = async id => {
@@ -104,6 +105,7 @@ function FavoriteCatManager({userId}) {
                       <Popup
                         trigger={
                           <Icon
+                            disabled={mutating}
                             styleName="delete-button"
                             name="close"
                             onClick={() => deleteFavoriteCat(cat.id)}
@@ -142,6 +144,7 @@ function FavoriteEventManager({userId}) {
     data: favoriteEvents,
     loading,
     mutate,
+    mutating,
   } = useIndicoAxiosWithMutation({
     url: eventFavoriteURL(userId !== null ? {user_id: userId} : {}),
   });
@@ -198,6 +201,7 @@ function FavoriteEventManager({userId}) {
                         <Popup
                           trigger={
                             <Icon
+                              disabled={mutating}
                               styleName="delete-button"
                               name="close"
                               onClick={() => deleteFavoriteEvent(event.id)}

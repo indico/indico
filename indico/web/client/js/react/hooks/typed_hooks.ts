@@ -12,8 +12,6 @@ import {useIndicoAxios} from 'indico/react/hooks/hooks';
 
 export interface MutateOptions {
   optimistic: boolean;
-  rollbackOnError: boolean;
-  revalidate: boolean;
 }
 
 export type IndicoAxiosOptions = AxiosRequestConfig & {
@@ -58,8 +56,8 @@ export function useIndicoAxiosWithMutation<T>(
       setMutating(true);
       setMutationError(null);
 
-      const {optimistic = true, rollbackOnError = true, revalidate = true} = mutateOptions;
-      const previous = patchedData;
+      const {optimistic = true} = mutateOptions;
+      const previous = patchedDataRef.current;
 
       try {
         if (optimistic) {
@@ -72,7 +70,7 @@ export function useIndicoAxiosWithMutation<T>(
           result = await request;
         } catch (e) {
           setMutationError(e);
-          if (optimistic && rollbackOnError) {
+          if (optimistic) {
             setPatchedData(previous);
           }
           throw e;
@@ -83,25 +81,20 @@ export function useIndicoAxiosWithMutation<T>(
           setPatchedData(newData);
         }
 
-        if (revalidate) {
-          await reFetch(axiosConfig);
-        }
+        const refetchResult = await reFetch();
+        setPatchedData(refetchResult.data);
 
         return result;
       } finally {
         setMutating(false);
       }
     },
-    [reFetch, axiosConfig, patchedData, mutating]
+    [reFetch, mutating]
   );
 
   useEffect(() => {
-    // while mutating, don't update patchedData based on the value of data
-    if (fetching || mutating) {
-      return;
-    }
     setPatchedData(data);
-  }, [data, fetching, mutating]);
+  }, [data]);
 
   useEffect(() => {
     patchedDataRef.current = patchedData;

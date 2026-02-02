@@ -102,9 +102,9 @@ describe('useIndixoAxiosWithMutation hook', () => {
       await promise;
     });
 
-    await waitFor(() => result.current.fetching === false);
+    await waitFor(() => result.current.mutating === false);
 
-    expect(result.current.mutating).toEqual(false);
+    expect(result.current.fetching).toEqual(false);
     expect(result.current.loading).toEqual(false);
     expect(result.current.data).toEqual(mockedData);
     expect(result.current.error).toEqual(null);
