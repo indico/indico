@@ -374,6 +374,10 @@ export function layoutAfterUnscheduledDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
+  if (entry.sessionId && entry.sessionId !== toBlock.sessionId) {
+    return;
+  }
+
   const draftEntry: ChildContribEntry = {
     ...entry,
     startDt,

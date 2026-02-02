@@ -353,31 +353,37 @@ export function DayTimetable({
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY, [
-        0,
-        minutesToPixels(defaultContributionDuration),
-      ]);
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY);
 
       if (event.button !== 0 || event.target !== calendarRef.current || isWithinLimitsWithOffset) {
         return;
       }
 
       const rect = calendarRef.current.getBoundingClientRect();
-      const y = minutesToPixels(
+      let y = minutesToPixels(
         Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES
       );
+      const maxPossibleDuration = pixelsToMinutes(limitBottom - limitTop);
+      const duration = Math.min(defaultContributionDuration, maxPossibleDuration);
+      const pxSurplus = Math.max(0, y + minutesToPixels(duration) - limitBottom);
 
-      const startDt = moment(dt)
+      let startDt = moment(dt)
         .startOf('days')
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
+
+      if (pxSurplus > 0) {
+        // Allows creation of blocks in the entire clickable area by shifting startDt
+        startDt = moment(startDt).subtract(pixelsToMinutes(pxSurplus), 'minutes');
+        y -= pxSurplus;
+      }
 
       setDraggingStartPos(y);
       dispatch(
         actions.setDraftEntry({
           startDt: moment.max(startDt, dt),
-          duration: defaultContributionDuration,
+          duration,
           locationParent: eventLocationParent,
           locationData: {...eventLocationParent.location_data, inheriting: true},
           y,
