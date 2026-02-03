@@ -57,3 +57,4 @@ def test_get_countries_deleted(mocker):
 def test_get_country_deleted(mocker):
     mocker.patch('indico.util.countries.config', MockConfigDeleteCountry())
     assert get_country('AQ') is None
+    assert get_country('AQ', use_fallback=True) == 'AQ'
