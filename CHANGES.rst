@@ -37,6 +37,8 @@ Improvements
 - Add support for configurable file types in Paper Peer Reviewing (:issue:`7162`, :pr:`7156`)
 - Use the event's default language (or system default if not set) when creating abstract
   notifications instead of the user's current language (:pr:`7294`)
+- Allow cloning registration forms within an event (:issue:`3229`, :pr:`6822`, thanks
+  :user:`adam-parker1, Emilijus-M`)
 
 Bugfixes
 ^^^^^^^^
