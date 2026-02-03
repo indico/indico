@@ -22,7 +22,7 @@ _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
 _bp.add_url_rule('/speakers/', 'speakers', RHSpeakers)
 _bp.add_url_rule('/speakers/<int:person_id>/photo', 'upload_speaker_photo', RHSpeakerPhotoUpload, methods=('POST',))
 _bp.add_url_rule('/api/speakers/', 'api_speakers_list', RHAPISpeakersList)
-_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker', RHAPISpeaker, methods=('POST',))
+_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker', RHAPISpeaker, methods=('POST', 'DELETE'))
 _bp.add_url_rule('/api/persons/email/send', 'api_email_event_persons_send', RHAPIEmailEventPersonsSend,
                  methods=('POST',))
 _bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadata', RHAPIEmailEventPersonsMetadata,

@@ -294,24 +294,11 @@ class RHSpeakers(RHPersonsBase):
 
 class RHAPISpeakersList(RHProtectedEventBase):
     def _process(self):
-        matches = (EventPerson.query
-                   .join(ContributionPersonLink, ContributionPersonLink.person_id == EventPerson.id, isouter=True)
-                   .join(
-                       Contribution,
-                       and_(
-                            ContributionPersonLink.contribution_id == Contribution.id,
-                            Contribution.is_deleted.is_(False)
-                        )
-                    )
-                   .filter(
-                        EventPerson.event_id == self.event.id,
-                        or_(
-                            EventPerson.contribution_links.any(
-                                ContributionPersonLink.is_speaker.is_(True),
-                            )
-                        )
-                    )
-                   .all())
+        matches = self.event.persons.filter(
+            EventPerson.contribution_links.any(and_(
+                ContributionPersonLink.is_speaker,
+                ContributionPersonLink.contribution.has(Contribution.is_deleted.is_(False))
+        ))).all()
         return SpeakerSchema().dump(matches, many=True)
 
 
@@ -335,6 +322,13 @@ class RHAPISpeaker(RHManageSpeakerBase):
             self.person.speaker_photo = photo
             photo.claim()
         return SpeakerSchema().dump(self.person)
+
+    def _process_DELETE(self):
+        self.person.speaker_description = None
+        if self.person.speaker_photo is not None:
+            self.person.speaker_photo.claimed = False
+            self.person.speaker_photo_file_id = None
+        return jsonify(success=True)
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):

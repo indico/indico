@@ -11,7 +11,7 @@ import speakersURL from 'indico-url:persons.api_speakers_list';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {
-  Button,
+  Dropdown,
   Icon,
   Image,
   Popup,
@@ -43,6 +43,32 @@ export function Speakers({eventId}: {eventId: number}) {
       event_id: eventId,
     })
   );
+  const speakersWithProfile = useMemo(
+    () =>
+      speakers
+        ? speakers.filter(
+            speaker =>
+              (speaker.speaker_description !== null && speaker.speaker_description !== '') ||
+              speaker.speaker_photo_url !== null
+          )
+        : [],
+    [speakers]
+  );
+  const speakerIDsWithProfile = useMemo(
+    () => speakersWithProfile.map(speaker => speaker.id),
+    [speakersWithProfile]
+  );
+  const speakerOptions = useMemo(() => {
+    return speakers
+      ? speakers
+          .filter(speaker => !speakerIDsWithProfile.includes(speaker.id))
+          .map(speaker => ({
+            text: speaker.name,
+            value: speaker.id,
+            key: speaker.id.toString(),
+          }))
+      : [];
+  }, [speakers, speakerIDsWithProfile]);
 
   const [modalOpened, setModalOpened] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,10 +76,10 @@ export function Speakers({eventId}: {eventId: number}) {
   const lowerCaseSearchTerm = useMemo(() => searchTerm.toLocaleLowerCase(), [searchTerm]);
   const filteredSpeakers = useMemo(
     () =>
-      speakers
-        ? speakers.filter(speaker => speaker.name.toLocaleLowerCase().includes(lowerCaseSearchTerm))
-        : [],
-    [lowerCaseSearchTerm, speakers]
+      speakersWithProfile.filter(speaker =>
+        speaker.name.toLocaleLowerCase().includes(lowerCaseSearchTerm)
+      ),
+    [lowerCaseSearchTerm, speakersWithProfile]
   );
 
   const handleEditSpeaker = useCallback(
@@ -88,6 +114,21 @@ export function Speakers({eventId}: {eventId: number}) {
     [selectedSpeaker, eventId, reFetch]
   );
 
+  const handleDeleteSpeaker = useCallback(
+    async (speakerId: number) => {
+      await indicoAxios.delete(updateSpeakerProfileURL({event_id: eventId, person_id: speakerId}));
+      setSpeakers(old =>
+        old.map(speaker =>
+          speaker.id === speakerId
+            ? {...speaker, speaker_description: null, speaker_photo_url: null}
+            : speaker
+        )
+      );
+      reFetch();
+    },
+    [reFetch, eventId]
+  );
+
   useEffect(() => {
     setSpeakers(data);
   }, [data]);
@@ -96,10 +137,17 @@ export function Speakers({eventId}: {eventId: number}) {
     <>
       <div styleName="action-bar">
         <div styleName="action-bar-half">
-          <Button>
-            <Icon name="add" />
-            {Translate.string('Add speakers')}
-          </Button>
+          <Dropdown
+            placeholder={Translate.string('Add speaker')}
+            search
+            fluid
+            options={speakerOptions}
+            value={null}
+            onChange={(_, selected) => {
+              setSelectedSpeaker(speakers.find(speaker => speaker.id === selected.value));
+              setModalOpened(true);
+            }}
+          />
         </div>
         <div styleName="action-bar-half">
           <Search
@@ -152,7 +200,14 @@ export function Speakers({eventId}: {eventId: number}) {
                     <Popup
                       content={Translate.string('Delete speaker profile')}
                       position="top center"
-                      trigger={<Icon name="trash" link color="black" onClick={() => null} />}
+                      trigger={
+                        <Icon
+                          name="trash"
+                          link
+                          color="black"
+                          onClick={() => handleDeleteSpeaker(speaker.id)}
+                        />
+                      }
                     />
                   </TableCell>
                 </TableRow>
