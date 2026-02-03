@@ -24,9 +24,9 @@ from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
-                                                      ParticipantsDisplayFormColumnsForm, RegistrationFormCreateForm,
-                                                      RegistrationFormEditForm, RegistrationFormScheduleForm,
-                                                      RegistrationManagersForm)
+                                                      ParticipantsDisplayFormColumnsForm, RegistrationFormCloneForm,
+                                                      RegistrationFormCreateForm, RegistrationFormEditForm,
+                                                      RegistrationFormScheduleForm, RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import Registration, RegistrationForm, RegistrationState
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationData
@@ -322,13 +322,18 @@ class RHRegistrationFormClone(RHManageRegFormBase):
     """Clone a registration form."""
 
     def _process(self):
-        new_regform = clone_registration_form(self.regform)
-        flash(_('Registration form cloned'), 'success')
-        logger.info('Registration form %r cloned into %r by %r', self.regform, new_regform, session.user)
-        log_text = f'Registration form cloned from "{self.regform.title}"'
-        new_regform.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
-                 data={'Source registration form ID': self.regform.id})
-        return redirect(url_for('.manage_regform', new_regform))
+        form = RegistrationFormCloneForm(title=self.regform.title)
+
+        if form.validate_on_submit():
+            new_regform = clone_registration_form(self.regform, form.title.data)
+            flash(_('Registration form cloned'), 'success')
+            logger.info('Registration form %r cloned into %r by %r', self.regform, new_regform, session.user)
+            log_text = f'Registration form cloned from "{self.regform.title}"'
+            new_regform.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
+                            data={'Source form ID': self.regform.id})
+            return jsonify_data(redirect=url_for('.manage_regform', new_regform))
+
+        return jsonify_form(form, submit=_('Clone'))
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):

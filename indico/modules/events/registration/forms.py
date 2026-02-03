@@ -213,6 +213,10 @@ class RegistrationFormCreateForm(IndicoForm):
             raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))
 
 
+class RegistrationFormCloneForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+
+
 class RegistrationFormScheduleForm(IndicoForm):
     start_dt = IndicoDateTimeField(_('Start'), [Optional()], default_time=time(0, 0),
                                    description=_('Moment when registrations will be open'))

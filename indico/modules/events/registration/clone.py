@@ -64,19 +64,19 @@ class RegistrationFormCloner(EventCloner):
 
     @classmethod
     @no_autoflush
-    def clone_single_regform(cls, old_form, title=None):
+    def clone_single_regform(cls, old_form, title):
         """Clone a single registration form within the same event.
 
         :param old_form: The registration form to clone
-        :param title: The title for the cloned form (defaults to 'Copy of <old title>')
+        :param title: A custom title for the cloned form
         :return: The cloned registration form
         """
         attrs = get_attrs_to_clone(RegistrationForm,
-                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid', 'title'})
         new_form = RegistrationForm(
             event=old_form.event,
-            title=title or f'Copy of {old_form.title}',
-            **{attr: getattr(old_form, attr) for attr in attrs if attr != 'title'}
+            title=title,
+            **{attr: getattr(old_form, attr) for attr in attrs}
         )
         cloner = cls(old_form.event)
         cloner._field_data_map = {}
