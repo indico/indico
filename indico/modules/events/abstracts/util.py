@@ -34,7 +34,7 @@ from indico.util.string import format_email_with_name
 from indico.web.flask.templating import get_template_module
 
 
-def build_default_email_template(event, tpl_type):
+def build_default_email_template(event: Event, tpl_type: str) -> AbstractEmailTemplate:
     """
     Build a default e-mail template based on a notification type
     provided by the user.
