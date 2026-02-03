@@ -248,3 +248,22 @@ def test_build_default_email_template_uses_event_locale(dummy_event, monkeypatch
     tpl = build_default_email_template(dummy_event, 'accept')
 
     assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
+
+
+def test_abstract_email_template_is_default(db, dummy_event):
+    tpl = build_default_email_template(dummy_event, 'accept')
+    tpl.title = 'Accepted'
+    tpl.rules = [{'state': [AbstractState.accepted.value]}]
+    dummy_event.abstract_email_templates.append(tpl)
+    db.session.flush()
+    assert tpl.tpl_path == 'events/abstracts/emails/default_accept_notification.txt'
+    assert tpl.is_default
+
+    # Invoke the setters with the same values
+    tpl.body = tpl.body
+    tpl.subject = tpl.subject
+    assert tpl.is_default
+
+    # Invoke the setter with a different value
+    tpl.subject = 'New subject'
+    assert not tpl.is_default

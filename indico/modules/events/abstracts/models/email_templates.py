@@ -6,10 +6,12 @@
 # LICENSE file for more details.
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+from indico.web.flask.templating import get_template_module
 
 
 def _get_next_position(context):
@@ -52,16 +54,16 @@ class AbstractEmailTemplate(db.Model):
         db.String,
         nullable=False
     )
-    #: The subject of the email
-    subject = db.Column(
-        db.String,
-        nullable=False
-    )
-    #: The body of the template
-    body = db.Column(
-        db.Text,
+    #: Whether this is the unmodified default template and thus can be translated
+    is_default = db.Column(
+        db.Boolean,
         nullable=False,
-        default=''
+        default=False,
+    )
+    #: Path to the default template used for this email template
+    tpl_path = db.Column(
+        db.String,
+        nullable=True
     )
     #: List of extra email addresses to be added as CC in the email
     extra_cc_emails = db.Column(
@@ -117,3 +119,46 @@ class AbstractEmailTemplate(db.Model):
 
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', _text=self.title)
+
+    @declared_attr
+    def _subject(cls):
+        return db.Column(
+            'subject',
+            db.String,
+            nullable=False,
+        )
+
+    @declared_attr
+    def _body(cls):
+        return db.Column(
+            'body',
+            db.Text,
+            nullable=False,
+            default='',
+        )
+
+    @property
+    def subject(self):
+        if self.is_default and self.tpl_path:
+            email = get_template_module(self.tpl_path)
+            return email.get_subject()
+        return self._subject
+
+    @subject.setter
+    def subject(self, value):
+        if self._subject != value:
+            self.is_default = False
+        self._subject = value
+
+    @property
+    def body(self):
+        if self.is_default and self.tpl_path:
+            email = get_template_module(self.tpl_path)
+            return email.get_body()
+        return self._body
+
+    @body.setter
+    def body(self, value):
+        if self._body != value:
+            self.is_default = False
+        self._body = value

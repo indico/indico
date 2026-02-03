@@ -39,15 +39,18 @@ def build_default_email_template(event: Event, tpl_type: str) -> AbstractEmailTe
     Build a default e-mail template based on a notification type
     provided by the user.
     """
+    tpl_path = f'events/abstracts/emails/default_{tpl_type}_notification.txt'
+    email = get_template_module(tpl_path)
     with event.force_event_locale():
-        email = get_template_module(f'events/abstracts/emails/default_{tpl_type}_notification.txt')
         return AbstractEmailTemplate(body=email.get_body(),
                                      extra_cc_emails=[],
                                      reply_to_address='',
                                      subject=email.get_subject(),
                                      include_authors=True,
                                      include_submitter=True,
-                                     include_coauthors=True)
+                                     include_coauthors=True,
+                                     is_default=True,
+                                     tpl_path=tpl_path)
 
 
 def _names_with_emails(person_links):
