@@ -227,3 +227,11 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
     abstract.judge = dummy_user
     abstract.judgment_dt = now_utc(False)
     send_abstract_notifications(abstract)
+
+
+@pytest.mark.usefixtures('request_context')
+def test_build_default_email_template_uses_event_locale(dummy_event):
+    dummy_event.default_locale = 'fr_FR'
+    tpl = build_default_email_template(dummy_event, 'accept')
+
+    assert tpl.subject == "Notification d'acceptation de résumé (#{abstract_id})"
