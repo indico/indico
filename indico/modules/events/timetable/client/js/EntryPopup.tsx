@@ -5,9 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
@@ -16,6 +13,7 @@ import './EntryPopup.module.scss';
 import moment from 'moment';
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
 import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -26,7 +24,15 @@ import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
-import {ReduxState, BreakEntry, ContribEntry, BlockEntry, EntryType, PersonLinkRole} from './types';
+import {
+  ReduxState,
+  BreakEntry,
+  ContribEntry,
+  BlockEntry,
+  EntryType,
+  PersonLinkRole,
+  isChildEntry,
+} from './types';
 import {mapTTDataToEntry} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
@@ -49,28 +55,16 @@ function EntryPopupContent({
   entry: BreakEntry | ContribEntry | BlockEntry;
   onClose: () => void;
 }) {
-  const dispatch = useDispatch();
-  const {
-    id,
-    objId,
-    type,
-    title,
-    attachments,
-    parent: entryParent,
-    colors,
-    duration,
-    startDt,
-    sessionId,
-    children,
-  } = entry;
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const {id, objId, type, title, attachments, colors, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const startTime = moment(startDt);
   const endTime = moment(startDt).add(duration, 'minutes');
+  const entryParent = isChildEntry(entry) ? entry.parent : null;
 
   const _getOrderedLocationArray = () => {
-    const {locationData = {}} = entry;
-    const {address, venueName, roomName} = locationData;
+    const {address, venueName, roomName} = entry.locationData;
     return Object.values([address, venueName, roomName]).filter(Boolean);
   };
 
@@ -99,15 +93,18 @@ function EntryPopupContent({
     const draftEntry = mapTTDataToEntry(data, sessions);
 
     if (type === EntryType.SessionBlock) {
-      (draftEntry as BlockEntry).children = children;
+      (draftEntry as BlockEntry).children = entry.children;
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
-  const onCreateChild = async (e: MouseEvent) => {
+  const onCreateChild = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
+    if (entry.type !== EntryType.SessionBlock) {
+      throw new Error('Expected a BlockEntry');
+    }
     let newChildStartDt = moment(entry.startDt);
     if (entry.children.length > 0) {
       const childWithLatestEndTime = entry.children.reduce((latest, child) => {
@@ -135,17 +132,21 @@ function EntryPopupContent({
     );
   };
 
-  const onDelete = async (e: MouseEvent) => {
+  const onDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
 
-    const deleteEntry = {
-      [EntryType.Break]: () => dispatch(actions.deleteBreak(entry, eventId)),
-      [EntryType.SessionBlock]: () => dispatch(actions.deleteBlock(entry, eventId)),
-      [EntryType.Contribution]: () => dispatch(actions.unscheduleEntry(entry, eventId)),
-    }[entry.type];
-
-    deleteEntry();
+    switch (entry.type) {
+      case EntryType.Break:
+        dispatch(actions.deleteBreak(entry, eventId));
+        break;
+      case EntryType.SessionBlock:
+        dispatch(actions.deleteBlock(entry, eventId));
+        break;
+      case EntryType.Contribution:
+        dispatch(actions.unscheduleEntry(entry, eventId));
+        break;
+    }
   };
 
   const locationArray = _getOrderedLocationArray();
