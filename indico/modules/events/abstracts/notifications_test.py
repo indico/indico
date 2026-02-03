@@ -8,6 +8,8 @@
 import re
 
 import pytest
+from babel.support import Translations
+from flask_babel import get_domain, get_locale
 
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
@@ -230,8 +232,19 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
 
 
 @pytest.mark.usefixtures('request_context')
-def test_build_default_email_template_uses_event_locale(dummy_event):
-    dummy_event.default_locale = 'fr_FR'
+def test_build_default_email_template_uses_event_locale(dummy_event, monkeypatch):
+    class MockTranslations(Translations):
+        def __init__(self):
+            super().__init__()
+            assert str(get_locale()) == 'en_AU'
+            self._catalog = {
+                'Abstract Acceptance notification (#{abstract_id})': 'Yarr abstract was accepted (#{abstract_id})'
+            }
+
+    domain = get_domain()
+    monkeypatch.setattr(domain, 'get_translations', MockTranslations)
+
+    dummy_event.default_locale = 'en_AU'
     tpl = build_default_email_template(dummy_event, 'accept')
 
-    assert tpl.subject == "Notification d'acceptation de résumé (#{abstract_id})"
+    assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
