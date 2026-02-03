@@ -13,7 +13,7 @@ import warnings
 from pprint import pformat
 
 import yaml
-from flask import has_request_context, request, session
+from flask import g, has_request_context, request
 
 from indico.core.config import config
 from indico.web.util import get_request_info, get_request_user
@@ -28,8 +28,9 @@ class AddRequestIDFilter:
 
 class AddUserIDFilter:
     def filter(self, record):
-        user = get_request_user()[0] if has_request_context() else None
-        record.user_id = str(session.user.id) if user else '-'
+        # TODO remove the current_api_user stuff once we get rid of the legacy http-api...
+        user = (g.get('current_api_user') or get_request_user()[0]) if has_request_context() else None
+        record.user_id = str(user.id) if user else '-'
         return True
 
 
