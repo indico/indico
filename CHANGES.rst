@@ -52,7 +52,8 @@ Bugfixes
   (:pr:`7255`)
 - Fix weird indentation on list items in markdown field preview (:pr:`7260`)
 - Fix unique title validation for disabled regform fields (:pr:`7277`)
-- Fix DatePicker selector on different timezones (:issue:`7273`, :pr:`7280`, thanks :user:`jbtwist`)
+- Fix DatePicker min/max limits being affected by client timezone (:issue:`7273`, :pr:`7280`,
+  thanks :user:`jbtwist`)
 
 Accessibility
 ^^^^^^^^^^^^^
