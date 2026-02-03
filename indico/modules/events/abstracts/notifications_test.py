@@ -17,6 +17,7 @@ from indico.modules.events.abstracts.util import build_default_email_template
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.date_time import now_utc
+from indico.util.i18n import force_locale
 
 
 def assert_text_equal(v1, v2):
@@ -233,25 +234,6 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
     send_abstract_notifications(abstract)
 
 
-@pytest.mark.usefixtures('request_context')
-def test_build_default_email_template_uses_event_locale(dummy_event, monkeypatch):
-    class MockTranslations(Translations):
-        def __init__(self):
-            super().__init__()
-            assert str(get_locale()) == 'en_AU'
-            self._catalog = {
-                'Abstract Acceptance notification (#{abstract_id})': 'Yarr abstract was accepted (#{abstract_id})'
-            }
-
-    domain = get_domain()
-    monkeypatch.setattr(domain, 'get_translations', MockTranslations)
-
-    dummy_event.default_locale = 'en_AU'
-    tpl = build_default_email_template(dummy_event, AbstractNotificationType.accepted)
-
-    assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
-
-
 def test_abstract_email_template_is_default(db, dummy_event):
     tpl = build_default_email_template(dummy_event, AbstractNotificationType.accepted)
     tpl.title = 'Accepted'
@@ -269,3 +251,21 @@ def test_abstract_email_template_is_default(db, dummy_event):
     # Invoke the setter with a different value
     tpl.subject = 'New subject'
     assert not tpl.is_default
+
+
+@pytest.mark.usefixtures('request_context')
+def test_abstract_email_template_correctly_translated(dummy_event, monkeypatch):
+    class MockTranslations(Translations):
+        def __init__(self):
+            super().__init__()
+            assert str(get_locale()) == 'en_AU'
+            self._catalog = {
+                'Abstract Acceptance notification (#{abstract_id})': 'Yarr abstract was accepted (#{abstract_id})'
+            }
+
+    tpl = build_default_email_template(dummy_event, AbstractNotificationType.accepted)
+    domain = get_domain()
+    monkeypatch.setattr(domain, 'get_translations', MockTranslations)
+
+    with force_locale('en_AU'):
+        assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
