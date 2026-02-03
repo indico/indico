@@ -444,13 +444,14 @@ export function DayTimetable({
     return createRestrictToCalendar(calendarRef, limitsDelta);
   }, [limitTop, limitBottom]);
 
+  const limitsGradientColor = 'rgba(0, 0, 0, 0.05)';
   const limitsGradientArg = [
-    'rgba(0, 0, 0, 0.05) 0',
-    `rgba(0, 0, 0, 0.05) ${limits[0]}px`,
+    `${limitsGradientColor} 0`,
+    `${limitsGradientColor} ${limits[0]}px`,
     `transparent ${limits[0]}px`,
     `transparent ${limits[1]}px`,
-    `rgba(0, 0, 0, 0.05) ${limits[1]}px`,
-    'rgba(0, 0, 0, 0.05)',
+    `${limitsGradientColor} ${limits[1]}px`,
+    limitsGradientColor,
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
