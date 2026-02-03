@@ -496,6 +496,7 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
                      'not the default language of this Indico server, set the default language of this event before '
                      'creating this notification.'))
 
+
 class AbstractForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
