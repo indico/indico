@@ -31,7 +31,6 @@ import {
   BlockEntry,
   EntryType,
   PersonLinkRole,
-  assertIsBlockEntry,
   isChildEntry,
 } from './types';
 import {mapTTDataToEntry} from './utils';
@@ -103,7 +102,9 @@ function EntryPopupContent({
   const onCreateChild = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
-    assertIsBlockEntry(entry);
+    if (entry.type !== EntryType.SessionBlock) {
+      throw new Error('Expected a BlockEntry');
+    }
     let newChildStartDt = moment(entry.startDt);
     if (entry.children.length > 0) {
       const childWithLatestEndTime = entry.children.reduce((latest, child) => {
