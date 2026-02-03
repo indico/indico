@@ -196,8 +196,7 @@ def _check_script_idempotence(scripts, db_conn, dbdiff_conn, config):
 @contextmanager
 def _get_db_context(verbose=False):
     # XXX: This is necessary because results dbdiff fails to properly sort functions when producing SQL diffs.
-    #      Remove once this is fixed: https://github.com/djrobstep/migra/issues/196.
-    # TODO: Open this issue in https://github.com/djrobstep/results
+    #      Remove once this is fixed: https://github.com/djrobstep/results/issues/11.
     def prepare_diff_db(dbdiff_conn):
         CreateSchema('indico').execute(dbdiff_conn)
         create_unaccent_function(dbdiff_conn)
