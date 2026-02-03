@@ -19,7 +19,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.pdfinterface.latex import AbstractBook
 from indico.modules.events import Event
 from indico.modules.events.abstracts.forms import InvitedAbstractMixin
-from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractNotificationType, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
@@ -34,13 +34,16 @@ from indico.util.string import format_email_with_name
 from indico.web.flask.templating import get_template_module
 
 
-def build_default_email_template(event: Event, tpl_type: str) -> AbstractEmailTemplate:
+def get_default_email_template(tpl_type: AbstractNotificationType):
+    return get_template_module(f'events/abstracts/emails/default_{tpl_type.name}_notification.txt')
+
+
+def build_default_email_template(event: Event, tpl_type: AbstractNotificationType) -> AbstractEmailTemplate:
     """
     Build a default e-mail template based on a notification type
     provided by the user.
     """
-    tpl_path = f'events/abstracts/emails/default_{tpl_type}_notification.txt'
-    email = get_template_module(tpl_path)
+    email = get_default_email_template(tpl_type)
     with event.force_event_locale():
         return AbstractEmailTemplate(body=email.get_body(),
                                      extra_cc_emails=[],
@@ -50,7 +53,7 @@ def build_default_email_template(event: Event, tpl_type: str) -> AbstractEmailTe
                                      include_submitter=True,
                                      include_coauthors=True,
                                      is_default=True,
-                                     tpl_path=tpl_path)
+                                     notification_type=tpl_type)
 
 
 def _names_with_emails(person_links):

@@ -9,9 +9,10 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.events.abstracts.models.abstracts import AbstractNotificationType
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
-from indico.web.flask.templating import get_template_module
 
 
 def _get_next_position(context):
@@ -57,12 +58,11 @@ class AbstractEmailTemplate(db.Model):
     #: Whether this is the unmodified default template and thus can be translated
     is_default = db.Column(
         db.Boolean,
-        nullable=False,
-        default=False,
+        nullable=True,
     )
     #: Path to the default template used for this email template
-    tpl_path = db.Column(
-        db.String,
+    notification_type = db.Column(
+        PyIntEnum(AbstractNotificationType),
         nullable=True
     )
     #: List of extra email addresses to be added as CC in the email
@@ -139,8 +139,9 @@ class AbstractEmailTemplate(db.Model):
 
     @property
     def subject(self):
-        if self.is_default and self.tpl_path:
-            email = get_template_module(self.tpl_path)
+        if self.is_default and self.notification_type:
+            from indico.modules.events.abstracts.util import get_default_email_template
+            email = get_default_email_template(self.notification_type)
             return email.get_subject()
         return self._subject
 
@@ -152,8 +153,9 @@ class AbstractEmailTemplate(db.Model):
 
     @property
     def body(self):
-        if self.is_default and self.tpl_path:
-            email = get_template_module(self.tpl_path)
+        if self.is_default and self.notification_type:
+            from indico.modules.events.abstracts.util import get_default_email_template
+            email = get_default_email_template(self.notification_type)
             return email.get_body()
         return self._body
 
