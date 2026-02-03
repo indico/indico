@@ -459,10 +459,10 @@ export function DayTimetable({
       <UnscheduledContributions dt={dt} />
       {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
       <div ref={wrapperRef} className="wrapper timetable-popup-boundary">
-        <div ref={innerWrapperRef} styleName="wrapper">
+        <div ref={innerWrapperRef} styleName="wrapper" style={{background: limitsGradient}}>
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
-            <div ref={calendarRef} style={{background: limitsGradient}}>
+            <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               <div
