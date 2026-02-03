@@ -212,7 +212,7 @@ def validate_search_token(token, user):
     try:
         sig_uid = secure_serializer.loads(token, max_age=86400, salt='user-search-token')
         if user.id != sig_uid:
-            raise BadSignature
+            raise BadSignature('Invalid search token')
     except BadSignature:
         raise Forbidden('Invalid search token')
 
