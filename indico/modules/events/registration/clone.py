@@ -113,10 +113,9 @@ class RegistrationFormCloner(EventCloner):
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
-        items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
         item_attrs = get_attrs_to_clone(RegistrationFormItem, skip={'is_purged'})
         for old_section in old_sections:
-            new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
+            new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in item_attrs})
             for old_item in old_section.children:
                 new_item = RegistrationFormItem(parent=new_section, registration_form=new_form,
                                                 **{attr: getattr(old_item, attr) for attr in item_attrs})
@@ -136,7 +135,6 @@ class RegistrationFormCloner(EventCloner):
         for old_item, new_item in self._item_map.items():
             if old_item.show_if_field:
                 new_item.show_if_field = self._item_map[old_item.show_if_field]
-                new_item.show_if_values = old_item.show_if_values
         db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):
