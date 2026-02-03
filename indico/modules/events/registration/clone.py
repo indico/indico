@@ -114,8 +114,7 @@ class RegistrationFormCloner(EventCloner):
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
-        # Skip show_if_id and show_if_values when cloning - they must be set together later after all items exist
-        item_attrs = get_attrs_to_clone(RegistrationFormItem, skip={'is_purged', 'show_if_id', 'show_if_values'})
+        item_attrs = get_attrs_to_clone(RegistrationFormItem, skip={'is_purged'})
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
