@@ -390,7 +390,7 @@ class CountryField(RegistrationFormFieldBase):
             # XXX: Not sure where this garbage data is coming from, but it resulted in
             # this method returning `None` and thus breaking the participant list..
             return ''
-        return get_country(registration_data.data) if registration_data.data else ''
+        return get_country(registration_data.data, use_fallback=True) if registration_data.data else ''
 
     @property
     def filter_choices(self):

@@ -17,6 +17,13 @@ class MockConfig:
     }
 
 
+class MockConfigDeleteCountry:
+    CUSTOM_COUNTRIES = {
+        **MockConfig.CUSTOM_COUNTRIES,
+        'AQ': None  # remove country
+    }
+
+
 @pytest.fixture(autouse=True)
 def _clear_country_cache():
     # those utils are memoized and other test code may call them before/after the tests
@@ -39,3 +46,15 @@ def test_get_countries(mocker, country):
 def test_get_country(mocker, country):
     mocker.patch('indico.util.countries.config', MockConfig())
     assert get_country(country) == MockConfig.CUSTOM_COUNTRIES[country]
+
+
+def test_get_countries_deleted(mocker):
+    mocker.patch('indico.util.countries.config', MockConfigDeleteCountry())
+    countries = get_countries()
+    assert 'AQ' not in countries
+
+
+def test_get_country_deleted(mocker):
+    mocker.patch('indico.util.countries.config', MockConfigDeleteCountry())
+    assert get_country('AQ') is None
+    assert get_country('AQ', use_fallback=True) == 'AQ'
