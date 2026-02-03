@@ -130,7 +130,6 @@ class RegistrationFormCloner(EventCloner):
                 new_section.children.append(new_item)
                 self._item_map[old_item] = new_item
             new_form.form_items.append(new_section)
-            db.session.flush()
         # link conditional fields to the new fields
         for old_item, new_item in self._item_map.items():
             if old_item.show_if_field:
