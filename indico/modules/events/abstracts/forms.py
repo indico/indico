@@ -492,7 +492,9 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
         ('merge', _('Merge')),
         ('withdrawn', _('Withdrawn'))
     ], description=_('The default template that will be used as a basis for this notification. '
-                     'You can customize it later.'))
+                     'You can customize it later. If you want the text to be in a specific language that is '
+                     'not the default language of this Indico server, set the default language of this event before '
+                     'creating this notification.'))
 
 
 class AbstractForm(IndicoForm):

@@ -35,6 +35,8 @@ Improvements
 - Add a UI for managing predefined affiliations (:pr:`7183`, :pr:`7278`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 - Add support for configurable file types in Paper Peer Reviewing (:issue:`7162`, :pr:`7156`)
+- Use the event's default language (or system default if not set) when creating abstract
+  notifications instead of the user's current language (:pr:`7294`)
 
 Bugfixes
 ^^^^^^^^
