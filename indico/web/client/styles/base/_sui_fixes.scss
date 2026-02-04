@@ -16,7 +16,7 @@
   color: #737373 !important;
 }
 
-.ui.primary.button {
+.ui.primary.button:not(.negative) {
   background-color: var(--accent-color);
 
   &:hover {
