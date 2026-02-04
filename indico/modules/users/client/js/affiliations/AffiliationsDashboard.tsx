@@ -10,8 +10,9 @@ import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {AutoSizer, Column, Table, TableCellRenderer} from 'react-virtualized';
-import {Button, Confirm, Icon, Loader, Message, Modal} from 'semantic-ui-react';
+import {Button, Icon, Loader, Message} from 'semantic-ui-react';
 
+import {RequestConfirmDelete} from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
@@ -236,23 +237,16 @@ export default function AffiliationsDashboard() {
         open={adding || !!editing}
         edit={!!editing}
       />
-      {deleting && (
-        <Confirm
-          size="tiny"
-          header={Translate.string('Confirm deletion')}
-          content={
-            <Translate as={Modal.Content}>
-              Are you sure you want to delete the affiliation{' '}
-              <Param name="affiliation" wrapper={<strong />} value={deleting.name} />?
-            </Translate>
-          }
-          confirmButton={<Button negative content={Translate.string('Delete')} />}
-          cancelButton={Translate.string('Cancel')}
-          onCancel={() => setDeleting(null)}
-          onConfirm={handleDelete}
-          open
-        />
-      )}
+      <RequestConfirmDelete
+        requestFunc={handleDelete}
+        onClose={() => setDeleting(null)}
+        open={deleting !== null}
+      >
+        <Translate>
+          Are you sure you want to delete the affiliation{' '}
+          <Param name="affiliation" wrapper={<strong />} value={deleting?.name} />?
+        </Translate>
+      </RequestConfirmDelete>
     </div>
   );
 }
