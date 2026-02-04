@@ -347,7 +347,7 @@ class RHAffiliationsAPI(RHAdminBase):
         affiliation.populate_from_dict(data)
         db.session.add(affiliation)
         db.session.flush()
-        signals.plugin.affiliation_created.send(affiliation)
+        signals.affiliations.affiliation_created.send(affiliation)
         affiliation.log(AppLogRealm.admin, LogKind.positive, 'Affiliation',
                          f'Affiliation "{affiliation.name}" created', session.user)
         search_affiliations.bump_version()
@@ -369,7 +369,7 @@ class RHAffiliationAPI(RHAdminBase):
 
     @use_args(AffiliationArgs, partial=True)
     def _process_PATCH(self, data):
-        signals.plugin.affiliation_update.send(self.affiliation, payload=data)
+        signals.affiliations.affiliation_updated.send(self.affiliation, payload=data)
         if not data:
             return '', 204
         changes = self.affiliation.populate_from_dict(data)
