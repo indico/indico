@@ -72,7 +72,8 @@ class RegistrationFormCloner(EventCloner):
         :return: The cloned registration form
         """
         attrs = get_attrs_to_clone(RegistrationForm,
-                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid', 'title'})
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid', 'title',
+                                         'is_participation'})
         new_form = RegistrationForm(
             event=old_form.event,
             title=title,
