@@ -106,11 +106,6 @@ If a plugin wants to modify the data the schema will eventually load, it may do 
 modifying the contents of ``data``.
 ''')
 
-affiliation_update = _signals.signal('affiliation-update', '''
-Called from RHAffiliationAPI when processing updates. The sender is the
-Affiliation being updated and the update dict is passed via ``payload``.
-''')
-
 schema_post_load = _signals.signal('schema-post-load', '''
 Called after a marshmallow schema is loaded. The *sender* is the schema class
 and code using this signal should always specify it. The signal is called with

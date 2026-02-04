@@ -167,7 +167,10 @@ export default function AffiliationsDashboard() {
               setAdding(true);
             }}
           />
-          {renderPluginComponents('affiliation-dashboard-extra-actions', {affiliations})}
+          {renderPluginComponents('affiliation-dashboard-extra-actions', {
+            affiliations,
+            visibleAffiliations,
+          })}
         </div>
         <AffiliationListFilter
           affiliations={affiliations}
