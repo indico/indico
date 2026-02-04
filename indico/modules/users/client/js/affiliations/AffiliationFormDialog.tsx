@@ -105,7 +105,6 @@ export default function AffiliationFormDialog({
     {
       key: 'address',
       title: Translate.string('Address'),
-      active: true,
       content: {
         content: (
           <>
@@ -177,7 +176,13 @@ export default function AffiliationFormDialog({
         label={Translate.string('Alternative names')}
         placeholder={Translate.string('Type a name and press Enter to add')}
       />
-      <Accordion exclusive={false} panels={formSections} styled fluid />
+      <Accordion
+        exclusive={false}
+        panels={formSections}
+        defaultActiveIndex={[...Array(formSections.length - 1).keys()]}
+        styled
+        fluid
+      />
     </FinalModalForm>
   );
 }
