@@ -79,6 +79,16 @@ by this function is exactly like ``<CUSTOMIZATION_DIR>/templates``, but
 it has lower priority than the one from the global customization dir.
 ''')
 
+affiliation_created = _signals.signal('affiliation-created', '''
+Called from RHAffiliationAPI when processing new affiliations. The sender is the
+Affiliation being created.
+''')
+
+affiliation_update = _signals.signal('affiliation-update', '''
+Called from RHAffiliationAPI when processing updates. The sender is the
+Affiliation being updated and the update dict is passed via ``payload``.
+''')
+
 schema_post_dump = _signals.signal('schema-post-dump', '''
 Called when a marshmallow schema is dumped. The *sender* is the schema class
 and code using this signal should always specify it. The signal is called with
@@ -104,11 +114,6 @@ the following arguments:
 
 If a plugin wants to modify the data the schema will eventually load, it may do so by
 modifying the contents of ``data``.
-''')
-
-affiliation_update = _signals.signal('affiliation-update', '''
-Called from RHAffiliationAPI when processing updates. The sender is the
-Affiliation being updated and the update dict is passed via ``payload``.
 ''')
 
 schema_post_load = _signals.signal('schema-post-load', '''

@@ -347,6 +347,7 @@ class RHAffiliationsAPI(RHAdminBase):
         affiliation.populate_from_dict(data)
         db.session.add(affiliation)
         db.session.flush()
+        signals.plugin.affiliation_created.send(affiliation)
         affiliation.log(AppLogRealm.admin, LogKind.positive, 'Affiliation',
                          f'Affiliation "{affiliation.name}" created', session.user)
         search_affiliations.bump_version()
