@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import re
+import warnings
 from functools import lru_cache
 
 import pycountry
@@ -23,20 +24,40 @@ def get_countries(locale=None):
     return _get_countries(locale)
 
 
+def get_country(code, locale=None, *, use_fallback=False):
+    if locale is None:
+        locale = get_current_locale()
+    return _get_country(code, locale) or (code if use_fallback else None)
+
+
 @lru_cache
 @make_interceptable
 def _get_countries(locale):
     _countries = {country.alpha_2: getattr(country, 'common_name', country.name) for country in pycountry.countries}
     _countries = {code: locale.territories.get(code, name) for code, name in _countries.items()}
-    _countries.update(config.CUSTOM_COUNTRIES)
-    _countries = {code: name for code, name in _countries.items() if name is not None}
+    _apply_custom_country(_countries, locale)
+
     return ImmutableDict(sorted(_countries.items(), key=lambda item: str_to_ascii(remove_accents(item[1]))))
 
 
-def get_country(code, locale=None, *, use_fallback=False):
-    if locale is None:
-        locale = get_current_locale()
-    return _get_country(code, locale) or (code if use_fallback else None)
+def _apply_custom_country(countries, locale):
+    for alpha_2, value in config.CUSTOM_COUNTRIES.items():
+        if value is None:
+            countries.pop(alpha_2, None)
+        elif isinstance(value, str):
+            countries[alpha_2] = value
+        elif isinstance(value, dict):
+            locale_str = str(locale)
+            locale_str = locale_str.split('_', maxsplit=1)[0]
+            if locale_str in value:
+                countries[alpha_2] = value[locale_str]
+            else:
+                warnings.warn(
+                    f"Locale '{locale_str}' not found for country '{alpha_2}' in CUSTOM_COUNTRIES. "
+                    f"Using ISO 3166 country name.",
+                    UserWarning,
+                    stacklevel=3
+                )
 
 
 def get_country_reverse(name, locale=None, case_sensitive=True):

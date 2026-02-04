@@ -6,8 +6,10 @@
 # LICENSE file for more details.
 
 import pytest
+from babel import Locale
 
 from indico.util.countries import _get_countries, _get_country, get_countries, get_country
+from indico.util.i18n import IndicoLocale
 
 
 class MockConfig:
@@ -20,6 +22,17 @@ class MockConfig:
 class MockConfigDeleteCountry:
     CUSTOM_COUNTRIES = {
         **MockConfig.CUSTOM_COUNTRIES,
+        'AQ': None  # remove country
+    }
+
+
+class MockConfigMixed:
+    CUSTOM_COUNTRIES = {
+        'XK': 'Kosovo',  # does not exist
+        'TW': {
+            'en': 'Taiwan, China',
+            'es': 'República independiente de Taiwán'
+        },  # different name based on locale
         'AQ': None  # remove country
     }
 
@@ -58,3 +71,35 @@ def test_get_country_deleted(mocker):
     mocker.patch('indico.util.countries.config', MockConfigDeleteCountry())
     assert get_country('AQ') is None
     assert get_country('AQ', use_fallback=True) == 'AQ'
+
+
+def test_get_countries_mixed_types(mocker):
+    mocker.patch('indico.util.countries.config', MockConfigMixed())
+
+    countries_en = get_countries(Locale('en'))
+    assert countries_en['XK'] == 'Kosovo'
+    assert countries_en['TW'] == 'Taiwan, China'
+    assert 'AQ' not in countries_en
+
+    countries_es = get_countries(Locale('es'))
+    assert countries_es['XK'] == 'Kosovo'
+    assert countries_es['TW'] == 'República independiente de Taiwán'
+
+    countries_en = get_countries(Locale('en_US'))
+    assert countries_en['XK'] == 'Kosovo'
+    assert countries_en['TW'] == 'Taiwan, China'
+
+    countries_es = get_countries(IndicoLocale('es_MX'))
+    assert countries_es['XK'] == 'Kosovo'
+    assert countries_es['TW'] == 'República independiente de Taiwán'
+
+
+def test_get_countries_mixed_fallback_warning(mocker):
+    """Test that warning is issued when locale is not found in custom country dict."""
+    mocker.patch('indico.util.countries.config', MockConfigMixed())
+
+    # Locale 'pl' (Polish) is not defined in MockConfigMixed
+    with pytest.warns(UserWarning, match="Locale 'pl' not found for country"):
+        countries = get_countries(Locale('pl'))
+
+    assert countries['TW'] == 'Tajwan'  # fallback to ISO name
