@@ -62,6 +62,32 @@ class RegistrationFormCloner(EventCloner):
         if self._has_content(target_event):
             return [_('The target event already has registration forms')]
 
+    @classmethod
+    @no_autoflush
+    def clone_single_regform(cls, old_form, title):
+        """Clone a single registration form within the same event.
+
+        :param old_form: The registration form to clone
+        :param title: A custom title for the cloned form
+        :return: The cloned registration form
+        """
+        attrs = get_attrs_to_clone(RegistrationForm,
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid', 'title',
+                                         'is_participation'})
+        new_form = RegistrationForm(
+            event=old_form.event,
+            title=title,
+            **{attr: getattr(old_form, attr) for attr in attrs}
+        )
+        cloner = cls(old_form.event)
+        cloner._field_data_map = {}
+        cloner._item_map = {}
+        cloner._clone_form_items(old_form, new_form, clone_all_revisions=False)
+        db.session.add(new_form)
+        db.session.flush()
+        signals.event.registration.after_registration_form_clone.send(old_form, new_form=new_form)
+        return new_form
+
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         # if the registration cloner is also enabled, we have to keep
@@ -88,12 +114,12 @@ class RegistrationFormCloner(EventCloner):
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
-        items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
+        item_attrs = get_attrs_to_clone(RegistrationFormItem, skip={'is_purged'})
         for old_section in old_sections:
-            new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
+            new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in item_attrs})
             for old_item in old_section.children:
                 new_item = RegistrationFormItem(parent=new_section, registration_form=new_form,
-                                                **{attr: getattr(old_item, attr) for attr in items_attrs})
+                                                **{attr: getattr(old_item, attr) for attr in item_attrs})
                 if new_item.is_field:
                     if clone_all_revisions:
                         self._clone_all_field_versions(old_item, new_item)
@@ -105,7 +131,6 @@ class RegistrationFormCloner(EventCloner):
                 new_section.children.append(new_item)
                 self._item_map[old_item] = new_item
             new_form.form_items.append(new_section)
-            db.session.flush()
         # link conditional fields to the new fields
         for old_item, new_item in self._item_map.items():
             if old_item.show_if_field:

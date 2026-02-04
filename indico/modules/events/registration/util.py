@@ -1073,6 +1073,17 @@ def close_registration(regform):
         regform.start_dt = regform.end_dt
 
 
+def clone_registration_form(regform: RegistrationForm, title: str) -> RegistrationForm:
+    """Clone a registration form within the same event.
+
+    :param regform: The registration form to clone
+    :param title: The title for the new registration form
+    :return: The cloned registration form
+    """
+    from indico.modules.events.registration.clone import RegistrationFormCloner
+    return RegistrationFormCloner.clone_single_regform(regform, title=title)
+
+
 def get_persons(registrations, include_accompanying_persons=False):
     persons = []
     for registration in registrations:

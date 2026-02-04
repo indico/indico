@@ -24,17 +24,17 @@ from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
-                                                      ParticipantsDisplayFormColumnsForm, RegistrationFormCreateForm,
-                                                      RegistrationFormEditForm, RegistrationFormScheduleForm,
-                                                      RegistrationManagersForm)
+                                                      ParticipantsDisplayFormColumnsForm, RegistrationFormCloneForm,
+                                                      RegistrationFormCreateForm, RegistrationFormEditForm,
+                                                      RegistrationFormScheduleForm, RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import Registration, RegistrationForm, RegistrationState
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationData
 from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
-from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
-                                                     get_flat_section_setup_data)
+from indico.modules.events.registration.util import (clone_registration_form, close_registration,
+                                                     create_personal_data_fields, get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.settings import data_retention_settings
@@ -316,6 +316,24 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         self.regform.log(EventLogRealm.management, LogKind.negative, 'Registration',
                          f'Registration form "{self.regform.title}" was deleted', session.user)
         return redirect(url_for('.manage_regform_list', self.event))
+
+
+class RHRegistrationFormClone(RHManageRegFormBase):
+    """Clone a registration form."""
+
+    def _process(self):
+        form = RegistrationFormCloneForm(title=self.regform.title)
+
+        if form.validate_on_submit():
+            new_regform = clone_registration_form(self.regform, form.title.data)
+            flash(_('Registration form cloned'), 'success')
+            logger.info('Registration form %r cloned into %r by %r', self.regform, new_regform, session.user)
+            log_text = f'Registration form cloned from "{self.regform.title}"'
+            new_regform.log(EventLogRealm.management, LogKind.positive, 'Registration', log_text, session.user,
+                            data={'Source form ID': self.regform.id})
+            return jsonify_data(redirect=url_for('.manage_regform', new_regform))
+
+        return jsonify_form(form, submit=_('Clone'))
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):

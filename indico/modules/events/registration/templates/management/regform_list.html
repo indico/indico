@@ -154,6 +154,13 @@
                                 {% trans %}Manage{% endtrans %}
                             </a>
                         </div>
+                        <div class="group hide-if-locked">
+                            <button class="i-button icon-copy"
+                                    title="{% trans %}Clone this registration form{% endtrans %}"
+                                    data-href="{{ url_for('.clone_regform', regform) }}"
+                                    data-title="{% trans %}Clone registration form{% endtrans %}"
+                                    data-ajax-dialog></button>
+                        </div>
                         {% block delete_regform_button scoped %}
                             <div class="group hide-if-locked">
                                 <button class="i-button icon-remove danger text-color"
