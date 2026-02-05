@@ -444,6 +444,7 @@ def inject_csp(response):
     sources = ' '.join(f"'{x}'" for x in sources)
     csp_directives = [
         f'script-src {sources}',
+        "base-uri 'none'",
         *config.CSP_DIRECTIVES,
     ]
     report_directives, report_headers = _get_csp_report_config()
