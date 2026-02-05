@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayBase
 
 
 class WPManagePersons(WPEventManagement):
@@ -17,4 +18,10 @@ class WPManagePersons(WPEventManagement):
 class WPManageSpeakers(WPEventManagement):
     template_prefix = 'events/persons/'
     sidemenu_option = 'speakers'
+    bundles = ('module_events.persons.js', 'module_events.persons.css')
+
+
+class WPDisplaySpeakers(WPConferenceDisplayBase):
+    template_prefix = 'events/persons/'
+    menu_entry_name = 'speakers'
     bundles = ('module_events.persons.js', 'module_events.persons.css')

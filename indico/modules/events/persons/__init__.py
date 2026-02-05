@@ -6,9 +6,11 @@
 # LICENSE file for more details.
 
 from flask import session
+from sqlalchemy import or_
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import EnumConverter
 from indico.util.enum import RichIntEnum
@@ -20,12 +22,29 @@ from indico.web.menu import SideMenuItem
 logger = Logger.get('events.persons')
 
 
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.contributions import contribution_settings
+    from indico.modules.events.layout.util import MenuEntryData
+
+    def _visible_speakers(event):
+        if not contribution_settings.get(event, 'published') and not event.can_manage(session.user):
+            return False
+        return EventPerson.query.filter(
+            EventPerson.event_id == event.id,
+            or_(EventPerson.speaker_description.is_not(None), EventPerson.speaker_photo_file_id.is_not(None))
+        ).has_rows()
+    yield MenuEntryData(title=_('Speaker Profiles'), name='speakers_profiles',
+                        endpoint='persons.display_speaker_profiles', position=1, visible=_visible_speakers,
+                        static_site=True)
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
         yield SideMenuItem('persons', _('Participant Roles'), url_for('persons.person_list', event),
                             section='organization')
-        yield SideMenuItem('speakers', _('Speakers'), url_for('persons.speakers', event),
+        yield SideMenuItem('speakers_profiles', _('Speaker Profiles'), url_for('persons.speaker_profiles', event),
                             section='organization')
 
 

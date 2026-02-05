@@ -13,5 +13,10 @@ export interface Speaker {
   last_name: string;
   speaker_description: string | null;
   speaker_photo_url: string | null;
+  speaker_facebook: string | null;
+  speaker_github: string | null;
+  speaker_linkedin: string | null;
+  speaker_webpage: string | null;
   avatar_url: string;
+  affiliation: string;
 }
