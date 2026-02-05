@@ -8,3 +8,4 @@
 import 'indico/react/components/AffiliationPopup';
 import './EditEventPerson';
 import './Speakers';
+import './SpeakersDisplay';

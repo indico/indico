@@ -176,6 +176,22 @@ class EventPerson(PersonMixin, db.Model):
         db.Text,
         nullable=True,
     )
+    speaker_linkedin = db.Column(
+        db.Text,
+        nullable=True,
+    )
+    speaker_facebook = db.Column(
+        db.Text,
+        nullable=True,
+    )
+    speaker_github = db.Column(
+        db.Text,
+        nullable=True,
+    )
+    speaker_webpage = db.Column(
+        db.Text,
+        nullable=True,
+    )
 
     speaker_photo = db.relationship(
         'File',
