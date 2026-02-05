@@ -7,6 +7,8 @@
 
 """Module containing the Indico exception class hierarchy."""
 
+from markupsafe import escape
+from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 from indico.util.i18n import _
@@ -18,6 +20,16 @@ def get_error_description(exception):
     This overrides some HTTPException messages to be more suitable
     for end-users.
     """
+    if isinstance(exception, ValidationError):
+        # Escape field names and error messages to prevent XSS
+        messages = []
+        for field, errors in exception.messages.items():
+            field = escape(field)
+            if isinstance(errors, list):
+                messages.extend(f'{field}: {escape(error)}' for error in errors)
+            else:
+                messages.append(f'{field}: {escape(errors)}')
+        return ' '.join(messages) if messages else str(exception)
     try:
         description = exception.description
     except AttributeError:

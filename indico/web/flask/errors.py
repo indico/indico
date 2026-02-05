@@ -53,7 +53,7 @@ def handle_validationerror(exc):
         response = jsonify(webargs_errors=exc.messages)
         response.status_code = 422
         return response
-    return render_error(exc, exc.name, get_error_description(exc), 422)
+    return render_error(exc, 'Validation error', get_error_description(exc), 422)
 
 
 @errors_bp.app_errorhandler(UnprocessableEntity)
