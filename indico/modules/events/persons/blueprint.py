@@ -7,29 +7,36 @@
 
 from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMetadata, RHAPIEmailEventPersonsSend,
                                                        RHAPISpeaker, RHAPISpeakersList, RHDeleteUnusedEventPerson,
-                                                       RHEmailEventPersonsPreview, RHEventPersonSearch,
-                                                       RHGrantModificationRights, RHGrantSubmissionRights,
-                                                       RHManagePersonLists, RHPersonsList, RHRevokeSubmissionRights,
-                                                       RHSpeakerPhotoUpload, RHSpeakers, RHSyncEventPerson,
-                                                       RHUpdateEventPerson)
+                                                       RHDisplaySpeakerProfiles, RHEmailEventPersonsPreview,
+                                                       RHEventPersonSearch, RHGrantModificationRights,
+                                                       RHGrantSubmissionRights, RHManagePersonLists, RHPersonsList,
+                                                       RHRevokeSubmissionRights, RHSpeakerPhotoUpload,
+                                                       RHSpeakerProfiles, RHSyncEventPerson, RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_template_folder='events/persons',
                       url_prefix='/event/<int:event_id>/manage')
 
+# Display
+_bp.add_url_rule('!/event/<int:event_id>/speakers/', 'display_speaker_profiles', RHDisplaySpeakerProfiles)
+
+# Management
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
-_bp.add_url_rule('/speakers/', 'speakers', RHSpeakers)
-_bp.add_url_rule('/speakers/<int:person_id>/photo', 'upload_speaker_photo', RHSpeakerPhotoUpload, methods=('POST',))
+_bp.add_url_rule('/speakers/', 'speaker_profiles', RHSpeakerProfiles)
+_bp.add_url_rule('/speakers/<int:person_id>/photo', 'upload_speaker_photo', RHSpeakerPhotoUpload,
+                 methods=('POST',))
 _bp.add_url_rule('/api/speakers/', 'api_speakers_list', RHAPISpeakersList)
-_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker', RHAPISpeaker, methods=('POST', 'DELETE'))
+_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker_profile', RHAPISpeaker,
+                 methods=('POST', 'DELETE'))
 _bp.add_url_rule('/api/persons/email/send', 'api_email_event_persons_send', RHAPIEmailEventPersonsSend,
                  methods=('POST',))
-_bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadata', RHAPIEmailEventPersonsMetadata,
-                 methods=('POST',))
+_bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadata',
+                 RHAPIEmailEventPersonsMetadata, methods=('POST',))
 _bp.add_url_rule('/api/persons/email/preview', 'email_event_persons_preview', RHEmailEventPersonsPreview,
                  methods=('POST',))
-_bp.add_url_rule('/persons/grant-submission', 'grant_submission_rights', RHGrantSubmissionRights, methods=('POST',))
+_bp.add_url_rule('/persons/grant-submission', 'grant_submission_rights', RHGrantSubmissionRights,
+                 methods=('POST',))
 _bp.add_url_rule('/persons/grant-modification', 'grant_modification_rights', RHGrantModificationRights,
                  methods=('POST',))
 _bp.add_url_rule('/persons/revoke-submission', 'revoke_submission_rights', RHRevokeSubmissionRights,
@@ -39,7 +46,8 @@ _bp.add_url_rule('/persons/revoke-submission', 'revoke_submission_rights', RHRev
 # EventPerson operations
 _bp.add_url_rule('/persons/<int:person_id>', 'update_person', RHUpdateEventPerson, methods=('PATCH',))
 _bp.add_url_rule('/persons/<int:person_id>/sync', 'sync_with_user', RHSyncEventPerson, methods=('POST',))
-_bp.add_url_rule('/persons/<int:person_id>', 'delete_unused_person', RHDeleteUnusedEventPerson, methods=('DELETE',))
+_bp.add_url_rule('/persons/<int:person_id>', 'delete_unused_person', RHDeleteUnusedEventPerson,
+                 methods=('DELETE',))
 _bp.add_url_rule('/api/persons/search', 'event_person_search', RHEventPersonSearch)
 
 

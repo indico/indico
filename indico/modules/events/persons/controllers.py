@@ -37,8 +37,8 @@ from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons import logger, persons_settings
 from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema, SpeakerSchema
-from indico.modules.events.persons.views import WPManagePersons, WPManageSpeakers
+from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema, SpeakerProfileSchema
+from indico.modules.events.persons.views import WPDisplaySpeakers, WPManagePersons, WPManageSpeakers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -236,7 +236,7 @@ class RHSpeakerBase(RHProtectedEventBase):
                        .first())
 
 
-class RHManageSpeakerBase(RHManageEventBase):
+class RHManageSpeakerProfileBase(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.person = (EventPerson.query
@@ -287,9 +287,14 @@ class RHPersonsList(RHPersonsBase):
                                                allow_custom_affiliations=allow_custom_affiliations)
 
 
-class RHSpeakers(RHPersonsBase):
+class RHSpeakerProfiles(RHPersonsBase):
     def _process(self):
         return WPManageSpeakers.render_template('management/speakers.html', self.event)
+
+
+class RHDisplaySpeakerProfiles(RHProtectedEventBase):
+    def _process(self):
+        return WPDisplaySpeakers.render_template('display/speakers.html', self.event)
 
 
 class RHAPISpeakersList(RHProtectedEventBase):
@@ -299,10 +304,10 @@ class RHAPISpeakersList(RHProtectedEventBase):
                 ContributionPersonLink.is_speaker,
                 ContributionPersonLink.contribution.has(Contribution.is_deleted.is_(False))
         ))).all()
-        return SpeakerSchema().dump(matches, many=True)
+        return SpeakerProfileSchema().dump(matches, many=True)
 
 
-class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerBase):
+class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
     def get_file_context(self):
         return 'event', self.event.id, 'speaker', self.person.id
 
@@ -310,21 +315,33 @@ class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerBase):
         return os.path.splitext(file.filename)[1].lower() in {'.png', '.jpg', '.jpeg'}
 
 
-class RHAPISpeaker(RHManageSpeakerBase):
+class RHAPISpeaker(RHManageSpeakerProfileBase):
     @use_kwargs({
         'photo': FileField(validate=file_extension('png', 'jpg', 'jpeg')),
-        'description': fields.String(validate=validate.Length(max=1000))
+        'description': fields.String(validate=validate.Length(max=1000)),
+        'facebook': fields.String(validate=validate.Length(max=500)),
+        'github': fields.String(validate=validate.Length(max=500)),
+        'linkedin': fields.String(validate=validate.Length(max=500)),
+        'webpage': fields.String(validate=validate.Length(max=500)),
     })
-    def _process_POST(self, description=None, photo=None):
+    def _process_POST(self, description=None, facebook=None, github=None, linkedin=None, webpage=None, photo=None):
+        self.person.speaker_facebook = facebook
+        self.person.speaker_github = github
+        self.person.speaker_linkedin = linkedin
+        self.person.speaker_webpage = webpage
         if description is not None:
             self.person.speaker_description = description
         if photo is not None:
             self.person.speaker_photo = photo
             photo.claim()
-        return SpeakerSchema().dump(self.person)
+        return SpeakerProfileSchema().dump(self.person)
 
     def _process_DELETE(self):
         self.person.speaker_description = None
+        self.person.speaker_facebook = None
+        self.person.speaker_linkedin = None
+        self.person.speaker_github = None
+        self.person.speaker_webpage = None
         if self.person.speaker_photo is not None:
             self.person.speaker_photo.claimed = False
             self.person.speaker_photo_file_id = None

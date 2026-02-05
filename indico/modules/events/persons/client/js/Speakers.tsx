@@ -5,29 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import updateSpeakerProfileURL from 'indico-url:persons.api_speaker';
+import updateSpeakerProfileURL from 'indico-url:persons.api_speaker_profile';
 import speakersURL from 'indico-url:persons.api_speakers_list';
 
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {
-  Dropdown,
-  Icon,
-  Image,
-  Popup,
-  Search,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
-} from 'semantic-ui-react';
+import {Button, Icon, Image, Popup, Search, Table} from 'semantic-ui-react';
 
 import {
   EditSpeakerFormData,
   EditSpeakerProfile,
 } from 'indico/modules/events/persons/EditSpeakerProfile';
+import {SpeakerSearch} from 'indico/modules/events/persons/SpeakerSearch';
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -35,6 +24,8 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import {Speaker} from './types';
 import './Speakers.module.scss';
+
+type SpeakersModalName = 'SEARCH_SPEAKER' | 'EDIT_SPEAKER';
 
 export function Speakers({eventId}: {eventId: number}) {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -49,6 +40,10 @@ export function Speakers({eventId}: {eventId: number}) {
         ? speakers.filter(
             speaker =>
               (speaker.speaker_description !== null && speaker.speaker_description !== '') ||
+              (speaker.speaker_facebook !== null && speaker.speaker_facebook !== '') ||
+              (speaker.speaker_github !== null && speaker.speaker_github !== '') ||
+              (speaker.speaker_linkedin !== null && speaker.speaker_linkedin !== '') ||
+              (speaker.speaker_webpage !== null && speaker.speaker_webpage !== '') ||
               speaker.speaker_photo_url !== null
           )
         : [],
@@ -58,19 +53,11 @@ export function Speakers({eventId}: {eventId: number}) {
     () => speakersWithProfile.map(speaker => speaker.id),
     [speakersWithProfile]
   );
-  const speakerOptions = useMemo(() => {
-    return speakers
-      ? speakers
-          .filter(speaker => !speakerIDsWithProfile.includes(speaker.id))
-          .map(speaker => ({
-            text: speaker.name,
-            value: speaker.id,
-            key: speaker.id.toString(),
-          }))
-      : [];
+  const speakersWithoutProfile = useMemo(() => {
+    return speakers ? speakers.filter(speaker => !speakerIDsWithProfile.includes(speaker.id)) : [];
   }, [speakers, speakerIDsWithProfile]);
 
-  const [modalOpened, setModalOpened] = useState(false);
+  const [openedModal, setOpenedModal] = useState<SpeakersModalName | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker>();
   const lowerCaseSearchTerm = useMemo(() => searchTerm.toLocaleLowerCase(), [searchTerm]);
@@ -85,12 +72,24 @@ export function Speakers({eventId}: {eventId: number}) {
   const handleEditSpeaker = useCallback(
     async (formData: EditSpeakerFormData) => {
       const bodyFormData = new FormData();
-      const photo = formData.photo?.['1']?.[0];
-      if (photo !== undefined) {
-        bodyFormData.append('photo', photo);
+      console.log(formData);
+      if (formData.photo !== undefined) {
+        bodyFormData.append('photo', formData.photo);
       }
       if (formData.description !== undefined) {
         bodyFormData.append('description', formData.description);
+      }
+      if (formData.github !== undefined) {
+        bodyFormData.append('github', formData.github);
+      }
+      if (formData.facebook !== undefined) {
+        bodyFormData.append('facebook', formData.facebook);
+      }
+      if (formData.linkedin !== undefined) {
+        bodyFormData.append('linkedin', formData.linkedin);
+      }
+      if (formData.webpage !== undefined) {
+        bodyFormData.append('webpage', formData.webpage);
       }
       const config = {
         headers: {'content-type': 'multipart/form-data'},
@@ -101,7 +100,7 @@ export function Speakers({eventId}: {eventId: number}) {
           bodyFormData,
           config
         );
-        setModalOpened(false);
+        setOpenedModal(null);
         setSpeakers(oldSpeakers => [
           ...oldSpeakers.filter(speaker => speaker.id !== selectedSpeaker.id),
           response.data,
@@ -137,16 +136,10 @@ export function Speakers({eventId}: {eventId: number}) {
     <>
       <div styleName="action-bar">
         <div styleName="action-bar-half">
-          <Dropdown
-            placeholder={Translate.string('Add speaker')}
-            search
-            fluid
-            options={speakerOptions}
-            value={null}
-            onChange={(_, selected) => {
-              setSelectedSpeaker(speakers.find(speaker => speaker.id === selected.value));
-              setModalOpened(true);
-            }}
+          <Button
+            icon="add"
+            content={Translate.string('Add speaker profile')}
+            onClick={() => setOpenedModal('SEARCH_SPEAKER')}
           />
         </div>
         <div styleName="action-bar-half">
@@ -160,28 +153,28 @@ export function Speakers({eventId}: {eventId: number}) {
         </div>
       </div>
       <Table sortable selectable singleLine fixed>
-        <TableHeader>
-          <TableRow>
-            <TableHeaderCell disabled width={1} />
-            <TableHeaderCell styleName="borderless" width={4}>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell disabled width={1} />
+            <Table.HeaderCell styleName="borderless" width={4}>
               {Translate.string('Name')}
-            </TableHeaderCell>
-            <TableHeaderCell width={4}>{Translate.string('Email')}</TableHeaderCell>
-            <TableHeaderCell width={12}>{Translate.string('Description')}</TableHeaderCell>
-            <TableHeaderCell disabled styleName="borderless" width={2} />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+            </Table.HeaderCell>
+            <Table.HeaderCell width={4}>{Translate.string('Email')}</Table.HeaderCell>
+            <Table.HeaderCell width={12}>{Translate.string('Description')}</Table.HeaderCell>
+            <Table.HeaderCell disabled styleName="borderless" width={2} />
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {filteredSpeakers.length > 0
             ? filteredSpeakers.map(speaker => (
-                <TableRow key={speaker.id}>
-                  <TableCell>
+                <Table.Row key={speaker.id}>
+                  <Table.Cell>
                     <Image src={speaker.speaker_photo_url ?? speaker.avatar_url} avatar />
-                  </TableCell>
-                  <TableCell>{speaker.name}</TableCell>
-                  <TableCell>{speaker.email}</TableCell>
-                  <TableCell>{speaker.speaker_description}</TableCell>
-                  <TableCell>
+                  </Table.Cell>
+                  <Table.Cell>{speaker.name}</Table.Cell>
+                  <Table.Cell>{speaker.email}</Table.Cell>
+                  <Table.Cell>{speaker.speaker_description}</Table.Cell>
+                  <Table.Cell>
                     <Popup
                       content={Translate.string('Edit speaker profile')}
                       position="top center"
@@ -192,7 +185,7 @@ export function Speakers({eventId}: {eventId: number}) {
                           color="black"
                           onClick={() => {
                             setSelectedSpeaker(speaker);
-                            setModalOpened(true);
+                            setOpenedModal('EDIT_SPEAKER');
                           }}
                         />
                       }
@@ -209,28 +202,44 @@ export function Speakers({eventId}: {eventId: number}) {
                         />
                       }
                     />
-                  </TableCell>
-                </TableRow>
+                  </Table.Cell>
+                </Table.Row>
               ))
             : null}
-        </TableBody>
+        </Table.Body>
       </Table>
       {filteredSpeakers.length === 0 ? (
         searchTerm.length > 0 ? (
-          <p>There are no entries that match your search criteria.</p>
+          <p>
+            <Translate>There are no entries that match your search criteria.</Translate>
+          </p>
         ) : (
-          <p>There are no speakers yet.</p>
+          <p>
+            <Translate>There are no speaker profiles yet.</Translate>
+          </p>
         )
       ) : null}
-      {modalOpened && (
+      {openedModal === 'EDIT_SPEAKER' && (
         <EditSpeakerProfile
           onClose={() => {
-            setModalOpened(false);
+            setOpenedModal(null);
             setSelectedSpeaker(undefined);
           }}
           onSubmit={handleEditSpeaker}
           speaker={selectedSpeaker}
           eventId={eventId}
+        />
+      )}
+      {openedModal === 'SEARCH_SPEAKER' && (
+        <SpeakerSearch
+          onClose={() => {
+            setOpenedModal(null);
+          }}
+          onSubmit={speaker => {
+            setSelectedSpeaker(speaker);
+            setOpenedModal('EDIT_SPEAKER');
+          }}
+          speakers={speakersWithoutProfile}
         />
       )}
     </>

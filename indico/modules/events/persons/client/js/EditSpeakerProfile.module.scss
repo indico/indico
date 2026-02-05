@@ -19,3 +19,15 @@
 .invisible {
   display: none;
 }
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+
+  :global(.field) {
+    flex: 1;
+  }
+}
