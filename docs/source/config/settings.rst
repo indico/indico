@@ -367,9 +367,9 @@ Customization
 
         CUSTOM_COUNTRIES = {
             'KP': 'North Korea',
-            'TW': {
-                'en': 'Taiwan, China',
-                'es': 'República independiente de Taiwán'
+            'US': {
+                'en_GB': 'United States of America',  # Translation based on locale specificity
+                'es': 'Estados Unidos'  # Translation based on language
             },
             'AQ': None,  # Remove Antarctica from the list
         }

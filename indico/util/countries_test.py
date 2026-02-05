@@ -29,9 +29,9 @@ class MockConfigDeleteCountry:
 class MockConfigMixed:
     CUSTOM_COUNTRIES = {
         'XK': 'Kosovo',  # does not exist
-        'TW': {
-            'en': 'Taiwan, China',
-            'es': 'República independiente de Taiwán'
+        'US': {
+            'en_GB': 'United States of America',
+            'es': 'Estados Unidos de América'
         },  # different name based on locale
         'AQ': None  # remove country
     }
@@ -76,22 +76,22 @@ def test_get_country_deleted(mocker):
 def test_get_countries_mixed_types(mocker):
     mocker.patch('indico.util.countries.config', MockConfigMixed())
 
-    countries_en = get_countries(Locale('en'))
+    countries_en = get_countries(Locale('en_GB'))
     assert countries_en['XK'] == 'Kosovo'
-    assert countries_en['TW'] == 'Taiwan, China'
+    assert countries_en['US'] == 'United States of America'
     assert 'AQ' not in countries_en
 
     countries_es = get_countries(Locale('es'))
     assert countries_es['XK'] == 'Kosovo'
-    assert countries_es['TW'] == 'República independiente de Taiwán'
+    assert countries_es['US'] == 'Estados Unidos de América'
 
     countries_en = get_countries(Locale('en_US'))
     assert countries_en['XK'] == 'Kosovo'
-    assert countries_en['TW'] == 'Taiwan, China'
+    assert countries_en['US'] == 'United States'
 
     countries_es = get_countries(IndicoLocale('es_MX'))
     assert countries_es['XK'] == 'Kosovo'
-    assert countries_es['TW'] == 'República independiente de Taiwán'
+    assert countries_es['US'] == 'Estados Unidos de América'
 
 
 def test_get_countries_mixed_fallback_warning(mocker):
@@ -102,4 +102,4 @@ def test_get_countries_mixed_fallback_warning(mocker):
     with pytest.warns(UserWarning, match="Locale 'pl' not found for country"):
         countries = get_countries(Locale('pl'))
 
-    assert countries['TW'] == 'Tajwan'  # fallback to ISO name
+    assert countries['US'] == 'Stany Zjednoczone'  # fallback to ISO name

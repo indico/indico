@@ -48,8 +48,9 @@ def _apply_custom_country(countries, locale):
             countries[alpha_2] = value
         elif isinstance(value, dict):
             locale_str = str(locale)
-            locale_str = locale_str.split('_', maxsplit=1)[0]
             if locale_str in value:
+                countries[alpha_2] = value[locale_str]
+            elif (locale_str := locale_str.split('_', maxsplit=1)[0]) in value:  # If not full locale, try just language
                 countries[alpha_2] = value[locale_str]
             else:
                 warnings.warn(
