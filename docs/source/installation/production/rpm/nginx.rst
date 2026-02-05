@@ -164,6 +164,7 @@ We also need a systemd unit to start uWSGI.
         alias /opt/indico/;
         add_header Content-Security-Policy $upstream_http_content_security_policy;
         add_header Content-Security-Policy-Report-Only $upstream_http_content_security_policy_report_only;
+        add_header Reporting-Endpoints $upstream_http_reporting_endpoints;
       }
 
       location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
