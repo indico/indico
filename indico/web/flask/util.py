@@ -257,7 +257,7 @@ def should_inline_file(mimetype, inline=None, *, safe=True):
         inline = False
     if _is_office_mimetype(mimetype):
         inline = False
-    if safe and mimetype in ('text/html', 'image/svg+xml'):
+    if safe and (mimetype == 'text/html' or mimetype.endswith('+xml')):
         inline = False
     return inline
 
@@ -294,7 +294,8 @@ def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, 
             raise
         raise NotFound(f'File not found: {path_or_fd}')
     if safe:
-        rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
+        # img-src self is needed due to https://bugzilla.mozilla.org/show_bug.cgi?id=1735994
+        rv.headers.add('Content-Security-Policy', "default-src 'none'; img-src 'self'")
     if not conditional and no_cache:
         del rv.expires
         del rv.cache_control.max_age

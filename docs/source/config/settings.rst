@@ -1001,6 +1001,8 @@ System
         location /.xsf/indico/ {
           internal;
           alias /opt/indico/;
+          add_header Content-Security-Policy $upstream_http_content_security_policy;
+          add_header Content-Security-Policy-Report-Only $upstream_http_content_security_policy_report_only;
         }
 
     The :ref:`production installation instructions <install-prod>` already
