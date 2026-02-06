@@ -17,7 +17,7 @@ import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
+import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
@@ -180,22 +180,17 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     ),
     ...(!isCreatingChild
       ? {
-          [EntryType.SessionBlock]: sessionValues.length ? (
+          [EntryType.SessionBlock]: (
             <>
-              {!isEditing && <SessionSelect sessions={sessionValues} required />}
+              {!isEditing && (
+                <SessionSelect sessions={sessionValues} required onCreateSession={() => null} />
+              )}
               <SessionBlockFormFields
                 eventId={eventId}
                 extraOptions={extraOptions}
                 locationParent={snakifyKeys(entry.locationParent)}
               />
             </>
-          ) : (
-            <Message
-              icon="question circle"
-              header={Translate.string('No sessions available')}
-              color="yellow"
-              content={Translate.string('Please create a session before creating a session block.')}
-            />
           ),
         }
       : null),

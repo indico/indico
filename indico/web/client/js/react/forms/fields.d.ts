@@ -53,7 +53,7 @@ interface FinalDropdownProps extends SharedFieldProps {
   label?: string | null;
   multiple?: boolean;
   selection?: boolean;
-  search?: boolean;
+  search?: boolean | ((options: DropdownItemProps[], value: string) => DropdownItemProps[]);
   nullIfEmpty?: boolean;
   parse?: (value: any) => any;
   format?: (value: any) => any;

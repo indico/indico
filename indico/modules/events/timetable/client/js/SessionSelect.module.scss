@@ -1,0 +1,42 @@
+:root {
+    --session-icon-height: 1.2em;
+    --session-icon-width: 1.2em;
+    --dropdown-height: 40px;
+}
+
+:global(.ui.search.dropdown) {
+    width: 100%;
+    height: var(--dropdown-height);
+
+    > :global(.search) {
+        height: var(--dropdown-height);
+    }
+
+    :global(.menu > .item) {
+        height: var(--dropdown-height);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+:global(i.icons).session-icons {
+    width: var(--session-icon-width);
+    min-width: var(--session-icon-width);
+    // Icon adds strange padding by default
+    height: var(--session-icon-height);
+    min-height: var(--session-icon-height);
+    border-radius: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+
+    :global(.icon).sub-icon {
+        position: absolute;
+        top: calc(50% - 0.4em);
+        left: calc(50% - 0.3em);
+        -webkit-transform: translateX(-53%);
+        transform: translateX(-53%);
+    }
+}
