@@ -361,7 +361,7 @@ export function DayTimetable({
       }
 
       const rect = wrapperRef.current.getBoundingClientRect();
-      const y = minutesToPixels(
+      let y = minutesToPixels(
         Math.round(pixelsToMinutes(clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
       );
       const maxPossibleDuration = pixelsToMinutes(limitBottom - limitTop);
