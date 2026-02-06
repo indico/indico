@@ -4,7 +4,10 @@ User-agent: *
 Disallow: /category/*/calendar
 Disallow: /category/*/overview
 Disallow: /category/*/upcoming
+Disallow: /category/*/statistics
+Disallow: /category/*/statistics.json
 Disallow: /search/*
+Disallow: /export/*
 Disallow: /api/*
 Disallow: /admin/*
 Crawl-delay: 10
