@@ -55,6 +55,11 @@ interface FinalDropdownProps extends SharedFieldProps {
   selection?: boolean;
   search?: boolean | ((options: DropdownItemProps[], value: string) => DropdownItemProps[]);
   nullIfEmpty?: boolean;
+  onSearchChange?: (
+    event: React.SyntheticEvent<HTMLElement>,
+    data: DropdownOnSearchChangeData
+  ) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
   parse?: (value: any) => any;
   format?: (value: any) => any;
 }

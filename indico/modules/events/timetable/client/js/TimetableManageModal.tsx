@@ -183,7 +183,14 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           [EntryType.SessionBlock]: (
             <>
               {!isEditing && (
-                <SessionSelect sessions={sessionValues} required onCreateSession={() => null} />
+                <SessionSelect
+                  sessions={sessionValues}
+                  required
+                  onCreateSession={async sessionData => {
+                    const {session} = await dispatch(actions.createSession(sessionData));
+                    return session;
+                  }}
+                />
               )}
               <SessionBlockFormFields
                 eventId={eventId}
