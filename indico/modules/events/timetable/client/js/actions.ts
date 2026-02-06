@@ -54,6 +54,7 @@ export const REDO_CHANGE = 'Redo change';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
+export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const EDIT_ENTRY = 'Edit entry';
@@ -174,6 +175,11 @@ interface ToggleDraftAction {
   type: typeof TOGGLE_DRAFT;
 }
 
+interface SetExpandedSessionBlockIdAction {
+  sessionBlockId: string | null;
+  type: typeof SET_EXPANDED_SESSION_BLOCK_ID;
+}
+
 export type Action =
   | SetTimetableDataAction
   | ResizeEntryAction
@@ -196,7 +202,8 @@ export type Action =
   | ToggleShowUnscheduledAction
   | SetCurrentDateAction
   | ToggleExpandAction
-  | ToggleDraftAction;
+  | ToggleDraftAction
+  | SetExpandedSessionBlockIdAction;
 
 export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -302,6 +309,12 @@ export function toggleExpand(): ToggleExpandAction {
 
 export function toggleDraft(): ToggleDraftAction {
   return {type: TOGGLE_DRAFT};
+}
+
+export function setExpandedSessionBlock(
+  sessionBlockId: string | null
+): SetExpandedSessionBlockIdAction {
+  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId};
 }
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
