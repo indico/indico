@@ -278,8 +278,8 @@ export function layoutAfterUnscheduledDrop(
   delta: Transform,
   mouse: MousePosition,
   offset: MousePosition,
-  eventStartDt: Moment,
-  eventEndDt: Moment
+  minStartDt: Moment,
+  maxEndDt: Moment
 ): [TopLevelEntry[], UnscheduledContribEntry[], Moment] | undefined {
   // TODO: add proper typing for unscheduled contribs
   const id = who.slice('unscheduled-'.length);
@@ -304,7 +304,7 @@ export function layoutAfterUnscheduledDrop(
   }
 
   const endDt = moment(startDt).add(unscheduledEntry.duration, 'minutes');
-  if (startDt.isBefore(eventStartDt) || endDt.isAfter(eventEndDt)) {
+  if (startDt.isBefore(minStartDt) || endDt.isAfter(maxEndDt)) {
     return;
   }
 
@@ -370,26 +370,12 @@ export function layoutAfterUnscheduledDropOnBlock(
     return;
   }
 
-  if (entry.sessionId !== toBlock.sessionId) {
-    if (!entry.sessionId) {
-      return layoutAfterUnscheduledDrop(
-        dt,
-        unscheduled,
-        entries,
-        who,
-        calendar,
-        delta,
-        mouse,
-        offset,
-        eventStartDt,
-        eventEndDt
-      );
-    }
-    return;
-  }
-
   if (entry.duration > toBlock.duration) {
     return; // TODO: auto-resize the block?
+  }
+
+  if (entry.sessionId && entry.sessionId !== toBlock.sessionId) {
+    return;
   }
 
   const draftEntry: ChildContribEntry = {
@@ -399,6 +385,8 @@ export function layoutAfterUnscheduledDropOnBlock(
       moment(startDt).add(deltaMinutes, 'minutes').diff(moment(toBlock.startDt), 'minutes')
     ),
     sessionBlockId: toBlock.id,
+    sessionId: toBlock.sessionId,
+    parent: toBlock,
     column: null,
     maxColumn: null,
   };
