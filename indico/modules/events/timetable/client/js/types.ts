@@ -174,6 +174,7 @@ interface StaticData {
 export interface Navigation {
   currentDate: Moment;
   isExpanded: boolean;
+  expandedSessionBlockId: string | null;
 }
 
 export interface ReduxState {

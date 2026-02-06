@@ -15,27 +15,26 @@ import {DayTimetable} from './DayTimetable';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {EntryType, ReduxState} from './types';
-import {getDateKey, minutesToPixels} from './utils';
+import {minutesToPixels} from './utils';
 
 import './timetable.scss';
 import './Timetable.module.scss';
 
 export default function Timetable() {
   const dispatch = useDispatch();
-  const entries = useSelector(selectors.getDayEntries);
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
-  const currentDateEntries = entries[getDateKey(currentDate)];
+  const currentEntries = useSelector(selectors.getCurrentEntries);
   const minScrollHour = 8;
   const minHour = 0;
   const maxHour = 23;
 
   const _getScrollMoment = () => {
-    const scrollMoment = !currentDateEntries.length
+    const scrollMoment = !currentEntries.length
       ? moment.max(currentDate.hours(minScrollHour), eventStartDt)
-      : moment.min(currentDateEntries.map(e => e.startDt));
+      : moment.min(currentEntries.map(e => e.startDt));
 
     return moment(scrollMoment);
   };
@@ -62,7 +61,7 @@ export default function Timetable() {
           eventId={eventId}
           minHour={minHour}
           maxHour={maxHour}
-          entries={currentDateEntries}
+          entries={currentEntries}
           scrollPosition={initialScrollPosition}
         />
       </div>
