@@ -403,12 +403,37 @@ def inject_current_url(response):
     return response
 
 
+def _get_csp_report_config():
+    if not config.CSP_REPORT_URI:
+        return [], {}
+    directives = [f'report-uri {config.CSP_REPORT_URI}', 'report-to csp']
+    headers = {'Reporting-Endpoints': f'csp="{config.CSP_REPORT_URI}"'}
+    return directives, headers
+
+
+def _inject_report_sample(directive):
+    name, *args = directive.split(' ')
+    is_src_directive = name.endswith('-src') or '-src-' in name
+    if "'report-sample'" in args or not is_src_directive:
+        # only set it on source directives that don't already have it
+        return directive
+    return f"{directive} 'report-sample'"
+
+
 def inject_csp(response):
-    if not config.CSP_ENABLED:
-        return response
-    if 'Content-Security-Policy' in response.headers:
+    if existing_csp := response.headers.get('Content-Security-Policy'):
         # do not inject a default CSP if one was already set explicitly, e.g. in plugins that
-        # want to apply a more restricted one in some areas
+        # want to apply a more restricted one in some areas. however, if we have reporting configured,
+        # merge the existing CSP with the reporting config
+        if config.CSP_REPORT_URI and 'report-to' not in existing_csp and 'report-uri' not in existing_csp:
+            report_directives, report_headers = _get_csp_report_config()
+            existing_directives = [_inject_report_sample(x.strip()) for x in existing_csp.split(';')]
+            new_csp = '; '.join([*existing_directives, *report_directives])
+            for name, value in report_headers.items():
+                response.headers[name] = value
+            response.headers['Content-Security-Policy'] = new_csp
+        return response
+    if not config.CSP_ENABLED:
         return response
     # unsafe-eval is currently needed because of webpack's script-loader which we need for legacy JS
     sources = ['self', 'unsafe-eval']
@@ -420,12 +445,13 @@ def inject_csp(response):
     sources = ' '.join(f"'{x}'" for x in sources)
     csp_directives = [
         f'script-src {sources}',
+        "base-uri 'none'",
         *config.CSP_DIRECTIVES,
     ]
-    if config.CSP_REPORT_URI:
-        csp_directives.append(f'report-uri {config.CSP_REPORT_URI}')
-        csp_directives.append('report-to csp')
-        response.headers['Reporting-Endpoints'] = f'csp="{config.CSP_REPORT_URI}"'
+    report_directives, report_headers = _get_csp_report_config()
+    csp_directives.extend(report_directives)
+    for name, value in report_headers.items():
+        response.headers[name] = value
     csp_header = (
         'Content-Security-Policy-Report-Only' if config.CSP_ENABLED == 'report-only' else 'Content-Security-Policy'
     )
