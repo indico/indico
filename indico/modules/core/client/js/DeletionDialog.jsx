@@ -63,17 +63,14 @@ const DeleteDialog = ({
             <Message.Header>
               <Translate>This action is irreversible</Translate>
             </Message.Header>
-            <Translate>{message}</Translate>
+            {message}
           </Message.Content>
         </Message>
         <div dangerouslySetInnerHTML={{__html: childrenHTML}} />
         <div>
           <Translate as="p">
             Are you sure you want to delete{' '}
-            <Param name="recordName" wrapper={<strong />}>
-              {recordName}
-            </Param>
-            ?
+            <Param name="recordName" wrapper={<strong />} value={recordName} />?
           </Translate>
         </div>
       </Modal.Content>
@@ -85,14 +82,12 @@ const DeleteDialog = ({
         />
         {isButtonDisabled ? (
           <Button color="red" disabled>
-            <Translate>
-              {confirmText || Translate.string('Delete')} (
-              <Param name="countdown_seconds" value={countdown} />)
-            </Translate>
+            {confirmText || Translate.string('Delete')} (
+            <Param name="countdown_seconds" value={countdown} />)
           </Button>
         ) : (
           <Button color="red" onClick={onDelete} disabled={isDeleting} loading={isDeleting}>
-            <Translate>{confirmText || Translate.string('Delete')}</Translate>
+            {confirmText || Translate.string('Delete')}
           </Button>
         )}
       </Modal.Actions>

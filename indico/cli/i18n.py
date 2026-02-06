@@ -473,6 +473,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
             click.secho('Exiting compile command for indico due to mismatched HTML tags.', fg='red', bold=True,
                         err=True)
             sys.exit(1)
+    failed = False
     try:
         if babel_cmd == 'CompileCatalog':
             split_all_po_files()
@@ -493,8 +494,11 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
             merge_pot_files(MESSAGES_ALL_POT, MESSAGES_REACT_POT, MESSAGES_POT, MESSAGES_JS_POT)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
+        failed = True
     if babel_cmd == 'ExtractMessages':
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
+    if failed:
+        sys.exit(1)
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
