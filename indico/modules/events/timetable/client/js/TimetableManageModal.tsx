@@ -96,15 +96,17 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const dayEntries = useSelector(selectors.getCurrentDayEntries);
+  const entries = useSelector(selectors.getCurrentEntries);
+  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
-  const {objId, sessionBlockId} = entry;
+  const {objId, sessionBlockId = expandedSessionBlock?.objId} = entry;
   const isEditing = !!objId;
   const isCreatingChild = !!sessionBlockId;
-  const parent = dayEntries.find(
-    e => e.id === getEntryUniqueId(EntryType.SessionBlock, sessionBlockId)
-  ) as Partial<BlockEntry>;
+  const parent = (expandedSessionBlock ||
+    entries.find(
+      e => e.id === getEntryUniqueId(EntryType.SessionBlock, sessionBlockId)
+    )) as Partial<BlockEntry>;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -176,23 +178,27 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         sessionBlock={parent}
       />
     ),
-    [EntryType.SessionBlock]: sessionValues.length ? (
-      <>
-        {!isEditing && <SessionSelect sessions={sessionValues} required />}
-        <SessionBlockFormFields
-          eventId={eventId}
-          extraOptions={extraOptions}
-          locationParent={snakifyKeys(entry.locationParent)}
-        />
-      </>
-    ) : (
-      <Message
-        icon="question circle"
-        header={Translate.string('No sessions available')}
-        color="yellow"
-        content={Translate.string('Please create a session before creating a session block.')}
-      />
-    ),
+    ...(!isCreatingChild
+      ? {
+          [EntryType.SessionBlock]: sessionValues.length ? (
+            <>
+              {!isEditing && <SessionSelect sessions={sessionValues} required />}
+              <SessionBlockFormFields
+                eventId={eventId}
+                extraOptions={extraOptions}
+                locationParent={snakifyKeys(entry.locationParent)}
+              />
+            </>
+          ) : (
+            <Message
+              icon="question circle"
+              header={Translate.string('No sessions available')}
+              color="yellow"
+              content={Translate.string('Please create a session before creating a session block.')}
+            />
+          ),
+        }
+      : null),
     [EntryType.Break]: (
       <BreakFormFields
         eventId={eventId}
@@ -372,20 +378,18 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
               <Translate>Entry Type</Translate>
             </Header>
             <div>
-              {Object.keys(forms)
-                .filter(key => !(isCreatingChild && key === EntryType.SessionBlock))
-                .map(key => (
-                  <Button
-                    key={key}
-                    type="button"
-                    onClick={() => {
-                      changeForm(key as EntryType);
-                    }}
-                    color={activeType === key ? 'blue' : undefined}
-                  >
-                    {typeLongNames[key as EntryType]}
-                  </Button>
-                ))}
+              {Object.keys(forms).map(key => (
+                <Button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    changeForm(key as EntryType);
+                  }}
+                  color={activeType === key ? 'blue' : undefined}
+                >
+                  {typeLongNames[key as EntryType]}
+                </Button>
+              ))}
             </div>
           </Segment>
           <Divider />

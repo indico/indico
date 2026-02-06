@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {EntryType, ReduxState, Session} from './types';
+import {BlockEntry, EntryType, ReduxState, Session} from './types';
 import {DAY_SIZE, getDiffInDays, getDateKey, minutesToPixels} from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -87,12 +87,42 @@ export const getSessionById = createSelector(
   (sessions, id) => sessions[id]
 );
 
+export const getCurrentDayEntries = createSelector(
+  getDayEntries,
+  getCurrentDate,
+  (entries, currentDate) => entries[getDateKey(currentDate)]
+);
+
+export const getExpandedSessionBlockId = createSelector(
+  getNavigation,
+  navigation => navigation.expandedSessionBlockId
+);
+
+export const getExpandedSessionBlock = createSelector(
+  getExpandedSessionBlockId,
+  getCurrentDayEntries,
+  (sessionBlockId, entries) =>
+    entries.find(entry => entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) ??
+    null
+);
+
 export const getCurrentLimits = createSelector(
   getCurrentDate,
   getEventStartDt,
   getEventEndDt,
-  (currentDate: Moment, startDt: Moment, endDt: Moment): [number, number] => {
+  getExpandedSessionBlock,
+  (
+    currentDate: Moment,
+    startDt: Moment,
+    endDt: Moment,
+    sessionBlock: BlockEntry
+  ): [number, number] => {
     const limits: [number, number] = [0, DAY_SIZE];
+
+    if (sessionBlock) {
+      startDt = moment(sessionBlock.startDt);
+      endDt = moment(sessionBlock.startDt).add(sessionBlock.duration, 'minutes');
+    }
 
     if (startDt.isSame(currentDate, 'day')) {
       limits[0] = minutesToPixels(moment.duration(startDt.format('HH:mm')).asMinutes());
@@ -106,10 +136,10 @@ export const getCurrentLimits = createSelector(
   }
 );
 
-export const getCurrentDayEntries = createSelector(
-  getDayEntries,
-  getCurrentDate,
-  (entries, currentDate) => entries[getDateKey(currentDate)]
+export const getCurrentEntries = createSelector(
+  getCurrentDayEntries,
+  getExpandedSessionBlock,
+  (entries, sessionBlock: BlockEntry) => sessionBlock?.children ?? entries
 );
 
 export const getUnscheduled = createSelector(
@@ -138,7 +168,12 @@ export const showUnscheduled = createSelector(
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
-  staticData => staticData.defaultContribDurationMinutes
+  getSessions,
+  getExpandedSessionBlock,
+  (staticData, sessions, expandedSessionBlock) => {
+    const session = sessions[expandedSessionBlock?.sessionId];
+    return session?.defaultContribDurationMinutes || staticData.defaultContribDurationMinutes;
+  }
 );
 
 export const getEventLocationParent = createSelector(

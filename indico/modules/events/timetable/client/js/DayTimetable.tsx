@@ -53,6 +53,11 @@ interface DayTimetableProps {
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  // (Ajob) In session block view, children become top-level entries
+  const parent = useSelector(selectors.getExpandedSessionBlock);
+  const parentEndDt = parent
+    ? moment(parent.startDt).add(parent.duration, 'minutes').format()
+    : null;
 
   const setDurations = useMemo(() => {
     const obj = {};
@@ -87,7 +92,12 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
             {...entry}
           />
         ) : (
-          <DraggableEntry key={entry.id} setDuration={setDurations[entry.id]} {...entry} />
+          <DraggableEntry
+            key={entry.id}
+            setDuration={setDurations[entry.id]}
+            parentEndDt={parentEndDt}
+            {...entry}
+          />
         )
       )}
     </>
@@ -117,6 +127,8 @@ export function DayTimetable({
   const [limitTop, limitBottom] = limits;
   const scrollPositionRef = useRef<number>(scrollPosition);
   const draftEntry = useSelector(selectors.getDraftEntry);
+  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const isDragging = draggingStartPos !== null;
@@ -174,25 +186,42 @@ export function DayTimetable({
     mouse: MousePosition,
     offset
   ) {
-    const [newLayout, newUnscheduled, startDt] =
-      layoutAfterUnscheduledDrop(
-        dt,
-        unscheduled,
-        entries,
+    const sessionBlockId = expandedSessionBlock?.id;
+
+    if (sessionBlockId) {
+      const {startDt: sbStartDt} = expandedSessionBlock;
+      const sbEndDt = moment(sbStartDt).add(expandedSessionBlock.duration, 'minutes');
+      handleUnscheduledDropOnBlock(
         who,
-        over,
+        {...over, id: sessionBlockId},
         delta,
         mouse,
         offset,
-        eventStartDt,
-        eventEndDt
-      ) || [];
-    if (!newLayout) {
-      return;
+        over,
+        sbStartDt,
+        sbEndDt
+      );
+    } else {
+      const [newLayout, newUnscheduled, startDt] =
+        layoutAfterUnscheduledDrop(
+          dt,
+          unscheduled,
+          currentDayEntries,
+          who,
+          over,
+          delta,
+          mouse,
+          offset,
+          eventStartDt,
+          eventEndDt
+        ) || [];
+      if (!newLayout) {
+        return;
+      }
+      // TODO(tomas): use something better than 'unscheduled-' prefix
+      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
     }
-    // TODO(tomas): use something better than 'unscheduled-' prefix
-    const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-    dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
   }
 
   function handleUnscheduledDropOnBlock(
@@ -201,21 +230,23 @@ export function DayTimetable({
     delta: Transform,
     mouse: MousePosition,
     offset,
-    calendar: Over
+    calendar: Over,
+    minStartDt: Moment = eventStartDt,
+    maxEndDt: Moment = eventEndDt
   ) {
     const [newLayout, newUnscheduled, startDt, blockId] =
       layoutAfterUnscheduledDropOnBlock(
         dt,
         unscheduled,
-        entries,
+        currentDayEntries,
         who,
         over,
         delta,
         mouse,
         offset,
         calendar,
-        eventStartDt,
-        eventEndDt
+        minStartDt,
+        maxEndDt
       ) || [];
     if (!newLayout) {
       return;
@@ -228,8 +259,34 @@ export function DayTimetable({
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
-    const [newLayout, movedEntry] = layoutAfterDropOnCalendar(entries, who, over, delta, mouse);
-    dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
+    const sessionBlockId = expandedSessionBlock?.id;
+    if (sessionBlockId) {
+      const [newLayout, movedEntry] = layoutAfterDropOnBlock(
+        currentDayEntries,
+        who,
+        {...over, id: sessionBlockId},
+        delta,
+        mouse,
+        over
+      );
+      dispatch(
+        actions.changeEntryLayout(
+          movedEntry,
+          newLayout,
+          getDateKey(dt),
+          expandedSessionBlock?.objId
+        )
+      );
+    } else {
+      const [newLayout, movedEntry] = layoutAfterDropOnCalendar(
+        currentDayEntries,
+        who,
+        over,
+        delta,
+        mouse
+      );
+      dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
+    }
   }
 
   function handleDropOnBlock(
@@ -296,31 +353,37 @@ export function DayTimetable({
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY, [
-        0,
-        minutesToPixels(defaultContributionDuration),
-      ]);
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY);
 
       if (event.button !== 0 || event.target !== calendarRef.current || isWithinLimitsWithOffset) {
         return;
       }
 
       const rect = calendarRef.current.getBoundingClientRect();
-      const y = minutesToPixels(
+      let y = minutesToPixels(
         Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES
       );
+      const maxPossibleDuration = pixelsToMinutes(limitBottom - limitTop);
+      const duration = Math.min(defaultContributionDuration, maxPossibleDuration);
+      const pxSurplus = Math.max(0, y + minutesToPixels(duration) - limitBottom);
 
-      const startDt = moment(dt)
+      let startDt = moment(dt)
         .startOf('days')
         .add(minHour, 'hours')
         .add(pixelsToMinutes(y), 'minutes');
+
+      if (pxSurplus > 0) {
+        // Allows creation of blocks in the entire clickable area by shifting startDt
+        startDt = moment(startDt).subtract(pixelsToMinutes(pxSurplus), 'minutes');
+        y -= pxSurplus;
+      }
 
       setDraggingStartPos(y);
       dispatch(
         actions.setDraftEntry({
           startDt: moment.max(startDt, dt),
-          duration: defaultContributionDuration,
+          duration,
           locationParent: eventLocationParent,
           locationData: {...eventLocationParent.location_data, inheriting: true},
           y,
@@ -365,7 +428,7 @@ export function DayTimetable({
       calendar.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour, limits]);
 
   useEffect(() => {
     if (wrapperRef.current) {
