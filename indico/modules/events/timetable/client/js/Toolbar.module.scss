@@ -35,6 +35,38 @@ $toolbar-bg-color: $raincloud-gray;
       height: 100px;
       overflow-y: hidden;
 
+      &.block {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        padding-top: 12px;
+
+        > :is(.header, .session) {
+          margin: 0;
+        }
+
+        > .header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          letter-spacing: 1px;
+        }
+
+        > .session {
+          font-weight: normal;
+          padding: 2px 6px;
+          border-radius: 100vh;
+        }
+
+        .close-btn {
+          box-shadow: none;
+          margin: 0;
+          padding: 2px;
+        }
+      }
+
       .days-wrapper {
         flex-shrink: 1;
         width: 100%;

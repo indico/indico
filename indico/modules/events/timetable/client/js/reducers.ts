@@ -459,6 +459,8 @@ export default {
         return {...state, isExpanded: !state.isExpanded};
       case actions.TOGGLE_DRAFT:
         return {...state, isDraft: !state.isDraft};
+      case actions.SET_EXPANDED_SESSION_BLOCK_ID:
+        return {...state, expandedSessionBlockId: action.sessionBlockId};
       default:
         return state;
     }
