@@ -47,6 +47,8 @@ import {getCurrentDateLocalStorage} from './utils';
         navigation: {
           isDraft: eventInfo.isDraft,
           currentDate,
+          // Refers to when a user clicks to view a session block as a timetable
+          expandedSessionBlockId: null,
         },
       };
 
