@@ -413,7 +413,8 @@ def _get_csp_report_config():
 
 def _inject_report_sample(directive):
     name, *args = directive.split(' ')
-    if "'report-sample'" in args or (not name.endswith('-src') and '-src-' not in name):
+    is_src_directive = name.endswith('-src') or '-src-' in name
+    if "'report-sample'" in args or not is_src_directive:
         # only set it on source directives that don't already have it
         return directive
     return f"{directive} 'report-sample'"
