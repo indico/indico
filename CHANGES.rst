@@ -21,6 +21,9 @@ Security fixes
     information is accessible via an unauthenticated HTTP GET request (e.g. in AWS cloud
     environments).
 
+- Fix an open redirect which could help making harmful URLs look more trustworthy by linking
+  to Indico and having it redirect the user to a malicious site
+
 Improvements
 ^^^^^^^^^^^^
 
