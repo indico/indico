@@ -41,7 +41,8 @@ from indico.modules.events.registration.controllers import (CheckEmailMixin, Reg
                                                             UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase,
-                                                                       RHManageRegistrationFieldActionBase)
+                                                                       RHManageRegistrationFieldActionBase,
+                                                                       _CheckinAccessMixin)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
                                                       RegistrationBasePriceForm,
@@ -95,7 +96,7 @@ def _render_registration_details(registration):
                                            assigned_tags=assigned_tags, all_tags=all_tags)
 
 
-class RHRegistrationsListManage(RHManageRegFormBase):
+class RHRegistrationsListManage(_CheckinAccessMixin, RHManageRegFormBase):
     """List all registrations of a specific registration form of an event."""
 
     def _process(self):
@@ -183,7 +184,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                                                     action_menu_items=action_menu_items, **reg_list_kwargs)
 
 
-class RHRegistrationsListCustomize(RHManageRegFormBase):
+class RHRegistrationsListCustomize(_CheckinAccessMixin, RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event."""
 
     ALLOW_LOCKED = True
@@ -203,7 +204,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
-class RHRegistrationListStaticURL(RHManageRegFormBase):
+class RHRegistrationListStaticURL(_CheckinAccessMixin, RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list."""
 
     ALLOW_LOCKED = True
@@ -212,7 +213,7 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
         return jsonify(url=self.list_generator.generate_static_url())
 
 
-class RHRegistrationDetails(RHManageRegistrationBase):
+class RHRegistrationDetails(_CheckinAccessMixin, RHManageRegistrationBase):
     """Display information about a registration."""
 
     def _process(self):
@@ -795,7 +796,7 @@ class RHRegistrationRemoveModification(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationCheckIn(RHManageRegistrationBase):
+class RHRegistrationCheckIn(_CheckinAccessMixin, RHManageRegistrationBase):
     """Set checked in state of a registration."""
 
     def _process_PUT(self):
@@ -811,7 +812,7 @@ class RHRegistrationCheckIn(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
+class RHRegistrationBulkCheckIn(_CheckinAccessMixin, RHRegistrationsActionBase):
     """Bulk apply check-in/not checked-in state to registrations."""
 
     def _process(self):
