@@ -42,7 +42,8 @@ from indico.modules.events.registration.controllers import (CheckEmailMixin, Reg
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase,
                                                                        RHManageRegistrationFieldActionBase,
-                                                                       _CheckinAccessMixin)
+                                                                       _CheckinAccessMixin, _ModerationAccessMixin,
+                                                                       _RegistrationAccessMixin)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
                                                       RegistrationBasePriceForm,
@@ -96,7 +97,7 @@ def _render_registration_details(registration):
                                            assigned_tags=assigned_tags, all_tags=all_tags)
 
 
-class RHRegistrationsListManage(_CheckinAccessMixin, RHManageRegFormBase):
+class RHRegistrationsListManage(_RegistrationAccessMixin, RHManageRegFormBase):
     """List all registrations of a specific registration form of an event."""
 
     def _process(self):
@@ -184,7 +185,7 @@ class RHRegistrationsListManage(_CheckinAccessMixin, RHManageRegFormBase):
                                                     action_menu_items=action_menu_items, **reg_list_kwargs)
 
 
-class RHRegistrationsListCustomize(_CheckinAccessMixin, RHManageRegFormBase):
+class RHRegistrationsListCustomize(_RegistrationAccessMixin, RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event."""
 
     ALLOW_LOCKED = True
@@ -204,7 +205,7 @@ class RHRegistrationsListCustomize(_CheckinAccessMixin, RHManageRegFormBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
-class RHRegistrationListStaticURL(_CheckinAccessMixin, RHManageRegFormBase):
+class RHRegistrationListStaticURL(_RegistrationAccessMixin, RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list."""
 
     ALLOW_LOCKED = True
@@ -213,7 +214,7 @@ class RHRegistrationListStaticURL(_CheckinAccessMixin, RHManageRegFormBase):
         return jsonify(url=self.list_generator.generate_static_url())
 
 
-class RHRegistrationDetails(_CheckinAccessMixin, RHManageRegistrationBase):
+class RHRegistrationDetails(_RegistrationAccessMixin, RHManageRegistrationBase):
     """Display information about a registration."""
 
     def _process(self):
@@ -696,7 +697,7 @@ def _modify_registration_status(registration, approve, rejection_reason='', atta
     return True
 
 
-class RHRegistrationApprove(RHManageRegistrationBase):
+class RHRegistrationApprove(_ModerationAccessMixin, RHManageRegistrationBase):
     """Accept a registration."""
 
     def _process(self):
@@ -704,7 +705,7 @@ class RHRegistrationApprove(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationReject(RHManageRegistrationBase):
+class RHRegistrationReject(_ModerationAccessMixin, RHManageRegistrationBase):
     """Reject a registration."""
 
     def _process(self):
@@ -717,7 +718,7 @@ class RHRegistrationReject(RHManageRegistrationBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
-class RHRegistrationReset(RHManageRegistrationBase):
+class RHRegistrationReset(_ModerationAccessMixin, RHManageRegistrationBase):
     """Reset a registration back to a non-approved status."""
 
     def _process(self):
@@ -755,7 +756,7 @@ class RHRegistrationHide(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationManageWithdraw(RHManageRegistrationBase):
+class RHRegistrationManageWithdraw(_ModerationAccessMixin, RHManageRegistrationBase):
     """Let a manager withdraw a registration."""
 
     def _process(self):
@@ -839,7 +840,7 @@ def _bulk_modify_registration_status(registrations, approve, rejection_reason=''
     return num_modified, num_skipped
 
 
-class RHRegistrationsApprove(RHRegistrationsActionBase):
+class RHRegistrationsApprove(_ModerationAccessMixin, RHRegistrationsActionBase):
     """Accept selected registrations from registration list."""
 
     def _process(self):
@@ -857,7 +858,7 @@ class RHRegistrationsApprove(RHRegistrationsActionBase):
         return jsonify_data(**self.list_generator.render_list())
 
 
-class RHRegistrationsReject(RHRegistrationsActionBase):
+class RHRegistrationsReject(_ModerationAccessMixin, RHRegistrationsActionBase):
     """Reject selected registrations from registration list."""
 
     def _process(self):
@@ -884,7 +885,7 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
-class RHRegistrationsReset(RHRegistrationsActionBase):
+class RHRegistrationsReset(_ModerationAccessMixin, RHRegistrationsActionBase):
     """Reset selected registration from registration list."""
 
     def _process(self):

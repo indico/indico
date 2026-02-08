@@ -23,7 +23,7 @@ from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
-                                                                       _CheckinAccessMixin)
+                                                                       _RegistrationAccessMixin)
 from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
                                                       ParticipantsDisplayFormColumnsForm, RegistrationFormCloneForm,
                                                       RegistrationFormCreateForm, RegistrationFormEditForm,
@@ -51,7 +51,7 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
-class RHManageRegistrationForms(_CheckinAccessMixin, RHManageRegFormsBase):
+class RHManageRegistrationForms(_RegistrationAccessMixin, RHManageRegFormsBase):
     """List all registrations forms for an event."""
 
     def _process(self):
