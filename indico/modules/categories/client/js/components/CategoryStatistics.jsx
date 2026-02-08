@@ -9,7 +9,7 @@ import categoryStatisticsURL from 'indico-url:categories.statistics_json';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useContext, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo, useRef} from 'react';
 import {Chart} from 'react-charts';
 import {Container, Header, Segment, Statistic, Message, Loader} from 'semantic-ui-react';
 
@@ -20,12 +20,28 @@ import {LocaleContext} from '../context.js';
 import './CategoryStatistics.module.scss';
 
 export default function CategoryStatistics({categoryId}) {
-  const {data, loading: isLoading} = useIndicoAxios(
+  const {
+    data,
+    error,
+    loading: isLoading,
+    reFetch,
+  } = useIndicoAxios(
     {url: categoryStatisticsURL({category_id: categoryId})},
-    {camelize: true}
+    {camelize: true, unhandledErrors: [409]}
   );
 
-  if (isLoading) {
+  const timeoutRef = useRef(null);
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (error?.response?.status === 409) {
+      timeoutRef.current = setTimeout(() => reFetch(), 5000);
+    }
+  }, [error, reFetch]);
+
+  if (isLoading || error?.response?.status === 409) {
     return <Loader size="massive" active />;
   } else if (!data) {
     return null;

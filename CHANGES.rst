@@ -79,6 +79,7 @@ Internal Changes
   places where the URL is user-provided (Mastodon URL check, LaTeX image retrieval, static
   site generation) (:pr:`7244`)
 - Log requests to the legacy export API to ``indico.log`` (:pr:`7290`)
+- Disallow concurrent generation of category statistics (:pr:`7307`)
 
 
 Version 3.3.9
