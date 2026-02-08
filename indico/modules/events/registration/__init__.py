@@ -57,7 +57,8 @@ def _merge_users(target, source, **kwargs):
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     registration_section = 'organization' if event.type == 'conference' else 'advanced'
-    if not any(event.can_manage(session.user, p) for p in ('registration', 'registration_moderation', 'checkin')):
+    if not any(event.can_manage(session.user, p) for p in ('registration', 'registration_moderation',
+                                                           'registration_checkin')):
         return
     if event.type != 'conference':
         yield SideMenuItem('participants', _('Participants'), url_for('event_participation.manage', event),
@@ -174,7 +175,7 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_checkin_management_url(event, **kwargs):
-    if event.can_manage(session.user, permission='checkin'):
+    if event.can_manage(session.user, permission='registration_checkin'):
         return url_for('event_registration.manage_regform_list', event)
 
 
@@ -258,22 +259,22 @@ class RegistrationFeature(EventFeature):
 
 class RegistrationPermission(ManagementPermission):
     name = 'registration'
-    friendly_name = _('Registration')
+    friendly_name = _('Registration (everything)')
     description = _('Grants management access to the registration form.')
     user_selectable = True
 
 
 class RegistrationModerationPermission(ManagementPermission):
     name = 'registration_moderation'
-    friendly_name = _('Registration moderation')
+    friendly_name = _('Registration (moderation only)')
     description = _('Grants access to approve and reject registrations without allowing registration form '
                     'configuration.')
     user_selectable = True
 
 
 class CheckinPermission(ManagementPermission):
-    name = 'checkin'
-    friendly_name = _('Check-in')
+    name = 'registration_checkin'
+    friendly_name = _('Registration (check-in only)')
     description = _('Grants access to check-in management.')
     user_selectable = True
 

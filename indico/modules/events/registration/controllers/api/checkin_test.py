@@ -25,7 +25,7 @@ def _configure_dummy_event(dummy_event):
 @pytest.fixture
 def auth_headers(dummy_personal_token, dummy_user, dummy_event):
     dummy_personal_token.scopes = ['registrants']
-    dummy_event.update_principal(dummy_user, add_permissions={'checkin'})
+    dummy_event.update_principal(dummy_user, add_permissions={'registration_checkin'})
     return {'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'}
 
 

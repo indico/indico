@@ -22,7 +22,7 @@ from indico.util.i18n import _
 def _can_manage_registration(event, user):
     """Check if the user has any registration-related management permission."""
     return any(event.can_manage(user, permission=p)
-               for p in ('registration', 'registration_moderation', 'checkin'))
+               for p in ('registration', 'registration_moderation', 'registration_checkin'))
 
 
 class _RegistrationAccessMixin:
@@ -47,12 +47,12 @@ class _ModerationAccessMixin:
 
 
 class _CheckinAccessMixin:
-    """Mixin granting access to users with 'registration' or 'checkin' permission."""
+    """Mixin granting access to users with 'registration' or 'registration_checkin' permission."""
 
     def _check_access(self):
         self._require_user()
         if not (self.event.can_manage(session.user, permission='registration') or
-                self.event.can_manage(session.user, permission='checkin')):
+                self.event.can_manage(session.user, permission='registration_checkin')):
             raise Forbidden(_('You are not authorized to manage this event.'))
         check_event_locked(self, self.event)
 
