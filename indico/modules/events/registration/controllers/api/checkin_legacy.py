@@ -24,7 +24,8 @@ class RHAPIRegistrant(RH):
     """
 
     def _check_access(self):
-        if not self.event.can_manage(session.user, permission='registration_checkin'):
+        if not any(self.event.can_manage(session.user, permission=p)
+                   for p in ('registration', 'registration_checkin')):
             raise Forbidden
 
     def _process_args(self):
@@ -63,7 +64,8 @@ class RHAPIRegistrants(RH):
     """
 
     def _check_access(self):
-        if not self.event.can_manage(session.user, permission='registration_checkin'):
+        if not any(self.event.can_manage(session.user, permission=p)
+                   for p in ('registration', 'registration_checkin')):
             raise Forbidden
 
     def _process_args(self):
