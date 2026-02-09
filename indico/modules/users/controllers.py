@@ -434,8 +434,11 @@ class RHProfilePicturePreview(RHUserBase):
             return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                              no_cache=True, inline=True)
         elif not config.DISABLE_GRAVATAR:
-            gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
-            return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
+            try:
+                gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
+                return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
+            except RuntimeError as exc:
+                raise UserValueError(str(exc))
         else:
             raise NotFound
 
@@ -493,8 +496,11 @@ class RHSaveProfilePicture(RHUserBase):
             image_bytes.seek(0)
             set_user_avatar(self.user, image_bytes.read(), f.filename)
         else:
-            content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
-            set_user_avatar(self.user, content, source.name, lastmod)
+            try:
+                content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
+                set_user_avatar(self.user, content, source.name, lastmod)
+            except RuntimeError as exc:
+                raise UserValueError(str(exc))
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
         self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Picture updated', session.user,
