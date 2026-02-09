@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
 import os
 import uuid
 from urllib.parse import urlsplit
@@ -439,10 +440,9 @@ def inject_csp(response):
     sources = ['self', 'unsafe-eval']
     if nonce := get_csp_nonce(init=False):
         sources.append(f'nonce-{nonce}')
-    sources.extend(config.CSP_SCRIPT_SOURCES)
     if config.CSP_REPORT_URI and 'report-sample' not in sources:
         sources.append('report-sample')
-    sources = ' '.join(f"'{x}'" for x in sources)
+    sources = ' '.join(itertools.chain((f"'{x}'" for x in sources), config.CSP_SCRIPT_SOURCES))
     csp_directives = [
         f'script-src {sources}',
         "base-uri 'none'",
