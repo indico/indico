@@ -25,7 +25,6 @@ export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePic
 export {default as CalendarRangeDatePicker} from './dates/CalendarRangeDatePicker';
 export {default as Carousel} from './Carousel';
 export {default as Checkbox} from './Checkbox';
-export {default as ComboBox} from './ComboBox';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';
 export {default as EmailListField, FinalEmailList} from './EmailListField';
@@ -46,6 +45,8 @@ export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as ManageNotes} from './notes/ManageNotes';
 export {default as Select} from './Select';
+export {default as TimePicker} from './time/TimePicker';
+export {default as TimeRangePicker} from './time/TimeRangePicker';
 export {default as TinyMCETextEditor, FinalTinyMCETextEditor} from './TinyMCETextEditor';
 export {default as WTFButtonsBooleanField} from './WTFButtonsBooleanField';
 export {default as WTFDateField} from './WTFDateField';

@@ -71,7 +71,7 @@ export default class TimeForm extends FilterFormComponent {
           startTime={startTime}
           endTime={endTime}
           onChange={this.setTimes}
-          minTime={minTime}
+          minTime={minTime ? toMoment(minTime, 'HH:mm') : null}
         />
       </div>
     );

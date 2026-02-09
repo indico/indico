@@ -1,0 +1,100 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import PropTypes from 'prop-types';
+import React, {useRef} from 'react';
+
+import {useNativeEvent} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
+
+import {commonDefaults, commonProps, timeString} from './prop_types.js';
+import {
+  TIME_FORMAT_PLACEHOLDER,
+  createBlurHandler,
+  useInputValue,
+  useNotice,
+  useOptions,
+  useSyncInputWithProp,
+} from './shared.js';
+
+import './time.module.scss';
+
+const getTimeClearedMessage = () => Translate.string('The time value was invalid and was cleared');
+const getTimeFormattedMessage = time =>
+  Translate.string('The time value was automatically formatted as {time}', {time});
+
+export default function TimePicker({
+  value,
+  startTime,
+  step,
+  min,
+  max,
+  timeFormat,
+  onChange,
+  ...inputProps
+}) {
+  const pickerRef = useRef();
+  const placeholder = TIME_FORMAT_PLACEHOLDER[timeFormat];
+
+  const [notice, setNotice] = useNotice();
+  const [inputValue, setInputValue] = useInputValue(value, timeFormat);
+  const options = useOptions(value, startTime, step, min, max, timeFormat);
+
+  useSyncInputWithProp(value, inputValue, setInputValue, timeFormat);
+
+  const handleBlur = createBlurHandler(
+    timeFormat,
+    setInputValue,
+    onChange,
+    setNotice,
+    getTimeClearedMessage,
+    getTimeFormattedMessage
+  );
+
+  const handleChange = evt => {
+    setInputValue(evt.target.value);
+  };
+
+  useNativeEvent(pickerRef, 'change', handleChange);
+
+  return (
+    <div styleName="time-picker">
+      <ind-time-picker ref={pickerRef} value={inputValue}>
+        <input
+          type="text"
+          role="combobox"
+          autoComplete="off"
+          placeholder={placeholder}
+          onBlur={handleBlur}
+          data-time-format={timeFormat}
+          {...inputProps}
+        />
+        <ul role="listbox">{options}</ul>
+        {inputProps.required ? null : (
+          <button type="button" value="clear" disabled={inputProps.disabled}>
+            <Translate as="span">Clear the time</Translate>
+          </button>
+        )}
+      </ind-time-picker>
+      <span styleName="notice" aria-live="polite">
+        {notice}
+      </span>
+    </div>
+  );
+}
+
+TimePicker.propTypes = {
+  value: PropTypes.string,
+  startTime: timeString,
+  ...commonProps,
+};
+
+TimePicker.defaultProps = {
+  value: '',
+  startTime: '',
+  ...commonDefaults,
+};
