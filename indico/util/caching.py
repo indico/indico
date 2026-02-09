@@ -9,6 +9,7 @@ from functools import wraps
 from inspect import getcallargs
 
 from flask import current_app, g, has_request_context
+from werkzeug.exceptions import Conflict
 
 
 _notset = object()
@@ -109,6 +110,47 @@ def memoize_redis(ttl, *, versioned=False):
         memoizer.is_cached = _is_cached
         if versioned:
             memoizer.bump_version = _bump_version
+        return memoizer
+
+    return decorator
+
+
+def global_lock(*, timeout, use_args=True):
+    """Globally lock a function so it cannot execute in parallel.
+
+    This is intended for expensive endpoints where it is not possible to apply more
+    fine-grained rate limiting (e.g. because they do not require authentication) AND
+    it does not cause disruption to users if requests can randomly fail. In particular,
+    it should only be used in places where the potential DoS of someone repeatedly
+    calling the endpoint does not cause notable issues for anyone else, for example by
+    caching the result and only applying this lock when no cached value is available.
+    """
+    from indico.core.cache import make_scoped_cache
+    cache = make_scoped_cache('global-lock')
+
+    def decorator(f):
+        def _get_key(args, kwargs):
+            args_key = (make_hashable(getcallargs(f, *args, **kwargs)),) if use_args else ()
+            return f.__module__, f.__name__, *args_key
+
+        def _is_running(*args, **kwargs):
+            return cache.get(_get_key(args, kwargs), _notset) is not _notset
+
+        @wraps(f)
+        def memoizer(*args, **kwargs):
+            if current_app.config['TESTING'] or current_app.config.get('REPL'):
+                # No limits during tests or in the shell
+                return f(*args, **kwargs)
+
+            key = _get_key(args, kwargs)
+            if cache.get(key, _notset) is not _notset:
+                raise Conflict('Please try again later')
+            cache.set(key, True, timeout=timeout)
+            rv = f(*args, **kwargs)
+            cache.delete(key)
+            return rv
+
+        memoizer.is_running = _is_running
         return memoizer
 
     return decorator

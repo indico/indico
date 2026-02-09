@@ -24,7 +24,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.sessions import Session
 from indico.modules.events.settings import unlisted_events_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.util.caching import memoize_redis
+from indico.util.caching import global_lock, memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.iterables import materialize_iterable
@@ -112,6 +112,7 @@ def get_attachment_count(category_id=None):
 
 
 @memoize_redis(86400)
+@global_lock(timeout=300, use_args=False)
 def get_category_stats(category_id=None):
     """Get category statistics.
 
