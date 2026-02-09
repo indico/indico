@@ -268,7 +268,7 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
   }
 
   const entriesSchedule: {time: number; type: 'start' | 'end'; id: string}[] = [];
-  const overlaps = new Set<string>();
+  let overlaps = new Set<string>();
   const active = new Set<string>();
 
   for (const e of entries) {
@@ -278,9 +278,7 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
     entriesSchedule.push({time: end, type: 'end', id: e.id});
     // Children are checked for overlap in their own scope
     if (e.type === EntryType.SessionBlock && (e as BlockEntry).children?.length) {
-      computeOverlappingEntryIds(e.children).forEach(id => {
-        overlaps.add(id);
-      });
+      overlaps = overlaps.union(computeOverlappingEntryIds(e.children));
     }
   }
 
@@ -291,10 +289,7 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
   for (const e of entriesSchedule) {
     if (e.type === 'start') {
       if (active.size > 0) {
-        overlaps.add(e.id);
-        for (const id of active) {
-          overlaps.add(id);
-        }
+        overlaps = overlaps.union(new Set([e.id, ...active]));
       }
       active.add(e.id);
     } else {
@@ -311,8 +306,5 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
  * @returns A flattened list of entries including children of block entries
  */
 export const flattenEntries = (entries: Entry[]): Entry[] => {
-  return entries.reduce(
-    (acc, curr) => [...acc, curr, ...((curr as BlockEntry)?.children ?? [])],
-    []
-  );
+  return entries.map(e => [e, ...((e as BlockEntry)?.children ?? [])]).flat();
 };
