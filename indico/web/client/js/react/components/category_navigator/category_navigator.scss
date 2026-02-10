@@ -1,0 +1,305 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+
+#category-navigator {
+  @extend %dialog-modal;
+  @extend %text-size-reset;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+
+  --border-thin: 0.0625em;
+  --border-thick: 0.25em;
+  --button-font-weight: 300;
+  --separator-border: 1px solid var(--container-separator-color);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .search {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    border: var(--control-border);
+    border-radius: var(--control-border-radius);
+  }
+
+  .search label {
+    display: contents;
+  }
+
+  .search label > span {
+    @extend %visually-hidden;
+  }
+
+  .search input {
+    flex: 1;
+    width: 100%;
+    padding: 0.5em 2.5em 0.5em 1em;
+
+    outline: revert;
+    border: none;
+    border-radius: var(--control-border-radius);
+    font: inherit;
+    color: inherit;
+  }
+
+  .search button[value='clear-search']:not([hidden]) {
+    @extend %button-icon-only;
+
+    position: absolute;
+    right: 0.5em;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-close;
+    }
+  }
+
+  .main {
+    flex: 1;
+
+    overflow-y: auto;
+
+    border: 1px solid var(--container-separator-color);
+    background: var(--background-secondary);
+  }
+
+  .category-list,
+  .search-result-list {
+    display: grid;
+    grid-template-columns: 2.5em 2em 1fr auto minmax(4.5em, auto);
+    column-gap: 0.5em;
+  }
+
+  .subcategory-list {
+    display: contents;
+  }
+
+  .current-category,
+  .subcategory,
+  .search-result {
+    display: grid;
+    grid-column: 1/6;
+    grid-template-columns: subgrid;
+    align-items: center;
+
+    min-height: 3.5em;
+
+    background: var(--background-primary);
+    border-bottom: var(--separator-border);
+    border-left: 0.25em solid transparent;
+  }
+
+  .current-category,
+  .subcategory:hover,
+  .search-result:hover {
+    border-left-color: var(--accent-color);
+  }
+
+  .protection-indicator {
+    justify-self: center;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-shield;
+    }
+
+    & > span {
+      @extend %visually-hidden;
+    }
+
+    &[data-protected='false'] {
+      opacity: 0.1;
+    }
+
+    &[data-protected='true'] {
+      color: var(--protected-color);
+    }
+  }
+
+  .current-category .protection-indicator,
+  .search-result .result-type-indicator {
+      grid-column: 1/2;
+  }
+
+  .search-result .protection-indicator {
+    grid-column: 2/3;
+  }
+
+  .current-category .title-wrapper {
+      grid-column: 2/4;
+  }
+
+  .search-result button[value='drill-down'] {
+    grid-column: 3/4;
+  }
+
+  .go-to-parent {
+    @extend %button-icon-only;
+
+    justify-self: center;
+
+    aspect-ratio: 1;
+    width: 1.5em;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-arrow-up;
+
+      color: var(--clickable-text-color);
+    }
+  }
+
+  .subcategory {
+    .protection-indicator {
+      grid-column: 2/3;
+    }
+
+    .title-wrapper,
+    button[value='drill-down'] {
+      grid-column: 3/4;
+    }
+  }
+
+  button[value='drill-down'] {
+    @extend %link-button;
+
+    text-align: left;
+  }
+
+  button[value='action'] {
+    grid-column: 4/5;
+  }
+
+  .category-stats {
+    grid-column: 5/6;
+
+    padding: 0 0.5em;
+  }
+
+  .category-stats > :first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-list;
+    }
+  }
+
+  .breadcrumb {
+    font-size: 87.5%;
+  }
+
+  .breadcrumb button {
+    @extend %link-button;
+  }
+
+  .category-action {
+    @extend %button;
+
+    --button-surface-color: transparent;
+
+    &::after {
+      @extend %icon;
+      @extend %icon-next;
+    }
+
+    &:is(:hover, :focus-visible) {
+      @extend %button-main-action;
+    }
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 20em;
+  }
+
+  .loading > * {
+    @extend %spinner-large;
+  }
+
+  .placeholder {
+    grid-column: 1/6;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+
+    width: 100%;
+    min-height: 20em;
+
+    text-align: center;
+  }
+
+  .placeholder-text {
+    font-size: var(--text-size-rel-l);
+    font-weight: bold;
+    color: var(--text-secondary-color);
+  }
+
+  .placeholder-help {
+    font-size: var(--text-size-rel-s);
+  }
+
+  .link-action {
+    @extend %link-button;
+  }
+
+  .button-bar button {
+    @extend %button;
+  }
+
+  .search-result-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+
+    padding: 0.5em;
+
+    border-bottom: var(--separator-border);
+  }
+
+  .search-result-info .clear {
+    @extend %link-button;
+  }
+
+  .result-type-indicator {
+    justify-self: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5em;
+    aspect-ratio: 1;
+
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    color: var(--accent-color);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-search;
+    }
+  }
+
+  .result-type-indicator span {
+    @extend %visually-hidden;
+  }
+}
