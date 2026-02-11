@@ -72,6 +72,9 @@
                     cache: false,
                     data: $.extend({}, extraData || {}, data),
                     dataType: 'json',
+                    headers: {
+                      'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+                    },
                     complete: IndicoUI.Dialogs.Util.progress(),
                     error: handleAjaxError,
                     success: function(data) {
