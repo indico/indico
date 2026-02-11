@@ -20,6 +20,7 @@ import alembic.config
 import click
 from alembic.script import ScriptDirectory
 from click import ClickException
+from click import BadParameter
 from flask.helpers import get_root_path
 from results.dbdiff import Migration
 from sqlalchemy import create_engine, text
@@ -44,6 +45,47 @@ REGEX_REV_DOCSTRING_HASH = re.compile(r'Revision\s*ID:\s*(\S+)')
 REGEX_ADD_COLUMN = re.compile(r'op\.add_column\([^\)]*?sa\.Column\((?P<body>.*?)schema', re.DOTALL)
 REGEX_NON_NULLABLE = re.compile(r'nullable\s*=\s*False')
 REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
+
+
+@click.command()
+@click.option('-n', '--nb-scripts', 'nb_scripts', default=0, type=int, show_default=True,
+              help='Number of scripts to check from the most recent (0 checks all)')
+@click.option('-v', '--verbose', 'verbose', is_flag=True, default=False, show_default=True,
+              help='Print debug information.')
+@click.option('-p', '--plugin-dir', 'plugin_dir', help='Path to an indico plugin directory', required=False,
+              type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
+              callback=lambda ctx, param, value: _validate_plugin_dir(ctx, param, value))
+def main(nb_scripts, verbose, plugin_dir):
+    """Check sanity of Alembic revision history and migration scripts.
+    By default, two test databases named 'indico_dbtest' and
+    'indico_dbtest_diff' will be created and dropped. The database names will be
+    overridden by the DB_NAME and DBDIFF_NAME environment variables.
+
+    Since this script uses the command-line PostgreSQL tools any other
+    configuration should be done using the various environment variables like
+    PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
+    """
+    plugin_name = _get_plugin_name(plugin_dir) if plugin_dir else None
+    target = 'Indico' if not plugin_name else f'plugin "{plugin_name}"'
+    click.secho(f'Running DB checks for {target}', fg='blue', bold=True)
+    _set_test_environment(plugin_name, verbose)
+    _check(nb_scripts, plugin_dir, verbose)
+
+
+# -- Validations -------------------------------------------------------------------------------------------------------
+
+def _validate_plugin_dir(ctx, param, plugin_dir: Path):
+    if not plugin_dir:
+        return None
+    if plugin_dir == INDICO_DIR:
+        raise BadParameter(click.style(f'\nIndico core found in {plugin_dir}', fg='red'))
+    try:
+        plugin_name = _get_plugin_name(plugin_dir)
+    except ClickException as e:
+        raise BadParameter(click.style(f'\n{str(e)}', fg='red'))
+    if not (plugin_dir / plugin_name / 'migrations').is_dir():
+        raise BadParameter(click.style(f'\nNo migrations/ folder found in "{plugin_dir}"', fg='red'))
+    return plugin_dir
 
 
 # -- Top-level checks --------------------------------------------------------------------------------------------------
@@ -314,7 +356,6 @@ def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
 def _get_alembic_revisions_dir(plugin_dir=None):
     if plugin_dir:
         return next(plugin_dir.glob('*/migrations'))
-    # TODO: Should it be possible to specify a runtime directory for Indico core, not just plugins?
     return Path(INDICO_DIR) / 'indico' / 'migrations' / 'versions'
 
 
@@ -351,9 +392,9 @@ def _get_plugin_name(plugin_dir):
     # TODO: Is this the best way to get the plugin name?
     packages = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
     if not packages:
-        raise ClickException(click.style(f'No plugin package found in {plugin_dir}', fg='red'))
+        raise ClickException(f'No plugin package found in {plugin_dir}')
     if len(packages) > 1:
-        raise ClickException(click.style(f'More than one plugin package in {plugin_dir}', fg='red'))
+        raise ClickException(f'More than one plugin package in {plugin_dir}')
     return packages[0]
 
 
@@ -371,46 +412,7 @@ def _run(cmd, input_=''):
         return stdout.decode('unicode_escape').strip()
 
 
-def _validate_plugin_dir(ctx, param, plugin_dir: Path):
-    if not plugin_dir:
-        return None
-    try:
-        plugin_name = _get_plugin_name(plugin_dir)
-    except ClickException as e:
-        raise click.BadParameter(str(e))
-    if not (plugin_dir / plugin_name / 'migrations').is_dir():
-        raise click.BadParameter(f'No migrations/ folder found in "{plugin_dir}"')
-    return plugin_dir
-
-
 # -- Entrypoint --------------------------------------------------------------------------------------------------------
-
-@click.command()
-@click.option('-n', '--nb-scripts', 'nb_scripts', default=0, type=int, show_default=True,
-              help='Number of scripts to check from the most recent (0 checks all)')
-@click.option('-v', '--verbose', 'verbose', is_flag=True, default=False, show_default=True,
-              help='Print debug information.')
-@click.option('-p', '--plugin-dir', 'plugin_dir', help='Path to an indico plugin directory', required=False,
-              type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
-              callback=_validate_plugin_dir)
-def main(nb_scripts, verbose, plugin_dir):
-    """Check sanity of Alembic revision history and migration scripts.
-    By default, two test databases named 'indico_dbtest' and
-    'indico_dbtest_diff' will be created and dropped. The database names will be
-    overridden by the DB_NAME and DBDIFF_NAME environment variables.
-
-    Since this script uses the command-line PostgreSQL tools any other
-    configuration should be done using the various environment variables like
-    PGHOST, PGPORT and PGUSER) and your `.pgpass` file.
-    """
-    if plugin_dir == INDICO_DIR:
-        raise ClickException(click.style(f'Plugin directory cannot be the indico directory: {plugin_dir}.', fg='red'))
-    plugin_name = _get_plugin_name(plugin_dir) if plugin_dir else None
-    target = 'Indico' if not plugin_name else f'plugin "{plugin_name}"'
-    click.secho(f'Running DB checks for {target}', fg='blue', bold=True)
-    _set_test_environment(plugin_name, verbose)
-    _check(nb_scripts, plugin_dir, verbose)
-
 
 if __name__ == '__main__':
     main()
