@@ -445,7 +445,9 @@ def inject_csp(response):
     sources = ' '.join(itertools.chain((f"'{x}'" for x in sources), config.CSP_SCRIPT_SOURCES))
     csp_directives = [
         f'script-src {sources}',
-        "base-uri 'none'",
+        # TODO: change base-uri back to 'none' after upgrading jQuery to 4.0 which no longer uses
+        # <base> internally in its $.parseHTML function (to test: open event creation dialog in Chrome)
+        "base-uri 'self'",
         *config.CSP_DIRECTIVES,
     ]
     report_directives, report_headers = _get_csp_report_config()

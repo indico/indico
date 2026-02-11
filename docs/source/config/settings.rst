@@ -859,7 +859,7 @@ Security
 
     Specify custom top-level CSP directives. This can include any CSP directive besides
     ``script-src`` which is already handled by Indico itself (use :data:`CSP_SCRIPT_SOURCES`
-    if you need to add custom values there) and ``base-uri`` which is always set to ``'none'``.
+    if you need to add custom values there) and ``base-uri`` which is always set to ``'self'``.
 
     Default: ``set()``
 
