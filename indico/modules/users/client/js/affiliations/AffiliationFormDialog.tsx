@@ -169,7 +169,7 @@ export default function AffiliationFormDialog({
       initialValues={{...defaultValues, ...(initialValues || {})}}
       disabledUntilChange
     >
-      <FinalInput name="name" label={Translate.string('Name')} required />
+      <FinalInput name="name" label={Translate.string('Name')} required autoFocus />
       <FinalStringListField
         name="alt_names"
         label={Translate.string('Alternative names')}
