@@ -849,7 +849,9 @@ Security
     here or they will not work (use your browser's dev tools to check for log
     messages related to CSP violations). Note that you MUST NOT add any ``nonce``
     values there, as this would make the whole policy useless (knowing the nonce
-    in advance means you can set it on any maliciously injected script).
+    in advance means you can set it on any maliciously injected script). The
+    values specified here are not automatically wrapped in single quotes, so if
+    you want to include e.g. a hash, you need to manually quote it.
 
     Default: ``set()``
 
@@ -857,7 +859,7 @@ Security
 
     Specify custom top-level CSP directives. This can include any CSP directive besides
     ``script-src`` which is already handled by Indico itself (use :data:`CSP_SCRIPT_SOURCES`
-    if you need to add custom values there) and ``base-uri`` which is always set to ``'none'``.
+    if you need to add custom values there) and ``base-uri`` which is always set to ``'self'``.
 
     Default: ``set()``
 

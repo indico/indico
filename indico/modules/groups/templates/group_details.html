@@ -31,6 +31,9 @@
             <script>
                 $.ajax({
                     url: {{ url_for('.group_members', group) | tojson }},
+                    headers: {
+                        'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+                    },
                     error: handleAjaxError,
                     success: function(data) {
                         $('#group-members').html(data.html);

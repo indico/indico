@@ -99,6 +99,9 @@
             function loadLoginForm(url) {
                 $.ajax({
                     url: url,
+                    headers: {
+                        'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+                    },
                     error: handleAjaxError,
                     success: function(data) {
                         $('#form-wrapper').html(data.html);

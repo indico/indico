@@ -262,6 +262,25 @@ def should_inline_file(mimetype, inline=None, *, safe=True):
     return inline
 
 
+def get_safe_file_csp():
+    """Return a strict CSP header suitable for serving arbitrary files.
+
+    This can be used e.g. by plugins that implement file storage backends
+    where `send_file` below is not used.
+    """
+    csp_directives = [
+        "default-src 'none'",
+        # img-src self is needed due to https://bugzilla.mozilla.org/show_bug.cgi?id=1735994
+        "img-src 'self'",
+        # Chrome cannot play videos using its builtin player when accessing a video URL directly
+        # since it's simply an HTML page with a <video> tag pointing to the same URL. Due to some
+        # of these URLs containing special characters that would not work in headers, we just stick
+        # with 'self'...
+        "media-src 'self'",
+    ]
+    return '; '.join(csp_directives)
+
+
 def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, inline=None,
               max_age=86400, conditional=False, safe=True, **kwargs):
     """Send a file to the user.
@@ -294,8 +313,7 @@ def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, 
             raise
         raise NotFound(f'File not found: {path_or_fd}')
     if safe:
-        # img-src self is needed due to https://bugzilla.mozilla.org/show_bug.cgi?id=1735994
-        rv.headers.add('Content-Security-Policy', "default-src 'none'; img-src 'self'")
+        rv.headers.add('Content-Security-Policy', get_safe_file_csp())
     if not conditional and no_cache:
         del rv.expires
         del rv.cache_control.max_age
