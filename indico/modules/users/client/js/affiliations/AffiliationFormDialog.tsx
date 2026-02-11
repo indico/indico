@@ -22,7 +22,6 @@ import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 import {getPluginObjects} from 'indico/utils/plugins';
 
 import FinalStringListField from './StringListField';
@@ -33,11 +32,11 @@ const isoToFlag = (country: string) =>
 
 const defaultValues: AffiliationFormValues = {
   name: '',
-  altNames: [],
+  alt_names: [],
   street: '',
   postcode: '',
   city: '',
-  countryCode: '',
+  country_code: '',
   meta: {},
 };
 
@@ -87,7 +86,7 @@ export default function AffiliationFormDialog({
 
   const handleSubmit = useCallback(
     async (formData: AffiliationFormValues, form: FormApi<AffiliationFormValues>) => {
-      const payload = snakifyKeys(edit ? getChangedValues(formData, form) : formData);
+      const payload = edit ? getChangedValues(formData, form) : formData;
       try {
         edit
           ? await indicoAxios.patch(affiliationURL, payload)
@@ -115,7 +114,7 @@ export default function AffiliationFormDialog({
             <Form.Group widths="equal">
               <FinalInput name="city" label={Translate.string('City')} />
               <FinalDropdown
-                name="countryCode"
+                name="country_code"
                 label={Translate.string('Country')}
                 fluid
                 selection
@@ -172,7 +171,7 @@ export default function AffiliationFormDialog({
     >
       <FinalInput name="name" label={Translate.string('Name')} required />
       <FinalStringListField
-        name="altNames"
+        name="alt_names"
         label={Translate.string('Alternative names')}
         placeholder={Translate.string('Type a name and press Enter to add')}
       />

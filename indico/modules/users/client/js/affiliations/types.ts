@@ -7,18 +7,18 @@
 
 interface AffiliationBase {
   name: string;
-  altNames: string[];
+  alt_names: string[];
   street: string;
   postcode: string;
   city: string;
-  countryCode: string;
+  country_code: string;
   meta: Record<string, unknown>;
   [key: string]: unknown;
 }
 
 export interface Affiliation extends AffiliationBase {
   id: number;
-  countryName: string;
+  country_name: string;
 }
 
 export type AffiliationFormValues = AffiliationBase;

@@ -49,7 +49,7 @@ export default function AffiliationsDashboard() {
     loading,
     reFetch,
     lastData,
-  } = useIndicoAxios(adminAffiliationsURL({}), {camelize: true});
+  } = useIndicoAxios(adminAffiliationsURL({}));
   const [tableHeight, setTableHeight] = useState<number>(MIN_TABLE_HEIGHT);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
   const [adding, setAdding] = useState(false);
@@ -81,8 +81,8 @@ export default function AffiliationsDashboard() {
         cellRenderer: ({rowData}) => (
           <>
             {rowData.name}
-            {rowData.altNames?.length ? (
-              <span style={{color: 'gray'}}> ({rowData.altNames.join(', ')})</span>
+            {rowData.alt_names?.length ? (
+              <span style={{color: 'gray'}}> ({rowData.alt_names.join(', ')})</span>
             ) : null}
           </>
         ),
@@ -96,7 +96,7 @@ export default function AffiliationsDashboard() {
             .filter(x => x)
             .join(' ')
             .trim();
-          const country = rowData.countryName || rowData.countryCode;
+          const country = rowData.country_name || rowData.country_code;
           const parts = [rowData.street, cityLine, country].filter(x => x);
           return parts.length ? parts.join(', ') : '-';
         },
