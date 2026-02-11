@@ -7,6 +7,8 @@
 
 """Module containing the Indico exception class hierarchy."""
 
+from markupsafe import Markup
+from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 from indico.util.i18n import _
@@ -18,10 +20,19 @@ def get_error_description(exception):
     This overrides some HTTPException messages to be more suitable
     for end-users.
     """
+    if isinstance(exception, ValidationError):
+        messages = []
+        for field, errors in exception.messages.items():
+            if not isinstance(errors, (list, set)):
+                errors = [errors]
+            messages.extend(f'{field}: {error}' for error in errors)
+        return Markup('<br>').join(messages) if messages else str(exception)
+
     try:
         description = exception.description
     except AttributeError:
         return str(exception)
+
     if isinstance(exception, Forbidden) and description == Forbidden.description:
         return _('You are not allowed to access this page.')
     elif isinstance(exception, NotFound) and description == NotFound.description:
