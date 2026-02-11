@@ -221,6 +221,10 @@ div.event-details {
   float: left;
   width: 200px;
   background: transparent none repeat scroll 0 0;
+
+  .event-menu-heading {
+    @extend %visually-hidden;
+  }
 }
 
 .menuConfTitle {

@@ -1,4 +1,4 @@
-<div class="footer {{ 'dark' if dark|default(false) }}">
+<footer class="footer {{ 'dark' if dark|default(false) }}">
     {% block footer -%}
         {%- set indico -%}
             <a href="https://getindico.io">Indico</a>
@@ -41,7 +41,7 @@
             </div>
         </div>
     {% endblock %}
-</div>
+</footer>
 
 {% include '_outdated_browser.html' %}
 
