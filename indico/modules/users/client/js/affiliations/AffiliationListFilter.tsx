@@ -83,18 +83,18 @@ export default function AffiliationListFilter({
         });
         const searchableFields = [
           affiliation.name,
-          ...affiliation.altNames,
+          ...affiliation.alt_names,
           affiliation.street,
           affiliation.postcode,
           affiliation.city,
-          affiliation.countryName,
-          affiliation.countryCode,
+          affiliation.country_name,
+          affiliation.country_code,
           ...metaValues,
         ] as string[];
 
         return {
           id: affiliation.id,
-          countryCode: affiliation.countryCode,
+          countryCode: affiliation.country_code,
           searchableFields,
           affiliation,
         };
@@ -107,10 +107,10 @@ export default function AffiliationListFilter({
       _.uniqBy(
         affiliations.map(affiliation => {
           return {
-            value: affiliation.countryCode || UNKNOWN_COUNTRY_VALUE,
+            value: affiliation.country_code || UNKNOWN_COUNTRY_VALUE,
             text:
-              affiliation.countryName || affiliation.countryCode || Translate.string('No value'),
-            exclusive: !affiliation.countryCode,
+              affiliation.country_name || affiliation.country_code || Translate.string('No value'),
+            exclusive: !affiliation.country_code,
           };
         }),
         'value'
