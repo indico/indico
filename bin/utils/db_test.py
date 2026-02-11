@@ -82,7 +82,7 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
     try:
         plugin_name = _get_plugin_name(plugin_dir)
     except ClickException as e:
-        raise BadParameter(click.style(f'\n{str(e)}', fg='red'))
+        raise BadParameter(click.style(f'\n{e!s}', fg='red'))
     if not (plugin_dir / plugin_name / 'migrations').is_dir():
         raise BadParameter(click.style(f'\nNo migrations/ folder found in "{plugin_dir}"', fg='red'))
     return plugin_dir
