@@ -63,6 +63,8 @@ Bugfixes
   thanks :user:`jbtwist`)
 - Fix validation error when choosing exactly the maximum date in a regform date field
   (:pr:`7288`)
+- Fix submit buttons not being enabled when modifying a markdown field using only the
+  button bar or a keyboard shortcut (:pr:`7310`)
 
 Accessibility
 ^^^^^^^^^^^^^
