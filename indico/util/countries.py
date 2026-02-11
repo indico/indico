@@ -54,9 +54,8 @@ def _apply_custom_country(countries, locale):
                 countries[alpha_2] = value[lang]
             else:
                 warnings.warn(
-                    f"Locale '{locale_str}' not found for country '{alpha_2}' in CUSTOM_COUNTRIES. "
-                    f"Using ISO 3166 country name.",
-                    UserWarning,
+                    f'Locale {locale_str!r} not found for country {alpha_2!r} in CUSTOM_COUNTRIES, falling back to '
+                    'ISO 3166 name.',
                     stacklevel=1
                 )
 
