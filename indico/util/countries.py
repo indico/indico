@@ -50,14 +50,14 @@ def _apply_custom_country(countries, locale):
             locale_str = str(locale)
             if locale_str in value:
                 countries[alpha_2] = value[locale_str]
-            elif (locale_str := locale_str.split('_', maxsplit=1)[0]) in value:  # If not full locale, try just language
-                countries[alpha_2] = value[locale_str]
+            elif (lang := locale_str.split('_', maxsplit=1)[0]) in value:  # If not full locale, try just language
+                countries[alpha_2] = value[lang]
             else:
                 warnings.warn(
                     f"Locale '{locale_str}' not found for country '{alpha_2}' in CUSTOM_COUNTRIES. "
                     f"Using ISO 3166 country name.",
                     UserWarning,
-                    stacklevel=3
+                    stacklevel=1
                 )
 
 
