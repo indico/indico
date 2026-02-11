@@ -360,12 +360,18 @@ Customization
     A dict with country name overrides.  This can be useful if the official
     ISO name of a country does not match what your Indico instance's target
     audience expects for a country, e.g. due to political situations. By setting
-    a country's name to ``None`` you can pretend it does not exist.
+    a country's name to ``None`` you can pretend it does not exist. Custom country
+    names can also be translated by using a dict mapping locale/language codes to
+    the translated country names.
 
     .. code-block:: python
 
         CUSTOM_COUNTRIES = {
             'KP': 'North Korea',
+            'US': {
+                'en_GB': 'United States of America',  # Translation based on specific locale
+                'es': 'Estados Unidos'  # Translation based on language (regardless of specific locale)
+            },
             'AQ': None,  # Remove Antarctica from the list
         }
 

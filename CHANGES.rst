@@ -42,6 +42,8 @@ Improvements
   notifications instead of the user's current language (:pr:`7294`)
 - Allow cloning registration forms within an event (:issue:`3229`, :pr:`6822`, thanks
   :user:`adam-parker1, Emilijus-M`)
+- Allow removing countries and providing custom translated names for countries via config
+  (:pr:`7292`, :pr:`7299`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^
