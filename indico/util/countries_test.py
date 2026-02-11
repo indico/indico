@@ -9,7 +9,6 @@ import pytest
 from babel import Locale
 
 from indico.util.countries import _get_countries, _get_country, get_countries, get_country
-from indico.util.i18n import IndicoLocale
 
 
 class MockConfig:
@@ -89,7 +88,7 @@ def test_get_countries_mixed_types(mocker):
     assert countries_en['XK'] == 'Kosovo'
     assert countries_en['US'] == 'United States'
 
-    countries_es = get_countries(IndicoLocale('es_MX'))
+    countries_es = get_countries(Locale('es_MX'))
     assert countries_es['XK'] == 'Kosovo'
     assert countries_es['US'] == 'Estados Unidos de América'
 
