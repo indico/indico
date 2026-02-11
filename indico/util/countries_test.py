@@ -75,22 +75,23 @@ def test_get_country_deleted(mocker):
 def test_get_countries_mixed_types(mocker):
     mocker.patch('indico.util.countries.config', MockConfigMixed())
 
-    countries_en = get_countries(Locale('en_GB'))
-    assert countries_en['XK'] == 'Kosovo'
-    assert countries_en['US'] == 'United States of America'
-    assert 'AQ' not in countries_en
+    countries_en_gb = get_countries(Locale('en_GB'))
+    assert countries_en_gb['XK'] == 'Kosovo'
+    assert countries_en_gb['US'] == 'United States of America'
+    assert 'AQ' not in countries_en_gb
 
     countries_es = get_countries(Locale('es'))
     assert countries_es['XK'] == 'Kosovo'
     assert countries_es['US'] == 'Estados Unidos de América'
+    assert 'AQ' not in countries_es
 
-    countries_en = get_countries(Locale('en_US'))
-    assert countries_en['XK'] == 'Kosovo'
-    assert countries_en['US'] == 'United States'
+    countries_en_us = get_countries(Locale('en_US'))
+    assert countries_en_us['XK'] == 'Kosovo'
+    assert countries_en_us['US'] == 'United States'
 
-    countries_es = get_countries(Locale('es_MX'))
-    assert countries_es['XK'] == 'Kosovo'
-    assert countries_es['US'] == 'Estados Unidos de América'
+    countries_es_mx = get_countries(Locale('es_MX'))
+    assert countries_es_mx['XK'] == 'Kosovo'
+    assert countries_es_mx['US'] == 'Estados Unidos de América'
 
 
 def test_get_countries_mixed_fallback_warning(mocker):
