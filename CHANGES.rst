@@ -67,6 +67,8 @@ Bugfixes
   (:pr:`7288`)
 - Fix submit buttons not being enabled when modifying a markdown field using only the
   button bar or a keyboard shortcut (:pr:`7310`)
+- Enforce DNS checks on emails only when inviting a new user, and not when importing
+  from CSV (:pr:`7291`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^

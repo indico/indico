@@ -76,7 +76,7 @@ class ActionMenuEntry:
     extra_classes: str = ''
 
 
-def import_user_records_from_csv(fileobj, columns, delimiter=None):
+def import_user_records_from_csv(fileobj, columns, delimiter=None, *, check_email_dns=True):
     """Parse and do basic validation of user data from a CSV file.
 
     :param fileobj: the CSV file to be read.
@@ -110,7 +110,7 @@ def import_user_records_from_csv(fileobj, columns, delimiter=None):
             raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
         record['email'] = record['email'].lower()
 
-        if not validate_email(record['email']):
+        if not validate_email(record['email'], check_dns=check_email_dns):
             raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
         if not record['first_name'] or not record['last_name']:
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))

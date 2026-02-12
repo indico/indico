@@ -19,9 +19,10 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
+from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, PrincipalList, make_validate_indico_placeholders,
                                      no_endpoint_links, no_relative_urls, not_empty)
-from indico.util.string import natural_sort_key
+from indico.util.string import natural_sort_key, validate_email
 from indico.web.flask.util import url_for
 
 
@@ -62,10 +63,16 @@ class NewInvitationSchema(InvitationSchemaBase):
 
     @validates_schema(skip_on_field_errors=True)
     def _check_user_fields(self, data, **kwargs):
-        has_user = data.get('user') is not None
-        has_users = bool(data.get('users'))
+        has_user = data['user'] is not None
+        has_users = bool(data['users'])
         if has_user == has_users:
             raise ValidationError('You must provide either a single user or a list of users.')
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_user_email(self, data, **kwargs):
+        user = data['user']
+        if user and not validate_email(user['email']):
+            raise ValidationError(_('Invalid email address.'), field_name='email')
 
 
 class InvitationImportSchema(InvitationSchemaBase):
