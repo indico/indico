@@ -75,6 +75,8 @@ Accessibility
 
 - Add accessible labels and tooltips to icon-only toolbar buttons in the contribution list
   (:pr:`7316`, thanks :user:`foxbunny`)
+- Screen reader users can now discover the page footer and conference side menu as a landmark
+  region (:pr:`7312`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

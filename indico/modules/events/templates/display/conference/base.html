@@ -57,11 +57,14 @@
             {% set visible_menu_entries = conf_layout_params.menu | selectattr('is_visible') | list %}
             <div class="conf_leftMenu">
                 {% if visible_menu_entries %}
-                    <ul id="outer">
-                        {%- for entry in visible_menu_entries %}
-                            {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
-                        {% endfor -%}
-                    </ul>
+                    <nav>
+                        <h2 class="event-menu-heading">{% trans %}Event menu{% endtrans %}</h2>
+                        <ul id="outer">
+                            {%- for entry in visible_menu_entries %}
+                                {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
+                            {% endfor -%}
+                        </ul>
+                    </nav>
                 {% endif %}
 
                 {% if event.contact_emails or event.contact_phones -%}
