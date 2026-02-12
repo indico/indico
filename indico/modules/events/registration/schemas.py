@@ -68,9 +68,9 @@ class NewInvitationSchema(InvitationSchemaBase):
         if has_user == has_users:
             raise ValidationError('You must provide either a single user or a list of users.')
 
-    @validates_schema
+    @validates_schema(skip_on_field_errors=True)
     def _validate_user_email(self, data, **kwargs):
-        user = data.get['user']
+        user = data['user']
         if user and not validate_email(user['email']):
             raise ValidationError(_('Invalid email address.'), field_name='email')
 
