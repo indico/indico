@@ -322,7 +322,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         const deltaStartDt = moment(resEntry.startDt).diff(entry.startDt, 'minutes');
         resEntry.children = shiftEntries(entry.children, deltaStartDt);
       }
-      dispatch(actions.updateEntry(activeType, resEntry, currentDay));
+      // TODO: (Ajob) Refactor to use updateEntry action, and remove api calls from this file
+      dispatch(actions._updateEntry(activeType, resEntry, currentDay));
     } else {
       dispatch(actions.createEntry(activeType, resEntry));
     }
