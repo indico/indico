@@ -6,25 +6,30 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
-import {DropdownItemProps, Icon} from 'semantic-ui-react';
+import {Dropdown, Icon} from 'semantic-ui-react';
 
-import {FinalDropdown} from 'indico/react/forms/fields';
+import {getRandomColors} from 'indico/modules/events/timetable/colors';
+import {FormFieldAdapter} from 'indico/react/forms';
+import {FinalField} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {Colors, Session} from './types';
+import {Colors, CompactSession, Session} from './types';
 
 import './SessionSelect.module.scss';
 
+const DEFAULT_DRAFT_ID = -1;
+
 interface SessionOption {
-  key: string;
+  key: `session:${string}`;
   text: string | React.ReactNode;
   title: string;
-  value: number;
+  value: 'draft' | number;
 }
 
 interface SessionSelectProps {
-  sessions: Session[];
-  onCreateSession?: (session: Partial<Session>) => Session | Promise<Session>;
+  sessions: CompactSession[];
+  value?: CompactSession | null;
+  onChange?: (session: CompactSession) => void;
   [key: string]: unknown;
 }
 
@@ -51,95 +56,98 @@ function DropdownElement({title, colors, children}: DropdownElementProps) {
   );
 }
 
-const _mapSessionsToOptions = (sessions: Session[]) => {
+const _mapSessionToOption = (session: CompactSession): SessionOption => ({
+  key: `session:${session.id}`,
+  text: <DropdownElement title={session.title} colors={session.colors} />,
+  title: session.title,
+  value: session.id,
+});
+
+const _mapSessionsToOptions = (sessions: CompactSession[]): SessionOption[] => {
   return sessions.length
     ? sessions
-        .flatMap((session: Session): SessionOption[] => {
-          return [
-            {
-              key: `session:${session.id}`,
-              text: <DropdownElement title={session.title} colors={session.colors} />,
-              title: session.title,
-              value: session.id,
-            },
-          ];
-        })
+        .flatMap(_mapSessionToOption)
         .sort((a, b) => a.title.toString().localeCompare(b.title.toString()))
     : [];
 };
 
-const _filterOptions = (options: DropdownItemProps[], query: string) => {
+const _filterOptions = (options: SessionOption[], query: string) => {
   const loweredQuery = query.toLowerCase();
   return options.filter(option => option.title.toLowerCase().includes(loweredQuery));
 };
 
-export function SessionSelect({
-  sessions: initialSessions,
-  onCreateSession,
-  ...rest
-}: SessionSelectProps) {
+export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
   const [query, setQuery] = useState('');
-  const [sessions, setSessions] = useState(initialSessions);
-  let options = _mapSessionsToOptions(sessions || []);
-  const [initialValue, setInitialValue] = useState(options[0]?.value);
-  // Only disabled if you can't create a session with call back function
-  const disabled = !(onCreateSession || sessions.length);
-  const actions: DropdownItemProps[] = [];
+  const [options, setOptions] = useState<SessionOption[]>(_mapSessionsToOptions(sessions || []));
 
-  const _createSession = async () => {
-    const session: Session = await onCreateSession({
-      title: query,
-      defaultContribDurationMinutes: 20,
-    });
-    setSessions([...sessions, session]);
-    options = _mapSessionsToOptions([...sessions, session]);
-    const selectedValue = options.find(opt => opt.value === session.id)?.value;
-
-    if (selectedValue) {
-      setInitialValue(selectedValue);
-    }
+  const _onChangeValue = (id: number) => {
+    const selectedSession = sessions.find(s => s.id === id);
+    onChange(selectedSession);
   };
 
-  if (onCreateSession) {
-    actions.push({
-      key: 'create',
-      text: (
-        <DropdownElement title={Translate.string("Create '{query}'", {query})}>
-          <Icon name="plus" styleName="action-icon" />
-        </DropdownElement>
-      ),
-      onClick: async () => await _createSession(),
-    });
-  }
+  const _sortOptionsFn = (a: SessionOption, b: SessionOption) =>
+    a.title.toString().localeCompare(b.title.toString());
+
+  const _createDraftSessionOption = () => {
+    const newOptions = [...options];
+    const draftSession: CompactSession = {
+      id: DEFAULT_DRAFT_ID,
+      title: query,
+      colors: getRandomColors(),
+    };
+    const newSessionOption = _mapSessionToOption(draftSession);
+
+    const draftSessionIndex = newOptions.findIndex(s => s.value === draftSession.id);
+    if (draftSessionIndex !== -1) {
+      newOptions[draftSessionIndex] = newSessionOption;
+    } else {
+      newOptions.push(newSessionOption);
+    }
+
+    setOptions(newOptions.toSorted(_sortOptionsFn));
+    onChange(draftSession);
+  };
 
   return (
-    <FinalDropdown
-      name="session_id"
-      label={Translate.string('Session')}
+    <Dropdown
       placeholder={
         sessions.length
           ? Translate.string('Select a session')
-          : Translate.string('No sessions available')
+          : Translate.string('Create a session by typing its title')
       }
-      options={[...options, ...actions]}
+      options={options}
       selection
-      disabled={disabled}
       multiple={false}
-      initialValue={initialValue}
-      // Using options instead of the argument (_) bypasses actions
-      search={(_, q) => [..._filterOptions(options, q), ...actions]}
+      value={value?.id}
+      onChange={(_, {value: id}) => _onChangeValue(id as number)}
+      allowAdditions
+      additionLabel={`${Translate.string('Create', {context: 'Session'})} `}
+      onAddItem={() => _createDraftSessionOption()}
+      search={(_, q) => _filterOptions(options, q)}
       onSearchChange={(_, {searchQuery: q}) => setQuery(q)}
-      onKeyDown={e => {
-        if (
-          e.key === 'Enter' &&
-          query &&
-          onCreateSession &&
-          !_filterOptions(options, query).length
-        ) {
-          e.preventDefault();
-          _createSession();
-        }
-      }}
+    />
+  );
+}
+
+interface SessionSelectAdapterProps {
+  input: {
+    value: CompactSession | null;
+    onChange: (session: Session) => void;
+  };
+}
+
+const SessionSelectAdapter: React.FC<SessionSelectAdapterProps> = ({input, ...rest}) => {
+  return <FormFieldAdapter input={input} {...rest} as={SessionSelect} />;
+};
+
+export function FinalSessionSelect({sessions, ...rest}: SessionSelectProps) {
+  return (
+    <FinalField
+      name="session_object"
+      required
+      label={Translate.string('Session')}
+      adapter={SessionSelectAdapter}
+      sessions={sessions}
       {...rest}
     />
   );

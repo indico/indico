@@ -17,6 +17,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:global(.active) {
+      font-weight: normal;
+    }
   }
 }
 
