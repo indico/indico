@@ -150,7 +150,7 @@ function EntryPopupContent({
   };
 
   // Only for Session Blocks
-  const onExpand = (e: MouseEvent) => {
+  const onExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onClose();
     dispatch(actions.setExpandedSessionBlock(entry.id));
