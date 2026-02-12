@@ -75,12 +75,14 @@ $toolbar-spacing: 10px;
   }
 
   & > ind-with-tooltip:first-child ind-menu > .i-button,
+  & > ind-with-tooltip:first-child > .i-button,
   & > ind-menu:first-child > .i-button {
     border-bottom-left-radius: $default-border-radius;
     border-top-left-radius: $default-border-radius;
   }
 
   & > ind-with-tooltip:last-child ind-menu > .i-button,
+  & > ind-with-tooltip:last-child > .i-button,
   & > ind-menu:last-child > .i-button {
     border-bottom-right-radius: $default-border-radius;
     border-top-right-radius: $default-border-radius;

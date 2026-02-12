@@ -71,7 +71,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Add accessible labels and tooltips to icon-only toolbar buttons in the contribution list
+  (:pr:`7316`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -23,25 +23,34 @@
             </div>
             {% if not g.static_site %}
                 <div class="group">
-                    <button class="i-button icon-filter js-dialog-action"
-                            data-href="{{ url_for('.customize_contribution_list', event) }}"
-                            data-title="{% trans %}Contribution list configuration{% endtrans %}"
-                            data-dialog-classes="list-filter-dialog"
-                            data-update='{"html": "#display-contribution-list", "counter": "#counter"}'
-                            data-ajax-dialog
-                            title="{%- trans %}Filters{% endtrans -%}"></button>
+                    <ind-with-tooltip>
+                        <button class="i-button icon-only icon-filter js-dialog-action"
+                                data-href="{{ url_for('.customize_contribution_list', event) }}"
+                                data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                                data-dialog-classes="list-filter-dialog"
+                                data-update='{"html": "#display-contribution-list", "counter": "#counter"}'
+                                data-ajax-dialog>
+                            <span data-tip-content>{% trans %}Filters{% endtrans %}</span>
+                        </button>
+                    </ind-with-tooltip>
                 </div>
             {% endif %}
             <div class="group">
                 {% if indico_config.LATEX_ENABLED %}
-                    <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
-                       title="{% trans %}Export to PDF{% endtrans %}"
-                       class="i-button icon-file-pdf"></a>
+                    <ind-with-tooltip>
+                        <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
+                           class="i-button icon-only icon-file-pdf">
+                            <span data-tip-content>{% trans %}Export to PDF{% endtrans %}</span>
+                        </a>
+                    </ind-with-tooltip>
                 {% endif %}
                 {% if not g.static_site %}
-                   <button class="i-button icon-link js-static-url"
-                           data-href="{{ url_for('.contribution_list_static_url', event) }}"
-                           title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
+                    <ind-with-tooltip>
+                        <button class="i-button icon-only icon-link js-static-url"
+                                data-href="{{ url_for('.contribution_list_static_url', event) }}">
+                            <span data-tip-content>{% trans %}Generate a URL for the selected filters.{% endtrans %}</span>
+                        </button>
+                    </ind-with-tooltip>
                 {% endif %}
             </div>
         </div>
