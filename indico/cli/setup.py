@@ -642,6 +642,7 @@ class SetupWizard:
             'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
             'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
             'LOCAL_PASSWORD_MIN_LENGTH = 15',  # use NIST recommendation for new installations
+            'CSP_ENABLED = True',  # TODO remove once we make this the default for all installations
             f'STORAGE_BACKENDS = {storage_backends!r}',
             "ATTACHMENT_STORAGE = 'default'",
             '',
