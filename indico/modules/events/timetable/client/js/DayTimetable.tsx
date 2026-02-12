@@ -18,7 +18,7 @@ import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
-import {DraggableBlockEntry, DraggableEntry} from './Entry';
+import {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
@@ -83,23 +83,15 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 
   return (
     <>
-      {entries.map(entry =>
-        entry.type === EntryType.SessionBlock ? (
-          <DraggableBlockEntry
-            key={entry.id}
-            setDuration={setDurations[entry.id]}
-            setChildDuration={setChildDurations[entry.id]}
-            {...entry}
-          />
-        ) : (
-          <DraggableEntry
-            key={entry.id}
-            setDuration={setDurations[entry.id]}
-            parentEndDt={parentEndDt}
-            {...entry}
-          />
-        )
-      )}
+      {entries.map(entry => (
+        <DraggableEntry
+          key={entry.id}
+          setDuration={setDurations[entry.id]}
+          setChildDuration={setChildDurations[entry.id]}
+          parentEndDt={parentEndDt}
+          {...entry}
+        />
+      ))}
     </>
   );
 }
