@@ -38,11 +38,7 @@ def update_gravatars(user=None):
 
 
 def _do_update_gravatar(user):
-    try:
-        gravatar, lastmod = get_gravatar_for_user(user, identicon=False, lastmod=user.picture_metadata['lastmod'])
-    except RuntimeError as exc:
-        logger.warning('Failed to update Gravatar for %r: %s', user, exc)
-        return
+    gravatar, lastmod = get_gravatar_for_user(user, identicon=False, lastmod=user.picture_metadata['lastmod'])
     if gravatar is None:
         logger.debug('Gravatar for %r did not change (not modified)', user)
         return
