@@ -289,7 +289,8 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
   for (const e of entriesSchedule) {
     if (e.type === 'start') {
       if (active.size > 0) {
-        overlaps = overlaps.union(new Set([e.id, ...active]));
+        overlaps.add(e.id);
+        overlaps = overlaps.union(active);
       }
       active.add(e.id);
     } else {
