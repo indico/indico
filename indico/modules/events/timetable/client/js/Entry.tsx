@@ -13,6 +13,7 @@ import {Icon} from 'semantic-ui-react';
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
+import {EntryMoveButtons} from './EntryMoveButtons';
 import {EntryPopup} from './EntryPopup';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
@@ -36,6 +37,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
   blockRef?: React.RefObject<HTMLDivElement>;
   parentEndDt?: string;
   setDuration: (duration: number) => void;
+  setChildDuration?: (id: string) => (duration: number) => void;
 }
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
@@ -103,16 +105,6 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
       entry={{id, ...rest}}
     />
   );
-}
-
-interface DraggableBlockEntryProps extends BlockEntry {
-  id: string;
-  setDuration: (duration: number) => void;
-  setChildDuration: (id: string) => (duration: number) => void;
-}
-
-export function DraggableBlockEntry({id, ...rest}: DraggableBlockEntryProps) {
-  return <DraggableEntry id={id} {...rest} />;
 }
 
 interface _EntryProps {
@@ -183,7 +175,7 @@ export default function ContributionEntry({
     position: 'absolute',
     top: y,
     left: offset,
-    width: `calc(${width} - 6px)`,
+    width: `calc(${width} - 5px)`,
     height,
     textAlign: 'left',
     zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
@@ -292,6 +284,7 @@ export default function ContributionEntry({
           </div>
         )}
       </div>
+      <EntryMoveButtons id={id} sessionBlockId={parent?.id} startDt={startDt} duration={duration} />
       <ResizeHandle
         duration={duration}
         minDuration={latestChildEndDt.diff(startDt, 'minutes')}
