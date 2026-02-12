@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
-import {Dropdown, Icon} from 'semantic-ui-react';
+import {Dropdown} from 'semantic-ui-react';
 
 import {getRandomColors} from 'indico/modules/events/timetable/colors';
+import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import {FormFieldAdapter} from 'indico/react/forms';
 import {FinalField} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
@@ -40,16 +41,9 @@ interface DropdownElementProps {
 }
 
 function DropdownElement({title, colors, children}: DropdownElementProps) {
-  const {color: subColor, backgroundColor: color} = colors || {};
-
   return (
     <span styleName="dropdown-element">
-      {colors && (
-        <Icon.Group>
-          <Icon name="circle" style={{color}} />
-          <Icon name="circle" styleName="sub-icon" size="mini" style={{color: subColor}} />
-        </Icon.Group>
-      )}
+      {colors && <SessionIcon colors={colors} />}
       {children}
       {title}
     </span>
@@ -110,6 +104,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
 
   return (
     <Dropdown
+      styleName="session-select"
       placeholder={
         sessions.length
           ? Translate.string('Select a session')

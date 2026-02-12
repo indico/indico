@@ -106,7 +106,6 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        margin-top: -1px;
       }
     }
   }
@@ -122,5 +121,15 @@
 
   &:hover {
     border-left: 4px solid #007cac;
+  }
+}
+
+.session-filter:global(.ui.dropdown) {
+  display: flex;
+  align-items: center;
+
+  :global(.menu > .item) {
+    display: flex;
+    align-items: center;
   }
 }

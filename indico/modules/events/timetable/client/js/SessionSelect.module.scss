@@ -4,7 +4,7 @@
   --dropdown-height: 40px;
 }
 
-:global(.ui.search.dropdown) {
+.session-select:global(.ui.search.dropdown) {
   width: 100%;
   height: var(--dropdown-height);
 
@@ -36,14 +36,6 @@
     align-items: center;
     justify-content: center;
     margin-right: 10px;
-
-    :global(i.icon).sub-icon {
-      position: absolute;
-      top: calc(50% - 0.4em);
-      left: calc(50% - 0.3em);
-      -webkit-transform: translateX(-53%);
-      transform: translateX(-53%);
-    }
   }
 
   :global(i.icon).action-icon {
