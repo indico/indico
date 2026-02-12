@@ -17,6 +17,7 @@ import {Dispatch} from 'redux';
 import {ThunkDispatch} from 'redux-thunk/es';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 
 import {
   TopLevelEntry,
@@ -419,12 +420,35 @@ export function editEntry(entryType: EntryType, entry: Entry) {
   return {type: EDIT_ENTRY, entryType, entry};
 }
 
-export function updateEntry(
+export function _updateEntry(
   entryType: EntryType,
   entry: Entry,
   currentDay: string
 ): UpdateEntryAction {
   return {type: UPDATE_ENTRY, entryType, entry, currentDay};
+}
+
+export function updateEntry(
+  entryType: EntryType,
+  entry: Entry,
+  currentDay: string,
+  customPayload = null
+) {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const updateURL = {
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
+    }[entry.type];
+
+    const action = synchronizedAjaxAction(
+      () => indicoAxios.patch(updateURL, customPayload ?? snakifyKeys(entry)),
+      _updateEntry(entryType, entry, currentDay)
+    );
+    return dispatch(action);
+  };
 }
 
 export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
