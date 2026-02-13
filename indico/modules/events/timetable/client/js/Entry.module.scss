@@ -115,20 +115,19 @@
   overflow: hidden;
   border-radius: 0 4px 4px 4px;
   backdrop-filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.15);
   border-right: 0;
   border-top: 0;
+  cursor: default;
 
   button {
-    background-color: rgba(255, 255, 255, 0.7);
+    opacity: 0.5;
     color: $black;
     border: none;
     border-radius: 2px;
-    width: 1.2rem;
-    height: 1.1rem;
-    font-size: 1rem;
-    line-height: 1rem;
+    width: 1.5rem;
+    height: calc(100% - 4px);
+    max-height: 1.5rem;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,6 +140,10 @@
 
     :global(.icon) {
       margin: 0;
+    }
+
+    &:hover {
+      opacity: 1;
     }
   }
 }
