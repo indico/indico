@@ -232,6 +232,8 @@ export default function ContributionEntry({
     return obj;
   }, [_children, setChildDuration]);
 
+  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
+
   return (
     <div
       role="button"
@@ -284,7 +286,13 @@ export default function ContributionEntry({
           </div>
         )}
       </div>
-      <EntryMoveButtons id={id} sessionBlockId={parent?.id} startDt={startDt} duration={duration} />
+      <EntryMoveButtons
+        id={id}
+        sessionBlockId={parent?.id}
+        startDt={startDt}
+        duration={duration}
+        colors={btnColors}
+      />
       <ResizeHandle
         duration={duration}
         minDuration={latestChildEndDt.diff(startDt, 'minutes')}
