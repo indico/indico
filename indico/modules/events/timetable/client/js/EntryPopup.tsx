@@ -33,7 +33,7 @@ import {
   PersonLinkRole,
   isChildEntry,
 } from './types';
-import {mapTTDataToEntry} from './utils';
+import {getIconByEntryType, mapTTDataToEntry} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
@@ -59,6 +59,9 @@ function EntryPopupContent({
   const {id, objId, type, title, attachments, colors, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const isPosterBlock = useSelector((state: ReduxState) =>
+    selectors.isPosterSessionBlock(state, entry.id)
+  );
   const startTime = moment(startDt);
   const endTime = moment(startDt).add(duration, 'minutes');
   const entryParent = isChildEntry(entry) ? entry.parent : null;
@@ -149,6 +152,12 @@ function EntryPopupContent({
     }
   };
 
+  const onShowPosterContributions = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClose();
+    // dispatch(actions.setPosterSessionBlockToShow(entry.id));
+  };
+
   // Only for Session Blocks
   const onExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -184,6 +193,12 @@ function EntryPopupContent({
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
               <Label circular empty style={{...styleColors}} />
+              {isPosterBlock && (
+                <Icon.Group>
+                  <Icon name="flag outline" />
+                  <Icon name="circle" color="red" size="mini" corner="bottom right" />
+                </Icon.Group>
+              )}
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
@@ -199,6 +214,14 @@ function EntryPopupContent({
         />
       </div>
       <Card.Content styleName="main" as={List}>
+        {isPosterBlock && (
+          <p styleName="poster-session-note">
+            <Translate>
+              This is a poster session block. All contributions inside of this block are running in
+              parallel.
+            </Translate>
+          </p>
+        )}
         <List.Item title={Translate.string('Date and time')}>
           <Icon name="clock outline" />
           {formatTimeRange('en', startTime, endTime)}
@@ -259,7 +282,18 @@ function EntryPopupContent({
         )}
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
-        {type === EntryType.SessionBlock && (
+        {isPosterBlock && (
+          <ActionPopup
+            content={Translate.string('Show contributions')}
+            trigger={
+              <Button basic onClick={onShowPosterContributions}>
+                <Icon name={getIconByEntryType(EntryType.Contribution)} />
+                {(entry as BlockEntry)?.children?.length}
+              </Button>
+            }
+          />
+        )}
+        {type === EntryType.SessionBlock && !isPosterBlock && (
           <>
             <ActionPopup
               content={<Translate>Go to session block timetable</Translate>}
