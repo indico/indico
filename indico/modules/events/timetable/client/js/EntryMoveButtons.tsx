@@ -13,7 +13,7 @@ import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import {ReduxState, BlockEntry, Entry, EntryType} from './types';
+import {ReduxState, BlockEntry, Entry, EntryType, Colors} from './types';
 import {getDateKey} from './utils';
 
 import './Entry.module.scss';
@@ -23,9 +23,16 @@ interface EntryMoveButtonsProps {
   startDt: Moment;
   duration: number;
   sessionBlockId?: string;
+  colors?: Colors;
 }
 
-export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryMoveButtonsProps) {
+export function EntryMoveButtons({
+  id,
+  startDt,
+  duration,
+  sessionBlockId,
+  colors,
+}: EntryMoveButtonsProps) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
@@ -157,11 +164,11 @@ export function EntryMoveButtons({id, startDt, duration, sessionBlockId}: EntryM
   return (
     canMove && (
       <div styleName="mv-buttons-wrapper">
-        <button type="button" onClick={moveUp} disabled={!above}>
-          <Icon name="chevron up" />
+        <button type="button" onClick={moveUp} disabled={!above} style={colors}>
+          <Icon name="angle up" />
         </button>
-        <button type="button" onClick={moveDown} disabled={!below}>
-          <Icon name="chevron down" />
+        <button type="button" onClick={moveDown} disabled={!below} style={colors}>
+          <Icon name="angle down" />
         </button>
       </div>
     )
