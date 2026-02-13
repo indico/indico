@@ -19,11 +19,20 @@
     height: var(--dropdown-height);
   }
 
+  > :global(.divider.text) {
+    width: 100%;
+  }
+
   :global(.menu > .item) {
     height: var(--dropdown-height);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:global(.disabled) {
+      display: none;
+      background-color: orange;
+    }
 
     &:global(.active) {
       font-weight: normal;
@@ -32,6 +41,12 @@
 }
 
 .dropdown-element {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+
   > :is(:global(i.icons), :global(i.icon)) {
     width: var(--session-icon-width);
     min-width: var(--session-icon-width);
@@ -42,10 +57,22 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
   }
 
   :global(i.icon).action-icon {
     font-size: 0.9em;
   }
+
+  .dropdown-element-title {
+    margin-left: 10px;
+  }
+}
+
+.new-label:global(.ui.label) {
+  padding: 2px 4px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0;
+  margin-left: 4px;
+  transform: translateY(-1px);
 }

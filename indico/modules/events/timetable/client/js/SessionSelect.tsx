@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
-import {Dropdown} from 'semantic-ui-react';
+import {Dropdown, Label} from 'semantic-ui-react';
 
 import {getRandomColors} from 'indico/modules/events/timetable/colors';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
@@ -14,17 +14,21 @@ import {FormFieldAdapter} from 'indico/react/forms';
 import {FinalField} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {Colors, CompactSession, Session} from './types';
+import {Colors, Session} from './types';
 
 import './SessionSelect.module.scss';
 
 const DEFAULT_DRAFT_ID = -1;
 
+interface CompactSession extends Pick<Session, 'title' | 'colors'> {
+  id: typeof DEFAULT_DRAFT_ID | number;
+}
+
 interface SessionOption {
   key: `session:${string}`;
   text: string | React.ReactNode;
   title: string;
-  value: 'draft' | number;
+  value: typeof DEFAULT_DRAFT_ID | number;
 }
 
 interface SessionSelectProps {
@@ -45,14 +49,20 @@ function DropdownElement({title, colors, children}: DropdownElementProps) {
     <span styleName="dropdown-element">
       {colors && <SessionIcon colors={colors} />}
       {children}
-      {title}
+      <span styleName="dropdown-element-title">{title}</span>
     </span>
   );
 }
 
 const _mapSessionToOption = (session: CompactSession): SessionOption => ({
   key: `session:${session.id}`,
-  text: <DropdownElement title={session.title} colors={session.colors} />,
+  text: (
+    <DropdownElement title={session.title} colors={session.colors}>
+      {session.id === DEFAULT_DRAFT_ID && (
+        <Label styleName="new-label" content={Translate.string('New session')} size="mini" />
+      )}
+    </DropdownElement>
+  ),
   title: session.title,
   value: session.id,
 });
@@ -71,11 +81,18 @@ const _filterOptions = (options: SessionOption[], query: string) => {
 };
 
 export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
+  sessions = [...sessions]; // Avoid mutating the original array when adding draft session
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<SessionOption[]>(_mapSessionsToOptions(sessions || []));
 
   const _onChangeValue = (id: number) => {
     const selectedSession = sessions.find(s => s.id === id);
+
+    if (id !== DEFAULT_DRAFT_ID) {
+      sessions = sessions.filter(s => s.id !== DEFAULT_DRAFT_ID);
+      setOptions(options.filter(o => o.value !== DEFAULT_DRAFT_ID));
+    }
+
     onChange(selectedSession);
   };
 
@@ -83,23 +100,18 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
     a.title.toString().localeCompare(b.title.toString());
 
   const _createDraftSessionOption = () => {
-    const newOptions = [...options];
     const draftSession: CompactSession = {
       id: DEFAULT_DRAFT_ID,
       title: query,
       colors: getRandomColors(),
     };
-    const newSessionOption = _mapSessionToOption(draftSession);
+    const draftSessionOption = _mapSessionToOption(draftSession);
 
-    const draftSessionIndex = newOptions.findIndex(s => s.value === draftSession.id);
-    if (draftSessionIndex !== -1) {
-      newOptions[draftSessionIndex] = newSessionOption;
-    } else {
-      newOptions.push(newSessionOption);
-    }
+    sessions = [draftSession, ...sessions.filter(s => s.id !== draftSession.id)];
+    const newOptions = options.filter(o => o.value !== DEFAULT_DRAFT_ID);
 
-    setOptions(newOptions.toSorted(_sortOptionsFn));
-    onChange(draftSession);
+    setOptions([draftSessionOption, ...newOptions.toSorted(_sortOptionsFn)]);
+    _onChangeValue(draftSession.id);
   };
 
   return (
@@ -117,6 +129,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
       onChange={(_, {value: id}) => _onChangeValue(id as number)}
       allowAdditions
       additionLabel={`${Translate.string('Create', {context: 'Session'})} `}
+      additionPosition="bottom"
       onAddItem={() => _createDraftSessionOption()}
       search={(_, q) => _filterOptions(options, q)}
       onSearchChange={(_, {searchQuery: q}) => setQuery(q)}

@@ -31,7 +31,7 @@ import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
-import {ReduxState, BlockEntry, EntryType, Session, CompactSession} from './types';
+import {ReduxState, BlockEntry, EntryType, Session} from './types';
 import {
   DATE_KEY_FORMAT,
   getEntryUniqueId,
@@ -278,18 +278,22 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
-  const _findOrCreateSession = async (sessionObject: CompactSession) => {
+  const _findOrCreateSession = async sessionObject => {
     const session: Session = sessions.find(s => s.id === sessionObject.id);
 
-    if (!session) {
-      try {
-        // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
-        const data = mapSessionToTTData(sessionObject);
-        const resData = await dispatch(actions.createSession(_.omit(data, 'id')));
-        return resData?.session;
-      } catch (error) {
-        handleAxiosError(error, true);
-      }
+    if (session) {
+      return session;
+    }
+
+    try {
+      // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
+      const data = mapSessionToTTData(sessionObject);
+      const {session: resSession = null} = await dispatch(
+        actions.createSession(_.omit(data, 'id'))
+      );
+      return resSession;
+    } catch (error) {
+      handleAxiosError(error, true);
     }
   };
 
@@ -322,10 +326,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     const session: Session = data.session_object
       ? await _findOrCreateSession(data.session_object)
       : null;
+
     delete data.session_object; // Was used temporarily only for id or draft
     const submitData = snakifyKeys({...data, session_id: session?.id});
 
-    // return;
     let resData;
     try {
       resData = (await submitHandler(submitData)).data;

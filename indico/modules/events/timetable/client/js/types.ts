@@ -73,20 +73,6 @@ export interface Session {
   colors: Colors;
 }
 
-// (Ajob) Used to treat draft and existing sessions as the same thing, for example in the session select component
-export interface CompactSession extends Pick<Session, 'title' | 'colors'> {
-  id: 'draft' | number;
-}
-
-// TODO: (Ajob) Remove once we get proper schemas from back-end that map with front-end
-export interface SessionObj {
-  id: number;
-  title: string;
-  is_poster: boolean;
-  default_contribution_duration: number;
-  colors: {text: string; background: string};
-}
-
 export interface BaseEntry {
   type: EntryType;
   id: string;

@@ -24,8 +24,7 @@ interface SessionColorPickerProps {
   trigger: React.ReactNode;
 }
 
-// Also used in sessions
-export const AVAILABLE_ENTRY_COLORS: ColorSchema[] = [
+export const AVAILABLE_COLORS: ColorSchema[] = [
   {text: '#1D041F', background: '#EEE0EF'},
   {text: '#253F08', background: '#E3F2D3'},
   {text: '#1F1F02', background: '#FEFFBF'},
@@ -65,7 +64,7 @@ export default function SessionColorPicker({value, onChange, trigger}: SessionCo
       onClose={() => setOpen(false)}
       content={
         <div styleName="choice-box">
-          {AVAILABLE_ENTRY_COLORS.map(color => (
+          {AVAILABLE_COLORS.map(color => (
             <Button
               key={color.background}
               type="button"
