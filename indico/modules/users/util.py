@@ -519,24 +519,18 @@ def get_color_for_user_id(user_id: int | str):
 
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = f'https://www.gravatar.com/avatar/{hashlib.md5(user.email.lower().encode()).hexdigest()}'
-    gravatar_type = 'Gravatar'
     if identicon:
         params = {'d': 'identicon', 's': str(size), 'forcedefault': 'y'}
-        gravatar_type = 'Identicon'
     else:
         params = {'d': 'mp', 's': str(size)}
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
-    try:
-        resp = requests.get(gravatar_url, params=params, headers=headers, timeout=10)
-    except (requests.RequestException, requests.exceptions.ConnectionError) as exc:
-
-        logger.warning('Failed to retrieve %s for user %s: %s', gravatar_type, user, exc)
-        raise RuntimeError(_('Could not retrieve {gravatar_type}').format(gravatar_type=gravatar_type))
+    resp = requests.get(gravatar_url, params=params, headers=headers, timeout=10)
     if resp.status_code == 304:
         return None, resp.headers.get('Last-Modified')
     elif resp.status_code != 200:
         # XXX: Identicon/Gravatar are names that should never be translated
-        raise RuntimeError(_('Could not retrieve {gravatar_type}').format(gravatar_type=gravatar_type))
+        raise RuntimeError(_('Could not retrieve {gravatar_type}')
+                           .format(gravatar_type=('Identicon' if identicon else 'Gravatar')))
     pic = Image.open(BytesIO(resp.content))
     if pic.mode not in ('RGB', 'RGBA'):
         pic = pic.convert('RGB')

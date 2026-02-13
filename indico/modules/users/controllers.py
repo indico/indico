@@ -11,6 +11,7 @@ from operator import attrgetter
 from urllib.parse import urlsplit
 from uuid import uuid4
 
+import requests
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadSignature
@@ -437,7 +438,7 @@ class RHProfilePicturePreview(RHUserBase):
             try:
                 gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
                 return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
-            except RuntimeError as exc:
+            except (requests.RequestException, requests.exceptions.ConnectionError) as exc:
                 raise UserValueError(str(exc))
         else:
             raise NotFound
@@ -499,7 +500,7 @@ class RHSaveProfilePicture(RHUserBase):
             try:
                 content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
                 set_user_avatar(self.user, content, source.name, lastmod)
-            except RuntimeError as exc:
+            except (requests.RequestException, requests.exceptions.ConnectionError) as exc:
                 raise UserValueError(str(exc))
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
