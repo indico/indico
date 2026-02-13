@@ -449,7 +449,8 @@ export function DayTimetable({
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
       <UnscheduledContributions dt={dt} />
-      <div ref={wrapperRef} className="wrapper">
+      {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
+      <div ref={wrapperRef} className="wrapper timetable-popup-boundary">
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
