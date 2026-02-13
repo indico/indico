@@ -54,7 +54,7 @@
     "prismjs": "^1.30.0",
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
-    "qs": "^6.14.1",
+    "qs": "^6.14.2",
     "qtip2": "git+https://indico@github.com/indico/qTip2.git#95a42a3be49767a631310a5a8bd924f386220799",
     "rc-time-picker": "^3.7.3",
     "react": "^17.0.2",
