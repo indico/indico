@@ -1,6 +1,32 @@
 # Indico linting and formatting
 # Run 'make lint' to check code, 'make fmt' to auto-fix issues
 
+.DEFAULT_GOAL := help
+
+# Show available targets
+.PHONY: help
+help:
+	@echo "Available targets:"
+	@echo "  make lint           - Run all linters"
+	@echo "  make fmt            - Format all code"
+	@echo ""
+	@echo "Language-specific linting:"
+	@echo "  make lint-py        - Lint Python code"
+	@echo "  make lint-js        - Lint JavaScript/TypeScript"
+	@echo "  make lint-css       - Lint CSS/SCSS"
+	@echo ""
+	@echo "Language-specific formatting:"
+	@echo "  make fmt-py         - Format Python code"
+	@echo "  make fmt-js         - Format JavaScript/TypeScript"
+	@echo "  make fmt-css        - Format CSS/SCSS"
+	@echo ""
+	@echo "Other checks:"
+	@echo "  make lint-eof       - Check EOF linebreaks"
+	@echo "  make lint-i18n-check - Validate i18n format strings and HTML tags"
+	@echo "  make lint-locales   - Check moment locales"
+	@echo "  make lint-icons     - Check icon definitions"
+	@echo "  make lint-headers   - Check file headers"
+
 # Lint: check code without modifying files
 .PHONY: lint
 lint: lint-eof lint-py lint-js lint-css lint-i18n-check lint-locales lint-icons lint-headers
