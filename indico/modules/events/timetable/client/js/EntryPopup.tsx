@@ -11,7 +11,7 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import './EntryPopup.module.scss';
 import moment from 'moment';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
@@ -302,6 +302,16 @@ export function EntryPopup({
   entry: BreakEntry | ContribEntry | BlockEntry;
   open?: boolean;
 }) {
+  const [boundaryElement, setBoundaryElement] = useState<Element | null>(null);
+
+  useEffect(() => {
+    const element = document.querySelector('.timetable-popup-boundary');
+    if (element === null) {
+      throw new Error('The boundary element for EntryPopup could not be found');
+    }
+    setBoundaryElement(element);
+  }, []);
+
   return (
     <Popup
       trigger={trigger}
@@ -311,6 +321,10 @@ export function EntryPopup({
       onClose={onClose}
       basic
       hideOnScroll
+      popperModifiers={[
+        {name: 'preventOverflow', options: {boundary: boundaryElement}},
+        {name: 'flip', options: {boundary: boundaryElement}},
+      ]}
       styleName="wrapper"
     >
       <EntryPopupContent entry={entry} onClose={onClose} />
