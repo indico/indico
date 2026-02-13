@@ -11,13 +11,13 @@ import eventFavoriteURL from 'indico-url:users.user_favorites_event_api';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState, useCallback} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button, Icon, List, Loader, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {UserSearch} from 'indico/react/components/principals/Search';
-import {useFavoriteUsers} from 'indico/react/hooks';
+import {useFavoriteUsers, useIndicoAxiosWithMutation} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -56,34 +56,24 @@ FavoriteManager.defaultProps = {
 };
 
 function FavoriteCatManager({userId}) {
-  const [favoriteCats, setFavoriteCats] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const getFavoriteCats = useCallback(async () => {
-    let res;
-    try {
-      res = await indicoAxios.get(categoryFavoriteURL(userId !== null ? {user_id: userId} : {}));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setFavoriteCats(res.data);
-    setLoading(false);
-  }, [userId]);
-
-  useEffect(() => {
-    getFavoriteCats();
-  }, [getFavoriteCats]);
+  const {
+    data: favoriteCats,
+    loading,
+    mutate,
+    mutating,
+  } = useIndicoAxiosWithMutation(categoryFavoriteURL(userId !== null ? {user_id: userId} : {}));
 
   const deleteFavoriteCat = async id => {
     try {
-      await indicoAxios.delete(categoryFavoriteURL({category_id: id}));
+      await mutate(indicoAxios.delete(categoryFavoriteURL({category_id: id})), oldData =>
+        _.omit(oldData, id)
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setFavoriteCats(values => _.omit(values, id));
   };
+
   return (
     <div className="column col-50">
       <div className="i-box just-group-list">
@@ -115,6 +105,7 @@ function FavoriteCatManager({userId}) {
                       <Popup
                         trigger={
                           <Icon
+                            disabled={mutating}
                             styleName="delete-button"
                             name="close"
                             onClick={() => deleteFavoriteCat(cat.id)}
@@ -149,33 +140,24 @@ FavoriteCatManager.defaultProps = {
 };
 
 function FavoriteEventManager({userId}) {
-  const [favoriteEvents, setFavoriteEvents] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const getFavoriteEvents = useCallback(async () => {
-    let res;
-    try {
-      res = await indicoAxios.get(eventFavoriteURL(userId !== null ? {user_id: userId} : {}));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setFavoriteEvents(res.data);
-    setLoading(false);
-  }, [userId]);
-
-  useEffect(() => {
-    getFavoriteEvents();
-  }, [getFavoriteEvents]);
+  const {
+    data: favoriteEvents,
+    loading,
+    mutate,
+    mutating,
+  } = useIndicoAxiosWithMutation({
+    url: eventFavoriteURL(userId !== null ? {user_id: userId} : {}),
+  });
 
   const deleteFavoriteEvent = async id => {
     try {
-      await indicoAxios.delete(eventFavoriteURL({event_id: id}));
+      await mutate(indicoAxios.delete(eventFavoriteURL({event_id: id})), oldData =>
+        _.omit(oldData, id)
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setFavoriteEvents(values => _.omit(values, id));
   };
 
   return (
@@ -219,6 +201,7 @@ function FavoriteEventManager({userId}) {
                         <Popup
                           trigger={
                             <Icon
+                              disabled={mutating}
                               styleName="delete-button"
                               name="close"
                               onClick={() => deleteFavoriteEvent(event.id)}
