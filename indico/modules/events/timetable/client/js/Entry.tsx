@@ -46,6 +46,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
+
   // Used to determine whether the entry was just clicked or actually dragged
   // if dragged, this prevents selecting the entry on drag end (and thus showing the popup)
   const isClick = useRef<boolean>(true);
@@ -153,6 +154,9 @@ export default function ContributionEntry({
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
 }: DraggableContribEntryProps) {
+  const isPosterBlock = useSelector((state: ReduxState) =>
+    selectors.isPosterSessionBlock(state, id)
+  );
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -263,7 +267,7 @@ export default function ContributionEntry({
           timeRange={timeRange}
           type={type}
         />
-        {type === EntryType.SessionBlock && (
+        {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
             ref={setDroppableNodeRef}
             styleName="children-wrapper"

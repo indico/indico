@@ -101,6 +101,22 @@ export const getCurrentDayEntries = createSelector(
   (entries, currentDate) => entries[getDateKey(currentDate)]
 );
 
+export const isPosterSessionBlock = createSelector(
+  getSessions,
+  getCurrentDayEntries,
+  (_state: ReduxState, id: string) => id,
+  (sessions, dayEntries, id) => {
+    const entry = dayEntries.find(e => e.id === id);
+    const session = sessions[entry?.sessionId];
+
+    if (!(session || entry)) {
+      return false;
+    }
+
+    return entry.type === EntryType.SessionBlock && session?.isPoster;
+  }
+);
+
 export const getExpandedSessionBlockId = createSelector(
   getNavigation,
   navigation => navigation.expandedSessionBlockId
