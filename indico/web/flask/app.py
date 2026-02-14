@@ -442,7 +442,8 @@ def inject_csp(response):
         sources.append(f'nonce-{nonce}')
     if config.CSP_REPORT_URI and 'report-sample' not in sources:
         sources.append('report-sample')
-    sources = ' '.join(itertools.chain((f"'{x}'" for x in sources), config.CSP_SCRIPT_SOURCES))
+    plugin_sources = values_from_signal(signals.core.get_csp_script_sources.send())
+    sources = ' '.join(itertools.chain((f"'{x}'" for x in sources), plugin_sources, config.CSP_SCRIPT_SOURCES))
     csp_directives = [
         f'script-src {sources}',
         # TODO: change base-uri back to 'none' after upgrading jQuery to 4.0 which no longer uses
