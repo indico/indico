@@ -120,11 +120,7 @@ export const mapTTDataToSession = (data: any): Session => {
   };
 };
 
-export const mapTTDataToEntry = (
-  data: any,
-  sessions: Record<string, Session> = {},
-  parent?: Partial<BlockEntry>
-): Entry => {
+export const mapTTDataToEntry = (data: any, sessions: Record<string, Session> = {}): Entry => {
   data = camelizeKeys(data);
   const {
     type,
@@ -143,6 +139,7 @@ export const mapTTDataToEntry = (
     keywords,
     sessionId,
     sessionTitle,
+    parent,
   } = data;
 
   const mappedObj = {
