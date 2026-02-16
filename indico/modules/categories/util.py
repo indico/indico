@@ -247,7 +247,6 @@ def can_create_unlisted_events(user):
 
 
 def get_all_event_creators():
-
     principals_query = (CategoryPrincipal.query
                        .filter(CategoryPrincipal.type.in_([PrincipalType.user,
                                                            PrincipalType.local_group,
@@ -265,9 +264,9 @@ def get_all_event_creators():
 
 
 def can_create_events_globally(user):
-    if not user:
-        return False
     if not event_creation_settings.get('restricted'):
         return True
+    if not user:
+        return False
 
     return user.is_admin or event_creation_settings.acls.contains_user('authorized_creators', user)
