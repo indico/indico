@@ -14,7 +14,7 @@ attrs==25.4.0
     # via
     #   -c requirements.txt
     #   aiosmtpd
-babel==2.17.0
+babel==2.18.0
     # via
     #   -c requirements.txt
     #   sphinx
@@ -46,7 +46,7 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.13.2
+coverage==7.13.4
     # via pytest-cov
 docker==7.1.0
     # via -r requirements.dev.in
@@ -98,7 +98,7 @@ markupsafe==3.0.3
     #   flask
     #   jinja2
     #   werkzeug
-mirakuru==3.0.1
+mirakuru==3.0.2
     # via pytest-redis
 packaging==26.0
     # via
@@ -120,7 +120,7 @@ pluggy==1.6.0
     #   pytest-cov
 port-for==1.0.0
     # via pytest-redis
-psutil==7.2.1
+psutil==7.2.2
     # via mirakuru
 psycopg==3.3.2
     # via results
@@ -174,11 +174,11 @@ requests==2.32.5
     #   sphinx
 responses==0.25.8
     # via -r requirements.dev.in
-results==1.4.1769602926
+results==1.4.1770293316
     # via -r requirements.dev.in
 roman-numerals==4.1.0
     # via sphinx
-ruff==0.15.0
+ruff==0.15.1
     # via -r requirements.dev.in
 six==1.17.0
     # via
@@ -243,7 +243,7 @@ urllib3==2.6.3
     #   docker
     #   requests
     #   responses
-uv==0.9.28
+uv==0.10.2
     # via -r requirements.dev.in
 uvicorn==0.40.0
     # via sphinx-autobuild
