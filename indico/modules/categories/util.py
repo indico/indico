@@ -22,7 +22,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
-from indico.modules.events.settings import unlisted_events_settings
+from indico.modules.events.settings import event_creation_settings, unlisted_events_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import global_lock, memoize_redis
 from indico.util.date_time import now_utc
@@ -242,3 +242,9 @@ def can_create_unlisted_events(user):
         return True
     else:
         return unlisted_events_settings.acls.contains_user('authorized_creators', user)
+
+
+def can_create_events_globally(user):
+    if not user:
+        return False
+    return user.is_admin or event_creation_settings.acls.contains_user('authorized_creators', user)

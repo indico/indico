@@ -40,6 +40,7 @@ from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.settings import event_creation_settings
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.logs.models.entries import AppLogRealm, LogKind, UserLogRealm
 from indico.modules.logs.util import make_diff_log
@@ -771,20 +772,35 @@ class RHAdmins(RHAdminBase):
         admins = set(User.query
                      .filter_by(is_admin=True, is_deleted=False)
                      .order_by(db.func.lower(User.first_name), db.func.lower(User.last_name)))
+        event_creators = event_creation_settings.acls.get('authorized_creators')
 
-        form = AdminsForm(admins=admins)
+        form = AdminsForm(admins=admins, event_creators=event_creators)
         if form.validate_on_submit():
-            added = form.admins.data - admins
-            removed = admins - form.admins.data
-            for user in added:
-                grant_admin(user)
-                flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
-            for user in removed:
-                revoke_admin(user)
-                flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
+            self._handle_admin_rights(form, admins)
+            self._handle_event_creation_rights(form, event_creators)
             return redirect(url_for('.admins'))
 
         return WPUsersAdmin.render_template('admins.html', 'admins', form=form)
+
+    def _handle_admin_rights(self, form, admins):
+        added_admins = form.admins.data - admins
+        removed_admins = admins - form.admins.data
+        for user in added_admins:
+            grant_admin(user)
+            flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
+        for user in removed_admins:
+            revoke_admin(user)
+            flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
+
+    def _handle_event_creation_rights(self, form, event_creators):
+        added_creators = form.event_creators.data - event_creators
+        removed_creators = event_creators - form.event_creators.data
+        for principal in added_creators:
+            event_creation_settings.acls.add_principal('authorized_creators', principal)
+            flash(_('Event creator added: {name}').format(name=principal.name), 'success')
+        for principal in removed_creators:
+            event_creation_settings.acls.remove_principal('authorized_creators', principal)
+            flash(_('Event creator removed: {name}').format(name=principal.name), 'success')
 
 
 class RHUsersAdmin(RHAdminBase):

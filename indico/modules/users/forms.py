@@ -193,4 +193,8 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
 
 
 class AdminsForm(IndicoForm):
-    admins = PrincipalListField(_('Admins'), [DataRequired()])
+    admins = PrincipalListField(_('Admins'), [DataRequired()],
+                                description=_('Admins have unrestricted access to everything in Indico'))
+    event_creators = PrincipalListField(_('Event creators'), allow_groups=True,
+                                        description=_('These users can access the global "Create event" button. '
+                                                      'They still need category-level permissions to create events.'))

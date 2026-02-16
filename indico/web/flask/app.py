@@ -43,6 +43,7 @@ from indico.core.sentry import init_sentry
 from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
+from indico.modules.categories.util import can_create_events_globally
 from indico.util import date_time as date_time_util
 from indico.util.i18n import (_, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context,
                               npgettext_context, pgettext_context, set_best_lang)
@@ -224,6 +225,7 @@ def setup_jinja(app):
     app.add_template_global(_get_indico_version(), 'indico_version')
     app.add_template_global(make_user_search_token)
     app.add_template_global(get_csp_nonce)
+    app.add_template_global(can_create_events_globally)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
