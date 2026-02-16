@@ -234,7 +234,10 @@ function SingleFileDrop<Value = unknown>({
       dropzone={dropzone}
       file={file}
       fileAction={fileAction}
-      errors={[...(dropState.errors || []), ...(validationError ? [validationError] : [])]}
+      errors={[
+        ...(dropState.errors || []),
+        ...(dropState.state !== DropState.processing && validationError ? [validationError] : []),
+      ]}
     />
   );
 }
