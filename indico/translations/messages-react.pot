@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-12-25 14:51+0100\n"
+"POT-Creation-Date: 2026-02-26 12:02+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -44,17 +44,20 @@ msgid "Email address"
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 msgid "First name"
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 msgid "Last name"
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
 #: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/principals/Search.jsx
@@ -64,6 +67,8 @@ msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Address"
 msgstr ""
@@ -137,6 +142,7 @@ msgid "Create my Indico profile"
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
+#: indico/modules/core/client/js/DeletionDialog.jsx
 #: indico/modules/events/abstracts/client/js/boa.jsx
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx
@@ -367,6 +373,28 @@ msgstr ""
 msgid "Delete category from favorites."
 msgstr ""
 
+#: indico/modules/core/client/js/DeletionDialog.jsx
+msgid "This action is irreversible"
+msgstr ""
+
+#: indico/modules/core/client/js/DeletionDialog.jsx
+msgid "Are you sure you want to delete {recordName}?"
+msgstr ""
+
+#: indico/modules/core/client/js/DeletionDialog.jsx
+#: indico/modules/events/abstracts/client/js/boa.jsx
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
+#: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+#: indico/web/client/js/react/components/RequestConfirm.jsx
+#: indico/web/client/js/react/components/principals/items.jsx
+msgid "Delete"
+msgstr ""
+
 #: indico/modules/core/client/js/impersonation.js
 msgid "Login as..."
 msgstr ""
@@ -496,18 +524,6 @@ msgstr ""
 msgid ""
 "Do you really want to delete the Book of Abstracts? This will disable the "
 "Book of Abstracts until you upload a new one."
-msgstr ""
-
-#: indico/modules/events/abstracts/client/js/boa.jsx
-#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
-#: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx
-#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx
-#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx
-#: indico/web/client/js/react/components/RequestConfirm.jsx
-#: indico/web/client/js/react/components/principals/items.jsx
-msgid "Delete"
 msgstr ""
 
 #: indico/modules/events/client/js/components/AutoLinkerConfig.jsx
@@ -656,6 +672,8 @@ msgid "Contribution"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx
+#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
+#: indico/modules/events/papers/client/js/components/RevisionSubmissionForm.tsx
 msgid "Submit paper"
 msgstr ""
 
@@ -1076,6 +1094,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 #: indico/modules/receipts/client/js/templates/Editor.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/notes/NoteEditor.jsx
@@ -1497,52 +1516,64 @@ msgstr ""
 msgid "Add extension"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "This type has files attached"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "This type is used in a review condition"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Cannot delete the only publishable type"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "There are no file types defined for this event"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
+msgid ""
+"There are publishable file types that will not be displayed due to the "
+"'Hide Accepted' setting being enabled."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
+msgid ""
+"No file types will be shown as there are no publishable file types and the "
+"'Hide Accepted' setting is disabled."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
 msgid "File required"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Multiple files allowed"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "File publishable"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "(no extension restrictions)"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Add a new file type"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Edit file type"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Create a new file type"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid "Are you sure you want to delete the file type {fileType}?"
 msgstr ""
 
@@ -1557,6 +1588,8 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 msgid "Name"
 msgstr ""
 
@@ -2006,6 +2039,7 @@ msgid "The paper was {url}submitted{/url} for editing"
 msgstr ""
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx
+#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
 msgid "Paper files"
 msgstr ""
 
@@ -2288,6 +2322,7 @@ msgid "This person is not a speaker"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -2338,6 +2373,16 @@ msgstr ""
 msgid "Display my participation to everyone who can see this event"
 msgstr ""
 
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+msgid "You are about to send {numInvitations} invitation."
+msgid_plural "You are about to send {numInvitations} invitations."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+msgid "Please upload a valid CSV file."
+msgstr ""
+
 #: indico/modules/events/registration/client/js/components/InvitationList.tsx
 msgid "Mark as declined"
 msgstr ""
@@ -2378,8 +2423,117 @@ msgstr ""
 msgid "Declined invitations"
 msgstr ""
 
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Users"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "The invitation will be sent to this address."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid ""
+"You should upload a CSV (comma-separated values) file with exactly 4 "
+"columns in the following order:"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
+msgid "First Name"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Last Name"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "E-mail"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "The fields \"First Name\", \"Last Name\" and \"E-mail\" are mandatory."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Skip existing invitations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Users with existing invitations will be ignored."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Indico users"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "New user"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Import CSV"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "{count} invitation was skipped."
+msgid_plural "{count} invitations were skipped."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Skip moderation"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "If enabled, the user's registration will be approved automatically."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Skip access check"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid ""
+"If enabled, the user will be able to register even if the event is "
+"access-restricted."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Lock email address"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "If enabled, the email address cannot be changed during registration."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Invite people"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Send invitation email?"
+msgid_plural "Send invitation emails?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "Send invitation"
+msgid_plural "Send invitations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+msgid "You are about to send {count} invitation. Do you want to proceed?"
+msgid_plural "You are about to send {count} invitations. Do you want to proceed?"
+msgstr[0] ""
+msgstr[1] ""
+
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+#: indico/modules/users/client/js/affiliations/StringListField.tsx
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/WTFLinkListField.jsx
 msgid "Add"
@@ -2556,15 +2710,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "You need to have at least one enabled option."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-msgid "First Name"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid "Last Name"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
@@ -2847,6 +2992,14 @@ msgstr ""
 msgid "The minimum value cannot be greater than the maximum value."
 msgstr ""
 
+#: indico/modules/events/registration/client/js/form/fields/PhoneInput.jsx
+msgid "Please use the international phone number format (e.g. +41 1234567)"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/PhoneInput.jsx
+msgid "Require international format (e.g. +41 1234567)"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgid "Minimum picture size"
 msgstr ""
@@ -2990,6 +3143,8 @@ msgid "Phone"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationListFilter.tsx
 msgid "Country"
 msgstr ""
 
@@ -5885,65 +6040,68 @@ msgstr ""
 msgid "Unblock User"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Delete {first_name} {last_name}?"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Enter a JSON object"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "This action is irreversible"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Street"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Deleted user accounts cannot be restored."
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Postal Code"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Once deleted, the following will happen:"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "City"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "{first_name} will no longer be able to access Indico."
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Select a country"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid ""
-"{first_name} will be removed from all areas of Indico - this does not "
-"affect their presence in events as a speaker or other role; they will still "
-"be listed in such capacities where applicable."
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Advanced"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid ""
-"Where it is not possible to delete {first_name}, they will be anonymized "
-"and all personal data associated with the user will be removed from Indico."
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Metadata (JSON)"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Are you sure you want to delete {first_name} {last_name}?"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Edit affiliation"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "No, I don't"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Add affiliation"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Yes, I want to delete {first_name} ({countdown_seconds})"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Alternative names"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Yes, I want to delete {first_name}"
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Type a name and press Enter to add"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "Delete User"
+#: indico/modules/users/client/js/affiliations/AffiliationListFilter.tsx
+msgid "No value"
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "You cannot delete an admin account"
+#: indico/modules/users/client/js/affiliations/AffiliationListFilter.tsx
+msgid "Search affiliations..."
 msgstr ""
 
-#: indico/modules/users/client/js/UserDelete.jsx
-msgid "You cannot delete your own account"
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+msgid "No affiliations found."
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+msgid "No affiliations match the current filters."
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+msgid "Are you sure you want to delete the affiliation {affiliation}?"
 msgstr ""
 
 #: indico/modules/users/client/js/dashboard.jsx
@@ -6195,6 +6353,10 @@ msgstr ""
 
 #: indico/web/client/js/react/components/ListFilter.jsx
 msgid "No filters were added yet"
+msgstr ""
+
+#: indico/web/client/js/react/components/ListFilter.jsx
+msgid "Search options..."
 msgstr ""
 
 #: indico/web/client/js/react/components/ListFilter.jsx
@@ -6473,6 +6635,22 @@ msgstr ""
 
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Choose new file from your computer"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/SingleFileDrop.tsx
+msgid "Processing the file failed."
+msgstr ""
+
+#: indico/web/client/js/react/components/files/SingleFileDrop.tsx
+msgid "Please upload a valid file."
+msgstr ""
+
+#: indico/web/client/js/react/components/files/SingleFileDrop.tsx
+msgid "Processing file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/SingleFileDrop.tsx
+msgid "Processing failed"
 msgstr ""
 
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx
@@ -6990,6 +7168,17 @@ msgstr ""
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx
 msgctxt "Review papers (verb)"
 msgid "Review"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/InviteDialogButton.jsx
+#. Title of the button to invite users to register
+msgctxt "verb"
+msgid "Invite"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+msgctxt "verb"
+msgid "Edit"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx

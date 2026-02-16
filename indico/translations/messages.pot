@@ -1,23 +1,24 @@
 # Translations template for Indico.
-# Copyright (C) 2025 ORGANIZATION
+# Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the Indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.9-dev\n"
+"Project-Id-Version: Indico 3.3.10-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-08 14:51+0100\n"
+"POT-Creation-Date: 2026-02-16 12:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: indico/core/emails.py
+#, python-brace-format
 msgid "{sender_name} (via {site_title})"
 msgstr ""
 
@@ -266,6 +267,7 @@ msgid "Plugins"
 msgstr ""
 
 #: indico/core/plugins/controllers.py
+#, python-brace-format
 msgid "Settings saved ({0})"
 msgstr ""
 
@@ -339,10 +341,8 @@ msgstr ""
 #: indico/modules/events/registration/controllers/management/reglists.py
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 #: indico/modules/events/registration/templates/management/email.html
-#: indico/modules/events/registration/templates/management/import_invitations.html
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/events/registration/templates/management/regform_display_form_columns.html
-#: indico/modules/events/registration/templates/management/regform_invite.html
 #: indico/modules/events/registration/templates/management/registration_create_multiple.html
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 #: indico/modules/events/roles/templates/import_members.html
@@ -351,9 +351,10 @@ msgstr ""
 #: indico/modules/events/templates/forms/session_block_form.html indico/modules/events/templates/reviews/forms.html
 #: indico/modules/events/timetable/templates/timetable_pdf_export.html
 #: indico/modules/logs/templates/resend_email_dialog.html indico/modules/oauth/templates/app_new.html
-#: indico/modules/oauth/templates/authorize.html indico/modules/users/templates/users_admin_create.html
-#: indico/modules/vc/templates/attach_room.html indico/modules/vc/templates/manage_event_create_room.html
-#: indico/web/templates/forms/form_common_fields_first.html indico/web/util.py
+#: indico/modules/oauth/templates/authorize.html indico/modules/users/templates/personal_data.html
+#: indico/modules/users/templates/users_admin_create.html indico/modules/vc/templates/attach_room.html
+#: indico/modules/vc/templates/manage_event_create_room.html indico/web/templates/forms/form_common_fields_first.html
+#: indico/web/util.py
 msgid "Cancel"
 msgstr ""
 
@@ -368,6 +369,7 @@ msgstr ""
 #: indico/legacy/pdfinterface/conference.py indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
 #: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 #: indico/legacy/pdfinterface/latex_templates/report.tex
+#, python-brace-format
 msgid "Page {}"
 msgstr ""
 
@@ -450,6 +452,7 @@ msgid "Report of Abstracts"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex.py
+#, python-brace-format
 msgid "Proposed for other tracks: {}"
 msgstr ""
 
@@ -503,6 +506,7 @@ msgid "Reviews:"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
+#, python-brace-format
 msgid "Submitted by {0} <{1}> on {2}"
 msgstr ""
 
@@ -1170,6 +1174,7 @@ msgid "Specific days"
 msgstr ""
 
 #: indico/modules/attachments/controllers/event_package.py
+#, python-brace-format
 msgid "{contrib} (in session \"{session}\")"
 msgstr ""
 
@@ -1186,6 +1191,7 @@ msgid "Sub contribution"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "The attachment has been uploaded"
 msgid_plural "{count} attachments have been uploaded"
 msgstr[0] ""
@@ -1196,22 +1202,27 @@ msgid "The link has been added"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "The attachment \"{name}\" has been updated"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "Folder \"{name}\" created"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "Folder \"{name}\" updated"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "Folder \"{name}\" deleted"
 msgstr ""
 
 #: indico/modules/attachments/controllers/management/base.py
+#, python-brace-format
 msgid "Attachment \"{name}\" deleted"
 msgstr ""
 
@@ -1489,6 +1500,7 @@ msgid "Please finish or cancel your pending registration before attempting to re
 msgstr ""
 
 #: indico/modules/auth/controllers.py
+#, python-brace-format
 msgid "Too many signup attempts. Please wait {}"
 msgstr ""
 
@@ -1497,6 +1509,7 @@ msgid "Your registration request has been received. We will send you an email on
 msgstr ""
 
 #: indico/modules/auth/controllers.py
+#, python-brace-format
 msgid ""
 "You have successfully registered your Indico profile. Check <a href=\"{url}\">your profile</a> for further details "
 "and settings."
@@ -1511,6 +1524,7 @@ msgid "Your local account credentials have been updated successfully"
 msgstr ""
 
 #: indico/modules/auth/controllers.py
+#, python-brace-format
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr ""
 
@@ -1549,11 +1563,9 @@ msgstr ""
 #: indico/modules/auth/forms.py indico/modules/events/editing/templates/management/editor_list.html
 #: indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/papers/templates/management/paper_person_list.html
-#: indico/modules/events/persons/templates/management/person_list.html indico/modules/events/registration/forms.py
-#: indico/modules/events/registration/templates/management/import_invitations.html
-#: indico/modules/events/registration/templates/management/regform_invite.html
-#: indico/modules/events/registration/wallets/apple.py indico/modules/events/surveys/templates/management/survey.html
-#: indico/modules/groups/templates/_group_members.html indico/modules/users/forms.py
+#: indico/modules/events/persons/templates/management/person_list.html indico/modules/events/registration/wallets/apple.py
+#: indico/modules/events/surveys/templates/management/survey.html indico/modules/groups/templates/_group_members.html
+#: indico/modules/users/forms.py
 msgid "Email"
 msgstr ""
 
@@ -1586,8 +1598,8 @@ msgstr ""
 msgid "Choose the email address you want to verify."
 msgstr ""
 
-#: indico/modules/auth/forms.py indico/modules/events/abstracts/forms.py indico/modules/events/registration/forms.py
-#: indico/modules/users/forms.py indico/modules/users/templates/registration_requests.html
+#: indico/modules/auth/forms.py indico/modules/events/abstracts/forms.py indico/modules/users/forms.py
+#: indico/modules/users/templates/registration_requests.html
 msgid "First name"
 msgstr ""
 
@@ -1596,8 +1608,7 @@ msgid "Family name"
 msgstr ""
 
 #: indico/modules/auth/forms.py indico/modules/cephalopod/templates/cephalopod.html
-#: indico/modules/events/persons/templates/management/person_list.html indico/modules/events/registration/forms.py
-#: indico/modules/events/registration/templates/management/import_invitations.html
+#: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/templates/management/import_registrations.html indico/modules/users/forms.py
 #: indico/modules/users/templates/registration_requests.html
 msgid "Affiliation"
@@ -1612,6 +1623,7 @@ msgid "Please use your email address to log in"
 msgstr ""
 
 #: indico/modules/auth/providers.py
+#, python-brace-format
 msgid ""
 "You are logging in with a secondary email address. Please note that any email notifications will always be sent to "
 "your primary email address ({email}). Go to <a href=\"{url}\">\"My profile\"</a> to manage your emails."
@@ -2345,10 +2357,12 @@ msgid ""
 msgstr ""
 
 #: indico/modules/categories/forms.py
+#, python-brace-format
 msgid "This category's visibility is currently limited by that of '{}'."
 msgstr ""
 
 #: indico/modules/categories/forms.py indico/modules/events/util.py
+#, python-brace-format
 msgid "IP networks cannot have management permissions: {}"
 msgstr ""
 
@@ -2413,10 +2427,12 @@ msgid "Invalid type"
 msgstr ""
 
 #: indico/modules/categories/forms.py
+#, python-brace-format
 msgid "Invalid category: {}"
 msgstr ""
 
 #: indico/modules/categories/forms.py
+#, python-brace-format
 msgid "Invalid event: {}"
 msgstr ""
 
@@ -2450,6 +2466,7 @@ msgid "A role with this code already exists."
 msgstr ""
 
 #: indico/modules/categories/util.py
+#, python-brace-format
 msgid "From the category above"
 msgid_plural "From {} categories above"
 msgstr[0] ""
@@ -2496,6 +2513,7 @@ msgid "You are not authorized to access this category."
 msgstr ""
 
 #: indico/modules/categories/controllers/base.py indico/modules/events/controllers/base.py
+#, python-brace-format
 msgid "If you believe you should have access, please contact {}"
 msgstr ""
 
@@ -2520,6 +2538,7 @@ msgid "You cannot upload this file as an icon/logo."
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py indico/modules/events/layout/controllers/layout.py
+#, python-brace-format
 msgid "The file has an invalid format ({format})"
 msgstr ""
 
@@ -2550,10 +2569,12 @@ msgid "Protection settings of the category have been updated"
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "Category \"{}\" has been created."
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "Category \"{}\" has been deleted."
 msgstr ""
 
@@ -2574,6 +2595,7 @@ msgid "Cannot move the category in a descendant of itself."
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "Category \"{}\" moved to \"{}\"."
 msgstr ""
 
@@ -2586,22 +2608,26 @@ msgid "Cannot move a category in a descendant of itself."
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "{0} category moved to \"{1}\"."
 msgid_plural "{0} categories moved to \"{1}\"."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "You have deleted one event"
 msgid_plural "You have deleted {} events"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "Your events have been moved to the category \"{}\""
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "Your events have been split into the categories \"{}\" and \"{}\""
 msgstr ""
 
@@ -2614,18 +2640,21 @@ msgid "You may not move events to this category."
 msgstr ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "You have moved {count} event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/controllers/management.py
+#, python-brace-format
 msgid "You have requested the move of {count} event to the category \"{cat}\""
 msgid_plural "You have requested the move of {count} events to the category \"{cat}\""
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/controllers/util.py
+#, python-brace-format
 msgid "Events of \"{}\""
 msgstr ""
 
@@ -3207,6 +3236,7 @@ msgid "Community Hub"
 msgstr ""
 
 #: indico/modules/cephalopod/controllers.py
+#, python-brace-format
 msgid "Operation failed, the community hub returned: {err}"
 msgstr ""
 
@@ -3215,6 +3245,7 @@ msgid "The operation timed-out. Please try again in a while."
 msgstr ""
 
 #: indico/modules/cephalopod/controllers.py
+#, python-brace-format
 msgid "Unexpected exception while contacting the Community Hub: {err}"
 msgstr ""
 
@@ -3223,6 +3254,7 @@ msgid "Synchronization is not possible if you don't join the community first."
 msgstr ""
 
 #: indico/modules/cephalopod/controllers.py
+#, python-brace-format
 msgid "Synchronization failed, the community hub returned: {err}"
 msgstr ""
 
@@ -3442,6 +3474,7 @@ msgid "Posters/Badges"
 msgstr ""
 
 #: indico/modules/designer/controllers.py
+#, python-brace-format
 msgid "Created copy of template '{}'"
 msgstr ""
 
@@ -3452,10 +3485,12 @@ msgstr ""
 #: indico/modules/designer/controllers.py indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/management/forms.py indico/modules/events/management/templates/_action_menu.html
 #: indico/modules/events/management/templates/clone_event.html
+#: indico/modules/events/registration/controllers/management/regforms.py
 msgid "Clone"
 msgstr ""
 
 #: indico/modules/designer/controllers.py
+#, python-brace-format
 msgid "Added new template '{}'"
 msgstr ""
 
@@ -3468,10 +3503,12 @@ msgid "The image file does not belong to this template"
 msgstr ""
 
 #: indico/modules/designer/controllers.py
+#, python-brace-format
 msgid "Invalid color in field \"{}\": {}"
 msgstr ""
 
 #: indico/modules/designer/controllers.py
+#, python-brace-format
 msgid "Invalid background color in field \"{}\": {}"
 msgstr ""
 
@@ -3488,6 +3525,7 @@ msgid "Template successfully unlinked."
 msgstr ""
 
 #: indico/modules/designer/controllers.py indico/modules/events/layout/controllers/images.py
+#, python-brace-format
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
 msgstr[0] ""
@@ -3535,6 +3573,7 @@ msgid "Event Dates"
 msgstr ""
 
 #: indico/modules/designer/placeholders.py
+#, python-brace-format
 msgid "{} to {}"
 msgstr ""
 
@@ -3604,12 +3643,12 @@ msgctxt "Salutation"
 msgid "Title"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py indico/modules/events/registration/templates/management/import_invitations.html
+#: indico/modules/designer/placeholders.py
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "First Name"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py indico/modules/events/registration/templates/management/import_invitations.html
+#: indico/modules/designer/placeholders.py
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Last Name"
 msgstr ""
@@ -3619,7 +3658,6 @@ msgid "Last Name (uppercase)"
 msgstr ""
 
 #: indico/modules/designer/placeholders.py indico/modules/events/registration/controllers/management/reglists.py
-#: indico/modules/events/registration/templates/management/import_invitations.html
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "E-mail"
 msgstr ""
@@ -4073,6 +4111,7 @@ msgid "%(link_start)sSelect an existing template%(link_end)s to be used as the b
 msgstr ""
 
 #: indico/modules/events/__init__.py
+#, python-brace-format
 msgid "You have been granted manager/submission privileges for an event."
 msgid_plural "You have been granted manager/submission privileges for {} events."
 msgstr[0] ""
@@ -4207,6 +4246,7 @@ msgid "Value"
 msgstr ""
 
 #: indico/modules/events/fields.py
+#, python-brace-format
 msgid "There is already a person with the email {email}"
 msgstr ""
 
@@ -4227,6 +4267,7 @@ msgid "There are no speakers"
 msgstr ""
 
 #: indico/modules/events/fields.py
+#, python-brace-format
 msgid "Person with email '{}' is duplicated"
 msgstr ""
 
@@ -4243,6 +4284,7 @@ msgid "URL template"
 msgstr ""
 
 #: indico/modules/events/forms.py
+#, python-brace-format
 msgid "The URL template must contain the '{value}' placeholder."
 msgstr ""
 
@@ -4259,6 +4301,7 @@ msgid "This name is already in use."
 msgstr ""
 
 #: indico/modules/events/forms.py
+#, python-brace-format
 msgid "The URL template must contain the placeholder '{value}'."
 msgstr ""
 
@@ -4384,6 +4427,14 @@ msgstr ""
 msgid "The title of the event"
 msgstr ""
 
+#: indico/modules/events/placeholders.py
+msgid "Event start date"
+msgstr ""
+
+#: indico/modules/events/placeholders.py
+msgid "Event start time"
+msgstr ""
+
 #: indico/modules/events/placeholders.py indico/modules/events/registration/placeholders/registrations.py
 msgid "Link to the event"
 msgstr ""
@@ -4406,6 +4457,7 @@ msgid "Empty regex"
 msgstr ""
 
 #: indico/modules/events/schemas.py
+#, python-brace-format
 msgid "Invalid regex: {}"
 msgstr ""
 
@@ -4414,10 +4466,12 @@ msgid "The regex needs to have at least one group"
 msgstr ""
 
 #: indico/modules/events/schemas.py
+#, python-brace-format
 msgid "Not all captured regex groups used ({})"
 msgstr ""
 
 #: indico/modules/events/schemas.py
+#, python-brace-format
 msgid "Placeholder not known: {}"
 msgstr ""
 
@@ -4426,10 +4480,12 @@ msgid "This event has been locked so no modifications are possible."
 msgstr ""
 
 #: indico/modules/events/util.py
+#, python-brace-format
 msgid "The theme '{}' is not valid for this event."
 msgstr ""
 
 #: indico/modules/events/util.py
+#, python-brace-format
 msgid "The theme '{}' does not exist."
 msgstr ""
 
@@ -4442,10 +4498,12 @@ msgid "Your action requires modification of session block boundaries, but you ar
 msgstr ""
 
 #: indico/modules/events/util.py
+#, python-brace-format
 msgid "Invalid ACL entry: {}"
 msgstr ""
 
 #: indico/modules/events/util.py
+#, python-brace-format
 msgid "Registrants cannot have management permissions: {}"
 msgstr ""
 
@@ -4558,6 +4616,7 @@ msgid "There are no authors"
 msgstr ""
 
 #: indico/modules/events/abstracts/fields.py indico/modules/events/contributions/fields.py
+#, python-brace-format
 msgid "{} has no role"
 msgstr ""
 
@@ -5013,10 +5072,12 @@ msgid "Body"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py
+#, python-brace-format
 msgid "Invitation email templates must contain the {placeholder} placeholder"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py
+#, python-brace-format
 msgid "Only invitation email templates may contain the {placeholder} placeholder"
 msgstr ""
 
@@ -5053,7 +5114,10 @@ msgid "Withdrawn"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py
-msgid "The default template that will be used as a basis for this notification. You can customize it later."
+msgid ""
+"The default template that will be used as a basis for this notification. You can customize it later. If you want the "
+"text to be in a specific language that is not the default language of this Indico server, set the default language of"
+" this event before creating this notification."
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py indico/modules/events/contributions/forms.py
@@ -5089,9 +5153,7 @@ msgstr ""
 msgid "Existing user"
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py
-#: indico/modules/events/registration/templates/management/regform_invitations.html
-#: indico/modules/events/registration/templates/management/regform_reglist.html
+#: indico/modules/events/abstracts/forms.py indico/modules/events/registration/templates/management/regform_reglist.html
 msgid "New user"
 msgstr ""
 
@@ -5195,6 +5257,7 @@ msgid "Submission comment"
 msgstr ""
 
 #: indico/modules/events/abstracts/lists.py
+#, python-brace-format
 msgid "The abstract '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
@@ -5404,18 +5467,21 @@ msgid "Abstract modified successfully"
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "{num} abstract has been judged."
 msgid_plural "{num} abstracts have been judged."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "{num} abstract has been skipped since it is already judged."
 msgid_plural "{num} abstracts have been skipped since they are already judged."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "{num} abstract has been skipped since it was under review for more than one track."
 msgid_plural "{num} abstracts have been skipped since they were under review for more than one track."
 msgstr[0] ""
@@ -5427,16 +5493,19 @@ msgid "Judge"
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "Abstract '{}' created successfully"
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "The abstract has been deleted."
 msgid_plural "{count} abstracts have been deleted."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
+#, python-brace-format
 msgid "The linked contribution has been deleted."
 msgid_plural "{count} linked contributions have been deleted."
 msgstr[0] ""
@@ -5468,12 +5537,14 @@ msgid "The Call for Abstracts is closed. Please contact the event organizer for 
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/display.py
+#, python-brace-format
 msgid ""
 "Your abstract '{}' has been successfully submitted. It is registered with the number #{}. You will be notified by "
 "email with the submission details."
 msgstr ""
 
 #: indico/modules/events/abstracts/controllers/display.py
+#, python-brace-format
 msgid "Your abstract '{}' has been successfully submitted. It is registered with the number #{}."
 msgstr ""
 
@@ -5812,17 +5883,19 @@ msgid "You can view this comment on the abstract page:"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_accept_notification.txt
+#, python-brace-format
 msgid "Abstract Acceptance notification (#{abstract_id})"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_accept_notification.txt
+#, python-brace-format
 msgid ""
 "We're pleased to announce that your abstract \"{abstract_title}\" with ID #{abstract_id} has been accepted in track "
 "\"{abstract_track}\" ({contribution_type})."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_accept_notification.txt
-#, python-format
+#, python-brace-format, python-format
 msgid ""
 "See below a summary of your submitted abstract:%(linebreak)s Conference: {event_title}%(linebreak)s Submitted by: "
 "{submitter_name}%(linebreak)s Title: {abstract_title}%(linebreak)s Authors: {primary_authors}%(linebreak)s Co-"
@@ -5840,7 +5913,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/emails/default_reject_notification.txt
 #: indico/modules/events/abstracts/templates/emails/default_submit_notification.txt
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
-#, python-format
+#, python-brace-format, python-format
 msgid "Kind regards,%(linebreak)s The organizers of {event_title}"
 msgstr ""
 
@@ -5857,38 +5930,47 @@ msgid "In order to submit your abstract please follow the link below:"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_merge_notification.txt
+#, python-brace-format
 msgid "Abstract Merge notification (#{abstract_id})"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_merge_notification.txt
+#, python-brace-format
 msgid "Your abstract \"{abstract_title}\" with ID #{abstract_id} has been merged into \"{target_abstract_title}\"."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_notification.txt
+#, python-brace-format
 msgid "Dear {submitter_name},"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_reject_notification.txt
+#, python-brace-format
 msgid "Abstract Rejection notification (#{abstract_id})"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_reject_notification.txt
+#, python-brace-format
 msgid "We're sorry to let you know that your abstract \"{abstract_title}\" with ID #{abstract_id} has been rejected."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_submit_notification.txt
+#, python-brace-format
 msgid "Abstract Submission confirmation (#{abstract_id})"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_submit_notification.txt
+#, python-brace-format
 msgid "We've received your abstract \"{abstract_title}\" to which we have assigned id #{abstract_id}."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
+#, python-brace-format
 msgid "Abstract Withdrawn notification (#{abstract_id})"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
+#, python-brace-format
 msgid "We're sorry to let you know that your abstract \"{abstract_title}\" with ID #{abstract_id} has been withdrawn."
 msgstr ""
 
@@ -6828,6 +6910,7 @@ msgid "You are trying to sign an agreement that requires you to be logged in"
 msgstr ""
 
 #: indico/modules/events/agreements/controllers.py
+#, python-brace-format
 msgid "Please log in as {name} to sign this agreement."
 msgstr ""
 
@@ -6836,6 +6919,7 @@ msgid "The URL for this agreement is invalid."
 msgstr ""
 
 #: indico/modules/events/agreements/controllers.py
+#, python-brace-format
 msgid "The '{}' agreement is not used in this event."
 msgstr ""
 
@@ -6848,6 +6932,7 @@ msgid "The agreement is already signed"
 msgstr ""
 
 #: indico/modules/events/agreements/controllers.py
+#, python-brace-format
 msgid "Agreement answered on behalf of {0}"
 msgstr ""
 
@@ -6884,6 +6969,7 @@ msgid "Email body"
 msgstr ""
 
 #: indico/modules/events/agreements/forms.py indico/modules/events/registration/forms.py indico/util/marshmallow.py
+#, python-brace-format
 msgid "Missing placeholders: {}"
 msgstr ""
 
@@ -7094,8 +7180,6 @@ msgstr ""
 
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html
 #: indico/modules/events/registration/templates/management/email.html
-#: indico/modules/events/registration/templates/management/import_invitations.html
-#: indico/modules/events/registration/templates/management/regform_invite.html
 msgid "Send"
 msgstr ""
 
@@ -7108,6 +7192,7 @@ msgid "Submit answer for"
 msgstr ""
 
 #: indico/modules/events/agreements/templates/emails/agreement_default_body.html
+#, python-brace-format
 msgid "Dear {person_name},"
 msgstr ""
 
@@ -7173,6 +7258,7 @@ msgid "Email:"
 msgstr ""
 
 #: indico/modules/events/contributions/__init__.py
+#, python-brace-format
 msgid "You have been granted manager/submission privileges for a contribution."
 msgid_plural "You have been granted manager/submission privileges for {} contributions."
 msgstr[0] ""
@@ -7373,26 +7459,32 @@ msgid "Not scheduled"
 msgstr ""
 
 #: indico/modules/events/contributions/lists.py
+#, python-brace-format
 msgid "The contribution '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
 #: indico/modules/events/contributions/util.py indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: malformed CSV data - please check that the number of columns is correct"
 msgstr ""
 
 #: indico/modules/events/contributions/util.py
+#, python-brace-format
 msgid "Row {row}: can't parse date: \"{date}\""
 msgstr ""
 
 #: indico/modules/events/contributions/util.py
+#, python-brace-format
 msgid "Row {row}: can't parse duration: {duration}"
 msgstr ""
 
 #: indico/modules/events/contributions/util.py
+#, python-brace-format
 msgid "Row {}: contribution title is required"
 msgstr ""
 
 #: indico/modules/events/contributions/util.py indico/util/roles.py
+#, python-brace-format
 msgid "Row {row}: invalid email address: {email}"
 msgstr ""
 
@@ -7410,32 +7502,39 @@ msgid "The contributions of this event have not been published yet."
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Contribution '{}' created successfully"
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Contribution '{}' successfully updated"
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "The contribution has been deleted."
 msgid_plural "{count} contributions have been deleted."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Contribution '{}' successfully deleted"
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Subcontribution '{}' created successfully"
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Subcontribution '{}' updated successfully"
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "Subcontribution '{}' deleted successfully"
 msgstr ""
 
@@ -7444,6 +7543,7 @@ msgid "The selected contributions do not have any materials."
 msgstr ""
 
 #: indico/modules/events/contributions/controllers/management.py
+#, python-brace-format
 msgid "{} contribution has been imported."
 msgid_plural "{} contributions have been imported."
 msgstr[0] ""
@@ -7842,7 +7942,6 @@ msgstr ""
 #: indico/modules/events/contributions/templates/management/contributions.html
 #: indico/modules/events/management/templates/_action_menu.html
 #: indico/modules/events/management/templates/import_event.html
-#: indico/modules/events/registration/templates/management/regform_invitations.html
 #: indico/modules/events/registration/templates/management/regform_reglist.html
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html
 msgid "Import"
@@ -7942,18 +8041,22 @@ msgid "There are no contribution types yet."
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "External ID type '{}' created successfully"
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "External ID type '{}' successfully updated"
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "External ID type '{}' successfully deleted"
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "Event label '{}' created successfully"
 msgstr ""
 
@@ -7962,10 +8065,12 @@ msgid "Allowed keywords have been saved"
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "Event label '{}' successfully updated"
 msgstr ""
 
 #: indico/modules/events/controllers/admin.py
+#, python-brace-format
 msgid "Event label '{}' successfully deleted"
 msgstr ""
 
@@ -8062,15 +8167,15 @@ msgstr ""
 msgid "Tag code must be unique"
 msgstr ""
 
-#: indico/modules/events/editing/schemas.py indico/modules/rb/schemas.py
+#: indico/modules/events/editing/schemas.py indico/modules/events/papers/schemas.py indico/modules/rb/schemas.py
 msgid "Name must be unique"
 msgstr ""
 
-#: indico/modules/events/editing/schemas.py
+#: indico/modules/events/editing/schemas.py indico/modules/events/papers/schemas.py
 msgid "Filename template cannot include dots"
 msgstr ""
 
-#: indico/modules/events/editing/schemas.py
+#: indico/modules/events/editing/schemas.py indico/modules/events/papers/schemas.py
 msgid "Extensions cannot have leading dots"
 msgstr ""
 
@@ -8095,14 +8200,16 @@ msgid "Invalid response"
 msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/editable_list.py
+#, python-brace-format
 msgid "You are not an editor of the {} type"
 msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/editable_list.py
+#, python-brace-format
 msgid "This user is not an editor of the {} type"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/management.py
+#: indico/modules/events/editing/controllers/backend/management.py indico/modules/events/papers/controllers/management.py
 msgid "Cannot delete file type which already has files"
 msgstr ""
 
@@ -8115,10 +8222,12 @@ msgid "Cannot delete the only publishable file type"
 msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/service.py
+#, python-brace-format
 msgid "Could not register event with service: {}"
 msgstr ""
 
 #: indico/modules/events/editing/controllers/backend/service.py
+#, python-brace-format
 msgid "Could not disconnect event from service: {}"
 msgstr ""
 
@@ -8307,24 +8416,28 @@ msgid "Features"
 msgstr ""
 
 #: indico/modules/events/features/__init__.py
+#, python-brace-format
 msgid "Feature disabled: {features} (not available for this event type)"
 msgid_plural "Features disabled: {features} (not available for this event type)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/features/controllers.py
+#, python-brace-format
 msgid "Feature enabled: {features}"
 msgid_plural "Features enabled: {features}"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/features/controllers.py
+#, python-brace-format
 msgid "Feature disabled: {features}"
 msgid_plural "Features disabled: {features}"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/features/util.py
+#, python-brace-format
 msgid "The '{feature_name}' feature is not enabled for this event."
 msgstr ""
 
@@ -8497,6 +8610,7 @@ msgid "Timetable theme"
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
+#, python-brace-format
 msgid ""
 "Logo to be displayed in the event page. When configured as banner, the logo will be displayed above the event title "
 "and the optimal width is {}px. Otherwise, the logo will be displayed to left of the event title and the optimal width"
@@ -8508,6 +8622,7 @@ msgid "Custom CSS file"
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
+#, python-brace-format
 msgid ""
 "If you want to fully customize your conference page you can create your own stylesheet and upload it. An example "
 "stylesheet can be downloaded {link}here{endlink}"
@@ -8518,6 +8633,7 @@ msgid "Custom title"
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
+#, python-brace-format
 msgid ""
 "If you customize the title, that title is used regardless of the user's language preference.  The default title "
 "<strong>{title}</strong> is displayed in the user's language."
@@ -8536,22 +8652,27 @@ msgid "In addition to anyone listed in the Access control list, speakers will ha
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
+#, python-brace-format
 msgid "Custom CSS file ({name})"
 msgstr ""
 
 #: indico/modules/events/layout/controllers/images.py
+#, python-brace-format
 msgid "The image '{name}' has an invalid type ({type}); only JPG, GIF and PNG are allowed."
 msgstr ""
 
 #: indico/modules/events/layout/controllers/images.py
+#, python-brace-format
 msgid "The image '{}' has been deleted"
 msgstr ""
 
 #: indico/modules/events/layout/controllers/layout.py
+#, python-brace-format
 msgid "The event logo is too small. It is recommended to use a logo with a width of at least {}px."
 msgstr ""
 
 #: indico/modules/events/layout/controllers/layout.py
+#, python-brace-format
 msgid "The event logo is too large. It is recommended to use a logo with a width of at most {}px."
 msgstr ""
 
@@ -8850,10 +8971,12 @@ msgid "To use this start date the timetable must be updated."
 msgstr ""
 
 #: indico/modules/events/management/forms.py
+#, python-brace-format
 msgid "The event is too short to fit all timetable entries. It must be at least {} longer."
 msgstr ""
 
 #: indico/modules/events/management/forms.py
+#, python-brace-format
 msgid "The event cannot end before its last timetable entry, which is at {}."
 msgstr ""
 
@@ -8891,6 +9014,7 @@ msgid "This text is displayed on the main conference page."
 msgstr ""
 
 #: indico/modules/events/management/forms.py indico/web/forms/fields/simple.py
+#, python-brace-format
 msgid "Invalid email address: {}"
 msgstr ""
 
@@ -8978,6 +9102,7 @@ msgid "Subcontribution speakers can edit minutes and upload materials."
 msgstr ""
 
 #: indico/modules/events/management/forms.py
+#, python-brace-format
 msgid "This event's visibility is currently limited by that of '{}'."
 msgstr ""
 
@@ -9102,6 +9227,7 @@ msgid "No default language"
 msgstr ""
 
 #: indico/modules/events/management/program_codes.py
+#, python-brace-format
 msgid "The ID of the contribution (optionally padded with zeros, e.g. {id:2} for \"01\" or {id} for \"1\")"
 msgstr ""
 
@@ -9178,22 +9304,27 @@ msgid "The weekday of the session block (e.g. \"TUE\")"
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "Edit session \"{name}\""
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "Edit contribution \"{name}\""
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "Edit folder \"{name}\""
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "Edit attachment \"{name}\""
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "You have added a user with no Indico account."
 msgid_plural "You have added {} users with no Indico account."
 msgstr[0] ""
@@ -9204,6 +9335,7 @@ msgid "An Indico account may be needed to upload materials and/or manage content
 msgstr ""
 
 #: indico/modules/events/management/util.py
+#, python-brace-format
 msgid "To invite them, please go to the {link_start}Roles page{link_end}"
 msgstr ""
 
@@ -9214,10 +9346,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/management/controllers/actions.py
+#, python-brace-format
 msgid "Event \"{}\" successfully deleted."
 msgstr ""
 
 #: indico/modules/events/management/controllers/actions.py
+#, python-brace-format
 msgid "The event type has been changed to {}."
 msgstr ""
 
@@ -9230,10 +9364,12 @@ msgid "The event is now unlocked."
 msgstr ""
 
 #: indico/modules/events/management/controllers/actions.py
+#, python-brace-format
 msgid "Event \"{event}\" has been moved to category \"{category}\""
 msgstr ""
 
 #: indico/modules/events/management/controllers/actions.py
+#, python-brace-format
 msgid "Moving the event \"{event}\" to \"{category}\" has been requested and is pending approval"
 msgstr ""
 
@@ -9254,6 +9390,7 @@ msgid "Welcome to your cloned event!"
 msgstr ""
 
 #: indico/modules/events/management/controllers/cloning.py
+#, python-brace-format
 msgid "{} new events created."
 msgstr ""
 
@@ -9981,6 +10118,7 @@ msgid "The members of the teams were updated successfully"
 msgstr ""
 
 #: indico/modules/events/papers/controllers/management.py
+#, python-brace-format
 msgid "Users have been removed from 1 contribution"
 msgid_plural "Users have been removed from {} contributions"
 msgstr[0] ""
@@ -10023,12 +10161,14 @@ msgid "Judging deadline has been set."
 msgstr ""
 
 #: indico/modules/events/papers/controllers/paper.py
+#, python-brace-format
 msgid "One paper has been judged."
 msgid_plural "{num} papers have been judged."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/papers/controllers/paper.py
+#, python-brace-format
 msgid "One contribution has been skipped since it has no paper submitted yet or it is in a final state."
 msgid_plural "{num} contributions have been skipped since they have no paper submitted yet or they are in a final state."
 msgstr[0] ""
@@ -10043,14 +10183,17 @@ msgid "Paper reviewing roles have been unassigned."
 msgstr ""
 
 #: indico/modules/events/papers/controllers/templates.py
+#, python-brace-format
 msgid "Paper template \"{}\" added."
 msgstr ""
 
 #: indico/modules/events/papers/controllers/templates.py
+#, python-brace-format
 msgid "Paper template \"{}\" updated."
 msgstr ""
 
 #: indico/modules/events/papers/controllers/templates.py
+#, python-brace-format
 msgid "Paper template \"{}\" deleted."
 msgstr ""
 
@@ -10108,16 +10251,7 @@ msgid "The call for papers is open"
 msgstr ""
 
 #: indico/modules/events/papers/templates/_contributions.html
-msgid "You can submit a paper."
-msgstr ""
-
-#: indico/modules/events/papers/templates/_contributions.html
-#, python-format
-msgid "Submit paper for &quot;%(title)s&quot;"
-msgstr ""
-
-#: indico/modules/events/papers/templates/_contributions.html indico/modules/events/papers/templates/display/_common.html
-msgid "Submit paper"
+msgid "You can submit a paper"
 msgstr ""
 
 #: indico/modules/events/papers/templates/_contributions.html
@@ -10302,24 +10436,6 @@ msgstr ""
 msgid "The call for papers is closed."
 msgstr ""
 
-#: indico/modules/events/papers/templates/display/_common.html
-#, python-format
-msgid "You can submit your paper for %(contrib_title)s"
-msgstr ""
-
-#: indico/modules/events/papers/templates/display/_common.html
-msgid "You can submit a paper"
-msgstr ""
-
-#: indico/modules/events/papers/templates/display/_common.html
-#: indico/modules/events/papers/templates/display/select_contribution.html
-msgid "Submit new paper"
-msgstr ""
-
-#: indico/modules/events/papers/templates/display/_common.html
-msgid "Select contribution"
-msgstr ""
-
 #: indico/modules/events/papers/templates/display/_paper_list.html
 msgid "Submitted for reviewing"
 msgstr ""
@@ -10338,6 +10454,10 @@ msgstr ""
 
 #: indico/modules/events/papers/templates/display/_paper_list.html
 msgid "Your layout review is pending"
+msgstr ""
+
+#: indico/modules/events/papers/templates/display/call_for_papers.html
+msgid "Papers awaiting my submission"
 msgstr ""
 
 #: indico/modules/events/papers/templates/display/call_for_papers.html
@@ -10416,6 +10536,10 @@ msgstr ""
 
 #: indico/modules/events/papers/templates/display/select_contribution.html
 msgid "Select a contribution for which you wish to submit a paper."
+msgstr ""
+
+#: indico/modules/events/papers/templates/display/select_contribution.html
+msgid "Submit new paper"
 msgstr ""
 
 #: indico/modules/events/papers/templates/emails/added_to_reviewing_team.html
@@ -10790,6 +10914,22 @@ msgid "Set paper judging deadline"
 msgstr ""
 
 #: indico/modules/events/papers/templates/management/overview.html
+msgid "File types"
+msgstr ""
+
+#: indico/modules/events/papers/templates/management/overview.html
+msgid "Configure file types"
+msgstr ""
+
+#: indico/modules/events/papers/templates/management/overview.html
+#: indico/modules/events/payment/templates/management/payments.html
+#: indico/modules/events/registration/templates/management/regform.html
+#: indico/modules/events/registration/templates/management/regform_list.html
+#: indico/modules/events/tracks/templates/management.html
+msgid "Configure"
+msgstr ""
+
+#: indico/modules/events/papers/templates/management/overview.html
 msgid "Manage paper templates that can be downloaded in the event area"
 msgstr ""
 
@@ -10940,6 +11080,7 @@ msgid "Gives event managers the opportunity to process payments for registration
 msgstr ""
 
 #: indico/modules/events/payment/controllers.py
+#, python-brace-format
 msgid "Settings for {} saved"
 msgstr ""
 
@@ -10958,6 +11099,7 @@ msgid "Currencies"
 msgstr ""
 
 #: indico/modules/events/payment/forms.py
+#, python-brace-format
 msgid ""
 "List of currencies that can be selected for an event. When deleting a currency, existing events will keep using it. "
 "The currency code must be a valid <a href='{0}'>ISO-4217</a> code such as 'EUR' or 'CHF'."
@@ -11088,13 +11230,6 @@ msgid "Edit payment settings"
 msgstr ""
 
 #: indico/modules/events/payment/templates/management/payments.html
-#: indico/modules/events/registration/templates/management/regform.html
-#: indico/modules/events/registration/templates/management/regform_list.html
-#: indico/modules/events/tracks/templates/management.html
-msgid "Configure"
-msgstr ""
-
-#: indico/modules/events/payment/templates/management/payments.html
 msgid "Payment methods"
 msgstr ""
 
@@ -11137,18 +11272,21 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/persons/controllers.py
+#, python-brace-format
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/persons/controllers.py
+#, python-brace-format
 msgid "Session modification rights have been granted to one session convener"
 msgid_plural "Session modification rights have been granted to {} session conveners"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/persons/controllers.py
+#, python-brace-format
 msgid "Submission rights have been revoked from one user"
 msgid_plural "Submission rights have been revoked from {} users"
 msgstr[0] ""
@@ -11245,6 +11383,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/emails/custom_email_default.html
 #: indico/modules/events/registration/templates/emails/invitation_default.html
 #: indico/modules/events/registration/templates/emails/registration_reminder_default.html
+#, python-brace-format
 msgid "Dear {first_name},"
 msgstr ""
 
@@ -11253,7 +11392,7 @@ msgid "Please register"
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/invitation.html
-#, python-format
+#, python-brace-format, python-format
 msgid "You have been added with some submission privileges to the event %(strong)s{event_title}%(endstrong)s."
 msgstr ""
 
@@ -11266,12 +11405,12 @@ msgid "You can do so at the following URL:"
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/invitation.html
-#, python-format
+#, python-brace-format, python-format
 msgid "When creating the profile, please make sure to use the email address %(strong)s{email}%(endstrong)s."
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/invitation.html
-#, python-format
+#, python-brace-format, python-format
 msgid "If you already have an Indico profile, simply add the email address %(strong)s{email}%(endstrong)s to your profile."
 msgstr ""
 
@@ -11446,6 +11585,7 @@ msgid "Participant List"
 msgstr ""
 
 #: indico/modules/events/registration/__init__.py
+#, python-brace-format
 msgid "A registration has been linked to your account."
 msgid_plural "{n} registrations have been linked to your account."
 msgstr[0] ""
@@ -11637,6 +11777,7 @@ msgid "Email addresses that will receive notifications"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
+#, python-brace-format
 msgid "Email address set as the sender of all notifications sent to users. If empty, then {email} is used."
 msgstr ""
 
@@ -11693,6 +11834,7 @@ msgid "The visibility duration cannot be zero."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
+#, python-brace-format
 msgid "The visibility duration cannot be longer than {} week. Leave the field empty for indefinite."
 msgid_plural "The visibility duration cannot be longer than {} weeks. Leave the field empty for indefinite."
 msgstr[0] ""
@@ -11716,101 +11858,6 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Deadline until which registration information can be modified"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Email subject"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Skip moderation"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "If enabled, the user's registration will be approved automatically."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Skip access check"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "If enabled, the user will be able to register even if the event is access-restricted."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Lock email address"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "If enabled, the email address cannot be changed during registration."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "The first name of the user you are inviting."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py indico/modules/users/templates/registration_requests.html
-msgid "Last name"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "The last name of the user you are inviting."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "The invitation will be sent to this address."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "The affiliation of the user you are inviting."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "There is already an invitation with this email address."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "There is already a registration with this email address."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py indico/modules/users/__init__.py
-#: indico/modules/users/templates/users_admin.html
-msgid "Users"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Select the users to invite."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "There are already invitations for the following email addresses: {emails}"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "There are already registrations with the following email addresses: {emails}"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
-#: indico/modules/events/timetable/forms.py
-msgid "Source File"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py indico/modules/events/timetable/forms.py
-msgid "You need to upload a CSV file."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
-#: indico/modules/events/timetable/forms.py
-msgid "CSV field delimiter"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Skip existing invitations"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "If enabled, users with existing invitations will be ignored."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -11911,7 +11958,6 @@ msgid "List of users allowed to modify registrations"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
-#: indico/modules/events/registration/templates/management/regform_invitations.html
 msgid "Indico users"
 msgstr ""
 
@@ -11924,6 +11970,7 @@ msgid "Notify the users about the registration."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
+#, python-brace-format
 msgid "A registration for {} already exists."
 msgstr ""
 
@@ -11985,12 +12032,25 @@ msgstr ""
 msgid "Margin between rows"
 msgstr ""
 
+#: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
+#: indico/modules/events/timetable/forms.py
+msgid "Source File"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py indico/modules/events/timetable/forms.py
+msgid "You need to upload a CSV file."
+msgstr ""
+
 #: indico/modules/events/registration/forms.py
 msgid "Skip Moderation"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "If enabled, the registration will be immediately accepted"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Skip access check"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -12003,6 +12063,11 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Whether the imported users should receive an e-mail notification"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
+#: indico/modules/events/timetable/forms.py
+msgid "CSV field delimiter"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -12065,6 +12130,7 @@ msgid "Remove fee for unpaid registrations"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
+#, python-brace-format
 msgid "Set fee to the registration form's default ({})"
 msgstr ""
 
@@ -12073,6 +12139,7 @@ msgid "Change fee to custom value"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
+#, python-brace-format
 msgid "A fixed fee (in {currency}) the selected users have to pay when registering."
 msgstr ""
 
@@ -12118,6 +12185,10 @@ msgstr ""
 msgid "Has documents"
 msgstr ""
 
+#: indico/modules/events/registration/schemas.py
+msgid "Invalid email address."
+msgstr ""
+
 #: indico/modules/events/registration/stats.py
 msgid "Accommodation"
 msgstr ""
@@ -12144,34 +12215,46 @@ msgid "Total"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+msgid "Not a valid CSV file."
+msgstr ""
+
+#: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: missing e-mail address"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: invalid e-mail address"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: missing first or last name"
 msgstr ""
 
 #: indico/modules/events/registration/util.py indico/util/roles.py
+#, python-brace-format
 msgid "Row {}: email address is not unique"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: a registration with this email already exists"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: a registration for this user already exists"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
+#, python-brace-format
 msgid "Row {}: an invitation for this user already exists"
 msgstr ""
 
@@ -12228,12 +12311,14 @@ msgid "Retention period cannot be longer than that of the registration form"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py indico/web/forms/validators.py
+#, python-brace-format
 msgid "The retention period cannot be less than {} week."
 msgid_plural "The retention period cannot be less than {} weeks."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/fields.py indico/web/forms/validators.py
+#, python-brace-format
 msgid "The retention period cannot be longer than {} week."
 msgid_plural "The retention period cannot be longer than {} weeks."
 msgstr[0] ""
@@ -12244,14 +12329,17 @@ msgid "The retention period cannot be longer than 10 years. Leave the field empt
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
 msgid "This field depends on \"{field}\", which has a shorter retention period ({period})."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
 msgid "This field is a condition for \"{field}\", which has a longer retention period (indefinite)."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
 msgid "This field is a condition for \"{field}\", which has a longer retention period ({period})."
 msgstr ""
 
@@ -12264,28 +12352,25 @@ msgid "Fields used as conditional cannot be deleted"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/invitations.py
-msgid "The invitation has been sent."
-msgid_plural "{n} invitations have been sent."
-msgstr[0] ""
-msgstr[1] ""
+#, python-brace-format
+msgid "There are already invitations for the following email addresses: {emails}"
+msgstr ""
 
 #: indico/modules/events/registration/controllers/management/invitations.py
-msgid "One invitation has been sent."
-msgid_plural "{n} invitations have been sent."
-msgstr[0] ""
-msgstr[1] ""
+#, python-brace-format
+msgid "There are already registrations with the following email addresses: {emails}"
+msgstr ""
 
 #: indico/modules/events/registration/controllers/management/invitations.py
-msgid "One invitation was skipped."
-msgid_plural "{n} invitations were skipped."
-msgstr[0] ""
-msgstr[1] ""
+msgid "The uploaded CSV file is empty"
+msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
 msgid "The participants display settings have been saved."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
+#, python-brace-format
 msgid "The settings for \"{}\" have been saved."
 msgstr ""
 
@@ -12302,14 +12387,21 @@ msgid "Registration form deleted"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
+msgid "Registration form cloned"
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/regforms.py
+#, python-brace-format
 msgid "Registrations for {} are now open"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
+#, python-brace-format
 msgid "Registrations for {} are now closed"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/regforms.py
+#, python-brace-format
 msgid "Registrations for {} have been scheduled"
 msgstr ""
 
@@ -12350,12 +12442,14 @@ msgid "The selected registrants have been removed."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "The email was sent."
 msgid_plural "{num} emails were sent."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Registration was deleted."
 msgid_plural "{num} registrations were deleted."
 msgstr[0] ""
@@ -12379,6 +12473,7 @@ msgid "Text too large to generate a PDF with table style. Please try again gener
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
 msgstr[0] ""
@@ -12409,44 +12504,62 @@ msgid "This registration cannot be marked as checked-in"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Selected registrations marked as {} successfully."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
-msgid "The selected registrations were successfully approved."
-msgstr ""
+#, python-brace-format
+msgid "{num} registration was successfully approved."
+msgid_plural "{num} registrations were successfully approved."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
+msgid "{num} registration was not pending and has been skipped."
+msgid_plural "{num} registrations were not pending and have been skipped."
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "Rejecting these registrations will trigger a notification email for each registrant."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
-msgid "The selected registrations were successfully rejected."
-msgstr ""
+#, python-brace-format
+msgid "{num} registration was successfully rejected."
+msgid_plural "{num} registrations were successfully rejected."
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The selected registrations were successfully reset."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Registration fee has been updated for {} registration."
 msgid_plural "Registration fee has been updated for {} registrations."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "{} registration was skipped because its fee is not zero or it is in an invalid state."
 msgid_plural "{} registrations were skipped because their fees are not zero or they are in an invalid state."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "{} registration was skipped because it is not in the unpaid state."
 msgid_plural "{} registrations were skipped because they are not in the unpaid state."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Document '{}' successfully published"
 msgstr ""
 
@@ -12455,10 +12568,12 @@ msgid "Publish"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Document '{}' successfully unpublished"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+#, python-brace-format
 msgid "Document '{}' successfully deleted"
 msgstr ""
 
@@ -12471,10 +12586,12 @@ msgid "A new tag has been created."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/tags.py
+#, python-brace-format
 msgid "Tag {} has been deleted."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/tags.py
+#, python-brace-format
 msgid "Tag {} has been modified."
 msgstr ""
 
@@ -12483,14 +12600,17 @@ msgid "There are no places left for this option."
 msgstr ""
 
 #: indico/modules/events/registration/fields/base.py
+#, python-brace-format
 msgid "Value of \"{form_item}\" ({parent_form_item})"
 msgstr ""
 
 #: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
 msgid "No places left for the option: {0}"
 msgstr ""
 
 #: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
 msgid "At most {max_choices} option can be selected"
 msgid_plural "At most {max_choices} options can be selected"
 msgstr[0] ""
@@ -12513,14 +12633,17 @@ msgid "Departure date is not within the required range."
 msgstr ""
 
 #: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
 msgid "Not enough rooms in '{0}'"
 msgstr ""
 
 #: indico/modules/events/registration/fields/sessions.py
+#, python-brace-format
 msgid "Please select no more than {max} sessions."
 msgstr ""
 
 #: indico/modules/events/registration/fields/sessions.py
+#, python-brace-format
 msgid "Please select at least {min} sessions."
 msgstr ""
 
@@ -12529,15 +12652,21 @@ msgid "Maximum date must be greater than the minimum date."
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
+#, python-brace-format
 msgid "Date cannot be before {}"
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
+#, python-brace-format
 msgid "Date cannot be after {}"
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
 msgid "Invalid date"
+msgstr ""
+
+#: indico/modules/events/registration/fields/simple.py
+msgid "Please enter a valid phone number with international prefix (e.g., +41 1234567)"
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
@@ -12553,6 +12682,7 @@ msgid "Invalid picture file."
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py
+#, python-brace-format
 msgid "The uploaded picture pixels is smaller than the minimum size of {}."
 msgstr ""
 
@@ -13198,7 +13328,7 @@ msgid "Registrant picture"
 msgstr ""
 
 #: indico/modules/events/registration/templates/emails/custom_email_default.html
-#, python-format
+#, python-brace-format, python-format
 msgid "We're contacting you because you registered for the event %(strong)s{event_title}%(endstrong)s."
 msgstr ""
 
@@ -13709,26 +13839,16 @@ msgid ""
 "email customized with the data of their registration."
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/import_invitations.html
-#: indico/modules/events/registration/templates/management/regform_invite.html
-msgid "Invitation details"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/import_invitations.html
-msgid "You should upload a CSV (comma-separated values) file with exactly 4 columns in the following order:"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/import_invitations.html
-#: indico/modules/events/registration/templates/management/import_registrations.html
-msgid "The fields \"First Name\", \"Last Name\" and \"E-mail\" are mandatory."
-msgstr ""
-
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "You should upload a CSV (comma-separated values) file with exactly 6 columns in the following order:"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Phone Number"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/import_registrations.html
+msgid "The fields \"First Name\", \"Last Name\" and \"E-mail\" are mandatory."
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/participants.html
@@ -13947,18 +14067,6 @@ msgid "Invite people to register for your event."
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_invitations.html
-msgid "Invite"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform_invitations.html
-msgid "Invite user to register"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform_invitations.html
-msgid "Import invitations from a CSV File"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform_invitations.html
 msgid "Remind pending invitees"
 msgstr ""
 
@@ -14034,6 +14142,14 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "List of registration forms"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html
+msgid "Clone this registration form"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html
+msgid "Clone registration form"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_list.html
@@ -14146,6 +14262,7 @@ msgid "Stats for \"%(title)s\""
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_stats.html
+#, python-brace-format
 msgid "Currency: {}"
 msgstr ""
 
@@ -14301,6 +14418,7 @@ msgid "Sent reminders cannot be deleted."
 msgstr ""
 
 #: indico/modules/events/reminders/controllers.py
+#, python-brace-format
 msgid "The reminder at {} has been deleted."
 msgstr ""
 
@@ -14313,10 +14431,12 @@ msgid "This reminder has already been sent and cannot be modified anymore."
 msgstr ""
 
 #: indico/modules/events/reminders/controllers.py
+#, python-brace-format
 msgid "The reminder at {} has been modified."
 msgstr ""
 
 #: indico/modules/events/reminders/controllers.py
+#, python-brace-format
 msgid "A reminder at {} has been created."
 msgstr ""
 
@@ -14418,7 +14538,19 @@ msgid "At least one type of recipient is required."
 msgstr ""
 
 #: indico/modules/events/reminders/forms.py
-msgid "The specified date is in the past"
+msgid "The specified date is in the past."
+msgstr ""
+
+#: indico/modules/events/reminders/forms.py
+msgid "Recipient-specific placeholders are not allowed when email addresses are entered manually."
+msgstr ""
+
+#: indico/modules/events/reminders/placeholders.py
+msgid "First name of the recipient"
+msgstr ""
+
+#: indico/modules/events/reminders/placeholders.py
+msgid "Last name of the recipient"
 msgstr ""
 
 #: indico/modules/events/reminders/templates/edit_reminder.html
@@ -14531,18 +14663,22 @@ msgid "The comment will be shown only if the request is accepted or rejected."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "There was a problem sending your request ({0}). Please contact support."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "Your request ({0}) has been accepted."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "Your request ({0}) has been sent."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "Your request ({0}) has been modified."
 msgstr ""
 
@@ -14559,10 +14695,12 @@ msgid "You have updated the request (only management-specific data)."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "There was a problem withdrawing your request ({0}). Please contact support."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py
+#, python-brace-format
 msgid "You have withdrawn your request ({0})"
 msgstr ""
 
@@ -14891,6 +15029,7 @@ msgid "Allows coordinators to manage/reschedule session blocks of their sessions
 msgstr ""
 
 #: indico/modules/events/sessions/__init__.py
+#, python-brace-format
 msgid "You have been granted manager/coordination privileges for a session."
 msgid_plural "You have been granted manager/coordination privileges for {} sessions."
 msgstr[0] ""
@@ -15268,6 +15407,7 @@ msgid "Email addresses to notify when a new submission is made"
 msgstr ""
 
 #: indico/modules/events/surveys/forms.py
+#, python-brace-format
 msgid "There is already a survey named \"{}\" on this event"
 msgstr ""
 
@@ -15340,6 +15480,7 @@ msgid "The questionnaire has been imported."
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Section \"{title}\" added"
 msgstr ""
 
@@ -15348,6 +15489,7 @@ msgid "Standalone section added"
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Section \"{title}\" updated"
 msgstr ""
 
@@ -15356,6 +15498,7 @@ msgid "Standalone section updated"
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Section \"{title}\" deleted"
 msgstr ""
 
@@ -15376,14 +15519,17 @@ msgid "Text item deleted"
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Question \"{title}\" added"
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Question \"{title}\" updated"
 msgstr ""
 
 #: indico/modules/events/surveys/controllers/management/questionnaire.py
+#, python-brace-format
 msgid "Question \"{title}\" deleted"
 msgstr ""
 
@@ -16242,6 +16388,10 @@ msgstr ""
 msgid "%(tz)s timezone"
 msgstr ""
 
+#: indico/modules/events/templates/display/conference/base.html
+msgid "Event menu"
+msgstr ""
+
 #: indico/modules/events/templates/display/indico/_common.html
 msgid "Show room on map"
 msgstr ""
@@ -16539,6 +16689,7 @@ msgid "Start time"
 msgstr ""
 
 #: indico/modules/events/timetable/forms.py
+#, python-brace-format
 msgid "{} exceeds current day. Adjust start time or duration."
 msgstr ""
 
@@ -16614,7 +16765,7 @@ msgstr ""
 msgid "Top-level items"
 msgstr ""
 
-#: indico/modules/events/timetable/forms.py indico/modules/users/models/export.py
+#: indico/modules/events/timetable/forms.py indico/modules/users/forms.py indico/modules/users/models/export.py
 msgid "Miscellaneous"
 msgstr ""
 
@@ -16633,22 +16784,27 @@ msgid "This action cannot be completed because the event dates have changed. Ple
 msgstr ""
 
 #: indico/modules/events/timetable/util.py
+#, python-brace-format
 msgid "Event start time changed to {}"
 msgstr ""
 
 #: indico/modules/events/timetable/util.py
+#, python-brace-format
 msgid "Event end time changed to {}"
 msgstr ""
 
 #: indico/modules/events/timetable/util.py
+#, python-brace-format
 msgid "Session block start time changed to {}"
 msgstr ""
 
 #: indico/modules/events/timetable/util.py
+#, python-brace-format
 msgid "Session block end time changed to {}"
 msgstr ""
 
 #: indico/modules/events/timetable/controllers/legacy.py
+#, python-brace-format
 msgid "Contribution '{}' could not be scheduled since it doesn't fit on this day."
 msgstr ""
 
@@ -16887,18 +17043,22 @@ msgid "The program has been updated."
 msgstr ""
 
 #: indico/modules/events/tracks/controllers.py
+#, python-brace-format
 msgid "Track \"{}\" has been created."
 msgstr ""
 
 #: indico/modules/events/tracks/controllers.py
+#, python-brace-format
 msgid "Track \"{}\" has been modified."
 msgstr ""
 
 #: indico/modules/events/tracks/controllers.py
+#, python-brace-format
 msgid "Track \"{}\" has been deleted."
 msgstr ""
 
 #: indico/modules/events/tracks/controllers.py
+#, python-brace-format
 msgid "Track Group \"{}\" has been deleted."
 msgstr ""
 
@@ -17038,14 +17198,17 @@ msgid "Local"
 msgstr ""
 
 #: indico/modules/groups/controllers.py
+#, python-brace-format
 msgid "The group '{name}' has been created."
 msgstr ""
 
 #: indico/modules/groups/controllers.py
+#, python-brace-format
 msgid "The group '{name}' has been updated."
 msgstr ""
 
 #: indico/modules/groups/controllers.py
+#, python-brace-format
 msgid "The group '{name}' has been deleted."
 msgstr ""
 
@@ -17161,6 +17324,7 @@ msgid "Accept terms of service & privacy policy"
 msgstr ""
 
 #: indico/modules/legal/forms.py
+#, python-brace-format
 msgid ""
 "I have read, understood and accept the {tos_link_start}terms of service{tos_link_end} and {pp_link_start}privacy "
 "policy{pp_link_end}."
@@ -17171,6 +17335,7 @@ msgid "Accept terms of service"
 msgstr ""
 
 #: indico/modules/legal/forms.py
+#, python-brace-format
 msgid "I have read, understood and accept the {tos_link_start}terms of service{tos_link_end}."
 msgstr ""
 
@@ -17179,6 +17344,7 @@ msgid "Accept privacy policy"
 msgstr ""
 
 #: indico/modules/legal/forms.py
+#, python-brace-format
 msgid "I have read, understood and accept the {pp_link_start}privacy policy{pp_link_end}."
 msgstr ""
 
@@ -17471,14 +17637,17 @@ msgid "IP subnets"
 msgstr ""
 
 #: indico/modules/news/controllers.py
+#, python-brace-format
 msgid "News '{title}' has been posted"
 msgstr ""
 
 #: indico/modules/news/controllers.py
+#, python-brace-format
 msgid "News '{title}' has been updated"
 msgstr ""
 
 #: indico/modules/news/controllers.py
+#, python-brace-format
 msgid "News '{title}' has been deleted"
 msgstr ""
 
@@ -17546,6 +17715,7 @@ msgid "API tokens"
 msgstr ""
 
 #: indico/modules/oauth/controllers.py
+#, python-brace-format
 msgid "Application {} was modified"
 msgstr ""
 
@@ -17554,6 +17724,7 @@ msgid "Application deleted successfully"
 msgstr ""
 
 #: indico/modules/oauth/controllers.py
+#, python-brace-format
 msgid "Application {} registered successfully"
 msgstr ""
 
@@ -17566,6 +17737,7 @@ msgid "App authorization revoked for all users."
 msgstr ""
 
 #: indico/modules/oauth/controllers.py
+#, python-brace-format
 msgid "Access for '{}' has been successfully revoked."
 msgstr ""
 
@@ -17574,14 +17746,17 @@ msgid "You cannot manage API tokens"
 msgstr ""
 
 #: indico/modules/oauth/controllers.py
+#, python-brace-format
 msgid "Token '{}' updated"
 msgstr ""
 
 #: indico/modules/oauth/controllers.py
+#, python-brace-format
 msgid "The token '{}' has been successfully revoked."
 msgstr ""
 
 #: indico/modules/oauth/forms.py
+#, python-brace-format
 msgid "Invalid URI: {}.<br>It must use http or https and may not contain a query string."
 msgstr ""
 
@@ -17948,6 +18123,7 @@ msgid "You cannot upload this file as a room picture."
 msgstr ""
 
 #: indico/modules/rb/controllers/backend/admin.py indico/modules/users/controllers.py
+#, python-brace-format
 msgid "The file has an invalid format ({format})."
 msgstr ""
 
@@ -17956,6 +18132,7 @@ msgid "You cannot create a booking which starts in the past"
 msgstr ""
 
 #: indico/modules/rb/controllers/backend/bookings.py
+#, python-brace-format
 msgid "Bookings for the room \"{}\" may not be longer than {} days"
 msgstr ""
 
@@ -17992,6 +18169,7 @@ msgid "Reservation has no valid occurrences"
 msgstr ""
 
 #: indico/modules/rb/models/rooms.py
+#, python-brace-format
 msgid "You cannot book this room more than {} days in advance"
 msgstr ""
 
@@ -18402,6 +18580,7 @@ msgid "Could not parse stylesheet"
 msgstr ""
 
 #: indico/modules/receipts/controllers/event.py
+#, python-brace-format
 msgid "Required fields missing: {}"
 msgstr ""
 
@@ -18442,6 +18621,14 @@ msgstr ""
 msgid "Admins"
 msgstr ""
 
+#: indico/modules/users/__init__.py indico/modules/users/templates/users_admin.html
+msgid "Users"
+msgstr ""
+
+#: indico/modules/users/__init__.py indico/modules/users/templates/affiliations_dashboard.html
+msgid "Affiliations"
+msgstr ""
+
 #: indico/modules/users/__init__.py indico/modules/users/templates/dashboard.html
 msgid "Dashboard"
 msgstr ""
@@ -18471,6 +18658,7 @@ msgid "My profile"
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "This user has been merged into <a href=\"{url}\">another user</a>."
 msgstr ""
 
@@ -18503,10 +18691,12 @@ msgid "Invalid Mastodon server URL."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "The email address {email} has been added to the account."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within 24 hours to confirm your new email "
 "address."
@@ -18529,6 +18719,7 @@ msgid "This email address is already in use by another account."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "The email address {email} has been added to your account."
 msgstr ""
 
@@ -18541,10 +18732,12 @@ msgid "Email address synchronization has been disabled since you manually change
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "Admin added: {name} ({email})"
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "Admin removed: {name} ({email})"
 msgstr ""
 
@@ -18625,18 +18818,22 @@ msgid "You cannot block yourself"
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "{name} has been blocked."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "{name} has been unblocked."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "{user_name} has been deleted."
 msgstr ""
 
 #: indico/modules/users/controllers.py
+#, python-brace-format
 msgid "{user_name} has been anonymized."
 msgstr ""
 
@@ -18759,11 +18956,25 @@ msgid "The user that will remain active in the end"
 msgstr ""
 
 #: indico/modules/users/forms.py
-msgid "Registration notifications"
+msgid "Account creation notifications"
+msgstr ""
+
+#: indico/modules/users/forms.py
+msgid "Notify all admins"
 msgstr ""
 
 #: indico/modules/users/forms.py
 msgid "Send an email to all administrators whenever someone registers a new local account."
+msgstr ""
+
+#: indico/modules/users/forms.py
+msgid "Notify emails"
+msgstr ""
+
+#: indico/modules/users/forms.py
+msgid ""
+"List of email addresses that receive a notification whenever a new local account is created. One email address per "
+"line."
 msgstr ""
 
 #: indico/modules/users/forms.py
@@ -18805,10 +19016,12 @@ msgid "Set login details"
 msgstr ""
 
 #: indico/modules/users/util.py
+#, python-brace-format
 msgid "Could not retrieve {gravatar_type}"
 msgstr ""
 
 #: indico/modules/users/views.py
+#, python-brace-format
 msgid "Profile of {name}"
 msgstr ""
 
@@ -18938,16 +19151,19 @@ msgid "primary email address"
 msgstr ""
 
 #: indico/modules/users/models/users.py
+#, python-brace-format
 msgid "Your {field_name} has been synchronized from '{old_value}' to '{new_value}'."
 msgstr ""
 
 #: indico/modules/users/models/users.py
+#, python-brace-format
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to '{new_value}' since the new email address is not "
 "valid."
 msgstr ""
 
 #: indico/modules/users/models/users.py
+#, python-brace-format
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to '{new_value}' due to a conflict with another "
 "Indico profile."
@@ -19073,12 +19289,65 @@ msgid ""
 "When doing so, make sure that the address is correct and belongs to the user."
 msgstr ""
 
+#: indico/modules/users/templates/personal_data.html
+msgid "You cannot delete your own account"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+msgid "You cannot delete an admin account"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+#, python-format
+msgid "Delete %(name)s"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+msgid "Delete User"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+msgid "Deleted user accounts cannot be restored."
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+#, python-format
+msgid "Yes, I want to delete %(name)s"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+msgid "Once deleted, the following will happen:"
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+#, python-format
+msgid "<strong>%(first_name)s</strong> will no longer be able to access Indico."
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+#, python-format
+msgid ""
+"<strong>%(first_name)s</strong> will be removed from all areas of Indico - this does not affect their presence in "
+"events as a speaker or other role; they will still be listed in such capacities where applicable."
+msgstr ""
+
+#: indico/modules/users/templates/personal_data.html
+#, python-format
+msgid ""
+"Where it is not possible to delete <strong>%(first_name)s</strong>, they will be anonymized and all personal data "
+"associated with the user will be removed from Indico."
+msgstr ""
+
 #: indico/modules/users/templates/registration_requests.html indico/modules/users/templates/users_admin.html
 msgid "Registration requests"
 msgstr ""
 
 #: indico/modules/users/templates/registration_requests.html
 msgid "Email Address"
+msgstr ""
+
+#: indico/modules/users/templates/registration_requests.html
+msgid "Last name"
 msgstr ""
 
 #: indico/modules/users/templates/registration_requests.html
@@ -19250,50 +19519,62 @@ msgid "The target event already has a videoconference"
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "There is already a videoconference attached to '{link_object_title}'."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "This {plugin_name} videoconference is already attached to the event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not allowed to create {plugin_name} videoconferences for this event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' created"
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not allowed to modify {} videoconferences for this event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' updated"
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not allowed to refresh {plugin_name} videoconferences for this event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' refreshed"
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not allowed to remove {} videoconferences from this event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' removed"
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not allowed to attach {plugin_name} videoconferences to this event."
 msgstr ""
 
 #: indico/modules/vc/controllers.py
+#, python-brace-format
 msgid "You are not authorized to attach the videoconference '{}'"
 msgstr ""
 
@@ -19384,14 +19665,17 @@ msgid "Days in the future"
 msgstr ""
 
 #: indico/modules/vc/util.py
+#, python-brace-format
 msgid "{} (event)"
 msgstr ""
 
 #: indico/modules/vc/util.py
+#, python-brace-format
 msgid "{} (contribution)"
 msgstr ""
 
 #: indico/modules/vc/util.py
+#, python-brace-format
 msgid "{} (session block)"
 msgstr ""
 
@@ -19506,30 +19790,35 @@ msgid "The videoconference \"%(room)s\" has been deleted by %(name)s."
 msgstr ""
 
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0} second"
 msgid_plural "{0} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0} minute"
 msgid_plural "{0} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0} hour"
 msgid_plural "{0} hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0} day"
 msgid_plural "{0} days"
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0} week"
 msgid_plural "{0} weeks"
 msgstr[0] ""
@@ -19537,6 +19826,7 @@ msgstr[1] ""
 
 #. Shorthand form for the number of seconds
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0}s"
 msgid_plural "{0}s"
 msgstr[0] ""
@@ -19544,6 +19834,7 @@ msgstr[1] ""
 
 #. Shorthand form for the number of minutes
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0}m"
 msgid_plural "{0}m"
 msgstr[0] ""
@@ -19551,6 +19842,7 @@ msgstr[1] ""
 
 #. Shorthand form for the number of hours
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0}h"
 msgid_plural "{0}h"
 msgstr[0] ""
@@ -19558,6 +19850,7 @@ msgstr[1] ""
 
 #. Shorthand form for the number of days
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0}d"
 msgid_plural "{0}d"
 msgstr[0] ""
@@ -19565,6 +19858,7 @@ msgstr[1] ""
 
 #. Shorthand form for the number of weeks
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{0}w"
 msgid_plural "{0}w"
 msgstr[0] ""
@@ -19631,54 +19925,64 @@ msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'Yesterday' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'Today' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'Tomorrow' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside.
 #. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'Last' EEEE 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the string, and only translate the text inside.
 #. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "EEEE 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the string, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "{date_fmt} 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'yesterday' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'today' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'tomorrow' 'at' {time_fmt}"
 msgstr ""
 
 #. keep the single quotes around the strings, and only translate the text inside.
 #. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
+#, python-brace-format
 msgid "'last' EEEE 'at' {time_fmt}"
 msgstr ""
 
@@ -19699,6 +20003,7 @@ msgid "Invalid file extension"
 msgstr ""
 
 #: indico/util/marshmallow.py
+#, python-brace-format
 msgid "This field has more than {} words"
 msgstr ""
 
@@ -19715,11 +20020,17 @@ msgid "The top-level YAML entity must be a mapping"
 msgstr ""
 
 #: indico/util/marshmallow.py
+#, python-brace-format
 msgid "The metadata contained within the YAML code is invalid: {error}"
 msgstr ""
 
 #: indico/util/passwords.py
+#, python-brace-format
 msgid "Passwords must be at least {} characters long."
+msgstr ""
+
+#: indico/util/passwords.py
+msgid "Passwords cannot be longer than 72 characters"
 msgstr ""
 
 #: indico/util/passwords.py
@@ -19739,16 +20050,19 @@ msgid "This password has been seen in previous data breaches."
 msgstr ""
 
 #: indico/util/roles.py
+#, python-brace-format
 msgid "Row {}: malformed CSV data"
 msgstr ""
 
 #: indico/util/roles.py
+#, python-brace-format
 msgid "{} member has been imported."
 msgid_plural "{} members have been imported."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/util/roles.py
+#, python-brace-format
 msgid "There is no user with this email address: {}"
 msgid_plural "There are no users with these email addresses: {}"
 msgstr[0] ""
@@ -19797,6 +20111,7 @@ msgid "The persistent link you used is invalid."
 msgstr ""
 
 #: indico/web/util.py
+#, python-brace-format
 msgid "Your profile has been merged into <strong>{}</strong>. Please log in using that profile."
 msgstr ""
 
@@ -19944,6 +20259,7 @@ msgid "Yes/No"
 msgstr ""
 
 #: indico/web/flask/app.py
+#, python-brace-format
 msgid "Login failed: {error}"
 msgstr ""
 
@@ -19952,6 +20268,11 @@ msgid "Please log in to access this page."
 msgstr ""
 
 #: indico/web/flask/errors.py
+msgid "Validation Error"
+msgstr ""
+
+#: indico/web/flask/errors.py
+#, python-brace-format
 msgid "Required argument missing: {}"
 msgstr ""
 
@@ -19967,6 +20288,10 @@ msgstr ""
 msgid "There was a database error while processing your request."
 msgstr ""
 
+#: indico/web/flask/errors.py
+msgid "Disallowed URL"
+msgstr ""
+
 #: indico/web/forms/base.py
 msgid "It looks like there was a problem with your current session. Please submit the form again."
 msgstr ""
@@ -19976,6 +20301,7 @@ msgid "Invalid CSRF token"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "This field is mutually exclusive with another field: {}"
 msgid_plural "This field is mutually exclusive with other fields: {}"
 msgstr[0] ""
@@ -19990,78 +20316,96 @@ msgid "Invalid email address list"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be in the past"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be before {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be in the future"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be after {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be in the past ({})"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be before {} ({})"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be in the future ({})"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "'{}' can't be after {} ({})"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "{} can't be before {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "{} can't be after {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "{} can't be equal to {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Duration cannot exceed {}"
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Must be between {earliest} and {latest}."
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Must be later than {earliest}."
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Must be earlier than {latest}."
 msgstr ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Field must contain at least {min} word."
 msgid_plural "Field must contain at least {min} words."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Field cannot contain more than {max} word."
 msgid_plural "Field cannot contain more than {max} words."
 msgstr[0] ""
 msgstr[1] ""
 
 #: indico/web/forms/validators.py
+#, python-brace-format
 msgid "Field must contain between {min} and {max} words."
 msgstr ""
 
