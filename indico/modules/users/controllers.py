@@ -11,17 +11,17 @@ from operator import attrgetter
 from urllib.parse import urlsplit
 from uuid import uuid4
 
-import requests
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
 from PIL import Image
+from requests import RequestException
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, ServiceUnavailable
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -437,9 +437,9 @@ class RHProfilePicturePreview(RHUserBase):
         elif not config.DISABLE_GRAVATAR:
             try:
                 gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
-                return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
-            except (requests.RequestException, requests.exceptions.ConnectionError) as exc:
-                raise UserValueError(str(exc))
+            except RequestException:
+                raise ServiceUnavailable('Could not load gravatar/identicon')
+            return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
         else:
             raise NotFound
 
@@ -499,9 +499,9 @@ class RHSaveProfilePicture(RHUserBase):
         else:
             try:
                 content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
-                set_user_avatar(self.user, content, source.name, lastmod)
-            except (requests.RequestException, requests.exceptions.ConnectionError) as exc:
-                raise UserValueError(str(exc))
+            except RequestException:
+                raise ServiceUnavailable('Could not load gravatar/identicon')
+            set_user_avatar(self.user, content, source.name, lastmod)
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
         self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Picture updated', session.user,

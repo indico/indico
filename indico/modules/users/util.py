@@ -524,7 +524,7 @@ def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     else:
         params = {'d': 'mp', 's': str(size)}
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
-    resp = requests.get(gravatar_url, params=params, headers=headers, timeout=10)
+    resp = requests.get(gravatar_url, params=params, headers=headers, timeout=5)
     if resp.status_code == 304:
         return None, resp.headers.get('Last-Modified')
     elif resp.status_code != 200:
