@@ -171,6 +171,34 @@ class LogEntryBase(db.Model):
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
 
+    @property
+    def object_details(self):
+        details_mapping = {
+            'registration_id': LogDetailsSource(
+                _('Registration details'),
+                lambda id: db.m.Registration.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.registration_details', obj),
+            ),
+            'registration_form_id': LogDetailsSource(
+                _('Registration form details'),
+                lambda id: db.m.RegistrationForm.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.manage_regform', obj),
+            ),
+            'abstract_id': LogDetailsSource(
+                _('Abstract details'),
+                lambda id: db.m.Abstract.get(id, is_deleted=False),
+                lambda obj: url_for('abstracts.display_abstract', obj, management=True),
+            ),
+        }
+        if len(self.meta) != 1:
+            return
+        key, id = list(self.meta.items())[0]
+        if not (spec := details_mapping.get(key)):
+            return
+        if not (obj := spec.get_obj(id)):
+            return
+        return {'title': spec.title, 'url': spec.get_url(obj)}
+
     def __repr__(self):
         return format_repr(self, 'id', type(self).link_fk_name, 'logged_dt', 'realm', 'module', _text=self.summary)
 
@@ -208,34 +236,6 @@ class EventLogEntry(LogEntryBase):
     @locator_property
     def locator(self):
         return dict(self.event.locator, log_entry_id=self.id)
-
-    @property
-    def object_details(self):
-        details_mapping = {
-            'registration_id': LogDetailsSource(
-                _('Registration details'),
-                lambda id: db.m.Registration.get(id, is_deleted=False),
-                lambda obj: url_for('event_registration.registration_details', obj),
-            ),
-            'registration_form_id': LogDetailsSource(
-                _('Registration form details'),
-                lambda id: db.m.RegistrationForm.get(id, is_deleted=False),
-                lambda obj: url_for('event_registration.manage_regform', obj),
-            ),
-            'abstract_id': LogDetailsSource(
-                _('Abstract details'),
-                lambda id: db.m.Abstract.get(id, is_deleted=False),
-                lambda obj: url_for('abstracts.display_abstract', obj, management=True),
-            ),
-        }
-        if len(self.meta) != 1:
-            return
-        key, id = list(self.meta.items())[0]
-        if not (spec := details_mapping.get(key)):
-            return
-        if not (obj := spec.get_obj(id)):
-            return
-        return {'title': spec.title, 'url': spec.get_url(obj)}
 
 
 class CategoryLogEntry(LogEntryBase):
