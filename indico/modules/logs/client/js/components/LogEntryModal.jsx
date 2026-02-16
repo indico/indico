@@ -121,7 +121,7 @@ export default class LogEntryModal extends React.Component {
           </div>
         </Slot>
         <Slot name="footer">
-          <div className="group flexrow f-j-space-between">
+          <div className="group flexrow f-j-space-between log-modal-footer">
             <IButton
               title={Translate.string('Previous')}
               icon="prev"
