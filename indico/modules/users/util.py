@@ -15,6 +15,7 @@ from operator import attrgetter, itemgetter
 import requests
 from flask import render_template, session
 from PIL import Image
+from requests import RequestException
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from sqlalchemy.sql.expression import nullslast
 from werkzeug.http import http_date, parse_date
@@ -517,20 +518,28 @@ def get_color_for_user_id(user_id: int | str):
         return user_colors[crc32(user_id) % len(user_colors)]
 
 
+class GravatarError(RuntimeError):
+    """Error class indicating a failure when retrieving Gravatar data."""
+
+
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     gravatar_url = f'https://www.gravatar.com/avatar/{hashlib.md5(user.email.lower().encode()).hexdigest()}'
     if identicon:
         params = {'d': 'identicon', 's': str(size), 'forcedefault': 'y'}
+        gravatar_type = 'Identicon'  # not translated on purpose
     else:
         params = {'d': 'mp', 's': str(size)}
+        gravatar_type = 'Gravatar'  # not translated on purpose
     headers = {'If-Modified-Since': lastmod} if lastmod is not None else {}
-    resp = requests.get(gravatar_url, params=params, headers=headers, timeout=5)
+    try:
+        resp = requests.get(gravatar_url, params=params, headers=headers, timeout=5)
+    except RequestException:
+        logger.exception(f'Could not retrieve {gravatar_type}')
+        raise GravatarError(_('Could not retrieve {gravatar_type}').format(gravatar_type=gravatar_type))
     if resp.status_code == 304:
         return None, resp.headers.get('Last-Modified')
     elif resp.status_code != 200:
-        # XXX: Identicon/Gravatar are names that should never be translated
-        raise RuntimeError(_('Could not retrieve {gravatar_type}')
-                           .format(gravatar_type=('Identicon' if identicon else 'Gravatar')))
+        raise GravatarError(_('Could not retrieve {gravatar_type}').format(gravatar_type=gravatar_type))
     pic = Image.open(BytesIO(resp.content))
     if pic.mode not in ('RGB', 'RGBA'):
         pic = pic.convert('RGB')

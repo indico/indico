@@ -17,7 +17,6 @@ from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
 from PIL import Image
-from requests import RequestException
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
@@ -56,11 +55,11 @@ from indico.modules.users.operations import (add_secondary_email, create_user, d
                                              revoke_admin)
 from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
-from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
-                                       get_mastodon_server_name, get_related_categories, get_suggested_categories,
-                                       get_unlisted_events, get_user_by_email, get_user_titles, log_user_update,
-                                       merge_users, search_affiliations, search_users, send_avatar, serialize_user,
-                                       set_user_avatar)
+from indico.modules.users.util import (GravatarError, get_avatar_url_from_name, get_gravatar_for_user,
+                                       get_linked_events, get_mastodon_server_name, get_related_categories,
+                                       get_suggested_categories, get_unlisted_events, get_user_by_email,
+                                       get_user_titles, log_user_update, merge_users, search_affiliations, search_users,
+                                       send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserDashboard, WPUserDataExport,
                                         WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
 from indico.util.countries import get_countries
@@ -437,8 +436,8 @@ class RHProfilePicturePreview(RHUserBase):
         elif not config.DISABLE_GRAVATAR:
             try:
                 gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
-            except RequestException:
-                raise ServiceUnavailable('Could not load gravatar/identicon')
+            except GravatarError as exc:
+                raise ServiceUnavailable(str(exc))
             return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
         else:
             raise NotFound
@@ -499,8 +498,8 @@ class RHSaveProfilePicture(RHUserBase):
         else:
             try:
                 content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
-            except RequestException:
-                raise ServiceUnavailable('Could not load gravatar/identicon')
+            except GravatarError as exc:
+                raise ServiceUnavailable(str(exc))
             set_user_avatar(self.user, content, source.name, lastmod)
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
