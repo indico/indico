@@ -235,7 +235,7 @@ typing-extensions==4.15.0
     #   psycopg
     #   psycopg-pool
     #   starlette
-unbeheader==1.4.0
+unbeheader==1.5.0
     # via -r requirements.dev.in
 urllib3==2.6.3
     # via
