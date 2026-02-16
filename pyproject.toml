@@ -69,7 +69,7 @@ artifacts = [
 
 [tool.hatch.build.targets.sdist.hooks.custom]
 path = 'hatch_build.py'
-dependencies = ['babel==2.17.0']
+dependencies = ['babel==2.18.0']
 
 [tool.uv]
 # uv does not know about dynamic metadata so `pip install -e .` should always reinstall
