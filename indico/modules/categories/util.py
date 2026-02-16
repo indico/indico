@@ -14,10 +14,12 @@ from sqlalchemy.orm.attributes import set_committed_value
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.categories import upcoming_events_settings
+from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -244,7 +246,28 @@ def can_create_unlisted_events(user):
         return unlisted_events_settings.acls.contains_user('authorized_creators', user)
 
 
+def get_all_event_creators():
+
+    principals_query = (CategoryPrincipal.query
+                       .filter(CategoryPrincipal.type.in_([PrincipalType.user,
+                                                           PrincipalType.local_group,
+                                                           PrincipalType.multipass_group]),
+                               db.or_(CategoryPrincipal.full_access,
+                                     CategoryPrincipal.permissions.contains(['create']))))
+
+    principals = set()
+    for cp in principals_query:
+        principal = cp.principal
+        if principal:
+            principals.add(principal)
+
+    return principals
+
+
 def can_create_events_globally(user):
     if not user:
         return False
+    if not event_creation_settings.get('restricted'):
+        return True
+
     return user.is_admin or event_creation_settings.acls.contains_user('authorized_creators', user)

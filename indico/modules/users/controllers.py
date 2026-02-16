@@ -36,6 +36,7 @@ from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
+from indico.modules.categories.util import get_all_event_creators
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -65,7 +66,7 @@ from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserD
                                         WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
 from indico.util.countries import get_countries
 from indico.util.date_time import now_utc
-from indico.util.i18n import _, force_locale
+from indico.util.i18n import _, force_locale, ngettext
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, ModelField, Principal, validate_with_message
 from indico.util.signals import values_from_signal
@@ -770,14 +771,31 @@ class RHAdmins(RHAdminBase):
 
     def _process(self):
         admins = set(User.query
-                     .filter_by(is_admin=True, is_deleted=False)
-                     .order_by(db.func.lower(User.first_name), db.func.lower(User.last_name)))
+                    .filter_by(is_admin=True, is_deleted=False)
+                    .order_by(db.func.lower(User.first_name), db.func.lower(User.last_name)))
+
+        restricted = event_creation_settings.get('restricted')
         event_creators = event_creation_settings.acls.get('authorized_creators')
 
-        form = AdminsForm(admins=admins, event_creators=event_creators)
+        form = AdminsForm(admins=admins,
+                        restrict_event_creation=restricted,
+                        event_creators=event_creators)
+
         if form.validate_on_submit():
+            if form.restrict_event_creation.data and form.auto_populate_creators.data:
+                all_creators = get_all_event_creators()
+                existing_creators = event_creation_settings.acls.get('authorized_creators')
+                creators = all_creators | existing_creators
+                event_creation_settings.acls.set('authorized_creators', creators)
+                flash(ngettext('{count} user/group with creation permissions has been added automatically.',
+                            '{count} users/groups with creation permissions have been added automatically.',
+                            len(creators - existing_creators)).format(count=len(creators - existing_creators)), 'info')
+            elif form.restrict_event_creation.data:
+                self._handle_event_creation_rights(form, event_creators)
+
             self._handle_admin_rights(form, admins)
-            self._handle_event_creation_rights(form, event_creators)
+            event_creation_settings.set('restricted', form.restrict_event_creation.data)
+
             return redirect(url_for('.admins'))
 
         return WPUsersAdmin.render_template('admins.html', 'admins', form=form)
