@@ -253,7 +253,7 @@ def get_all_event_creators():
                                                            PrincipalType.local_group,
                                                            PrincipalType.multipass_group]),
                                db.or_(CategoryPrincipal.full_access,
-                                     CategoryPrincipal.permissions.contains(['create']))))
+                                     CategoryPrincipal.has_management_permission('create'))))
 
     principals = set()
     for cp in principals_query:
