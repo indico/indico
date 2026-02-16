@@ -22357,17 +22357,17 @@ msgstr "Les inscriptions sélectionnées ont été marquées comme {} avec succ�
 #, python-brace-format
 msgid "{num} registration was successfully approved."
 msgid_plural "{num} registrations were successfully approved."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} inscription a été approuvée."
+msgstr[1] "{num} inscriptions ont été approuvées."
+msgstr[2] "{num} inscriptions ont été approuvées."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
 msgid "{num} registration was not pending and has been skipped."
 msgid_plural "{num} registrations were not pending and have been skipped."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} inscription n'était pas en attente et a été sautée."
+msgstr[1] " {num} inscriptions n'étaient pas en attente et ont été sautées."
+msgstr[2] "{num} inscriptions n'étaient pas en attente et ont été sautées."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid ""
@@ -22381,9 +22381,9 @@ msgstr ""
 #, python-brace-format
 msgid "{num} registration was successfully rejected."
 msgid_plural "{num} registrations were successfully rejected."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} inscription a été refusée."
+msgstr[1] "{num} inscriptions ont été refusées."
+msgstr[2] "{num} inscriptions ont été refusées."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The selected registrations were successfully reset."
@@ -22539,6 +22539,8 @@ msgid ""
 "Please enter a valid phone number with international prefix (e.g., +41 "
 "1234567)"
 msgstr ""
+"Veuillez entrer un numéro de téléphone valide avec un préfixe international "
+"(ex. +41 1234567)"
 
 #: indico/modules/events/registration/fields/simple.py
 msgid "Invalid file UUID"
@@ -24238,11 +24240,11 @@ msgstr "Liste des formulaires d'inscription"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Clone this registration form"
-msgstr ""
+msgstr "Cloner ce formulaire d'inscription"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Clone registration form"
-msgstr ""
+msgstr "Cloner le formulaire d'inscription"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Delete this registration form"
@@ -24649,21 +24651,23 @@ msgstr "Au moins un type de destinataire est requis."
 
 #: indico/modules/events/reminders/forms.py
 msgid "The specified date is in the past."
-msgstr ""
+msgstr "La date spécifiée est passée."
 
 #: indico/modules/events/reminders/forms.py
 msgid ""
 "Recipient-specific placeholders are not allowed when email addresses are "
 "entered manually."
 msgstr ""
+"Les paramètres de substitution spécifiques au destinataire ne sont pas "
+"autorisés lorsque l'adresse électronique est entrée manuellement."
 
 #: indico/modules/events/reminders/placeholders.py
 msgid "First name of the recipient"
-msgstr ""
+msgstr "Prénom du destinataire"
 
 #: indico/modules/events/reminders/placeholders.py
 msgid "Last name of the recipient"
-msgstr ""
+msgstr "Nom du destinataire"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html
 msgid "This reminder is overdue and will be sent within a few minutes."
@@ -26674,7 +26678,7 @@ msgstr "Fuseau horaire %(tz)s"
 
 #: indico/modules/events/templates/display/conference/base.html
 msgid "Event menu"
-msgstr ""
+msgstr "Menu de l'événement"
 
 #: indico/modules/events/templates/display/indico/_common.html
 msgid "Show room on map"
@@ -29107,7 +29111,7 @@ msgstr "Administrateurs"
 #: indico/modules/users/__init__.py
 #: indico/modules/users/templates/affiliations_dashboard.html
 msgid "Affiliations"
-msgstr ""
+msgstr "Affiliations"
 
 #: indico/modules/users/__init__.py
 #: indico/modules/users/templates/dashboard.html
@@ -29463,11 +29467,11 @@ msgstr "L'utilisateur qui restera actif à la fin du processus"
 
 #: indico/modules/users/forms.py
 msgid "Account creation notifications"
-msgstr ""
+msgstr "Notifications de création de compte"
 
 #: indico/modules/users/forms.py
 msgid "Notify all admins"
-msgstr ""
+msgstr "Notifier tous les administrateurs"
 
 #: indico/modules/users/forms.py
 msgid ""
@@ -29479,13 +29483,15 @@ msgstr ""
 
 #: indico/modules/users/forms.py
 msgid "Notify emails"
-msgstr ""
+msgstr "Adresses de notification"
 
 #: indico/modules/users/forms.py
 msgid ""
 "List of email addresses that receive a notification whenever a new local "
 "account is created. One email address per line."
 msgstr ""
+"Liste des adresses électroniques qui reçoivent une notification lorsqu'un "
+"nouveau compte est créé. Une adresse par ligne."
 
 #: indico/modules/users/forms.py
 msgid "Email blacklist"
@@ -29820,7 +29826,7 @@ msgstr "Vous ne pouvez pas supprimer un compte utilisateur"
 #: indico/modules/users/templates/personal_data.html
 #, python-format
 msgid "Delete %(name)s"
-msgstr ""
+msgstr "Supprimer %(name)s"
 
 #: indico/modules/users/templates/personal_data.html
 msgid "Delete User"
@@ -29833,7 +29839,7 @@ msgstr "Les comptes utilisateurs supprimés ne peuvent pas être restaurés."
 #: indico/modules/users/templates/personal_data.html
 #, python-format
 msgid "Yes, I want to delete %(name)s"
-msgstr ""
+msgstr "Oui, je veux supprimer %(name)s"
 
 #: indico/modules/users/templates/personal_data.html
 msgid "Once deleted, the following will happen:"
@@ -29843,7 +29849,7 @@ msgstr "Après suppression, voici ce qui arrivera:"
 #, python-format
 msgid ""
 "<strong>%(first_name)s</strong> will no longer be able to access Indico."
-msgstr ""
+msgstr "<strong>%(first_name)s</strong> ne pourra plus accéder à Indico."
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -29852,6 +29858,10 @@ msgid ""
 "this does not affect their presence in events as a speaker or other role; "
 "they will still be listed in such capacities where applicable."
 msgstr ""
+"<strong>%(first_name)s</strong> sera supprimé de toutes les zones d'Indico -"
+" ceci n'affectera pas leur présence dans les événements comme orateur ou "
+"dans d'autres roles; ils seront toujours listés comme tels partout où c'est "
+"nécessaire."
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -29860,6 +29870,9 @@ msgid ""
 "will be anonymized and all personal data associated with the user will be "
 "removed from Indico."
 msgstr ""
+"Lorsque ça ne sera pas possible de supprimer "
+"<strong>%(first_name)s</strong>, ils seront anonymisés et toutes les données"
+" personnelles associées à l'utilisateur seront supprimées d'Indico."
 
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_admin.html
@@ -30632,7 +30645,7 @@ msgstr "Les mots de passe doivent contenir au moins {} caractères."
 
 #: indico/util/passwords.py
 msgid "Passwords cannot be longer than 72 characters"
-msgstr ""
+msgstr "La longueur des mots de passe ne peut pas dépasser 72 caractères"
 
 #: indico/util/passwords.py
 msgid "Passwords may not contain the word \"indico\" or variations."
@@ -30865,7 +30878,7 @@ msgstr "Veuiller vous authentifier pour accéder à cette page."
 
 #: indico/web/flask/errors.py
 msgid "Validation Error"
-msgstr ""
+msgstr "Erreur de validation"
 
 #: indico/web/flask/errors.py
 #, python-brace-format
@@ -30884,7 +30897,7 @@ msgstr ""
 
 #: indico/web/flask/errors.py
 msgid "Disallowed URL"
-msgstr ""
+msgstr "URL non autorisé"
 
 #: indico/web/forms/base.py
 msgid ""
