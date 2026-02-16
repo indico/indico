@@ -69,6 +69,8 @@ Bugfixes
   button bar or a keyboard shortcut (:pr:`7310`)
 - Enforce DNS checks on emails only when inviting a new user, and not when importing
   from CSV (:pr:`7291`, thanks :user:`duartegalvao, unconventionaldotdev`)
+- Hide "This field is required" error while uploading files on single-file upload fields
+  (:pr:`7325`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
