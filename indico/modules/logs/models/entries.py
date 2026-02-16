@@ -222,7 +222,11 @@ class EventLogEntry(LogEntryBase):
                 lambda id: db.m.RegistrationForm.get(id, is_deleted=False),
                 lambda obj: url_for('event_registration.manage_regform', obj),
             ),
-            # TODO: add similar definitions for other objects where this may be useful
+            'abstract_id': LogDetailsSource(
+                _('Abstract details'),
+                lambda id: db.m.Abstract.get(id, is_deleted=False),
+                lambda obj: url_for('abstracts.display_abstract', obj, management=True),
+            ),
         }
         if len(self.meta) != 1:
             return
