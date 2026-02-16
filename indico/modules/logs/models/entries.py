@@ -211,14 +211,18 @@ class EventLogEntry(LogEntryBase):
 
     @property
     def object_details(self):
-        from indico.modules.events.registration.models.registrations import Registration
         details_mapping = {
             'registration_id': LogDetailsSource(
-                                _('Registration details'),
-                                lambda id: Registration.get(id, is_deleted=False),
-                                lambda reg: url_for('event_registration.registration_details', reg)
-                                ),
-            # add similar definitions for other objects where this may be useful
+                _('Registration details'),
+                lambda id: db.m.Registration.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.registration_details', obj),
+            ),
+            'registration_form_id': LogDetailsSource(
+                _('Registration form details'),
+                lambda id: db.m.RegistrationForm.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.manage_regform', obj),
+            ),
+            # TODO: add similar definitions for other objects where this may be useful
         }
         if len(self.meta) != 1:
             return
