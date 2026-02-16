@@ -20,7 +20,7 @@ from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, ServiceUnavailable
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -55,11 +55,11 @@ from indico.modules.users.operations import (add_secondary_email, create_user, d
                                              revoke_admin)
 from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
-from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
-                                       get_mastodon_server_name, get_related_categories, get_suggested_categories,
-                                       get_unlisted_events, get_user_by_email, get_user_titles, log_user_update,
-                                       merge_users, search_affiliations, search_users, send_avatar, serialize_user,
-                                       set_user_avatar)
+from indico.modules.users.util import (GravatarError, get_avatar_url_from_name, get_gravatar_for_user,
+                                       get_linked_events, get_mastodon_server_name, get_related_categories,
+                                       get_suggested_categories, get_unlisted_events, get_user_by_email,
+                                       get_user_titles, log_user_update, merge_users, search_affiliations, search_users,
+                                       send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserDashboard, WPUserDataExport,
                                         WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
 from indico.util.countries import get_countries
@@ -434,7 +434,10 @@ class RHProfilePicturePreview(RHUserBase):
             return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                              no_cache=True, inline=True)
         elif not config.DISABLE_GRAVATAR:
-            gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
+            try:
+                gravatar = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, size=80)[0]
+            except GravatarError as exc:
+                raise ServiceUnavailable(str(exc))
             return send_file('avatar.png', BytesIO(gravatar), mimetype='image/png')
         else:
             raise NotFound
@@ -493,7 +496,10 @@ class RHSaveProfilePicture(RHUserBase):
             image_bytes.seek(0)
             set_user_avatar(self.user, image_bytes.read(), f.filename)
         else:
-            content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
+            try:
+                content, lastmod = get_gravatar_for_user(self.user, source == ProfilePictureSource.identicon, 256)
+            except GravatarError as exc:
+                raise ServiceUnavailable(str(exc))
             set_user_avatar(self.user, content, source.name, lastmod)
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
