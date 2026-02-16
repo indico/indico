@@ -97,6 +97,7 @@ export default class LogEntryModal extends React.Component {
       html,
       user: {fullName},
       time,
+      detailsLink,
     } = entries[currentViewIndex];
 
     return (
@@ -120,7 +121,7 @@ export default class LogEntryModal extends React.Component {
           </div>
         </Slot>
         <Slot name="footer">
-          <div className="group flexrow f-j-space-between">
+          <div className="group flexrow f-j-space-between log-modal-footer">
             <IButton
               title={Translate.string('Previous')}
               icon="prev"
@@ -130,9 +131,21 @@ export default class LogEntryModal extends React.Component {
               <Translate>Previous</Translate>
             </IButton>
 
-            <IButton onClick={this.relatedEntries} disabled={!this._hasRelatedEntries()}>
-              <Translate>Related entries</Translate>
-            </IButton>
+            <div>
+              <IButton onClick={this.relatedEntries} disabled={!this._hasRelatedEntries()}>
+                <Translate>Related entries</Translate>
+              </IButton>
+              {detailsLink !== null ? (
+                <a
+                  href={detailsLink.url}
+                  className="i-button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {detailsLink.title}
+                </a>
+              ) : null}
+            </div>
             <IButton
               title={Translate.string('Next')}
               classes={{next: true}}

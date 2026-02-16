@@ -44,6 +44,8 @@ Improvements
   :user:`adam-parker1, Emilijus-M`)
 - Allow removing countries and providing custom translated names for countries via config
   (:pr:`7292`, :pr:`7299`, thanks :user:`jbtwist`)
+- Add link from log entry details to the related object's page where applicable
+  (:pr:`7269`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^

@@ -5,6 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from collections.abc import Callable
+from dataclasses import dataclass
+
 from sqlalchemy.dialects.postgresql import JSON, JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -17,6 +20,14 @@ from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+from indico.web.flask.util import url_for
+
+
+@dataclass(frozen=True)
+class LogDetailsSource:
+    title: str
+    get_obj: Callable[[int], db.Model | None]
+    get_url: Callable[[db.Model], str]
 
 
 class EventLogRealm(RichIntEnum):
@@ -159,6 +170,34 @@ class LogEntryBase(db.Model):
         """
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
+
+    @property
+    def object_details(self):
+        details_mapping = {
+            'registration_id': LogDetailsSource(
+                _('Registration details'),
+                lambda id: db.m.Registration.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.registration_details', obj),
+            ),
+            'registration_form_id': LogDetailsSource(
+                _('Registration form details'),
+                lambda id: db.m.RegistrationForm.get(id, is_deleted=False),
+                lambda obj: url_for('event_registration.manage_regform', obj),
+            ),
+            'abstract_id': LogDetailsSource(
+                _('Abstract details'),
+                lambda id: db.m.Abstract.get(id, is_deleted=False),
+                lambda obj: url_for('abstracts.display_abstract', obj, management=True),
+            ),
+        }
+        if len(self.meta) != 1:
+            return
+        key, id = list(self.meta.items())[0]
+        if not (spec := details_mapping.get(key)):
+            return
+        if not (obj := spec.get_obj(id)):
+            return
+        return {'title': spec.title, 'url': spec.get_url(obj)}
 
     def __repr__(self):
         return format_repr(self, 'id', type(self).link_fk_name, 'logged_dt', 'realm', 'module', _text=self.summary)
