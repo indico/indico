@@ -8,26 +8,10 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {BrowserRouter as Router, Link} from 'react-router-dom';
 
 import {IButton, Modal} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
-
-function LogDetailsLink({title, url}) {
-  return (
-    <Router>
-      <Link to={url} className="i-button" target="_blank" rel="noopener noreferrer">
-        {title}
-      </Link>
-    </Router>
-  );
-}
-
-LogDetailsLink.propTypes = {
-  title: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-};
 
 export default class LogEntryModal extends React.Component {
   static propTypes = {
@@ -147,12 +131,21 @@ export default class LogEntryModal extends React.Component {
               <Translate>Previous</Translate>
             </IButton>
 
-            <IButton onClick={this.relatedEntries} disabled={!this._hasRelatedEntries()}>
-              <Translate>Related entries</Translate>
-            </IButton>
-            {detailsLink !== null ? (
-              <LogDetailsLink title={detailsLink.title} url={detailsLink.url} />
-            ) : null}
+            <div>
+              <IButton onClick={this.relatedEntries} disabled={!this._hasRelatedEntries()}>
+                <Translate>Related entries</Translate>
+              </IButton>
+              {detailsLink !== null ? (
+                <a
+                  href={detailsLink.url}
+                  className="i-button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {detailsLink.title}
+                </a>
+              ) : null}
+            </div>
             <IButton
               title={Translate.string('Next')}
               classes={{next: true}}
