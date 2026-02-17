@@ -42,6 +42,7 @@ DEFAULTS = {
     'CELERY_BROKER': None,
     'CELERY_CONFIG': {},
     'CELERY_RESULT_BACKEND': None,
+    'CHECK_ACTION_PERMISSIONS': False,
     'CHECKIN_APP_URL': 'https://checkin.getindico.io',
     'COMMUNITY_HUB_URL': 'https://hub.getindico.io',
     'CSP_ENABLED': False,

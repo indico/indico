@@ -24,6 +24,8 @@ from indico.util.i18n import _, ngettext
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
+from indico.core.config import config
+
 
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
@@ -157,15 +159,19 @@ def _sidemenu_items(sender, **kwargs):
 
 
 @signals.menu.sections.connect_via('top-menu')
-def _topmenu_sections(sender, **kwargs):
-    yield TopMenuSection('create-event', _('Create event'), 90)
+def _topmenu_sections(sender, category=None, **kwargs):
+    from indico.core.config import config
+    if not config.CHECK_ACTION_PERMISSIONS or category.can_create_events(session.user):
+        yield TopMenuSection('create-event', _('Create event'), 90)
 
 
 @signals.menu.items.connect_via('top-menu')
-def _topmenu_items(sender, **kwargs):
-    yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
-    yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
-    yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
+def _topmenu_items(sender, category=None, **kwargs):
+    from indico.core.config import config
+    if not config.CHECK_ACTION_PERMISSIONS or category.can_create_events(session.user):
+        yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
+        yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
+        yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
 
 
 @signals.event.sidemenu.connect

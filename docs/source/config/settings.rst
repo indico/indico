@@ -1091,6 +1091,23 @@ System
 
     Default: ``False``
 
+.. data:: CHECK_ACTION_PERMISSIONS
+
+    When enabled, certain action buttons in the UI (such as "Create event")
+    will be displayed to logged-in users only if they have the necessary
+    permissions to perform that action.
+
+    When disabled, buttons are always shown, even to non-logged in users (who will be redirected
+    to login when clicking).
+
+    .. note::
+        Enabling this setting incurs a performance cost as permission checks
+        are performed during page rendering. These checks can be computationally
+        expensive, especially in categories with complex permission structures
+        (multiple groups, ACLs, etc.).
+
+    Default: ``False``
+
 .. data:: ALLOW_ADMIN_USER_DELETION
 
     Whether to allow administrators to permanently delete users from the

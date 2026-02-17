@@ -1,13 +1,15 @@
 {% macro create_event_button(category, classes="", text="") %}
     {% block create_event_button scoped %}
-        <ind-menu class="create-event-button">
-            <button class="{{ classes }} i-button">{{- text -}}</button>
-            <menu>
-                <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
-                <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
-                <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
-            </menu>
-        </ind-menu>
+        {% if not indico_config.CHECK_ACTION_PERMISSIONS or category.can_create_events(session.user) %}
+            <ind-menu class="create-event-button">
+                <button class="{{ classes }} i-button">{{- text -}}</button>
+                <menu>
+                    <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
+                    <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
+                    <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
+                </menu>
+            </ind-menu>
+        {% endif %}
     {% endblock %}
 {% endmacro %}
 
