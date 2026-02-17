@@ -11,7 +11,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Fix potential SSRF issues by disallowing outgoing requests to private/internal/local
-  IP addresses when the URL is user-provided.
+  IP addresses when the URL is user-provided (:cve:`2026-25738`)
 
 .. note::
 
@@ -23,6 +23,7 @@ Security fixes
 
 - Fix an open redirect which could help making harmful URLs look more trustworthy by linking
   to Indico and having it redirect the user to a malicious site
+- Fix an XSS vulnerability related to uploaded materials (:cve:`2026-25739`)
 
 Improvements
 ^^^^^^^^^^^^
@@ -31,8 +32,8 @@ Improvements
 - Allow sending account creation notifications to specific email addresses (:issue:`7166`,
   :pr:`7233`, thanks :user:`duartegalvao`)
 - Support markdown in survey introduction text (:pr:`7260`)
-- Add Content-Security-Policy support (opt-in via the :data:`CSP_ENABLED` setting)
-  (:issue:`5486`, :pr:`7257`)
+- Add Content-Security-Policy support (opt-in via the :data:`CSP_ENABLED` setting) and send
+  a strict CSP for material downloads (:issue:`5486`, :pr:`7257`, :pr:`7303`, :pr:`7308`)
 - Allow admins to disable Gravatar/Identicon profile pictures via the :data:`DISABLE_GRAVATAR`
   config option (:issue:`7210`, :pr:`7251`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add a UI for managing predefined affiliations (:pr:`7183`, :pr:`7278`, thanks
