@@ -146,6 +146,17 @@ def _format_placeholders(value, **kwargs):
     return value
 
 
+def _format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=None):
+    """A wrapper around date_time.format_interval that accepts both `format` and `skeleton`.
+
+    The `format` parameter is kept for backwards compatibility with existing document
+    templates which use `format_interval(format=...)`. Prefer using the `skeleton`
+    parameter instead.
+    """
+    assert not (format and skeleton), 'Cannot specify both format and skeleton'
+    return format_interval(start_dt, end_dt, format or skeleton, locale=locale)
+
+
 def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
@@ -159,7 +170,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_placeholders': _format_placeholders,
         })
         env.globals.update({
-            'format_interval': format_interval,
+            'format_interval': _format_interval,
         })
         return env.from_string(code).render(
             **template_context,

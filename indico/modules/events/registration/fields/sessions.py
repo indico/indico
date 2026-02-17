@@ -33,7 +33,7 @@ class SessionsFieldDataSchema(FieldSetupSchemaBase):
 
 
 def _format_block(block, tzinfo):
-    interval = format_interval(block.start_dt.astimezone(tzinfo), block.end_dt.astimezone(tzinfo), 'Hm')
+    interval = format_interval(block.start_dt.astimezone(tzinfo), block.end_dt.astimezone(tzinfo), skeleton='Hm')
     day = format_skeleton(block.start_dt, 'EdMM', timezone=tzinfo)
     return f'{day}: {interval} - {block.full_title}'
 
