@@ -1,6 +1,6 @@
 {% macro create_event_button(category, classes="", text="") %}
     {% block create_event_button scoped %}
-        {% if not indico_config.CHECK_ACTION_PERMISSIONS or category.can_create_events(session.user) %}
+        {% if not indico_config.CHECK_ACTION_PERMISSIONS or (session.user and session.user.has_create_permission(category)) %}
             <ind-menu class="create-event-button">
                 <button class="{{ classes }} i-button">{{- text -}}</button>
                 <menu>

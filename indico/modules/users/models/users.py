@@ -29,6 +29,9 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
+from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.principals import CategoryPrincipal
+from indico.modules.categories.models.roles import CategoryRole, role_members_table
 from indico.modules.logs import UserLogEntry
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
@@ -666,6 +669,47 @@ class User(PersonMixin, db.Model):
     def can_be_modified(self, user):
         """If this user can be modified by the given user."""
         return self == user or user.is_admin
+
+    def has_create_permission(self, category=None):
+        """Check if the user has create events permissions somewhere."""
+        from indico.modules.categories.util import can_create_unlisted_events
+
+        return (self.is_admin or
+                can_create_unlisted_events(self) or
+                self._has_create_via_acl() or
+                self._has_create_via_role())
+
+    def _has_create_via_acl(self):
+        return db.session.query(
+            db.session.query(Category.id)
+            .join(CategoryPrincipal, CategoryPrincipal.category_id == Category.id)
+            .filter(
+                ~Category.is_deleted,
+                CategoryPrincipal.user_id == self.id,
+                db.or_(
+                    CategoryPrincipal.full_access,
+                    CategoryPrincipal.has_management_permission('create')
+                )
+            )
+            .exists()
+        ).scalar()
+
+    def _has_create_via_role(self):
+        return db.session.query(
+            db.session.query(Category.id)
+            .join(CategoryPrincipal, CategoryPrincipal.category_id == Category.id)
+            .join(CategoryRole, CategoryPrincipal.category_role_id == CategoryRole.id)
+            .join(role_members_table, role_members_table.c.role_id == CategoryRole.id)
+            .filter(
+                ~Category.is_deleted,
+                role_members_table.c.user_id == self.id,
+                db.or_(
+                    CategoryPrincipal.full_access,
+                    CategoryPrincipal.has_management_permission('create')
+                )
+            )
+            .exists()
+        ).scalar()
 
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.

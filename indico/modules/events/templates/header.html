@@ -237,8 +237,8 @@
             {% block management_button %}
                 {% if not indico_config.CHECK_ACTION_PERMISSIONS or event.can_manage(session.user) %}
                     <a class="i-button text-color subtle icon-edit"
-                    href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
-                    title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+                       href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
+                       title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
                 {% endif %}
             {% endblock %}
 
