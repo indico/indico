@@ -137,7 +137,9 @@ form {
       padding: 0.5em 0.5em 0 0;
       line-height: $i-form-line-height;
       color: $black;
-      width: 400px;
+      width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
 
       .form-field-description {
         font-style: italic;
