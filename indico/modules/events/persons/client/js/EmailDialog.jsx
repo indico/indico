@@ -96,6 +96,7 @@ export function EmailDialog({
   validate,
   title,
   getPreviewPayload,
+  imageUploadURL,
 }) {
   const [preview, setPreview] = useState(null);
 
@@ -182,7 +183,7 @@ export function EmailDialog({
           name="body"
           label={Translate.string('Email body')}
           required
-          config={{images: false, forceAbsoluteURLs: true}}
+          config={{images: !!imageUploadURL, forceAbsoluteURLs: true, imageUploadURL}}
         />
         {placeholders.length > 0 && (
           <Form.Field>
@@ -272,6 +273,7 @@ EmailDialog.propTypes = {
   title: PropTypes.string,
   getPreviewPayload: PropTypes.func,
   sentEmailsWarning: PropTypes.node,
+  imageUploadURL: PropTypes.string,
 };
 
 EmailDialog.defaultProps = {
@@ -285,4 +287,5 @@ EmailDialog.defaultProps = {
   validate: undefined,
   title: null,
   getPreviewPayload: null,
+  imageUploadURL: null,
 };
