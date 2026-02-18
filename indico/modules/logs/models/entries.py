@@ -59,9 +59,10 @@ class UserLogRealm(RichIntEnum):
 
 
 class AppLogRealm(RichIntEnum):
-    __titles__ = (None, _('System'), _('Admin'))
+    __titles__ = (None, _('System'), _('Admin'), _('Emails'))
     system = 1
     admin = 2
+    emails = 3
 
 
 class LogKind(IndicoIntEnum):

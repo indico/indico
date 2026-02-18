@@ -43,15 +43,15 @@ def email_sender(fn):
     return wrapper
 
 
-def send_email(email, event=None, module=None, user=None, log_metadata=None, log_summary=None):
+def send_email(email, obj=None, module=None, user=None, log_metadata=None, log_summary=None):
     """Send an email created by :func:`make_email`.
 
     When called while inside a RH, the email will be queued and only
     sent or passed on to celery once the database commit succeeded.
 
     :param email: The email object returned by :func:`make_email`
-    :param event: If specified, the email will be saved in that
-                  event's log
+    :param obj: If specified, the email will be saved in that object's log. The
+                object must have a `log()` method and an `id` attribute.
     :param module: The module name to show in the email log
     :param user: The user to show in the email log
     :param log_metadata: A metadata dictionary to be saved in the event's log
@@ -60,16 +60,17 @@ def send_email(email, event=None, module=None, user=None, log_metadata=None, log
     fn = send_email_task.delay if config.SMTP_USE_CELERY else do_send_email
     # we log the email immediately (as pending).  if we don't commit,
     # the log message will simply be thrown away later
-    log_entry = _log_email(email, event, module, user, log_metadata, log_summary)
+    log_entry = _log_email(email, obj, module, user, log_metadata, log_summary)
     if 'email_queue' in g:
         g.email_queue.append((fn, email, log_entry))
     else:
         fn(email, log_entry)
 
 
-def _log_email(email, event, module, user, meta=None, summary=None):
-    from indico.modules.logs import EventLogRealm, LogKind
-    if not event:
+def _log_email(email, obj, module, user, meta=None, summary=None):
+    from indico.modules.events import Event
+    from indico.modules.logs import AppLogRealm, EventLogRealm, LogKind
+    if not obj:
         return None
     log_data = {
         'content_type': 'text/html' if email['html'] else 'text/plain',
@@ -94,7 +95,9 @@ def _log_email(email, event, module, user, meta=None, summary=None):
         unique_id = g.setdefault('stored_email_attachments_uuid', uuid4().hex)
         storage = get_storage(config.EMAIL_LOG_STORAGE)
         stored = []
-        base_path = f'emails/{event.id}'
+        obj_type = type(obj).__name__.lower()
+        obj_id = getattr(obj, 'id', None) or 'unknown'
+        base_path = f'emails/{obj_type}/{obj_id}'
 
         for att in attachments:
             match att:
@@ -132,8 +135,9 @@ def _log_email(email, event, module, user, meta=None, summary=None):
             })
         if stored:
             log_data['stored_attachments'] = stored
-    return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', summary or log_data['subject'],
-                     user, type_='email', data=log_data, meta=meta)
+    log_realm = EventLogRealm.emails if isinstance(obj, Event) else AppLogRealm.emails
+    return obj.log(log_realm, LogKind.other, module or 'Unknown', summary or log_data['subject'], user,
+                   type_='email', data=log_data, meta=meta)
 
 
 def init_email_queue():
