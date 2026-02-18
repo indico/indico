@@ -8,7 +8,7 @@
 import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
-import React, {useReducer, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -82,6 +82,119 @@ ICSExportOptions.propTypes = {
 ICSExportOptions.defaultProps = {
   selected: undefined,
   options: [],
+};
+
+const ICSCalendarLinkContent = ({
+  options,
+  popupState,
+  handleSetOption,
+  copyButton,
+  eventInSeries,
+  exportEventSeries,
+  setExportEventSeries,
+  _handleSetOption,
+}) => (
+  <>
+    <Header styleName="export-header">
+      <ICSExportOptions
+        options={options}
+        selected={popupState.key}
+        handleSetOption={handleSetOption}
+      />
+    </Header>
+    <Popup.Content styleName="content">
+      {eventInSeries && (
+        <>
+          <strong styleName="export-option">
+            <Translate>Export options</Translate>
+          </strong>
+          <div
+            styleName="export-event-series"
+            onClick={() => {
+              const option = options.find(opt => opt.key === popupState.key);
+              let extraParams = option?.extraParams || {};
+              if (!exportEventSeries) {
+                extraParams = {...extraParams, series: true};
+              }
+              setExportEventSeries(!exportEventSeries);
+              _handleSetOption(popupState.key, extraParams);
+            }}
+          >
+            <Translate>Export all events in this event series</Translate>
+            <Checkbox showAsToggle label="" checked={exportEventSeries} />
+          </div>
+        </>
+      )}
+      <strong styleName="export-option">
+        <Translate>Synchronize with your calendar</Translate>
+      </strong>
+      <p>
+        <Translate>
+          You may copy-paste the following URL into your scheduling application. Contents will be
+          automatically synchronized.
+        </Translate>
+      </p>
+      <Input
+        placeholder={Translate.string('Loading…')}
+        readOnly
+        loading={!popupState.url}
+        size="mini"
+        fluid
+        value={popupState.url || ''}
+        action={popupState.url && navigator.clipboard ? copyButton : null}
+      />
+      {popupState.copied && (
+        <Grid centered>
+          <Grid.Row>
+            <Label pointing="above" color="teal">
+              <Translate>Copied!</Translate>
+            </Label>
+          </Grid.Row>
+        </Grid>
+      )}
+      <strong styleName="export-option">
+        <Translate>Download</Translate>
+      </strong>
+      <div styleName="download-option">
+        <span>
+          <Translate>
+            Download an iCalendar file that you can use in calendaring applications.
+          </Translate>
+        </span>
+        <Button
+          styleName="download-button"
+          title={Translate.string('Download')}
+          as="a"
+          href={popupState.url}
+          icon="download"
+          loading={!popupState.url}
+          disabled={!popupState.url}
+        />
+      </div>
+    </Popup.Content>
+  </>
+);
+
+ICSCalendarLinkContent.propTypes = {
+  options: ICSExportOptions.propTypes.options,
+  popupState: PropTypes.shape({
+    key: PropTypes.string,
+    open: PropTypes.bool.isRequired,
+    url: PropTypes.string,
+    controller: PropTypes.object,
+    copied: PropTypes.bool.isRequired,
+  }).isRequired,
+  handleSetOption: PropTypes.func.isRequired,
+  copyButton: PropTypes.node.isRequired,
+  eventInSeries: PropTypes.bool,
+  exportEventSeries: PropTypes.bool.isRequired,
+  setExportEventSeries: PropTypes.func.isRequired,
+  _handleSetOption: PropTypes.func.isRequired,
+};
+
+ICSCalendarLinkContent.defaultProps = {
+  options: [],
+  eventInSeries: false,
 };
 
 export default function ICSCalendarLink({
@@ -176,83 +289,16 @@ export default function ICSCalendarLink({
       }}
       wide
     >
-      <Header styleName="export-header">
-        <ICSExportOptions
-          options={options}
-          selected={popupState.key}
-          handleSetOption={handleSetOption}
-        />
-      </Header>
-      <Popup.Content styleName="content">
-        {eventInSeries && (
-          <>
-            <strong styleName="export-option">
-              <Translate>Export options</Translate>
-            </strong>
-            <div
-              styleName="export-event-series"
-              onClick={() => {
-                const option = options.find(opt => opt.key === popupState.key);
-                let extraParams = option?.extraParams || {};
-                if (!exportEventSeries) {
-                  extraParams = {...extraParams, series: true};
-                }
-                setExportEventSeries(!exportEventSeries);
-                _handleSetOption(popupState.key, extraParams);
-              }}
-            >
-              <Translate>Export all events in this event series</Translate>
-              <Checkbox showAsToggle label="" checked={exportEventSeries} />
-            </div>
-          </>
-        )}
-        <strong styleName="export-option">
-          <Translate>Synchronize with your calendar</Translate>
-        </strong>
-        <p>
-          <Translate>
-            You may copy-paste the following URL into your scheduling application. Contents will be
-            automatically synchronized.
-          </Translate>
-        </p>
-        <Input
-          placeholder={Translate.string('Loading…')}
-          readOnly
-          loading={!popupState.url}
-          size="mini"
-          fluid
-          value={popupState.url || ''}
-          action={popupState.url && navigator.clipboard ? copyButton : null}
-        />
-        {popupState.copied && (
-          <Grid centered>
-            <Grid.Row>
-              <Label pointing="above" color="teal">
-                <Translate>Copied!</Translate>
-              </Label>
-            </Grid.Row>
-          </Grid>
-        )}
-        <strong styleName="export-option">
-          <Translate>Download</Translate>
-        </strong>
-        <div styleName="download-option">
-          <span>
-            <Translate>
-              Download an iCalendar file that you can use in calendaring applications.
-            </Translate>
-          </span>
-          <Button
-            styleName="download-button"
-            title={Translate.string('Download')}
-            as="a"
-            href={popupState.url}
-            icon="download"
-            loading={!popupState.url}
-            disabled={!popupState.url}
-          />
-        </div>
-      </Popup.Content>
+      <ICSCalendarLinkContent
+        options={options}
+        popupState={popupState}
+        handleSetOption={handleSetOption}
+        copyButton={copyButton}
+        eventInSeries={eventInSeries}
+        exportEventSeries={exportEventSeries}
+        setExportEventSeries={setExportEventSeries}
+        _handleSetOption={_handleSetOption}
+      />
     </Popup>
   );
 }
@@ -273,3 +319,124 @@ ICSCalendarLink.defaultProps = {
   options: ICSExportOptions.defaultProps.options,
   eventInSeries: false,
 };
+
+function ICSCalendarLinkStatic({
+  endpoint,
+  params,
+  options,
+  eventInSeries,
+  onClose,
+  triggerElement,
+}) {
+  const [popupState, dispatch] = useReducer(popupReducer, initialState);
+  const [exportEventSeries, setExportEventSeries] = useState(false);
+
+  const copyButton = (
+    <Button
+      icon="copy"
+      title={Translate.string('Copy to clipboard')}
+      onClick={async () => {
+        await navigator.clipboard.writeText(popupState.url);
+        dispatch({type: 'COPIED'});
+      }}
+    />
+  );
+
+  const fetchURL = async (extraParams, controller) => {
+    try {
+      const {
+        data: {url: signedURL},
+      } = await indicoAxios.post(
+        signURL(),
+        snakifyKeys({endpoint, params: {...params, ...extraParams}}),
+        {signal: controller.signal}
+      );
+      return signedURL;
+    } catch (error) {
+      handleAxiosError(error);
+      return null;
+    }
+  };
+
+  const _handleSetOption = async (key, extraParams) => {
+    if (popupState.controller) {
+      popupState.controller.abort();
+    }
+    const controller = new AbortController();
+    dispatch({type: 'OPEN', key, controller});
+    const url = await fetchURL(extraParams, controller);
+    if (url !== null) {
+      dispatch({type: 'LOADED', url});
+    }
+  };
+
+  const handleSetOption = (key, extraParams) => {
+    if (!popupState.open || popupState.key !== key) {
+      if (exportEventSeries) {
+        extraParams = {...extraParams, series: true};
+      }
+      _handleSetOption(key, extraParams);
+    }
+  };
+
+  const handleClose = () => {
+    if (popupState.controller) {
+      popupState.controller.abort();
+    }
+    dispatch({type: 'CLOSE'});
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    const {key, extraParams} = options[0];
+    handleSetOption(key, extraParams);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!popupState.open) {
+    return null;
+  }
+
+  return (
+    <Popup
+      styleName="popup"
+      context={triggerElement}
+      open={popupState.open}
+      popperDependencies={[popupState.copied]}
+      onClose={handleClose}
+      position="bottom right"
+      wide
+    >
+      <ICSCalendarLinkContent
+        options={options}
+        popupState={popupState}
+        handleSetOption={handleSetOption}
+        copyButton={copyButton}
+        eventInSeries={eventInSeries}
+        exportEventSeries={exportEventSeries}
+        setExportEventSeries={setExportEventSeries}
+        _handleSetOption={_handleSetOption}
+      />
+    </Popup>
+  );
+}
+
+ICSCalendarLinkStatic.propTypes = {
+  endpoint: PropTypes.string.isRequired,
+  params: PropTypes.objectOf(PropTypes.string),
+  options: ICSExportOptions.propTypes.options,
+  eventInSeries: PropTypes.bool,
+  onClose: PropTypes.func,
+  triggerElement: PropTypes.object.isRequired,
+};
+
+ICSCalendarLinkStatic.defaultProps = {
+  params: {},
+  options: ICSExportOptions.defaultProps.options,
+  eventInSeries: false,
+  onClose: null,
+};
+
+ICSCalendarLink.Static = ICSCalendarLinkStatic;
