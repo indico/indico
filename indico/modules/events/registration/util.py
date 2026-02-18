@@ -51,7 +51,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import CSVFieldDelimiter, csv_text_io_wrapper, unique_col
@@ -1192,3 +1192,45 @@ class CustomTicketCode:
     def lookup_registration(cls, data: str) -> Registration | None:
         """Lookup a registration based on custom ticket code data."""
         raise NotImplementedError
+
+
+def prepare_participant_list_data(reglist, display, static_items_ids):
+    primary_headers = ['ID', 'Name']
+    dynamic_headers = [item.title for item in display]
+
+    rows = []
+    for registration in reglist:
+        row = {
+            'ID': f'#{registration.friendly_id}',
+            'Name': registration.display_full_name
+        }
+        reg_data_by_field = registration.data_by_field
+
+        for item in display:
+            reg_data = reg_data_by_field.get(item.id)
+            cell_data = None
+            if reg_data:
+                cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
+            row[item.title] = cell_data or '-'
+
+        for item_id in static_items_ids:
+            match item_id:
+                case 'reg_date':
+                    cell_data = format_datetime(registration.submitted_dt)
+                case 'state':
+                    cell_data = registration.state.title
+                case 'price':
+                    cell_data = registration.render_price()
+                case 'checked_in':
+                    cell_data = 'Yes' if registration.checked_in else 'No'
+                case 'checked_in_date' if registration.checked_in_dt:
+                    cell_data = format_datetime(registration.checked_in_dt)
+                case 'tags_present' if registration.tags:
+                    cell_data = ', '.join(sorted(t.title for t in registration.tags))
+                case _:
+                    cell_data = None
+            row[item_id] = cell_data or '-'
+
+        rows.append(row)
+
+    return primary_headers, dynamic_headers, rows

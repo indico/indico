@@ -17,6 +17,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableItemSchema,
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
@@ -290,6 +291,10 @@ class MultiChoiceField(ChoiceBaseField):
         choices = [_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.items()]
 
         return ', '.join(choices) if for_humans or for_search else choices
+
+    def render_reglist_column(self, data):
+        display_text = self.get_friendly_data(data, for_humans=True)
+        return RegistrationListColumn(display_text, display_text)
 
     def get_validators(self, existing_registration):
         def _check_max_choices(new_data):
@@ -668,3 +673,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
                    'departure': 'departure_date'}
         rv = self.get_friendly_data(data).get(mapping[key], '')
         return format_date(rv) if isinstance(rv, date) else rv
+
+    def render_reglist_column(self, data):
+        content_dict = self.get_friendly_data(data)
+        text_val = f"{content_dict['choice']} ({content_dict['nights']} nights)"
+        return RegistrationListColumn(content_dict, text_val)
