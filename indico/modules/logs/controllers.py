@@ -222,7 +222,7 @@ class RHResendEmail(RHManageEventBase):
         form = ResendEmailPrefaceForm(subject=original_subject, is_html_email=is_html_email)
         if form.validate_on_submit():
             email = self._build_email(form.data, is_html_email)
-            send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
+            send_email(email, obj=self.event, module=self.entry.module, user=self.entry.user,
                        log_metadata=self.entry.meta, log_summary=f'Resent email: {original_subject}')
             flash(_('The email has been re-sent.'), 'success')
             return jsonify_data()
