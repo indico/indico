@@ -24,7 +24,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Screen readers now announce the filtering state indicator descriptive text instead of
+  just the short numeric label (:pr:`7335`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
