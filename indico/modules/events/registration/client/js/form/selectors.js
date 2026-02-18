@@ -100,6 +100,14 @@ export const getFieldLabelLookup = createSelector(
         label: formField.title,
         id: `input-${formField.id}`,
       });
+      // Picture field use `_${formField.htmlName}_invalidator` to signal its state.
+      // Register it so FormErrorList can display an error
+      if (formField.inputType === 'picture') {
+        lookup.set(`_${formField.htmlName}_invalidator`, {
+          label: formField.title,
+          id: `input-${formField.id}`,
+        });
+      }
     }
     // Include the "Captcha" field which isn't part of reg form registry
     lookup.set('captcha', {

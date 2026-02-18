@@ -63,7 +63,7 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             icon="check"
             primary
             // i18n: Crop an image
-            content={Translate.string('Crop')}
+            content={Translate.string('Confirm Picture')}
             onClick={onCrop}
           />
         </Button.Group>
