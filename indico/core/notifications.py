@@ -127,12 +127,17 @@ def _log_email(email, obj, module, user, meta=None, summary=None):
                     logger.exception('Could not store email attachment')
                     continue
                 stored_attachments[name] = file_id
-            stored.append({
+            stored_item = {
                 'storage_backend': config.EMAIL_LOG_STORAGE,
                 'storage_file_id': file_id,
                 'filename': filename,
                 'content_type': ctype,
-            })
+            }
+            if isinstance(att, MIMEBase):
+                content_id = att.get('Content-ID')
+                if content_id:
+                    stored_item['content_id'] = content_id.strip('<>')
+            stored.append(stored_item)
         if stored:
             log_data['stored_attachments'] = stored
     log_realm = EventLogRealm.emails if isinstance(obj, Event) else AppLogRealm.emails
