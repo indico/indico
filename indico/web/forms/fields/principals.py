@@ -158,8 +158,8 @@ class PermissionsField(SearchTokenMixin, JSONField):
         'category': Category
     }
 
-    def __init__(self, *args, **kwargs):
-        self.object_type = kwargs.pop('object_type')
+    def __init__(self, *args, object_type, **kwargs):
+        self.object_type = object_type
         super().__init__(*args, **kwargs)
         self.ip_networks = IPNetworkGroupSchema(many=True).dump(IPNetworkGroup.query.filter_by(hidden=False).all())
 
