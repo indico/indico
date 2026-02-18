@@ -11,7 +11,6 @@ from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
@@ -159,16 +158,14 @@ def _sidemenu_items(sender, **kwargs):
 
 @signals.menu.sections.connect_via('top-menu')
 def _topmenu_sections(sender, category=None, **kwargs):
-    if not config.CHECK_ACTION_PERMISSIONS or (session.user and session.user.has_create_permission(category)):
-        yield TopMenuSection('create-event', _('Create event'), 90)
+    yield TopMenuSection('create-event', _('Create event'), 90)
 
 
 @signals.menu.items.connect_via('top-menu')
 def _topmenu_items(sender, category=None, **kwargs):
-    if not config.CHECK_ACTION_PERMISSIONS or (session.user and session.user.has_create_permission(category)):
-        yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
-        yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
-        yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
+    yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
+    yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
+    yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
 
 
 @signals.event.sidemenu.connect
