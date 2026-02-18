@@ -14,6 +14,8 @@
 %menu-item {
   padding: 0;
 
+  background: var(--menu-background-color);
+
   :is(a, button) {
     @extend %flex-row;
     flex: none;
