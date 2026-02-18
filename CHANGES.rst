@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Show event role dropdown when editing contribution/session ACLs (:pr:`7339`)
 
 Accessibility
 ^^^^^^^^^^^^^
