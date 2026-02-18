@@ -90,6 +90,8 @@ Improvements
   (:pr:`7292`, :pr:`7299`, thanks :user:`jbtwist`)
 - Add link from log entry details to the related object's page where applicable
   (:pr:`7269`, thanks :user:`vtran99`)
+- Add a setting to hide certain buttons to prevent users to access certain endpoints without
+  the required permissions for them (:pr:`7332`, thanks :user:`jbtwist, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
