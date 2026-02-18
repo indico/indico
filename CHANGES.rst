@@ -83,6 +83,7 @@ Improvements
   (:pr:`7292`, :pr:`7299`, thanks :user:`jbtwist`)
 - Add link from log entry details to the related object's page where applicable
   (:pr:`7269`, thanks :user:`vtran99`)
+- Show Picture field validation status in the registration form (:pr:`7337`, thanks :user:`jbtwist, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
