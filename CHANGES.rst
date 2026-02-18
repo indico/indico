@@ -56,6 +56,8 @@ Improvements
   :user:`duartegalvao, unconventionaldotdev`)
 - Log registration tag changes in the event log (:pr:`7446`,
   thanks :user:`moliholy, unconventionaldotdev`)
+- Display embedded images in email log entries (:pr:`7338`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
