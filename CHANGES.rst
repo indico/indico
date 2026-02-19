@@ -21,6 +21,8 @@ Bugfixes
   from external search plugins (:pr:`7345`)
 - Require management access to all events in a series to manage it (:pr:`7348`)
 - Fix deleting an event series that contains deleted events (:pr:`7348`)
+- Fix email validation error when entering speakers manually in an invited abstract
+  while logged in (:pr:`7340`)
 
 Accessibility
 ^^^^^^^^^^^^^

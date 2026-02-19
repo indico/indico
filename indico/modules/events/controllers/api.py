@@ -10,9 +10,10 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.modules.events import Event
+from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.persons.util import check_person_link_email
 from indico.modules.events.util import get_object_from_args
-from indico.util.marshmallow import LowercaseString, ModelField
+from indico.util.marshmallow import LowercaseString, ModelField, UUIDString
 from indico.web.args import use_kwargs
 from indico.web.rh import RH, RHProtected
 
@@ -43,13 +44,25 @@ class RHEventCheckEmail(RHProtected):
         if self.object is None:
             raise NotFound
 
-    def _check_access(self):
+    @use_kwargs({
+        'invited_abstract_uuid': UUIDString(load_default=None),
+    }, location='query')
+    def _check_access(self, invited_abstract_uuid):
         obj = self.object.session if self.object_type == 'session_block' else self.object
-        # Depending on the settings, contribution submitters may be able to edit
-        # speakers/authors without having management rights
-        method = obj.can_edit if self.object_type in ('contribution', 'subcontribution', 'abstract') else obj.can_manage
-        if not method(session.user):
-            raise Forbidden
+        # For invited abstracts we only care about the UUID instead of regular edit permissions, because
+        # the person submitting it may be logged in as a user who does not have edit permissions on the invited
+        # abstract, but can nonetheless submit it due to the UUID
+        if (
+            self.object_type != 'abstract'
+            or self.object.state != AbstractState.invited
+            or self.object.uuid != invited_abstract_uuid
+        ):
+            # Depending on the settings, contribution submitters may be able to edit
+            # speakers/authors without having management rights
+            method = (obj.can_edit if self.object_type in ('contribution', 'subcontribution', 'abstract')
+                      else obj.can_manage)
+            if not method(session.user):
+                raise Forbidden
         # Abstract submission is usually open to unknown people, so in case of search restrictions we require
         # at least abstract management access
         if (

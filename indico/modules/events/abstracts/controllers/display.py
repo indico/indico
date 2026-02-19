@@ -99,7 +99,7 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
         abstract_form_cls = make_abstract_form(self.event, form_user)
         custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.abstract.field_values}
         form_defaults = FormDefaults(self.abstract, **custom_field_values)
-        return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
+        return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract, submit_invited=True)
 
     def _process_GET(self):
         return WPDisplayAbstracts.render_template('invited_abstract.html', self.abstract.event, abstract=self.abstract,
