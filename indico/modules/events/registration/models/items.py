@@ -68,6 +68,7 @@ class PersonalDataType(IndicoIntEnum):
     @strict_classproperty
     @classmethod
     def FIELD_DATA(cls):  # noqa: N802
+        from indico.modules.events.registration.fields.affiliation import AffiliationMode
         title_item = {'price': 0,
                       'places_limit': 0,
                       'is_enabled': True}
@@ -89,8 +90,11 @@ class PersonalDataType(IndicoIntEnum):
             }),
             (cls.affiliation, {
                 'title': cls.affiliation.get_title(),
-                'input_type': 'text',
-                'position': 4
+                'input_type': 'affiliation',
+                'position': 4,
+                'data': {
+                    'affiliation_mode': AffiliationMode.both,
+                },
             }),
             # Fields disabled by default start in position 1000 to avoid problems reordering
             (cls.address, {

@@ -632,7 +632,7 @@ def _weighted_score(*params):
 
 
 @memoize_redis(3600, versioned=True)
-def search_affiliations(q):
+def search_affiliations(q, *, filters=()):
     exact_match = _match_search(q, exact=True)
     score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
     countries = set(get_countries_regex().findall(q))
@@ -649,7 +649,7 @@ def search_affiliations(q):
     q_filter = fts_matches(Affiliation.searchable_names, q)
     return (
         Affiliation.query
-        .filter(~Affiliation.is_deleted, q_filter)
+        .filter(~Affiliation.is_deleted, q_filter, *filters)
         .order_by(
             score.desc(),
             db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),

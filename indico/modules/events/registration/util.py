@@ -215,7 +215,9 @@ def get_user_data(regform, user, invitation=None):
         user_data = {}
     else:
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
-                     if t.name not in {'title', 'picture'} and getattr(user, t.name, None)}
+                     if t.name not in {'title', 'affiliation', 'picture'} and getattr(user, t.name, None)}
+        if user.affiliation:
+            user_data['affiliation'] = {'id': user.affiliation_id, 'text': user.affiliation or ''}
         if (
             (country_field := get_country_field(regform)) and
             country_field.data.get('use_affiliation_country') and
@@ -226,7 +228,7 @@ def get_user_data(regform, user, invitation=None):
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:
-            user_data['affiliation'] = invitation.affiliation
+            user_data['affiliation'] = {'id': None, 'text': invitation.affiliation}
     title = getattr(user, 'title', None)
     if title_uuid := get_title_uuid(regform, title):
         user_data['title'] = title_uuid

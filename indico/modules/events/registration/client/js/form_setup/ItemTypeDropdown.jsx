@@ -7,15 +7,18 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import {getFieldRegistry} from '../form/fields/registry';
+import {getStaticData} from '../form/selectors';
 
 import '../../styles/regform.module.scss';
 
 export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
+  const staticData = useSelector(getStaticData);
   const fieldRegistry = getFieldRegistry();
   const dropdownText = newItemType
     ? fieldRegistry[newItemType].title
@@ -36,7 +39,7 @@ export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
   }
 
   const newItemTypeOptions = Object.entries(fieldRegistry)
-    .filter(([name]) => name !== 'label')
+    .filter(([, fieldConfig]) => !fieldConfig.hideFromItemDropdown?.(staticData))
     .map(([name, {title, icon}]) => ({
       key: name,
       value: name,
