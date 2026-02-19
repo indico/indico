@@ -36,7 +36,7 @@ def _get_timezone_display(local_tz, timezone, force=False):
 
 
 def render_header(category=None, protected_object=None, local_tz=None, force_local_tz=False):
-    top_menu_items = build_menu_structure('top-menu', category=category)
+    top_menu_items = build_menu_structure('top-menu')
     return render_template('header.html',
                            category=category,
                            top_menu_items=top_menu_items,
