@@ -768,6 +768,14 @@ Logging
 
     Default: ``None``
 
+.. data:: SENTRY_ENVIRONMENT
+
+    If you use `Sentry`_ for logging warnings/errors, you can specify the
+    environment name here. This can be used to distinguish data from separate
+    Indico installations that are logged to the same Sentry project.
+
+    Default: ``'production'``
+
 .. data:: SENTRY_LOGGING_LEVEL
 
     The minimum level a log record needs to have to be sent to Sentry.

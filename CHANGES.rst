@@ -25,7 +25,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Require a modern Sentry version (at least v20.6.0) when using a self-hosted Sentry
+  installation for error reporting (:pr:`7333`)
 
 
 Version 3.3.10

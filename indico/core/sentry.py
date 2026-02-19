@@ -38,6 +38,7 @@ def init_sentry(app):
     sentry_sdk.init(
         dsn=config.SENTRY_DSN,
         release=indico.__version__,
+        environment=config.SENTRY_ENVIRONMENT,
         send_default_pii=True,
         attach_stacktrace=True,
         propagate_traces=False,
