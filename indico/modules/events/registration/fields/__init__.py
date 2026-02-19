@@ -18,11 +18,13 @@ def get_field_types():
 @signals.core.get_fields.connect_via(RegistrationFormFieldBase)
 def _get_fields(sender, **kwargs):
     from .accompanying import AccompanyingPersonsField
+    from .affiliation import AffiliationField
     from .choices import AccommodationField, MultiChoiceField, SingleChoiceField
     from .sessions import SessionsField
     from .simple import (BooleanField, CheckboxField, CountryField, DateField, EmailField, FileField, NumberField,
                          PhoneField, PictureField, TextAreaField, TextField)
     yield AccommodationField
+    yield AffiliationField
     yield MultiChoiceField
     yield SingleChoiceField
     yield AccompanyingPersonsField
