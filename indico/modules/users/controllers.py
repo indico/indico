@@ -323,12 +323,24 @@ class RHPersonalDataUpdate(RHUserBase):
         return '', 204
 
 
-class RHSearchAffiliations(RH):
+class SearchAffiliationsMixin:
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
-        res = search_affiliations(q)
+        filters = values_from_signal(signals.affiliations.get_affiliation_filters.send(self, context=self.context),
+                                     as_list=True, multi_value_types=list)
+        res = search_affiliations(q, filters=filters)
         basic_fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
         return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
+
+    @property
+    def context(self):
+        raise NotImplementedError
+
+
+class RHSearchAffiliations(SearchAffiliationsMixin, RH):
+    @property
+    def context(self):
+        return {}
 
 
 class RHAffiliationsAPI(RHAdminBase):

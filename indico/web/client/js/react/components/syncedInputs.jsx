@@ -5,21 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import searchAffiliationURL from 'indico-url:users.api_affiliations';
-
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {useField, useForm} from 'react-final-form';
-import {Form, Header, Popup} from 'semantic-ui-react';
+import {Form, Popup} from 'semantic-ui-react';
 
-import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import {makeAsyncDebounce} from 'indico/utils/debounce';
+
+import FinalAffiliationField from './FinalAffiliationField';
 
 import './syncedInputs.module.scss';
-
-const debounce = makeAsyncDebounce(250);
 
 function SyncedFinalField({
   name,
@@ -122,7 +118,6 @@ export function SyncedFinalDropdown(props) {
   return <SyncedFinalField as={FinalDropdown} selection fluid {...props} />;
 }
 
-// TODO: see if we can't converge with FinalAffiliationField to remove the duplicated code...
 export function SyncedFinalAffiliationDropdown({
   name,
   required,
@@ -133,44 +128,9 @@ export function SyncedFinalAffiliationDropdown({
   currentAffiliation,
   allowCustomAffiliations,
 }) {
-  const [_affiliationResults, setAffiliationResults] = useState([]);
-  const affiliationResults =
-    currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
-      ? [currentAffiliation, ..._affiliationResults]
-      : _affiliationResults;
-
-  const getSubheader = ({city, country_name: countryName}) => {
-    if (city && countryName) {
-      return `${city}, ${countryName}`;
-    }
-    return city || countryName;
-  };
-
-  const affiliationOptions = affiliationResults.map(res => ({
-    key: res.id,
-    value: res.id,
-    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
-    content: <Header style={{fontSize: 14}} content={res.name} subheader={getSubheader(res)} />,
-  }));
-
-  const searchAffiliationChange = async (evt, {searchQuery}) => {
-    if (!searchQuery) {
-      setAffiliationResults([]);
-      return;
-    }
-    let resp;
-    try {
-      resp = await debounce(() => indicoAxios.get(searchAffiliationURL({q: searchQuery})));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setAffiliationResults(resp.data);
-  };
-
   return (
     <SyncedFinalField
-      as={FinalComboDropdown}
+      as={FinalAffiliationField}
       name={name}
       required={required}
       validate={v =>
@@ -178,32 +138,14 @@ export function SyncedFinalAffiliationDropdown({
       }
       syncName={syncName}
       processSyncedValue={(value, values) => ({id: values.affiliation_id || null, text: value})}
-      options={affiliationOptions}
-      fluid
-      allowAdditions={allowCustomAffiliations}
-      additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
-      onSearchChange={searchAffiliationChange}
-      search={options => [
-        ...(options.find(o => o.key === 'addition') || []),
-        ...options.filter(o => o.key !== 'addition'),
-      ]}
-      placeholder={
-        allowCustomAffiliations
-          ? Translate.string('Select an affiliation or add your own')
-          : Translate.string('Select an affiliation')
-      }
-      noResultsMessage={
-        allowCustomAffiliations
-          ? Translate.string('Search an affiliation or enter one manually')
-          : Translate.string('Search an affiliation')
-      }
-      renderCustomOptionContent={value => (
-        <Header content={value} subheader={Translate.string('You entered this option manually')} />
-      )}
+      currentAffiliation={currentAffiliation}
+      allowCustomAffiliations={allowCustomAffiliations}
       label={Translate.string('Affiliation')}
       syncedValues={syncedValues}
       lockedFields={lockedFields}
       lockedFieldMessage={lockedFieldMessage}
+      hasPredefinedAffiliations
+      fluid
     />
   );
 }
