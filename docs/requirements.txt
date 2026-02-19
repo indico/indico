@@ -20,7 +20,7 @@ docutils==0.22.4
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-flask==3.1.2
+flask==3.1.3
     # via
     #   -r docs/requirements.in
     #   flask-babel
@@ -95,5 +95,5 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 urllib3==2.6.3
     # via requests
-werkzeug==3.1.5
+werkzeug==3.1.6
     # via flask
