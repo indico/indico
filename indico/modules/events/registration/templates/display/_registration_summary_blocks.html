@@ -43,24 +43,26 @@
                         <div class="old-visibility">{{ registration.visibility_before_override.title }}</div>
                         <div>{{ registration.visibility.title }}</div>
                     {% endif %}
-                    {% set tooltip_text -%}
-                        {%- if registration.participant_hidden -%}
-                            {% trans %}This will restore this participant's visibility based on the form's settings{% endtrans %}
-                        {%- else -%}
-                            {% trans %}This will hide this participant from the list of participants regardless of other settings{% endtrans %}
-                        {%- endif -%}
-                    {%- endset %}
-                    <button class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
-                            data-update="#registration-details"
-                            data-method="POST"
-                            data-href="{{ url_for('.hide_registration', registration) }}"
-                            title="{{ tooltip_text }}">
-                        {%- if registration.participant_hidden -%}
-                            {% trans %}Show participant{% endtrans %}
-                        {%- else -%}
-                            {% trans %}Hide participant{% endtrans %}
-                        {%- endif -%}
-                    </button>
+                    {% if registration.event.can_manage(session.user, permission='registration') %}
+                        {% set tooltip_text -%}
+                            {%- if registration.participant_hidden -%}
+                                {% trans %}This will restore this participant's visibility based on the form's settings{% endtrans %}
+                            {%- else -%}
+                                {% trans %}This will hide this participant from the list of participants regardless of other settings{% endtrans %}
+                            {%- endif -%}
+                        {%- endset %}
+                        <button class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
+                                data-update="#registration-details"
+                                data-method="POST"
+                                data-href="{{ url_for('.hide_registration', registration) }}"
+                                title="{{ tooltip_text }}">
+                            {%- if registration.participant_hidden -%}
+                                {% trans %}Show participant{% endtrans %}
+                            {%- else -%}
+                                {% trans %}Hide participant{% endtrans %}
+                            {%- endif -%}
+                        </button>
+                    {% endif %}
                 </div>
             {% else %}
                 <div id="registration-summary-consent-to-publish"
@@ -111,7 +113,10 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_registration_summary(registration, from_management=false) %}
+{% macro render_registration_summary(registration, from_management=false, can_manage_registration=none) %}
+    {% if can_manage_registration is none %}
+        {% set can_manage_registration = from_management %}
+    {% endif %}
     <div id="registration-summary" class="regform-done" data-bypass-target="{% trans %}Skip to registration summary{% endtrans %}">
         <div class="i-box-header">
             <div class="i-box-title">
@@ -139,13 +144,16 @@
         </div>
     </div>
     <div id="receipts-list">
-        {{ render_receipts_list(registration, from_management) }}
+        {{ render_receipts_list(registration, from_management, can_manage_registration) }}
     </div>
 {% endmacro %}
 
-{% macro render_receipts_list(registration, from_management=false) %}
-    {% set receipts = registration.receipt_files if from_management else registration.published_receipts %}
-    {% set can_generate_receipts = from_management and registration.event.has_receipt_templates() %}
+{% macro render_receipts_list(registration, from_management=false, can_manage_registration=none) %}
+    {% if can_manage_registration is none %}
+        {% set can_manage_registration = from_management %}
+    {% endif %}
+    {% set receipts = registration.receipt_files if can_manage_registration else (registration.published_receipts if not from_management else []) %}
+    {% set can_generate_receipts = can_manage_registration and registration.event.has_receipt_templates() %}
 
     {% if receipts or can_generate_receipts %}
         <div class="regform-done">
@@ -178,7 +186,7 @@
                                         <span class="unpublished-receipt-warning">({% trans %}not published{% endtrans %})</span>
                                     {% endif %}
                                 </td>
-                                {% if from_management -%}
+                                {% if can_manage_registration -%}
                                     <td class="actions-column">
                                         <div class="group right entry-action-buttons">
                                             {% if receipt.is_published %}
