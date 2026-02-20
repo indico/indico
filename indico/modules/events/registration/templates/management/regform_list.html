@@ -12,32 +12,34 @@
 {% endblock %}
 
 {% block content %}
-    {% if not event.has_feature('payment') %}
-        {% block payments_disabled_box %}
-            <div id="payment-disabled-notice" class="action-box highlight">
-                <div class="section">
-                    <div class="icon icon-coins"></div>
-                    <div class="text">
-                        <div class="label">
-                            {% trans %}Payments disabled{% endtrans %}
+    {% set can_manage_registration = event.can_manage(session.user, permission='registration') %}
+    {% if can_manage_registration %}
+        {% if not event.has_feature('payment') %}
+            {% block payments_disabled_box %}
+                <div id="payment-disabled-notice" class="action-box highlight">
+                    <div class="section">
+                        <div class="icon icon-coins"></div>
+                        <div class="text">
+                            <div class="label">
+                                {% trans %}Payments disabled{% endtrans %}
+                            </div>
+                            {% trans %}Payments are disabled for this event{% endtrans %}
                         </div>
-                        {% trans %}Payments are disabled for this event{% endtrans %}
+                        {% if event.can_manage(session.user) %}
+                            <div class="toolbar hide-if-locked">
+                                <a href="#" class="js-enable-payments"
+                                   data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
+                                   data-method="PUT"
+                                   data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
+                                   data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
+                                    {% trans %}Enable payments{% endtrans %}
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
-                    {% if event.can_manage(session.user) %}
-                        <div class="toolbar hide-if-locked">
-                            <a href="#" class="js-enable-payments"
-                               data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
-                               data-method="PUT"
-                               data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
-                               data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
-                                {% trans %}Enable payments{% endtrans %}
-                            </a>
-                        </div>
-                    {% endif %}
                 </div>
-            </div>
-        {% endblock %}
-    {% endif %}
+            {% endblock %}
+        {% endif %}
 
     {% block global_registration_actions_box %}
         <div class="action-box">
@@ -121,6 +123,7 @@
         </div>
     {% endblock %}
     {{ template_hook('extra-registration-settings', event=event) }}
+    {% endif %}
     <div class="regform-list">
         <h3>{% trans %}List of registration forms{% endtrans %}</h3>
         {% for regform in regforms %}
@@ -149,29 +152,31 @@
                                 {% endblock %}
                             </a>
                         </div>
-                        <div class="group">
-                            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
-                                {% trans %}Manage{% endtrans %}
-                            </a>
-                        </div>
-                        <div class="group hide-if-locked">
-                            <button class="i-button icon-copy"
-                                    title="{% trans %}Clone this registration form{% endtrans %}"
-                                    data-href="{{ url_for('.clone_regform', regform) }}"
-                                    data-title="{% trans %}Clone registration form{% endtrans %}"
-                                    data-ajax-dialog></button>
-                        </div>
-                        {% block delete_regform_button scoped %}
-                            <div class="group hide-if-locked">
-                                <button class="i-button icon-remove danger text-color"
-                                        title="{% trans %}Delete this registration form{% endtrans %}"
-                                        data-qtip-style="danger"
-                                        data-href="{{ url_for('.delete_regform', regform) }}"
-                                        data-method="POST"
-                                        data-title="{% trans %}Delete registration form?{% endtrans %}"
-                                        data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></button>
+                        {% if can_manage_registration %}
+                            <div class="group">
+                                <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
+                                    {% trans %}Manage{% endtrans %}
+                                </a>
                             </div>
-                        {% endblock %}
+                            <div class="group hide-if-locked">
+                                <button class="i-button icon-copy"
+                                        title="{% trans %}Clone this registration form{% endtrans %}"
+                                        data-href="{{ url_for('.clone_regform', regform) }}"
+                                        data-title="{% trans %}Clone registration form{% endtrans %}"
+                                        data-ajax-dialog></button>
+                            </div>
+                            {% block delete_regform_button scoped %}
+                                <div class="group hide-if-locked">
+                                    <button class="i-button icon-remove danger text-color"
+                                            title="{% trans %}Delete this registration form{% endtrans %}"
+                                            data-qtip-style="danger"
+                                            data-href="{{ url_for('.delete_regform', regform) }}"
+                                            data-method="POST"
+                                            data-title="{% trans %}Delete registration form?{% endtrans %}"
+                                            data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></button>
+                                </div>
+                            {% endblock %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -182,13 +187,15 @@
         {% endfor %}
     </div>
 
-    <div class="toolbar f-j-end hide-if-locked">
-        {% block create_form_button %}
-            <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus">
-                {%- trans %}Create form{% endtrans -%}
-            </a>
-        {% endblock %}
-    </div>
+    {% if can_manage_registration %}
+        <div class="toolbar f-j-end hide-if-locked">
+            {% block create_form_button %}
+                <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus">
+                    {%- trans %}Create form{% endtrans -%}
+                </a>
+            {% endblock %}
+        </div>
+    {% endif %}
 
     <script>
         setupRegistrationFormListPage();

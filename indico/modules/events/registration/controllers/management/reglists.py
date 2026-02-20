@@ -189,6 +189,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event."""
 
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
     ALLOW_LOCKED = True
 
     def _process_GET(self):
@@ -209,6 +210,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 class RHRegistrationListStaticURL(RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list."""
 
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
     ALLOW_LOCKED = True
 
     def _process(self):
@@ -229,6 +231,8 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
     """Download a file attached to a registration."""
+
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
 
     normalize_url_spec = {
         'locators': {
