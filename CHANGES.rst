@@ -153,6 +153,7 @@ Improvements
   buttons for guests and users who do not have access to them (:pr:`7332`, thanks
   :user:`jbtwist, unconventionaldotdev`)
 - Add option to filter room booking calendar to show only unused rooms (:pr:`7350`)
+- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
@@ -355,7 +356,6 @@ Improvements
 - Show a warning when bulk registration approval/rejection skips registrations that are not
   pending (:issue:`7197`, :pr:`7205`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add a JSON endpoint that returns the event's program/tracks (:pr:`7207`)
-- Limit the number of evaluations on the PRM (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
