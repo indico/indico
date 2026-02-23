@@ -359,7 +359,6 @@ class RHTimetableContribution(RHManageContributionBase):
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
-
     class ScheduleContribSchema(mm.Schema):
         contrib_id = fields.Int(required=True)
         start_dt = fields.DateTime(required=True)
@@ -372,10 +371,6 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
         self.session_block = None
         if block_id is not None:
             self.session_block = self.event.get_session_block(request.view_args['block_id'])
-            if self.session_block is None:
-                raise NotFound
-            if self.session and self.session != self.session_block.session:
-                raise BadRequest
 
     @use_kwargs({
         'contribs': fields.List(fields.Nested(ScheduleContribSchema), required=True),
@@ -390,6 +385,8 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
 
         with track_time_changes():
             for contrib in query:
+                if self.session_block is None:
+                    contrib.session = None
                 if self.session and contrib.session_id != self.session.id:
                     # TODO(tomas): Allow scheduling contributions assigned to other sessions?
                     raise Forbidden('Contribution not assigned to this session')
