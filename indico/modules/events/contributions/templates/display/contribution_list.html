@@ -17,10 +17,11 @@
             <div id="counter" class="group">
                 {{- render_displayed_entries_fragment(contribs|length, total_entries) -}}
             </div>
-            <div class="group">
+            <label class="group">
                 <span class="i-button label icon-search"></span>
+                <span class="contrib-search-label">{% trans %}Search contributions{% endtrans %}</span>
                 <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
-            </div>
+            </label>
             {% if not g.static_site %}
                 <div class="group">
                     <ind-with-tooltip>

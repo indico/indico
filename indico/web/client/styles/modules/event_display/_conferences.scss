@@ -6,6 +6,11 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
+
+.contrib-search-label {
+  @extend %visually-hidden;
+}
 
 .author-info {
   table-layout: auto;
