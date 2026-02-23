@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon} from 'semantic-ui-react';
+import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -266,6 +266,7 @@ export default function ContributionEntry({
           duration={duration}
           timeRange={timeRange}
           type={type}
+          {...(isPosterBlock ? {icon: 'flag outline'} : {})}
         />
         {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
@@ -315,11 +316,13 @@ export function EntryTitle({
   timeRange,
   type,
   duration,
+  icon,
 }: {
   title: string;
   timeRange: string;
   type: EntryType;
   duration?: number;
+  icon?: SemanticICONS;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [lines, setLines] = useState<number>(1);
@@ -342,7 +345,7 @@ export function EntryTitle({
       }}
     >
       <div styleName="title-overflow-wrapper">
-        <Icon name={getIconByEntryType(type)} />
+        <Icon name={icon || getIconByEntryType(type)} />
         <span
           styleName="title"
           style={{

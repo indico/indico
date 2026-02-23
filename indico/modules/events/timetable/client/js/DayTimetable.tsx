@@ -29,8 +29,8 @@ import {
   layoutAfterUnscheduledDropOnBlock,
   layoutGroup,
 } from './layout';
+import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import TimetableManageModal from './TimetableManageModal';
 import {ReduxState, TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
@@ -127,6 +127,19 @@ export function DayTimetable({
   const isDragging = draggingStartPos !== null;
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
+
+  const {openModal} = useModal();
+
+  function handleOpenDraftModal() {
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+        setDraggingStartPos(null);
+      },
+    });
+  }
 
   function handleDragEnd(
     who: string,
@@ -408,7 +421,11 @@ export function DayTimetable({
     }
 
     function onMouseUp() {
-      if (isDragging && draftEntry) {
+      if (draftEntry) {
+        handleOpenDraftModal();
+      }
+
+      if (isDragging) {
         setDraggingStartPos(null);
       }
     }
@@ -482,16 +499,6 @@ export function DayTimetable({
                     )
                   : null}
               </div>
-              {!isDragging && draftEntry && (
-                <TimetableManageModal
-                  eventId={eventId}
-                  onClose={() => {
-                    dispatch(actions.setDraftEntry(null));
-                    setDraggingStartPos(null);
-                  }}
-                  entry={draftEntry}
-                />
-              )}
             </div>
           </DnDCalendar>
         </div>

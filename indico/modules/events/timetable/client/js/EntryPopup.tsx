@@ -23,6 +23,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
+import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {
   ReduxState,
@@ -32,6 +33,7 @@ import {
   EntryType,
   PersonLinkRole,
   isChildEntry,
+  SessionBlockId,
 } from './types';
 import {getIconByEntryType, mapTTDataToEntry} from './utils';
 
@@ -65,6 +67,7 @@ function EntryPopupContent({
   const startTime = moment(startDt);
   const endTime = moment(startDt).add(duration, 'minutes');
   const entryParent = isChildEntry(entry) ? entry.parent : null;
+  const {openModal} = useModal();
 
   const _getOrderedLocationArray = () => {
     const {address, venueName, roomName} = entry.locationData;
@@ -100,6 +103,13 @@ function EntryPopupContent({
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+      },
+    });
   };
 
   const onCreateChild = (e: React.MouseEvent) => {
@@ -153,8 +163,9 @@ function EntryPopupContent({
   };
 
   const onShowPosterContributions = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: entry.id as SessionBlockId});
     onClose();
+    e.stopPropagation();
     // dispatch(actions.setPosterSessionBlockToShow(entry.id));
   };
 

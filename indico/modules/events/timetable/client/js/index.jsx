@@ -14,6 +14,7 @@ import {UserSearchTokenContext} from 'indico/react/components/principals/Search'
 import createReduxStore from 'indico/utils/redux';
 
 import {setSessionData, setTimetableData} from './actions';
+import {ModalProvider} from './ModalContext';
 import reducers from './reducers';
 import Timetable from './Timetable';
 import {getCurrentDateLocalStorage} from './utils';
@@ -58,7 +59,9 @@ import {getCurrentDateLocalStorage} from './utils';
       ReactDOM.render(
         <Provider store={store}>
           <UserSearchTokenContext.Provider value={searchToken}>
-            <Timetable />
+            <ModalProvider>
+              <Timetable />
+            </ModalProvider>
           </UserSearchTokenContext.Provider>
         </Provider>,
         root
