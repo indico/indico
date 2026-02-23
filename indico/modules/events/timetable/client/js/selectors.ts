@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, EntryType, ReduxState, Session} from './types';
+import {BlockEntry, EntryType, EntryUniqueID, ReduxState, Session} from './types';
 import {
   DAY_SIZE,
   getDiffInDays,
@@ -104,7 +104,7 @@ export const getCurrentDayEntries = createSelector(
 export const isPosterSessionBlock = createSelector(
   getSessions,
   getCurrentDayEntries,
-  (_state: ReduxState, id: string) => id,
+  (_state: ReduxState, id: EntryUniqueID) => id,
   (sessions, dayEntries, id) => {
     const entry = dayEntries.find(e => e.id === id);
     const session = sessions[entry?.sessionId];

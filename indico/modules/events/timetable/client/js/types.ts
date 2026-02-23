@@ -24,6 +24,11 @@ export type HexColor = `#${string}`;
 
 export type EventType = 'lecture' | 'meeting' | 'conference';
 
+export type SessionBlockId = `s${number}`;
+export type BreakId = `b${number}`;
+export type ContribId = `c${number}`;
+export type EntryUniqueID = SessionBlockId | BreakId | ContribId;
+
 export interface PersonLink {
   affiliation: string;
   avatarURL: string;
@@ -70,7 +75,7 @@ export interface Session {
 
 export interface BaseEntry {
   type: EntryType;
-  id: string;
+  id: EntryUniqueID;
   objId: number;
   title: string;
   duration: number;
@@ -96,17 +101,20 @@ export interface UnscheduledContribEntry extends BaseEntry {
 }
 
 export interface ContribEntry extends BaseEntry, ScheduledMixin {
+  id: ContribId;
   type: EntryType.Contribution;
   attachments?: Attachment[];
   sessionId?: number;
 }
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
+  id: BreakId;
   type: EntryType.Break;
   sessionId?: number;
 }
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
+  id: SessionBlockId;
   type: EntryType.SessionBlock;
   sessionId: number;
   sessionTitle: string;
@@ -174,7 +182,7 @@ interface StaticData {
 export interface Navigation {
   currentDate: Moment;
   isExpanded: boolean;
-  expandedSessionBlockId: string | null;
+  expandedSessionBlockId: EntryUniqueID | null;
 }
 
 export interface ReduxState {
