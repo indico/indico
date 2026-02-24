@@ -26,6 +26,8 @@ Accessibility
 
 - Screen readers now announce the filtering state indicator descriptive text instead of
   just the short numeric label (:pr:`7335`, thanks :user:`foxbunny`)
+- Screen reader users can now identify the search field on the contribution list page
+  (:pr:`7343`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
