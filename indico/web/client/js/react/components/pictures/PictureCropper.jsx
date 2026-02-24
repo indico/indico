@@ -62,7 +62,7 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             styleName="cropper-action-btn"
             icon="check"
             primary
-            content={Translate.string('Save Changes')}
+            content={Translate.string('Save changes')}
             onClick={onCrop}
           />
         </Button.Group>
