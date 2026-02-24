@@ -5,24 +5,32 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
-from werkzeug.exceptions import NotFound
+from flask import session
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.core.errors import NoReportError
+from indico.modules.events.models.events import Event
 from indico.modules.events.models.series import EventSeries
 from indico.modules.events.series.schemas import EventSeriesSchema, EventSeriesUpdateSchema
 from indico.util.i18n import _
-from indico.web.args import use_rh_args
-from indico.web.rh import RH
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_kwargs, use_rh_args
+from indico.web.rh import RHProtected
 
 
-class RHEventSeries(RH):
-    def _process_args(self):
-        self.series = None
-        if 'series_id' in request.view_args:
-            self.series = EventSeries.get(request.view_args['series_id'])
-            if self.series is None:
-                raise NotFound(_('A series with this ID does not exist.'))
+class RHEventSeries(RHProtected):
+    @use_kwargs({
+        'series': ModelField(EventSeries, load_default=None, data_key='series_id')
+    }, location='view_args')
+    def _process_args(self, series):
+        self.series = series
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if self.series and not self.series.can_manage(session.user):
+            raise NoReportError.wrap_exc(Forbidden(_('You can only manage a series if you can manage all its events.')))
+        # XXX for POST the check for event management access is done in EventSeriesUpdateSchema
 
     def _process_GET(self):
         return EventSeriesSchema().dump(self.series)
@@ -39,5 +47,6 @@ class RHEventSeries(RH):
         return '', 204
 
     def _process_DELETE(self):
+        Event.query.filter_by(series_id=self.series.id, is_deleted=True).update({Event.series_id: None})
         db.session.delete(self.series)
         return '', 204

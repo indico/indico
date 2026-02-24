@@ -45,5 +45,10 @@ class EventSeries(db.Model):
     # relationship backrefs:
     # - events (Event.series)
 
+    def can_manage(self, user):
+        if not user:
+            return False
+        return all(evt.can_manage(user) for evt in self.events)
+
     def __repr__(self):
         return format_repr(self, 'id')
