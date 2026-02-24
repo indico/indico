@@ -3,12 +3,14 @@
 
 {% macro render_contribution_list(event, timezone, contributions, total_entries=none, with_session_info=true) %}
     {% if contributions %}
-        {% for contrib in contributions | selectattr('start_dt_display') | sort(attribute='title') | sort(attribute='start_dt_display') %}
-            {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
-        {% endfor %}
-        {% for contrib in contributions | rejectattr('start_dt_display') | sort(attribute='title') %}
-            {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
-        {% endfor %}
+        <ol class="contribution-list-items">
+            {% for contrib in contributions | selectattr('start_dt_display') | sort(attribute='title') | sort(attribute='start_dt_display') %}
+                {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
+            {% endfor %}
+            {% for contrib in contributions | rejectattr('start_dt_display') | sort(attribute='title') %}
+                {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
+            {% endfor %}
+        </ol>
     {%- else %}
         {% if total_entries is none %}{% set total_entries = contributions|length %}{% endif %}
         {%- call message_box('info') %}
@@ -24,7 +26,7 @@
 {% endmacro %}
 
 {% macro _render_contribution_row(timezone, contrib, with_session_info=true) %}
-    <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
+    <li class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
         <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
             <span class="value">
                 <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
@@ -78,5 +80,5 @@
                 </div>
             </a>
         {%- endif %}
-    </div>
+    </li>
 {% endmacro %}

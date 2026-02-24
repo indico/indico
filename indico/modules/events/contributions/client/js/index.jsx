@@ -412,8 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
     const filterConfig = {
-      itemHandle: 'div.contribution-row',
-      listItems: '#display-contribution-list div.contribution-row',
+      itemHandle: '.contribution-row',
+      listItems: '#display-contribution-list .contribution-row',
       term: '#search-input',
       state: '#filtering-state',
       placeholder: '#filter-placeholder',
