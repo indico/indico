@@ -21,7 +21,7 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
     <div styleName="picture-outer-div">
       <div styleName="picture-inner-div cropper-inner-div" style={{width: size}}>
         <Header as="h3" color="grey">
-          <Translate>Save changes</Translate>
+          <Translate>Edit picture</Translate>
         </Header>
         <Cropper
           ref={cropperRef}
