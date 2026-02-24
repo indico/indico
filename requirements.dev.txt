@@ -67,7 +67,7 @@ h11==0.16.0
     # via uvicorn
 hatch-requirements-txt==0.4.1
     # via -r requirements.dev.in
-hatchling==1.28.0
+hatchling==1.29.0
     # via
     #   -r requirements.dev.in
     #   hatch-requirements-txt
@@ -80,7 +80,7 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.3.0
     # via pytest
-isort==7.0.0
+isort==8.0.0
     # via -r requirements.dev.in
 itsdangerous==2.2.0
     # via
@@ -122,7 +122,7 @@ port-for==1.0.0
     # via pytest-redis
 psutil==7.2.2
     # via mirakuru
-psycopg==3.3.2
+psycopg==3.3.3
     # via results
 psycopg-pool==3.3.0
     # via psycopg
@@ -172,13 +172,13 @@ requests==2.32.5
     #   plantweb
     #   responses
     #   sphinx
-responses==0.25.8
+responses==0.26.0
     # via -r requirements.dev.in
 results==1.4.1770293316
     # via -r requirements.dev.in
 roman-numerals==4.1.0
     # via sphinx
-ruff==0.15.1
+ruff==0.15.2
     # via -r requirements.dev.in
 six==1.17.0
     # via
@@ -243,9 +243,9 @@ urllib3==2.6.3
     #   docker
     #   requests
     #   responses
-uv==0.10.3
+uv==0.10.5
     # via -r requirements.dev.in
-uvicorn==0.40.0
+uvicorn==0.41.0
     # via sphinx-autobuild
 watchfiles==1.1.1
     # via

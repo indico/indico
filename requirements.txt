@@ -136,7 +136,7 @@ fonttools==4.61.1
     # via weasyprint
 google-auth==2.48.0
     # via -r requirements.in
-greenlet==3.3.1
+greenlet==3.3.2
     # via sqlalchemy
 hiredis==3.3.0
     # via redis
@@ -144,7 +144,7 @@ html2text==2025.4.15
     # via -r requirements.in
 html5lib==1.1
     # via lxml
-icalendar==7.0.0
+icalendar==7.0.2
     # via -r requirements.in
 idna==3.11
     # via
@@ -251,7 +251,7 @@ pyasn1==0.6.2
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
-pycountry==24.6.1
+pycountry==26.2.16
     # via -r requirements.in
 pycparser==3.0
     # via cffi
@@ -264,7 +264,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
 pynpm==0.3.0
     # via pywebpack
-pypdf==6.7.1
+pypdf==6.7.3
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
@@ -341,11 +341,12 @@ traitlets==5.14.3
     #   matplotlib-inline
 translitcodec==0.7.0
     # via -r requirements.in
-typeguard==4.5.0
+typeguard==4.5.1
     # via marshmallow-dataclass
 typing-extensions==4.15.0
     # via
     #   alembic
+    #   icalendar
     #   limits
     #   referencing
     #   typeguard
