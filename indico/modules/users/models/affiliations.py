@@ -102,9 +102,9 @@ class Affiliation(db.Model):
             return existing
         return cls(**affiliation_data)
 
-    def log(self, *args, **kwargs):
+    def log(self, *args, meta=None, **kwargs):
         """Log with prefilled metadata for the affiliation."""
-        return AppLogEntry.log(*args, meta={'affiliation_id': self.id}, **kwargs)
+        return AppLogEntry.log(*args, meta=dict(meta or {}, affiliation_id=self.id), **kwargs)
 
 
 define_unaccented_lowercase_index(Affiliation.searchable_names, Affiliation.__table__,
