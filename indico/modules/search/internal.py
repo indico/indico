@@ -7,7 +7,7 @@
 
 import itertools
 
-from marshmallow import fields
+from marshmallow import EXCLUDE, fields
 from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload, selectinload, subqueryload, undefer
 from werkzeug.exceptions import BadRequest
 
@@ -56,6 +56,9 @@ def _apply_acl_entry_strategy(rel, principal):
 class _InternalSearchArgs(mm.Schema):
     category_id = fields.Int()
     event_id = fields.Int()
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 def _apply_event_access_strategy(rel):
