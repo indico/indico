@@ -186,6 +186,12 @@
   }
 }
 
+.contribution-list-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .contribution-list,
 .track-review-list {
   @include font-family-modern-body();

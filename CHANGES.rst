@@ -28,6 +28,8 @@ Accessibility
   just the short numeric label (:pr:`7335`, thanks :user:`foxbunny`)
 - Screen reader users can now identify the search field on the contribution list page
   (:pr:`7343`, thanks :user:`foxbunny`)
+- The contribution list is now announced as a list by screen readers, conveying the
+  number of items (:pr:`7346`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
