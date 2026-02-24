@@ -18,6 +18,8 @@ Bugfixes
 - Show event role dropdown when editing contribution/session ACLs (:pr:`7339`)
 - Fix error when loading category search results with extra query string params
   from external search plugins (:pr:`7345`)
+- Require management access to all events in a series to manage it (:pr:`7348`)
+- Fix deleting an event series that contains deleted events (:pr:`7348`)
 
 Accessibility
 ^^^^^^^^^^^^^
