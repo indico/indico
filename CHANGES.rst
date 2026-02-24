@@ -10,7 +10,8 @@ Version 3.3.11
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Show picture field validation status in the registration form (:pr:`7337`,
+  thanks :user:`jbtwist, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

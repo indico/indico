@@ -21,7 +21,7 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
     <div styleName="picture-outer-div">
       <div styleName="picture-inner-div cropper-inner-div" style={{width: size}}>
         <Header as="h3" color="grey">
-          <Translate>Crop</Translate>
+          <Translate>Edit picture</Translate>
         </Header>
         <Cropper
           ref={cropperRef}
@@ -62,8 +62,7 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             styleName="cropper-action-btn"
             icon="check"
             primary
-            // i18n: Crop an image
-            content={Translate.string('Crop')}
+            content={Translate.string('Save changes')}
             onClick={onCrop}
           />
         </Button.Group>
