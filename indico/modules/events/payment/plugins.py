@@ -84,7 +84,7 @@ class PaymentPluginMixin:
 
     def get_invalid_regforms(self, event):
         """Return registration forms with incompatible currencies."""
-        from indico.modules.events.registration.models.forms import RegistrationForm
+        from indico.modules.formify.models.forms import RegistrationForm
         invalid_regforms = []
         if self.valid_currencies is not None:
             invalid_regforms = (RegistrationForm.query.with_parent(event)

@@ -14,11 +14,11 @@ from webargs import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, PrincipalList, make_validate_indico_placeholders,
                                      no_endpoint_links, no_relative_urls, not_empty)

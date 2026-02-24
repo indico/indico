@@ -8,7 +8,7 @@
 
 {% block back_button_url -%}
     {%- if preview -%}
-        {{ url_for('.manage_regform_list', event) }}
+        {{ url_for('event_registration.manage_regform_list', event) }}
     {%- endif -%}
 {%- endblock %}
 

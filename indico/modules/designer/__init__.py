@@ -89,7 +89,7 @@ def _get_designer_placeholders(sender, regform=None, **kwargs):
 
     if regform:
         from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
-        from indico.modules.events.registration.models.items import RegistrationFormItemType
+        from indico.modules.formify.models.items import RegistrationFormItemType
         for field in regform.active_fields:
             # Personal data fields are already included in the 'registrant' group
             if field.type != RegistrationFormItemType.field_pd:

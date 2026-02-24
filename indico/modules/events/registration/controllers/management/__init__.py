@@ -11,27 +11,27 @@ from sqlalchemy.orm import contains_eager, defaultload
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.formify.models.form_fields import RegistrationFormField
+from indico.modules.formify.models.forms import RegistrationForm
 
 
-class RHManageRegFormsBase(RHManageEventBase):
-    """Base class for all registration management RHs."""
+class RHEventManageRegFormsBase(RHManageEventBase):
+    """Base class for all event registration management RHs."""
 
     PERMISSION = 'registration'
 
 
-class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
-    """Base class for a specific registration form."""
+class RHEventManageRegFormBase(RegistrationFormMixin, RHEventManageRegFormsBase):
+    """Base class for a specific event registration form."""
 
     def _process_args(self):
-        RHManageRegFormsBase._process_args(self)
+        RHEventManageRegFormsBase._process_args(self)
         RegistrationFormMixin._process_args(self)
         self.list_generator = RegistrationListGenerator(regform=self.regform)
 
 
-class RHManageRegistrationBase(RHManageRegFormBase):
+class RHManageRegistrationBase(RHEventManageRegFormBase):
     """Base class for a specific registration."""
 
     normalize_url_spec = {
@@ -41,7 +41,7 @@ class RHManageRegistrationBase(RHManageRegFormBase):
     }
 
     def _process_args(self):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         self.registration = (Registration.query
                              .filter(Registration.id == request.view_args['registration_id'],
                                      ~Registration.is_deleted,
@@ -55,7 +55,7 @@ class RHManageRegistrationBase(RHManageRegFormBase):
                              .one())
 
 
-class RHManageRegistrationFieldActionBase(RHManageRegFormBase):
+class RHManageRegistrationFieldActionBase(RHEventManageRegFormBase):
     """Base class for a specific registration field."""
 
     normalize_url_spec = {
@@ -66,7 +66,7 @@ class RHManageRegistrationFieldActionBase(RHManageRegFormBase):
     }
 
     def _process_args(self):
-        RHManageRegFormBase._process_args(self)
+        RHEventManageRegFormBase._process_args(self)
         self.field = (RegistrationFormField.query
                       .filter(RegistrationFormField.id == request.view_args['field_id'],
                               RegistrationFormField.registration_form == self.regform,

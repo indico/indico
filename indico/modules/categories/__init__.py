@@ -86,6 +86,12 @@ def _get_management_permissions(sender, **kwargs):
     yield EventMoveRequestPermission
 
 
+@signals.menu.items.connect_via('category-management-sidemenu')
+def _sidemenu_items(sender, category, **kwargs):
+    yield SideMenuItem('registration', _('Registration'), url_for('categories.manage_regform_list', category),
+                       40, icon='list')
+
+
 class CreatorPermission(ManagementPermission):
     name = 'create'
     friendly_name = _('Event creation')

@@ -1,0 +1,87 @@
+{% if event is defined and not event.has_feature('payment') %}
+    {% block payments_disabled_box %}
+        <div id="payment-disabled-notice" class="action-box highlight">
+            <div class="section">
+                <div class="icon icon-coins"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Payments disabled{% endtrans %}
+                    </div>
+                    {% trans %}Payments are disabled for this event{% endtrans %}
+                </div>
+                {% if event.can_manage(session.user) %}
+                    <div class="toolbar hide-if-locked">
+                        <a href="#" class="js-enable-payments"
+                            data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
+                            data-method="PUT"
+                            data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
+                            data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
+                            {% trans %}Enable payments{% endtrans %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block global_registration_actions_box %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">{% trans %}Registration managers{% endtrans %}</div>
+                {% trans %}Add/remove users allowed to manage registrations{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <button class="i-button icon-settings"
+                            data-title="{% trans %}Manage registration managers{% endtrans %}"
+                            data-href="{{ url_for('.manage_registration_managers', target) }}"
+                            data-ajax-dialog>
+                        {%- trans %}Configure{% endtrans -%}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="icon icon-list"></div>
+            <div class="text">
+                <div class="label">{% trans %}Participant list{% endtrans %}</div>
+                {% trans %}Define how the participant list will be shown on the event page{% endtrans %}
+            </div>
+            {% if event is defined and event.type == 'conference' %}
+                <div class="toolbar">
+                    <div class="group">
+                        <a href="{{ url_for('.manage_participant_list_preview', target) }}" class="i-button icon-list">
+                            {%- trans %}Preview as participant{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="toolbar">
+                <div class="group">
+                    <a href="{{ url_for('.manage_regforms_display', target) }}" class="i-button icon-settings">
+                        {%- trans %}Customize{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% block tags_section %}
+            <div class="section">
+                <div class="icon icon-tag"></div>
+                <div class="text">
+                    <div class="label">{% trans %}Registration tags{% endtrans %}</div>
+                    {% trans %}Create tags to mark and filter registrations{% endtrans %}
+                </div>
+                <div class="toolbar">
+                    <div class="group">
+                        <a href="{{ url_for('.manage_registration_tags', target) }}" class="i-button icon-settings">
+                            {%- trans %}Configure{% endtrans -%}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

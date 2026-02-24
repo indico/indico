@@ -22,8 +22,8 @@ from indico.modules.events.management.views import WPEventSettings, render_event
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room

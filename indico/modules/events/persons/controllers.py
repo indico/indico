@@ -37,10 +37,10 @@ from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
 from indico.modules.events.persons.views import WPManagePersons
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.logs import LogKind
 from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation

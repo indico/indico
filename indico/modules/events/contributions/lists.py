@@ -16,10 +16,10 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import ListGeneratorBase
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 

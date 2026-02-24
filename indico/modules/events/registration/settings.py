@@ -7,8 +7,8 @@
 
 from indico.core.settings.converters import EnumConverter
 from indico.modules.designer import PageOrientation, PageSize
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.formify.models.items import PersonalDataType
 
 
 DEFAULT_BADGE_SETTINGS = {

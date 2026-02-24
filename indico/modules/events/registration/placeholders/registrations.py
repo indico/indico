@@ -8,7 +8,7 @@
 from flask import request
 from markupsafe import Markup
 
-from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.formify.models.items import PersonalDataType
 from indico.util.i18n import _
 from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 from indico.web.flask.util import url_for

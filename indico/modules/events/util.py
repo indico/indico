@@ -41,11 +41,11 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.settings import EventSetting
 from indico.modules.events.models.static_list_links import StaticListLink
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.formify.models.forms import RegistrationForm
 from indico.modules.networks import IPNetworkGroup
 from indico.modules.users import User
 from indico.util.caching import memoize_request
