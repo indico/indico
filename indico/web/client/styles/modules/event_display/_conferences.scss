@@ -198,6 +198,7 @@
 
   .contribution-row,
   .track-review-row {
+    position: relative;
     padding: 0 10px;
     border-left: 3px solid $pastel-gray;
     margin-bottom: 1em;
@@ -226,6 +227,25 @@
         position: absolute;
         background: linear-gradient(transparent 0.4em, white 4.2em);
       }
+    }
+
+    .description-link {
+      position: absolute;
+      inset: 0;
+
+      &:focus-visible {
+        outline: 2px solid $blue;
+        outline-offset: -2px;
+      }
+    }
+
+    .description-link-text {
+      @extend %visually-hidden;
+    }
+
+    .contrib-session a {
+      position: relative;
+      z-index: 1;
     }
 
     &:hover {

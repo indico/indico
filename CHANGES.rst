@@ -31,6 +31,8 @@ Accessibility
   (:pr:`7343`, thanks :user:`foxbunny`)
 - The contribution list is now announced as a list by screen readers, conveying the
   number of items (:pr:`7346`, thanks :user:`foxbunny`)
+- Contribution descriptions are no longer announced as links by screen readers
+  (:pr:`7349`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

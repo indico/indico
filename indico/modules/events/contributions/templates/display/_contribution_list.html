@@ -74,11 +74,12 @@
             {%- endif %}
         </div>
         {% if contrib.description -%}
-            <a href="{{ url_for('contributions.display_contribution', contrib) }}">
-                <div class="description js-mathjax">
-                    {{ contrib.description|truncate(400) }}
-                </div>
-            </a>
+            <div class="description js-mathjax">
+                {{ contrib.description|truncate(400) }}
+                <a class="description-link" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                    <span class="description-link-text">{% trans %}Go to contribution page{% endtrans %}</span>
+                </a>
+            </div>
         {%- endif %}
     </li>
 {% endmacro %}
