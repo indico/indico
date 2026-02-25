@@ -1,4 +1,4 @@
-{% from 'events/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_person_affiliation %}
 
 {% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations,
                            allow_custom_affiliations) %}
@@ -46,7 +46,7 @@
         {{ person.email }}
     </td>
     <td class="i-table affiliation-column">
-        {{ render_affiliation(person) }}
+        {{ render_person_affiliation(person) }}
     </td>
     <td class="i-table roles-column">
         {% for role, role_data in person_data.roles.items() %}

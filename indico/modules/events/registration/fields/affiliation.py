@@ -10,12 +10,16 @@ from marshmallow import ValidationError, fields
 from indico.core import signals
 from indico.core.db import db
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.base import FieldSetupSchemaBase, RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.users.models.affiliations import Affiliation
+from indico.modules.users.schemas import AffiliationSchema
+from indico.util.caching import memoize_request
 from indico.util.enum import IndicoIntEnum
 from indico.util.marshmallow import not_empty
 from indico.util.signals import values_from_signal
+from indico.web.flask.templating import get_template_module
 
 
 class AffiliationMode(IndicoIntEnum):
@@ -31,6 +35,12 @@ class AffiliationFieldDataSchema(FieldSetupSchemaBase):
 class AffiliationValueSchema(mm.Schema):
     id = fields.Integer(required=True, allow_none=True)
     text = fields.String(required=True)
+
+
+@memoize_request
+def _get_affiliation_details(affiliation_id):
+    affiliation = Affiliation.query.filter_by(id=affiliation_id, is_deleted=False).one_or_none()
+    return AffiliationSchema().dump(affiliation) if affiliation else None
 
 
 class AffiliationField(RegistrationFormFieldBase):
@@ -79,6 +89,16 @@ class AffiliationField(RegistrationFormFieldBase):
         if isinstance(data, dict):
             return data.get('text') or ''
         return data or ''
+
+    def _render_affiliation(self, value):
+        details = _get_affiliation_details(value['id']) if value['id'] is not None else None
+        return get_template_module('events/_affiliation.html').render_affiliation(value['text'], details)
+
+    def render_summary_data(self, data: RegistrationData):
+        return self._render_affiliation(data.data)
+
+    def render_reglist_column(self, data: RegistrationData) -> RegistrationListColumn:
+        return RegistrationListColumn(self._render_affiliation(data.data), data.search_data)
 
     def create_sql_filter(self, data_list):
         return db.func.coalesce(RegistrationData.data['text'].astext, RegistrationData.data.astext).in_(data_list)
