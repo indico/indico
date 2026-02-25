@@ -36,10 +36,11 @@ function ModalRoot({modal, closeModal}: any) {
           eventId={payload.eventId}
           entry={payload.entry}
           onClose={() => {
+            closeModal();
+
             if (payload.onClose) {
               payload.onClose();
             }
-            closeModal();
           }}
         />
       );
