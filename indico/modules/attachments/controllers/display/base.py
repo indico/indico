@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, session
+from flask import flash, redirect, request, session
 from marshmallow import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -60,7 +60,8 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             ]
             for pattern in sensitive_patterns:
                 if re.findall(pattern, content, re.IGNORECASE):
-                    raise Forbidden(_('The file cannot be downloaded because it contains sensitive data.'))
+                    flash(_('The file cannot be downloaded because it contains sensitive data.'), 'warning')
+                    return redirect(request.referrer or '/')
 
             inline = not force_download and should_inline_file(self.attachment.file.content_type)
             return self.attachment.file.send(inline=inline)
