@@ -106,8 +106,18 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.require_primary_author = kwargs.pop('require_primary_author', True)
         self.require_speaker = kwargs.pop('require_speaker', False)
         self.sort_by_last_name = True
+        self.invited_abstract_uuid = None
         self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
+
+    @property
+    def validate_email_url(self):
+        if not self.object or not self.search_token:
+            return None
+        kwargs = {}
+        if self.invited_abstract_uuid:
+            kwargs = {'invited_abstract_uuid': self.invited_abstract_uuid}
+        return url_for('events.check_email', self.object, **kwargs)
 
     @no_autoflush
     def _get_person_link(self, data):
