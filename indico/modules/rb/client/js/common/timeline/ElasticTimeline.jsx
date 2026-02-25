@@ -38,6 +38,7 @@ export default class ElasticTimeline extends React.Component {
     lazyScroll: PropTypes.object,
     extraContent: PropTypes.node,
     showUnused: PropTypes.bool,
+    showUsed: PropTypes.bool,
     fixedHeight: PropTypes.string,
     roomTimelineAction: PropTypes.bool,
     setDate: PropTypes.func.isRequired,
@@ -60,6 +61,7 @@ export default class ElasticTimeline extends React.Component {
     onClickLabel: null,
     lazyScroll: null,
     showUnused: true,
+    showUsed: true,
     fixedHeight: null,
     roomTimelineAction: false,
   };
@@ -188,6 +190,15 @@ export default class ElasticTimeline extends React.Component {
     }
   }
 
+  /** Filter out rooms that are already used */
+  filterUsed(rows, mode) {
+    if (mode === 'days') {
+      return rows.filter(({availability: av}) => !this.hasUsage(av));
+    } else {
+      return rows.filter(({availability: av}) => av.some(([, a]) => !this.hasUsage(a)));
+    }
+  }
+
   renderTimeline = () => {
     const {
       extraContent,
@@ -201,6 +212,7 @@ export default class ElasticTimeline extends React.Component {
       lazyScroll,
       datePicker: {minHour, maxHour, hourStep, mode, dateRange},
       showUnused,
+      showUsed,
       fixedHeight,
       emptyMessage,
       roomTimelineAction,
@@ -225,6 +237,10 @@ export default class ElasticTimeline extends React.Component {
 
     if (!showUnused) {
       rows = this.filterUnused(rows, mode);
+    }
+
+    if (!showUsed) {
+      rows = this.filterUsed(rows, mode);
     }
 
     if (!rows.length && !isLoading) {

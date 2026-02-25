@@ -60,6 +60,7 @@ export function initialRoomFilterStateFactory(namespace) {
     Object.assign(state, {
       myBookings: false,
       hideUnused: false,
+      hideUsed: false,
       showInactive: false,
     });
   }

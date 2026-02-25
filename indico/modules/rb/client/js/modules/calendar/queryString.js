@@ -38,6 +38,11 @@ const rules = {
     sanitizer: v.toBoolean(),
     stateField: boolStateField('filters.hideUnused'),
   },
+  hide_used: {
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+    stateField: boolStateField('filters.hideUsed'),
+  },
   show_inactive: {
     validator: v.isBoolean(),
     sanitizer: v.toBoolean(),
