@@ -235,7 +235,7 @@
             {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-link') }}
 
             {% block management_button %}
-                {% if not indico_config.CHECK_ACTION_PERMISSIONS or event.can_manage(session.user) %}
+                {% if show_management_button %}
                     <a class="i-button text-color subtle icon-edit"
                        href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
                        title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>

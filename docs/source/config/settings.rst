@@ -1101,6 +1101,7 @@ System
     to login when clicking).
 
     .. note::
+
         Enabling this setting incurs a performance cost as permission checks
         are performed during page rendering. These checks can be computationally
         expensive, especially in categories with complex permission structures
