@@ -576,7 +576,7 @@ msgstr "Ez a művelet visszafordíthatatlan"
 #: indico/modules/core/client/js/DeletionDialog.jsx
 #, python-brace-format
 msgid "Are you sure you want to delete {recordName}?"
-msgstr ""
+msgstr "Biztosan törölni szeretné ezt: {recordName}?"
 
 #: indico/modules/categories/templates/management/settings.html
 #: indico/modules/core/client/js/DeletionDialog.jsx
@@ -2078,12 +2078,16 @@ msgid ""
 "There are publishable file types that will not be displayed due to the 'Hide"
 " Accepted' setting being enabled."
 msgstr ""
+"Vannak olyan publikálható fájltípusok, amelyek nem jelennek meg, mert az "
+"\"Elfogadott elrejtése\" beállítás engedélyezve van."
 
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 msgid ""
 "No file types will be shown as there are no publishable file types and the "
 "'Hide Accepted' setting is disabled."
 msgstr ""
+"Semmilyen fájltípus nem jelenik meg, mivel nincsenek közzétehető "
+"fájltípusok, és a „Elfogadottak elrejtése” beállítás le van tiltva."
 
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
@@ -3148,12 +3152,12 @@ msgstr ""
 #, python-brace-format
 msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numInvitations} meghívót készül elküldeni."
+msgstr[1] "{numInvitations} meghívót készül elküldeni."
 
 #: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
 msgid "Please upload a valid CSV file."
-msgstr ""
+msgstr "Kérjük, töltsön fel érvényes CSV fájlt."
 
 #: indico/modules/events/registration/client/js/components/InvitationList.tsx
 msgid "Mark as declined"
@@ -3250,7 +3254,7 @@ msgstr "Meglévő meghívók kihagyása"
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Users with existing invitations will be ignored."
-msgstr ""
+msgstr "Meghívással rendelkező felhasználók nem lesznek figyelembe véve."
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #: indico/modules/events/registration/forms.py
@@ -3265,14 +3269,14 @@ msgstr "Új felhasználó"
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Import CSV"
-msgstr ""
+msgstr "CSV importálása"
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #, python-brace-format
 msgid "{count} invitation was skipped."
 msgid_plural "{count} invitations were skipped."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} meghívó került kihagyásra."
+msgstr[1] "{count} meghívó került kihagyásra."
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Skip moderation"
@@ -3313,23 +3317,23 @@ msgstr "Személyek meghívása"
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Send invitation email?"
 msgid_plural "Send invitation emails?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Elküldi a meghívó e-mailt?"
+msgstr[1] "Elküldi a meghívó e-maileket?"
 
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Send invitation"
 msgid_plural "Send invitations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Meghívó küldése"
+msgstr[1] "Meghívók küldése"
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #, python-brace-format
 msgid "You are about to send {count} invitation. Do you want to proceed?"
 msgid_plural ""
 "You are about to send {count} invitations. Do you want to proceed?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} meghívót készül elküldeni. Folytatni szeretné?"
+msgstr[1] "{count} meghívót készül elküldeni. Folytatni szeretné?"
 
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/events/registration/forms.py
@@ -3847,10 +3851,11 @@ msgstr "A minimális érték nem lehet nagyobb, mint a maximális érték."
 #: indico/modules/events/registration/client/js/form/fields/PhoneInput.jsx
 msgid "Please use the international phone number format (e.g. +41 1234567)"
 msgstr ""
+"Kérjük, használja a nemzetközi telefonszám formátumot (pl. +41 1234567)."
 
 #: indico/modules/events/registration/client/js/form/fields/PhoneInput.jsx
 msgid "Require international format (e.g. +41 1234567)"
-msgstr ""
+msgstr "Nemzetközi formátumot igényel (pl. +41 1234567)"
 
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgid "Minimum picture size"
@@ -7330,19 +7335,19 @@ msgstr "Felhasználó letiltásának feloldása"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Enter a JSON object"
-msgstr ""
+msgstr "Adjon meg egy JSON objektumot"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Street"
-msgstr ""
+msgstr "Utca"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Postal Code"
-msgstr ""
+msgstr "Irányítószám"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "City"
-msgstr ""
+msgstr "Város"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Select a country"
@@ -7357,23 +7362,24 @@ msgstr "Haladó"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Metadata (JSON)"
-msgstr ""
+msgstr " Metaadatok (JSON)"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Edit affiliation"
-msgstr ""
+msgstr "Szervezet szerkesztése"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Add affiliation"
-msgstr ""
+msgstr "Szervezet hozzáadása"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Alternative names"
-msgstr ""
+msgstr "Alternatív nevek"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Type a name and press Enter to add"
 msgstr ""
+"Írjon be egy nevet, majd nyomja meg az Enter billentyűt a hozzáadáshoz."
 
 #: indico/modules/events/contributions/models/fields.py
 #: indico/modules/users/client/js/affiliations/AffiliationListFilter.tsx
@@ -7382,20 +7388,20 @@ msgstr "Nincs érték megadva"
 
 #: indico/modules/users/client/js/affiliations/AffiliationListFilter.tsx
 msgid "Search affiliations..."
-msgstr ""
+msgstr "Szervezetek keresése..."
 
 #: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 msgid "No affiliations found."
-msgstr ""
+msgstr "Nincs kapcsolódó szervezet."
 
 #: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 msgid "No affiliations match the current filters."
-msgstr ""
+msgstr "Egyetlen szervezet sem felel meg a jelenlegi szűrőknek."
 
 #: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 #, python-brace-format
 msgid "Are you sure you want to delete the affiliation {affiliation}?"
-msgstr ""
+msgstr " Biztosan törölni szeretné a(z) {affiliation} szervezetet?"
 
 #: indico/modules/users/client/js/dashboard.jsx
 msgid "Events at hand"
@@ -7687,7 +7693,7 @@ msgstr "Még nincsenek szűrők hozzáadva"
 
 #: indico/web/client/js/react/components/ListFilter.jsx
 msgid "Search options..."
-msgstr ""
+msgstr "Keresési lehetőségek..."
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
@@ -8017,19 +8023,19 @@ msgstr "Új fájl kiválasztása a számítógépről"
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing the file failed."
-msgstr ""
+msgstr "A fájl feldolgozása sikertelen volt."
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Please upload a valid file."
-msgstr ""
+msgstr "Kérjük, egy érvényes fájlt töltsön fel."
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing file"
-msgstr ""
+msgstr "Fájl feldolgozása"
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing failed"
-msgstr ""
+msgstr "A feldolgozás sikertelen volt"
 
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx
 msgid "Upload failed"
@@ -8606,12 +8612,12 @@ msgstr "Véleményezés"
 #: indico/modules/events/registration/client/js/components/InviteDialogButton.jsx
 msgctxt "verb"
 msgid "Invite"
-msgstr ""
+msgstr "Meghívás"
 
 #: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 msgctxt "verb"
 msgid "Edit"
-msgstr ""
+msgstr "Szerkesztés"
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
@@ -13206,11 +13212,11 @@ msgstr "Az esemény címe"
 
 #: indico/modules/events/placeholders.py
 msgid "Event start date"
-msgstr ""
+msgstr "Az esemény kezdő dátuma"
 
 #: indico/modules/events/placeholders.py
 msgid "Event start time"
-msgstr ""
+msgstr "Az esemény kezdési ideje"
 
 #: indico/modules/events/placeholders.py
 #: indico/modules/events/registration/placeholders/registrations.py
@@ -13933,6 +13939,10 @@ msgid ""
 "that is not the default language of this Indico server, set the default "
 "language of this event before creating this notification."
 msgstr ""
+"Az alapértelmezett sablon, amely ennek az értesítésnek az alapjául szolgál. "
+"Ez később módosítható. Ha azt szeretné, hogy a szöveg egy adott nyelven "
+"jelenjen meg, ami nem az Indico szerver alapértelmezett nyelve, akkor az "
+"értesítés létrehozása előtt állítsa be az esemény alapértelmezett nyelvét."
 
 #: indico/modules/events/abstracts/forms.py
 #: indico/modules/events/contributions/forms.py
@@ -19638,7 +19648,7 @@ msgstr "Az Ön elrendezés felülvizsgálata folyamatban van"
 
 #: indico/modules/events/papers/templates/display/call_for_papers.html
 msgid "Papers awaiting my submission"
-msgstr ""
+msgstr "Beküldésre váró dokumentumok"
 
 #: indico/modules/events/papers/templates/display/call_for_papers.html
 #: indico/modules/events/papers/templates/management/overview.html
@@ -21638,7 +21648,7 @@ msgstr "Rendelkezik dokumentumokkal"
 
 #: indico/modules/events/registration/schemas.py
 msgid "Invalid email address."
-msgstr ""
+msgstr "Érvénytelen e-mail cím."
 
 #: indico/modules/events/registration/stats.py
 msgid "Accommodations paid"
@@ -21655,7 +21665,7 @@ msgstr "Összes"
 
 #: indico/modules/events/registration/util.py
 msgid "Not a valid CSV file."
-msgstr ""
+msgstr "Nem érvényes CSV fájl."
 
 #: indico/modules/events/registration/util.py
 #, python-brace-format
@@ -21837,7 +21847,7 @@ msgstr "Már regisztráltak a következő e-mail címekkel: {emails}"
 
 #: indico/modules/events/registration/controllers/management/invitations.py
 msgid "The uploaded CSV file is empty"
-msgstr ""
+msgstr "A feltöltött CSV fájl üres."
 
 #: indico/modules/events/registration/controllers/management/regforms.py
 msgid "The participants display settings have been saved."
@@ -21862,7 +21872,7 @@ msgstr "Regisztrációs űrlap törölve"
 
 #: indico/modules/events/registration/controllers/management/regforms.py
 msgid "Registration form cloned"
-msgstr ""
+msgstr "Regisztrációs űrlap klónozva"
 
 #: indico/modules/events/registration/controllers/management/regforms.py
 #, python-brace-format
@@ -21991,15 +22001,16 @@ msgstr ""
 #, python-brace-format
 msgid "{num} registration was successfully approved."
 msgid_plural "{num} registrations were successfully approved."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} regisztráció sikeresen jóvá lett hagyva."
+msgstr[1] "{num} regisztráció sikeresen jóvá lett hagyva."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
 msgid "{num} registration was not pending and has been skipped."
 msgid_plural "{num} registrations were not pending and have been skipped."
-msgstr[0] ""
+msgstr[0] "{num} regisztáció nem volt függőben, ezért ki lett hagyva."
 msgstr[1] ""
+" {num} regisztráció nem volt függőben, ezért azok ki lettek hagyva."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid ""
@@ -22013,8 +22024,8 @@ msgstr ""
 #, python-brace-format
 msgid "{num} registration was successfully rejected."
 msgid_plural "{num} registrations were successfully rejected."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} regisztráció sikeresen elutasításra került."
+msgstr[1] "{num} regisztráció sikeresen elutasításra került."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The selected registrations were successfully reset."
@@ -22162,6 +22173,8 @@ msgid ""
 "Please enter a valid phone number with international prefix (e.g., +41 "
 "1234567)"
 msgstr ""
+"Kérjük, adjon meg érvényes telefonszámot nemzetközi előhívószámmal (pl. +41 "
+"1234567)."
 
 #: indico/modules/events/registration/fields/simple.py
 msgid "Invalid file UUID"
@@ -23820,11 +23833,11 @@ msgstr "A regisztrációs űrlapok listája"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Clone this registration form"
-msgstr ""
+msgstr "Másolat készítése erről a regisztrációs űrlapról:"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Clone registration form"
-msgstr ""
+msgstr "Regisztrációs űrlap másolása"
 
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Delete this registration form"
@@ -24228,21 +24241,23 @@ msgstr "Legalább egy típusú címzettre van szükség."
 
 #: indico/modules/events/reminders/forms.py
 msgid "The specified date is in the past."
-msgstr ""
+msgstr "A megadott dátum már elmúlt."
 
 #: indico/modules/events/reminders/forms.py
 msgid ""
 "Recipient-specific placeholders are not allowed when email addresses are "
 "entered manually."
 msgstr ""
+"A címzett-specifikus helykitöltők nem megengedettek, ha az e-mail címeket "
+"manuálisan adják meg."
 
 #: indico/modules/events/reminders/placeholders.py
 msgid "First name of the recipient"
-msgstr ""
+msgstr "A címzett utóneve"
 
 #: indico/modules/events/reminders/placeholders.py
 msgid "Last name of the recipient"
-msgstr ""
+msgstr "A címzett családi neve"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html
 msgid "This reminder is overdue and will be sent within a few minutes."
@@ -26225,7 +26240,7 @@ msgstr "%(tz)s időzóna"
 
 #: indico/modules/events/templates/display/conference/base.html
 msgid "Event menu"
-msgstr ""
+msgstr "Esemény menü"
 
 #: indico/modules/events/templates/display/indico/_common.html
 msgid "Show room on map"
@@ -28617,7 +28632,7 @@ msgstr "Adminok"
 #: indico/modules/users/__init__.py
 #: indico/modules/users/templates/affiliations_dashboard.html
 msgid "Affiliations"
-msgstr ""
+msgstr "Szervezetek"
 
 #: indico/modules/users/__init__.py
 #: indico/modules/users/templates/dashboard.html
@@ -28970,11 +28985,11 @@ msgstr "A felhasználó, aki aktív marad a végén"
 
 #: indico/modules/users/forms.py
 msgid "Account creation notifications"
-msgstr ""
+msgstr "Fiók létrehozásáról szóló értesítések"
 
 #: indico/modules/users/forms.py
 msgid "Notify all admins"
-msgstr ""
+msgstr "Összes adminisztrátor értesítése"
 
 #: indico/modules/users/forms.py
 msgid ""
@@ -28986,13 +29001,15 @@ msgstr ""
 
 #: indico/modules/users/forms.py
 msgid "Notify emails"
-msgstr ""
+msgstr "E-mailek értesítése"
 
 #: indico/modules/users/forms.py
 msgid ""
 "List of email addresses that receive a notification whenever a new local "
 "account is created. One email address per line."
 msgstr ""
+"Azok az e-mail címek, amik értesítést kapnak, ha új helyi fiókot hoznak "
+"létre. Soronként egy e-mail cím."
 
 #: indico/modules/users/forms.py
 msgid "Email blacklist"
@@ -29329,7 +29346,7 @@ msgstr "Admin fiókot nem lehet törölni"
 #: indico/modules/users/templates/personal_data.html
 #, python-format
 msgid "Delete %(name)s"
-msgstr ""
+msgstr "%(name)s törlése"
 
 #: indico/modules/users/templates/personal_data.html
 msgid "Delete User"
@@ -29342,7 +29359,7 @@ msgstr "A törölt felhasználói fiókok nem állíthatók vissza."
 #: indico/modules/users/templates/personal_data.html
 #, python-format
 msgid "Yes, I want to delete %(name)s"
-msgstr ""
+msgstr "Igen, törölni szeretném %(name)s-t"
 
 #: indico/modules/users/templates/personal_data.html
 msgid "Once deleted, the following will happen:"
@@ -29353,6 +29370,7 @@ msgstr "A törlés után a következők történnek:"
 msgid ""
 "<strong>%(first_name)s</strong> will no longer be able to access Indico."
 msgstr ""
+"<strong>%(first_name)s</strong> nem fog többé hozzáférni az Indicohoz."
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -29361,6 +29379,10 @@ msgid ""
 "this does not affect their presence in events as a speaker or other role; "
 "they will still be listed in such capacities where applicable."
 msgstr ""
+"<strong>%(first_name)s</strong> eltávolításra kerül az Indico összes "
+"területéről – ez nem érinti az eseményeken való részvételét előadóként vagy "
+"más szerepkörben; továbbra is szerepelni fog az ilyen minőségében, ahol ez "
+"alkalmazható."
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -29369,6 +29391,9 @@ msgid ""
 "will be anonymized and all personal data associated with the user will be "
 "removed from Indico."
 msgstr ""
+"Ahol nem lehetséges <strong>%(first_name)s</strong> törlése, ott "
+"anonimizálásra kerül, és a felhasználóval kapcsolatos összes személyes adat "
+"eltávolításra kerül az Indicoból."
 
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_admin.html
@@ -30117,7 +30142,7 @@ msgstr "A jelszavaknak legalább {} karakter hosszúaknak kell lenniük."
 
 #: indico/util/passwords.py
 msgid "Passwords cannot be longer than 72 characters"
-msgstr ""
+msgstr "A jelszavak nem lehetnek hosszabbak 72 karakternél."
 
 #: indico/util/passwords.py
 msgid "Passwords may not contain the word \"indico\" or variations."
@@ -30354,7 +30379,7 @@ msgstr "Az oldal eléréséhez kérjük jelentkezzen be."
 
 #: indico/web/flask/errors.py
 msgid "Validation Error"
-msgstr ""
+msgstr "Érvényesítési hiba"
 
 #: indico/web/flask/errors.py
 #, python-brace-format
@@ -30371,7 +30396,7 @@ msgstr "Adatbázis hiba lépett fel kérésének feldolgozása alatt."
 
 #: indico/web/flask/errors.py
 msgid "Disallowed URL"
-msgstr ""
+msgstr "Nem engedélyezett URL"
 
 #: indico/web/forms/base.py
 msgid ""
