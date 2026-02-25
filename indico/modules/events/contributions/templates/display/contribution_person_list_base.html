@@ -2,7 +2,7 @@
 
 {% from 'events/display/indico/_common.html' import render_users %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
-{% from 'events/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_person_affiliation %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
 
@@ -45,7 +45,7 @@
                 </span>
                 {% if user_data.affiliation %}
                     <span class="affiliation" data-searchable="{{ user_data.affiliation | lower }}">
-                        <span class="text">({{ render_affiliation(user_data) }})</span>
+                        <span class="text">({{ render_person_affiliation(user_data) }})</span>
                     </span>
                 {% endif %}
             </span>
