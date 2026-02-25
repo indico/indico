@@ -96,7 +96,8 @@ function EntryPopupContent({
     data['type'] = type;
 
     const sessions = session ? {[session.id]: session} : {};
-    const draftEntry = mapTTDataToEntry(data, sessions);
+
+    const draftEntry = mapTTDataToEntry(data, sessions, entryParent);
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;
@@ -132,17 +133,23 @@ function EntryPopupContent({
     }
     const newChildDuration = session.defaultContribDurationMinutes;
     // TODO: (Michel) Disable time picker for any time after parent end time
-    dispatch(
-      actions.setDraftEntry({
-        startDt: newChildStartDt,
-        duration: newChildDuration,
-        sessionBlockId: entry.objId,
-        sessionId: entry.sessionId,
-        locationParent: entry.childLocationParent,
-        locationData: {...entry.childLocationParent.location_data, inheriting: true},
-        parent: {id, objId, title, colors},
-      })
-    );
+    const draftEntry = {
+      startDt: newChildStartDt,
+      duration: newChildDuration,
+      sessionBlockId: entry.objId,
+      sessionId: entry.sessionId,
+      locationParent: entry.childLocationParent,
+      locationData: {...entry.childLocationParent.location_data, inheriting: true},
+      parent: {id, objId, title, colors},
+    };
+    dispatch(actions.setDraftEntry(draftEntry));
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+      },
+    });
   };
 
   const onDelete = (e: React.MouseEvent) => {

@@ -142,6 +142,7 @@ export const mapTTDataToEntry = (
     code,
     keywords,
     sessionId,
+    sessionBlockId = parent?.id,
     sessionTitle,
   } = data;
 
@@ -176,7 +177,9 @@ export const mapTTDataToEntry = (
         colors: parent.colors,
         title: parent.title,
       },
-      sessionBlockId: parent.id,
+    }),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
     }),
   };
 
