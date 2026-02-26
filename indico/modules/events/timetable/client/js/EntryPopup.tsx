@@ -211,12 +211,6 @@ function EntryPopupContent({
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
               <Label circular empty style={{...styleColors}} />
-              {isPosterBlock && (
-                <Icon.Group>
-                  <Icon name="flag outline" />
-                  <Icon name="circle" color="red" size="mini" corner="bottom right" />
-                </Icon.Group>
-              )}
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
