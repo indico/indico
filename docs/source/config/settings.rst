@@ -1102,10 +1102,13 @@ System
 
     .. note::
 
-        Enabling this setting incurs a performance cost as permission checks
-        are performed during page rendering. These checks can be computationally
-        expensive, especially in categories with complex permission structures
-        (multiple groups, ACLs, etc.).
+        For performance reasons the access check for the "Create event" button only
+        takes into account permissions granted directly to the user, via a local group or via
+        a category role. When using externally-managed groups (e.g. LDAP), then this setting
+        should not be enabled as people may not see the button even though they have creation
+        privileges. When using a custom plugin that grants creation or management access to
+        categories bypassing Indico's usual permission system, this setting should also not be
+        used.
 
     Default: ``False``
 
