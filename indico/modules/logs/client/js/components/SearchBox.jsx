@@ -10,18 +10,27 @@ import React from 'react';
 
 export default class SearchBox extends React.Component {
   static propTypes = {
+    keyword: PropTypes.string,
     setKeyword: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    keyword: '',
+  };
+
   render() {
-    const {setKeyword} = this.props;
+    const {keyword, setKeyword} = this.props;
     return (
       <div className="toolbar">
         <div className="group">
           <span className="i-button label">
             <span className="icon-search" />
           </span>
-          <input type="text" onChange={e => setKeyword(e.target.value.trim())} />
+          <input
+            type="text"
+            value={keyword || ''}
+            onChange={e => setKeyword(e.target.value.trim())}
+          />
         </div>
       </div>
     );

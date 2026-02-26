@@ -11,6 +11,10 @@ import {connect} from 'react-redux';
 import {setKeyword, fetchLogEntries, setPage} from '../actions';
 import SearchBox from '../components/SearchBox';
 
+const mapStateToProps = state => ({
+  keyword: state.logs.keyword,
+});
+
 const mapDispatchToProps = dispatch => ({
   setKeyword: debounce(keyword => {
     dispatch(setKeyword(keyword));
@@ -19,4 +23,4 @@ const mapDispatchToProps = dispatch => ({
   }, 250),
 });
 
-export default connect(null, mapDispatchToProps)(SearchBox);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBox);
