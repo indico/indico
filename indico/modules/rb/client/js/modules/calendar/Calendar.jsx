@@ -123,21 +123,27 @@ class Calendar extends React.Component {
     });
   };
 
-  toggleHideUnused = () => {
+  toggleShowAll = () => {
     const {
-      localFilters: {hideUnused},
       actions: {setFilterParameter},
     } = this.props;
-    setFilterParameter('hideUnused', !hideUnused);
+    setFilterParameter('hideUnused', false);
     setFilterParameter('hideUsed', false);
   };
 
-  toggleHideUsed = () => {
+  toggleShowUsed = () => {
     const {
-      localFilters: {hideUsed},
       actions: {setFilterParameter},
     } = this.props;
-    setFilterParameter('hideUsed', !hideUsed);
+    setFilterParameter('hideUnused', true);
+    setFilterParameter('hideUsed', false);
+  };
+
+  toggleShowUnused = () => {
+    const {
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('hideUsed', true);
     setFilterParameter('hideUnused', false);
   };
 
@@ -169,21 +175,21 @@ class Calendar extends React.Component {
     const {view} = this.props;
 
     return (
-      <Button.Group size="small">
-        <ResponsivePopup
-          trigger={
-            <Button
-              primary={myBookings}
-              icon="user circle"
-              disabled={isFetching || isFetchingActiveBookings}
-              onClick={() => setFilterParameter('myBookings', !myBookings || null)}
-            />
-          }
-        >
-          <Translate>Show only my bookings</Translate>
-        </ResponsivePopup>
-        {view === 'timeline' && (
-          <>
+      <>
+        <Button.Group size="small">
+          <ResponsivePopup
+            trigger={
+              <Button
+                primary={myBookings}
+                icon="user circle"
+                disabled={isFetching || isFetchingActiveBookings}
+                onClick={() => setFilterParameter('myBookings', !myBookings || null)}
+              />
+            }
+          >
+            <Translate>Show only my bookings</Translate>
+          </ResponsivePopup>
+          {view === 'timeline' && (
             <ResponsivePopup
               trigger={
                 <Button
@@ -200,41 +206,47 @@ class Calendar extends React.Component {
                 <Translate>Show rejected/cancelled bookings</Translate>
               )}
             </ResponsivePopup>
-            <ResponsivePopup
-              trigger={
-                <Button
-                  primary={hideUnused}
-                  icon={hideUnused ? 'plus square outline' : 'minus square outline'}
-                  disabled={isFetching}
-                  onClick={this.toggleHideUnused}
-                />
-              }
-            >
-              {hideUnused ? (
-                <Translate>Show unused spaces</Translate>
-              ) : (
-                <Translate>Hide unused spaces</Translate>
-              )}
-            </ResponsivePopup>
-            <ResponsivePopup
-              trigger={
-                <Button
-                  primary={hideUsed}
-                  icon={hideUsed ? 'plus square outline' : 'minus square outline'}
-                  disabled={isFetching}
-                  onClick={this.toggleHideUsed}
-                />
-              }
-            >
-              {hideUsed ? (
-                <Translate>Show used spaces</Translate>
-              ) : (
-                <Translate>Hide used spaces</Translate>
-              )}
-            </ResponsivePopup>
-          </>
-        )}
-      </Button.Group>
+          )}
+        </Button.Group>
+        <Button.Group basic>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={hideUnused}
+                content={Translate.string('Used')}
+                disabled={isFetching}
+                onClick={this.toggleShowUsed}
+              />
+            }
+          >
+            <Translate>Show only used spaces</Translate>
+          </ResponsivePopup>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={!(hideUnused || hideUsed)}
+                content={Translate.string('All')}
+                disabled={isFetching}
+                onClick={this.toggleShowAll}
+              />
+            }
+          >
+            <Translate>Show all spaces</Translate>
+          </ResponsivePopup>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={hideUsed}
+                content={Translate.string('Unused')}
+                disabled={isFetching}
+                onClick={this.toggleShowUnused}
+              />
+            }
+          >
+            <Translate>Show only unused spaces</Translate>
+          </ResponsivePopup>
+        </Button.Group>
+      </>
     );
   };
 
