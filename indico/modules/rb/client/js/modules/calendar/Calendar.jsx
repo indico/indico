@@ -224,7 +224,7 @@ class Calendar extends React.Component {
           <ResponsivePopup
             trigger={
               <Button
-                active={!(hideUnused || hideUsed)}
+                active={!hideUnused && !hideUsed}
                 content={Translate.string('All')}
                 disabled={isFetching}
                 onClick={this.showAll}
