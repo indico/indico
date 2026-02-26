@@ -24,7 +24,7 @@ blinker==1.9.0
     #   flask
 build==1.4.0
     # via -r requirements.dev.in
-certifi==2026.1.4
+certifi==2026.2.25
     # via
     #   -c requirements.txt
     #   requests
@@ -178,7 +178,7 @@ results==1.4.1770293316
     # via -r requirements.dev.in
 roman-numerals==4.1.0
     # via sphinx
-ruff==0.15.2
+ruff==0.15.4
     # via -r requirements.dev.in
 six==1.17.0
     # via
@@ -243,7 +243,7 @@ urllib3==2.6.3
     #   docker
     #   requests
     #   responses
-uv==0.10.5
+uv==0.10.6
     # via -r requirements.dev.in
 uvicorn==0.41.0
     # via sphinx-autobuild

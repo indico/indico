@@ -43,7 +43,7 @@ celery==5.6.2
     # via
     #   -r requirements.in
     #   sentry-sdk
-certifi==2026.1.4
+certifi==2026.2.25
     # via
     #   -r requirements.in
     #   requests
