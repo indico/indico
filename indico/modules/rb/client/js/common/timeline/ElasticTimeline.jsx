@@ -195,7 +195,7 @@ export default class ElasticTimeline extends React.Component {
     if (mode === 'days') {
       return rows.filter(({availability: av}) => !this.hasUsage(av));
     } else {
-      return rows.filter(({availability: av}) => av.some(([, a]) => !this.hasUsage(a)));
+      return rows.filter(({availability: av}) => av.every(([, a]) => !this.hasUsage(a)));
     }
   }
 

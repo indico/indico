@@ -123,7 +123,7 @@ class Calendar extends React.Component {
     });
   };
 
-  toggleShowAll = () => {
+  showAll = () => {
     const {
       actions: {setFilterParameter},
     } = this.props;
@@ -131,7 +131,7 @@ class Calendar extends React.Component {
     setFilterParameter('hideUsed', false);
   };
 
-  toggleShowUsed = () => {
+  showUsed = () => {
     const {
       actions: {setFilterParameter},
     } = this.props;
@@ -139,7 +139,7 @@ class Calendar extends React.Component {
     setFilterParameter('hideUsed', false);
   };
 
-  toggleShowUnused = () => {
+  showUnused = () => {
     const {
       actions: {setFilterParameter},
     } = this.props;
@@ -215,7 +215,7 @@ class Calendar extends React.Component {
                 active={hideUnused}
                 content={Translate.string('Used')}
                 disabled={isFetching}
-                onClick={this.toggleShowUsed}
+                onClick={this.showUsed}
               />
             }
           >
@@ -227,7 +227,7 @@ class Calendar extends React.Component {
                 active={!(hideUnused || hideUsed)}
                 content={Translate.string('All')}
                 disabled={isFetching}
-                onClick={this.toggleShowAll}
+                onClick={this.showAll}
               />
             }
           >
@@ -239,7 +239,7 @@ class Calendar extends React.Component {
                 active={hideUsed}
                 content={Translate.string('Unused')}
                 disabled={isFetching}
-                onClick={this.toggleShowUnused}
+                onClick={this.showUnused}
               />
             }
           >
