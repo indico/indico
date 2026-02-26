@@ -29,9 +29,6 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
-from indico.modules.categories.models.categories import Category
-from indico.modules.categories.models.principals import CategoryPrincipal
-from indico.modules.categories.models.roles import CategoryRole, role_members_table
 from indico.modules.logs import UserLogEntry
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
@@ -671,34 +668,42 @@ class User(PersonMixin, db.Model):
         return self == user or user.is_admin
 
     def has_create_permission(self):
-        """Check if the user has create events permissions somewhere."""
+        """Check if the user has create events permissions somewhere.
+
+        For performance reasons this only checks local groups and roles, but
+        ignores any membership in remote (multipass) groups from LDAP or similar
+        provides. It also does not take into account any permissions granted
+        through plugins that affect the regular user permission checks.
+        """
+        from indico.modules.categories.models.categories import Category
+        from indico.modules.categories.models.principals import CategoryPrincipal
+        from indico.modules.categories.models.roles import CategoryRole
         from indico.modules.categories.util import can_create_unlisted_events
+        from indico.modules.groups.models.groups import LocalGroup
 
-        return (self.is_admin or
-                can_create_unlisted_events(self) or
-                self._has_create_via_acl() or
-                self._has_create_via_role())
-
-    def _has_create_via_acl(self):
-        return db.session.query(Category.id).join(
-            CategoryPrincipal, CategoryPrincipal.category_id == Category.id).filter(
-                ~Category.is_deleted,
-                CategoryPrincipal.user_id == self.id,
-                CategoryPrincipal.has_management_permission('create')
-            ).has_rows()
-
-    def _has_create_via_role(self):
-        return db.session.query(Category.id).join(
-            CategoryPrincipal, CategoryPrincipal.category_id == Category.id
-        ).join(
-            CategoryRole, CategoryPrincipal.category_role_id == CategoryRole.id
-        ).join(
-            role_members_table, role_members_table.c.role_id == CategoryRole.id
-        ).filter(
-            ~Category.is_deleted,
-            role_members_table.c.user_id == self.id,
-            CategoryPrincipal.has_management_permission('create')
-        ).has_rows()
+        return (
+            self.is_admin
+            or can_create_unlisted_events(self)
+            or (
+                CategoryPrincipal.query.join(Category)
+                .filter(
+                    ~Category.is_deleted,
+                    CategoryPrincipal.has_management_permission('create'),
+                )
+                .filter(
+                    db.or_(
+                        CategoryPrincipal.user == self,
+                        CategoryPrincipal.local_group.has(
+                            LocalGroup.members.any(User.id == self.id)
+                        ),
+                        CategoryPrincipal.category_role.has(
+                            CategoryRole.members.any(User.id == self.id)
+                        ),
+                    )
+                )
+                .has_rows()
+            )
+        )
 
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.
