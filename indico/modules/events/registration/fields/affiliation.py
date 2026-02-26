@@ -14,7 +14,6 @@ from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.base import FieldSetupSchemaBase, RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.users.models.affiliations import Affiliation
-from indico.modules.users.schemas import AffiliationSchema
 from indico.util.caching import memoize_request
 from indico.util.enum import IndicoIntEnum
 from indico.util.marshmallow import not_empty
@@ -39,6 +38,7 @@ class AffiliationValueSchema(mm.Schema):
 
 @memoize_request
 def _get_affiliation_details(affiliation_id):
+    from indico.modules.users.schemas import AffiliationSchema
     affiliation = Affiliation.query.filter_by(id=affiliation_id, is_deleted=False).one_or_none()
     return AffiliationSchema().dump(affiliation) if affiliation else None
 
@@ -66,22 +66,27 @@ class AffiliationField(RegistrationFormFieldBase):
         return _validate_affiliation
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-        if value['id'] is not None:
-            context = {
-                'event': self.form_item.registration_form.event,
-                'registration_form': self.form_item.registration_form,
-                'registration': registration,
-                'field': self
-            }
-            filters = values_from_signal(signals.affiliations.get_affiliation_filters.send(self, context=context),
-                                         as_list=True, multi_value_types=list)
-            query = Affiliation.query.filter_by(id=value['id'], is_deleted=False)
-            if filters:
-                query = query.filter(*filters)
-            affiliation = query.one_or_none()
-            if not affiliation:
-                raise ValidationError('Invalid affiliation')
-            value['text'] = affiliation.name
+        if isinstance(value, str):
+            value = {'id': None, 'text': value}
+        if value['id'] is None:
+            return super().process_form_data(registration, value if value['text'] else '', old_data,
+                                             billable_items_locked)
+
+        context = {
+            'event': self.form_item.registration_form.event,
+            'registration_form': self.form_item.registration_form,
+            'registration': registration,
+            'field': self
+        }
+        filters = values_from_signal(signals.affiliations.get_affiliation_filters.send(self, context=context),
+                                        as_list=True, multi_value_types=list)
+        query = Affiliation.query.filter_by(id=value['id'], is_deleted=False)
+        if filters:
+            query = query.filter(*filters)
+        affiliation = query.one_or_none()
+        if not affiliation:
+            raise ValidationError('Invalid affiliation')
+        value['text'] = affiliation.name
         return super().process_form_data(registration, value, old_data, billable_items_locked)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):

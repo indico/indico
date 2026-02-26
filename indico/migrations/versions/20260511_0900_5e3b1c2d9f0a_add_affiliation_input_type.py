@@ -30,6 +30,7 @@ def upgrade():
         WHERE rd.field_data_id = ffd.id
             AND fi.input_type = 'affiliation'
             AND jsonb_typeof(rd.data) = 'string'
+            AND rd.data #>> '{}' <> ''
     ''')
 
 
