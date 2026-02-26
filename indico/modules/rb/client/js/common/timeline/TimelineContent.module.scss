@@ -178,3 +178,14 @@ $split-row-height: $row-height / 2;
 .rotate-icon {
   animation: rotate90 1s ease-out 1s forwards;
 }
+
+.results-message {
+  box-sizing: border-box;
+  width: fit-content;
+  line-height: 40px;
+  font-size: 14px;
+  text-align: left;
+  margin: 0;
+  opacity: 0.5;
+  font-style: italic;
+}

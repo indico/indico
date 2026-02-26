@@ -205,6 +205,7 @@ export default connect(
           {
             myBookings: true,
             hideUnused: true,
+            hideUsed: false,
           },
           false
         )
@@ -219,6 +220,7 @@ export default connect(
           {
             onlyMine: true,
             hideUnused: true,
+            hideUsed: false,
           },
           false
         )

@@ -15,6 +15,7 @@ Improvements
 - Add a setting :data:`CHECK_ACTION_PERMISSIONS` to hide event creation/management
   buttons for guests and users who do not have access to them (:pr:`7332`, thanks
   :user:`jbtwist, unconventionaldotdev`)
+- Add option to filter room booking calendar to show only unused rooms (:pr:`7350`)
 
 Bugfixes
 ^^^^^^^^

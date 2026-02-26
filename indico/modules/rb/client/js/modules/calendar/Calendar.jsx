@@ -46,6 +46,7 @@ class Calendar extends React.Component {
     calendarFilters: PropTypes.object.isRequired,
     localFilters: PropTypes.shape({
       hideUnused: PropTypes.bool.isRequired,
+      hideUsed: PropTypes.bool.isRequired,
     }).isRequired,
     allowDragDrop: PropTypes.bool,
     view: PropTypes.oneOf(['timeline', 'list']).isRequired,
@@ -122,12 +123,28 @@ class Calendar extends React.Component {
     });
   };
 
-  toggleHideUnused = () => {
+  showAll = () => {
     const {
-      localFilters: {hideUnused},
       actions: {setFilterParameter},
     } = this.props;
-    setFilterParameter('hideUnused', !hideUnused);
+    setFilterParameter('hideUnused', false);
+    setFilterParameter('hideUsed', false);
+  };
+
+  showUsed = () => {
+    const {
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('hideUnused', true);
+    setFilterParameter('hideUsed', false);
+  };
+
+  showUnused = () => {
+    const {
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('hideUsed', true);
+    setFilterParameter('hideUnused', false);
   };
 
   toggleShowInactive = () => {
@@ -150,7 +167,7 @@ class Calendar extends React.Component {
   renderExtraButtons = () => {
     const {
       calendarFilters: {myBookings, showInactive},
-      localFilters: {hideUnused},
+      localFilters: {hideUnused, hideUsed},
       actions: {setFilterParameter},
       isFetching,
       isFetchingActiveBookings,
@@ -158,21 +175,21 @@ class Calendar extends React.Component {
     const {view} = this.props;
 
     return (
-      <Button.Group size="small">
-        <ResponsivePopup
-          trigger={
-            <Button
-              primary={myBookings}
-              icon="user circle"
-              disabled={isFetching || isFetchingActiveBookings}
-              onClick={() => setFilterParameter('myBookings', !myBookings || null)}
-            />
-          }
-        >
-          <Translate>Show only my bookings</Translate>
-        </ResponsivePopup>
-        {view === 'timeline' && (
-          <>
+      <>
+        <Button.Group size="small">
+          <ResponsivePopup
+            trigger={
+              <Button
+                primary={myBookings}
+                icon="user circle"
+                disabled={isFetching || isFetchingActiveBookings}
+                onClick={() => setFilterParameter('myBookings', !myBookings || null)}
+              />
+            }
+          >
+            <Translate>Show only my bookings</Translate>
+          </ResponsivePopup>
+          {view === 'timeline' && (
             <ResponsivePopup
               trigger={
                 <Button
@@ -189,25 +206,47 @@ class Calendar extends React.Component {
                 <Translate>Show rejected/cancelled bookings</Translate>
               )}
             </ResponsivePopup>
-            <ResponsivePopup
-              trigger={
-                <Button
-                  primary={hideUnused}
-                  icon={hideUnused ? 'plus square outline' : 'minus square outline'}
-                  disabled={isFetching}
-                  onClick={this.toggleHideUnused}
-                />
-              }
-            >
-              {hideUnused ? (
-                <Translate>Show unused spaces</Translate>
-              ) : (
-                <Translate>Hide unused spaces</Translate>
-              )}
-            </ResponsivePopup>
-          </>
-        )}
-      </Button.Group>
+          )}
+        </Button.Group>
+        <Button.Group basic>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={hideUnused}
+                content={Translate.string('Used')}
+                disabled={isFetching}
+                onClick={this.showUsed}
+              />
+            }
+          >
+            <Translate>Show only used spaces</Translate>
+          </ResponsivePopup>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={!hideUnused && !hideUsed}
+                content={Translate.string('All')}
+                disabled={isFetching}
+                onClick={this.showAll}
+              />
+            }
+          >
+            <Translate>Show all spaces</Translate>
+          </ResponsivePopup>
+          <ResponsivePopup
+            trigger={
+              <Button
+                active={hideUsed}
+                content={Translate.string('Unused')}
+                disabled={isFetching}
+                onClick={this.showUnused}
+              />
+            }
+          >
+            <Translate>Show only unused spaces</Translate>
+          </ResponsivePopup>
+        </Button.Group>
+      </>
     );
   };
 
@@ -260,7 +299,7 @@ class Calendar extends React.Component {
       view,
       isFetching,
       isFetchingActiveBookings,
-      localFilters: {hideUnused},
+      localFilters: {hideUnused, hideUsed},
       calendarFilters: {showInactive},
       roomFilters: {text},
       calendarData: {rows},
@@ -282,10 +321,12 @@ class Calendar extends React.Component {
                     <div className="filter-row-filters">
                       <RoomFilterBar disabled={isFetching || isFetchingActiveBookings} />
                       {this.renderExtraButtons()}
-                      <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                     </div>
                   </div>
                   {this.renderViewSwitch()}
+                </Grid.Row>
+                <Grid.Row styleName="search-row">
+                  <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                 </Grid.Row>
                 {isTimelineVisible && (
                   <TimelineHeader
@@ -306,6 +347,7 @@ class Calendar extends React.Component {
                   onClickReservation={openBookingDetails}
                   onAddSlot={editable ? this.onAddSlot : null}
                   showUnused={!hideUnused}
+                  showUsed={!hideUsed}
                   setDate={setDate}
                   setMode={setMode}
                   longLabel

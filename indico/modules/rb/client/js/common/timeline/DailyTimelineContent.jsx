@@ -15,7 +15,7 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {toMoment, localeUses24HourTime} from 'indico/utils/date';
 
@@ -192,13 +192,21 @@ export default class DailyTimelineContent extends React.Component {
   };
 
   renderDefaultHeader = (hourSpan, hourSeries, hasActions) => {
-    const {hourStep, longLabel, trim12hMins} = this.props;
+    const {hourStep, longLabel, trim12hMins, rows} = this.props;
     const labelWidth = longLabel ? 200 : 150;
     const short12hTimes = !localeUses24HourTime(moment.locale().replace('_', '-')) && trim12hMins;
 
     return (
       <>
-        <div style={{width: labelWidth}} />
+        {rows.length ? (
+          <Translate
+            as="p"
+            style={{width: labelWidth}}
+            styleName="results-message timeline-header-label"
+          >
+            Results: <Param name="count" wrapper={<strong />} value={rows.length} />
+          </Translate>
+        ) : null}
         <div styleName="timeline-header-labels">
           {_.range(0, hourSpan + hourStep, hourStep).map((i, n) => (
             <div
