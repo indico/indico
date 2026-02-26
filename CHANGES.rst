@@ -15,6 +15,7 @@ Improvements
 - Add a setting :data:`CHECK_ACTION_PERMISSIONS` to hide event creation/management
   buttons for guests and users who do not have access to them (:pr:`7332`, thanks
   :user:`jbtwist, unconventionaldotdev`)
+- Add ability to show/hide unused spaces in room booking (:pr:`7350`)
 
 Bugfixes
 ^^^^^^^^
