@@ -8,6 +8,7 @@
 import _ from 'lodash';
 import React from 'react';
 
+import {Param, Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 
@@ -102,7 +103,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
   }
 
   renderHeader() {
-    const {longLabel, selectable, setDate, setMode} = this.props;
+    const {longLabel, selectable, setDate, setMode, rows} = this.props;
     const labelWidth = longLabel ? 200 : 150;
 
     return (
@@ -110,7 +111,11 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         styleName="baseStyle.timeline-header"
         className={!selectable ? 'timeline-non-selectable' : ''}
       >
-        <div style={{minWidth: labelWidth}} />
+        {rows.length ? (
+          <Translate as="p" style={{minWidth: labelWidth}} styleName="baseStyle.results-message">
+            Results: <Param name="spaces" wrapper={<strong />} value={rows.length} />
+          </Translate>
+        ) : null}
         <div styleName="style.timeline-header-labels">
           {this.dates.map((dt, n) => {
             const indicateWeekend = this.weekendDays.includes(n);

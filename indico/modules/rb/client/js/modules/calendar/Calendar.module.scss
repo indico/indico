@@ -22,9 +22,11 @@
   .view-switch {
     display: flex;
     align-items: flex-start;
-
-    :global(.icon:last-child) {
-      margin-right: 0.75em;
-    }
   }
+}
+
+.search-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }

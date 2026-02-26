@@ -8,14 +8,14 @@
 @use 'rb:styles/responsive' as *;
 
 .room-filters {
-  .text-filter input {
-    width: 300px;
+  .text-filter {
+    width: 100%;
 
     @media (max-width: $tablet-width) {
-      width: 275px;
+      min-width: 275px;
     }
 
-    & + i.icon.remove {
+    i.icon.remove {
       cursor: pointer;
     }
   }

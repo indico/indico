@@ -321,10 +321,12 @@ class Calendar extends React.Component {
                     <div className="filter-row-filters">
                       <RoomFilterBar disabled={isFetching || isFetchingActiveBookings} />
                       {this.renderExtraButtons()}
-                      <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                     </div>
                   </div>
                   {this.renderViewSwitch()}
+                </Grid.Row>
+                <Grid.Row styleName="search-row">
+                  <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                 </Grid.Row>
                 {isTimelineVisible && (
                   <TimelineHeader
