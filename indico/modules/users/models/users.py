@@ -675,35 +675,9 @@ class User(PersonMixin, db.Model):
         provides. It also does not take into account any permissions granted
         through plugins that affect the regular user permission checks.
         """
-        from indico.modules.categories.models.categories import Category
-        from indico.modules.categories.models.principals import CategoryPrincipal
-        from indico.modules.categories.models.roles import CategoryRole
-        from indico.modules.categories.util import can_create_unlisted_events
-        from indico.modules.groups.models.groups import LocalGroup
+        from indico.modules.categories.util import can_create_events_explicit, can_create_unlisted_events
 
-        return (
-            self.is_admin
-            or can_create_unlisted_events(self)
-            or (
-                CategoryPrincipal.query.join(Category)
-                .filter(
-                    ~Category.is_deleted,
-                    CategoryPrincipal.has_management_permission('create'),
-                )
-                .filter(
-                    db.or_(
-                        CategoryPrincipal.user == self,
-                        CategoryPrincipal.local_group.has(
-                            LocalGroup.members.any(User.id == self.id)
-                        ),
-                        CategoryPrincipal.category_role.has(
-                            CategoryRole.members.any(User.id == self.id)
-                        ),
-                    )
-                )
-                .has_rows()
-            )
-        )
+        return self.is_admin or can_create_unlisted_events(self) or (can_create_events_explicit(self))
 
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.

@@ -242,3 +242,34 @@ def can_create_unlisted_events(user):
         return True
     else:
         return unlisted_events_settings.acls.contains_user('authorized_creators', user)
+
+
+def can_create_events_explicit(user):
+    """Check if the user has explicitly granted event creation permissions somewhere.
+
+    For performance reasons this only checks local groups and roles, but
+    ignores any membership in remote (multipass) groups from LDAP or similar
+    provides. It also does not take into account any permissions granted
+    through plugins that affect the regular user permission checks.
+    """
+    from indico.modules.categories.models.categories import Category
+    from indico.modules.categories.models.principals import CategoryPrincipal
+    from indico.modules.categories.models.roles import CategoryRole
+    from indico.modules.groups.models.groups import LocalGroup
+    from indico.modules.users.models.users import User
+
+    return (
+        CategoryPrincipal.query.join(Category)
+        .filter(
+            ~Category.is_deleted,
+            CategoryPrincipal.has_management_permission('create'),
+        )
+        .filter(
+            db.or_(
+                CategoryPrincipal.user == user,
+                CategoryPrincipal.local_group.has(LocalGroup.members.any(User.id == user.id)),
+                CategoryPrincipal.category_role.has(CategoryRole.members.any(User.id == user.id)),
+            )
+        )
+        .has_rows()
+    )
