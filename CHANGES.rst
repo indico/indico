@@ -34,6 +34,8 @@ Improvements
 - Add QR code generator to event share widget (:issue:`6796`, :pr:`7504`)
 - Add contribution link placeholder for emailing abstract roles (:issue:`3602`, :pr:`7569`)
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
+- Add "Affiliation" field type to regforms (:pr:`7352`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
