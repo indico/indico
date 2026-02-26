@@ -37,9 +37,8 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.users.controllers import SearchAffiliationsMixin
 from indico.modules.users.models.affiliations import Affiliation
-from indico.modules.users.util import send_avatar, send_default_avatar
+from indico.modules.users.util import SearchAffiliationsMixin, send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString

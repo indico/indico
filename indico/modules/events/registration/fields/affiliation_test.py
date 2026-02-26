@@ -77,7 +77,9 @@ def test_affiliation_process_form_data_applies_signal_filters(db, affiliation_fi
         with pytest.raises(ValidationError, match='Invalid affiliation'):
             affiliation_field.field_impl.process_form_data(dummy_reg, {'id': affiliation.id, 'text': 'CERN'})
 
-    assert signal_data['sender'] is affiliation_field.field_impl
+    assert isinstance(signal_data['sender'], type(affiliation_field.field_impl))
+    assert signal_data['sender'].form_item == affiliation_field
     assert signal_data['context']['event'] == affiliation_field.registration_form.event
     assert signal_data['context']['registration_form'] == affiliation_field.registration_form
     assert signal_data['context']['registration'] == dummy_reg
+    assert signal_data['context']['field'].form_item == affiliation_field
