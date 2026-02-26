@@ -11,8 +11,8 @@ from flask import current_app, render_template, request, session
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
+from indico.core import signals
 from indico.core.config import config
-from indico.core.signals import event_management
 from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
@@ -57,8 +57,11 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
               for tid, data in theme_settings.get_themes_for(event.type_.name).items()}
     forced_event_locale = event.get_forced_event_locale(session.user, allow_session=True)
     forced_event_locale_alts = event.supported_locales if forced_event_locale else None
-    show_management_button = bool(not config.CHECK_ACTION_PERMISSIONS or
-                                  values_from_signal(event_management.management_url.send(event)))
+    show_management_button = (
+        not config.CHECK_ACTION_PERMISSIONS
+        or (session.user and event.can_manage(session.user))
+        or bool(values_from_signal(signals.event_management.management_url.send(event)))
+    )
     return render_template('events/header.html', event=event, print_url=print_url, show_nav_bar=show_nav_bar,
                            themes=themes, theme=theme, force_locale=forced_event_locale,
                            force_locale_alts=forced_event_locale_alts, show_management_button=show_management_button)
