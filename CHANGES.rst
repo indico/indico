@@ -12,6 +12,9 @@ Improvements
 
 - Show picture field validation status in the registration form (:pr:`7337`,
   thanks :user:`jbtwist, unconventionaldotdev`)
+- Add a setting :data:`CHECK_ACTION_PERMISSIONS` to hide event creation/management
+  buttons for guests and users who do not have access to them (:pr:`7332`, thanks
+  :user:`jbtwist, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

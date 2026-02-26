@@ -667,6 +667,18 @@ class User(PersonMixin, db.Model):
         """If this user can be modified by the given user."""
         return self == user or user.is_admin
 
+    def has_create_permission(self):
+        """Check if the user has create events permissions somewhere.
+
+        For performance reasons this only checks local groups and roles, but
+        ignores any membership in remote (multipass) groups from LDAP or similar
+        provides. It also does not take into account any permissions granted
+        through plugins that affect the regular user permission checks.
+        """
+        from indico.modules.categories.util import can_create_events_explicit, can_create_unlisted_events
+
+        return self.is_admin or can_create_unlisted_events(self) or can_create_events_explicit(self)
+
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.
 
