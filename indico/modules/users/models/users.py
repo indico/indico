@@ -677,7 +677,7 @@ class User(PersonMixin, db.Model):
         """
         from indico.modules.categories.util import can_create_events_explicit, can_create_unlisted_events
 
-        return self.is_admin or can_create_unlisted_events(self) or (can_create_events_explicit(self))
+        return self.is_admin or can_create_unlisted_events(self) or can_create_events_explicit(self)
 
     def iter_identifiers(self, check_providers=False, providers=None):
         """Yields ``(provider, identifier)`` tuples for the user.

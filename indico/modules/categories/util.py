@@ -245,7 +245,7 @@ def can_create_unlisted_events(user):
 
 
 def can_create_events_explicit(user):
-    """Check if the user has explicitly granted event creation permissions somewhere.
+    """Check if the user has explicit event creation permissions somewhere.
 
     For performance reasons this only checks local groups and roles, but
     ignores any membership in remote (multipass) groups from LDAP or similar
