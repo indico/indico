@@ -12,6 +12,7 @@ from flask import flash, jsonify, redirect, render_template, session
 from marshmallow import validate
 from sqlalchemy.orm import undefer
 from webargs import fields
+from werkzeug.exceptions import Forbidden
 from wtforms.validators import ValidationError
 
 from indico.core import signals
@@ -52,6 +53,8 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event."""
+
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
 
     def _process(self):
         regforms = (RegistrationForm.query
@@ -165,8 +168,14 @@ def _get_regform_creation_log_data(regform):
 class RHManageParticipants(RHManageRegFormsBase):
     """Show and enable the dummy registration form for participants."""
 
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+
     def _process(self):
         regform = self.event.participation_regform
+        if not self.event.can_manage(session.user, permission='registration'):
+            if regform and self.event.has_feature('registration'):
+                return redirect(url_for('event_registration.manage_reglist', regform))
+            raise Forbidden
         registration_enabled = self.event.has_feature('registration')
         participant_visibility = (PublishRegistrationsMode.show_with_consent
                                   if self.event.type_ == EventType.lecture
