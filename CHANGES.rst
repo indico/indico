@@ -35,6 +35,8 @@ Accessibility
   number of items (:pr:`7346`, thanks :user:`foxbunny`)
 - Contribution descriptions are no longer announced as links by screen readers
   (:pr:`7349`, thanks :user:`foxbunny`)
+- Contribution list description text, track badges, and type badges now meet WCAG AA
+  color contrast requirements (:pr:`7351`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

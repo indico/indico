@@ -214,7 +214,7 @@
 
     .description {
       position: relative;
-      color: $dark-gray;
+      color: var(--text-secondary-color);
       max-height: 4.2em;
       overflow: hidden;
 
@@ -276,13 +276,13 @@
 .contrib-type {
   margin: 6px 3px 0 0;
   padding: 0.5em;
-  color: $light-gray;
+  color: white;
   background-color: $dark-blue;
 }
 
 .contrib-track {
-  background: $dark-gray;
-  color: $light-blue;
+  background: var(--text-secondary-color);
+  color: white;
 }
 
 .contrib-session {
