@@ -204,7 +204,7 @@ export default class DailyTimelineContent extends React.Component {
             style={{width: labelWidth}}
             styleName="results-message timeline-header-label"
           >
-            Results: <Param name="spaces" wrapper={<strong />} value={rows.length} />
+            Results: <Param name="count" wrapper={<strong />} value={rows.length} />
           </Translate>
         ) : null}
         <div styleName="timeline-header-labels">

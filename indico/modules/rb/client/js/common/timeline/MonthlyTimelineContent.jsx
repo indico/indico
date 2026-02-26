@@ -113,7 +113,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
       >
         {rows.length ? (
           <Translate as="p" style={{minWidth: labelWidth}} styleName="baseStyle.results-message">
-            Results: <Param name="spaces" wrapper={<strong />} value={rows.length} />
+            Results: <Param name="count" wrapper={<strong />} value={rows.length} />
           </Translate>
         ) : null}
         <div styleName="style.timeline-header-labels">
