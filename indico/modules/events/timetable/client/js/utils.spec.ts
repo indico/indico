@@ -139,7 +139,7 @@ describe('computeOverlappingEntryIds', () => {
     });
 
     const overlaps = computeOverlappingEntryIds([block, contrib]);
-    expect(overlaps).toEqual(new Set(['c1', 'c3', 'b1', 'c4']));
+    expect(overlaps).toEqual(new Set(['c1', 'c3', 's1', 'c4']));
   });
 });
 
