@@ -53,3 +53,11 @@ export const ENTRY_COLORS_BY_BACKGROUND: Record<HexColor, Colors> = Object.fromE
     {color, backgroundColor: childBackgroundColor},
   ])
 );
+
+export const getRandomColors = (): Colors =>
+  ENTRY_COLORS[Math.floor(Math.random() * ENTRY_COLORS.length)];
+
+export const parseColorsToSchema = (colors: Colors): {text: string; background: string} => ({
+  text: colors.color,
+  background: colors.backgroundColor,
+});

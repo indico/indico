@@ -87,13 +87,13 @@ export function mapTTColor(dbColors: {text: HexColor; background: HexColor}): Co
   return {color: dbColors.text, backgroundColor: dbColors.background};
 }
 
-export function mapTTEntryColor(dbEntry: any, sessions: Record<string, Session> = {}): Colors {
-  const {sessionId, type, colors} = dbEntry;
+export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
+  const {type, colors} = dbEntry;
 
   const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
 
   if (type === EntryType.SessionBlock) {
-    return sessions[sessionId].colors ?? fallbackColor;
+    return session?.colors ?? fallbackColor;
   }
   return fallbackColor;
 }
@@ -120,9 +120,23 @@ export const mapTTDataToSession = (data: any): Session => {
   };
 };
 
+export const mapSessionToTTData = (data): any => {
+  return {
+    id: data.id,
+    title: data.title,
+    is_poster: data.isPoster,
+    ...(data.colors && {
+      colors: {text: data.colors.color, background: data.colors.backgroundColor},
+    }),
+    ...(data.defaultContribDurationMinutes && {
+      default_contribution_duration: data.defaultContribDurationMinutes * 60,
+    }),
+  };
+};
+
 export const mapTTDataToEntry = (
   data: any,
-  sessions: Record<string, Session> = {},
+  session: Session,
   parent?: Partial<BlockEntry>
 ): Entry => {
   data = camelizeKeys(data);
@@ -167,7 +181,7 @@ export const mapTTDataToEntry = (
     children: [],
     sessionId: sessionId || null,
     sessionTitle: sessionTitle || '',
-    colors: mapTTEntryColor(data, sessions),
+    colors: mapTTEntryColor(data, session),
     ...(sessionId && {sessionId}),
     ...(parent && {
       parent: {
