@@ -37,11 +37,15 @@ registration_data:
     input_type: email
     position: 3
     title: Email Address
-  - data: ''
-    default_value: ''
+  - data:
+      id: null
+      text: ''
+    default_value:
+      id: null
+      text: ''
     description: ''
     id: <id>
-    input_type: text
+    input_type: affiliation
     position: 4
     title: Affiliation
   - data: ''

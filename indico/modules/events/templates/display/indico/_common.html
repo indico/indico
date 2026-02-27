@@ -1,4 +1,4 @@
-{% from 'events/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_person_affiliation %}
 
 {% macro _render_location_tip(item) -%}
     {% set show_url = item.room and item.room.map_url %}
@@ -62,7 +62,7 @@
     <span>{{ user_data.display_full_name }}</span>
     {%- if user_data.affiliation %}
         <span class="affiliation">
-            <span class="text">({{ render_affiliation(user_data) }})</span>{#--#}
+            <span class="text">({{ render_person_affiliation(user_data) }})</span>{#--#}
         </span>
     {%- endif %}
 {%- endmacro %}

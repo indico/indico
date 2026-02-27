@@ -131,6 +131,7 @@
                 data-currency="{{ regform.currency }}"
                 data-form-data="{{ form_data | tojson | forceescape }}"
                 data-initial-values="{{ initial_values | tojson | forceescape }}"
+                data-has-predefined-affiliations="{{ has_predefined_affiliations | tojson | forceescape }}"
                 data-management="{{ management | tojson | forceescape }}"
                 data-moderated="{{ moderated | tojson | forceescape }}"
                 data-lock-email="{{ (invitation.lock_email if invitation else false) | tojson | forceescape }}"

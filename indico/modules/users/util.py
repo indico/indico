@@ -14,6 +14,7 @@ from operator import attrgetter, itemgetter
 
 import requests
 from flask import render_template, session
+from marshmallow import fields
 from PIL import Image
 from requests import RequestException
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -45,8 +46,9 @@ from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.network import make_validate_request_url_hook, validate_request_url
-from indico.util.signals import make_interceptable
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.string import crc32, remove_accents
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import strip_path_from_url
 
@@ -632,7 +634,7 @@ def _weighted_score(*params):
 
 
 @memoize_redis(3600, versioned=True)
-def search_affiliations(q):
+def search_affiliations(q, *, filters=()):
     exact_match = _match_search(q, exact=True)
     score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
     countries = set(get_countries_regex().findall(q))
@@ -649,7 +651,7 @@ def search_affiliations(q):
     q_filter = fts_matches(Affiliation.searchable_names, q)
     return (
         Affiliation.query
-        .filter(~Affiliation.is_deleted, q_filter)
+        .filter(~Affiliation.is_deleted, q_filter, *filters)
         .order_by(
             score.desc(),
             db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),
@@ -657,6 +659,21 @@ def search_affiliations(q):
         .limit(20)
         .all()
     )
+
+
+class SearchAffiliationsMixin:
+    @use_kwargs({'q': fields.String(load_default='')}, location='query')
+    def _process(self, q):
+        from indico.modules.users.schemas import AffiliationSchema
+        filters = values_from_signal(signals.affiliations.get_affiliation_filters.send(self, context=self.context),
+                                     as_list=True, multi_value_types=list)
+        res = search_affiliations(q, filters=filters)
+        basic_fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+        return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
+
+    @property
+    def context(self):
+        raise NotImplementedError
 
 
 @make_interceptable
