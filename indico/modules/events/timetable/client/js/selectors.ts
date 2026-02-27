@@ -109,11 +109,7 @@ export const isPosterSessionBlock = createSelector(
     const entry = dayEntries.find(e => e.id === id);
     const session = sessions[entry?.sessionId];
 
-    if (!(session || entry)) {
-      return false;
-    }
-
-    return entry.type === EntryType.SessionBlock && session?.isPoster;
+    return entry?.type === EntryType.SessionBlock && session?.isPoster;
   }
 );
 

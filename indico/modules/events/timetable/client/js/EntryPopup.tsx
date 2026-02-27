@@ -173,7 +173,6 @@ function EntryPopupContent({
     openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: entry.id as SessionBlockId});
     onClose();
     e.stopPropagation();
-    // dispatch(actions.setPosterSessionBlockToShow(entry.id));
   };
 
   // Only for Session Blocks
