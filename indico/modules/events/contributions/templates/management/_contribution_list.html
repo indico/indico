@@ -38,8 +38,8 @@
                             <th class="i-table">
                                 {% trans %}Subcontributions{% endtrans %}
                             </th>
-                            <th class="i-table">
-                                {% trans %}Favorites{% endtrans %}
+                            <th class="i-table favorites-column">
+                                {% trans %}Interested{% endtrans %}
                             </th>
                             {% for item in static_columns if has_types or item.id != 'type' %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
