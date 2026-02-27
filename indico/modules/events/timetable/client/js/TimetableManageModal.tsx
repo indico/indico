@@ -17,22 +17,28 @@ import moment from 'moment';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
-import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
+import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
-import {SessionSelect} from './SessionSelect';
+import {FinalSessionSelect} from './SessionSelect';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT, getEntryUniqueId, mapTTDataToEntry, shiftEntries} from './utils';
+import {
+  DATE_KEY_FORMAT,
+  getEntryUniqueId,
+  mapSessionToTTData,
+  mapTTDataToEntry,
+  shiftEntries,
+} from './utils';
 
 // Generic models
 
@@ -162,10 +168,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     [EntryType.Break]: Translate.string('Break'),
   };
 
-  const sessions = useSelector(selectors.getSessions);
   const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
-
-  const sessionValues: Session[] = Object.values(sessions);
+  const sessionsObj = useSelector(selectors.getSessions);
+  const sessions: Session[] = Object.values(sessionsObj);
 
   const forms: {[key in EntryType]: React.ReactElement} = {
     [EntryType.Contribution]: (
@@ -180,22 +185,15 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     ),
     ...(!isCreatingChild
       ? {
-          [EntryType.SessionBlock]: sessionValues.length ? (
+          [EntryType.SessionBlock]: (
             <>
-              {!isEditing && <SessionSelect sessions={sessionValues} required />}
+              {!isEditing && <FinalSessionSelect sessions={sessions} required />}
               <SessionBlockFormFields
                 eventId={eventId}
                 extraOptions={extraOptions}
                 locationParent={snakifyKeys(entry.locationParent)}
               />
             </>
-          ) : (
-            <Message
-              icon="question circle"
-              header={Translate.string('No sessions available')}
-              color="yellow"
-              content={Translate.string('Please create a session before creating a session block.')}
-            />
           ),
         }
       : null),
@@ -280,6 +278,20 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
   };
 
+  const _findOrCreateSession = async sessionObject => {
+    const session = sessions.find(s => s.id === sessionObject.id);
+
+    if (session) {
+      return session;
+    }
+
+    // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
+    const data = mapSessionToTTData(sessionObject);
+    const {session: resSession} = await dispatch(actions.createSession(_.omit(data, 'id')));
+
+    return resSession;
+  };
+
   const handleSubmit = async (data: any, form: any) => {
     const submitHandlers = isEditing
       ? {
@@ -306,16 +318,32 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       data.start_dt = moment(data.start_dt).format('YYYY-MM-DDTHH:mm:ss');
     }
 
-    const submitData = snakifyKeys(data);
+    const submitData = snakifyKeys({...data});
+
+    let session: Session;
+
+    if (data.session_object) {
+      try {
+        session = await _findOrCreateSession(data.session_object);
+        submitData.session_id = session?.id;
+      } catch (error) {
+        handleAxiosError(error, true);
+        return;
+      }
+
+      delete data.session_object; // Was used temporarily only for id or draft
+    }
+
     let resData;
     try {
       resData = (await submitHandler(submitData)).data;
     } catch (exc) {
       return handleSubmitError(exc);
     }
+
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData, sessions, parent);
+    const resEntry = mapTTDataToEntry(resData, session, parent);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {
@@ -336,16 +364,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     setActiveType(key);
   };
 
-  const meetsSubmitConditions = () => {
-    // Allows to prevent submitting with pre-conditions, such as
-    // not having any sessions available for session blocks. Can
-    // be extended for other conditions and forms.
-    if (activeType === EntryType.SessionBlock) {
-      return !!sessionValues.length;
-    }
-    return true;
-  };
-
   return (
     <FinalModalForm
       id="tt-create"
@@ -363,13 +381,11 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       }
       noSubmitButton
       extraActions={
-        meetsSubmitConditions() ? (
-          <FinalSubmitButton
-            form="final-modal-form-tt-create"
-            label={Translate.string('Submit')}
-            disabledUntilChange
-          />
-        ) : null
+        <FinalSubmitButton
+          form="final-modal-form-tt-create"
+          label={Translate.string('Submit')}
+          activeSubmitButton
+        />
       }
     >
       {!isEditing && (
@@ -386,7 +402,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
                   onClick={() => {
                     changeForm(key as EntryType);
                   }}
-                  color={activeType === key ? 'blue' : undefined}
+                  primary={activeType === key}
                 >
                   {typeLongNames[key as EntryType]}
                 </Button>

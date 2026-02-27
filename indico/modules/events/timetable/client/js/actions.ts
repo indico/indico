@@ -19,6 +19,7 @@ import {ThunkDispatch} from 'redux-thunk/es';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
+import {getRandomColors, parseColorsToSchema} from './colors';
 import {
   TopLevelEntry,
   BlockEntry,
@@ -233,7 +234,8 @@ export function editSession(sessionId: number, session: Partial<Session>) {
   };
 }
 
-export function createSession(session: Session) {
+// TODO: (Ajob) Implement interface for raw data session (e.g. uses ColorSchema)
+export function createSession(session) {
   return async (
     dispatch: ThunkDispatch<ReduxState, unknown, Action>,
     getState: () => ReduxState
@@ -244,11 +246,16 @@ export function createSession(session: Session) {
     const url = createSessionURL({event_id: eventId});
 
     try {
-      const {data: newSession} = await indicoAxios.post(url, session);
+      if (!session.colors) {
+        session.colors = parseColorsToSchema(getRandomColors());
+      }
 
-      await dispatch({
+      const {data: newSession} = await indicoAxios.post(url, session);
+      const mappedSession = mapTTDataToSession(newSession);
+
+      return dispatch({
         type: CREATE_SESSION,
-        session: mapTTDataToSession(newSession),
+        session: mappedSession,
       });
     } catch (e) {
       handleAxiosError(e);
