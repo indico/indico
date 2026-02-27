@@ -120,6 +120,7 @@
 
 {% block page_actions -%}
     <div class="toolbar">
+        <ind-favorite-contribution-icon contribution-id="{{ contribution.id }}" event-id="{{ event.id }}"></ind-favorite-contribution-icon>
         {% if contribution.can_edit(session.user) -%}
             <button class="i-button icon-edit"
                     data-title

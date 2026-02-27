@@ -295,6 +295,15 @@
   color: $black;
 }
 
+.contrib-favorites {
+  color: $black;
+  width: fit-content;
+}
+
+.contrib-favorites::before {
+  color: $black;
+}
+
 ul.author-list {
   list-style-type: none;
   padding: 0;

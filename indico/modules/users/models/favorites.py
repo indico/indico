@@ -73,3 +73,25 @@ favorite_event_table = db.Table(
     ),
     schema='users'
 )
+
+favorite_contribution_table = db.Table(
+    'favorite_contributions',
+    db.metadata,
+    db.Column(
+        'user_id',
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    ),
+    db.Column(
+        'target_id',
+        db.Integer,
+        db.ForeignKey('events.contributions.id'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    ),
+    schema='users'
+)

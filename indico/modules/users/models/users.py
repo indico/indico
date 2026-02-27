@@ -32,7 +32,8 @@ from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.logs import UserLogEntry
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
+from indico.modules.users.models.favorites import (favorite_category_table, favorite_contribution_table,
+                                                   favorite_event_table, favorite_user_table)
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale
@@ -409,6 +410,14 @@ class User(PersonMixin, db.Model):
     favorite_events = db.relationship(
         'Event',
         secondary=favorite_event_table,
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('favorite_of', lazy=True, collection_class=set),
+    )
+    #: the users's favorite contributions
+    favorite_contributions = db.relationship(
+        'Contribution',
+        secondary=favorite_contribution_table,
         lazy=True,
         collection_class=set,
         backref=db.backref('favorite_of', lazy=True, collection_class=set),
