@@ -112,6 +112,7 @@ export function DayTimetable({
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const innerWrapperRef = useRef<HTMLDivElement | null>(null);
   const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
@@ -345,16 +346,23 @@ export function DayTimetable({
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      const isWithinLimitsWithOffset = !isWithinLimits(limits, event.offsetY);
+      const clientY = event.clientY + wrapperRef.current.scrollTop;
+      const offsetY = clientY - wrapperRef.current.offsetTop;
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY, [
+        0,
+        minutesToPixels(defaultContributionDuration),
+      ]);
 
-      if (event.button !== 0 || event.target !== calendarRef.current || isWithinLimitsWithOffset) {
+      const clickedOnCalendar =
+        event.target === calendarRef.current || event.target === innerWrapperRef.current;
+
+      if (event.button !== 0 || !clickedOnCalendar || isWithinLimitsWithOffset) {
         return;
       }
 
-      const rect = calendarRef.current.getBoundingClientRect();
+      const rect = wrapperRef.current.getBoundingClientRect();
       let y = minutesToPixels(
-        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
-          GRID_SIZE_MINUTES
+        Math.round(pixelsToMinutes(clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
       );
       const maxPossibleDuration = pixelsToMinutes(limitBottom - limitTop);
       const duration = Math.min(defaultContributionDuration, maxPossibleDuration);
@@ -408,16 +416,16 @@ export function DayTimetable({
       }
     }
 
-    const calendar = calendarRef.current;
-    calendar.addEventListener('mousedown', onMouseDown);
-    calendar.addEventListener('mousemove', onMouseMove);
-    calendar.addEventListener('mouseup', onMouseUp);
+    const wrapper = wrapperRef.current;
+    wrapper.addEventListener('mousedown', onMouseDown);
+    wrapper.addEventListener('mousemove', onMouseMove);
+    wrapper.addEventListener('mouseup', onMouseUp);
     document.addEventListener('keydown', onKeyDown);
 
     return () => {
-      calendar.removeEventListener('mousedown', onMouseDown);
-      calendar.removeEventListener('mousemove', onMouseMove);
-      calendar.removeEventListener('mouseup', onMouseUp);
+      wrapper.removeEventListener('mousedown', onMouseDown);
+      wrapper.removeEventListener('mousemove', onMouseMove);
+      wrapper.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [draftEntry, dt, dispatch, isDragging, minHour, limits]);
@@ -436,13 +444,14 @@ export function DayTimetable({
     return createRestrictToCalendar(calendarRef, limitsDelta);
   }, [limitTop, limitBottom]);
 
+  const limitsGradientColor = 'rgba(0, 0, 0, 0.05)';
   const limitsGradientArg = [
-    'rgba(0, 0, 0, 0.05) 0',
-    `rgba(0, 0, 0, 0.05) ${limits[0]}px`,
+    `${limitsGradientColor} 0`,
+    `${limitsGradientColor} ${limits[0]}px`,
     `transparent ${limits[0]}px`,
     `transparent ${limits[1]}px`,
-    `rgba(0, 0, 0, 0.05) ${limits[1]}px`,
-    'rgba(0, 0, 0, 0.05)',
+    `${limitsGradientColor} ${limits[1]}px`,
+    limitsGradientColor,
   ].join(', ');
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
@@ -451,10 +460,10 @@ export function DayTimetable({
       <UnscheduledContributions dt={dt} />
       {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
       <div ref={wrapperRef} className="wrapper timetable-popup-boundary">
-        <div styleName="wrapper">
+        <div ref={innerWrapperRef} styleName="wrapper" style={{background: limitsGradient}}>
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
-            <div ref={calendarRef} style={{background: limitsGradient}}>
+            <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               <div
