@@ -90,7 +90,8 @@ function EntryPopupContent({
     data['type'] = type;
 
     const sessions = session ? {[session.id]: session} : {};
-    const draftEntry = mapTTDataToEntry(data, sessions);
+
+    const draftEntry = mapTTDataToEntry({...data, parent: entryParent}, sessions);
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;

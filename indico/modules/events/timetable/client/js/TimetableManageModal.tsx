@@ -32,7 +32,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT, getEntryUniqueId, mapTTDataToEntry, shiftEntries} from './utils';
+import {DATE_KEY_FORMAT, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
 
@@ -103,10 +103,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const {objId, sessionBlockId = expandedSessionBlock?.objId} = entry;
   const isEditing = !!objId;
   const isCreatingChild = !!sessionBlockId;
-  const parent = (expandedSessionBlock ||
-    entries.find(
-      e => e.id === getEntryUniqueId(EntryType.SessionBlock, sessionBlockId)
-    )) as Partial<BlockEntry>;
+  const parent =
+    expandedSessionBlock || (entries.find(e => e.id === sessionBlockId) as Partial<BlockEntry>);
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -315,7 +313,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData, sessions, parent);
+    const resEntry = mapTTDataToEntry({...resData, parent}, sessions);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {
