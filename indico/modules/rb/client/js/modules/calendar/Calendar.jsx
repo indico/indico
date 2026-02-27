@@ -46,7 +46,6 @@ class Calendar extends React.Component {
     calendarFilters: PropTypes.object.isRequired,
     localFilters: PropTypes.shape({
       hideUnused: PropTypes.bool.isRequired,
-      hideUsed: PropTypes.bool.isRequired,
     }).isRequired,
     allowDragDrop: PropTypes.bool,
     view: PropTypes.oneOf(['timeline', 'list']).isRequired,
@@ -131,14 +130,6 @@ class Calendar extends React.Component {
     setFilterParameter('hideUnused', !hideUnused);
   };
 
-  toggleHideUsed = () => {
-    const {
-      localFilters: {hideUsed},
-      actions: {setFilterParameter},
-    } = this.props;
-    setFilterParameter('hideUsed', !hideUsed);
-  };
-
   toggleShowInactive = () => {
     const {
       calendarFilters: {showInactive},
@@ -159,7 +150,7 @@ class Calendar extends React.Component {
   renderExtraButtons = () => {
     const {
       calendarFilters: {myBookings, showInactive},
-      localFilters: {hideUnused, hideUsed},
+      localFilters: {hideUnused},
       actions: {setFilterParameter},
       isFetching,
       isFetchingActiveBookings,
@@ -212,22 +203,6 @@ class Calendar extends React.Component {
                 <Translate>Show unused spaces</Translate>
               ) : (
                 <Translate>Hide unused spaces</Translate>
-              )}
-            </ResponsivePopup>
-            <ResponsivePopup
-              trigger={
-                <Button
-                  primary={hideUsed}
-                  icon={hideUsed ? 'plus square outline' : 'minus square outline'}
-                  disabled={isFetching}
-                  onClick={this.toggleHideUsed}
-                />
-              }
-            >
-              {hideUsed ? (
-                <Translate>Show used spaces</Translate>
-              ) : (
-                <Translate>Hide used spaces</Translate>
               )}
             </ResponsivePopup>
           </>

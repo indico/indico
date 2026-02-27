@@ -39,7 +39,7 @@ function ModalRoot({modal, closeModal}: any) {
             closeModal();
 
             if (payload.onClose) {
-              payload.onClose();
+              payload?.onClose();
             }
           }}
         />
