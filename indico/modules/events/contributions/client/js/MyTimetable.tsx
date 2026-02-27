@@ -8,10 +8,11 @@
 import contributionFavoriteURL from 'indico-url:contributions.favorite_contributions_api';
 
 import _ from 'lodash';
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {Icon} from 'semantic-ui-react';
 
+import {useIndicoAxiosWithMutation} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -25,34 +26,25 @@ interface MyTimetableProps {
 }
 
 export function MyTimetable({eventId}: MyTimetableProps) {
-  const [scheduledContributions, setScheduledContributions] = useState<ContributionRecord | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-
-  const getMyTimetable = useCallback(async () => {
-    try {
-      const res = await indicoAxios.get(contributionFavoriteURL({event_id: eventId}));
-      setScheduledContributions(res.data);
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setLoading(false);
-  }, [eventId]);
-
-  useEffect(() => {
-    getMyTimetable();
-  }, [getMyTimetable]);
+  const {
+    data: scheduledContributions,
+    loading,
+    mutate,
+    mutating,
+  } = useIndicoAxiosWithMutation<ContributionRecord>({
+    url: contributionFavoriteURL({event_id: eventId}),
+  });
 
   const removeScheduledContribution = async (id: number) => {
     try {
-      await indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId}));
+      await mutate(
+        indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId})),
+        oldData => _.omit(oldData, id)
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setScheduledContributions(values => _.omit(values, id));
   };
 
   return (
@@ -64,6 +56,7 @@ export function MyTimetable({eventId}: MyTimetableProps) {
         <Icon
           styleName="delete-button"
           name="close"
+          disabled={mutating}
           onClick={() => removeScheduledContribution(contribution.id)}
           link
         />
