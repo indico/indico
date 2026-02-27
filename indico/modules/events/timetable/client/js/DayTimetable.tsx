@@ -208,9 +208,6 @@ export function DayTimetable({
           eventStartDt,
           eventEndDt
         ) || [];
-      if (!newLayout) {
-        return;
-      }
       // TODO(tomas): use something better than 'unscheduled-' prefix
       const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
       dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
