@@ -45,7 +45,10 @@ export class TipBase extends CustomElementBase {
         ? positioning.horizontalTooltipPositionStrategy
         : positioning.verticalTooltipPositionStrategy;
 
-    const stopPositioning = positioning.position(this.$tip, this, strategy);
+    this.toggleAttribute('data-position-check', true);
+    const stopPositioning = positioning.position(this.$tip, this, strategy, () => {
+      this.removeAttribute('data-position-check');
+    });
     this.addEventListener('toggle', stopPositioning, {once: true});
   }
 

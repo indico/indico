@@ -258,6 +258,7 @@ Accessibility
 - Improve dropdown accessibility in category list toolbar (:pr:`7069`,
   thanks :user:`foxbunny`)
 - Fix footer color contrast (:pr:`7095`, thanks :user:`foxbunny`)
+- Improve keyboard focus order and color contrast in session bar (:pr:`6590`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -671,6 +672,7 @@ Accessibility
   keyboard support (:pr:`6621`, thanks :user:`foxbunny`)
 - Improve keyboard accessibility of the timetable sessions field in registration form (:pr:`6639`,
   thanks :user:`foxbunny`)
+- Improve screen reader support for protection details button (:pr:`6590`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
