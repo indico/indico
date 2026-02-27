@@ -125,7 +125,7 @@ describe('computeOverlappingEntryIds', () => {
       duration: 30,
     }) as ChildEntry;
     const block = createEntry({
-      id: 'b1',
+      id: 's1',
       type: EntryType.SessionBlock,
       startDt: moment('2026-01-29 10:00', 'YYYY-MM-DD HH:mm'),
       duration: 180,
