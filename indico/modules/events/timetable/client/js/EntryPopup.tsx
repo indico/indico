@@ -23,6 +23,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
+import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {
   ReduxState,
@@ -32,8 +33,9 @@ import {
   EntryType,
   PersonLinkRole,
   isChildEntry,
+  SessionBlockId,
 } from './types';
-import {mapTTDataToEntry} from './utils';
+import {getIconByEntryType, mapTTDataToEntry} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
@@ -59,9 +61,13 @@ function EntryPopupContent({
   const {id, objId, type, title, attachments, colors, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const isPosterBlock = useSelector((state: ReduxState) =>
+    selectors.isPosterSessionBlock(state, entry.id)
+  );
   const startTime = moment(startDt);
   const endTime = moment(startDt).add(duration, 'minutes');
   const entryParent = isChildEntry(entry) ? entry.parent : null;
+  const {openModal} = useModal();
 
   const _getOrderedLocationArray = () => {
     const {address, venueName, roomName} = entry.locationData;
@@ -90,13 +96,21 @@ function EntryPopupContent({
     data['type'] = type;
 
     const sessions = session ? {[session.id]: session} : {};
-    const draftEntry = mapTTDataToEntry(data, sessions);
+
+    const draftEntry = mapTTDataToEntry(data, sessions, entryParent);
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;
     }
 
     dispatch(actions.setDraftEntry(draftEntry));
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+      },
+    });
   };
 
   const onCreateChild = (e: React.MouseEvent) => {
@@ -119,17 +133,23 @@ function EntryPopupContent({
     }
     const newChildDuration = session.defaultContribDurationMinutes;
     // TODO: (Michel) Disable time picker for any time after parent end time
-    dispatch(
-      actions.setDraftEntry({
-        startDt: newChildStartDt,
-        duration: newChildDuration,
-        sessionBlockId: entry.objId,
-        sessionId: entry.sessionId,
-        locationParent: entry.childLocationParent,
-        locationData: {...entry.childLocationParent.location_data, inheriting: true},
-        parent: {id, objId, title, colors},
-      })
-    );
+    const draftEntry = {
+      startDt: newChildStartDt,
+      duration: newChildDuration,
+      sessionBlockId: entry.objId,
+      sessionId: entry.sessionId,
+      locationParent: entry.childLocationParent,
+      locationData: {...entry.childLocationParent.location_data, inheriting: true},
+      parent: {id, objId, title, colors},
+    };
+    dispatch(actions.setDraftEntry(draftEntry));
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+      },
+    });
   };
 
   const onDelete = (e: React.MouseEvent) => {
@@ -147,6 +167,12 @@ function EntryPopupContent({
         dispatch(actions.unscheduleEntry(entry, eventId));
         break;
     }
+  };
+
+  const onShowPosterContributions = (e: React.MouseEvent) => {
+    openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: entry.id as SessionBlockId});
+    onClose();
+    e.stopPropagation();
   };
 
   // Only for Session Blocks
@@ -199,6 +225,14 @@ function EntryPopupContent({
         />
       </div>
       <Card.Content styleName="main" as={List}>
+        {isPosterBlock && (
+          <p styleName="poster-session-note">
+            <Translate>
+              This is a poster session block. All contributions inside of this block are running in
+              parallel.
+            </Translate>
+          </p>
+        )}
         <List.Item title={Translate.string('Date and time')}>
           <Icon name="clock outline" />
           {formatTimeRange('en', startTime, endTime)}
@@ -259,7 +293,18 @@ function EntryPopupContent({
         )}
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
-        {type === EntryType.SessionBlock && (
+        {isPosterBlock && (
+          <ActionPopup
+            content={Translate.string('Show contributions')}
+            trigger={
+              <Button basic onClick={onShowPosterContributions}>
+                <Icon name={getIconByEntryType(EntryType.Contribution)} />
+                {(entry as BlockEntry)?.children?.length}
+              </Button>
+            }
+          />
+        )}
+        {type === EntryType.SessionBlock && !isPosterBlock && (
           <>
             <ActionPopup
               content={<Translate>Go to session block timetable</Translate>}

@@ -15,7 +15,15 @@ import {
   getWidthAndOffset,
   layoutGroupAfterMove,
 } from './layout';
-import {BlockEntry, ChildContribEntry, ChildEntry, ContribEntry, EntryType} from './types';
+import {
+  BlockEntry,
+  ChildContribEntry,
+  ChildEntry,
+  ContribEntry,
+  ContribId,
+  EntryType,
+  SessionBlockId,
+} from './types';
 
 function makeCounter() {
   let id = 0;
@@ -59,7 +67,7 @@ function contrib({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: string;
+  id?: ContribId;
   title?: string;
   time: string;
   duration: number;
@@ -95,7 +103,7 @@ function childContrib({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: string;
+  id?: ContribId;
   sessionBlockId: string;
   title?: string;
   time: string;
@@ -115,7 +123,7 @@ function block({
   column = 0,
   maxColumn = 0,
 }: {
-  id?: string;
+  id?: SessionBlockId;
   title?: string;
   children: ChildEntry[];
   time: string;
@@ -124,7 +132,7 @@ function block({
   maxColumn?: number;
 }): BlockEntry {
   if (id === undefined) {
-    id = `b${nextId()}`;
+    id = `s${nextId()}`;
   }
   if (title === undefined) {
     title = `Block ${id}`;
@@ -505,18 +513,18 @@ describe('computeYOffset()', () => {
   it('Should compute the Y offset of child entries', () => {
     const entries = [
       block({
-        id: 'b0',
+        id: 's0',
         time: '10:00',
         duration: 60,
-        children: [childContrib({sessionBlockId: 'b0', time: '10:00', duration: 30})],
+        children: [childContrib({sessionBlockId: 's0', time: '10:00', duration: 30})],
       }),
       block({
-        id: 'b1',
+        id: 's1',
         time: '11:00',
         duration: 60,
         children: [
-          childContrib({sessionBlockId: 'b1', time: '11:00', duration: 30}),
-          childContrib({sessionBlockId: 'b1', time: '11:30', duration: 30}),
+          childContrib({sessionBlockId: 's1', time: '11:00', duration: 30}),
+          childContrib({sessionBlockId: 's1', time: '11:30', duration: 30}),
         ],
       }),
     ];

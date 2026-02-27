@@ -125,7 +125,7 @@ describe('computeOverlappingEntryIds', () => {
       duration: 30,
     }) as ChildEntry;
     const block = createEntry({
-      id: 'b1',
+      id: 's1',
       type: EntryType.SessionBlock,
       startDt: moment('2026-01-29 10:00', 'YYYY-MM-DD HH:mm'),
       duration: 180,
@@ -139,7 +139,7 @@ describe('computeOverlappingEntryIds', () => {
     });
 
     const overlaps = computeOverlappingEntryIds([block, contrib]);
-    expect(overlaps).toEqual(new Set(['c1', 'c3', 'b1', 'c4']));
+    expect(overlaps).toEqual(new Set(['c1', 'c3', 's1', 'c4']));
   });
 });
 

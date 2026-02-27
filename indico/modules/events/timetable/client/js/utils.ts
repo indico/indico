@@ -98,7 +98,7 @@ export function mapTTEntryColor(dbEntry: any, sessions: Record<string, Session> 
   return fallbackColor;
 }
 
-export const getEntryUniqueId = (type: EntryType, id: string): string => {
+export const getEntryUniqueId = (type: EntryType, id: number): `${'s' | 'b' | 'c'}${number}` => {
   switch (type) {
     case EntryType.SessionBlock:
       return `s${id}`;
@@ -142,6 +142,7 @@ export const mapTTDataToEntry = (
     code,
     keywords,
     sessionId,
+    sessionBlockId = parent?.id,
     sessionTitle,
   } = data;
 
@@ -176,7 +177,9 @@ export const mapTTDataToEntry = (
         colors: parent.colors,
         title: parent.title,
       },
-      sessionBlockId: parent.id,
+    }),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
     }),
   };
 
