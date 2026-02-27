@@ -23,6 +23,9 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
 }
 
 .time-gutter {
+  // (Ajob) Allows for clicking directly on timetable
+  //        wrapper for click-drag creation.
+  pointer-events: none;
   user-select: none;
   border-right: 1px solid $raincloud-gray;
 
