@@ -53,8 +53,8 @@ from indico.modules.users.models.export import DataExportOptions, DataExportRequ
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import (add_secondary_email, create_user, delete_or_anonymize_user, grant_admin,
                                              revoke_admin)
-from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema,
-                                          FavoriteEventSchema, UserPersonalDataSchema)
+from indico.modules.users.schemas import (AffiliationArgs, AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+                                          UserPersonalDataSchema)
 from indico.modules.users.util import (GravatarError, get_avatar_url_from_name, get_gravatar_for_user,
                                        get_linked_events, get_mastodon_server_name, get_related_categories,
                                        get_suggested_categories, get_unlisted_events, get_user_by_email,
