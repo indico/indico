@@ -29,8 +29,8 @@ interface PosterContributionProps {
 
 const PosterContribution: React.FC<PosterContributionProps> = ({entry, block, session}) => {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const eventId = useSelector(selectors.getEventId);
   const {openModal} = useModal();
+  const eventId = useSelector(selectors.getEventId);
 
   const onEdit = async e => {
     e.stopPropagation();
@@ -59,8 +59,22 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block, se
     <Segment styleName="contrib">
       {entry.title}
       <div>
-        <Button type="button" icon="edit" basic size="small" onClick={onEdit} />
-        <Button type="button" icon="trash" basic size="small" onClick={onDelete} />
+        <Button
+          type="button"
+          icon="edit"
+          title={Translate.string('Edit')}
+          basic
+          size="small"
+          onClick={onEdit}
+        />
+        <Button
+          type="button"
+          icon="trash"
+          title={Translate.string('Delete')}
+          basic
+          size="small"
+          onClick={onDelete}
+        />
       </div>
     </Segment>
   );
@@ -70,6 +84,9 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
   id,
   onClose,
 }) => {
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const {openModal} = useModal();
+  const eventId = useSelector(selectors.getEventId);
   const block = useSelector(selectors.getCurrentDayEntries).find(
     (e): e is BlockEntry => e.id === id
   );
@@ -77,9 +94,29 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
     selectors.getSessionById(state, block.sessionId)
   );
 
+  const onCreate = () => {
+    const draftEntry = {
+      sessionId: session.id,
+      sessionBlockId: block.objId,
+      duration: Math.min(20, block.duration),
+      startDt: block.startDt,
+    };
+    actions.setDraftEntry(draftEntry);
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+        openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: block.id});
+      },
+    });
+  };
+
   if (!(block || session)) {
     return;
   }
+
+  const children = block.children.sort((c1, c2) => c1.title.localeCompare(c2.title));
 
   return (
     <Modal size="small" onClose={onClose} defaultOpen closeIcon>
@@ -92,7 +129,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       </Modal.Header>
       <Modal.Content styleName="modal-content">
         <Segment.Group styleName="contribs">
-          {block.children.map(c => (
+          {children.map(c => (
             <PosterContribution
               key={c.id}
               entry={c as ContribEntry}
@@ -103,6 +140,14 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
         </Segment.Group>
       </Modal.Content>
       <Modal.Actions>
+        <Button
+          onClick={onCreate}
+          primary
+          basic
+          floated="left"
+          icon="plus"
+          content={Translate.string('Create contribution')}
+        />
         <Button onClick={onClose} content={Translate.string('Close')} />
       </Modal.Actions>
     </Modal>
