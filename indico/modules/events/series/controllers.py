@@ -10,6 +10,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
+from indico.core.logger import Logger
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.series import EventSeries
 from indico.modules.events.series.schemas import EventSeriesSchema, EventSeriesUpdateSchema
@@ -17,6 +18,9 @@ from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs, use_rh_args
 from indico.web.rh import RHProtected
+
+
+logger = Logger.get('events.series')
 
 
 class RHEventSeries(RHProtected):
@@ -37,6 +41,7 @@ class RHEventSeries(RHProtected):
 
     @use_rh_args(EventSeriesUpdateSchema, partial=True)
     def _process_PATCH(self, changes):
+        logger.info('Event series %r updated with %r', self.series.id, changes)
         self.series.populate_from_dict(changes)
         return '', 204
 
@@ -44,9 +49,13 @@ class RHEventSeries(RHProtected):
     def _process_POST(self, data):
         series = EventSeries()
         series.populate_from_dict(data)
+        db.session.flush()
+        logger.info('Event series %r created with %r', series.id, data)
         return '', 204
 
     def _process_DELETE(self):
         Event.query.filter_by(series_id=self.series.id, is_deleted=True).update({Event.series_id: None})
+        logger.info('Event series %r deleted (events: %s)', self.series.id,
+                    ', '.join(str(e.id) for e in self.series.events))
         db.session.delete(self.series)
         return '', 204
