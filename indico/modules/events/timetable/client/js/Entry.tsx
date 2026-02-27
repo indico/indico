@@ -33,7 +33,6 @@ import './DayTimetable.module.scss';
 import './Entry.module.scss';
 
 interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
-  id: string;
   blockRef?: React.RefObject<HTMLDivElement>;
   parentEndDt?: string;
   setDuration: (duration: number) => void;
