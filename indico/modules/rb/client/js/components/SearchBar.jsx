@@ -23,10 +23,12 @@ class SearchBar extends React.Component {
     actions: PropTypes.exact({
       setFilterParameter: PropTypes.func.isRequired,
     }).isRequired,
+    wide: PropTypes.bool,
   };
 
   static defaultProps = {
     disabled: false,
+    wide: false,
   };
 
   updateTextFilter = filterValue => {
@@ -40,6 +42,7 @@ class SearchBar extends React.Component {
     const {
       filters: {text},
       disabled,
+      wide,
     } = this.props;
     let inputIcon;
 
@@ -50,7 +53,7 @@ class SearchBar extends React.Component {
     }
 
     return (
-      <div styleName="room-filters">
+      <div styleName={`room-filters ${wide ? 'wide' : ''}`}>
         <DebounceInput
           element={Input}
           size="large"

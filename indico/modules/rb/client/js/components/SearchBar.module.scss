@@ -8,10 +8,16 @@
 @use 'rb:styles/responsive' as *;
 
 .room-filters {
-  width: 100%;
-
-  .text-filter {
+  &.wide {
     width: 100%;
+
+    .text-filter {
+      width: 100%;
+    }
+  }
+
+  .text-filter input {
+    min-width: 300px;
 
     @media (max-width: $tablet-width) {
       min-width: 275px;
