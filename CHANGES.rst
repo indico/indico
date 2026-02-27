@@ -7,6 +7,19 @@ Version 3.3.11
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Add missing access checks when managing event series (:cve:`2026-28352 `, thanks
+  :user:`lighthousekeeper1212`)
+
+.. note::
+
+    While this issue allowed unauthorized changes to event series, the impact is rather low,
+    since this cannot be used to tamper with events or deface them in any way. In case there
+    are access-restricted events in a series, their title and category location could be
+    disclosed though.
+
 Improvements
 ^^^^^^^^^^^^
 
