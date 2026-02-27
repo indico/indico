@@ -42,7 +42,8 @@ import './items.module.scss';
 import './Search.module.scss';
 
 const InitialFormValuesContext = React.createContext({});
-export const UserSearchTokenContext = React.createContext(null);
+export const UserSearchTokenContext = (window._UserSearchTokenContext =
+  window._UserSearchTokenContext || React.createContext(null));
 
 const searchFactory = config => {
   const {
