@@ -11,6 +11,7 @@ import React, {Fragment, ReactNode, useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
 
+import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -89,7 +90,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         count: (contribsGrouped[session.id] ?? []).length,
         text: (
           <div styleName="session">
-            <Label empty circular style={{...session.colors}} />
+            <SessionIcon colors={session.colors} />
             <span>{session.title}</span>
           </div>
         ),
@@ -235,6 +236,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   //              keeps dropdown open.
                   setSelectedFilter(value);
                 }}
+                styleName="session-filter"
                 options={dropdownSessions}
               />
               {Number.isInteger(selectedFilter) && (
