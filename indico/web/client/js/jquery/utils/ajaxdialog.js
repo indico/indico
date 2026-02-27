@@ -22,7 +22,6 @@ import {$T} from 'indico/utils/i18n';
   // data-href.
   // eslint-disable-next-line func-name-matching
   $.fn.ajaxDialog = function jqAjaxDialog(options) {
-    console.log(this);
     return this.on('click', function(e) {
       e.preventDefault();
       if ($(this).hasClass('disabled')) {
@@ -88,6 +87,7 @@ import {$T} from 'indico/utils/i18n';
     let oldOnBeforeUnload = null;
     let ignoreOnBeforeUnload = false;
     let savedFiles = {};
+    const triggerElement = document.activeElement;
 
     loadDialog();
 
@@ -212,6 +212,9 @@ import {$T} from 'indico/utils/i18n';
         _onOpen();
         _.defer(() => {
           popup.canvas.focusFirstField();
+          if (!popup.contentContainer[0].contains(document.activeElement)) {
+            popup.contentContainer.attr('tabindex', '-1').trigger('focus');
+          }
         });
 
         return true;
@@ -267,6 +270,9 @@ import {$T} from 'indico/utils/i18n';
         window.onbeforeunload = oldOnBeforeUnload;
       }
       popup = null;
+      if (triggerElement && document.contains(triggerElement)) {
+        triggerElement.focus();
+      }
     }
 
     function _onOpen() {

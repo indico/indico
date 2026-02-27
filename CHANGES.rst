@@ -41,6 +41,8 @@ Accessibility
   (:pr:`7349`, thanks :user:`foxbunny`)
 - Contribution list description text, track badges, and type badges now meet WCAG AA
   color contrast requirements (:pr:`7351`, thanks :user:`foxbunny`)
+- Dialogs now announce their title to screen readers and return focus to the trigger
+  element when closed (:pr:`7354`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
