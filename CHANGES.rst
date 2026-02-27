@@ -5,7 +5,7 @@ Changelog
 Version 3.3.11
 --------------
 
-*Unreleased*
+*Released on February 27, 2026*
 
 Security fixes
 ^^^^^^^^^^^^^^
