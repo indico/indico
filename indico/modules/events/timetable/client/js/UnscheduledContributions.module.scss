@@ -118,9 +118,9 @@
   height: 100%;
   cursor: ew-resize;
   user-select: none;
-  border-left: 1px solid #d4d4d5;
+  border-right: 1px solid #d4d4d5;
 
   &:hover {
-    border-left: 4px solid #007cac;
+    border-right: 4px solid #007cac;
   }
 }
