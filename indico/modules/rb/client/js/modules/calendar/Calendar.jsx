@@ -326,7 +326,7 @@ class Calendar extends React.Component {
                   {this.renderViewSwitch()}
                 </Grid.Row>
                 <Grid.Row styleName="search-row">
-                  <SearchBar disabled={isFetching || isFetchingActiveBookings} />
+                  <SearchBar disabled={isFetching || isFetchingActiveBookings} wide />
                 </Grid.Row>
                 {isTimelineVisible && (
                   <TimelineHeader
