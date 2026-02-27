@@ -17,15 +17,14 @@ type ModalPayload<T extends ModalType> = Extract<ModalState, {type: T}>['payload
 
 type ModalFunction = <T extends ModalType>(type: T, payload: ModalPayload<T>) => void;
 
-interface ModalContextValue {
+interface ModalRootInterface {
   modal: ModalState | null;
-  openModal: ModalFunction;
   closeModal: () => void;
 }
 
-const ModalContext = createContext<ModalContextValue>(null);
+const ModalContext = createContext<ModalRootInterface & {openModal: ModalFunction}>(null);
 
-function ModalRoot({modal, closeModal}: any) {
+function ModalRoot({modal, closeModal}: ModalRootInterface) {
   const {type, payload} = modal ?? {};
   switch (type) {
     case POSTER_BLOCK_CONTRIBUTIONS_MODAL:
@@ -49,6 +48,12 @@ function ModalRoot({modal, closeModal}: any) {
   }
 }
 
+/**
+ * ModalProvider centralizes modal management for the application.
+ *
+ * Instead of rendering and controlling individual modals in every component,
+ * this provider allows you to open and close modals from anywhere using the context.
+ */
 export function ModalProvider({children}: {children: React.ReactNode}) {
   const [modal, setModal] = useState<ModalState | null>(null);
 
