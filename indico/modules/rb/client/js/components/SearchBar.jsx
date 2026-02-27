@@ -28,6 +28,7 @@ class SearchBar extends React.Component {
 
   static defaultProps = {
     disabled: false,
+    wide: false,
   };
 
   updateTextFilter = filterValue => {
