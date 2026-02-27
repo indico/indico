@@ -12,6 +12,7 @@ import pytest
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
+from indico.modules.events.registration.models.checks import RegistrationCheckType
 from indico.util.date_time import now_utc
 from indico.util.string import crc32
 
@@ -22,7 +23,7 @@ DUMMY_BMP_IMAGE = (b'BM\x1e\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00'
 
 
 @pytest.fixture
-def create_event(dummy_user, dummy_category, db):
+def create_event(dummy_user, dummy_category, db, dummy_check_type):
     """Return a callable which lets you create dummy events."""
 
     def _create_event(id_=None, creator=None, creator_has_privileges=False, **kwargs):
@@ -36,6 +37,7 @@ def create_event(dummy_user, dummy_category, db):
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
         kwargs.setdefault('category', dummy_category)
+        kwargs.setdefault('default_check_type_id', dummy_check_type.id)
         event = Event(id=id_, creator=creator, acl_entries=set(), **kwargs)
 
         if creator_has_privileges:
@@ -75,3 +77,22 @@ def dummy_event_logo(dummy_event):
         'filename': 'dummy-event-logo.bmp',
         'content_type': 'image/bmp'
     }
+
+
+@pytest.fixture
+def create_registration_check_type(db):
+    """Return a callable which lets you create dummy RegistrationCheckTypes."""
+
+    def _create_registration_check_type(title=None, is_system_defined=False):
+        check_type = RegistrationCheckType(title=title, is_system_defined=is_system_defined)
+        db.session.add(check_type)
+        db.session.flush()
+        return check_type
+
+    return _create_registration_check_type
+
+
+@pytest.fixture
+def dummy_check_type(create_registration_check_type):
+    """Create a mocked dummy RegistrationCheckType."""
+    return create_registration_check_type(title='Check type', is_system_defined=True)
