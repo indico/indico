@@ -7,6 +7,7 @@
 
 import moment, {Moment} from 'moment';
 
+import {DEFAULT_CONTRIB_COLORS} from './colors';
 import {Transform, Over, MousePosition} from './dnd';
 import {
   TopLevelEntry,
@@ -299,10 +300,6 @@ export function layoutAfterUnscheduledDrop(
     return;
   }
 
-  if (unscheduledEntry.sessionId) {
-    return;
-  }
-
   const endDt = moment(startDt).add(unscheduledEntry.duration, 'minutes');
   if (startDt.isBefore(minStartDt) || endDt.isAfter(maxEndDt)) {
     return;
@@ -314,9 +311,11 @@ export function layoutAfterUnscheduledDrop(
     y: minutesToPixels(
       moment(startDt).add(deltaMinutes, 'minutes').diff(moment(dt).startOf('day'), 'minutes')
     ),
+    colors: DEFAULT_CONTRIB_COLORS,
     column: null,
     maxColumn: null,
   };
+  delete entry.sessionId;
 
   const groupIds = getGroup(entry, entries);
   let group = entries.filter(e => groupIds.has(e.id));
@@ -372,10 +371,6 @@ export function layoutAfterUnscheduledDropOnBlock(
 
   if (entry.duration > toBlock.duration) {
     return; // TODO: auto-resize the block?
-  }
-
-  if (entry.sessionId && entry.sessionId !== toBlock.sessionId) {
-    return;
   }
 
   const draftEntry: ChildContribEntry = {
