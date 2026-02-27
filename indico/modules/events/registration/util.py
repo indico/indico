@@ -9,13 +9,15 @@ import base64
 import csv
 import dataclasses
 import itertools
+import re
 import uuid
 from datetime import datetime
 from io import BytesIO
 from operator import attrgetter
+from urllib.parse import urlparse
 
 from flask import json, session
-from marshmallow import RAISE, ValidationError, fields, validates
+from marshmallow import RAISE, ValidationError, fields, validates, validates_schema
 from PIL import Image, ImageOps
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
@@ -325,6 +327,18 @@ def check_registration_email(regform, email, registration=None, management=False
             return {'status': 'ok', 'user': None}
 
 
+def check_registration_field_content(field, value):
+    """Check whether field value observes the constraint in field's content validation."""
+    constraint = field.data.get('content_validation')
+    if constraint == 'url_only':
+        if urlparse(value).scheme not in ('http', 'https'):
+            raise ValidationError(_('Not a valid URL.'), field_name=field.html_field_name)
+    elif constraint == 'no_url':
+        pattern = r'https?://\S+|www\.\S+'
+        if re.findall(pattern, value):
+            raise ValidationError(_('URLs are not allowed in this field.'), field_name=field.html_field_name)
+
+
 class RegistrationSchemaBase(IndicoSchema):
     # note: this schema is kept outside `make_registration_schema` so plugins can use it in
     # subclass checks when using signals such as `schema_post_load`
@@ -354,6 +368,13 @@ def make_registration_schema(
             status = check_registration_email(regform, email, registration, management=management)
             if status['status'] == 'error':
                 raise ValidationError('Email validation failed: ' + status['conflict'])
+
+        @validates_schema(skip_on_field_errors=True)
+        def validate_content(self, data, **kwargs):
+            for field in regform.active_fields:
+                if field.html_field_name in data:
+                    check_registration_field_content(field, data.get(field.html_field_name, ''))
+                # TODO: check existing values of non modified fields
 
     schema = {}
 
