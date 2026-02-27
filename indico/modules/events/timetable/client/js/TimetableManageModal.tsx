@@ -279,22 +279,17 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const _findOrCreateSession = async sessionObject => {
-    const session: Session = sessions.find(s => s.id === sessionObject.id);
+    const session = sessions.find(s => s.id === sessionObject.id);
 
     if (session) {
       return session;
     }
 
-    try {
-      // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
-      const data = mapSessionToTTData(sessionObject);
-      const {session: resSession = null} = await dispatch(
-        actions.createSession(_.omit(data, 'id'))
-      );
-      return resSession;
-    } catch (error) {
-      handleAxiosError(error, true);
-    }
+    // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
+    const data = mapSessionToTTData(sessionObject);
+    const {session: resSession} = await dispatch(actions.createSession(_.omit(data, 'id')));
+
+    return resSession;
   };
 
   const handleSubmit = async (data: any, form: any) => {
@@ -323,12 +318,21 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       data.start_dt = moment(data.start_dt).format('YYYY-MM-DDTHH:mm:ss');
     }
 
-    const session: Session = data.session_object
-      ? await _findOrCreateSession(data.session_object)
-      : null;
+    const submitData = snakifyKeys({...data});
 
-    delete data.session_object; // Was used temporarily only for id or draft
-    const submitData = snakifyKeys({...data, session_id: session?.id});
+    let session: Session;
+
+    if (data.session_object) {
+      try {
+        session = await _findOrCreateSession(data.session_object);
+        submitData.session_id = session?.id;
+      } catch (error) {
+        handleAxiosError(error, true);
+        return;
+      }
+
+      delete data.session_object; // Was used temporarily only for id or draft
+    }
 
     let resData;
     try {
@@ -336,6 +340,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     } catch (exc) {
       return handleSubmitError(exc);
     }
+
     resData.type = activeType;
 
     const resEntry = mapTTDataToEntry(resData, session, parent);

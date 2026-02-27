@@ -40,11 +40,6 @@ export interface Colors {
   backgroundColor: HexColor;
 }
 
-export interface ColorSchema {
-  text: string;
-  background: string;
-}
-
 export interface LocationData {
   address: string;
   venueId?: number;

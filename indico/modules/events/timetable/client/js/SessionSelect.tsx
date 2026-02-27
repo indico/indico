@@ -67,13 +67,11 @@ const _mapSessionToOption = (session: CompactSession): SessionOption => ({
   value: session.id,
 });
 
-const _mapSessionsToOptions = (sessions: CompactSession[]): SessionOption[] => {
-  return sessions.length
-    ? sessions
-        .flatMap(_mapSessionToOption)
-        .sort((a, b) => a.title.toString().localeCompare(b.title.toString()))
-    : [];
-};
+const _sessionSortFn = (a: SessionOption, b: SessionOption) =>
+  a.title.toString().localeCompare(b.title.toString());
+
+const _mapSessionsToOptions = (sessions: CompactSession[]): SessionOption[] =>
+  sessions.flatMap(_mapSessionToOption).sort(_sessionSortFn);
 
 const _filterOptions = (options: SessionOption[], query: string) => {
   const loweredQuery = query.toLowerCase();

@@ -13,7 +13,7 @@ import {Colors} from 'indico/modules/events/timetable/types';
 import './SessionIcon.module.scss';
 
 export function SessionIcon({colors, ...rest}: {colors: Colors}) {
-  const {color: subColor, backgroundColor: color} = colors || {};
+  const {color: subColor, backgroundColor: color} = colors;
 
   return (
     <Icon.Group {...rest}>
