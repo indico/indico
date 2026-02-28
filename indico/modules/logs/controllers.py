@@ -70,9 +70,16 @@ class RHEventLogs(RHManageEventBase):
 
     def _process(self):
         metadata_query = _get_metadata_query()
+        initial_keyword = request.args.get('q', '')
+        initial_filters = request.args.getlist('filters')
+        user = request.args.get('user', type=int)
+
         realms = {realm.name: realm.title for realm in EventLogRealm}
         return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
-                                           logs_api_url=url_for('.api_event_logs', self.event))
+                                           logs_api_url=url_for('.api_event_logs', self.event),
+                                           initial_keyword=initial_keyword,
+                                           initial_filters=initial_filters,
+                                           user=user)
 
 
 class RHUserLogs(RHUserBase):
@@ -108,8 +115,9 @@ class LogsAPIMixin:
         filters = request.args.getlist('filters')
         metadata_query = _get_metadata_query()
         text = request.args.get('q')
+        user = request.args.get('user', type=int)
 
-        if not filters and not metadata_query:
+        if not filters and not metadata_query and not user and not text:
             return jsonify(current_page=1, pages=[], entries=[], total_page_count=0)
 
         query = self.object.log_entries if self.object else self.model.query
@@ -118,7 +126,11 @@ class LogsAPIMixin:
         if realms:
             query = query.filter(self.model.realm.in_(realms))
 
-        if text:
+        if user:
+            # When filtering by user, only filter by user_id (not by text)
+            query = query.filter(self.model.user_id == user)
+        elif text:
+            # Only apply text search if user is not present
             query = query.filter(
                 db.or_(_contains(self.model.module, text),
                        _contains(self.model.type, text),
