@@ -7,7 +7,7 @@
 
 from functools import partial
 
-from indico.modules.events.contributions.controllers import display, management
+from indico.modules.events.contributions.controllers import api, display, management
 from indico.modules.events.contributions.controllers.compat import compat_contribution, compat_subcontribution
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -140,6 +140,7 @@ _bp.add_url_rule('/manage/contributions/fields/description', 'manage_description
 _bp.add_url_rule('/contributions/', 'contribution_list', display.RHContributionList)
 _bp.add_url_rule('/contributions/contributions.pdf', 'contribution_list_pdf', display.RHContributionsExportToPDF)
 _bp.add_url_rule('/contributions/mine', 'my_contributions', display.RHMyContributions)
+_bp.add_url_rule('/contributions/my_timetable', 'my_timetable', display.RHMyTimetable)
 _bp.add_url_rule('/contributions/authors', 'author_list', display.RHAuthorList)
 _bp.add_url_rule('/contributions/speakers', 'speaker_list', display.RHSpeakerList)
 _bp.add_url_rule('/contributions/customize', 'customize_contribution_list', display.RHContributionListFilter,
@@ -154,6 +155,12 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics', display.RHContributionExportToICAL)
 _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  display.RHSubcontributionDisplay)
+
+_bp.add_url_rule('/api/contributions/mine', 'my_contributions_api', api.RHAPIMyContributions)
+_bp.add_url_rule('/api/contributions/favorite', 'favorite_contributions_api',
+                    api.RHFavoriteContributionsAPI)
+_bp.add_url_rule('/api/contributions/favorite/<int:contrib_id>', 'favorite_contributions_api',
+                    api.RHFavoriteContributionsAPI, methods=('GET', 'PUT', 'DELETE'))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<int:event_id>')
