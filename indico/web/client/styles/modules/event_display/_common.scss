@@ -87,18 +87,28 @@
       border-right: 1px dotted $light-black;
     }
 
-    .i-dropdown {
+    ind-with-tooltip,
+    ind-menu {
+      align-self: stretch;
+    }
+
+    ind-menu > menu {
       @include border-all($color: $black);
       @include single-box-shadow($color: $black);
 
       background: $dark-black;
+      list-style: none;
 
       li {
+        padding: 0.1em 1em;
+
         a {
+          display: block;
+          line-height: 1.7rem;
           color: $dark-gray;
         }
 
-        &:hover a:not(.disabled) {
+        &:hover a:not([aria-current]) {
           color: $light-gray;
         }
       }
