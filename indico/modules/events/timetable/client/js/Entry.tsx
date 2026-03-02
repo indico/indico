@@ -22,7 +22,6 @@ import {
   ReduxState,
   ContribEntry,
   EntryType,
-  BlockEntry,
   BaseEntry,
   ScheduledMixin,
   EntryUniqueID,
@@ -126,11 +125,12 @@ interface _EntryProps {
   onMouseUp?: () => void;
   setChildDuration?: (id: string) => (duration: number) => void;
   children?: ContribEntry[];
-  parent?: BlockEntry | null;
   parentEndDt?: string;
+  sessionId?: number;
+  sessionBlockId?: string;
 }
 
-type DraggableContribEntryProps = _EntryProps & ScheduledMixin & BaseEntry;
+type EntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
 // TODO: (Ajob) Fix these type errors
 export default function Entry({
@@ -159,7 +159,7 @@ export default function Entry({
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
-}: DraggableContribEntryProps) {
+}: EntryProps) {
   const isPosterBlock = useSelector((state: ReduxState) =>
     selectors.isPosterSessionBlock(state, id)
   );
