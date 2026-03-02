@@ -45,7 +45,7 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
             closeModal();
 
             if (payload.onClose) {
-              payload?.onClose();
+              payload.onClose();
             }
           }}
         />

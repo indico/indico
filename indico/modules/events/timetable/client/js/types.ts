@@ -75,7 +75,6 @@ export interface Session {
 
 export interface BaseEntry {
   type: EntryType;
-  id: EntryUniqueID;
   objId: number;
   title: string;
   duration: number;
@@ -183,7 +182,7 @@ interface StaticData {
 export interface Navigation {
   currentDate: Moment;
   isExpanded: boolean;
-  expandedSessionBlockId: EntryUniqueID | null;
+  expandedSessionBlockId: SessionBlockId;
 }
 
 export interface ReduxState {

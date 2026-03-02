@@ -19,7 +19,15 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ReduxState, ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {
+  ReduxState,
+  ContribEntry,
+  EntryType,
+  BlockEntry,
+  BaseEntry,
+  ScheduledMixin,
+  EntryUniqueID,
+} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
@@ -33,6 +41,7 @@ import './DayTimetable.module.scss';
 import './Entry.module.scss';
 
 interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
+  id: EntryUniqueID;
   blockRef?: React.RefObject<HTMLDivElement>;
   parentEndDt?: string;
   setDuration: (duration: number) => void;
@@ -107,6 +116,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 }
 
 interface _EntryProps {
+  id?: EntryUniqueID;
   sessionTitle?: string;
   isDragging: boolean;
   transform: {x: number; y: number} | undefined;
