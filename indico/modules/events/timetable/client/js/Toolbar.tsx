@@ -17,15 +17,16 @@ import * as actions from './actions';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {ReduxState} from './types';
-import {getDiffInDays} from './utils';
+import {getDiffInDays, getEntryColors} from './utils';
 
 import './Toolbar.module.scss';
 
 function SessionBlockToolbar() {
   const dispatch = useDispatch();
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
-  const {title, colors, sessionId} = expandedSessionBlock ?? {};
+  const {title, sessionId} = expandedSessionBlock ?? {};
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const colors = getEntryColors(expandedSessionBlock, session);
 
   if (!expandedSessionBlock) {
     return null;
