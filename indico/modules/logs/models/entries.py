@@ -59,9 +59,10 @@ class UserLogRealm(RichIntEnum):
 
 
 class AppLogRealm(RichIntEnum):
-    __titles__ = (None, _('System'), _('Admin'))
+    __titles__ = (None, _('System'), _('Admin'), _('Emails'))
     system = 1
     admin = 2
+    emails = 3
 
 
 class LogKind(IndicoIntEnum):
@@ -171,6 +172,10 @@ class LogEntryBase(db.Model):
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
 
+    def get_email_attachment_url(self, attachment_id):
+        """Return the URL for a stored email attachment."""
+        raise NotImplementedError
+
     @property
     def object_details(self):
         details_mapping = {
@@ -233,6 +238,10 @@ class EventLogEntry(LogEntryBase):
         )
     )
 
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.event_email_attachment', event_id=self.event_id, log_entry_id=self.id,
+                       attachment_id=attachment_id)
+
     @locator_property
     def locator(self):
         return dict(self.event.locator, log_entry_id=self.id)
@@ -268,6 +277,10 @@ class CategoryLogEntry(LogEntryBase):
         )
     )
 
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.category_email_attachment', category_id=self.category_id, log_entry_id=self.id,
+                       attachment_id=attachment_id)
+
 
 class UserLogEntry(LogEntryBase):
     """Log entries for users."""
@@ -301,6 +314,10 @@ class UserLogEntry(LogEntryBase):
         foreign_keys=[target_user_id]
     )
 
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.user_email_attachment', user_id=self.target_user_id, log_entry_id=self.id,
+                       attachment_id=attachment_id)
+
 
 class AppLogEntry(LogEntryBase):
     """Log entries for the application."""
@@ -320,6 +337,9 @@ class AppLogEntry(LogEntryBase):
                             data=(data or {}), meta=(meta or {}))
         db.session.add(entry)
         return entry
+
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.app_email_attachment', log_entry_id=self.id, attachment_id=attachment_id)
 
     def __repr__(self):
         return format_repr(self, 'id', 'logged_dt', 'realm', 'module', _text=self.summary)
