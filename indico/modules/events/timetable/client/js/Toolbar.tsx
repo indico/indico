@@ -25,9 +25,6 @@ function SessionBlockToolbar() {
   const dispatch = useDispatch();
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const {title, colors, sessionId} = expandedSessionBlock ?? {};
-  // (Ajob) Did not want to use sessionTitle property to get title, as
-  //        it would not change when a session is changed in the future due
-  //        to it simply being an appended value.
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
 
   if (!expandedSessionBlock) {

@@ -107,7 +107,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       duration: Math.min(20, block.duration),
       startDt: block.startDt,
     };
-    actions.setDraftEntry(draftEntry);
+    actions.createEntry(EntryType.Contribution, draftEntry);
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
       entry: draftEntry,

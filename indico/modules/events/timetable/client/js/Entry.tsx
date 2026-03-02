@@ -11,7 +11,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {useDraggable, useDroppable} from './dnd';
 import {EntryMoveButtons} from './EntryMoveButtons';
 import {EntryPopup} from './EntryPopup';
@@ -35,6 +34,7 @@ import {
   snapMinutes,
   formatBlockTitle,
   getIconByEntryType,
+  getEntryColors,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -90,7 +90,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   }, [dispatch, isDragging]);
 
   const entry = (
-    <ContributionEntry
+    <Entry
       id={id}
       {...rest}
       listeners={listeners}
@@ -116,8 +116,6 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 }
 
 interface _EntryProps {
-  id?: EntryUniqueID;
-  sessionTitle?: string;
   isDragging: boolean;
   transform: {x: number; y: number} | undefined;
   listeners: Record<string, unknown>;
@@ -135,14 +133,13 @@ interface _EntryProps {
 type DraggableContribEntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
 // TODO: (Ajob) Fix these type errors
-export default function ContributionEntry({
+export default function Entry({
   type,
   id,
   startDt,
   duration: _duration,
   title,
   blockRef,
-  sessionTitle,
   selected,
   y,
   listeners,
@@ -156,8 +153,9 @@ export default function ContributionEntry({
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
   parentEndDt,
-  parent,
-  colors,
+  sessionId,
+  sessionBlockId,
+  colors: customColors,
   children: _children = [],
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
@@ -165,11 +163,14 @@ export default function ContributionEntry({
   const isPosterBlock = useSelector((state: ReduxState) =>
     selectors.isPosterSessionBlock(state, id)
   );
+  const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+  const colors = getEntryColors({type, sessionBlockId, customColors}, session);
+  const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
 
   let style: Record<string, string | number | undefined> = transform
     ? {
@@ -178,8 +179,6 @@ export default function ContributionEntry({
       }
     : {};
 
-  const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
-  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
   const minHeight = minutesToPixels(5);
   const height = minutesToPixels(Math.max(duration, minHeight)) - 1;
 
@@ -194,7 +193,7 @@ export default function ContributionEntry({
     zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     boxShadow: selected || isDragging ? `0 0 0 4px rgba(0,0,0,0.1)` : undefined,
-    ...styleColors,
+    ...colors,
   };
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
@@ -262,14 +261,16 @@ export default function ContributionEntry({
         styleName="drag-handle"
         style={{
           cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
-          borderLeftColor: selected || isDragging ? `${colors.color}66` : `${styleColors.color}33`,
+          borderLeftColor: selected || isDragging ? `${colors.color}66` : `${colors.color}33`,
         }}
         ref={setNodeRef}
         {...listeners}
       >
         {/* TODO: (Ajob) Evaluate need for formatBlockTitle */}
         <EntryTitle
-          title={type === EntryType.SessionBlock ? formatBlockTitle(sessionTitle, title) : title}
+          title={
+            type === EntryType.SessionBlock ? formatBlockTitle(session?.title ?? '', title) : title
+          }
           duration={duration}
           timeRange={timeRange}
           type={type}
@@ -300,7 +301,7 @@ export default function ContributionEntry({
       </div>
       <EntryMoveButtons
         id={id}
-        sessionBlockId={parent?.id}
+        sessionBlockId={sessionBlockId}
         startDt={startDt}
         duration={duration}
         colors={btnColors}

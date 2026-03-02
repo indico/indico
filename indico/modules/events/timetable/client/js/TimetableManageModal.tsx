@@ -335,7 +335,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData, session, parent);
+    const resEntry = mapTTDataToEntry(resData);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {
