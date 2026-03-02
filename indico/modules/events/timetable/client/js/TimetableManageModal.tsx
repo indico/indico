@@ -312,7 +312,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       data.session_block_id = parent.objId;
     }
 
-    let session: Session;
+    let session: Session = sessions.find(s => s.id === entry.sessionId);
+
     if (data.session_object) {
       try {
         session = await _findOrCreateSession(data.session_object);

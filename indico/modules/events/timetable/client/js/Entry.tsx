@@ -169,6 +169,7 @@ export default function ContributionEntry({
     : {};
 
   const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
+  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
   const minHeight = minutesToPixels(5);
   const height = minutesToPixels(Math.max(duration, minHeight)) - 1;
 
@@ -233,8 +234,6 @@ export default function ContributionEntry({
     }
     return obj;
   }, [_children, setChildDuration]);
-
-  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
 
   return (
     <div
