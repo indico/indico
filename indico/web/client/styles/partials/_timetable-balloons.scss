@@ -182,3 +182,14 @@
 .push-back {
   z-index: 0 !important;
 }
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row > .expand {
+  flex: 1;
+}
