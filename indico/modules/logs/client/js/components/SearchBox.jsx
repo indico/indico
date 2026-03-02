@@ -26,11 +26,7 @@ export default class SearchBox extends React.Component {
           <span className="i-button label">
             <span className="icon-search" />
           </span>
-          <input
-            type="text"
-            value={keyword || ''}
-            onChange={e => setKeyword(e.target.value.trim())}
-          />
+          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value.trim())} />
         </div>
       </div>
     );
