@@ -128,10 +128,17 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
     <Modal size="small" onClose={onClose} defaultOpen closeIcon>
       <Modal.Header styleName="title">
         <Label circular size="mini" style={session.colors} />
-        <Translate>
-          Contributions of '
-          <Param name="posterSessionBlockTitle" value={block.title} />'
-        </Translate>
+        {block.title ? (
+          <Translate>
+            Contributions of '
+            <Param name="posterSessionBlockTitle" value={block.title} />'
+          </Translate>
+        ) : (
+          <Translate>
+            Contributions of block in session '
+            <Param name="posterSessionTitle" value={session.title} />'
+          </Translate>
+        )}
       </Modal.Header>
       <Modal.Content styleName="modal-content">
         <Segment.Group styleName="contribs">
