@@ -2,102 +2,111 @@
                                                                                render_invoice %}
 
 {% macro render_registration_details(registration, payment_enabled, assigned_tags, all_tags) %}
+    {% set can_manage_registration = registration.event.can_manage(session.user, permission='registration') %}
+    {% set can_moderate = registration.event.can_manage(session.user, permission='registration_moderation') %}
+    {% set can_checkin = registration.event.can_manage(session.user, permission='registration_checkin') %}
     <div id="registration-details">
         {{ template_hook('before-registration-actions', registration=registration) }}
         <div class="action-box">
            <div class="section">
                <div class="icon icon-quill registration-{{ registration.state.name }}"></div>
                 {% if registration.state.name == 'pending' %}
-                    {{ _render_pending_actions(registration) }}
+                    {{ _render_pending_actions(registration, can_manage_registration or can_moderate) }}
                 {% elif registration.state.name == 'unpaid' %}
-                    {{ _render_unpaid_actions(registration) }}
+                    {{ _render_unpaid_actions(registration, can_manage_registration, can_manage_registration or can_moderate) }}
                 {% elif registration.state.name == 'complete' %}
-                    {{ _render_complete_actions(registration) }}
+                    {{ _render_complete_actions(registration, can_manage_registration or can_moderate) }}
                 {% elif registration.state.name in ('rejected', 'withdrawn') %}
-                    {{ _render_cancelled_actions(registration) }}
+                    {{ _render_cancelled_actions(registration, can_manage_registration or can_moderate) }}
                 {% endif %}
             </div>
             {% block checkin_state scoped %}
-                {% if registration.state.name in ('unpaid', 'complete') %}
+                {% if registration.state.name in ('unpaid', 'complete') and (can_manage_registration or can_checkin) %}
                     {{ _render_check_in(registration) }}
                 {% endif %}
             {% endblock %}
             {{ template_hook('extra-registration-actions', registration=registration) }}
         </div>
         {% block render_withdraw_actions scoped %}
-            {% if registration.state.name not in ('rejected', 'withdrawn') %}
+            {% if registration.state.name not in ('rejected', 'withdrawn') and (can_manage_registration or can_moderate) %}
                 {{ _render_withdraw_actions(registration) }}
             {% endif %}
         {% endblock %}
         {% block render_allow_modification scoped %}
-            {{ _render_allow_modification(registration) if registration.is_active }}
+            {% if can_manage_registration %}
+                {{ _render_allow_modification(registration) if registration.is_active }}
+            {% endif %}
         {% endblock %}
-        {% if all_tags %}
+        {% if can_manage_registration and all_tags %}
             <div class="action-box">
                 {{ _render_registration_tags(registration, assigned_tags, all_tags) }}
             </div>
         {% endif %}
         {% block render_view_logs scoped %}
-            {{ _render_view_logs(registration) }}
+            {% if can_manage_registration %}
+                {{ _render_view_logs(registration) }}
+            {% endif %}
         {% endblock %}
         {{ template_hook('before-registration-summary', registration=registration) }}
-        {{ render_registration_summary(registration, from_management=True) }}
-        {% call render_invoice(registration, payment_enabled) %}
-            <table class="regform-done-footer registration-info">
-                <tr>
-                    <td>
-                        {% if registration.transaction and registration.transaction.data.changed_by_name %}
-                            <div class="checkbox-with-text">
-                                <div class="payment-conditions-agreement">
-                                    {%- trans updated_by=registration.transaction.data.changed_by_name,
-                                             timestamp=registration.transaction.timestamp | format_date(timezone=registration.event.tzinfo) -%}
-                                        Last updated by {{ updated_by }} on {{ timestamp }}.
-                                    {% endtrans -%}
+        {{ render_registration_summary(registration, from_management=True, can_manage_registration=can_manage_registration) }}
+        {% if can_manage_registration %}
+            {% call render_invoice(registration, payment_enabled) %}
+                <table class="regform-done-footer registration-info">
+                    <tr>
+                        <td>
+                            {% if registration.transaction and registration.transaction.data.changed_by_name %}
+                                <div class="checkbox-with-text">
+                                    <div class="payment-conditions-agreement">
+                                        {%- trans updated_by=registration.transaction.data.changed_by_name,
+                                                 timestamp=registration.transaction.timestamp | format_date(timezone=registration.event.tzinfo) -%}
+                                            Last updated by {{ updated_by }} on {{ timestamp }}.
+                                        {% endtrans -%}
+                                    </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                    </td>
-                    <td class="regform-done-footer-button">
-                        {% if not registration.is_paid %}
-                            <button class="i-button big"
-                                    data-update="#registration-details"
-                                    data-method="POST"
-                                    data-params="{{ dict(pay=1) | tojson | forceescape }}"
-                                    {{ 'disabled' if registration.state.name != 'unpaid' }}
-                                    data-href="{{ url_for('.toggle_registration_payment', registration) }}">
-                                {% trans %}Mark as paid{% endtrans %}
-                            </button>
-                        {% else %}
-                            <button class="i-button big"
-                                    data-update="#registration-details"
-                                    data-method="POST"
-                                    data-params="{{ dict(pay=0) | tojson | forceescape }}"
-                                    data-href="{{ url_for('.toggle_registration_payment', registration) }}">
-                                {% trans %}Mark as unpaid{% endtrans %}
-                            </button>
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        {% endcall %}
+                            {% endif %}
+                        </td>
+                        <td class="regform-done-footer-button">
+                            {% if not registration.is_paid %}
+                                <button class="i-button big"
+                                        data-update="#registration-details"
+                                        data-method="POST"
+                                        data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                                        {{ 'disabled' if registration.state.name != 'unpaid' }}
+                                        data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                                    {% trans %}Mark as paid{% endtrans %}
+                                </button>
+                            {% else %}
+                                <button class="i-button big"
+                                        data-update="#registration-details"
+                                        data-method="POST"
+                                        data-params="{{ dict(pay=0) | tojson | forceescape }}"
+                                        data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                                    {% trans %}Mark as unpaid{% endtrans %}
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            {% endcall %}
 
-        {% if registration.transaction %}
-            <div id="transaction-summary" class="regform-done">
-                <div class="i-box-header">
-                    <div class="i-box-title">
-                        {% trans %}Payment transaction{% endtrans %}
+            {% if registration.transaction %}
+                <div id="transaction-summary" class="regform-done">
+                    <div class="i-box-header">
+                        <div class="i-box-title">
+                            {% trans %}Payment transaction{% endtrans %}
+                        </div>
+                    </div>
+                    <div class="i-box-content">
+                        {{ registration.transaction.render_details()|safe }}
                     </div>
                 </div>
-                <div class="i-box-content">
-                    {{ registration.transaction.render_details()|safe }}
-                </div>
-            </div>
+            {% endif %}
         {% endif %}
     </div>
 {% endmacro %}
 
 
-{% macro _render_pending_actions(registration) %}
+{% macro _render_pending_actions(registration, can_moderate) %}
     <div class="text">
        <div class="label">
            {% trans %}Registration awaiting manager approval{% endtrans %}
@@ -106,60 +115,64 @@
            You can validate or reject this registration and the user will receive a notification.
        {%- endtrans %}
     </div>
-    <div class="toolbar">
-        {% block registration_pending_action_buttons scoped %}
-            <div class="group">
-                <button class="i-button accept"
-                        data-update="#registration-details"
-                        data-method="POST"
-                        data-href="{{ url_for('.approve_registration', registration) }}"
-                        data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
-                        data-title="{% trans %}Approve registration{% endtrans %}">
-                    {%- trans %}Approve{% endtrans -%}
-                </button>
-            </div>
-            <div class="group">
-                <button class="i-button danger"
-                        data-update="#registration-details"
-                        data-href="{{ url_for('.reject_registration', registration) }}"
-                        data-title="{% trans %}Reject registration{% endtrans %}"
-                        data-ajax-dialog>
-                    {%- trans %}Reject{% endtrans -%}
-                </button>
-            </div>
-        {% endblock %}
-    </div>
+    {% if can_moderate %}
+        <div class="toolbar">
+            {% block registration_pending_action_buttons scoped %}
+                <div class="group">
+                    <button class="i-button accept"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            data-href="{{ url_for('.approve_registration', registration) }}"
+                            data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
+                            data-title="{% trans %}Approve registration{% endtrans %}">
+                        {%- trans %}Approve{% endtrans -%}
+                    </button>
+                </div>
+                <div class="group">
+                    <button class="i-button danger"
+                            data-update="#registration-details"
+                            data-href="{{ url_for('.reject_registration', registration) }}"
+                            data-title="{% trans %}Reject registration{% endtrans %}"
+                            data-ajax-dialog>
+                        {%- trans %}Reject{% endtrans -%}
+                    </button>
+                </div>
+            {% endblock %}
+        </div>
+    {% endif %}
 {% endmacro %}
 
 
-{% macro _render_unpaid_actions(registration) %}
+{% macro _render_unpaid_actions(registration, can_manage_registration, can_moderate) %}
     <div class="text">
         <div class="label">
            {% trans %}Registration not paid yet{% endtrans %}
         </div>
         {% if registration.is_paid %}
             {% trans %}The current transaction is still pending.{% endtrans %}
-        {% else %}
+        {% elif can_manage_registration %}
             {% trans %}You can mark the registration as paid manually.{% endtrans %}
         {% endif %}
     </div>
-    {% if not registration.is_paid %}
+    {% if not registration.is_paid and (can_manage_registration or can_moderate) %}
         <div class="toolbar">
-            <div class="group">
-                <span class="i-button label icon-coins">
-                    {{ registration.render_price() }}
-                </span>
-            </div>
-            <div class="group">
-                <button class="i-button"
-                        data-update="#registration-details"
-                        data-method="POST"
-                        data-params="{{ dict(pay=1) | tojson | forceescape }}"
-                        data-href="{{ url_for('.toggle_registration_payment', registration) }}">
-                    {% trans %}Mark as paid{% endtrans %}
-                </button>
-            </div>
-            {% if registration.registration_form.moderation_enabled %}
+            {% if can_manage_registration %}
+                <div class="group">
+                    <span class="i-button label icon-coins">
+                        {{ registration.render_price() }}
+                    </span>
+                </div>
+                <div class="group">
+                    <button class="i-button"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                            data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                        {% trans %}Mark as paid{% endtrans %}
+                    </button>
+                </div>
+            {% endif %}
+            {% if can_moderate and registration.registration_form.moderation_enabled %}
                 {{ _render_reset_registration_button(registration, _('Reset approval')) }}
             {% endif %}
         </div>
@@ -167,7 +180,7 @@
 {% endmacro %}
 
 
-{% macro _render_complete_actions(registration) %}
+{% macro _render_complete_actions(registration, can_moderate) %}
     <div class="text">
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
@@ -176,7 +189,7 @@
             Submitted: {{ submitted }}
         {%- endtrans %}
     </div>
-    {% set can_reset = registration.registration_form.moderation_enabled and not registration.is_paid %}
+    {% set can_reset = can_moderate and registration.registration_form.moderation_enabled and not registration.is_paid %}
     {% set ticket_template = registration.registration_form.get_ticket_template() %}
     {% set can_get_ticket = registration.registration_form.tickets_enabled and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
     {% if can_reset or can_get_ticket %}
@@ -194,7 +207,7 @@
 {% endmacro %}
 
 
-{% macro _render_cancelled_actions(registration) %}
+{% macro _render_cancelled_actions(registration, can_moderate) %}
     <div class="text">
         <div class="label">
             {% trans state=registration.state.title|lower -%}
@@ -205,10 +218,12 @@
             {% trans reason=registration.rejection_reason %}Reason: {{ reason }}{% endtrans %}
         {% endif %}
     </div>
-    <div class="toolbar hide-if-locked">
-        {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
-        {{ _render_reset_registration_button(registration, action, registration.has_conflict()) }}
-    </div>
+    {% if can_moderate %}
+        <div class="toolbar hide-if-locked">
+            {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
+            {{ _render_reset_registration_button(registration, action, registration.has_conflict()) }}
+        </div>
+    {% endif %}
 {% endmacro %}
 
 
