@@ -164,6 +164,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         '&': r'\&',
         '~': r'\~{}',
         '_': r'\_',
+        '^^5c': r'\textbackslash{}',
         '^': r'\^{}',
         '\\': r'\textbackslash{}',
         '\x0c': '',
@@ -188,7 +189,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
     if ignore_math:
         # Extract math-mode segments and replace with placeholder
-        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
+        text = re.sub(r'\$[^\$]+\$|\$\$[^\$]+\$\$', math_replace, text)
 
     pattern = re.compile('|'.join(re.escape(k) for k in chars))
     res = pattern.sub(substitute, text)
@@ -206,7 +207,7 @@ def sanitize_mathmode(text):
         command = m.group(1)
         return m.group(0) if command in safe_mathmode_commands else r'\\' + command
 
-    return re.sub(r'\\([a-zA-Z]+|\\)', _escape_unsafe_command, text)
+    return re.sub(r'(?:\\|\^\^5c)([a-zA-Z]+|(?:\\|\^\^5c))', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):
