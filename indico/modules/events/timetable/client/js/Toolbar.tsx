@@ -14,6 +14,7 @@ import PublicationStateSwitch from 'indico/modules/events/contributions/Publicat
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {ReduxState} from './types';
 import {getDiffInDays} from './utils';
@@ -61,6 +62,8 @@ function SessionBlockToolbar() {
 
 export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
+  const {openModal} = useModal();
+
   const ref = useRef(null);
   const daysBarRef = useRef<HTMLDivElement | null>(null);
   const eventId = useSelector(selectors.getEventId);
@@ -145,6 +148,13 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
       locationData: {...eventLocationParent.location_data, inheriting: true},
     };
     dispatch(actions.setDraftEntry(draftEntry));
+    openModal(DRAFT_ENTRY_MODAL, {
+      eventId,
+      entry: draftEntry,
+      onClose: () => {
+        dispatch(actions.setDraftEntry(null));
+      },
+    });
   };
 
   useEffect(() => {
