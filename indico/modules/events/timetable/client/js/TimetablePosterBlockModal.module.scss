@@ -1,0 +1,40 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:global(.ui.modal > .content).modal-content {
+  padding: 0;
+}
+
+:global(.ui.modal > .header).title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+:global(.ui.segments).contribs {
+  border: none;
+  box-shadow: none;
+  max-height: 800px;
+  overflow-y: auto;
+  padding: 21px;
+}
+
+:global(.ui.segment).contrib {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 0;
+
+  &:not(:first-of-type) {
+    padding-top: 15px;
+  }
+
+  &:not(:last-of-type) {
+    padding-bottom: 15px;
+  }
+}
