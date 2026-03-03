@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon} from 'semantic-ui-react';
+import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -19,7 +19,15 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {ReduxState, ContribEntry, EntryType, BlockEntry, BaseEntry, ScheduledMixin} from './types';
+import {
+  ReduxState,
+  ContribEntry,
+  EntryType,
+  BlockEntry,
+  BaseEntry,
+  ScheduledMixin,
+  EntryUniqueID,
+} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
@@ -33,7 +41,7 @@ import './DayTimetable.module.scss';
 import './Entry.module.scss';
 
 interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
-  id: string;
+  id: EntryUniqueID;
   blockRef?: React.RefObject<HTMLDivElement>;
   parentEndDt?: string;
   setDuration: (duration: number) => void;
@@ -108,6 +116,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 }
 
 interface _EntryProps {
+  id?: EntryUniqueID;
   sessionTitle?: string;
   isDragging: boolean;
   transform: {x: number; y: number} | undefined;
@@ -153,6 +162,9 @@ export default function ContributionEntry({
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
 }: DraggableContribEntryProps) {
+  const isPosterBlock = useSelector((state: ReduxState) =>
+    selectors.isPosterSessionBlock(state, id)
+  );
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -167,6 +179,7 @@ export default function ContributionEntry({
     : {};
 
   const styleColors = parent ? ENTRY_COLORS_BY_BACKGROUND[parent.colors.backgroundColor] : colors;
+  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
   const minHeight = minutesToPixels(5);
   const height = minutesToPixels(Math.max(duration, minHeight)) - 1;
 
@@ -232,8 +245,6 @@ export default function ContributionEntry({
     return obj;
   }, [_children, setChildDuration]);
 
-  const btnColors = {backgroundColor: styleColors.color, color: styleColors.backgroundColor};
-
   return (
     <div
       role="button"
@@ -262,8 +273,9 @@ export default function ContributionEntry({
           duration={duration}
           timeRange={timeRange}
           type={type}
+          {...(isPosterBlock ? {icon: 'flag outline'} : {})}
         />
-        {type === EntryType.SessionBlock && (
+        {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
             ref={setDroppableNodeRef}
             styleName="children-wrapper"
@@ -311,11 +323,13 @@ export function EntryTitle({
   timeRange,
   type,
   duration,
+  icon,
 }: {
   title: string;
   timeRange: string;
   type: EntryType;
   duration?: number;
+  icon?: SemanticICONS;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [lines, setLines] = useState<number>(1);
@@ -338,7 +352,7 @@ export function EntryTitle({
       }}
     >
       <div styleName="title-overflow-wrapper">
-        <Icon name={getIconByEntryType(type)} />
+        <Icon name={icon || getIconByEntryType(type)} />
         <span
           styleName="title"
           style={{

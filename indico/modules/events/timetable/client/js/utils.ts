@@ -16,7 +16,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, HexColor, Session} from './types';
+import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, HexColor, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -98,7 +98,7 @@ export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
   return fallbackColor;
 }
 
-export const getEntryUniqueId = (type: EntryType, id: string): string => {
+export const getEntryUniqueId = (type: EntryType, id: number): EntryUniqueID => {
   switch (type) {
     case EntryType.SessionBlock:
       return `s${id}`;
@@ -156,6 +156,7 @@ export const mapTTDataToEntry = (
     code,
     keywords,
     sessionId,
+    sessionBlockId = parent?.id,
     sessionTitle,
   } = data;
 
@@ -190,7 +191,9 @@ export const mapTTDataToEntry = (
         colors: parent.colors,
         title: parent.title,
       },
-      sessionBlockId: parent.id,
+    }),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
     }),
   };
 
