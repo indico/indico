@@ -26,6 +26,7 @@
   word-break: break-word;
   text-align: left;
   max-width: 400px;
+  min-width: 250px;
 
   >.header-wrapper {
     display: flex;
@@ -157,4 +158,13 @@
       }
     }
   }
+}
+
+.poster-session-note {
+  background-color: rgba(0 0 0 / 0.1);
+  border-radius: 5px;
+  margin-top: 0;
+  padding: 10px;
+  font-size: 0.9rem;
+  line-height: 1.1rem;
 }
