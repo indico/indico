@@ -13,13 +13,13 @@ import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import {ReduxState, BlockEntry, Entry, EntryType, Colors} from './types';
+import {ReduxState, BlockEntry, Entry, EntryType, Colors, EntryUniqueID} from './types';
 import {getDateKey} from './utils';
 
 import './Entry.module.scss';
 
 interface EntryMoveButtonsProps {
-  id: string;
+  id: EntryUniqueID;
   startDt: Moment;
   duration: number;
   sessionBlockId?: string;
