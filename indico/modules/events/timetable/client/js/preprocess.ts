@@ -12,10 +12,13 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import {
   Attachment,
+  BreakId,
   ChildEntry,
   Colors,
+  ContribId,
   DayEntries,
   EntryType,
+  EntryUniqueID,
   LocationData,
   PersonLink,
   Session,
@@ -30,12 +33,23 @@ interface SchemaDate {
 }
 
 interface SchemaEntry {
-  id: string;
+  startDate: SchemaDate;
+  id: EntryUniqueID;
   objId: number;
   title: string;
   description?: string;
+  locationData: LocationData;
+  duration: number;
   colors?: Colors;
   slotTitle?: string;
+  personLinks?: PersonLink[];
+  // (Ajob) Attachments are not possible for breaks but we need to rework
+  //        the interfaces as a whole in general.
+  attachments?: Attachment[];
+}
+
+interface SchemaChild extends Omit<SchemaEntry, 'id'> {
+  id: ContribId | BreakId;
 }
 
 interface SchemaSession extends SchemaEntry {
@@ -45,20 +59,16 @@ interface SchemaSession extends SchemaEntry {
 }
 
 interface SchemaBlock extends SchemaEntry {
-  startDate: SchemaDate;
-  duration: number;
   sessionId?: number;
   sessionTitle?: string;
-  entries?: Record<string, SchemaEntry>;
-  personLinks?: PersonLink[];
+  entries?: Record<string, SchemaChild>;
   attachments?: Attachment[];
-  locationData: LocationData;
 }
 
 const entryTypeMapping = {
-  s: 'block',
-  c: 'contrib',
-  b: 'break',
+  s: EntryType.SessionBlock,
+  c: EntryType.Contribution,
+  b: EntryType.Break,
 };
 
 export function preprocessSessionData(
@@ -144,7 +154,7 @@ export function preprocessTimetableEntries(
       if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
 
-        const children = Object.values(entry.entries).map((c: SchemaBlock) => {
+        const children = Object.values(entry.entries).map((c: SchemaChild) => {
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
             type: childType,

@@ -80,4 +80,4 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
     parent_id = fields.Integer(allow_none=True, load_only=True)
-    session_block_id = fields.Integer(allow_none=True, load_only=True)
+    session_block_id = fields.Integer(allow_none=True)
