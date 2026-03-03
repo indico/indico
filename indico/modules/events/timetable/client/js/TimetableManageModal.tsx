@@ -32,13 +32,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {
-  DATE_KEY_FORMAT,
-  getEntryUniqueId,
-  mapSessionToTTData,
-  mapTTDataToEntry,
-  shiftEntries,
-} from './utils';
+import {DATE_KEY_FORMAT, mapSessionToTTData, mapTTDataToEntry, shiftEntries} from './utils';
 
 // Generic models
 
@@ -110,9 +104,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const isEditing = !!objId;
   const isCreatingChild = !!sessionBlockId;
   const parent = (expandedSessionBlock ||
-    entries.find(
-      e => e.id === getEntryUniqueId(EntryType.SessionBlock, sessionBlockId)
-    )) as Partial<BlockEntry>;
+    entries.find(e => e.id === sessionBlockId)) as Partial<BlockEntry>;
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -214,7 +206,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   );
 
   const _handleCreateContribution = async (data: any) => {
-    data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',
@@ -251,7 +242,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   // TODO: Implement logic for breaks
   const _handleCreateBreak = async (data: any) => {
-    data.session_block_id = sessionBlockId;
     data = _.pick(data, [
       'title',
       'description',
@@ -318,14 +308,16 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       data.start_dt = moment(data.start_dt).format('YYYY-MM-DDTHH:mm:ss');
     }
 
-    const submitData = snakifyKeys({...data});
+    if (parent) {
+      data.session_block_id = parent.objId;
+    }
 
-    let session: Session;
+    let session: Session = sessions.find(s => s.id === entry.sessionId);
 
     if (data.session_object) {
       try {
         session = await _findOrCreateSession(data.session_object);
-        submitData.session_id = session?.id;
+        data.session_id = session?.id;
       } catch (error) {
         handleAxiosError(error, true);
         return;
@@ -336,7 +328,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     let resData;
     try {
-      resData = (await submitHandler(submitData)).data;
+      resData = (await submitHandler(data)).data;
     } catch (exc) {
       return handleSubmitError(exc);
     }
