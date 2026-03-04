@@ -94,6 +94,11 @@ class PaperReviewingSettingsForm(IndicoForm):
     hide_accepted = BooleanField(_('Keep papers hidden'), widget=SwitchWidget(),
                                  description=_("Keep papers hidden from participants even after they've "
                                                'been accepted.'))
+    limit_review_cycles = BooleanField(_('Limit review cycles'), widget=SwitchWidget(),
+                                             description=_('Limit reviewers to accept or reject papers '
+                                                           'after a certain number of review cycles.'))
+    review_cycles = IntegerField(_('Review cycles'),
+                                     [HiddenUnless('limit_review_cycles'), InputRequired()])
     authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
                                                allow_external_users=True, allow_groups=True,
                                                allow_event_roles=True, allow_category_roles=True,

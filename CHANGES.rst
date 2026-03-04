@@ -10,7 +10,7 @@ Version 3.3.12
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
