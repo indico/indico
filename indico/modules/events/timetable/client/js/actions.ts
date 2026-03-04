@@ -111,7 +111,7 @@ interface UnscheduleEntryAction {
 interface CreateEntryAction {
   type: typeof CREATE_ENTRY;
   entryType: string;
-  entry: TopLevelEntry;
+  entry: Entry;
 }
 
 interface UpdateEntryAction {
@@ -411,16 +411,8 @@ export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
 
-function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
+export function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
   return {type: CREATE_ENTRY, entryType, entry};
-}
-
-export function createEntry(entryType: EntryType, entry: Entry) {
-  return (dispatch: Dispatch<Action>) => {
-    const color = entry.colors;
-    const newEntry = {...entry, ...color};
-    dispatch(_createEntry(entryType, newEntry));
-  };
 }
 
 export function editEntry(entryType: EntryType, entry: Entry) {

@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -601,7 +600,6 @@ function layoutAfterDropOnCalendar(
   if (isChildEntry(draftEntry)) {
     delete draftEntry.sessionBlockId;
     delete draftEntry.sessionId;
-    delete draftEntry.parent;
   }
 
   if (draftEntry.type === EntryType.SessionBlock) {
@@ -706,7 +704,6 @@ function layoutAfterDropOnBlock(
     ),
     sessionBlockId: toBlock.id,
     sessionId: toBlock.sessionId,
-    parent: _.pick(toBlock, ['id', 'objId', 'title', 'colors']),
   };
 
   if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
