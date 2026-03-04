@@ -581,6 +581,19 @@ Emails
 
     Default: ``None``
 
+.. data:: MAX_EMAIL_ATTACHMENT_SIZE
+
+    The maximum total size of attachments (in bytes) that can be included when
+    sending emails from Indico's email dialogs (e.g. emailing event participants).
+
+    When set to ``None`` (the default), the email attachment feature is disabled
+    entirely: the attachment UI will not be shown and the upload endpoint will
+    reject requests.
+
+    Example: ``15 * 1024 * 1024`` for a 15 MB limit.
+
+    Default: ``None``
+
 .. data:: SMTP_SERVER
 
     The hostname and port of the SMTP server used for sending emails.
