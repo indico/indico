@@ -142,7 +142,6 @@ function block({
     id,
     objId,
     title,
-    sessionTitle: 'Session',
     description: '',
     personLinks: [],
     attachments: [],
