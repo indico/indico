@@ -381,7 +381,6 @@ export function layoutAfterUnscheduledDropOnBlock(
     ),
     sessionBlockId: toBlock.id,
     sessionId: toBlock.sessionId,
-    parent: toBlock,
     column: null,
     maxColumn: null,
   };

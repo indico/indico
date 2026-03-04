@@ -117,7 +117,6 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
   id: SessionBlockId;
   type: EntryType.SessionBlock;
   sessionId: number;
-  sessionTitle: string;
   // eslint-disable-next-line no-use-before-define
   children: ChildEntry[];
   personLinks: PersonLink[];
@@ -128,7 +127,6 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
 
 export interface ChildBaseEntry {
   sessionBlockId?: string;
-  parent?: Partial<BlockEntry>;
 }
 
 export type ChildContribEntry = ContribEntry & ChildBaseEntry;

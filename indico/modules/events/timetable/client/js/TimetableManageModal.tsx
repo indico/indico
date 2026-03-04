@@ -76,6 +76,7 @@ interface DraftEntry {
   description?: string;
   colors?: EntryColors;
   session_id?: number;
+  session_block_id?: number;
   code?: string;
   board_number?: string;
 }
@@ -144,6 +145,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     start_dt: initialStartDt,
     duration: entry.duration * 60, // Minutes to seconds
     session_id: entry.sessionId,
+    session_block_id: entry.sessionBlockId,
     board_number: entry.boardNumber,
     code: entry.code,
     ...(entry.colors && {
@@ -335,7 +337,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     resData.type = activeType;
 
-    const resEntry = mapTTDataToEntry(resData, session, parent);
+    const resEntry = mapTTDataToEntry(resData);
 
     if (isEditing) {
       if (resEntry.type === EntryType.SessionBlock) {
@@ -345,7 +347,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       // TODO: (Ajob) Refactor to use updateEntry action, and remove api calls from this file
       dispatch(actions._updateEntry(activeType, resEntry, currentDay));
     } else {
-      dispatch(actions.createEntry(activeType, resEntry));
+      dispatch(actions._createEntry(activeType, resEntry));
     }
 
     onSubmit();
