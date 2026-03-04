@@ -15,7 +15,7 @@ import {SemanticICONS} from 'semantic-ui-react';
 
 import {camelizeKeys} from 'indico/utils/case';
 
-import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS} from './colors';
+import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, HexColor, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
@@ -98,6 +98,18 @@ export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
   return fallbackColor;
 }
 
+export function getEntryColors(entry, session) {
+  const {colors, type, sessionBlockId} = entry;
+
+  if (session) {
+    return sessionBlockId
+      ? ENTRY_COLORS_BY_BACKGROUND[session.colors.backgroundColor]
+      : session.colors;
+  }
+
+  return colors ?? getDefaultColorByType(type);
+}
+
 export const getEntryUniqueId = (type: EntryType, id: number): EntryUniqueID => {
   switch (type) {
     case EntryType.SessionBlock:
@@ -134,11 +146,7 @@ export const mapSessionToTTData = (data): any => {
   };
 };
 
-export const mapTTDataToEntry = (
-  data: any,
-  session: Session,
-  parent?: Partial<BlockEntry>
-): Entry => {
+export const mapTTDataToEntry = (data: any): Entry => {
   data = camelizeKeys(data);
   const {
     type,
@@ -156,8 +164,8 @@ export const mapTTDataToEntry = (
     code,
     keywords,
     sessionId,
-    sessionBlockId = parent?.id,
-    sessionTitle,
+    colors,
+    sessionBlockId,
   } = data;
 
   const mappedObj = {
@@ -181,17 +189,8 @@ export const mapTTDataToEntry = (
     maxColumn: 0,
     children: [],
     sessionId: sessionId || null,
-    sessionTitle: sessionTitle || '',
-    colors: mapTTEntryColor(data, session),
+    ...(colors && {colors}),
     ...(sessionId && {sessionId}),
-    ...(parent && {
-      parent: {
-        id: parent.id,
-        objId: parent.objId,
-        colors: parent.colors,
-        title: parent.title,
-      },
-    }),
     ...(sessionBlockId && {
       sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
     }),

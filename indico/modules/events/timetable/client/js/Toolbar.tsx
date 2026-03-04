@@ -17,18 +17,16 @@ import * as actions from './actions';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {ReduxState} from './types';
-import {getDiffInDays} from './utils';
+import {getDiffInDays, getEntryColors} from './utils';
 
 import './Toolbar.module.scss';
 
 function SessionBlockToolbar() {
   const dispatch = useDispatch();
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
-  const {title, colors, sessionId} = expandedSessionBlock ?? {};
-  // (Ajob) Did not want to use sessionTitle property to get title, as
-  //        it would not change when a session is changed in the future due
-  //        to it simply being an appended value.
+  const {title, sessionId} = expandedSessionBlock ?? {};
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const colors = getEntryColors(expandedSessionBlock, session);
 
   if (!expandedSessionBlock) {
     return null;

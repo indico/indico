@@ -60,8 +60,8 @@ interface SchemaSession extends SchemaEntry {
 
 interface SchemaBlock extends SchemaEntry {
   sessionId?: number;
-  sessionTitle?: string;
-  entries?: Record<string, SchemaChild>;
+  entries?: Record<string, SchemaEntry>;
+  personLinks?: PersonLink[];
   attachments?: Attachment[];
 }
 
@@ -121,7 +121,7 @@ export function preprocessTimetableEntries(
         id,
         objId,
         attachments,
-        colors = getDefaultColorByType(type),
+        colors,
       } = entry;
 
       dayEntries[day].push({
@@ -144,7 +144,7 @@ export function preprocessTimetableEntries(
         locationData,
         childLocationParent,
         attachments,
-        colors,
+        ...(colors && {colors}),
       });
 
       if (entry.sessionId) {
@@ -152,8 +152,6 @@ export function preprocessTimetableEntries(
       }
 
       if (type === EntryType.SessionBlock) {
-        dayEntries[day].at(-1).sessionTitle = entry.sessionTitle;
-
         const children = Object.values(entry.entries).map((c: SchemaChild) => {
           const childType = entryTypeMapping[c.id[0]];
           const childEntry: ChildEntry = {
@@ -170,13 +168,6 @@ export function preprocessTimetableEntries(
             locationData: c.locationData,
             column: 0,
             maxColumn: 0,
-            colors: c.colors || getDefaultColorByType(childType),
-            parent: {
-              colors,
-              id,
-              objId,
-              title,
-            },
           };
 
           if (childEntry.type === EntryType.Contribution) {
@@ -192,8 +183,6 @@ export function preprocessTimetableEntries(
         });
         dayEntries[day].at(-1).children = children;
       }
-
-      dayEntries[day].at(-1).colors = colors;
     }
   }
 

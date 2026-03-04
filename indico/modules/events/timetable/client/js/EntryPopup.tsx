@@ -21,7 +21,6 @@ import './Entry.module.scss';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
-import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
@@ -35,7 +34,7 @@ import {
   isChildEntry,
   SessionBlockId,
 } from './types';
-import {getIconByEntryType, mapTTDataToEntry} from './utils';
+import {getIconByEntryType, getEntryColors, mapTTDataToEntry} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
@@ -58,15 +57,18 @@ function EntryPopupContent({
   onClose: () => void;
 }) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const {id, objId, type, title, attachments, colors, duration, startDt, sessionId} = entry;
+  const {objId, type, title, attachments, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
+  const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const isPosterBlock = useSelector((state: ReduxState) =>
     selectors.isPosterSessionBlock(state, entry.id)
   );
+  const isChild = isChildEntry(entry);
+  const parent = isChild ? entries.find(e => e.id === entry.sessionBlockId) : null;
   const startTime = moment(startDt);
   const endTime = moment(startDt).add(duration, 'minutes');
-  const entryParent = isChildEntry(entry) ? entry.parent : null;
+  const colors = getEntryColors(entry, session);
   const {openModal} = useModal();
 
   const _getOrderedLocationArray = () => {
@@ -95,7 +97,7 @@ function EntryPopupContent({
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapTTDataToEntry(data, session, entryParent);
+    const draftEntry = mapTTDataToEntry(data);
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;
@@ -138,7 +140,6 @@ function EntryPopupContent({
       sessionId: entry.sessionId,
       locationParent: entry.childLocationParent,
       locationData: {...entry.childLocationParent.location_data, inheriting: true},
-      parent: {id, objId, title, colors},
     };
     dispatch(actions.setDraftEntry(draftEntry));
     openModal(DRAFT_ENTRY_MODAL, {
@@ -186,28 +187,24 @@ function EntryPopupContent({
     presenters = _getPresentersArray();
   }
 
-  const styleColors = entryParent
-    ? ENTRY_COLORS_BY_BACKGROUND[entryParent.colors.backgroundColor]
-    : colors;
-
   return (
     <>
       <div styleName="header-wrapper">
         <div styleName="header-wrapper-content">
-          {entryParent && session && (
+          {session && (
             <Label
               circular
               title={Translate.string('Session title')}
               styleName="session"
               size="tiny"
-              style={{...entryParent.colors}}
+              style={{...session.colors}}
             >
               <Translate>{session.title}</Translate>
             </Label>
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
             <span>
-              <Label circular empty style={{...styleColors}} />
+              <Label circular empty style={{...colors}} />
               <span>{title || Translate.string('No title')}</span>
             </span>
           </Header>
@@ -235,11 +232,11 @@ function EntryPopupContent({
           <Icon name="clock outline" />
           {formatTimeRange('en', startTime, endTime)}
         </List.Item>
-        {entryParent?.title && (
+        {parent?.title && (
           <List.Item title={Translate.string('Session block title')}>
             <Icon name="calendar alternate outline" />
             <Label circular basic>
-              {entryParent.title}
+              {parent.title}
             </Label>
           </List.Item>
         )}
