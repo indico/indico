@@ -16,6 +16,7 @@ from webargs import validate
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -41,6 +42,9 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.util import check_event_locked
+from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.files.models.files import File
 from indico.modules.logs import LogKind
 from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
@@ -267,6 +271,26 @@ class RHPersonsList(RHPersonsBase):
                                                allow_custom_affiliations=allow_custom_affiliations)
 
 
+class RHUploadEmailAttachment(UploadFileMixin, RHManageEventBase):
+    """Upload a file to be used as an email attachment."""
+
+    # Accept any management permission that grants access to an email-sending endpoint.
+    # This covers contributions managers, registration managers, etc. without requiring
+    # a single fixed permission that would exclude valid callers.
+    _EMAIL_PERMISSIONS = ('contributions', 'registration', 'abstracts', 'surveys')
+
+    def _check_access(self):
+        if config.MAX_EMAIL_ATTACHMENT_SIZE is None:
+            raise Forbidden(_('Email attachments are not enabled on this server.'))
+        self._require_user()
+        if not any(self.event.can_manage(session.user, permission=p) for p in self._EMAIL_PERMISSIONS):
+            raise Forbidden(_('You are not authorized to manage this event.'))
+        check_event_locked(self, self.event)
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'email-attachment'
+
+
 class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
@@ -343,10 +367,19 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
+        'attachments': fields.List(fields.UUID(), load_default=list),
     })
-    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
+    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, attachments):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
+        attachment_files = File.query.filter(File.uuid.in_(attachments)).all() if attachments else []
+        max_size = config.MAX_EMAIL_ATTACHMENT_SIZE
+        if max_size is not None:
+            total_attachment_size = sum(f.size or 0 for f in attachment_files)
+            if total_attachment_size > max_size:
+                limit_mb = max_size // (1024 * 1024)
+                abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % limit_mb]})
+        email_attachments = [f.as_attachment() for f in attachment_files]
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
@@ -359,7 +392,7 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
                 email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
-                                   template=tpl, html=True)
+                                   template=tpl, html=True, attachments=email_attachments)
             send_email(email, self.event, 'Event Persons')
         return jsonify(count=len(self.recipients))
 
