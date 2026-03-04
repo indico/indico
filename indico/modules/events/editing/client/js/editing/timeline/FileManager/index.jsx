@@ -21,7 +21,13 @@ import {Param, Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import FileList from './FileList';
 import reducer from './reducer';
-import {getFiles, getUploadedFileUUIDs, getValidationError, isUploading} from './selectors';
+import {
+  getFiles,
+  getTotalSize,
+  getUploadedFileUUIDs,
+  getValidationError,
+  isUploading,
+} from './selectors';
 import Uploads from './Uploads';
 import {
   FileManagerContext,
@@ -152,18 +158,20 @@ function FileType({
 
   return (
     <div styleName="file-type" className="file-manager-file-type">
-      <h3>
-        {fileType.name}
-        {fileType.required && (
-          <Popup
-            position="bottom center"
-            content={<Translate>This file type is required</Translate>}
-            trigger={
-              <Icon corner="top right" name="asterisk" color={files.length ? 'black' : 'red'} />
-            }
-          />
-        )}
-      </h3>
+      {fileType.name && (
+        <h3>
+          {fileType.name}
+          {fileType.required && (
+            <Popup
+              position="bottom center"
+              content={<Translate>This file type is required</Translate>}
+              trigger={
+                <Icon corner="top right" name="asterisk" color={files.length ? 'black' : 'red'} />
+              }
+            />
+          )}
+        </h3>
+      )}
       <FileRequirements fileType={fileType} />
       <FileList files={files} fileType={fileType} uploadURL={uploadURL} />
       <div styleName="box-list">
@@ -291,6 +299,7 @@ export default function FileManager({
   pristine,
   mustChange,
   uploadableFiles,
+  maxTotalSize,
 }) {
   const lastPristineRef = useRef(pristine);
   const _fileTypes = useMemo(
@@ -327,6 +336,14 @@ export default function FileManager({
 
   const uploading = isUploading(state);
   const validationError = getValidationError(state);
+  const totalSize = maxTotalSize !== null ? getTotalSize(state) : 0;
+  const sizeError =
+    maxTotalSize !== null && totalSize > maxTotalSize
+      ? Translate.string('Total attachment size ({current} MB) exceeds the {limit} MB limit', {
+          current: (totalSize / 1024 / 1024).toFixed(1),
+          limit: Math.round(maxTotalSize / 1024 / 1024),
+        })
+      : null;
   return (
     <div styleName="file-manager-wrapper">
       <div styleName="file-manager">
@@ -365,7 +382,11 @@ export default function FileManager({
             render={() => null}
           />
         )}
+        {!!finalFieldName && sizeError && (
+          <Field name={`_${finalFieldName}_size`} validate={() => sizeError} render={() => null} />
+        )}
       </div>
+      {sizeError && <Message negative>{sizeError}</Message>}
     </div>
   );
 }
@@ -381,6 +402,7 @@ FileManager.propTypes = {
   pristine: PropTypes.bool,
   mustChange: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
+  maxTotalSize: PropTypes.number,
 };
 
 FileManager.defaultProps = {
@@ -390,18 +412,26 @@ FileManager.defaultProps = {
   pristine: null,
   mustChange: false,
   uploadableFiles: [],
+  maxTotalSize: null,
 };
 
 export function FinalFileManager({
   name,
   uploadURL,
   uploadExistingURL = null,
-  fileTypes,
+  fileTypes: _fileTypes = [],
   files = [],
   mustChange = false,
   uploadableFiles = [],
+  maxTotalSize = null,
   ...rest
 }) {
+  // When fileTypes is empty, there are no file type restrictions — any files can be uploaded.
+  // The file type below is used to drive the existing logic to this purpose.
+  const fileTypes = _fileTypes.length
+    ? _fileTypes
+    : [{name: '', extensions: [], allowMultipleFiles: true, filenameTemplate: null, id: -1}];
+
   // We do not use FinalField here since the file manager is more "standalone"
   // and thus not wrapped in the usual SUI field markup.
   return (
@@ -418,6 +448,7 @@ export function FinalFileManager({
           pristine={pristine}
           mustChange={mustChange}
           uploadableFiles={uploadableFiles}
+          maxTotalSize={maxTotalSize}
         />
       )}
     </Field>
@@ -428,8 +459,9 @@ FinalFileManager.propTypes = {
   name: PropTypes.string.isRequired,
   uploadURL: PropTypes.string.isRequired,
   uploadExistingURL: PropTypes.string,
-  fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)),
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   mustChange: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
+  maxTotalSize: PropTypes.number,
 };

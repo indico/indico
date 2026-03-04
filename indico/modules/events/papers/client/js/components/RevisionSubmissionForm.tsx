@@ -104,11 +104,11 @@ export default function RevisionSubmissionForm({
         <Form
           id="paper-submission-form"
           onSubmit={fprops.handleSubmit}
-          styleName={fileTypes.length === 1 ? 'single-file-type-form' : ''}
+          styleName={_fileTypes.length <= 1 ? 'single-file-type-form' : ''}
         >
           <FinalFileManager
             name="files"
-            fileTypes={fileTypes}
+            fileTypes={_fileTypes}
             files={[]}
             uploadURL={apiUploadURL({
               event_id: eventId,

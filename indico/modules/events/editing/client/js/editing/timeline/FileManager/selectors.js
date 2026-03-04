@@ -33,6 +33,14 @@ export const getUploadedFileUUIDs = state => {
   );
 };
 
+export const getTotalSize = state => {
+  return state.fileTypes.reduce((total, {files}) => {
+    return (
+      total + files.filter(f => f.state !== 'deleted').reduce((sum, f) => sum + (f.size || 0), 0)
+    );
+  }, 0);
+};
+
 export const getValidationError = createSelector(
   state => state.fileTypes,
   fileTypes => {
