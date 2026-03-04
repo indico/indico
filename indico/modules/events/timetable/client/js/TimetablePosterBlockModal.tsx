@@ -18,7 +18,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import * as actions from './actions';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {BlockEntry, ContribEntry, EntryType, ReduxState, Session, SessionBlockId} from './types';
+import {BlockEntry, ContribEntry, EntryType, ReduxState, SessionBlockId} from './types';
 import {mapTTDataToEntry} from './utils';
 
 import './TimetablePosterBlockModal.module.scss';
@@ -31,10 +31,9 @@ interface TimetablePosterBlockModalProps {
 interface PosterContributionProps {
   entry: ContribEntry;
   block: BlockEntry;
-  session: Session;
 }
 
-const PosterContribution: React.FC<PosterContributionProps> = ({entry, block, session}) => {
+const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) => {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const {openModal} = useModal();
   const eventId = useSelector(selectors.getEventId);
@@ -45,7 +44,7 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block, se
     const {data} = await indicoAxios.get(editURL);
     data.type = EntryType.Contribution;
 
-    const draftEntry = mapTTDataToEntry(data, session);
+    const draftEntry = mapTTDataToEntry(data);
     dispatch(actions.setDraftEntry(draftEntry));
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
@@ -107,7 +106,6 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       duration: Math.min(20, block.duration),
       startDt: block.startDt,
     };
-    actions.setDraftEntry(draftEntry);
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
       entry: draftEntry,
@@ -143,12 +141,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       <Modal.Content styleName="modal-content">
         <Segment.Group styleName="contribs">
           {children.map(c => (
-            <PosterContribution
-              key={c.id}
-              entry={c as ContribEntry}
-              block={block}
-              session={session}
-            />
+            <PosterContribution key={c.id} entry={c as ContribEntry} block={block} />
           ))}
         </Segment.Group>
       </Modal.Content>
