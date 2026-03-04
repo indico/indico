@@ -115,6 +115,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 }
 
 interface _EntryProps {
+  id: EntryUniqueID;
   isDragging: boolean;
   transform: {x: number; y: number} | undefined;
   listeners: Record<string, unknown>;

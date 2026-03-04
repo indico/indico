@@ -411,7 +411,7 @@ export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
 
-export function createEntry(entryType: EntryType, entry: Partial<Entry>): CreateEntryAction {
+export function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
   return {type: CREATE_ENTRY, entryType, entry};
 }
 
