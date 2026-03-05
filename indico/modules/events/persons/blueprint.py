@@ -9,7 +9,8 @@ from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMet
                                                        RHDeleteUnusedEventPerson, RHEmailEventPersonsPreview,
                                                        RHEventPersonSearch, RHGrantModificationRights,
                                                        RHGrantSubmissionRights, RHManagePersonLists, RHPersonsList,
-                                                       RHRevokeSubmissionRights, RHSyncEventPerson, RHUpdateEventPerson)
+                                                       RHRevokeSubmissionRights, RHSyncEventPerson, RHUpdateEventPerson,
+                                                       RHUploadEmailAttachment)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -23,6 +24,8 @@ _bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadat
                  methods=('POST',))
 _bp.add_url_rule('/api/persons/email/preview', 'email_event_persons_preview', RHEmailEventPersonsPreview,
                  methods=('POST',))
+_bp.add_url_rule('/api/persons/email/upload-attachment', 'api_email_attachment_upload',
+                 RHUploadEmailAttachment, methods=('POST',))
 _bp.add_url_rule('/persons/grant-submission', 'grant_submission_rights', RHGrantSubmissionRights, methods=('POST',))
 _bp.add_url_rule('/persons/grant-modification', 'grant_modification_rights', RHGrantModificationRights,
                  methods=('POST',))
