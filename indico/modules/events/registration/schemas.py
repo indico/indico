@@ -109,11 +109,16 @@ class RegistrationInvitationSchema(mm.SQLAlchemyAutoSchema):
 
     registration_details_url = fields.Function(
         lambda invitation: (
-            url_for('.registration_details', invitation.registration) if invitation.registration else None
+            url_for('event_registration.registration_details', invitation.registration)
+            if invitation.registration else None
         )
     )
-    decline_url = fields.Function(lambda invitation: url_for('.manager_decline_invitation', invitation))
-    delete_url = fields.Function(lambda invitation: url_for('.delete_invitation', invitation))
+    decline_url = fields.Function(
+        lambda invitation: url_for('event_registration.manager_decline_invitation', invitation)
+    )
+    delete_url = fields.Function(
+        lambda invitation: url_for('event_registration.delete_invitation', invitation)
+    )
 
 
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
