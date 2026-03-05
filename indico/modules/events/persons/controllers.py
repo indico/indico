@@ -42,8 +42,6 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.util import check_event_locked
-from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.files.models.files import File
 from indico.modules.logs import LogKind
 from indico.modules.users import user_management_settings
@@ -269,26 +267,6 @@ class RHPersonsList(RHPersonsBase):
                                                custom_roles=custom_roles, person_schema=EventPersonSchema(),
                                                has_predefined_affiliations=Affiliation.query.has_rows(),
                                                allow_custom_affiliations=allow_custom_affiliations)
-
-
-class RHUploadEmailAttachment(UploadFileMixin, RHManageEventBase):
-    """Upload a file to be used as an email attachment."""
-
-    # Accept any management permission that grants access to an email-sending endpoint.
-    # This covers contributions managers, registration managers, etc. without requiring
-    # a single fixed permission that would exclude valid callers.
-    _EMAIL_PERMISSIONS = ('contributions', 'registration', 'abstracts', 'surveys')
-
-    def _check_access(self):
-        if config.MAX_EMAIL_ATTACHMENT_SIZE is None:
-            raise Forbidden(_('Email attachments are not enabled on this server.'))
-        self._require_user()
-        if not any(self.event.can_manage(session.user, permission=p) for p in self._EMAIL_PERMISSIONS):
-            raise Forbidden(_('You are not authorized to manage this event.'))
-        check_event_locked(self, self.event)
-
-    def get_file_context(self):
-        return 'event', self.event.id, 'email-attachment'
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):

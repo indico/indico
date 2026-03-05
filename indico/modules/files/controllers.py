@@ -14,6 +14,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.modules.files.util import validate_upload_file_size
@@ -72,6 +73,15 @@ class UploadFileMixin:
         This is usually not needed, but could be used e.g. to add some flag which
         is then used in a validator of the form accepting the file uploaded here.
         """
+
+
+class UploadEmailAttachmentMixin(UploadFileMixin):
+    """Mixin for RHs that handle email attachment uploads for the email dialog."""
+
+    def _check_access(self):
+        if config.MAX_EMAIL_ATTACHMENT_SIZE is None:
+            raise Forbidden(_('Email attachments are not enabled on this server.'))
+        super()._check_access()
 
 
 class RHFileBase(RHProtected):
