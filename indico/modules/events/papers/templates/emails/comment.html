@@ -7,7 +7,7 @@
 {% block header_subtitle_ref %}{% trans id=contribution.friendly_id %}ref #{{ id }}{% endtrans %}{% endblock %}
 
 {% block content_header %}
-    <p>{% trans receiver=receiver %}Dear {{ receiver }},{% endtrans %}</p>
+    <p>{% trans name=receiver.first_name %}Dear {{ name }},{% endtrans %}</p>
     <p>{% trans name=submitter.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe, title=contribution.title -%}
         {{ name }} commented on the paper {{ strong }}{{ title }}{{ endstrong }}:
     {% endtrans %}</p>
