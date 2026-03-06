@@ -721,6 +721,14 @@ LaTeX
     on the server (such as generating the Book of Abstracts or exporting
     contributions to PDF) will be disabled.
 
+    For security reasons we recommend setting this to the special string
+    ``'podman'`` and installing Podman on the system. That way, any LaTeX
+    rendering will be done in a container, and thus fully sandboxed from
+    the rest of Indico. When using this string, a default TeXLive image is
+    used. If you want to use a different one for whatever reason, you can
+    specify it like this: ``'podman:imagename:version'`` (anything that both
+    ``podman pull`` and ``podman run`` understands can be used).
+
     Default: ``None``
 
 .. data:: STRICT_LATEX
