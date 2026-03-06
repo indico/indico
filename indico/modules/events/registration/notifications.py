@@ -11,6 +11,8 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.notifications import make_email, send_email
 from indico.modules.core.settings import core_settings
+from indico.modules.email_templates.models.email_templates import EmailTemplate, RegistrationNotificationType
+from indico.modules.email_templates.util import get_email_template
 from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.placeholders import replace_placeholders
@@ -33,7 +35,7 @@ def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresse
 
 
 @make_interceptable
-def _notify_registration(registration, template_name, *, to_managers=False, attach_rejection_reason=False,
+def _notify_registration(registration, template, *, to_managers=False, attach_rejection_reason=False,
                          diff=None, old_price=None, receipt=None, allow_session_locale=False, include_pictures=False):
     from indico.modules.events.registration.util import get_ticket_attachments
     attachments = []
@@ -57,17 +59,24 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
     to_list = (
         registration.email if not to_managers else registration.registration_form.organizer_notification_recipients
     )
+    # TODO: Think about modification template too?
     sender_address = registration.registration_form.notification_sender_address if not to_managers else None
     with registration.event.force_event_locale(registration.user if not to_managers else None,
                                                allow_session=allow_session_locale):
-        tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
-                                  attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price,
-                                  receipt=receipt)
-        mail = make_email(to_list=to_list, template=tpl, html=True, sender_address=sender_address,
-                          attachments=attachments)
+        if isinstance(template, EmailTemplate):
+            mail = make_email(to_list=to_list, subject=template.get_subject(registration),
+                              body=template.get_body(registration), html=True, sender_address=sender_address,
+                              attachments=attachments)
+        else:
+            tpl = get_template_module(f'events/registration/emails/{template}', registration=registration,
+                                      attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price,
+                                      receipt=receipt)
+            mail = make_email(to_list=to_list, template=tpl, html=True, sender_address=sender_address,
+                              attachments=attachments)
     user = session.user if session else None
+    # FIXME: update the signal
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
-                                               template_name=template_name, to_managers=to_managers,
+                                               template_name=template, to_managers=to_managers,
                                                attach_rejection_reason=attach_rejection_reason)
     send_email(mail, event=registration.registration_form.event, module='Registration', user=user,
                log_metadata={'registration_id': registration.id})
@@ -75,7 +84,10 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
 
 def notify_registration_creation(registration, *, from_management=False, notify_user=True):
     if notify_user:
-        _notify_registration(registration, 'registration_creation_to_registrant.html',
+        email_tpl = get_email_template(registration.event,
+                                       notification_type=RegistrationNotificationType.registration_creation)
+        email_tpl = email_tpl or 'registration_creation_to_registrant.html'
+        _notify_registration(registration, email_tpl,
                              allow_session_locale=(not from_management), include_pictures=True)
     if registration.registration_form.organizer_notifications_enabled:
         _notify_registration(registration, 'registration_creation_to_managers.html', to_managers=True,
@@ -94,15 +106,22 @@ def notify_registration_modification(registration, *, from_management=False, not
 
 
 def notify_registration_state_update(registration, *, attach_rejection_reason=False, from_management=False):
-    _notify_registration(registration, 'registration_state_update_to_registrant.html',
-                         attach_rejection_reason=attach_rejection_reason, allow_session_locale=(not from_management))
+    email_tpl = get_email_template(registration.event,
+                                   notification_type=RegistrationNotificationType.registration_state_update,
+                                   status=registration.state.name)
+    email_tpl = email_tpl or 'registration_state_update_to_registrant.html'
+    _notify_registration(registration, email_tpl, attach_rejection_reason=attach_rejection_reason,
+                         allow_session_locale=(not from_management))
     if registration.registration_form.organizer_notifications_enabled:
         _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
 
 
 def notify_registration_receipt_created(registration, receipt, notify_user=True):
     if notify_user:
-        _notify_registration(registration, 'registration_receipt_created_to_registrant.html', receipt=receipt)
+        email_tpl = get_email_template(registration.event,
+                                       notification_type=RegistrationNotificationType.registration_receipt_creation)
+        email_tpl = email_tpl or 'registration_receipt_created_to_registrant.html'
+        _notify_registration(registration, email_tpl, receipt=receipt)
     if registration.registration_form.organizer_notifications_enabled:
         _notify_registration(registration, 'registration_receipt_created_to_managers.html', to_managers=True,
                              receipt=receipt)
