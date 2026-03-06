@@ -29,6 +29,15 @@ as the *Book of Abstracts* and the PDF versions of contributions.  If
 you do not need these features, you can skip this part of the documentation
 and avoid installing LaTeX altogether.
 
+.. warning::
+
+    LaTeX is extremely powerful, and while Indico tries its best to sanitize LaTeX
+    input to disarm any harmful statements, we cannot make any guarantees that all
+    these usecases are covered. We **strongly** recommend not installing LaTeX on
+    your system anymore, but instead running it inside a container.
+
+    More docs coming later... ;)
+
 Since Indico requires quite a few LaTeX packages which are not always
 installed by default when using the texlive packages of the various
 linux distributions, we recommend installing it manually.

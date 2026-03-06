@@ -40,6 +40,7 @@ from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType,
 from indico.modules.events.contributions.util import sort_contribs
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
+from indico.util.caching import memoize_redis
 from indico.util.date_time import format_date, format_human_timedelta, format_time
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
@@ -75,8 +76,8 @@ def generate_cached_pdf(fn, key, obj=None) -> BytesIO:
     # XXX We cache by user just in case something in the templates depends on who's generating them.
     # I don't think it's the case, and it should not be the case, but better stick on the safe side.
     cache_key = (key, user_id, *(inspect(obj).identity_key[:2] if obj else ()))
-    if (cached := cache.get(cache_key)) is not None:
-        return BytesIO(cached)
+    # if (cached := cache.get(cache_key)) is not None:
+    #     return BytesIO(cached)
     if not session.user and not latex_rate_limiter.hit():
         delay = format_human_timedelta(latex_rate_limiter.get_reset_delay())
         raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
@@ -177,6 +178,23 @@ def _latex_escape(s, ignore_braces=False):
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
+@memoize_redis(300)
+def _get_texmf_path(image):
+    pattern = '/usr/local/texlive/20??/texmf.cnf'
+    output = subprocess.check_output([
+        'podman', 'run',
+         '--pull', 'never',
+        '--rm',
+        '--network', 'none',
+        image,
+        'sh', '-c', f'echo {pattern}'
+    ], text=True).strip()
+    if output == pattern:
+        # no match
+        return None
+    return output
+
+
 class LatexRunner:
     """Handle the PDF generation from a chosen LaTeX template."""
 
@@ -185,6 +203,52 @@ class LatexRunner:
         self.has_toc = has_toc
 
     def run_latex(self, source_file, log_file=None):
+        assert config.XELATEX_PATH
+        if config.XELATEX_PATH == 'podman' or config.XELATEX_PATH.startswith('podman:'):
+            self._run_latex_podman(source_file, log_file)
+        else:
+            self._run_latex_local(source_file, log_file)
+
+    def _run_latex_podman(self, source_file, log_file=None):
+        image = (
+            'registry.gitlab.com/islandoftex/images/texlive:TL2026-2026-03-08-full'
+            if config.XELATEX_PATH == 'podman'
+            else config.XELATEX_PATH.split(':', 1)[1]
+        )
+        font_dir = os.readlink(os.path.join(self.source_dir, 'fonts'))
+        font_cache = os.path.join(config.CACHE_DIR, 'fontconfig')
+        if not os.path.exists(font_cache):
+            os.mkdir(font_cache)
+        texmf_cnf_local = Path(__file__).parent / 'texmf.cnf'
+        if not (texmf_container_path := _get_texmf_path(image)):
+            raise RuntimeError('Could not locate texmf config inside container')
+        podman_cmd = [
+            'podman', 'run',
+            '--pull', 'never',
+            '--rm',
+            '--network', 'none',
+            '-v', f'{font_cache}:/var/cache/fontconfig',
+            '-v', f'{self.source_dir}:/workdir',
+            '-v', f'{font_dir}:{font_dir}:ro',
+            '-v', f'{texmf_cnf_local}:{texmf_container_path}:ro',
+            image,
+            'xelatex',
+            '-no-shell-escape',
+            '-interaction', 'nonstopmode',
+            '-output-directory', '/workdir',
+            os.path.basename(source_file),
+        ]
+        try:
+            subprocess.check_call(podman_cmd, stdout=log_file, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code: %s)!', exc.returncode)
+            # Only fail if we are in strict mode
+            if config.STRICT_LATEX:
+                if log_file:
+                    log_file.flush()
+                raise
+
+    def _run_latex_local(self, source_file, log_file=None):
         pdflatex_cmd = [config.XELATEX_PATH,
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
@@ -201,12 +265,10 @@ class LatexRunner:
                 env=dict(os.environ, TEXMFCNF=f'{os.path.dirname(__file__)}:')
             )
             Logger.get('pdflatex').debug('PDF created successfully!')
-
         except subprocess.CalledProcessError:
             Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code)!')
             # Only fail if we are in strict mode
             if config.STRICT_LATEX:
-                # flush log, go to beginning and read it
                 if log_file:
                     log_file.flush()
                 raise
