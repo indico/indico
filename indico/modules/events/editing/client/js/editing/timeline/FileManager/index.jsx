@@ -338,10 +338,10 @@ export default function FileManager({
   const validationError = getValidationError(state);
   const totalSize = maxTotalSize !== null ? getTotalSize(state) : 0;
   const sizeError =
-    maxTotalSize !== null && totalSize > maxTotalSize
+    maxTotalSize !== null && totalSize > maxTotalSize * 1024 * 1024
       ? Translate.string('Total attachment size ({current} MB) exceeds the {limit} MB limit', {
           current: (totalSize / 1024 / 1024).toFixed(1),
-          limit: Math.round(maxTotalSize / 1024 / 1024),
+          limit: Math.round(maxTotalSize),
         })
       : null;
   return (

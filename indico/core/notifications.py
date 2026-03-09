@@ -237,8 +237,8 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
     from_address, reply_address = get_actual_sender_address(sender_address, reply_address)
     if config.MAX_EMAIL_ATTACHMENT_SIZE is not None and (attachments := attachments or []):
         total = sum(_attachment_size(a) for a in attachments)
-        if total > config.MAX_EMAIL_ATTACHMENT_SIZE:
-            raise ValueError(config.MAX_EMAIL_ATTACHMENT_SIZE // (1024 * 1024))
+        if total > config.MAX_EMAIL_ATTACHMENT_SIZE * 1024 * 1024:
+            raise ValueError(config.MAX_EMAIL_ATTACHMENT_SIZE)
     return {
         'to': set(to_list),
         'cc': set(cc_list),

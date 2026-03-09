@@ -41,12 +41,12 @@ export default function RevisionSubmissionForm({
 }: RevisionSubmissionFormProps) {
   const dispatch = useDispatch();
   const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
-  const _fileTypes = camelizeKeys(data || []);
+  const fileTypes = camelizeKeys(data || []);
 
   const submitRevision = async ({files}) => {
     let urlFunc, payload;
 
-    if (_fileTypes.length) {
+    if (fileTypes.length) {
       urlFunc = submitRevisionURL;
       payload = {files};
     } else {
@@ -80,11 +80,11 @@ export default function RevisionSubmissionForm({
         <Form
           id="paper-submission-form"
           onSubmit={fprops.handleSubmit}
-          styleName={_fileTypes.length <= 1 ? 'single-file-type-form' : ''}
+          styleName={fileTypes.length <= 1 ? 'single-file-type-form' : ''}
         >
           <FinalFileManager
             name="files"
-            fileTypes={_fileTypes}
+            fileTypes={fileTypes}
             files={[]}
             uploadURL={apiUploadURL({
               event_id: eventId,
