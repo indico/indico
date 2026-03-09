@@ -101,7 +101,7 @@ export function EmailDialog({
   attachmentsUploadURL,
 }) {
   const maxEmailAttachmentSize = Indico.FileRestrictions.MaxEmailAttachmentSize;
-  const effectiveAllowAttachments = !!attachmentsUploadURL && !!maxEmailAttachmentSize;
+  const allowAttachments = !!attachmentsUploadURL;
   const [preview, setPreview] = useState(null);
 
   const togglePreview = async (values, contextOverride = null) => {
@@ -205,7 +205,7 @@ export function EmailDialog({
           label={Translate.string('Send a copy of each email to my mailbox')}
           showAsToggle
         />
-        {effectiveAllowAttachments && (
+        {allowAttachments && (
           <Form.Field>
             <Translate as="label">Attachments</Translate>
             <FinalFileManager
@@ -232,13 +232,13 @@ export function EmailDialog({
         body: '',
         bcc_addresses: [],
         copy_for_sender: false,
-        ...(effectiveAllowAttachments ? {attachments: {}} : {}),
+        ...(allowAttachments ? {attachments: {}} : {}),
         ...initialFormValues,
       }}
       initialValuesEqual={_.isEqual}
       onClose={onClose}
       onSubmit={async (values, ...rest) => {
-        const transformedValues = effectiveAllowAttachments
+        const transformedValues = allowAttachments
           ? {...values, attachments: Object.values(values.attachments || {}).flat()}
           : values;
         const resp = await onSubmit(transformedValues, ...rest);
