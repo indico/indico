@@ -191,7 +191,8 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         text = re.sub(r'\$[^\$]+\$|\$\$[^\$]+\$\$', math_replace, text)
 
     pattern = re.compile('|'.join(re.escape(k) for k in chars))
-    text = re.sub(r'\^{2,}0*5c', r'\\', text)  # handle encoded backslashes, the `chars` replacement below escapes them
+    # handle encoded backslashes, the `chars` replacement below escapes them
+    text = re.sub(r'\^{2,}(?:0*5c|\x1c)', r'\\', text)
     text = pattern.sub(substitute, text)
 
     if ignore_math:
@@ -207,7 +208,7 @@ def sanitize_mathmode(text):
         command = m.group(1)
         return m.group(0) if command in safe_mathmode_commands else fr'\\{command}'
 
-    return re.sub(r'(?:\\|\^{2,}0*5c)([a-zA-Z]+|(?:\\|\^{2,}))', _escape_unsafe_command, text)
+    return re.sub(r'(?:\\|\^{2,}(?:0*5c|\x1c))([a-zA-Z]+|(?:\\|\^{2,}))', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):

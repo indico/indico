@@ -16,6 +16,7 @@ from indico.util.mdx_latex import LaTeXExtension, latex_escape
 def test_escape():
     assert latex_escape(r'\naughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^5cnaughty') == r'\textbackslash{}naughty'
+    assert latex_escape('^^\x1cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^^^^^00005cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^^^005cnaughty') == r'\textbackslash{}naughty'
     assert (latex_escape(r'this\\is\\harmless') ==
@@ -28,6 +29,7 @@ def test_escape():
 def test_escape_math():
     assert latex_escape(r'$\naughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$^^5cnaughty$') == r'\protect $\\naughty$'
+    assert latex_escape('$^^\x1cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$\\naughty$') == r'\protect $\\naughty$'
