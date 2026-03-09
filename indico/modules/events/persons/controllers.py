@@ -46,7 +46,7 @@ from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import LowercaseString, no_relative_urls, not_empty, validate_with_message
+from indico.util.marshmallow import FilesField, LowercaseString, no_relative_urls, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.user import principal_from_identifier, validate_search_token
 from indico.web.args import use_args, use_kwargs
@@ -343,10 +343,12 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
+        'attachments': FilesField(load_default=list),
     })
-    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
+    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, attachments):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
+        email_attachments = [f.as_attachment() for f in attachments]
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
@@ -358,8 +360,11 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
-                                   template=tpl, html=True)
+                try:
+                    email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
+                                       template=tpl, html=True, attachments=email_attachments)
+                except ValueError as e:
+                    abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % e]})
             send_email(email, self.event, 'Event Persons')
         return jsonify(count=len(self.recipients))
 

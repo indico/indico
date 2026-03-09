@@ -41,12 +41,12 @@ export default function RevisionSubmissionForm({
 }: RevisionSubmissionFormProps) {
   const dispatch = useDispatch();
   const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
-  const _fileTypes = camelizeKeys(data || []);
+  const fileTypes = camelizeKeys(data || []);
 
   const submitRevision = async ({files}) => {
     let urlFunc, payload;
 
-    if (_fileTypes.length) {
+    if (fileTypes.length) {
       urlFunc = submitRevisionURL;
       payload = {files};
     } else {
@@ -64,21 +64,6 @@ export default function RevisionSubmissionForm({
     }
   };
 
-  // TODO this could probably be moved into the FileManager to support (via a new prop or passing explicit
-  // `null` fileTypes) the case where no file types should be displayed. in this case the `name` can be
-  // something dummy/empty as it should not be displayed to users
-  const fileTypes = _fileTypes.length
-    ? _fileTypes
-    : [
-        {
-          name: '', // Needs to be added empty as it is required
-          extensions: [],
-          allowMultipleFiles: true,
-          filenameTemplate: null,
-          id: -1,
-        },
-      ];
-
   if (!data) {
     return null;
   }
@@ -95,12 +80,11 @@ export default function RevisionSubmissionForm({
         <Form
           id="paper-submission-form"
           onSubmit={fprops.handleSubmit}
-          styleName={fileTypes.length === 1 ? 'single-file-type-form' : ''}
+          styleName={fileTypes.length <= 1 ? 'single-file-type-form' : ''}
         >
           <FinalFileManager
             name="files"
             fileTypes={fileTypes}
-            files={[]}
             uploadURL={apiUploadURL({
               event_id: eventId,
               contrib_id: contributionId,
