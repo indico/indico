@@ -10,7 +10,7 @@ Version 3.3.12
 Improvements
 ^^^^^^^^^^^^
 
-- Allow bulk (de-)selecting data in tables with shift+click (:pr:`7376`)
+- Allow bulk (de-)selecting data in tables with shift+click (:issue:`7375`, :pr:`7376`)
 
 Bugfixes
 ^^^^^^^^
