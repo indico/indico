@@ -588,15 +588,12 @@ type(
       // Add any extra buttons displayed under the tabs
       var container = $('<div class="tabExtraButtons"/>');
       $.each(this.extraButtons, function(i, btnData) {
-        var btn = $('<div class="buttonContainer"/>')
-          .append(btnData.btn.dom || btnData.btn)
-          .click(function() {
-            btnData.onclick(btn);
-          });
+        var btn = $(btnData.btn.dom || btnData.btn);
+        btn.click(function() {
+          btnData.onclick(btn);
+        });
         container.append(btn);
       });
-      container.children(':first').addClass('buttonContainerLeft');
-      container.children(':last').addClass('buttonContainerRight');
       this.widget.append(container);
     },
     _notifyTabChange: function() {},
@@ -801,16 +798,9 @@ type(
         extraButtons = Html.div('tabExtraButtons');
       }
       each(this.extraButtons, function(btn, index) {
-        var extraCSSClass = '';
-        if (index === 0) {
-          extraCSSClass = 'buttonContainerLeft';
-        } else if (index == self.extraButtons.length - 1) {
-          extraCSSClass = 'buttonContainerRight';
-        }
-        var btnContainer = Html.div('buttonContainer ' + extraCSSClass, btn.btn);
-        extraButtons.append(btnContainer);
-        btnContainer.observeClick(function() {
-          btn.onclick(btnContainer);
+        extraButtons.append(btn.btn);
+        btn.btn.observeClick(function() {
+          btn.onclick(btn.btn);
         });
       });
 

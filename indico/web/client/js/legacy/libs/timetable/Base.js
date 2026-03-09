@@ -308,7 +308,7 @@ type(
       var self = this;
       var container = $('<div class="tabExtraButtons"/>');
       var goBackButton = {
-        btn: Html.div('buttonWhite', $T('Exit Full Screen')),
+        btn: Html.button('buttonWhite', $T('Exit Full Screen')),
         onclick: function(btnContainer) {
           location.reload();
         },
@@ -316,16 +316,13 @@ type(
       var buttons = self._functionButtons();
       buttons[2] = goBackButton;
       $.each(buttons, function(i, btnData) {
-        var btn = $('<div class="buttonContainer"/>')
-          .append(btnData.btn.dom || btnData.btn)
-          .click(function() {
-            btnData.onclick(btn);
-          });
+        var btn = $(btnData.btn.dom || btnData.btn);
+        btn.click(function() {
+          btnData.onclick(btn);
+        });
         container.append(btn);
       });
-      container.children(':first').addClass('buttonContainerLeft');
-      container.children(':last').addClass('buttonContainerRight');
-      goBackButton.btn.getParent().dom.style.background = '#9F883B';
+      goBackButton.btn.dom.style.background = '#9F883B';
       return container;
     },
 
@@ -378,21 +375,21 @@ type(
       var self = this;
 
       this.printButton = {
-        btn: Html.div('printButtonWhite', $T('Print')),
+        btn: Html.button('printButtonWhite', $T('Print')),
         onclick: function(btnContainer) {
           self.print();
         },
       };
 
       this.pdfButton = {
-        btn: Html.div('buttonWhite', $T('PDF')),
+        btn: Html.button('buttonWhite', $T('PDF')),
         onclick: function(btnContainer) {
           self.pdf();
         },
       };
 
       this.fullScreenButton = {
-        btn: Html.div('buttonWhite', $T('Full screen')),
+        btn: Html.button('buttonWhite', $T('Full screen')),
         onclick: function(btnContainer) {
           self.fullScreen();
         },
@@ -402,7 +399,7 @@ type(
       this.linkButton = Html.div('linkButtonWhite', $T('Link'));
 
       this.detailsButton = {
-        btn: Html.div(
+        btn: Html.button(
           {className: 'buttonWhite', id: 'detailsButton'},
           Html.span({}, $T('Detailed view'))
         ),
@@ -412,7 +409,7 @@ type(
       };
 
       this.filterButton = {
-        btn: Html.div('buttonWhite', $T('Filter')),
+        btn: Html.button('buttonWhite', $T('Filter')),
         onclick: function(btnContainer) {
           // Save the container so that the filter button background
           // color can be restored when filter is closed
@@ -1315,7 +1312,7 @@ type(
         $('#legendMainToggle').position({
           my: 'left top',
           at: 'left bottom',
-          of: $('#detailsButton').parent('.buttonContainer'),
+          of: $('#detailsButton'),
         });
         $('#timeTableLegend:visible').width($('#timeTableLegend').get(0).clientWidth - 10);
       }
