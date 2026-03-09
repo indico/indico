@@ -19,8 +19,7 @@ const isValid = value => /^\S+@\S+\.\S+$/.test(value);
 /**
  * A field that lets the user enter email addresses
  */
-const EmailListField = props => {
-  const {value, disabled, onChange, onFocus, onBlur} = props;
+export function EmailListField({value, disabled, onChange, onFocus, onBlur}) {
   const [searchQuery, setSearchQuery] = useState('');
   const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
@@ -77,7 +76,7 @@ const EmailListField = props => {
       icon=""
     />
   );
-};
+}
 
 EmailListField.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string).isRequired,
