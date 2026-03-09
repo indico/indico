@@ -192,11 +192,11 @@ class RegistrationFormItem(db.Model):
                            .format(t=RegistrationFormItemType,
                                    required_fields=','.join([str(f.value) for f in PersonalDataType if f.is_required])),
                            name='retention_period_allowed_fields'),
+        db.CheckConstraint("internal_name != ''", name='internal_name_not_empty'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
                  postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
                  postgresql_where=db.text(f'type = {RegistrationFormItemType.field_pd}')),
-        db.Index(None, 'internal_name', postgresql_where=db.text('is_enabled AND NOT is_deleted')),
         {'schema': 'event_registration'}
     )
     __mapper_args__ = {
@@ -253,6 +253,7 @@ class RegistrationFormItem(db.Model):
     #: The internal name of this field
     internal_name = db.Column(
         db.String,
+        index=True,
         nullable=True,
     )
     #: The title of this field
