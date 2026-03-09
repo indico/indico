@@ -96,7 +96,6 @@ export default function PaperSubmissionButton({
           <FinalFileManager
             name="files"
             fileTypes={fileTypes}
-            files={[]}
             uploadURL={apiUploadURL({
               event_id: eventId,
               contrib_id: contributionId,
