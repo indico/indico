@@ -235,13 +235,19 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 disabled={itemData.fieldIsPersonalData}
                 nullIfEmpty
                 validate={val => {
-                  if (val && val !== val.toLowerCase()) {
-                    return Translate.string('Only lowercase letters are allowed.');
+                  if (val && !/^[a-z0-9_]+$/.test(val)) {
+                    Translate.string(
+                      'Only lowercase alphanumeric characters and underscore ("_") are allowed.'
+                    );
                   }
                 }}
-                description={Translate.string(
-                  'Use for identifying the same field across events regardless of the title.'
-                )}
+                description={
+                  <Translate>
+                    Used for identifying the same field across registration forms regardless of the
+                    title. This can also be used across events if you make sure to use the same
+                    internal name.
+                  </Translate>
+                }
               />
             )}
           </Fieldset>

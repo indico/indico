@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
 from datetime import timedelta
 
 from flask import jsonify, request, session
@@ -118,8 +119,8 @@ class GeneralFieldDataSchema(mm.Schema):
             raise ValidationError(_('Changing internal name for personal data field is not allowed.'))
         if internal_name is None:
             return
-        if internal_name != internal_name.strip():
-            raise ValidationError(_('Leading and trailing whitespaces are not allowed.'))
+        if not re.match(r'^[a-z0-9_]+$', internal_name):
+            raise ValidationError(_('Only lowercase alphanumeric characters and underscore ("_") are allowed.'))
         if field.is_enabled is not False:  # None for new field
             # unique on form
             query = (RegistrationFormItem.query
@@ -286,7 +287,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 raise NoReportError.wrap_exc(
                     BadRequest(_('There is already a field in this section with the same title.'))
                 )
-            # check unique internal name in from
+            # check unique internal name in form
             query = (RegistrationFormItem.query
                      .filter(RegistrationFormItem.parent_id == self.field.parent.id,
                              RegistrationFormItem.internal_name == self.field.internal_name,
