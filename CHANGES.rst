@@ -10,12 +10,12 @@ Version 3.3.12
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Allow bulk (de-)selecting data in tables with shift+click (:pr:`7376`)
 
 Bugfixes
 ^^^^^^^^
 
-- Allow bulk (de-)selecting data in tables with shift+click (:pr:`7376`)
+- Nothing so far :)
 
 Accessibility
 ^^^^^^^^^^^^^
