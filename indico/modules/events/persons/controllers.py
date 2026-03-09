@@ -16,7 +16,6 @@ from webargs import validate
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -349,12 +348,6 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, attachments):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
-        max_size = config.MAX_EMAIL_ATTACHMENT_SIZE
-        if max_size is not None:
-            total_attachment_size = sum(f.size for f in attachments)
-            if total_attachment_size > max_size:
-                limit_mb = max_size // (1024 * 1024)
-                abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % limit_mb]})
         email_attachments = [f.as_attachment() for f in attachments]
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):
@@ -367,8 +360,11 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
-                                   template=tpl, html=True, attachments=email_attachments)
+                try:
+                    email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
+                                       template=tpl, html=True, attachments=email_attachments)
+                except ValueError as e:
+                    abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % e]})
             send_email(email, self.event, 'Event Persons')
         return jsonify(count=len(self.recipients))
 
