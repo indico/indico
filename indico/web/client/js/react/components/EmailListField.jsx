@@ -80,10 +80,16 @@ export function EmailListField({value, disabled, onChange, onFocus, onBlur}) {
 
 EmailListField.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string).isRequired,
-  disabled: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+};
+
+EmailListField.defaultProps = {
+  disabled: false,
+  onFocus: () => {},
+  onBlur: () => {},
 };
 
 export default React.memo(EmailListField);
