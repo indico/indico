@@ -210,8 +210,6 @@ export function EmailDialog({
             <Translate as="label">Attachments</Translate>
             <FinalFileManager
               name="attachments"
-              fileTypes={[]}
-              files={[]}
               uploadURL={attachmentsUploadURL}
               maxTotalSize={maxEmailAttachmentSize}
             />
