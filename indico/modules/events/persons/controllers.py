@@ -42,13 +42,12 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.files.models.files import File
 from indico.modules.logs import LogKind
 from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import LowercaseString, no_relative_urls, not_empty, validate_with_message
+from indico.util.marshmallow import FilesField, LowercaseString, no_relative_urls, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.user import principal_from_identifier, validate_search_token
 from indico.web.args import use_args, use_kwargs
@@ -345,19 +344,18 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
-        'attachments': fields.List(fields.UUID(), load_default=list),
+        'attachments': FilesField(load_default=list),
     })
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, attachments):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
-        attachment_files = File.query.filter(File.uuid.in_(attachments)).all() if attachments else []
         max_size = config.MAX_EMAIL_ATTACHMENT_SIZE
         if max_size is not None:
-            total_attachment_size = sum(f.size or 0 for f in attachment_files)
+            total_attachment_size = sum(f.size for f in attachments)
             if total_attachment_size > max_size:
                 limit_mb = max_size // (1024 * 1024)
                 abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % limit_mb]})
-        email_attachments = [f.as_attachment() for f in attachment_files]
+        email_attachments = [f.as_attachment() for f in attachments]
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
