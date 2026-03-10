@@ -153,6 +153,14 @@ def unescape_html_entities(text):
     return out.replace('&quot;', '"')
 
 
+def _resolve_latex_carets(text):
+    while True:
+        text, n = re.subn(r'\^\^0*([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), text)
+        if not n:
+            break
+    return text.replace('^^\x1c', '\\')
+
+
 def latex_escape(text, ignore_math=True, ignore_braces=False):
     if text is None:
         return ''
@@ -208,7 +216,8 @@ def sanitize_mathmode(text):
         command = m.group(1)
         return m.group(0) if command in safe_mathmode_commands else fr'\\{command}'
 
-    return re.sub(r'(?:\\|\^{2,}(?:0*5c|\x1c))([a-zA-Z]+|(?:\\|\^{2,}))', _escape_unsafe_command, text)
+    text = _resolve_latex_carets(text)
+    return re.sub(r'\\([a-zA-Z]+|\\)', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):
