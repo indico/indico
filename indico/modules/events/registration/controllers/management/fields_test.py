@@ -122,3 +122,21 @@ class TestGeneralFieldDataSchema:
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_position_field})
         assert schema.load({'input_type': 'text', 'title': position_field.title,
                             'internal_name': position_field.internal_name})
+
+    def test_internal_name_with_different_input_type_on_other_regform(self, db, create_regform, dummy_regform):
+        other_form = create_regform(dummy_regform.event, title='Other Form')
+        pd_section = dummy_regform.sections[0]
+        # Disable the title field on dummy_regform to be able to add another title field but with different type
+        title_field = next((field for field in pd_section.fields
+                            if field.personal_data_type == PersonalDataType.title), None)
+        title_field.is_enabled = False
+        db.session.flush()
+        new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            assert schema.load({'input_type': 'text', 'title': title_field.title,
+                                'internal_name': title_field.internal_name})
+        assert exc_info.value.messages == {
+            'internal_name': [f'The field "{title_field.title}" with the same internal name on form '
+                              f'"{other_form.title}" uses a different input type which is not allowed.']
+        }

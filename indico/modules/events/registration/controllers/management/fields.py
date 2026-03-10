@@ -17,10 +17,12 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
+from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import (RegistrationFormItem, RegistrationFormItemType,
                                                              RegistrationFormText)
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
@@ -133,6 +135,21 @@ class GeneralFieldDataSchema(mm.Schema):
             if same_field := query.first():
                 raise ValidationError(_('The field "{}" on this form has the same internal name.')
                                       .format(same_field.title))
+            # consistent type on forms of the same event
+            query = (RegistrationFormItem.query
+                     .join(RegistrationForm, Event)
+                     .filter(RegistrationFormItem.internal_name == internal_name,
+                             RegistrationFormItem.registration_form_id != field.registration_form.id,
+                             RegistrationFormItem.input_type != field.input_type,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted,
+                             Event.id == field.registration_form.event_id))
+            if field.id:
+                query = query.filter(RegistrationFormItem.id != field.id)
+            if inconsistent_field := query.first():
+                raise ValidationError(_('The field "{}" with the same internal name on form "{}" '
+                                        'uses a different input type which is not allowed.')
+                                      .format(inconsistent_field.title, inconsistent_field.registration_form.title))
 
     @validates('show_if_id')
     @no_autoflush
@@ -296,6 +313,21 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             if same_field := query.first():
                 raise NoReportError.wrap_exc(
                     BadRequest(_('The field "{}" on this form has the same internal name.').format(same_field.title))
+                )
+            # consistent type on forms of the same event
+            query = (RegistrationFormItem.query
+                     .join(RegistrationForm, Event)
+                     .filter(RegistrationFormItem.internal_name == self.field.internal_name,
+                             RegistrationFormItem.registration_form_id != self.field.registration_form.id,
+                             RegistrationFormItem.input_type != self.field.input_type,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted,
+                             Event.id == self.field.registration_form.event_id))
+            if inconsistent_field := query.first():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('The field "{}" with the same internal name on form "{}" '
+                                 'uses a different input type which is not allowed.')
+                               .format(inconsistent_field.title, inconsistent_field.registration_form.title))
                 )
 
         self.field.is_enabled = enabled
