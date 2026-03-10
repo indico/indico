@@ -28,6 +28,8 @@ def test_escape():
 
 def test_escape_math():
     assert latex_escape(r'$\naughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$\begin{naughty}$') == r'\protect $\\begin{naughty}$'
+    assert latex_escape(r'$\begin{equation}$') == r'\protect $\begin{equation}$'
     assert latex_escape(r'$^^5cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape('$^^\x1cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $^^^^\\naughty$'

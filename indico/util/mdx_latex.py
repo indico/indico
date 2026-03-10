@@ -103,7 +103,7 @@ IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.item
 safe_mathmode_commands = {
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
     'arctan', 'arg', 'array', 'Arrowvert', 'arrowvert', 'ast', 'asymp', 'atop', 'atopwithdelims', 'backslash',
-    'bar', 'Bbb', 'begin', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
+    'bar', 'Bbb', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
     'Biggl', 'biggl', 'Biggm', 'biggm', 'Biggr', 'biggr', 'Bigl', 'bigl', 'Bigm', 'bigm', 'bigodot', 'bigoplus',
     'bigotimes', 'Bigr', 'bigr', 'bigsqcup', 'bigtriangledown', 'bigtriangleup', 'biguplus', 'bigvee', 'bigwedge',
     'bmod', 'bot', 'bowtie', 'brace', 'bracevert', 'brack', 'breve', 'buildrel', 'bullet', 'cap', 'cases', 'cdot',
@@ -139,6 +139,13 @@ safe_mathmode_commands = {
     'underrightarrow', 'underset', 'Uparrow', 'uparrow', 'Updownarrow', 'updownarrow', 'uplus', 'uproot', 'Upsilon',
     'upsilon', 'varepsilon', 'varphi', 'varpi', 'varrho', 'varsigma', 'vartheta', 'vcenter', 'vdash', 'vdots', 'vec',
     'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta', '\\'
+}
+
+# XXX not sure if all of them make sense inside math blocks, but they're safe and used by people...
+safe_environments = {
+    'eqnarray', 'equation', 'center', 'equation*', 'array', 'align', 'figure', 'itemize', 'align*', 'table', 'tabular',
+    'aligned', 'eqnarray*', 'enumerate', 'acronym', 'justify', 'gathered', 'pmatrix', 'description', 'multline',
+    'cases', 'matrix',
 }
 
 
@@ -213,11 +220,26 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
 def sanitize_mathmode(text):
     def _escape_unsafe_command(m):
-        command = m.group(1)
-        return m.group(0) if command in safe_mathmode_commands else fr'\\{command}'
+        fullcommand = m.group('fullcmd')  # full command w/ args but without leading backslash
+        command = m.group('cmd1') or m.group('cmd2')  # just the command name
+        arg = m.group('arg')  # the arg from inside {...} after the command
+        if (command == 'begin' and arg in safe_environments) or command in safe_mathmode_commands:
+            return m.group(0)
+        else:
+            return fr'\\{fullcommand}'
 
     text = _resolve_latex_carets(text)
-    return re.sub(r'\\([a-zA-Z]+|\\)', _escape_unsafe_command, text)
+    return re.sub(r'''
+        \\
+        (?P<fullcmd>
+            (?:
+                (?P<cmd1>begin)        # command name if it's one where we care about the arg
+                \s*\{(?P<arg>[^}]+)\}  # {arg}
+            )
+            |
+            (?P<cmd2>[a-zA-Z]+|\\)     # command name if it's anything else or a backslash
+        )
+    ''', _escape_unsafe_command, text, flags=re.VERBOSE)
 
 
 def escape_latex_entities(text):
