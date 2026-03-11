@@ -26,11 +26,13 @@ import {camelizeKeys} from 'indico/utils/case';
 interface PaperSubmissionButtonProps {
   eventId: number;
   contributionId: number;
+  contributionCode: string;
 }
 
 export default function PaperSubmissionButton({
   eventId,
   contributionId,
+  contributionCode,
 }: PaperSubmissionButtonProps) {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const {data} = useIndicoAxios(fileTypesURL({event_id: eventId}));
@@ -61,7 +63,14 @@ export default function PaperSubmissionButton({
   // `null` fileTypes) the case where no file types should be displayed. in this case the `name` can be
   // something dummy/empty as it should not be displayed to users
   const fileTypes = _fileTypes.length
-    ? _fileTypes
+    ? _fileTypes.map(fileType =>
+        fileType.filenameTemplate
+          ? {
+              ...fileType,
+              filenameTemplate: fileType.filenameTemplate.replace('{code}', contributionCode),
+            }
+          : fileType
+      )
     : [
         {
           name: Translate.string('Paper files'),

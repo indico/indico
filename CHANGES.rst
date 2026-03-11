@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix paper file submission when a filename template is configured (:pr:`7381`)
 
 Accessibility
 ^^^^^^^^^^^^^

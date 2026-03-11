@@ -21,7 +21,7 @@ export default function SubmitRevision() {
   const {
     state: {name: stateName},
     event: {id: eventId},
-    contribution: {id: contributionId},
+    contribution: {id: contributionId, code: contributionCode},
   } = useSelector(getPaperDetails);
   const currentUser = useSelector(getCurrentUser);
 
@@ -41,7 +41,11 @@ export default function SubmitRevision() {
           <Translate>Upload corrected revision</Translate>
         </div>
         <div className="i-box-content">
-          <RevisionSubmissionForm eventId={eventId} contributionId={contributionId}>
+          <RevisionSubmissionForm
+            eventId={eventId}
+            contributionId={contributionId}
+            contributionCode={contributionCode}
+          >
             <FinalSubmitButton
               type="submit"
               label={Translate.string('Submit new revision')}
