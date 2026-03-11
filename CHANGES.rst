@@ -16,6 +16,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix paper file submission when a filename template is configured (:pr:`7381`)
+- Fix selecting existing paper files when submitting an editable (:pr:`7381`)
 
 Accessibility
 ^^^^^^^^^^^^^

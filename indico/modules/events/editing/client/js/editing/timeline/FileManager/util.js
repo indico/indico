@@ -42,8 +42,7 @@ export const fileTypePropTypes = {
 
 export async function uploadExistingFile(url, file) {
   try {
-    const {data} = await indicoAxios.post(url, snakifyKeys(file));
-    return data;
+    return await indicoAxios.post(url, snakifyKeys(file));
   } catch (e) {
     handleAxiosError(e);
     return null;
