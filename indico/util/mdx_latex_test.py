@@ -16,21 +16,33 @@ from indico.util.mdx_latex import LaTeXExtension, latex_escape
 def test_escape():
     assert latex_escape(r'\naughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^5cnaughty') == r'\textbackslash{}naughty'
+    assert latex_escape('^^\x1cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^^^^^00005cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^^^005cnaughty') == r'\textbackslash{}naughty'
     assert (latex_escape(r'this\\is\\harmless') ==
             r'this\textbackslash{}\textbackslash{}is\textbackslash{}\textbackslash{}harmless')
     assert latex_escape(r'\\\extranaughty') == r'\textbackslash{}\textbackslash{}\textbackslash{}extranaughty'
+    assert latex_escape(r'\mbox{\naughty}') == r'\textbackslash{}mbox\{\textbackslash{}naughty\}'
+    assert latex_escape(r'\mbox{\^^6eaughty}') == r'\textbackslash{}mbox\{\textbackslash{}\^{}\^{}6eaughty\}'
 
 
 def test_escape_math():
     assert latex_escape(r'$\naughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$\begin{naughty}$') == r'\protect $\\begin{naughty}$'
+    assert latex_escape(r'$\begin{equation}$') == r'\protect $\begin{equation}$'
     assert latex_escape(r'$^^5cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $\\naughty$'
+    assert latex_escape('$^^\x1cnaughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $^^^^\\naughty$'
+    assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $^^\\naughty$'
     assert latex_escape(r'$\\naughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$^^5e^5cnaughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$\to^^64ay$') == r'\protect $\\today$'
     assert latex_escape(r'$harm\\less$') == r'\protect $harm\\less$'
     assert latex_escape(r'$\\\extranaughty$') == r'\protect $\\\\extranaughty$'
+    assert latex_escape(r'$\mbox{\naughty}$') == r'\protect $\mbox{\\naughty}$'
+    assert latex_escape(r'$\mbox{\^^6eaughty}$') == r'\protect $\mbox{\\naughty}$'
+    assert latex_escape(r'$\mbox{\very^^6eaughty}$') == r'\protect $\mbox{\\verynaughty}$'
+    assert latex_escape(r'$\epsilon_\psi^\theta$') == r'\protect $\epsilon_\psi^\theta$'
 
 
 @pytest.mark.parametrize(('input', 'expected'), (

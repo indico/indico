@@ -10,6 +10,7 @@ import functools
 import os
 import subprocess
 import tempfile
+import time
 from importlib.resources import as_file
 from importlib.resources import files as res_files
 from io import BytesIO
@@ -253,6 +254,7 @@ class LatexRunner:
         source_filename, target_filename = self.prepare(template_name, **kwargs)
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')  # noqa: SIM115
+        start = time.time()
         try:
             self.run_latex(source_filename, log_file)
             if self.has_toc:
@@ -264,6 +266,8 @@ class LatexRunner:
                 # something went terribly wrong, no LaTeX file was produced
                 raise LaTeXRuntimeException(source_filename, log_filename)
 
+        duration = time.time() - start
+        Logger.get('pdflatex').info('Generated PDF in %.02f seconds', duration)
         return target_filename
 
 

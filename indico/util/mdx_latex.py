@@ -103,7 +103,7 @@ IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.item
 safe_mathmode_commands = {
     'above', 'abovewithdelims', 'acute', 'aleph', 'alpha', 'amalg', 'And', 'angle', 'approx', 'arccos', 'arcsin',
     'arctan', 'arg', 'array', 'Arrowvert', 'arrowvert', 'ast', 'asymp', 'atop', 'atopwithdelims', 'backslash',
-    'bar', 'Bbb', 'begin', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
+    'bar', 'Bbb', 'beta', 'bf', 'Big', 'big', 'bigcap', 'bigcirc', 'bigcup', 'Bigg', 'bigg',
     'Biggl', 'biggl', 'Biggm', 'biggm', 'Biggr', 'biggr', 'Bigl', 'bigl', 'Bigm', 'bigm', 'bigodot', 'bigoplus',
     'bigotimes', 'Bigr', 'bigr', 'bigsqcup', 'bigtriangledown', 'bigtriangleup', 'biguplus', 'bigvee', 'bigwedge',
     'bmod', 'bot', 'bowtie', 'brace', 'bracevert', 'brack', 'breve', 'buildrel', 'bullet', 'cap', 'cases', 'cdot',
@@ -141,6 +141,13 @@ safe_mathmode_commands = {
     'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta', '\\'
 }
 
+# XXX not sure if all of them make sense inside math blocks, but they're safe and used by people...
+safe_environments = {
+    'eqnarray', 'equation', 'center', 'equation*', 'array', 'align', 'figure', 'itemize', 'align*', 'table', 'tabular',
+    'aligned', 'eqnarray*', 'enumerate', 'acronym', 'justify', 'gathered', 'pmatrix', 'description', 'multline',
+    'cases', 'matrix',
+}
+
 
 class ImageURLException(Exception):
     pass
@@ -151,6 +158,14 @@ def unescape_html_entities(text):
     out = out.replace('&lt;', '<')
     out = out.replace('&gt;', '>')
     return out.replace('&quot;', '"')
+
+
+def _resolve_latex_carets(text):
+    while True:
+        text, n = re.subn(r'\^\^0*([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), text)
+        if not n:
+            break
+    return text.replace('^^\x1c', '\\')
 
 
 def latex_escape(text, ignore_math=True, ignore_braces=False):
@@ -191,7 +206,8 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         text = re.sub(r'\$[^\$]+\$|\$\$[^\$]+\$\$', math_replace, text)
 
     pattern = re.compile('|'.join(re.escape(k) for k in chars))
-    text = re.sub(r'\^{2,}0*5c', r'\\', text)  # handle encoded backslashes, the `chars` replacement below escapes them
+    # handle encoded backslashes, the `chars` replacement below escapes them
+    text = re.sub(r'\^{2,}(?:0*5c|\x1c)', r'\\', text)
     text = pattern.sub(substitute, text)
 
     if ignore_math:
@@ -204,10 +220,26 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
 def sanitize_mathmode(text):
     def _escape_unsafe_command(m):
-        command = m.group(1)
-        return m.group(0) if command in safe_mathmode_commands else r'\\' + command
+        fullcommand = m.group('fullcmd')  # full command w/ args but without leading backslash
+        command = m.group('cmd1') or m.group('cmd2')  # just the command name
+        arg = m.group('arg')  # the arg from inside {...} after the command
+        if (command == 'begin' and arg in safe_environments) or command in safe_mathmode_commands:
+            return m.group(0)
+        else:
+            return fr'\\{fullcommand}'
 
-    return re.sub(r'(?:\\|\^{2,}0*5c)([a-zA-Z]+|(?:\\|\^{2,}0*5c))', _escape_unsafe_command, text)
+    text = _resolve_latex_carets(text)
+    return re.sub(r'''
+        \\
+        (?P<fullcmd>
+            (?:
+                (?P<cmd1>begin)        # command name if it's one where we care about the arg
+                \s*\{(?P<arg>[^}]+)\}  # {arg}
+            )
+            |
+            (?P<cmd2>[a-zA-Z]+|\\)     # command name if it's anything else or a backslash
+        )
+    ''', _escape_unsafe_command, text, flags=re.VERBOSE)
 
 
 def escape_latex_entities(text):
