@@ -36,7 +36,7 @@ Version 3.3.11
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Add missing access checks when managing event series (:cve:`2026-28352 `, thanks
+- Add missing access checks when managing event series (:cve:`2026-28352`, thanks
   :user:`lighthousekeeper1212`)
 
 .. note::
