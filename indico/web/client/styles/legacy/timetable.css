@@ -43,6 +43,9 @@ div.timetableFullScreenHeader {
   color: #202020;
   box-shadow: 0 0 5px #ddd;
   min-height: 26px;
+  padding: 0;
+  font: inherit;
+  text-align: left;
 }
 
 .timetableBlockPileEffect {
@@ -119,11 +122,11 @@ div.timetableContribution {
     0 0.1em 0.11em rgba(0, 0, 0, 0.9);
 }
 
-div.ui-draggable.timetableBlock:hover {
+.ui-draggable.timetableBlock:hover {
   cursor: move;
 }
 
-div.ui-draggable-dragging.timetableBlock {
+.ui-draggable-dragging.timetableBlock {
   z-index: 9000;
   opacity: 0.5;
 }
