@@ -725,9 +725,20 @@ LaTeX
     ``'podman'`` and installing Podman on the system. That way, any LaTeX
     rendering will be done in a container, and thus fully sandboxed from
     the rest of Indico. When using this string, a default TeXLive image is
-    used. If you want to use a different one for whatever reason, you can
-    specify it like this: ``'podman:imagename:version'`` (anything that both
-    ``podman pull`` and ``podman run`` understands can be used).
+    used.
+
+    You can also use the ``'podman:foo=123,bar=456'`` syntax to customize
+    the podman behavior using the following options:
+
+    - ``image`` -- a custom image, using any format that both ``podman pull``
+      and ``podman run`` understand
+    - ``connection`` -- a podman connection name when using the local podman
+      service (defaults to not using the service)
+    - ``timeout`` -- a timeout (in seconds) after which the LaTeX build container
+      is killed (defaults to no timeout)
+    - ``allow_pull`` -- when set to ``false``, a missing image is not pulled but
+      generating the PDF fails; when using this option, the image must be pulled
+      using ``indico maint pull-latex-image`` or directly using podman
 
     Default: ``None``
 
