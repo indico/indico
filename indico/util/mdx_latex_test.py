@@ -10,13 +10,14 @@
 import pytest
 from markdown import Markdown
 
-from indico.util.mdx_latex import LaTeXExtension, latex_escape
+from indico.util.mdx_latex import LaTeXExtension, _resolve_latex_carets, latex_escape
 
 
 def test_escape():
     assert latex_escape(r'\naughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^5cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape('^^\x1cnaughty') == r'\textbackslash{}naughty'
+    assert latex_escape('^^\x1c^^.aughty') == r'\textbackslash{}\^{}\^{}.aughty'
     assert latex_escape(r'^^^^^^00005cnaughty') == r'\textbackslash{}naughty'
     assert latex_escape(r'^^^^005cnaughty') == r'\textbackslash{}naughty'
     assert (latex_escape(r'this\\is\\harmless') ==
@@ -32,8 +33,9 @@ def test_escape_math():
     assert latex_escape(r'$\begin{equation}$') == r'\protect $\begin{equation}$'
     assert latex_escape(r'$^^5cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape('$^^\x1cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $^^^^\\naughty$'
-    assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $^^\\naughty$'
+    assert latex_escape('$^^\x1c^^.aughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $\\naughty$'
+    assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$\\naughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$^^5e^5cnaughty$') == r'\protect $\\naughty$'
     assert latex_escape(r'$\to^^64ay$') == r'\protect $\\today$'
@@ -43,6 +45,23 @@ def test_escape_math():
     assert latex_escape(r'$\mbox{\^^6eaughty}$') == r'\protect $\mbox{\\naughty}$'
     assert latex_escape(r'$\mbox{\very^^6eaughty}$') == r'\protect $\mbox{\\verynaughty}$'
     assert latex_escape(r'$\epsilon_\psi^\theta$') == r'\protect $\epsilon_\psi^\theta$'
+
+
+@pytest.mark.parametrize(('input', 'expected'), (
+    (r'\^^4oday we are ^^5cnaughty \^^4aday', r'\today we are \naughty \Jday'),
+    (r'\^^4aday we are ^^5cnaughty \^^4oday', r'\Jday we are \naughty \today'),
+    (r'\^^4aday we are ^^5cnaughty \^^4aday', r'\Jday we are \naughty \Jday'),
+    (r'\^^4oday', r'\today'),
+    (r'^^5e^5ctoday', r'\today'),
+    (r'^^5cnaughty', r'\naughty'),
+    ('^^\x1cnaughty', r'\naughty'),
+    ('^^\x1c^^.aughty', r'\naughty'),
+    (r'^^^^^^00005cnaughty', r'\naughty'),
+    (r'^^^^^^00x05cnaughty', r'00x05cnaughty'),
+    (r'^^^^00x05cnaughty', r'^00x05cnaughty'),
+))
+def test_resolve_carets(input, expected):
+    assert _resolve_latex_carets(input) == expected
 
 
 @pytest.mark.parametrize(('input', 'expected'), (

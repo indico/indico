@@ -161,11 +161,32 @@ def unescape_html_entities(text):
 
 
 def _resolve_latex_carets(text):
-    while True:
-        text, n = re.subn(r'\^\^0*([0-9a-fA-F]{2})', lambda m: chr(int(m.group(1), 16)), text)
-        if not n:
-            break
-    return text.replace('^^\x1c', '\\')
+    done = False
+    while not done:
+        done = True
+        while m := re.search(r'(\^{2,})(?=[a-f0-9])', text):
+            num = len(m.group(1))
+            start = m.start(1)
+            end = m.end(1)
+            if not re.match(rf'[a-f0-9]{{{num}}}', text[end : end + num]):
+                break
+            ccode = int(text[end : end + num], 16)
+            char = chr(ccode) if ccode else ''  # avoid NULs
+            text = text[:start] + char + text[end + num :]
+            done = False
+        if m := re.search(r'(\^\^)([\x00-\xbf])', text):
+            start = m.start(1)
+            end = m.end(2)
+            ccode = ord(m.group(2))
+            # we ignore the -64 case for low char codes since this mostly adds nonsense
+            # and simply swallowing that character instead of inserting it should be safe.
+            # this also matches what the latex renderer on overleaf does when there's a
+            # string with an invalid caret escape sequence, ie the carets disappear and
+            # the rest remains as-is.
+            char = chr(ccode + 64) if ccode < 64 else ''
+            text = text[:start] + char + text[end:]
+            done = False
+    return text
 
 
 def latex_escape(text, ignore_math=True, ignore_braces=False):
