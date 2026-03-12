@@ -13,8 +13,8 @@ from webargs import fields
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_ical
 from indico.modules.events.layout.views import WPPage
-from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
+from indico.modules.events.operations import get_event_privacy
 from indico.modules.events.settings import autolinker_settings
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
@@ -94,10 +94,11 @@ class RHDisplayPrivacyPolicy(RHDisplayEventBase):
     view_class = WPConferencePrivacyDisplay
 
     def _process(self):
+        privacy_info, _inherited = get_event_privacy(self.event)
         return self.view_class.render_template(
             'privacy_policy.html' if request.is_xhr else 'privacy.html',
             self.event,
-            privacy_info=privacy_settings.get_all(self.event)
+            privacy_info=privacy_info
         )
 
 
