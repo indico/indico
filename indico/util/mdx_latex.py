@@ -161,6 +161,11 @@ def unescape_html_entities(text):
 
 
 def _resolve_latex_carets(text):
+    """Resolve LaTeX double-caret escape sequences.
+
+    See this TeX.SE answer for details on how LaTeX handles such sequences:
+    https://tex.stackexchange.com/a/64848/1651
+    """
     done = False
     while not done:
         done = True
@@ -171,7 +176,7 @@ def _resolve_latex_carets(text):
             if not re.match(rf'[a-f0-9]{{{num}}}', text[end : end + num]):
                 break
             ccode = int(text[end : end + num], 16)
-            char = chr(ccode) if ccode else ''  # avoid NULs
+            char = chr(ccode) if ccode and ccode <= 0x10ffff else ''  # avoid NULs and invalid charchodes
             text = text[:start] + char + text[end + num :]
             done = False
         if m := re.search(r'(\^\^)([\x00-\xbf])', text):
