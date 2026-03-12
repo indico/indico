@@ -11,6 +11,7 @@ import os
 import subprocess
 import tempfile
 import time
+import typing as t
 from dataclasses import dataclass
 from importlib.resources import as_file
 from importlib.resources import files as res_files
@@ -189,9 +190,8 @@ class PodmanConfig:
     allow_pull: bool = True
 
     @classmethod
-    def from_string(cls, optstring):
+    def from_string(cls, optstring) -> t.Self:
         options = dict((x.strip() for x in item.split('=', 1)) for item in optstring.split(',')) if optstring else {}
-        print(PodmanConfigSchema().load(options))
         return PodmanConfigSchema().load(options)
 
     @property
@@ -219,14 +219,6 @@ class PodmanConfigSchema(mm.Schema):
     @post_load
     def _wrap(self, data, **kwargs):
         return PodmanConfig(**data)
-
-
-def get_latex_podman_config() -> PodmanConfig | None:
-    if config.XELATEX_PATH == 'podman':
-        return PodmanConfig()
-    elif config.XELATEX_PATH.startswith('podman:'):
-        optstring = config.XELATEX_PATH.removeprefix('podman:')
-        return PodmanConfig.from_string(optstring)
 
 
 @memoize_redis(300)
@@ -263,8 +255,8 @@ class LatexRunner:
         self.source_dir = source_dir
         self.has_toc = has_toc
 
-    def run_latex(self, source_file, log_file, podman_config):
-        if podman_config:
+    def run_latex(self, source_file, log_file):
+        if podman_config := config.XELATEX_PODMAN_CONFIG:
             self._run_latex_podman(source_file, log_file, podman_config)
         else:
             self._run_latex_local(source_file, log_file)
@@ -371,13 +363,13 @@ class LatexRunner:
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')  # noqa: SIM115
         start = time.time()
-        podman_config = get_latex_podman_config()
+        podman_config = config.XELATEX_PODMAN_CONFIG
         if podman_config and not podman_config.allow_pull and not _check_podman_image(podman_config):
             raise ServiceUnavailable('PDF files are currently unavailable. Please try again later.')
         try:
-            self.run_latex(source_filename, log_file, podman_config)
+            self.run_latex(source_filename, log_file)
             if self.has_toc:
-                self.run_latex(source_filename, log_file, podman_config)
+                self.run_latex(source_filename, log_file)
         finally:
             log_file.close()
 
