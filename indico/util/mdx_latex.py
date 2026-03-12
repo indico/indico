@@ -232,8 +232,6 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         text = re.sub(r'\$[^\$]+\$|\$\$[^\$]+\$\$', math_replace, text)
 
     pattern = re.compile('|'.join(re.escape(k) for k in chars))
-    # handle encoded backslashes, the `chars` replacement below escapes them
-    text = re.sub(r'\^{2,}(?:0*5c|\x1c)', r'\\', text)
     text = pattern.sub(substitute, text)
 
     if ignore_math:

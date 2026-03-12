@@ -15,11 +15,11 @@ from indico.util.mdx_latex import LaTeXExtension, _resolve_latex_carets, latex_e
 
 @pytest.mark.parametrize(('input', 'expected'), (
     (r'\naughty', r'\textbackslash{}naughty'),
-    (r'^^5cnaughty', r'\textbackslash{}naughty'),
-    ('^^\x1cnaughty', r'\textbackslash{}naughty'),
-    ('^^\x1c^^.aughty', r'\textbackslash{}\^{}\^{}.aughty'),
-    (r'^^^^^^00005cnaughty', r'\textbackslash{}naughty'),
-    (r'^^^^005cnaughty', r'\textbackslash{}naughty'),
+    (r'^^5cnaughty', r'\^{}\^{}5cnaughty'),
+    ('^^\x1cnaughty', '\\^{}\\^{}\x1cnaughty'),
+    ('^^\x1c^^.aughty', '\\^{}\\^{}\x1c\\^{}\\^{}.aughty'),
+    (r'^^^^^^00005cnaughty', r'\^{}\^{}\^{}\^{}\^{}\^{}00005cnaughty'),
+    (r'^^^^005cnaughty', r'\^{}\^{}\^{}\^{}005cnaughty'),
     (r'this\\is\\harmless', r'this\textbackslash{}\textbackslash{}is\textbackslash{}\textbackslash{}harmless'),
     (r'\\\extranaughty', r'\textbackslash{}\textbackslash{}\textbackslash{}extranaughty'),
     (r'\mbox{\naughty}', r'\textbackslash{}mbox\{\textbackslash{}naughty\}'),
