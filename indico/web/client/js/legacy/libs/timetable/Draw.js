@@ -319,7 +319,7 @@ type(
       }
 
       if (!self.printableVersion) {
-        $(this.block.dom).on('click', '.entry-content', function(e) {
+        $(this.block.dom).on('click', function(e) {
           if (!self.timetable.getTimetableDrawer().eventsDisabled) {
             $(this).trigger('tt_block.balloon', e);
           }
@@ -394,7 +394,7 @@ type(
     this.printableVersion = printableVersion;
     this.detailLevel = detailLevel;
     this.arrows = Html.span({});
-    this.block = Html.div({});
+    this.block = Html.button({});
 
     var self = this;
     $(this.block.dom).bind('tt_block.balloon', function(event, originalEvent) {
@@ -445,7 +445,7 @@ type(
         Break: 'timetableBreak ',
       };
 
-      var block = Html.div(
+      var block = Html.button(
         {
           style: {
             backgroundColor: this.eventData.color,
