@@ -330,7 +330,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     let resData;
     try {
-      resData = (await submitHandler(data)).data;
+      resData = (await submitHandler(snakifyKeys(data))).data;
     } catch (exc) {
       return handleSubmitError(exc);
     }
