@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db
 from indico.modules.events.registration.controllers.display import RHRegistrationForm
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.base import FieldSetupSchemaBase, RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -104,3 +105,7 @@ class SessionsField(RegistrationFormFieldBase):
     def create_sql_filter(self, data_list):
         data_list = json.dumps(list(map(int, data_list)))
         return RegistrationData.data.op('@>')(db.func.jsonb(data_list))
+
+    def render_reglist_column(self, data):
+        display_text = self.get_friendly_data(data, for_humans=True)
+        return RegistrationListColumn(display_text, display_text)
