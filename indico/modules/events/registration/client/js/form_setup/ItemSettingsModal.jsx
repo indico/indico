@@ -51,6 +51,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   const isUnsupportedField = !(inputType in fieldRegistry);
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
+  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
 
   const handleSubmit = async (formData, form) => {
     const data = getValuesForFields(formData, form);
@@ -212,6 +213,44 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               </FormSpy>
             </Fieldset>
           )}
+          <Fieldset
+            legend={
+              <div
+                style={{cursor: 'pointer', userSelect: 'none'}}
+                onClick={() => setAdvancedSettingsOpen(open => !open)}
+              >
+                <Translate>Advanced settings</Translate>
+                <div className="group right">
+                  <span className={advancedSettingsOpen ? 'icon-expand' : 'icon-next'} />
+                </div>
+              </div>
+            }
+            compact
+          >
+            {advancedSettingsOpen && (
+              <FinalInput
+                name="internalName"
+                type="text"
+                label={Translate.string('Internal name')}
+                disabled={itemData.fieldIsPersonalData}
+                nullIfEmpty
+                validate={val => {
+                  if (val && !/^[a-z0-9_]+$/.test(val)) {
+                    Translate.string(
+                      'Only lowercase alphanumeric characters and underscore ("_") are allowed.'
+                    );
+                  }
+                }}
+                description={
+                  <Translate>
+                    Used for identifying the same field across registration forms regardless of the
+                    title. This can also be used across events if you make sure to use the same
+                    internal name.
+                  </Translate>
+                }
+              />
+            )}
+          </Fieldset>
           {isUnsupportedField && (
             <Message visible warning>
               Unknown input type: {inputType}.<br />
