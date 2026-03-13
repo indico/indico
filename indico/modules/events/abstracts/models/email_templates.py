@@ -6,8 +6,11 @@
 # LICENSE file for more details.
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.events.abstracts.models.abstracts import AbstractNotificationType
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
@@ -52,16 +55,15 @@ class AbstractEmailTemplate(db.Model):
         db.String,
         nullable=False
     )
-    #: The subject of the email
-    subject = db.Column(
-        db.String,
-        nullable=False
+    #: Whether this is the unmodified default template and thus can be translated
+    is_default = db.Column(
+        db.Boolean,
+        nullable=True,
     )
-    #: The body of the template
-    body = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
+    #: Path to the default template used for this email template
+    notification_type = db.Column(
+        PyIntEnum(AbstractNotificationType),
+        nullable=True
     )
     #: List of extra email addresses to be added as CC in the email
     extra_cc_emails = db.Column(
@@ -117,3 +119,48 @@ class AbstractEmailTemplate(db.Model):
 
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', _text=self.title)
+
+    @declared_attr
+    def _subject(cls):
+        return db.Column(
+            'subject',
+            db.String,
+            nullable=False,
+        )
+
+    @declared_attr
+    def _body(cls):
+        return db.Column(
+            'body',
+            db.Text,
+            nullable=False,
+            default='',
+        )
+
+    @property
+    def subject(self):
+        if self.is_default and self.notification_type:
+            from indico.modules.events.abstracts.util import get_default_email_template
+            email = get_default_email_template(self.notification_type)
+            return email.get_subject()
+        return self._subject
+
+    @subject.setter
+    def subject(self, value):
+        if self._subject != value:
+            self.is_default = False
+        self._subject = value
+
+    @property
+    def body(self):
+        if self.is_default and self.notification_type:
+            from indico.modules.events.abstracts.util import get_default_email_template
+            email = get_default_email_template(self.notification_type)
+            return email.get_body()
+        return self._body
+
+    @body.setter
+    def body(self, value):
+        if self._body != value:
+            self.is_default = False
+        self._body = value
