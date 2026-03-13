@@ -259,11 +259,12 @@ class RHPersonsList(RHPersonsBase):
         for person_data in persons.values():
             if not person_data['registrations']:
                 person_data['roles']['no_registration'] = True
+        has_predefined_affiliations = Affiliation.query.filter_by(is_deleted=False).has_rows()
         allow_custom_affiliations = not user_management_settings.get('only_predefined_affiliations')
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
                                                custom_roles=custom_roles, person_schema=EventPersonSchema(),
-                                               has_predefined_affiliations=Affiliation.query.has_rows(),
+                                               has_predefined_affiliations=has_predefined_affiliations,
                                                allow_custom_affiliations=allow_custom_affiliations)
 
 

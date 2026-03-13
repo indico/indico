@@ -1,7 +1,7 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/management/_lists.html' import render_num_reviews_tooltip %}
-{% from 'events/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_person_affiliation %}
 
 {% macro _get_track_full_title(track, searchable=false) -%}
     {% if track.code -%}
@@ -147,7 +147,7 @@
                                         <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name }}">
                                             {{- abstract.submitter.display_full_name }}
                                             {% if abstract.submitter.affiliation %}
-                                                <span class="text-superfluous">({{ render_affiliation(abstract.submitter) }})</span>
+                                                <span class="text-superfluous">({{ render_person_affiliation(abstract.submitter) }})</span>
                                             {% endif %}
                                         </td>
                                     {% elif item.id == 'speakers' %}
@@ -157,7 +157,7 @@
                                                 <div class="person-row icon-user">
                                                     {{- speaker.display_full_name }}
                                                     {% if speaker.affiliation %}
-                                                        <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
+                                                        <span class="text-superfluous">({{ render_person_affiliation(speaker) }})</span>
                                                     {% endif %}
                                                 </div>
                                             {%- endfor %}
@@ -169,7 +169,7 @@
                                                 <div class="person-row icon-user">
                                                     {{- author.display_full_name }}
                                                     {% if author.affiliation %}
-                                                        <span class="text-superfluous">({{ render_affiliation(author) }})</span>
+                                                        <span class="text-superfluous">({{ render_person_affiliation(author) }})</span>
                                                     {% endif %}
                                                 </div>
                                             {%- endfor %}
@@ -181,7 +181,7 @@
                                                 <div class="person-row icon-user">
                                                     {{- author.display_full_name }}
                                                     {% if author.affiliation %}
-                                                        <span class="text-superfluous">({{ render_affiliation(author) }})</span>
+                                                        <span class="text-superfluous">({{ render_person_affiliation(author) }})</span>
                                                     {% endif %}
                                                 </div>
                                             {%- endfor %}

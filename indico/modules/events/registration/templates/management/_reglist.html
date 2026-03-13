@@ -118,11 +118,18 @@
                                         </td>
                                     {% else %}
                                         {% set search_value = data[item.id].search_data if item.id in data else '' %}
-                                        <td class="i-table" data-text="{{ search_value }}">
-                                            {%- if item.id in data and data[item.id].friendly_data %}
-                                                {{- data[item.id].friendly_data }}
-                                            {%- endif %}
-                                        </td>
+                                        {% if item.id in data and data[item.id].field_data.field.input_type == 'affiliation' %}
+                                            {% set spec = data[item.id].field_data.field.field_impl.render_reglist_column(data[item.id]) %}
+                                            <td class="i-table" data-text="{{ spec.text_value }}" {{ spec.td_attrs | html_params }}>
+                                                {{ spec.content }}
+                                            </td>
+                                        {% else %}
+                                            <td class="i-table" data-text="{{ search_value }}">
+                                                {%- if item.id in data and data[item.id].friendly_data %}
+                                                    {{- data[item.id].friendly_data }}
+                                                {%- endif %}
+                                            </td>
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                                 {% for item in extra_columns if not item.filter_only %}
