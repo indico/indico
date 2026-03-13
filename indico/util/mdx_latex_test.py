@@ -10,39 +10,65 @@
 import pytest
 from markdown import Markdown
 
-from indico.util.mdx_latex import LaTeXExtension, latex_escape
+from indico.util.mdx_latex import LaTeXExtension, _resolve_latex_carets, latex_escape
 
 
-def test_escape():
-    assert latex_escape(r'\naughty') == r'\textbackslash{}naughty'
-    assert latex_escape(r'^^5cnaughty') == r'\textbackslash{}naughty'
-    assert latex_escape('^^\x1cnaughty') == r'\textbackslash{}naughty'
-    assert latex_escape(r'^^^^^^00005cnaughty') == r'\textbackslash{}naughty'
-    assert latex_escape(r'^^^^005cnaughty') == r'\textbackslash{}naughty'
-    assert (latex_escape(r'this\\is\\harmless') ==
-            r'this\textbackslash{}\textbackslash{}is\textbackslash{}\textbackslash{}harmless')
-    assert latex_escape(r'\\\extranaughty') == r'\textbackslash{}\textbackslash{}\textbackslash{}extranaughty'
-    assert latex_escape(r'\mbox{\naughty}') == r'\textbackslash{}mbox\{\textbackslash{}naughty\}'
-    assert latex_escape(r'\mbox{\^^6eaughty}') == r'\textbackslash{}mbox\{\textbackslash{}\^{}\^{}6eaughty\}'
+@pytest.mark.parametrize(('input', 'expected'), (
+    (r'\naughty', r'\textbackslash{}naughty'),
+    (r'^^5cnaughty', r'\^{}\^{}5cnaughty'),
+    ('^^\x1cnaughty', '\\^{}\\^{}\x1cnaughty'),
+    ('^^\x1c^^.aughty', '\\^{}\\^{}\x1c\\^{}\\^{}.aughty'),
+    (r'^^^^^^00005cnaughty', r'\^{}\^{}\^{}\^{}\^{}\^{}00005cnaughty'),
+    (r'^^^^005cnaughty', r'\^{}\^{}\^{}\^{}005cnaughty'),
+    (r'this\\is\\harmless', r'this\textbackslash{}\textbackslash{}is\textbackslash{}\textbackslash{}harmless'),
+    (r'\\\extranaughty', r'\textbackslash{}\textbackslash{}\textbackslash{}extranaughty'),
+    (r'\mbox{\naughty}', r'\textbackslash{}mbox\{\textbackslash{}naughty\}'),
+    (r'\mbox{\^^6eaughty}', r'\textbackslash{}mbox\{\textbackslash{}\^{}\^{}6eaughty\}'),
+))
+def test_escape(input, expected):
+    assert latex_escape(input) == expected
 
 
-def test_escape_math():
-    assert latex_escape(r'$\naughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$\begin{naughty}$') == r'\protect $\\begin{naughty}$'
-    assert latex_escape(r'$\begin{equation}$') == r'\protect $\begin{equation}$'
-    assert latex_escape(r'$^^5cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape('$^^\x1cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$^^^^^^00005cnaughty$') == r'\protect $^^^^\\naughty$'
-    assert latex_escape(r'$^^^^005cnaughty$') == r'\protect $^^\\naughty$'
-    assert latex_escape(r'$\\naughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$^^5e^5cnaughty$') == r'\protect $\\naughty$'
-    assert latex_escape(r'$\to^^64ay$') == r'\protect $\\today$'
-    assert latex_escape(r'$harm\\less$') == r'\protect $harm\\less$'
-    assert latex_escape(r'$\\\extranaughty$') == r'\protect $\\\\extranaughty$'
-    assert latex_escape(r'$\mbox{\naughty}$') == r'\protect $\mbox{\\naughty}$'
-    assert latex_escape(r'$\mbox{\^^6eaughty}$') == r'\protect $\mbox{\\naughty}$'
-    assert latex_escape(r'$\mbox{\very^^6eaughty}$') == r'\protect $\mbox{\\verynaughty}$'
-    assert latex_escape(r'$\epsilon_\psi^\theta$') == r'\protect $\epsilon_\psi^\theta$'
+@pytest.mark.parametrize(('input', 'expected'), (
+    (r'\naughty', r'\protect $\\naughty$'),
+    (r'\begin{naughty}', r'\protect $\\begin{naughty}$'),
+    (r'\begin{equation}', r'\protect $\begin{equation}$'),
+    (r'^^5cnaughty', r'\protect $\\naughty$'),
+    ('^^\x1cnaughty', r'\protect $\\naughty$'),
+    ('^^\x1c^^.aughty', r'\protect $\\naughty$'),
+    (r'^^^^^^00005cnaughty', r'\protect $\\naughty$'),
+    (r'^^^^005cnaughty', r'\protect $\\naughty$'),
+    (r'\\naughty', r'\protect $\\naughty$'),
+    (r'^^5e^5cnaughty', r'\protect $\\naughty$'),
+    (r'\to^^64ay', r'\protect $\\today$'),
+    (r'harm\\less', r'\protect $harm\\less$'),
+    (r'\\\extranaughty', r'\protect $\\\\extranaughty$'),
+    (r'\mbox{\naughty}', r'\protect $\mbox{\\naughty}$'),
+    (r'\mbox{\^^6eaughty}', r'\protect $\mbox{\\naughty}$'),
+    (r'\mbox{\very^^6eaughty}', r'\protect $\mbox{\\verynaughty}$'),
+    (r'\epsilon_\psi^\theta', r'\protect $\epsilon_\psi^\theta$'),
+))
+def test_escape_math(input, expected):
+    assert latex_escape(f'${input}$') == expected
+
+
+@pytest.mark.parametrize(('input', 'expected'), (
+    (r'\^^4oday we are ^^5cnaughty \^^4aday', r'\today we are \naughty \Jday'),
+    (r'\^^4aday we are ^^5cnaughty \^^4oday', r'\Jday we are \naughty \today'),
+    (r'\^^4aday we are ^^5cnaughty \^^4aday', r'\Jday we are \naughty \Jday'),
+    (r'\^^4oday', r'\today'),
+    (r'^^5e^5ctoday', r'\today'),
+    (r'^^5cnaughty', r'\naughty'),
+    ('^^\x1cnaughty', r'\naughty'),
+    ('^^\x1c^^.aughty', r'\naughty'),
+    (r'^^^^^^00005cnaughty', r'\naughty'),
+    (r'^^^^^^00x05cnaughty', r'00x05cnaughty'),
+    (r'^^^^00x05cnaughty', r'^00x05cnaughty'),
+    (r'^^^^^^10ffff', '\U0010ffff'),
+    (r'^^^^^^110000', ''),
+))
+def test_resolve_carets(input, expected):
+    assert _resolve_latex_carets(input) == expected
 
 
 @pytest.mark.parametrize(('input', 'expected'), (
