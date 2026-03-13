@@ -14,6 +14,7 @@ from webargs import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
+from indico.modules.events.registration.models.checks import RegistrationCheckType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
@@ -119,9 +120,20 @@ class RegistrationInvitationSchema(mm.SQLAlchemyAutoSchema):
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title', 'description', 'start_dt', 'end_dt', 'registration_tags')
+        fields = ('id', 'title', 'description', 'start_dt', 'end_dt', 'registration_tags', 'check_types',
+                  'default_check_type')
 
     registration_tags = fields.Nested(RegistrationTagSchema, many=True)
+
+    check_types = fields.Method('_get_check_types')
+    default_check_type = fields.Function(lambda event:
+        {'id': event.default_check_type.id,
+         'title': f'{event.default_check_type.title} ({event.default_check_type.rule.title})'})
+
+    def _get_check_types(self, event):
+        check_types = (event.check_types +
+                       RegistrationCheckType.query.filter(RegistrationCheckType.is_system_defined).all())
+        return [{'id': c.id, 'title': f'{c.title} ({c.rule.title})'} for c in check_types]
 
 
 class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
@@ -132,7 +144,13 @@ class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
 
     is_open = fields.Bool()
     registration_count = fields.Int(attribute='existing_registrations_count')
-    checked_in_count = fields.Int(attribute='checked_in_registrations_count')
+    checked_in_count = fields.Method('_checked_in_count')
+
+    def _checked_in_count(self, regform):
+        check_type_id = self.context.get('check_type_id')
+        if check_type_id is not None:
+            return regform.get_checked_in_registrations_count(check_type_id)
+        return regform.checked_in_registrations_count  # Uses the default_check_type of the event
 
 
 class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
@@ -140,18 +158,47 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
         model = Registration
         fields = ('id', 'regform_id', 'event_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
                   'checkin_secret', 'is_paid', 'price', 'payment_date', 'currency', 'formatted_price', 'tags',
-                  'occupied_slots', 'registration_date', 'registration_data', 'personal_data_picture')
+                  'occupied_slots', 'registration_date', 'registration_data', 'personal_data_picture',
+                  'checked_out', 'checked_out_dt')
 
     regform_id = fields.Int(attribute='registration_form_id')
     full_name = fields.Str(attribute='display_full_name')
     state = fields.Enum(RegistrationState)
     checkin_secret = fields.UUID(attribute='ticket_uuid')
+    checked_in = fields.Method('_get_checked_in')
+    checked_in_dt = fields.Method('_get_checked_in_dt')
+    checked_out = fields.Method('_get_checked_out')
+    checked_out_dt = fields.Method('_get_checked_out_dt')
     payment_date = fields.Method('_get_payment_date')
     formatted_price = fields.Function(lambda reg: reg.render_price())
     tags = fields.Nested(RegistrationTagSchema, many=True)
     registration_date = fields.DateTime(attribute='submitted_dt')
     registration_data = fields.Method('_get_registration_data')
     personal_data_picture = fields.Method('_get_personal_data_picture')
+
+    def _get_checked_in(self, registration):
+        check_type_id = self.context.get('check_type_id')
+        if check_type_id is not None:
+            return registration.is_checked_in_for_type(check_type_id)
+        return registration.checked_in
+
+    def _get_checked_in_dt(self, registration):
+        check_type_id = self.context.get('check_type_id')
+        if check_type_id is not None:
+            return str(registration.get_checked_in_dt_for_type(check_type_id))
+        return str(registration.checked_in_dt)
+
+    def _get_checked_out(self, registration):
+        check_type_id = self.context.get('check_type_id')
+        if check_type_id is not None:
+            return registration.is_checked_out_for_type(check_type_id)
+        return registration.checked_out
+
+    def _get_checked_out_dt(self, registration):
+        check_type_id = self.context.get('check_type_id')
+        if check_type_id is not None:
+            return str(registration.get_checked_out_dt_for_type(check_type_id))
+        return str(registration.checked_out_dt)
 
     def _get_payment_date(self, registration):
         if registration.is_paid and (transaction := registration.transaction):

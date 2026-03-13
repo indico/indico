@@ -13,6 +13,9 @@
     - userref
     - 00000000-0000-4000-8000-000000000001
     custom_boa_id: null
+    default_check_type_id: !!python/tuple
+    - idref
+    - 00000000-0000-4000-8000-000000000002
     default_page_id: null
     description: ''
     end_dt: !!python/tuple
@@ -66,7 +69,7 @@
     friendly_id: 1
     id: !!python/tuple
     - idref_set
-    - 00000000-0000-4000-8000-000000000002
+    - 00000000-0000-4000-8000-000000000003
     inherit_location: true
     is_deleted: true
     protection_mode: !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode
@@ -96,7 +99,7 @@
     friendly_id: 1
     id: !!python/tuple
     - idref_set
-    - 00000000-0000-4000-8000-000000000004
+    - 00000000-0000-4000-8000-000000000005
     inherit_location: true
     is_deleted: false
     keywords: []
@@ -132,7 +135,7 @@
     friendly_id: 2
     id: !!python/tuple
     - idref_set
-    - 00000000-0000-4000-8000-000000000006
+    - 00000000-0000-4000-8000-000000000007
     inherit_location: true
     is_deleted: true
     keywords: []
@@ -145,7 +148,7 @@
     session_block_id: null
     session_id: !!python/tuple
     - idref
-    - 00000000-0000-4000-8000-000000000002
+    - 00000000-0000-4000-8000-000000000003
     title: c2
     track_id: null
     type_id: null

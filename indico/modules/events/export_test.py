@@ -18,6 +18,7 @@ from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.export import export_event, import_event
 from indico.modules.events.sessions import Session
+from indico.modules.events.settings import default_check_type_settings
 from indico.testing.util import assert_yaml_snapshot
 from indico.util.date_time import as_utc
 
@@ -115,11 +116,11 @@ def test_event_attachment_export(db, dummy_event):
         assert file_['size'] == 11
         assert file_['md5'] == '5eb63bbbe01eeed093cb22bb8f5acdc3'
         # check that the file itself was included (and verify content)
-        assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'objects-1.yaml', 'data.yaml', 'ids.yaml']
-        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == b'hello world'
+        assert tarf.getnames() == ['00000000-0000-4000-8000-000000000014', 'objects-1.yaml', 'data.yaml', 'ids.yaml']
+        assert tarf.extractfile('00000000-0000-4000-8000-000000000014').read() == b'hello world'
 
 
-def test_event_import(db, dummy_user):
+def test_event_import(db, dummy_user, dummy_check_type):
     data_yaml_content = (Path(__file__).parent / 'tests' / 'export_test_2.yaml').read_text()
     objects_yaml_content = (Path(__file__).parent / 'tests' / 'export_test_2_objects.yaml').read_text()
     data_yaml = BytesIO(data_yaml_content.encode())
@@ -129,6 +130,8 @@ def test_event_import(db, dummy_user):
     # User should be matched by e-mail
     dummy_user.email = '1337@example.test'
     db.session.flush()
+
+    default_check_type_settings.set('default_check_type', dummy_check_type)
 
     # create a tar file artificially, using the provided YAML
     with tarfile.open(mode='w', fileobj=tar_buffer) as tarf:
