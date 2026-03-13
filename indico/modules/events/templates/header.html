@@ -41,26 +41,31 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <button class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
-       title="{% trans %}Change theme{% endtrans %}"></button>
-    <ul class="i-dropdown">
-        {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
-        {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
-           if group.grouper or event.can_manage(session.user) %}
-            {% if not group.grouper %}
-                <li class="themes-separator"></li>
-            {% endif %}
-            {% for id, data in group.list %}
-                <li>
-                    {% if id == theme %}
-                        <a class="disabled"><strong>{{ data.name }}</strong></a>
-                    {% else %}
-                        <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
+    <ind-with-tooltip>
+        <ind-menu>
+            <button class="i-button text-color subtle icon-layout">
+                <span data-tip-content>{% trans %}Change theme{% endtrans %}</span>
+            </button>
+            <menu>
+                {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
+                {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
+                   if group.grouper or event.can_manage(session.user) %}
+                    {% if not group.grouper %}
+                        <li class="themes-separator"></li>
                     {% endif %}
-                </li>
-            {% endfor %}
-        {% endfor %}
-    </ul>
+                    {% for id, data in group.list %}
+                        <li>
+                            {% if id == theme %}
+                                <a aria-current="true"><strong>{{ data.name }}</strong></a>
+                            {% else %}
+                                <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </menu>
+        </ind-menu>
+    </ind-with-tooltip>
 {%- endmacro -%}
 
 
