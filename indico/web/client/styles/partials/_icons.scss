@@ -157,9 +157,17 @@ i[class^='icon-']::before {
 %icon-calendar {
   content: '\e90f';
 }
+.icon-calendar-check-o::before,
+%icon-calendar-check-o {
+  content: '\e99f';
+}
 .icon-calendar-day::before,
 %icon-calendar-day {
   content: '\ea65';
+}
+.icon-calendar-plus-o::before,
+%icon-calendar-plus-o {
+  content: '\e9a0';
 }
 .icon-camera::before,
 %icon-camera {

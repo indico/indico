@@ -115,13 +115,18 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.contributions.util import user_has_contributions
+    from indico.modules.events.contributions.util import user_has_contributions, user_has_scheduled_contributions
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_contributions(event):
         if not session.user:
             return False
         return user_has_contributions(event, session.user)
+
+    def _visible_my_timetable(event):
+        if not session.user:
+            return False
+        return user_has_scheduled_contributions(event, session.user)
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')
@@ -130,6 +135,8 @@ def _extend_event_menu(sender, **kwargs):
 
     yield MenuEntryData(title=_('My Contributions'), name='my_contributions', visible=_visible_my_contributions,
                         endpoint='contributions.my_contributions', position=2, parent='my_conference')
+    yield MenuEntryData(title=_('My Timetable'), name='my_timetable', visible=_visible_my_timetable,
+                        endpoint='contributions.my_timetable', position=3, parent='my_conference')
     yield MenuEntryData(title=_('Contribution List'), name='contributions', endpoint='contributions.contribution_list',
                         position=4, static_site=True, visible=_visible_list_of_contributions)
     yield MenuEntryData(title=_('Author List'), name='author_index', endpoint='contributions.author_list', position=5,

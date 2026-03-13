@@ -371,6 +371,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     # - _paper_revisions (PaperRevision._contribution)
     # - attachment_folders (AttachmentFolder.contribution)
     # - editables (Editable.contribution)
+    # - favorite_of (User.favorite_contributions)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
     # - room_reservation_occurrence_links (ReservationOccurrenceLink.contribution)
@@ -391,6 +392,15 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         query = (db.select([db.func.count(SubContribution.id)])
                  .where((SubContribution.contribution_id == cls.id) & ~SubContribution.is_deleted)
                  .correlate_except(SubContribution)
+                 .scalar_subquery())
+        return db.column_property(query, deferred=True)
+
+    @declared_attr
+    def favorite_count(cls):
+        from indico.modules.users.models.favorites import favorite_contribution_table
+        query = (db.select([db.func.count(favorite_contribution_table.c.user_id)])
+                 .where(favorite_contribution_table.c.target_id == cls.id)
+                 .correlate_except(favorite_contribution_table)
                  .scalar_subquery())
         return db.column_property(query, deferred=True)
 
