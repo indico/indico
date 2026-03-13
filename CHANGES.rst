@@ -22,6 +22,10 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Nothing so far
+- The event theme selector dropdown now supports keyboard navigation and
+  screen readers (thanks :user:`foxbunny`)
+- Timetable toolbar buttons (Print, PDF, Full screen, Detailed view, Filter)
+  are now keyboard accessible and readable by screen readers (:pr:`7374`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

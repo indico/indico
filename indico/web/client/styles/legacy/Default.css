@@ -157,14 +157,14 @@ div.tabBorderGradient {
   z-index: 1;
 }
 
-.tabExtraButtons .buttonContainer {
+.tabExtraButtons button {
   float: left;
-  padding: 0 10px;
+  padding: 4px 10px;
   border-left: 1px solid #aaa;
   cursor: pointer;
 }
 
-.tabExtraButtons .buttonContainerLeft {
+.tabExtraButtons button:first-child {
   border-left: none;
   -webkit-border-bottom-left-radius: 3px;
   -moz-border-radius-bottomleft: 3px;
@@ -172,14 +172,15 @@ div.tabBorderGradient {
   -moz-border-radius-topleft: 3px;
 }
 
-.tabExtraButtons .buttonContainerRight {
+.tabExtraButtons button:last-child {
   -webkit-border-bottom-right-radius: 3px;
   -moz-border-radius-bottomright: 3px;
   -webkit-border-top-right-radius: 3px;
   -moz-border-radius-topright: 3px;
 }
 
-.tabExtraButtons .buttonContainer:hover {
+.tabExtraButtons button:hover,
+.tabExtraButtons button:focus-visible {
   background: #555;
 }
 
