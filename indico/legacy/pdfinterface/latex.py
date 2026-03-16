@@ -196,14 +196,17 @@ class PodmanConfig:
 
     @property
     def global_args(self):
+        """Arguments passed to all podman calls."""
         return ('--connection', self.connection) if self.connection else ()
 
     @property
     def pull_args(self):
+        """Arguments related to pulling images when running a container."""
         return ('--pull', 'never') if not self.allow_pull else ()
 
     @property
     def run_args(self):
+        """Arguments used when running a container to render a PDF."""
         return ('--timeout', self.timeout) if self.timeout else ()
 
 
