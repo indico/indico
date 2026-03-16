@@ -80,8 +80,8 @@ def generate_cached_pdf(fn, key, obj=None) -> BytesIO:
     # XXX We cache by user just in case something in the templates depends on who's generating them.
     # I don't think it's the case, and it should not be the case, but better stick on the safe side.
     cache_key = (key, user_id, *(inspect(obj).identity_key[:2] if obj else ()))
-    # if (cached := cache.get(cache_key)) is not None:
-    #     return BytesIO(cached)
+    if (cached := cache.get(cache_key)) is not None:
+        return BytesIO(cached)
     if not session.user and not latex_rate_limiter.hit():
         delay = format_human_timedelta(latex_rate_limiter.get_reset_delay())
         raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
