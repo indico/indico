@@ -14,7 +14,7 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-authlib==1.6.8
+authlib==1.6.9
     # via -r requirements.in
 babel==2.18.0
     # via
