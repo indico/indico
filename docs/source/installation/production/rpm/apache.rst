@@ -248,6 +248,17 @@ should be handled.
     (typetransition unconfined_service_t usr_t sock_file "uwsgi.sock" httpd_sys_rw_content_t)
     (filecon "/opt/indico/web/uwsgi\.sock" socket (system_u object_r httpd_sys_rw_content_t ((s0)(s0))))
 
+    ; allow containers (podman/texlive) to write to our tmp/cache dir, and still let the web server read from there
+    (type indico_tmp_t)
+    (typeattributeset file_type (indico_tmp_t))
+    (roletype object_r indico_tmp_t)
+    (allow container_t indico_tmp_t (dir (create read write add_name remove_name search getattr open rmdir)))
+    (allow container_t indico_tmp_t (file (create read write append getattr open link rename unlink map)))
+    (allow container_t indico_tmp_t (lnk_file (create read write append getattr open unlink map)))
+    (allow httpd_t indico_tmp_t (file (read getattr open map)))
+    (filecon "/opt/indico/tmp(/.*)?" any (system_u object_r indico_tmp_t ((s0)(s0))))
+    (filecon "/opt/indico/cache(/.*)?" any (system_u object_r indico_tmp_t ((s0)(s0))))
+
     ; let apache connect to uwsgi
     (allow httpd_t unconfined_service_t (unix_stream_socket (connectto)))
 
@@ -408,8 +419,8 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
-13. Install TeXLive
--------------------
+13. Setup LaTeX PDF generation (optional)
+-----------------------------------------
 
 Follow the :ref:`PDF generation guide <pdf_generation>` to setup PDF document
 generation in Indico.
