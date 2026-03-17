@@ -16,6 +16,62 @@ user-facing downtime.
     fully read and understand the :ref:`Upgrading from 3.x to 3.3 <upgrade-3-to-33>`
     guide before starting with any of the upgrade steps below.
 
+
+.. _upgrade-3-to-312:
+
+Upgrading to 3.3.12
+-------------------
+
+.. note::
+
+    This change is only applicable if you use LaTeX functionality in Indico, ie if you have
+    :data:`XELATEX_PATH` set in your ``indico.conf`` file.
+
+If you use Alma/Rocky (or any other RPM-based distribution), the SELinux config changed
+and you need to run the SELinux setup step once again; see the relevant docs for an
+:ref:`nginx-based setup <rpm-nginx-selinux>` and an :ref:`Apache-based setup <rpm-apache-selinux>`.
+
+Afterwards, follow the :ref:`PDF generation guide <latex>` to install Podman and
+configure Indico to use it.
+
+You can then remove the system-level TeXLive installation, either by deleting ``/opt/texlive``
+or by using your package manager to uninstall it.
+
+
+Upgrading to 3.3.10
+-------------------
+
+.. note::
+
+    This change is only applicable when using nginx as your web server.
+
+Edit the ``/etc/nginx/conf.d/indico.conf`` file and replace this block:
+
+.. code-block:: nginx
+
+    location /.xsf/indico/ {
+      internal;
+      alias /opt/indico/;
+    }
+
+with this one (adding the ``add_header`` lines, everything else is unchanged):
+
+.. code-block:: nginx
+
+    location /.xsf/indico/ {
+      internal;
+      alias /opt/indico/;
+      add_header Content-Security-Policy $upstream_http_content_security_policy;
+      add_header Content-Security-Policy-Report-Only $upstream_http_content_security_policy_report_only;
+      add_header Reporting-Endpoints $upstream_http_reporting_endpoints;
+    }
+
+Then restart nginx:
+
+.. code-block:: shell
+
+    systemctl restart nginx.service
+
 .. _upgrade-3-to-3:
 
 Upgrading between 3.x versions
@@ -88,6 +144,14 @@ changes, the command will simply do nothing.
     restart uWSGI by running ``systemctl restart indico-uwsgi.service`` as
     *root* (in a separate shell, i.e. don't abort the upgrade command!)
     which will ensure nothing is accessing Indico for a moment.
+
+When using LaTeX using the recommended containerized setup, it is also a good
+idea to fetch the latest container image so it doesn't need to be done on the
+fly while handling a request:
+
+.. code-block:: shell
+
+    indico maint pull-latex-image
 
 Unless you just restarted uWSGI, it is now time to reload it so the new
 version is actually used:

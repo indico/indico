@@ -222,6 +222,7 @@ commercial certification authority or get a free one from
     config references a directory yet to be created, which prevents
     Apache from starting.
 
+.. _rpm-apache-selinux:
 
 6. Configure SELinux
 --------------------

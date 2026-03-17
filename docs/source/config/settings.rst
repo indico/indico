@@ -1038,6 +1038,7 @@ System
           alias /opt/indico/;
           add_header Content-Security-Policy $upstream_http_content_security_policy;
           add_header Content-Security-Policy-Report-Only $upstream_http_content_security_policy_report_only;
+          add_header Reporting-Endpoints $upstream_http_reporting_endpoints;
         }
 
     The :ref:`production installation instructions <install-prod>` already

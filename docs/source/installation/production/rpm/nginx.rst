@@ -253,6 +253,7 @@ commercial certification authority or get a free one from
     config references a directory yet to be created, which prevents
     nginx from starting.
 
+.. _rpm-nginx-selinux:
 
 6. Configure SELinux
 --------------------
