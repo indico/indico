@@ -25,7 +25,8 @@ def cleanup_cmd(temp=False, cache=False, min_age=1, dry_run=False, verbose=False
     if cache:
         if verbose:
             click.echo(click.style(f'cleaning cache ({config.CACHE_DIR})', fg='white', bold=True))
-        deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=min_age), dry_run=dry_run)
+        deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=min_age), dry_run=dry_run,
+                              exclude=lambda p: p == 'fontconfig')
         if verbose:
             _print_files(deleted)
     if temp:
