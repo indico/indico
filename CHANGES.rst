@@ -21,7 +21,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- The event theme selector dropdown now supports keyboard navigation and
+  screen readers (:pr:`7359`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
