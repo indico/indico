@@ -32,6 +32,8 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Add more endpoints that shouldn't be crawled to ``robots.txt`` (:pr:`7390`)
+- Allow running TeXLive sandboxed in a container instead of installing it globally and
+  running it directly as the ``indico`` user (:pr:`7384`)
 
 
 Version 3.3.11
