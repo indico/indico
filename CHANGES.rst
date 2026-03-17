@@ -21,7 +21,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Timetable day navigation tabs can now be operated with the keyboard: the previous/next scroll
+  buttons are focusable and activatable, tabs respond to arrow key navigation, and all interactive
+  elements have visible focus rings (:pr:`7386`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -107,13 +107,13 @@
   background: none !important;
 }
 
-.ui-tabs a {
-  outline: none;
+.ui-tabs-nav a:focus-visible {
+  outline: 2px solid #0d5fa3;
+  outline-offset: 2px;
 }
 
 .ui-tabs .ui-tabs-nav li {
   padding: 0;
-  outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-disabled {
@@ -139,8 +139,22 @@
   border-radius: 0;
 }
 
+.ui-tabs button.tab-scroll-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
+.ui-tabs button.tab-scroll-button:focus-visible {
+  outline: 2px solid #0d5fa3;
+  outline-offset: 2px;
+}
+
 .ui-tabs .tab-scroll-button .ui-icon {
   background-image: url(~jquery-ui/themes/base/images/ui-icons_777620_256x240.png);
+  overflow: hidden;
+  text-indent: -9999px;
 }
 
 .ui-tabs {
