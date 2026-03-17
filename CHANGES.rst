@@ -21,7 +21,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Timetable toolbar buttons ("Detailed view" etc.) are now keyboard accessible and
+  readable by screen readers (:pr:`7374`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
