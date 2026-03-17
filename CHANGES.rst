@@ -29,6 +29,9 @@ Accessibility
 
 - Timetable toolbar buttons ("Detailed view" etc.) are now keyboard accessible and
   readable by screen readers (:pr:`7374`, thanks :user:`foxbunny`)
+- Timetable day navigation tabs can now be operated with the keyboard: the previous/next scroll
+  buttons are focusable and activatable, tabs respond to arrow key navigation, and all interactive
+  elements have visible focus rings (:pr:`7386`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
