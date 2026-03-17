@@ -336,6 +336,29 @@ type(
         // focus first tab
         this.widget.tabs('option', 'active', 0);
       }
+      this._fixTabAria();
+    },
+    _fixTabAria: function(activeIndex) {
+      if (activeIndex === undefined) {
+        activeIndex = this.widget.tabs('option', 'active');
+      }
+      this.widget.find('.ui-tabs-nav > li').each(function(i) {
+        var li = $(this);
+        var a = li.find('> a');
+        var isActive = i === activeIndex;
+        li.attr('role', 'presentation')
+          .removeAttr('tabindex')
+          .removeAttr('aria-selected')
+          .removeAttr('aria-expanded');
+        a.attr('role', 'tab')
+          .attr('tabindex', isActive ? '0' : '-1')
+          .attr('aria-selected', String(isActive))
+          .attr('aria-expanded', String(isActive));
+        var controls = li.attr('aria-controls');
+        if (controls) {
+          a.attr('aria-controls', controls);
+        }
+      });
     },
     _titleTemplate: function(text) {
       return text;
@@ -368,7 +391,7 @@ type(
         this.disableTab(i);
       }
       if (this.scrollable) {
-        this.scrollButtons.children().addClass('ui-state-disabled');
+        this.scrollButtons.children().prop('disabled', true);
       }
     },
     enableTab: function(index) {
@@ -455,9 +478,8 @@ type(
         position: 'relative',
         zIndex: 100,
       });
-      $('<span/>')
+      $('<button type="button"/>')
         .disableSelection()
-        .attr('title', $T('Previous tab'))
         .css(arrowsCommonCss)
         .css('left', 0)
         .addClass('ui-state-active ui-corner-tl ui-corner-bl tab-scroll-button')
@@ -469,15 +491,11 @@ type(
             .css('marginTop', arrowsTopMargin)
         )
         .click(function() {
-          if ($(this).hasClass('ui-state-disabled')) {
-            return;
-          }
           self.scrollToTab(Math.max(0, self.scrollOffset - 1));
         })
         .appendTo(self.scrollButtons);
-      $('<span/>')
+      $('<button type="button"/>')
         .disableSelection()
-        .attr('title', $T('Next tab'))
         .css(arrowsCommonCss)
         .css('right', 0)
         .addClass('ui-state-active ui-corner-tr ui-corner-br tab-scroll-button')
@@ -488,9 +506,6 @@ type(
             .css('marginTop', arrowsTopMargin)
         )
         .click(function() {
-          if ($(this).hasClass('ui-state-disabled')) {
-            return;
-          }
           self.scrollToTab(Math.min(nav.find('> li').length - 1, self.scrollOffset + 1));
         })
         .appendTo(self.scrollButtons);
@@ -521,9 +536,9 @@ type(
       this.scrollButtons
         .children()
         .eq(0)
-        .toggleClass('ui-state-disabled', this.scrollOffset == 0);
+        .prop('disabled', this.scrollOffset == 0);
       // no next allowed if last element is visible
-      this.scrollButtons.children().eq(1).toggleClass('ui-state-disabled', lastElementShown);
+      this.scrollButtons.children().eq(1).prop('disabled', lastElementShown);
     },
     scrollToTab: function(idx, fuzzy) {
       var self = this;
@@ -631,6 +646,27 @@ type(
       beforeActivate: function(e, ui) {
         self._notifyTabChange();
       },
+    });
+    self.widget.on('tabsactivate', function(e, ui) {
+      var idx = ui.newTab.index();
+      _.defer(function() {
+        self._fixTabAria(idx);
+      });
+    });
+    self.widget.on('keydown', '.ui-tabs-nav a', function(e) {
+      var anchors = self.widget.find('.ui-tabs-nav li a');
+      var idx = $(this).closest('li').index();
+      var next;
+      if (e.key === 'ArrowRight') {
+        next = (idx + 1) % anchors.length;
+      } else if (e.key === 'ArrowLeft') {
+        next = (idx - 1 + anchors.length) % anchors.length;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      self.setSelectedTab(next);
+      anchors.eq(next).focus();
     });
     // add initial tabs
     $.each(tabs, function(i, tab) {
