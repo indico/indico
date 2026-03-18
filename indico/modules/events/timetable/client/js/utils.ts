@@ -1,0 +1,327 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
+
+import moment, {Moment} from 'moment';
+import {useEffect, useRef} from 'react';
+import {SemanticICONS} from 'semantic-ui-react';
+
+import {camelizeKeys} from 'indico/utils/case';
+
+import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, HexColor, Session} from './types';
+
+export const DATE_KEY_FORMAT = 'YYYYMMDD';
+export const LOCAL_STORAGE_KEY = 'manageTimetableData';
+export const GRID_SIZE_MINUTES = 5;
+export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const HOUR_SIZE = minutesToPixels(60);
+export const DAY_SIZE = 24 * HOUR_SIZE;
+
+export function snapPixels(x: number) {
+  return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
+}
+
+export function snapMinutes(x: number) {
+  return Math.ceil(x / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
+}
+
+export function minutesToPixels(minutes: number) {
+  return Math.round(minutes * 2);
+}
+
+export function pixelsToMinutes(pixels: number) {
+  return Math.round(pixels / 2);
+}
+
+export function isWithinLimits(limits: [number, number], y: number, offsets = [0, 0]) {
+  return y > limits[0] + offsets[0] && y < limits[1] - offsets[1];
+}
+
+export function minutesFromStartOfDay(dt: Moment) {
+  return moment(dt).diff(moment(dt).startOf('day'), 'minutes');
+}
+
+export function lcm(...args: number[]) {
+  return args.reduce((acc, curr) => (acc * curr) / gcd(acc, curr), 1);
+}
+
+function gcd(a: number, b: number) {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  while (b) {
+    const t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
+export const getEntryURLByObjId = (
+  eventId: number,
+  entryType: EntryType,
+  entryObjId: number
+): string => {
+  return {
+    [EntryType.Break]: breakURL({event_id: eventId, break_id: entryObjId}),
+    [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entryObjId}),
+    [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entryObjId}),
+  }[entryType];
+};
+
+export function getDefaultColorByType(type: Exclude<EntryType, 'block'>): Colors {
+  return {
+    [EntryType.Contribution]: DEFAULT_CONTRIB_COLORS,
+    [EntryType.Break]: DEFAULT_BREAK_COLORS,
+  }[type];
+}
+
+export function mapTTColor(dbColors: {text: HexColor; background: HexColor}): Colors {
+  return {color: dbColors.text, backgroundColor: dbColors.background};
+}
+
+export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
+  const {type, colors} = dbEntry;
+
+  const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
+
+  if (type === EntryType.SessionBlock) {
+    return session?.colors ?? fallbackColor;
+  }
+  return fallbackColor;
+}
+
+export function getEntryColors(entry, session) {
+  const {colors, type, sessionBlockId} = entry;
+
+  if (session) {
+    return sessionBlockId
+      ? ENTRY_COLORS_BY_BACKGROUND[session.colors.backgroundColor]
+      : session.colors;
+  }
+
+  return colors ?? getDefaultColorByType(type);
+}
+
+export const getEntryUniqueId = (type: EntryType, id: number): EntryUniqueID => {
+  switch (type) {
+    case EntryType.SessionBlock:
+      return `s${id}`;
+    case EntryType.Contribution:
+      return `c${id}`;
+    case EntryType.Break:
+      return `b${id}`;
+  }
+};
+
+export const mapTTDataToSession = (data: any): Session => {
+  data = camelizeKeys(data);
+  return {
+    ...data,
+    ...(data.colors && {colors: mapTTColor(data.colors)}),
+    ...(data.defaultContributionDuration && {
+      defaultContribDurationMinutes: data.defaultContributionDuration / 60,
+    }),
+  };
+};
+
+export const mapSessionToTTData = (data): any => {
+  return {
+    id: data.id,
+    title: data.title,
+    is_poster: data.isPoster,
+    ...(data.colors && {
+      colors: {text: data.colors.color, background: data.colors.backgroundColor},
+    }),
+    ...(data.defaultContribDurationMinutes && {
+      default_contribution_duration: data.defaultContribDurationMinutes * 60,
+    }),
+  };
+};
+
+export const mapTTDataToEntry = (data: any): Entry => {
+  data = camelizeKeys(data);
+  const {
+    type,
+    startDt,
+    id,
+    duration,
+    title,
+    description,
+    conveners,
+    personLinks,
+    boardNumber,
+    locationData,
+    locationParent,
+    childLocationParent,
+    code,
+    keywords,
+    sessionId,
+    colors,
+    sessionBlockId,
+  } = data;
+
+  const mappedObj = {
+    id: getEntryUniqueId(type, id),
+    objId: id,
+    type,
+    title,
+    description,
+    duration: duration / 60,
+    startDt: moment(startDt),
+    x: 0,
+    y: 0,
+    personLinks: personLinks || conveners || [],
+    boardNumber,
+    locationData,
+    locationParent,
+    childLocationParent,
+    code,
+    keywords,
+    column: 0,
+    maxColumn: 0,
+    children: [],
+    sessionId: sessionId || null,
+    ...(colors && {colors}),
+    ...(sessionId && {sessionId}),
+    ...(sessionBlockId && {
+      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
+    }),
+  };
+
+  return mappedObj;
+};
+
+export function getIconByEntryType(type: EntryType) {
+  return {
+    [EntryType.Break]: 'lemon outline',
+    [EntryType.Contribution]: 'file outline',
+    [EntryType.SessionBlock]: 'calendar outline',
+  }[type] as SemanticICONS;
+}
+
+export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
+  return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
+}
+
+/*
+ * Custom hook to log changes to props.
+ * Useful for figuring out why a component is re-rendering.
+ */
+export function useTraceUpdate(props: any) {
+  const prev = useRef(props);
+  useEffect(() => {
+    const changedProps = Object.entries(props).reduce((ps, [k, v]) => {
+      if (prev.current[k] !== v) {
+        ps[k] = [prev.current[k], v];
+      }
+      return ps;
+    }, {} as any);
+    if (Object.keys(changedProps).length > 0) {
+      console.log('Changed props:', changedProps);
+    }
+    prev.current = props;
+  });
+}
+
+export function getDateKey(date: Moment) {
+  return date.format(DATE_KEY_FORMAT);
+}
+
+/*
+ * Gives the difference between two dates without modifying given dates. Takes into
+ * account cases where two dates might be within 24 hours of each other.
+ */
+export function getDiffInDays(dt1: Moment, dt2: Moment) {
+  dt1 = moment(dt1).startOf('day');
+  dt2 = moment(dt2).startOf('day');
+
+  return Math.abs(dt1.diff(dt2, 'day'));
+}
+
+// Local storage utils
+export function setCurrentDateLocalStorage(date: Moment, eventId: number) {
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  manageTimetableData[eventId] = {
+    ...(manageTimetableData[eventId] || {}),
+    currentDtKey: getDateKey(date),
+  };
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(manageTimetableData));
+}
+
+export function getCurrentDateLocalStorage(eventId: number) {
+  const manageTimetableData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+  const dt = (manageTimetableData[eventId] || {}).currentDtKey;
+  return dt ? moment(dt, DATE_KEY_FORMAT) : null;
+}
+
+export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number): T[] {
+  return entries.map(child => ({
+    ...child,
+    startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
+  }));
+}
+
+export function sortEntriesByStartDt(entries: Entry[]): Entry[] {
+  return [...entries].sort((a, b) => moment(a.startDt).diff(moment(b.startDt)));
+}
+
+/**
+ * Computes the IDs of entries that have overlapping time ranges.
+ * @param entries List of entries to check for overlaps
+ * @returns A set of entry IDs that overlap with at least one other entry
+ */
+export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
+  if (!entries || entries.length <= 1) {
+    return new Set<string>();
+  }
+
+  const entriesSchedule: {time: number; type: 'start' | 'end'; id: string}[] = [];
+  let overlaps = new Set<string>();
+  const active = new Set<string>();
+
+  for (const e of entries) {
+    const start = +e.startDt;
+    const end = start + (e.duration || 0) * 60 * 1000;
+    entriesSchedule.push({time: start, type: 'start', id: e.id});
+    entriesSchedule.push({time: end, type: 'end', id: e.id});
+    // Children are checked for overlap in their own scope
+    if (e.type === EntryType.SessionBlock && (e as BlockEntry).children?.length) {
+      overlaps = overlaps.union(computeOverlappingEntryIds(e.children));
+    }
+  }
+
+  entriesSchedule.sort(
+    (a, b) => a.time - b.time || (a.type === 'end' && b.type === 'start' ? -1 : 1)
+  );
+
+  for (const e of entriesSchedule) {
+    if (e.type === 'start') {
+      if (active.size > 0) {
+        overlaps.add(e.id);
+        overlaps = overlaps.union(active);
+      }
+      active.add(e.id);
+    } else {
+      active.delete(e.id);
+    }
+  }
+
+  return overlaps;
+}
+
+/**
+ * Flattens a list of entries to include children of block entries
+ * @param entries List of entries to flatten
+ * @returns A flattened list of entries including children of block entries
+ */
+export const flattenEntries = (entries: Entry[]): Entry[] => {
+  return entries.map(e => [e, ...((e as BlockEntry)?.children ?? [])]).flat();
+};
