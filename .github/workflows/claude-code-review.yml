@@ -5,6 +5,8 @@ on:
     branches:
       - dev-docker-setup
     types: [opened, synchronize, ready_for_review, reopened]
+    paths-ignore:
+      - '.github/workflows/claude-code-review.yml'
 
 jobs:
   claude-review:
@@ -27,6 +29,27 @@ jobs:
           role-to-assume: ${{ secrets.TELEMEND_AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ env.AWS_DEFAULT_REGION || 'us-east-1' }}
 
+      - name: Create Telemend MCP config
+        run: |
+          cat > /tmp/mcp-config.json << 'EOF'
+          {
+            "mcpServers": {
+              "telemend": {
+                "command": "uvx",
+                "args": [
+                  "--from",
+                  "git+https://github.com/mxiamxia/aws-otel-python-instrumentation-telemend.git@min_dev#subdirectory=mcp",
+                  "telemend-mcp"
+                ],
+                "env": {
+                  "TELEMEND_API_URL": "https://application-signals-beta.us-west-2.api.aws",
+                  "AWS_REGION": "us-west-2"
+                }
+              }
+            }
+          }
+          EOF
+
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
@@ -34,6 +57,59 @@ jobs:
           use_bedrock: "true"
           show_full_output: "true"
           claude_args: |
-            --model us.anthropic.claude-opus-4-6-v1 --allowedTools "Bash(gh pr *),Bash(gh api *),Bash(python3 *),Bash(awk *)"
+            --model us.anthropic.claude-opus-4-6-v1 --mcp-config /tmp/mcp-config.json --allowedTools "Bash(gh pr *),Bash(gh api *),Bash(python3 *),Bash(awk *),mcp__telemend__get_health_overview,mcp__telemend__list_functions,mcp__telemend__search_functions,mcp__telemend__get_function_details,mcp__telemend__get_endpoints,mcp__telemend__get_incidents,mcp__telemend__get_incident_details,mcp__telemend__find_deployment,mcp__telemend__get_code_context,mcp__telemend__audit_slos,mcp__telemend__query_service_metrics,mcp__telemend__search_transaction_spans,mcp__telemend__get_xray_trace"
           prompt: |
-            Review this PR for bugs, security issues, and code quality. Post your findings as inline review comments on the relevant lines.
+            You are performing a telemetry-enriched code review. You have access to production telemetry via Telemend MCP tools. Use them to augment your review with real-world runtime data.
+
+            ## Phase 1: Situational Awareness (do this first)
+
+            1. Call `get_health_overview` (hours=24) to understand the current state of the service — error counts, top error functions, recent incidents, and any SLO breaches.
+            2. Call `get_incidents` (hours=24, limit=5) to see recent incidents. Note any patterns (recurring endpoints, exception types).
+
+            ## Phase 2: Identify Changed Functions
+
+            3. Use `gh pr diff` or the PR file list to identify which Python files and functions are modified in this PR.
+            4. For each modified Python function, call `search_functions` with the function name to find it in telemetry.
+            5. For functions found in telemetry, call `get_function_details` (include_exceptions=true) to get:
+               - Call frequency and caller graph (who calls this function)
+               - Duration stats (avg, min, max) — performance baseline
+               - Exception breakdown and error rates
+               - Which endpoints this function serves
+
+            ## Phase 3: Telemetry-Informed Review
+
+            Use the telemetry data alongside traditional code review. For each finding, consider:
+
+            - **High-traffic functions** (>1000 calls/day): Flag any changes that could affect performance. Mention the call volume.
+            - **Functions with active errors**: If the PR modifies a function that already has errors in production, note whether the change addresses or could worsen those errors.
+            - **Incident correlation**: If a modified function appears in recent incidents from Phase 1, flag this prominently.
+            - **Caller blast radius**: If a function has many callers, flag signature changes or behavioral contract changes.
+            - **Performance-sensitive paths**: If latency is already high, flag changes that add I/O, loops, or computational overhead.
+
+            ## Phase 4: Standard Code Review
+
+            Also review for (regardless of telemetry):
+            - Bugs, logic errors, and edge cases
+            - Security issues (SQL injection, XSS, auth bypasses, secrets in code)
+            - Code quality (readability, maintainability, naming)
+            - Error handling and resource cleanup
+            - Test coverage gaps
+
+            ## Output Format
+
+            Post your findings as **inline review comments** on the relevant PR lines. Structure each comment to include:
+            - The issue found
+            - Severity (critical / warning / info)
+            - If telemetry informed the finding, briefly cite the data (e.g., "This function handles ~5k calls/day with avg=120ms")
+
+            At the end, post a summary comment on the PR with:
+            - A "Runtime Context" section summarizing key telemetry findings (health status, any incidents involving modified code, performance baselines for hot functions)
+            - A "Review Findings" section with a count of issues by severity
+            - If telemetry tools fail or return no data, note this and proceed with a standard code review
+
+            ## Important Guidelines
+
+            - Telemetry is ONE input to your review, not the only one. Always do a thorough code review regardless.
+            - If telemetry tools fail or the service has no telemetry data, proceed with a normal code review — do not block on telemetry.
+            - Do NOT use any instrumentation management tools. You only have read-only observability access.
+            - Keep the review focused and actionable. Do not dump raw telemetry data into comments.
