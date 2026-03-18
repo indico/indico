@@ -11,7 +11,14 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import {fetchLogEntries, setMetadataQuery, setInitialRealms, setHasNewEntries} from './actions';
+import {
+  fetchLogEntries,
+  setMetadataQuery,
+  setInitialRealms,
+  setHasNewEntries,
+  setKeyword,
+  setFilter,
+} from './actions';
 import EventLog from './components/EventLog';
 import reducer from './reducers';
 
@@ -19,11 +26,13 @@ import '../style/logs.scss';
 
 window.addEventListener('load', () => {
   const rootElement = document.querySelector('.event-log');
+  const user = rootElement.dataset.user;
   const initialData = {
     staticData: {
       fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
       realms: JSON.parse(rootElement.dataset.realms),
       pageSize: 15,
+      user: user ? parseInt(user, 10) : null,
     },
   };
   const store = createReduxStore(
@@ -34,8 +43,25 @@ window.addEventListener('load', () => {
     initialData
   );
   window.addEventListener('indico:logsRefresh', () => store.dispatch(setHasNewEntries()));
-  store.dispatch(setInitialRealms(Object.keys(initialData.staticData.realms)));
+
+  // Set initial filters
+  const initialFilters = JSON.parse(rootElement.dataset.initialFilters || '[]');
+  const allRealms = Object.keys(initialData.staticData.realms);
+  if (initialFilters.length > 0) {
+    // Use filters from URL
+    const filterState = Object.fromEntries(allRealms.map(r => [r, initialFilters.includes(r)]));
+    store.dispatch(setFilter(filterState));
+  } else {
+    // Default: enable all realms
+    store.dispatch(setInitialRealms(allRealms));
+  }
+
   store.dispatch(setMetadataQuery(JSON.parse(rootElement.dataset.metadataQuery)));
+
+  const initialKeyword = rootElement.dataset.initialKeyword;
+  if (initialKeyword) {
+    store.dispatch(setKeyword(initialKeyword));
+  }
 
   ReactDOM.render(
     <Provider store={store}>
