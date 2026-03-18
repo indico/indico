@@ -33,6 +33,7 @@ jobs:
         run: |
           aws s3 cp s3://telemend-private-beta-artifacts/mcp/telemend-mcp.zip ./
           unzip telemend-mcp.zip -d /tmp/telemend-mcp/
+          pip install /tmp/telemend-mcp/
 
       - name: Create Telemend MCP config
         run: |
@@ -40,8 +41,8 @@ jobs:
           {
             "mcpServers": {
               "telemend": {
-                "command": "uvx",
-                "args": ["--from", "/tmp/telemend-mcp", "telemend-mcp"],
+                "command": "python3",
+                "args": ["-m", "telemend_mcp.server"],
                 "env": {
                   "TELEMEND_API_URL": "https://application-signals-beta.us-west-2.api.aws",
                   "AWS_REGION": "us-west-2"
