@@ -29,6 +29,11 @@ jobs:
           role-to-assume: ${{ secrets.TELEMEND_AWS_ASSUME_ROLE_ARN }}
           aws-region: ${{ env.AWS_DEFAULT_REGION || 'us-east-1' }}
 
+      - name: Install Telemend MCP
+        run: |
+          aws s3 cp s3://telemend-private-beta-artifacts/mcp/telemend-mcp.zip ./
+          unzip telemend-mcp.zip -d /tmp/telemend-mcp/
+
       - name: Create Telemend MCP config
         run: |
           cat > /tmp/mcp-config.json << 'EOF'
@@ -36,11 +41,7 @@ jobs:
             "mcpServers": {
               "telemend": {
                 "command": "uvx",
-                "args": [
-                  "--from",
-                  "git+https://github.com/mxiamxia/aws-otel-python-instrumentation-telemend.git@min_dev#subdirectory=mcp",
-                  "telemend-mcp"
-                ],
+                "args": ["--from", "/tmp/telemend-mcp", "telemend-mcp"],
                 "env": {
                   "TELEMEND_API_URL": "https://application-signals-beta.us-west-2.api.aws",
                   "AWS_REGION": "us-west-2"
