@@ -267,15 +267,14 @@ class RegistrationPermission(ManagementPermission):
 class RegistrationModerationPermission(ManagementPermission):
     name = 'registration_moderation'
     friendly_name = _('Registration (moderation only)')
-    description = _('Grants access to approve and reject registrations without allowing registration form '
-                    'configuration.')
+    description = _('Grants access to view, approve, reject and withdraw registrations.')
     user_selectable = True
 
 
 class CheckinPermission(ManagementPermission):
     name = 'registration_checkin'
     friendly_name = _('Registration (check-in only)')
-    description = _('Grants access to check-in management.')
+    description = _('Grants access to view and check-in registrations.')
     user_selectable = True
 
 
