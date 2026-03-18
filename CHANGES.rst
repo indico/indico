@@ -31,7 +31,7 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Add more endpoints that shouldn't be crawled to ``robots.txt`` (:pr:`7390`)
 
 
 Version 3.3.11
