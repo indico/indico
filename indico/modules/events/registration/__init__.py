@@ -169,19 +169,10 @@ def _associate_registrations(user, silent=False, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if event.can_manage(session.user, permission='registration'):
-        return url_for('event_registration.manage_regform_list', event)
-
-
-@signals.event_management.management_url.connect
-def _get_checkin_management_url(event, **kwargs):
-    if event.can_manage(session.user, permission='registration_checkin'):
-        return url_for('event_registration.manage_regform_list', event)
-
-
-@signals.event_management.management_url.connect
-def _get_moderation_management_url(event, **kwargs):
-    if event.can_manage(session.user, permission='registration_moderation'):
+    if any(
+        event.can_manage(session.user, permission=p)
+        for p in ('registration', 'registration_checkin', 'registration_moderation')
+    ):
         return url_for('event_registration.manage_regform_list', event)
 
 
