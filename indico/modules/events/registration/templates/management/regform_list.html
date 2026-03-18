@@ -1,5 +1,7 @@
 {% extends 'events/management/base.html' %}
+
 {% from 'message_box.html' import message_box %}
+{% from 'events/registration/management/_checkin.html' import render_checkin_setup %}
 
 {% block title %}
     {%- trans %}Registration{% endtrans -%}
@@ -13,6 +15,7 @@
 
 {% block content %}
     {% set can_manage_registration = event.can_manage(session.user, permission='registration') %}
+    {% set can_manage_checkin = event.can_manage(session.user, permission='registration_checkin') %}
     {% if can_manage_registration %}
         {% if not event.has_feature('payment') %}
             {% block payments_disabled_box %}
@@ -134,6 +137,12 @@
                         <div class="label">{{ regform.title }}</div>
                     </div>
                     <div class="toolbar">
+                        {% if can_manage_checkin and not can_manage_registration %}
+                            <div class="group">
+                                {{ render_checkin_setup(regform) }}
+                            </div>
+                        {% endif %}
+
                         <div class="group">
                             {% set purged_title %}
                                 {% trans %}Registration is disabled due to an expired retention period{% endtrans %}
