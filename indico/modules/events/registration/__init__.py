@@ -227,7 +227,7 @@ def _get_feature_definitions(sender, **kwargs):
 def _get_management_permissions(sender, **kwargs):
     yield RegistrationPermission
     yield RegistrationModerationPermission
-    yield CheckinPermission
+    yield RegistrationCheckinPermission
 
 
 @signals.event_management.get_cloners.connect
@@ -262,7 +262,7 @@ class RegistrationModerationPermission(ManagementPermission):
     user_selectable = True
 
 
-class CheckinPermission(ManagementPermission):
+class RegistrationCheckinPermission(ManagementPermission):
     name = 'registration_checkin'
     friendly_name = _('Registration (check-in only)')
     description = _('Grants access to view and check-in registrations.')
