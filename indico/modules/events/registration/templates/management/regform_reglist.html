@@ -3,7 +3,11 @@
 {% from 'message_box.html' import message_box %}
 
 {% block back_button_url -%}
-    {{ url_for('.manage_regform', regform) }}
+    {% if event.can_manage(session.user, permission='registration') -%}
+        {{ url_for('.manage_regform', regform) }}
+    {%- else -%}
+        {{ url_for('.manage_regform_list', event) }}
+    {%- endif %}
 {%- endblock %}
 
 {% block title %}
@@ -27,6 +31,9 @@
 {% endblock %}
 
 {% macro render_registrations() -%}
+    {% set can_manage_registration = event.can_manage(session.user, permission='registration') %}
+    {% set can_moderate = event.can_manage(session.user, permission='registration_moderation') %}
+    {% set can_checkin = event.can_manage(session.user, permission='registration_checkin') %}
     <div class="list registrations">
         <div class="toolbars space-after">
             <div class="toolbar">
@@ -48,106 +55,110 @@
                         {% trans %}Customize list{% endtrans %}
                     </button>
                 </div>
-                <div class="group hide-if-locked">
-                    <button class="i-button arrow icon-plus" data-toggle="dropdown">
-                        {% trans %}Register{% endtrans %}
-                    </button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a href="{{ url_for('.create_registration', regform) }}"
-                               data-title="{% trans %}Register a user that doesn't exist in Indico{% endtrans %}">
-                                {% trans %}New user{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="js-add-user"
-                               data-href="{{ url_for('.create_registration', regform) }}"
-                               data-title="{% trans %}Register a Indico user{% endtrans %}"
-                               data-search-token="{{ make_user_search_token() }}">
-                                {% trans %}Indico user{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="js-add-multiple-users"
-                               data-href="{{ url_for('.create_multiple_registrations', regform) }}"
-                               data-title="{% trans %}Register multiple Indico users{% endtrans %}">
-                                {% trans %}Multiple Indico users{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                    <button class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
-                       data-href="{{ url_for('.delete_registrations', regform) }}"
-                       data-method="POST">
-                        {%- trans %}Remove{% endtrans -%}
-                    </button>
-                </div>
-                <div class="group">
-                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
-                        {%- trans %}Export{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
-                                {%- trans %}PDF (table style){% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
-                                {%- trans %}PDF (book style){% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
-                        </li>
-                    </ul>
-                    <button class="i-button"
-                            data-href="{{ url_for('.registrations_import', regform) }}"
-                            data-title="{% trans %}Import registrants from CSV File{% endtrans %}"
-                            data-ajax-dialog>
-                        {%- trans %}Import{% endtrans -%}
-                    </button>
-                    <button class="i-button arrow button js-requires-selected-row disabled"
-                            data-toggle="dropdown">
-                        {%- trans %}Actions{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        {% for item in action_menu_items %}
-                            <li {% if item.hide_if_locked %}class="hide-if-locked"{% endif %}>
-                                <a href="#"
-                                   class="icon-{{ item.icon_name }}
-                                          disabled
-                                          {{ 'js-requires-selected-row' if item.requires_selected }}
-                                          {{ item.extra_classes }}"
-                                   data-weight="{{ item.weight }}"
-                                   data-params="{{ item.params | tojson | forceescape }}"
-                                   {% if item.type == "callback" %}
-                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                       data-callback="{{ item.callback }}"
-                                   {% elif item.type == "href-custom" %}
-                                       data-href="{{ item.url }}"
-                                   {% elif item.type == "ajax-dialog" %}
-                                       data-href="{{ item.url }}"
-                                       data-title="{{ item.dialog_title or item.text }}"
-                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                       data-method="POST"
-                                       data-ajax-dialog
-                                       {{ 'data-reload-after' if item.reload_page }}
-                                   {% endif %}
-                                >
-                                    {{ item.text }}
+                {% if can_manage_registration %}
+                    <div class="group hide-if-locked">
+                        <button class="i-button arrow icon-plus" data-toggle="dropdown">
+                            {% trans %}Register{% endtrans %}
+                        </button>
+                        <ul class="i-dropdown">
+                            <li>
+                                <a href="{{ url_for('.create_registration', regform) }}"
+                                   data-title="{% trans %}Register a user that doesn't exist in Indico{% endtrans %}">
+                                    {% trans %}New user{% endtrans %}
                                 </a>
                             </li>
-                        {% endfor %}
-                    </ul>
+                            <li>
+                                <a href="#" class="js-add-user"
+                                   data-href="{{ url_for('.create_registration', regform) }}"
+                                   data-title="{% trans %}Register a Indico user{% endtrans %}"
+                                   data-search-token="{{ make_user_search_token() }}">
+                                    {% trans %}Indico user{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="js-add-multiple-users"
+                                   data-href="{{ url_for('.create_multiple_registrations', regform) }}"
+                                   data-title="{% trans %}Register multiple Indico users{% endtrans %}">
+                                    {% trans %}Multiple Indico users{% endtrans %}
+                                </a>
+                            </li>
+                        </ul>
+                        <button class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
+                           data-href="{{ url_for('.delete_registrations', regform) }}"
+                           data-method="POST">
+                            {%- trans %}Remove{% endtrans -%}
+                        </button>
+                    </div>
+                    <div class="group">
+                        <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                            {%- trans %}Export{% endtrans -%}
+                        </button>
+                        <ul class="i-dropdown">
+                            <li>
+                                <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
+                                    {%- trans %}PDF (table style){% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.registrations_pdf_export_book', regform) }}">
+                                    {%- trans %}PDF (book style){% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.registrations_csv_export', regform) }}">CSV</a>
+                            </li>
+                            <li>
+                                <a href="#" class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
+                            </li>
+                        </ul>
+                        <button class="i-button"
+                                data-href="{{ url_for('.registrations_import', regform) }}"
+                                data-title="{% trans %}Import registrants from CSV File{% endtrans %}"
+                                data-ajax-dialog>
+                            {%- trans %}Import{% endtrans -%}
+                        </button>
+                        <button class="i-button arrow button js-requires-selected-row disabled"
+                                data-toggle="dropdown">
+                            {%- trans %}Actions{% endtrans -%}
+                        </button>
+                        <ul class="i-dropdown">
+                            {% for item in action_menu_items %}
+                                <li {% if item.hide_if_locked %}class="hide-if-locked"{% endif %}>
+                                    <a href="#"
+                                       class="icon-{{ item.icon_name }}
+                                              disabled
+                                              {{ 'js-requires-selected-row' if item.requires_selected }}
+                                              {{ item.extra_classes }}"
+                                       data-weight="{{ item.weight }}"
+                                       data-params="{{ item.params | tojson | forceescape }}"
+                                       {% if item.type == "callback" %}
+                                           data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                           data-callback="{{ item.callback }}"
+                                       {% elif item.type == "href-custom" %}
+                                           data-href="{{ item.url }}"
+                                       {% elif item.type == "ajax-dialog" %}
+                                           data-href="{{ item.url }}"
+                                           data-title="{{ item.dialog_title or item.text }}"
+                                           data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                           data-method="POST"
+                                           data-ajax-dialog
+                                           {{ 'data-reload-after' if item.reload_page }}
+                                       {% endif %}
+                                    >
+                                        {{ item.text }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="group hide-if-locked">
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
-                    {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
+                    {% if (can_manage_registration or can_moderate) and (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
                         <button class="i-button arrow button js-requires-selected-row disabled"
                                 data-toggle="dropdown">
                             {%- trans %}Moderation{% endtrans -%}
@@ -182,7 +193,7 @@
                             </li>
                         </ul>
                     {% endif %}
-                    {% if not event.is_locked %}
+                    {% if (can_manage_registration or can_checkin) and not event.is_locked %}
                         <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Check-in control{% endtrans -%}
                         </button>

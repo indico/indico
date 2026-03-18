@@ -55,6 +55,12 @@ class RHManageRegistrationBase(RHManageRegFormBase):
                              .one())
 
 
+class RHManageRegistrationModerationBase(RHManageRegistrationBase):
+    """Base class for moderating registrations."""
+
+    PERMISSION = ('registration', 'registration_moderation')
+
+
 class RHManageRegistrationFieldActionBase(RHManageRegFormBase):
     """Base class for a specific registration field."""
 
