@@ -12,7 +12,7 @@ Improvements
 
 - Allow bulk (de-)selecting data in tables with shift+click (:issue:`7375`, :pr:`7376`)
 - Add new permissions that grant only moderation and checkin permissions for registrations
-  (:pr:`7306`, thanks :user:`moliholy, unconventionaldotdev`))
+  (:pr:`7306`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
