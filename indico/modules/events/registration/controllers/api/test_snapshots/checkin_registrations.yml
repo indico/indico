@@ -1,5 +1,7 @@
 - checked_in: true
   checked_in_dt: <timestamp>
+  checked_out: false
+  checked_out_dt: <timestamp>
   checkin_secret: <uuid>
   currency: USD
   email: 1337@example.test
