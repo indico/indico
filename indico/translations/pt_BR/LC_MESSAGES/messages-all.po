@@ -14,9 +14,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.10-dev\n"
+"Project-Id-Version: Indico 3.3.12-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-16 12:02+0100\n"
+"POT-Creation-Date: 2026-03-18 16:20+0100\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Andre Garcia <sambombe@gmail.com>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/indico/teams/6478/pt_BR/)\n"
@@ -1243,6 +1243,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 #: indico/modules/users/client/js/ProfilePicture.jsx
+#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Save changes"
 msgstr "Salvar mudanças"
 
@@ -5169,6 +5170,13 @@ msgid "No photo found."
 msgstr "Nenhuma foto encontrada."
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/MonthlyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
+#, python-brace-format
+msgid "Results: {count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
 msgstr "Por favor gire o dispositivo horizontalmente para ver esta página"
 
@@ -6528,12 +6536,28 @@ msgid "Show rejected/cancelled bookings"
 msgstr "Mostrar reservas rejeitadas / canceladas"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Show unused spaces"
-msgstr "Mostrar espaços não utilizados"
+msgid "Used"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Hide unused spaces"
-msgstr "Ocultar espaços não utilizados"
+msgid "Show only used spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "All"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show all spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Unused"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show only unused spaces"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -8216,10 +8240,9 @@ msgstr "Houve alguns problemas com a imagem"
 msgid "Drag a picture here"
 msgstr "Arraste uma imagem para cá"
 
-#. Crop an image
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
-msgid "Crop"
-msgstr "Colheita"
+msgid "Edit picture"
+msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Rotate"
@@ -9173,6 +9196,7 @@ msgstr "Participante"
 
 #: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
 msgid "Registration details"
 msgstr "Detalhes do registro"
 
@@ -12280,6 +12304,14 @@ msgstr "Por favor, considere registrar seu servidor no Hub da Communidade."
 #: indico/modules/core/templates/admin/settings.html
 msgid "Debug mode is enabled."
 msgstr "O modo de depuração (debug) está ativado."
+
+#: indico/modules/core/templates/admin/settings.html
+#, python-format
+msgid ""
+"You are using server-side LaTeX functionality without containerization. This"
+" is no longer considered secure and thus discouraged. Please %(link)sconsult"
+" our documentation%(endlink)s on how to change this."
+msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html
 msgid ""
@@ -16646,6 +16678,10 @@ msgstr ""
 msgid "There are no contributions yet."
 msgstr "Não há contribuições ainda."
 
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
+msgstr ""
+
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 msgid "Edit this contribution"
 msgstr "Editar esta contribuição"
@@ -16729,6 +16765,10 @@ msgstr "Editar subcontribuição '%(title)s'"
 #: indico/modules/events/templates/display/common/_manage_button.html
 msgid "Edit subcontribution"
 msgstr "Editar subcontribuição"
+
+#: indico/modules/events/contributions/templates/display/contribution_list.html
+msgid "Search contributions"
+msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/management/contributions.html
@@ -21044,8 +21084,28 @@ msgstr ""
 "evento."
 
 #: indico/modules/events/registration/__init__.py
+msgid "Registration (everything)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
 msgstr "Concede acesso de gerenciamento para o formulário de registro."
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (moderation only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, approve, reject and withdraw registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (check-in only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view and check-in registrations."
+msgstr ""
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -23265,6 +23325,27 @@ msgstr ""
 "Sua inscrição para o Evento %(link)s %(title)s %(endlink)s %(at_time)s agora"
 " é %(strong)snão paga%(endstrong)s."
 
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Use the app to manage the check-in status of the participants"
+msgstr ""
+"Use o aplicativo para gerenciar o status de check-in dos participantes"
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Open the Check-in App"
+msgstr "Abra o aplicativo de check-in"
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid ""
+"In order to configure your mobile app to use this event, you will have to "
+"scan the QR code"
+msgstr ""
+"Para configurar seu aplicativo móvel para usar este Evento, você terá que "
+"digitalizar o código QR"
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "QR Code"
+msgstr "QR Code"
+
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 msgid ""
 "<strong>Tip</strong>: if your printer does not align the badges correctly, "
@@ -23686,27 +23767,6 @@ msgstr "ingressos"
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure ticketing system"
 msgstr "Configurar sistema de ingresso"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Use the app to manage the check-in status of the participants"
-msgstr ""
-"Use o aplicativo para gerenciar o status de check-in dos participantes"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Open the Check-in App"
-msgstr "Abra o aplicativo de check-in"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid ""
-"In order to configure your mobile app to use this event, you will have to "
-"scan the QR code"
-msgstr ""
-"Para configurar seu aplicativo móvel para usar este Evento, você terá que "
-"digitalizar o código QR"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "QR Code"
-msgstr "QR Code"
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure tickets"
@@ -24812,8 +24872,8 @@ msgstr ""
 "linha."
 
 #: indico/modules/events/series/controllers.py
-msgid "A series with this ID does not exist."
-msgstr "Não existe uma série com essa ID."
+msgid "You can only manage a series if you can manage all its events."
+msgstr ""
 
 #: indico/modules/events/series/schemas.py
 msgid "At least one event is already in a series."
@@ -27408,6 +27468,14 @@ msgstr "ACL"
 #: indico/modules/users/templates/_labels.html
 msgid "Admin"
 msgstr "Administrador"
+
+#: indico/modules/logs/models/entries.py
+msgid "Registration form details"
+msgstr ""
+
+#: indico/modules/logs/models/entries.py
+msgid "Abstract details"
+msgstr ""
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"
