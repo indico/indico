@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-02-26 12:02+0100\n"
+"POT-Creation-Date: 2026-03-26 16:20+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -913,6 +913,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 #: indico/modules/users/client/js/ProfilePicture.jsx
+#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Save changes"
 msgstr ""
 
@@ -4124,6 +4125,12 @@ msgid "No photo found."
 msgstr ""
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/MonthlyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
+msgid "Results: {count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
 msgstr ""
 
@@ -5274,11 +5281,27 @@ msgid "Show rejected/cancelled bookings"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Show unused spaces"
+msgid "Used"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Hide unused spaces"
+msgid "Show only used spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "All"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show all spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Unused"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show only unused spaces"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
@@ -6770,8 +6793,7 @@ msgid "Drag a picture here"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
-#. Crop an image
-msgid "Crop"
+msgid "Edit picture"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx

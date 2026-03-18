@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.10-dev\n"
+"Project-Id-Version: Indico 3.3.12-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-16 12:02+0100\n"
+"POT-Creation-Date: 2026-03-18 16:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -378,6 +378,7 @@ msgid "Registrant"
 msgstr ""
 
 #: indico/legacy/pdfinterface/conference.py indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
 msgid "Registration details"
 msgstr ""
 
@@ -3396,6 +3397,13 @@ msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html
 msgid "Debug mode is enabled."
+msgstr ""
+
+#: indico/modules/core/templates/admin/settings.html
+#, python-format
+msgid ""
+"You are using server-side LaTeX functionality without containerization. This is no longer considered secure and thus "
+"discouraged. Please %(link)sconsult our documentation%(endlink)s on how to change this."
 msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html
@@ -7600,6 +7608,10 @@ msgstr ""
 msgid "There are no contributions yet."
 msgstr ""
 
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
+msgstr ""
+
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 msgid "Edit this contribution"
 msgstr ""
@@ -7678,6 +7690,10 @@ msgstr ""
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html
 #: indico/modules/events/templates/display/common/_manage_button.html
 msgid "Edit subcontribution"
+msgstr ""
+
+#: indico/modules/events/contributions/templates/display/contribution_list.html
+msgid "Search contributions"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
@@ -11596,7 +11612,27 @@ msgid "Gives event managers the opportunity to handle registrations within the e
 msgstr ""
 
 #: indico/modules/events/registration/__init__.py
+msgid "Registration (everything)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (moderation only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, approve, reject and withdraw registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (check-in only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view and check-in registrations."
 msgstr ""
 
 #: indico/modules/events/registration/badges.py
@@ -13593,6 +13629,22 @@ msgstr ""
 msgid "Your registration for the event %(link)s%(title)s%(endlink)s %(at_time)s is now %(strong)sunpaid%(endstrong)s."
 msgstr ""
 
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Use the app to manage the check-in status of the participants"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Open the Check-in App"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "In order to configure your mobile app to use this event, you will have to scan the QR code"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "QR Code"
+msgstr ""
+
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 msgid "<strong>Tip</strong>: if your printer does not align the badges correctly, you can tweak the margins."
 msgstr ""
@@ -13937,22 +13989,6 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure ticketing system"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Use the app to manage the check-in status of the participants"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Open the Check-in App"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "In order to configure your mobile app to use this event, you will have to scan the QR code"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "QR Code"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform.html
@@ -15001,7 +15037,7 @@ msgid "You should upload a CSV or TXT file with one email address per line."
 msgstr ""
 
 #: indico/modules/events/series/controllers.py
-msgid "A series with this ID does not exist."
+msgid "You can only manage a series if you can manage all its events."
 msgstr ""
 
 #: indico/modules/events/series/schemas.py
@@ -17460,6 +17496,14 @@ msgstr ""
 
 #: indico/modules/logs/models/entries.py indico/modules/users/templates/_labels.html
 msgid "Admin"
+msgstr ""
+
+#: indico/modules/logs/models/entries.py
+msgid "Registration form details"
+msgstr ""
+
+#: indico/modules/logs/models/entries.py
+msgid "Abstract details"
 msgstr ""
 
 #: indico/modules/logs/templates/entry_email.html
