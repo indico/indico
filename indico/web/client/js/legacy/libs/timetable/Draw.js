@@ -400,6 +400,24 @@ type(
     $(this.block.dom).bind('tt_block.balloon', function(event, originalEvent) {
       if (!self.popupActive) {
         self.openPopup(originalEvent);
+      } else {
+        var api = $(self.div.dom).qtip('api');
+        if (api) {
+          if (api.tooltip.is(':visible')) {
+            api.hide();
+          } else {
+            if (originalEvent.detail > 0) {
+              api.set('position.target', [originalEvent.pageX, originalEvent.pageY]);
+            } else {
+              var rect = self.div.dom.getBoundingClientRect();
+              api.set('position.target', [
+                rect.left + rect.width / 2 + window.pageXOffset,
+                rect.top + rect.height / 2 + window.pageYOffset,
+              ]);
+            }
+            $(self.div.dom).qtip('show');
+          }
+        }
       }
     });
   }
@@ -714,6 +732,7 @@ function drawBalloon(self, evt, editable) {
         },
       },
       show: {
+        event: false,
         ready: true,
       },
       hide: {
@@ -726,16 +745,20 @@ function drawBalloon(self, evt, editable) {
             evt.preventDefault();
           }
         },
-        render: function(e, api) {
-          api.elements.target.on('click', function() {
-            api.hide();
-          });
-        },
       },
       position: {
         at: 'top center',
         my: 'bottom center',
-        target: [evt.pageX, evt.pageY],
+        target: (function() {
+          if (evt.detail > 0) {
+            return [evt.pageX, evt.pageY];
+          }
+          var rect = timetableBlock[0].getBoundingClientRect();
+          return [
+            rect.left + rect.width / 2 + window.pageXOffset,
+            rect.top + rect.height / 2 + window.pageYOffset,
+          ];
+        })(),
         adjust: {
           mouse: false,
         },
