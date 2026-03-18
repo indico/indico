@@ -15,7 +15,7 @@
                 {% elif registration.state.name == 'unpaid' %}
                     {{ _render_unpaid_actions(registration, can_manage_registration, can_manage_registration or can_moderate) }}
                 {% elif registration.state.name == 'complete' %}
-                    {{ _render_complete_actions(registration, can_manage_registration or can_moderate) }}
+                    {{ _render_complete_actions(registration, can_manage_registration, can_manage_registration or can_moderate) }}
                 {% elif registration.state.name in ('rejected', 'withdrawn') %}
                     {{ _render_cancelled_actions(registration, can_manage_registration or can_moderate) }}
                 {% endif %}
@@ -182,7 +182,7 @@
 {% endmacro %}
 
 
-{% macro _render_complete_actions(registration, can_moderate) %}
+{% macro _render_complete_actions(registration, can_manage, can_moderate) %}
     <div class="text">
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
@@ -193,7 +193,7 @@
     </div>
     {% set can_reset = can_moderate and registration.registration_form.moderation_enabled and not registration.is_paid %}
     {% set ticket_template = registration.registration_form.get_ticket_template() %}
-    {% set can_get_ticket = registration.registration_form.tickets_enabled and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
+    {% set can_get_ticket = registration.registration_form.tickets_enabled and (not ticket_template.is_ticket or not registration.is_ticket_blocked) and can_manage %}
     {% if can_reset or can_get_ticket %}
         <div class="toolbar">
             {% if can_reset %}
