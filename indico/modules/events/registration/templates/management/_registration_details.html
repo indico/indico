@@ -108,12 +108,14 @@
 
 {% macro _render_pending_actions(registration, can_moderate) %}
     <div class="text">
-       <div class="label">
-           {% trans %}Registration awaiting manager approval{% endtrans %}
-       </div>
-       {% trans -%}
-           You can validate or reject this registration and the user will receive a notification.
-       {%- endtrans %}
+        <div class="label">
+            {% trans %}Registration awaiting manager approval{% endtrans %}
+        </div>
+        {% if can_moderate %}
+            {% trans -%}
+                You can validate or reject this registration and the user will receive a notification.
+            {%- endtrans %}
+        {% endif %}
     </div>
     {% if can_moderate %}
         <div class="toolbar">
