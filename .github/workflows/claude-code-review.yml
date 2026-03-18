@@ -1,0 +1,39 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    branches:
+      - dev-docker-setup
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 #5.0.0
+        with:
+          role-to-assume: ${{ secrets.TELEMEND_AWS_ASSUME_ROLE_ARN }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION || 'us-east-1' }}
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          use_bedrock: "true"
+          show_full_output: "true"
+          claude_args: |
+            --model us.anthropic.claude-opus-4-6-v1 --allowedTools "Bash(gh pr *),Bash(gh api *),Bash(python3 *),Bash(awk *)"
+          prompt: |
+            Review this PR for bugs, security issues, and code quality. Post your findings as inline review comments on the relevant lines.
