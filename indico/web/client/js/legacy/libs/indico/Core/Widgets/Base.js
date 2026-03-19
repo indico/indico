@@ -653,21 +653,38 @@ type(
         self._fixTabAria(idx);
       });
     });
-    self.widget.on('keydown', '.ui-tabs-nav a', function(e) {
-      var anchors = self.widget.find('.ui-tabs-nav li a');
-      var idx = $(this).closest('li').index();
-      var next;
-      if (e.key === 'ArrowRight') {
-        next = (idx + 1) % anchors.length;
-      } else if (e.key === 'ArrowLeft') {
-        next = (idx - 1 + anchors.length) % anchors.length;
-      } else {
-        return;
-      }
-      e.preventDefault();
-      self.setSelectedTab(next);
-      anchors.eq(next).focus();
-    });
+    self.widget.find('.ui-tabs-nav')[0].addEventListener(
+      'keydown',
+      function(e) {
+        if (!e.target.matches('a')) {
+          return;
+        }
+        var anchors = Array.from(self.widget.find('.ui-tabs-nav li a'));
+        var idx = anchors.indexOf(e.target);
+        if (idx === -1) {
+          return;
+        }
+        var next;
+        if (e.key === 'ArrowRight') {
+          next = Math.min(idx + 1, anchors.length - 1);
+        } else if (e.key === 'ArrowLeft') {
+          next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+          next = 0;
+        } else if (e.key === 'End') {
+          next = anchors.length - 1;
+        } else {
+          return;
+        }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (next !== idx) {
+          self.setSelectedTab(next);
+        }
+        anchors[next].focus();
+      },
+      true
+    );
     // add initial tabs
     $.each(tabs, function(i, tab) {
       var content = tab[1].dom ? tab[1].dom : tab[1];
