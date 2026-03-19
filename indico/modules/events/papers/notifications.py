@@ -99,13 +99,8 @@ def notify_paper_assignment(user, role, contributions, event, assign):
 
 def notify_comment(person, paper, comment, submitter):
     event = paper.event
-    receiver_name = {
-        'first_name': getattr(person, 'first_name', 'user'),
-        'last_name': getattr(person, 'last_name', 'user'),
-        'full_name': getattr(person, 'full_name', 'user')
-    }
     with person.force_user_locale() if isinstance(person, User) else event.force_event_locale():
-        template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
+        template = get_template_module('events/papers/emails/comment.html', event=event, receiver=person,
                                        contribution=paper.contribution, comment=comment, submitter=submitter)
         email = make_email(to_list=person.email, template=template, html=True)
     send_email(email, event=event, module='Papers', user=session.user)
