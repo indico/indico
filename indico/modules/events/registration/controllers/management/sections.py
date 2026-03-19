@@ -77,6 +77,9 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             raise BadRequest
         changes = self.section.populate_from_dict(changes)
         if changes.get('is_manager_only') == (False, True):
+            # Check that no field in this section is conditionally shown
+            if any(field.show_if_id is not None for field in self.section.children if not field.is_deleted):
+                raise ValidationError('Sections with conditional fields cannot be made manager-only')
             # Check no conditional fields depend on this section if it is becoming manager-only now
             critical_fields_ids = {field.id for field in self.section.children if not field.is_deleted}
             for section in self.regform.sections:

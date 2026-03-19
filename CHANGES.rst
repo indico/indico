@@ -23,6 +23,8 @@ Bugfixes
   (:pr:`7388`)
 - Fix fully conditional registration form sections not showing up correctly in
   Safari (:issue:`7393`, :pr:`7398`)
+- Do not allow changing registration form sections containing conditional fields
+  to manager-only (:pr:`7392`, thanks :user:`SegiNyn`)
 
 Accessibility
 ^^^^^^^^^^^^^
