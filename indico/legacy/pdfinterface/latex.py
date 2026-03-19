@@ -10,6 +10,9 @@ import functools
 import os
 import subprocess
 import tempfile
+import time
+import typing as t
+from dataclasses import dataclass
 from importlib.resources import as_file
 from importlib.resources import files as res_files
 from io import BytesIO
@@ -23,15 +26,17 @@ from flask.helpers import get_root_path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from jinja2.ext import Extension
 from jinja2.lexer import Token
+from marshmallow import RAISE, fields, post_load
 from pytz import timezone
 from sqlalchemy import inspect
-from werkzeug.exceptions import TooManyRequests
+from werkzeug.exceptions import ServiceUnavailable, TooManyRequests
 from werkzeug.local import LocalProxy
 
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.limiter import make_rate_limiter
 from indico.core.logger import Logger
+from indico.core.marshmallow import mm
 from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
@@ -39,6 +44,7 @@ from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType,
 from indico.modules.events.contributions.util import sort_contribs
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
+from indico.util.caching import memoize_redis
 from indico.util.date_time import format_date, format_human_timedelta, format_time
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
@@ -176,6 +182,75 @@ def _latex_escape(s, ignore_braces=False):
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
+@dataclass(frozen=True)
+class PodmanConfig:
+    image: str = 'registry.gitlab.com/islandoftex/images/texlive:TL2026-2026-03-08-full'
+    connection: str = ''
+    timeout: int = 0
+    allow_pull: bool = True
+
+    @classmethod
+    def from_string(cls, optstring) -> t.Self:
+        options = dict((x.strip() for x in item.split('=', 1)) for item in optstring.split(',')) if optstring else {}
+        return PodmanConfigSchema().load(options)
+
+    @property
+    def global_args(self):
+        """Arguments passed to all podman calls."""
+        return ('--connection', self.connection) if self.connection else ()
+
+    @property
+    def pull_args(self):
+        """Arguments related to pulling images when running a container."""
+        return ('--pull', 'never') if not self.allow_pull else ()
+
+    @property
+    def run_args(self):
+        """Arguments used when running a container to render a PDF."""
+        return ('--timeout', self.timeout) if self.timeout else ()
+
+
+class PodmanConfigSchema(mm.Schema):
+    class Meta:
+        missing = RAISE
+
+    image = fields.String()
+    connection = fields.String()
+    timeout = fields.Integer()
+    allow_pull = fields.Boolean()
+
+    @post_load
+    def _wrap(self, data, **kwargs):
+        return PodmanConfig(**data)
+
+
+@memoize_redis(300)
+def _get_texmf_path(podman_config: PodmanConfig):
+    pattern = '/usr/local/texlive/20??/texmf.cnf'
+    output = subprocess.check_output([
+        'podman', *podman_config.global_args, 'run',
+        *podman_config.pull_args,
+        '--rm',
+        '--network', 'none',
+        podman_config.image,
+        'sh', '-c', f'echo {pattern}'
+    ], text=True).strip()
+    if output == pattern:
+        # no match
+        return None
+    return output
+
+
+def _check_podman_image(podman_config: PodmanConfig):
+    res = subprocess.run(['podman', *podman_config.global_args, 'image', 'exists', podman_config.image],
+                         capture_output=True)
+    return res.returncode == 0
+
+
+def pull_latex_image(podman_config: PodmanConfig):
+    subprocess.run(['podman', *podman_config.global_args, 'image', 'pull', podman_config.image])
+
+
 class LatexRunner:
     """Handle the PDF generation from a chosen LaTeX template."""
 
@@ -183,7 +258,47 @@ class LatexRunner:
         self.source_dir = source_dir
         self.has_toc = has_toc
 
-    def run_latex(self, source_file, log_file=None):
+    def run_latex(self, source_file, log_file):
+        if podman_config := config.XELATEX_PODMAN_CONFIG:
+            self._run_latex_podman(source_file, log_file, podman_config)
+        else:
+            self._run_latex_local(source_file, log_file)
+
+    def _run_latex_podman(self, source_file, log_file, podman_config: PodmanConfig):
+        font_dir = os.readlink(os.path.join(self.source_dir, 'fonts'))
+        font_cache = os.path.join(config.CACHE_DIR, 'fontconfig')
+        if not os.path.exists(font_cache):
+            os.mkdir(font_cache)
+        texmf_cnf_local = Path(__file__).parent / 'texmf.cnf'
+        if not (texmf_container_path := _get_texmf_path(podman_config)):
+            raise RuntimeError('Could not locate texmf config inside container')
+        podman_cmd = [
+            'podman', *podman_config.global_args, 'run',
+            *podman_config.pull_args,
+            '--rm',
+            '--network', 'none',
+            '-v', f'{font_cache}:/var/cache/fontconfig',
+            '-v', f'{self.source_dir}:/workdir',
+            '-v', f'{font_dir}:{font_dir}:ro',
+            '-v', f'{texmf_cnf_local}:{texmf_container_path}:ro',
+            *podman_config.run_args,
+            podman_config.image,
+            'xelatex',
+            '-no-shell-escape',
+            '-interaction', 'nonstopmode',
+            '-output-directory', '/workdir',
+            os.path.basename(source_file),
+        ]
+        try:
+            subprocess.check_call(podman_cmd, stdout=log_file, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code: %s)!', exc.returncode)
+            # Only fail if we are in strict mode
+            if config.STRICT_LATEX:
+                log_file.flush()
+                raise
+
+    def _run_latex_local(self, source_file, log_file=None):
         pdflatex_cmd = [config.XELATEX_PATH,
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
@@ -200,14 +315,11 @@ class LatexRunner:
                 env=dict(os.environ, TEXMFCNF=f'{os.path.dirname(__file__)}:')
             )
             Logger.get('pdflatex').debug('PDF created successfully!')
-
         except subprocess.CalledProcessError:
             Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code)!')
             # Only fail if we are in strict mode
             if config.STRICT_LATEX:
-                # flush log, go to beginning and read it
-                if log_file:
-                    log_file.flush()
+                log_file.flush()
                 raise
 
     def _render_template(self, template_name, kwargs):
@@ -253,6 +365,10 @@ class LatexRunner:
         source_filename, target_filename = self.prepare(template_name, **kwargs)
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')  # noqa: SIM115
+        start = time.time()
+        podman_config = config.XELATEX_PODMAN_CONFIG
+        if podman_config and not podman_config.allow_pull and not _check_podman_image(podman_config):
+            raise ServiceUnavailable('PDF files are currently unavailable. Please try again later.')
         try:
             self.run_latex(source_filename, log_file)
             if self.has_toc:
@@ -264,6 +380,8 @@ class LatexRunner:
                 # something went terribly wrong, no LaTeX file was produced
                 raise LaTeXRuntimeException(source_filename, log_filename)
 
+        duration = time.time() - start
+        Logger.get('pdflatex').info('Generated PDF in %.02f seconds', duration)
         return target_filename
 
 

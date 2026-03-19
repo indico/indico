@@ -38,6 +38,20 @@
         {{ message_box(severity, message) }}
     {% endfor %}
 
+    {% if indico_config.XELATEX_PATH and not indico_config.XELATEX_PODMAN_CONFIG %}
+        {% call message_box('danger') -%}
+            {% set link %}
+                <a href="https://docs.getindico.io/en/stable/installation/upgrade/#upgrading-to-3-3-12">
+            {% endset %}
+            {% trans endlink='</a>'|safe %}
+                You are using server-side LaTeX functionality without containerization. This is no longer
+                considered secure and thus discouraged. Please {{ link }}consult our documentation{{ endlink }}
+                on how to change this.
+            {% endtrans %}
+        {%- endcall %}
+    {% endif %}
+
+
     {% call message_box('highlight', classes='js-indico-version-message', style='display: none;') -%}
         {% trans -%}
             A new Indico version (<strong id="new-indico-version"></strong>) is available!

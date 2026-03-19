@@ -124,7 +124,7 @@ class RHSubmitRevisionUntyped(RHSubmitRevisionBase):
 
     @use_rh_kwargs({
         'files': FilesField(required=True),
-    }, rh_context=('event', 'contrib'))
+    }, rh_context=('event', 'contribution'))
     def _process(self, files):
         create_paper_revision(self.paper, session.user, {None: files})
         return jsonify_data(flash=False)
@@ -139,7 +139,7 @@ class RHSubmitRevision(RHSubmitRevisionBase):
 
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
-    }, rh_context=('event', 'contrib'))
+    }, rh_context=('event', 'contribution'))
     def _process(self, files):
         create_paper_revision(self.paper, session.user, files)
         return jsonify_data(flash=False)
@@ -154,7 +154,7 @@ class RHSubmitPaperUntyped(RHSubmitPaperBase):
 
     @use_rh_kwargs({
         'files': FilesField(required=True),
-    }, rh_context=('event', 'contrib'))
+    }, rh_context=('event', 'contribution'))
     def _process(self, files):
         # Key for files obj is 'None' as there is no FileType for single files
         create_new_paper(self.contribution, session.user, {None: files})
@@ -170,7 +170,7 @@ class RHSubmitPaper(RHSubmitPaperBase):
 
     @use_rh_kwargs({
         'files': PaperFilesField(required=True),
-    }, rh_context=('event', 'contrib'))
+    }, rh_context=('event', 'contribution'))
     def _process(self, files):
         create_new_paper(self.contribution, session.user, files)
         return jsonify_data(flash=False)

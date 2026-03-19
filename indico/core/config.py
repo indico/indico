@@ -12,12 +12,14 @@ import re
 import socket
 import warnings
 from datetime import timedelta
+from functools import cache
 from urllib.parse import urljoin, urlsplit
 
 import pytz
 from celery.schedules import crontab
 from flask import current_app, g
 from flask.helpers import get_root_path
+from marshmallow import ValidationError
 from werkzeug.datastructures import ImmutableDict
 
 from indico.util.caching import make_hashable
@@ -312,6 +314,18 @@ class IndicoConfig:
     def ABSOLUTE_WALLET_LOGO_URL(self):
         return urljoin(self.BASE_URL, self.WALLET_LOGO_URL) if self.WALLET_LOGO_URL else None
 
+    @property
+    @cache  # noqa: B019
+    def XELATEX_PODMAN_CONFIG(self):
+        from indico.legacy.pdfinterface.latex import PodmanConfig
+        if not self.XELATEX_PATH:
+            return None
+        elif self.XELATEX_PATH == 'podman':
+            return PodmanConfig()
+        elif self.XELATEX_PATH.startswith('podman:'):
+            optstring = self.XELATEX_PATH.removeprefix('podman:')
+            return PodmanConfig.from_string(optstring)
+
     def validate(self):
         from indico.core.auth import login_rate_limiter, signup_rate_limiter
         from indico.legacy.pdfinterface.latex import latex_rate_limiter
@@ -328,6 +342,10 @@ class IndicoConfig:
             raise ValueError('Minimum password length cannot be less than 8 characters long')
         if self.CSP_ENABLED not in {True, False, 'report-only'}:
             raise ValueError(f'Invalid value for CSP_ENABLED: {self.CSP_ENABLED!r}')
+        try:
+            self.XELATEX_PODMAN_CONFIG  # noqa: B018
+        except ValidationError as err:
+            raise ValueError(f'Invalid value for XELATEX_PATH: {err}')
 
     def __getattr__(self, name):
         try:

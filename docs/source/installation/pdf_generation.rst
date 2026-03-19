@@ -20,107 +20,90 @@ require any setup.
 .. _weasyprint: https://github.com/Kozea/WeasyPrint
 .. _DT: https://learn.getindico.io/document_templates/about/
 
-LaTeX
------
 .. _latex:
 
+LaTeX
+-----
+
 Indico uses LaTeX (xelatex to be exact) to generate some PDF files such
-as the *Book of Abstracts* and the PDF versions of contributions.  If
+as the *Book of Abstracts* and the PDF versions of contributions. If
 you do not need these features, you can skip this part of the documentation
 and avoid installing LaTeX altogether.
 
-Since Indico requires quite a few LaTeX packages which are not always
-installed by default when using the texlive packages of the various
-linux distributions, we recommend installing it manually.
+.. warning::
 
-.. note::
+    LaTeX is extremely powerful, and while Indico tries its best to sanitize LaTeX
+    input to disarm any harmful statements, we cannot make any guarantees that all
+    these usecases are covered. We **strongly** recommend not installing LaTeX on
+    your system anymore, but instead running it inside a container.
 
-    If you know what you're doing, feel free to try using your distribution's "full"
-    texlive package (often named ``texlive-full``, ``texlive-scheme-full``, or similar)
-    instead of using the texlive installer.
+    If you absolutely insist on installing TeXLive system-wide, you probably need
+    a "full" version of TeXLive, often called ``texlive-full``, ``texlive-scheme-full``
+    or similar.
 
-    However, e.g. on Alma9 there are some LaTeX packages missing which Indico needs.
-    A possible workaround for this (which works fine) is using the packages from
-    Fedora 34, but this is not straightforward at all.
+For the reasons mentioned in the warning above, we only support the containerized
+setup using Podman. Installing it is quite easy:
 
-First of all, you will need to install some dependencies so that all TeX
-formats are generated successfully upon TeXLive installation.
-
-.. code-block:: shell
-
-    # If you use Alma or Rocky:
-    dnf install perl ghostscript fontconfig wget
-    # If you use Debian or Ubuntu:
-    apt install perl ghostscript libfontconfig1
-
-You are now ready to install TeXLive. The following commands should work
-fine to install everything you need.
-You need to run the installation as root or create ``/opt/texlive`` as
-root and grant your user write access to it.
-
-Download the installer and cd to its location (the directory name contains
-the date when the package was built, so use the wildcard or type the name
-manually based on the output when unpacking the archive):
+If you are on an RPM-based distribution (AlmaLinux, RockyLinux, RHEL), run this:
 
 .. code-block:: shell
 
-    cd /tmp
-    wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-    tar xvzf install-tl-unx.tar.gz
-    cd install-tl-*/
+    dnf install podman
 
-Create the setup config file to install all the packages you need:
+If you are on a DEB-based distribution (Debian, Ubuntu), use this instead:
 
 .. code-block:: shell
 
-    cat > texlive.profile <<'EOF'
-    selected_scheme scheme-full
-    TEXDIR /opt/texlive
-    TEXMFCONFIG ~/.texlive/texmf-config
-    TEXMFHOME ~/texmf
-    TEXMFLOCAL /opt/texlive/texmf-local
-    TEXMFSYSCONFIG /opt/texlive/texmf-config
-    TEXMFSYSVAR /opt/texlive/texmf-var
-    TEXMFVAR ~/.texlive/texmf-var
-    binary_x86_64-linux 1
-    instopt_adjustpath 0
-    instopt_adjustrepo 0
-    instopt_letter 0
-    instopt_portable 0
-    instopt_write18_restricted 1
-    tlpdbopt_autobackup 1
-    tlpdbopt_backupdir tlpkg/backups
-    tlpdbopt_create_formats 1
-    tlpdbopt_generate_updmap 0
-    tlpdbopt_install_docfiles 0
-    tlpdbopt_install_srcfiles 0
-    tlpdbopt_post_code 1
-    tlpdbopt_sys_bin /usr/local/bin
-    tlpdbopt_sys_info /usr/local/share/info
-    tlpdbopt_sys_man /usr/local/share/man
-    EOF
+    apt install podman
 
-Start the installer and wait for it to complete. This may take between
-a few minutes and a few hours depending on the speed of the (randomly
-chosen) mirror.
+You then need to configure the Indico user to be able to run unprivileged containers.
+It is recommended that you check ``/etc/subuid`` and ``/etc/subgid`` to avoid any
+conflicts, but on a system that doesn't run anything besides Indico it is extremely
+unlikely to encounter conflicts. You can also edit that file directly and add a range
+manually instead of using the ``usermod`` command below:
 
 .. code-block:: shell
 
-    ./install-tl --profile texlive.profile
+    usermod indico --add-subuids 1000000-1065535 --add-subgids 1000000-1065535
+    loginctl enable-linger indico
 
-After installing it, add this line to your ``indico.conf`` file to use
-your new TeXLive installation:
+.. important::
+
+    If (and only if) you are on Debian 12 (Bookworm), you need to run this command to
+    avoid excessive disk space usage and performance issues as well (however, you should
+    not be installing Indico on Debian 12 anymore, considering that it reaches end of life
+    in June 2026):
+
+    .. code-block:: shell
+
+        cat >> /etc/containers/storage.conf <<'EOF'
+        [storage]
+        driver = "overlay"
+        EOF
+
+After setting everything up it, add this line to your ``indico.conf`` file to enable
+containerized LaTeX functionality:
 
 .. code-block:: python
 
-    XELATEX_PATH = '/opt/texlive/bin/x86_64-linux/xelatex'
+    XELATEX_PATH = 'podman'
 
-If you are in a production setup, reload uWSGI using
-``touch /opt/indico/web/indico.wsgi`` to reload the config file.
-
-As security-related updates are released frequently, it is also
-a good idea to periodically update the TeXLive packages by running:
+You may then want to proactively pull the texlive container image; otherwise it is
+done on the fly the first time it's needed which can make this request quite slow.
 
 .. code-block:: shell
 
-    /opt/texlive/bin/x86_64-linux/tlmgr update --self --all
+    indico maint pull-latex-image
+
+If you are in a production setup, restart uWSGI and Celery so the updatd config
+is actually used:
+
+.. code-block:: shell
+
+    systemctl restart indico-celery.service indico-uwsgi.service
+
+.. tip::
+
+    :data:`XELATEX_PATH` also has some advanced options that allow specifying custom
+    container images etc. Most likely you do not need them, but check the linked
+    documentation page if you are interested.

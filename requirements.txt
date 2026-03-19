@@ -14,7 +14,7 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-authlib==1.6.8
+authlib==1.6.9
     # via -r requirements.in
 babel==2.18.0
     # via
@@ -245,7 +245,7 @@ pure-eval==0.2.3
     # via
     #   sentry-sdk
     #   stack-data
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   pyasn1-modules
     #   rsa
@@ -264,7 +264,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
 pynpm==0.3.0
     # via pywebpack
-pypdf==6.7.3
+pypdf==6.9.1
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
@@ -275,7 +275,7 @@ python-dateutil==2.9.0.post0
     #   feedgen
     #   icalendar
     #   wtforms-dateutil
-pytz==2025.2
+pytz==2026.1.post1
     # via
     #   -r requirements.in
     #   flask-babel

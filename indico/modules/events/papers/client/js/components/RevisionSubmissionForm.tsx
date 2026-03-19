@@ -31,12 +31,14 @@ import './RevisionSubmissionForm.module.scss';
 interface RevisionSubmissionFormProps {
   eventId: number;
   contributionId: number;
+  contributionCode: string;
   children?: React.ReactNode;
 }
 
 export default function RevisionSubmissionForm({
   eventId,
   contributionId,
+  contributionCode,
   children,
 }: RevisionSubmissionFormProps) {
   const dispatch = useDispatch();
@@ -68,7 +70,14 @@ export default function RevisionSubmissionForm({
   // `null` fileTypes) the case where no file types should be displayed. in this case the `name` can be
   // something dummy/empty as it should not be displayed to users
   const fileTypes = _fileTypes.length
-    ? _fileTypes
+    ? _fileTypes.map(fileType =>
+        fileType.filenameTemplate
+          ? {
+              ...fileType,
+              filenameTemplate: fileType.filenameTemplate.replace('{code}', contributionCode),
+            }
+          : fileType
+      )
     : [
         {
           name: '', // Needs to be added empty as it is required

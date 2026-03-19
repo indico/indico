@@ -51,6 +51,8 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
 class RHTicketConfigQRCodeImage(RHManageRegFormBase):
     """Display configuration QRCode."""
 
+    PERMISSION = ('registration', 'registration_checkin')
+
     def _process(self):
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         qr = qrcode.QRCode(
@@ -90,5 +92,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
 
 
 class RHTicketConfigQRCode(RHManageRegFormBase):
+    PERMISSION = ('registration', 'registration_checkin')
+
     def _process(self):
         return render_template('events/registration/management/regform_qr_code.html', regform=self.regform)

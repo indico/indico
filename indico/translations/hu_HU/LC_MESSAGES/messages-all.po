@@ -12,9 +12,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.10-dev\n"
+"Project-Id-Version: Indico 3.3.12-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-16 12:02+0100\n"
+"POT-Creation-Date: 2026-03-18 16:20+0100\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Anna Szabó, 2026\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
@@ -1243,6 +1243,7 @@ msgstr "Biztosan vissza szeretné vonni a véleményezését?"
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 #: indico/modules/users/client/js/ProfilePicture.jsx
+#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Save changes"
 msgstr "Változások mentése"
 
@@ -5148,6 +5149,13 @@ msgid "No photo found."
 msgstr "Nem található fotó."
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/MonthlyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
+#, python-brace-format
+msgid "Results: {count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
 msgstr "Az oldal megtekintéséhez fordítsa vízszintesen a készüléket."
 
@@ -6483,12 +6491,28 @@ msgid "Show rejected/cancelled bookings"
 msgstr "Az elutasított/törölt foglalások megjelenítése"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Show unused spaces"
-msgstr "A nem használt helyiségek megjelenítése"
+msgid "Used"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Hide unused spaces"
-msgstr "A nem használt helyiségek elrejtése"
+msgid "Show only used spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "All"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show all spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Unused"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show only unused spaces"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -8166,10 +8190,9 @@ msgstr "Problémák akadtak a képpel"
 msgid "Drag a picture here"
 msgstr "Húzzon ide egy képet"
 
-#. Crop an image
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
-msgid "Crop"
-msgstr "Kivágás"
+msgid "Edit picture"
+msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Rotate"
@@ -9117,6 +9140,7 @@ msgstr "Regisztráló"
 
 #: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
 msgid "Registration details"
 msgstr "Regisztráció részletei"
 
@@ -12218,6 +12242,14 @@ msgstr "Kérjük, fontolja meg a szerver regisztrálását a Community Hub-on."
 #: indico/modules/core/templates/admin/settings.html
 msgid "Debug mode is enabled."
 msgstr "Hibakereső mód engedélyezve."
+
+#: indico/modules/core/templates/admin/settings.html
+#, python-format
+msgid ""
+"You are using server-side LaTeX functionality without containerization. This"
+" is no longer considered secure and thus discouraged. Please %(link)sconsult"
+" our documentation%(endlink)s on how to change this."
+msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html
 msgid ""
@@ -16578,6 +16610,10 @@ msgstr ""
 msgid "There are no contributions yet."
 msgstr "Még nincsenek felszólalások."
 
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
+msgstr ""
+
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 msgid "Edit this contribution"
 msgstr "Felszólalás szerkesztése"
@@ -16660,6 +16696,10 @@ msgstr "'%(title)s' alfelszólalás szerkesztése"
 #: indico/modules/events/templates/display/common/_manage_button.html
 msgid "Edit subcontribution"
 msgstr "Alfelszólalás szerkesztése"
+
+#: indico/modules/events/contributions/templates/display/contribution_list.html
+msgid "Search contributions"
+msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/management/contributions.html
@@ -20977,8 +21017,28 @@ msgstr ""
 "regisztrációkat kezeljenek."
 
 #: indico/modules/events/registration/__init__.py
+msgid "Registration (everything)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
 msgstr "Hozzáférést biztosít a menedzsment számára a regisztrációs űrlaphoz."
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (moderation only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, approve, reject and withdraw registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (check-in only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view and check-in registrations."
+msgstr ""
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -23196,6 +23256,27 @@ msgstr ""
 "A(z) %(link)s%(title)s%(endlink)s %(at_time)s eseményre való regisztrációja "
 "%(strong)skifizetetlen%(endstrong)s."
 
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Use the app to manage the check-in status of the participants"
+msgstr ""
+"Használja az alkalmazást a résztvevők bejelentkezési státuszának kezelésére."
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Open the Check-in App"
+msgstr "Use the app to manage the login status of participants."
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid ""
+"In order to configure your mobile app to use this event, you will have to "
+"scan the QR code"
+msgstr ""
+"Ahhoz, hogy a mobilalkalmazást az esemény használatára konfigurálja, be kell"
+" olvasnia a QR-kódot."
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "QR Code"
+msgstr "QR-kód"
+
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 msgid ""
 "<strong>Tip</strong>: if your printer does not align the badges correctly, "
@@ -23607,27 +23688,6 @@ msgstr "Jegyek"
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure ticketing system"
 msgstr "A jegykezelő rendszer beállítása"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Use the app to manage the check-in status of the participants"
-msgstr ""
-"Használja az alkalmazást a résztvevők bejelentkezési státuszának kezelésére."
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Open the Check-in App"
-msgstr "Use the app to manage the login status of participants."
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid ""
-"In order to configure your mobile app to use this event, you will have to "
-"scan the QR code"
-msgstr ""
-"Ahhoz, hogy a mobilalkalmazást az esemény használatára konfigurálja, be kell"
-" olvasnia a QR-kódot."
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "QR Code"
-msgstr "QR-kód"
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure tickets"
@@ -24740,8 +24800,8 @@ msgid "You should upload a CSV or TXT file with one email address per line."
 msgstr "Egy CSV vagy TXT fájlt kell feltöltenie, soronként egy e-mail címmel."
 
 #: indico/modules/events/series/controllers.py
-msgid "A series with this ID does not exist."
-msgstr "Ilyen azonosítóval rendelkező sorozat nem létezik."
+msgid "You can only manage a series if you can manage all its events."
+msgstr ""
 
 #: indico/modules/events/series/schemas.py
 msgid "At least one event is already in a series."
@@ -27339,6 +27399,14 @@ msgstr "ACL"
 #: indico/modules/users/templates/_labels.html
 msgid "Admin"
 msgstr "Admin"
+
+#: indico/modules/logs/models/entries.py
+msgid "Registration form details"
+msgstr ""
+
+#: indico/modules/logs/models/entries.py
+msgid "Abstract details"
+msgstr ""
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"

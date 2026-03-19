@@ -35,7 +35,7 @@ from indico.web.rh import cors, json_errors, oauth_scope
 class RHCheckinAPIBase(RHManageEventBase):
     """Base class for the Check-in API."""
 
-    PERMISSION = 'registration'
+    PERMISSION = ('registration', 'registration_checkin')
 
 
 class RHCheckinAPIEventDetails(RHCheckinAPIBase):

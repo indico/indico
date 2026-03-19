@@ -47,16 +47,22 @@ class PaperEmailSettingsField(JSONField):
 
 
 class PaperFilesField(Dict):
-    def __init__(self, event=None, contrib=None, **kwargs):
-        self.event = event
-        self.contrib = contrib
-
+    def __init__(self, **kwargs):
         def _get_query(m, ctx):
-            return self._get_file_types_query(event or ctx['event'])
+            # can't use self.event here because `self` is different than the one used during deserialization
+            return self._get_file_types_query(ctx['event'])
 
         keys_field = ModelField(PaperFileType, get_query=_get_query)
         values_field = FilesField(required=True)
         super().__init__(keys=keys_field, values=values_field, **kwargs)
+
+    @property
+    def event(self):
+        return self.context['event']
+
+    @property
+    def contribution(self):
+        return self.context['contribution']
 
     def _get_file_types_query(self, event):
         return PaperFileType.query.with_parent(event)
@@ -67,7 +73,7 @@ class PaperFilesField(Dict):
         return rv
 
     def validate_files(self, value):
-        required_types = {ft for ft in self._get_file_types_query(self.event or self.context['event']) if ft.required}
+        required_types = {ft for ft in self._get_file_types_query(self.event) if ft.required}
 
         # ensure all required file types have files
         required_missing = required_types - {ft for ft, files in value.items() if files}
@@ -93,7 +99,7 @@ class PaperFilesField(Dict):
             # ensure all filenames conform to the template
             if file_type.filename_template:
                 filenames = {os.path.splitext(f.filename)[0] for f in files}
-                filename_template = file_type.filename_template.replace('{code}', self.contrib.code)
+                filename_template = file_type.filename_template.replace('{code}', self.contribution.code)
                 if not all(fnmatch.fnmatch(filename, filename_template) for filename in filenames):
                     raise ValidationError(
                         f"Some files do not conform to the filename template '{file_type.filename_template}'"

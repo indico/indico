@@ -8,9 +8,11 @@
 import click
 
 from indico.cli.core import cli_group
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.legacy.pdfinterface.latex import pull_latex_image
 from indico.modules.attachments import Attachment, AttachmentFolder
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.events.contributions import Contribution
@@ -101,3 +103,13 @@ def fix_event_role_acls():
                   default=True, abort=True)
     db.session.commit()
     click.secho('Success!', fg='green')
+
+
+@cli.command('pull-latex-image')
+def pull_latex_image_cmd():
+    """Pull the podman image to build LaTeX documents."""
+    if not (podman_config := config.XELATEX_PODMAN_CONFIG):
+        click.echo('Containerized LaTeX building is not enabled')
+        return
+    click.echo('Pulling image: ' + click.style(podman_config.image, fg='white', bold=True))
+    pull_latex_image(podman_config)

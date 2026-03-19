@@ -156,19 +156,11 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
             filepath = os.path.join(root, filename)
 
             try:
-                # raises an exception for invalid symlinks
-                mtime = os.path.getmtime(filepath)
+                mtime = os.lstat(filepath).st_mtime
             except OSError:
-                if is_broken_symlink(filepath):
-                    if dry_run or silentremove(filepath):
-                        deleted.add(os.path.relpath(filepath, path))
-                    else:
-                        has_files = True
-                else:
-                    from indico.core.logger import Logger
-                    Logger.get('fs').exception('Could not stat %s', filepath)
-                    has_files = True
-
+                from indico.core.logger import Logger
+                Logger.get('fs').exception('Could not stat %s', filepath)
+                has_files = True
                 continue
 
             if mtime >= min_mtime:
@@ -181,14 +173,6 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
         if not dry_run and not has_files and not dirs and relroot:
             removedirs(path, relroot)
     return deleted
-
-
-def is_broken_symlink(path):
-    """Check whether a file is a broken symlink.
-
-    :param path: The path to the file
-    """
-    return os.path.islink(path) and not os.path.exists(path)
 
 
 def chmod_umask(path, execute=False):

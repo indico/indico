@@ -10,22 +10,30 @@ Version 3.3.12
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Allow bulk (de-)selecting data in tables with shift+click (:issue:`7375`, :pr:`7376`)
+- Add new permissions that grant only moderation and checkin permissions for registrations
+  (:pr:`7306`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix paper file submission when a filename template is configured (:pr:`7381`)
+- Fix selecting existing paper files when submitting an editable (:pr:`7381`)
+- Use symlink mtime instead of target mtime when cleaning up old temp/cache files
+  (:pr:`7388`)
 
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Timetable toolbar buttons ("Detailed view" etc.) are now keyboard accessible and
+  readable by screen readers (:pr:`7374`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Add more endpoints that shouldn't be crawled to ``robots.txt`` (:pr:`7390`)
+- Allow running TeXLive sandboxed in a container instead of installing it globally and
+  running it directly as the ``indico`` user (:pr:`7384`)
 
 
 Version 3.3.11
@@ -36,7 +44,7 @@ Version 3.3.11
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Add missing access checks when managing event series (:cve:`2026-28352 `, thanks
+- Add missing access checks when managing event series (:cve:`2026-28352`, thanks
   :user:`lighthousekeeper1212`)
 
 .. note::
@@ -251,7 +259,7 @@ Improvements
   (:pr:`7168`, thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add setting :data:`EMAIL_LOG_STORAGE` to permanently store email attachments and
   allow re-sending emails with attachments from the event log (:pr:`7182`, :pr:`7203`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+  thanks :user:`moliholy, unconventionaldotdev`)
 - Show confirmation dialog when sending invitations (:pr:`7204`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 - Show a warning when bulk registration approval/rejection skips registrations that are not
@@ -422,7 +430,7 @@ Improvements
 - Use :data:`STATIC_SITE_STORAGE` for the temporary file from a material package
   (:pr:`6898`)
 - Implement conditional fields in registration forms (:issue:`1227`, :pr:`6678`,
-  thanks :user:`Moliholy, omegak, unconventionaldotdev`)
+  thanks :user:`moliholy, omegak, unconventionaldotdev`)
 - Log user-specific ACL changes to user log (:pr:`6841`, thanks :user:`tomako`)
 - Include language settings when cloning an event (:issue:`6871`, :pr:`6929`)
 - Log user merges to user log (:issue:`6882`, :pr:`6920`)
@@ -441,7 +449,7 @@ Improvements
   of another Indico user (:pr:`6960`)
 - Allow linking existing booking to an event even if there's no exact date/time overlap,
   and do not show a large number of unrelated bookings (:issue:`6568`, :issue:`6811`,
-  :pr:`6846`, thanks :user:`Moliholy, unconventionaldotdev`)
+  :pr:`6846`, thanks :user:`moliholy, unconventionaldotdev`)
 - Add a log for global admin actions, similar to that in events, categories and users
   (:pr:`6868`, thanks :user:`tomako`)
 
@@ -666,16 +674,16 @@ Improvements
   :pr:`6591`)
 - Streamline "get next editable" UI and only show editables that still unassigned (:pr:`6583`)
 - Add preview link for custom text snippets in registration notification emails (:issue:`6539`,
-  :pr:`6560`, thanks :user:`Moliholy, unconventionaldotdev`)
+  :pr:`6560`, thanks :user:`moliholy, unconventionaldotdev`)
 - Stop spoofing email sender addresses when using the :data:`SMTP_ALLOWED_SENDERS` and
   :data:`SMTP_SENDER_FALLBACK` config settings. Instead, the *From* address will be rewritten
   to the fallback whenever the requested address is not an allowed sender (:pr:`6231`, thanks
   :user:`SegiNyn`)
 - Allow alternative CSV delimiters everywhere when importing content from CSV files (:pr:`6607`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+  thanks :user:`moliholy, unconventionaldotdev`)
 - Improve readability of room booking room statistics card (:pr:`6616`)
 - Add option to use flat zip file structure when downloading registration attachments
-  (:issue:`6536`, :pr:`6608`, thanks :user:`Moliholy, unconventionaldotdev`)
+  (:issue:`6536`, :pr:`6608`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -755,7 +763,7 @@ Improvements
 - Add ability to filter editable lists by the parent session of the editable's
   contribution (:pr:`6453`)
 - Allow alternative CSV delimiters when importing registration invitations (:pr:`6458`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+  thanks :user:`moliholy, unconventionaldotdev`)
 - A room's bookable hours can now be applied to specific weekdays, making it
   unbookable on any other weekdays (:pr:`6439`)
 - Add global settings for min/max registration form data retention periods (:pr:`6445`,
@@ -835,7 +843,7 @@ Improvements
 
 - Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
 - Allow linking existing room booking occurrences to an event (:pr:`6243`, thanks
-  :user:`Moliholy, unconventionaldotdev`)
+  :user:`moliholy, unconventionaldotdev`)
 - Support including a picture (from a registration's picture field) in the conference
   participant list (:pr:`6228`, thanks :user:`vtran99`)
 - Add :data:`FAVICON_URL` config option to set a custom URL for the favicon (:pr:`6323`,
@@ -1072,16 +1080,16 @@ Improvements
   likely to fail in poor lighting conditions (:pr:`6123`)
 - Add a legend to the category calendar, allowing to filter events either by category, venue,
   room or keywords (:issue:`6105, 6106, 6128, 6148, 6149, 6127`, :pr:`6110, 6158, 6183`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+  thanks :user:`moliholy, unconventionaldotdev`)
 - Allow to configure a restrictive set of allowed event keywords (:issue:`6127`, :pr:`6183`,
-  thanks :user:`Moliholy, unconventionaldotdev`).
+  thanks :user:`moliholy, unconventionaldotdev`).
 - Add week and day views in the category calendar and improve navigation controls
-  (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
+  (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`moliholy, unconventionaldotdev`).
 - Add the ability to clone privacy settings (:pr:`6156`, thanks :user:`SegiNyn`)
 - Add option for managers to change the registration fee of a set of registrations (:issue:`6132`,
   :pr:`6138`)
 - Add setting to configure whether room bookings require a reason (:issue:`6150`, :pr:`6155`,
-  thanks :user:`Moliholy, unconventionaldotdev`)
+  thanks :user:`moliholy, unconventionaldotdev`)
 - Add a "Picture" personal data field to registrations. When used, it allows including the
   picture provided by the user on badges/tickets (:pr:`6160`, thanks :user:`vtran99`)
 - Support ``~~text~~`` to strike-out text in markdown (:pr:`6166`)

@@ -23,6 +23,7 @@ import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {getPluginObjects} from 'indico/utils/plugins';
 
 import ImportInvitationsField from './ImportInvitationsField';
 
@@ -150,6 +151,7 @@ const getSkippedWarningMessage = skipped =>
     : null;
 
 export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
+  const pluginModes = useMemo(() => getPluginObjects('invite-dialog-extra-modes'), []);
   const [mode, setMode] = useState('existing');
   const [sentEmailsCount, setSentEmailsCount] = useState(0);
   const [sentEmailsWarning, setSentEmailsWarning] = useState(null);
@@ -161,10 +163,34 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     {camelize: true}
   );
 
+  const allModes = useMemo(
+    () => ({
+      ...modeConfig,
+      ...Object.fromEntries(
+        pluginModes.map(pm => [
+          pm.key,
+          {
+            buttonLabel: pm.buttonLabel,
+            renderFields: props => <pm.Component {...props} />,
+            extraFields: pm.extraFields,
+            getCount: pm.getCount,
+            getPreviewPayload: () => ({context: {}, disabled: true}),
+            getSubmitURL: pm.getSubmitURL ?? null,
+          },
+        ])
+      ),
+    }),
+    [pluginModes]
+  );
+
   const initialFormValues = useMemo(() => {
     if (!metadata) {
       return {};
     }
+    const pluginInitialValues = pluginModes.reduce(
+      (acc, pm) => ({...acc, ...(pm.initialValues ?? {})}),
+      {}
+    );
     return {
       subject: metadata.defaultSubject,
       body: metadata.defaultBody,
@@ -180,8 +206,9 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       email: '',
       affiliation: '',
       imported: [],
+      ...pluginInitialValues,
     };
-  }, [metadata]);
+  }, [metadata, pluginModes]);
 
   const requestConfirmation = useCallback(count => {
     return new Promise(resolve => {
@@ -201,9 +228,10 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
 
   const handleSubmit = useCallback(
     async values => {
-      const count = modeConfig[mode].getCount(values);
+      const activeMode = allModes[mode];
+      const count = activeMode.getCount(values);
       if (count === 0) {
-        return {[modeConfig[mode].extraFields[0]]: 'No recipients specified.'};
+        return {[activeMode.extraFields[0]]: 'No recipients specified.'};
       }
       const confirmed = await requestConfirmation(count);
       if (!confirmed) {
@@ -220,15 +248,17 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         'skip_access_check',
         'lock_email',
         ...(metadata?.moderationEnabled ? ['skip_moderation'] : []),
-        ...modeConfig[mode].extraFields,
+        ...activeMode.extraFields,
       ]);
 
-      const submitURL = mode === 'import' ? inviteImportURL : inviteURL;
+      const submitURL =
+        mode === 'import'
+          ? inviteImportURL({event_id: eventId, reg_form_id: regformId})
+          : activeMode.getSubmitURL
+            ? activeMode.getSubmitURL({eventId, regformId})
+            : inviteURL({event_id: eventId, reg_form_id: regformId});
       try {
-        const {data} = await indicoAxios.post(
-          submitURL({event_id: eventId, reg_form_id: regformId}),
-          payload
-        );
+        const {data} = await indicoAxios.post(submitURL, payload);
         onSuccess(data);
         setSentEmailsCount(data.sent);
         setSentEmailsWarning(getSkippedWarningMessage(data.skipped));
@@ -238,6 +268,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
       setTimeout(() => onClose(), successTimeout);
     },
     [
+      allModes,
       eventId,
       metadata?.moderationEnabled,
       mode,
@@ -257,19 +288,19 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
     );
   }
 
-  const ModeFields = modeConfig[mode].renderFields;
+  const ModeFields = allModes[mode]?.renderFields;
 
   const recipientsField = (
     <>
       <Button.Group fluid attached="top">
-        {['existing', 'new', 'import'].map(key => (
+        {Object.entries(allModes).map(([key, config]) => (
           <Button type="button" key={key} primary={mode === key} onClick={() => setMode(key)}>
-            {modeConfig[key].buttonLabel}
+            {config.buttonLabel}
           </Button>
         ))}
       </Button.Group>
       <Segment attached="bottom">
-        <ModeFields eventId={eventId} regformId={regformId} />
+        {ModeFields && <ModeFields eventId={eventId} regformId={regformId} />}
       </Segment>
       {metadata.moderationEnabled && (
         <FinalCheckbox
@@ -305,7 +336,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         senders={metadata.senders}
         placeholders={metadata.placeholders}
         previewURL={invitationPreviewURL({event_id: eventId, reg_form_id: regformId})}
-        getPreviewPayload={values => modeConfig[mode].getPreviewPayload(values)}
+        getPreviewPayload={values => allModes[mode].getPreviewPayload(values)}
         recipientsField={recipientsField}
         initialFormValues={initialFormValues}
         title={Translate.string('Invite people')}

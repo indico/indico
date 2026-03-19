@@ -310,6 +310,13 @@ div.timetableManagementInfoArea ul li {
   cursor: pointer;
 }
 
+button.printButtonWhite,
+button.buttonWhite {
+  background: none;
+  border: none;
+  font: inherit;
+}
+
 .printButtonWhite,
 .buttonWhite {
   color: white;

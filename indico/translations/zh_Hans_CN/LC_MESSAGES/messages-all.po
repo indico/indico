@@ -14,9 +14,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.10-dev\n"
+"Project-Id-Version: Indico 3.3.12-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-16 12:02+0100\n"
+"POT-Creation-Date: 2026-03-18 16:20+0100\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2026\n"
 "Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
@@ -1196,6 +1196,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx
 #: indico/modules/users/client/js/PersonalDataForm.jsx
 #: indico/modules/users/client/js/ProfilePicture.jsx
+#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Save changes"
 msgstr "保存更改"
 
@@ -4937,6 +4938,13 @@ msgid "No photo found."
 msgstr "找不到照片"
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/MonthlyTimelineContent.jsx
+#: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
+#, python-brace-format
+msgid "Results: {count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
 msgstr "请水平转动您的设备以查看此页。"
 
@@ -6181,12 +6189,28 @@ msgid "Show rejected/cancelled bookings"
 msgstr "显示 拒绝/取消 的预订"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Show unused spaces"
-msgstr "显示没被使用的会议室"
+msgid "Used"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
-msgid "Hide unused spaces"
-msgstr "隐藏没被使用的会议室"
+msgid "Show only used spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "All"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show all spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Unused"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
+msgid "Show only unused spaces"
+msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -7790,9 +7814,8 @@ msgstr ""
 msgid "Drag a picture here"
 msgstr ""
 
-#. Crop an image
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
-msgid "Crop"
+msgid "Edit picture"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
@@ -8714,6 +8737,7 @@ msgstr "注册人"
 
 #: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
 msgid "Registration details"
 msgstr "注册详细信息"
 
@@ -11580,6 +11604,14 @@ msgstr "请考虑在社区中心注册您的服务。"
 #: indico/modules/core/templates/admin/settings.html
 msgid "Debug mode is enabled."
 msgstr "启用调试模式。"
+
+#: indico/modules/core/templates/admin/settings.html
+#, python-format
+msgid ""
+"You are using server-side LaTeX functionality without containerization. This"
+" is no longer considered secure and thus discouraged. Please %(link)sconsult"
+" our documentation%(endlink)s on how to change this."
+msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html
 msgid ""
@@ -15692,6 +15724,10 @@ msgstr "筛选条件与任何现有的报告不匹配。尝试清除筛选。"
 msgid "There are no contributions yet."
 msgstr "还没有报告。"
 
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
+msgstr ""
+
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 msgid "Edit this contribution"
 msgstr "编辑此报告"
@@ -15771,6 +15807,10 @@ msgstr "编辑子报告 '%(title)s'"
 #: indico/modules/events/templates/display/common/_manage_button.html
 msgid "Edit subcontribution"
 msgstr "编辑子报告"
+
+#: indico/modules/events/contributions/templates/display/contribution_list.html
+msgid "Search contributions"
+msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/management/contributions.html
@@ -19721,8 +19761,28 @@ msgid ""
 msgstr "给事件管理员机会去处理事件注册。"
 
 #: indico/modules/events/registration/__init__.py
+msgid "Registration (everything)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
 msgstr "授予管理访问注册表的权限。"
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (moderation only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, approve, reject and withdraw registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (check-in only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view and check-in registrations."
+msgstr ""
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -21747,6 +21807,24 @@ msgid ""
 "now %(strong)sunpaid%(endstrong)s."
 msgstr ""
 
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Use the app to manage the check-in status of the participants"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "Open the Check-in App"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid ""
+"In order to configure your mobile app to use this event, you will have to "
+"scan the QR code"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_checkin.html
+msgid "QR Code"
+msgstr "二维码"
+
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html
 msgid ""
 "<strong>Tip</strong>: if your printer does not align the badges correctly, "
@@ -22108,24 +22186,6 @@ msgstr "票单"
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure ticketing system"
 msgstr "配置票单系统"
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Use the app to manage the check-in status of the participants"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "Open the Check-in App"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid ""
-"In order to configure your mobile app to use this event, you will have to "
-"scan the QR code"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform.html
-msgid "QR Code"
-msgstr "二维码"
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Configure tickets"
@@ -23179,7 +23239,7 @@ msgid "You should upload a CSV or TXT file with one email address per line."
 msgstr "您应该上传一个CSV或TXT文件，每行一个电子邮件地址。"
 
 #: indico/modules/events/series/controllers.py
-msgid "A series with this ID does not exist."
+msgid "You can only manage a series if you can manage all its events."
 msgstr ""
 
 #: indico/modules/events/series/schemas.py
@@ -25637,6 +25697,14 @@ msgstr "ACL"
 #: indico/modules/users/templates/_labels.html
 msgid "Admin"
 msgstr "管理员"
+
+#: indico/modules/logs/models/entries.py
+msgid "Registration form details"
+msgstr ""
+
+#: indico/modules/logs/models/entries.py
+msgid "Abstract details"
+msgstr ""
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"
