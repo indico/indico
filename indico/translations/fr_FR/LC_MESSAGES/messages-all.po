@@ -5233,7 +5233,7 @@ msgstr "Aucune photo."
 #: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
 #, python-brace-format
 msgid "Results: {count}"
-msgstr ""
+msgstr "Résultats: {count}"
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
@@ -6602,27 +6602,27 @@ msgstr "Montrer les réservations refusées/annulées"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Used"
-msgstr ""
+msgstr "Utilisé"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only used spaces"
-msgstr ""
+msgstr "Afficher seulement les espaces utilisés"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "All"
-msgstr ""
+msgstr "Tous"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show all spaces"
-msgstr ""
+msgstr "Afficher tous les espaces"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Unused"
-msgstr ""
+msgstr "Inutilisé"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only unused spaces"
-msgstr ""
+msgstr "Afficher seulement les espaces inutilisés"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -8321,7 +8321,7 @@ msgstr "Déposer une photo ici"
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Edit picture"
-msgstr ""
+msgstr "Modifier la photo"
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Rotate"
@@ -12457,6 +12457,10 @@ msgid ""
 " is no longer considered secure and thus discouraged. Please %(link)sconsult"
 " our documentation%(endlink)s on how to change this."
 msgstr ""
+"Vous utilisez la fonction LaTeX côté serveur sans conteneurisation. Ceci "
+"n'est plus considéré comme sûr et est donc découragé. Veuillez "
+"%(link)sconsulter notre documentation%(endlink)s pour comprendre comment "
+"changer cela."
 
 #: indico/modules/core/templates/admin/settings.html
 msgid ""
@@ -16891,7 +16895,7 @@ msgstr "Il n'y a encore aucune contribution."
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
 msgid "Go to contribution page"
-msgstr ""
+msgstr "Aller à la page de la contribution"
 
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 msgid "Edit this contribution"
@@ -16980,7 +16984,7 @@ msgstr "Modifier la sous-contribution"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 msgid "Search contributions"
-msgstr ""
+msgstr "Chercher les contributions"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/management/contributions.html
@@ -21345,7 +21349,7 @@ msgstr ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (everything)"
-msgstr ""
+msgstr "Inscription (tout)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
@@ -21353,19 +21357,20 @@ msgstr "Accorde les droits de gestion du formulaire d'inscription."
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (moderation only)"
-msgstr ""
+msgstr "Inscription (seulement la modération)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view, approve, reject and withdraw registrations."
 msgstr ""
+"Donne accès pour voir, approuver, rejeter et retirer les inscriptions."
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (check-in only)"
-msgstr ""
+msgstr "Inscription (seulement l'enregistrement)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view and check-in registrations."
-msgstr ""
+msgstr "Donne l'accès pour voir et enregistrer les inscriptions."
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -25217,6 +25222,8 @@ msgstr ""
 #: indico/modules/events/series/controllers.py
 msgid "You can only manage a series if you can manage all its events."
 msgstr ""
+"Vous pouvez seulement gérer une série si vous pouvez gérer tous les "
+"événements qu'elle contient."
 
 #: indico/modules/events/series/schemas.py
 msgid "At least one event is already in a series."
@@ -27858,11 +27865,11 @@ msgstr "Admin"
 
 #: indico/modules/logs/models/entries.py
 msgid "Registration form details"
-msgstr ""
+msgstr "Détails du formulaire d'inscription"
 
 #: indico/modules/logs/models/entries.py
 msgid "Abstract details"
-msgstr ""
+msgstr "Détails du résumé"
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"
