@@ -61,7 +61,7 @@ jobs:
         run: npm ci
       - name: Build wheel 🏗
         run: ./bin/maintenance/build-wheel.py indico --add-version-suffix
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         name: Upload build artifacts 📦
         with:
           name: indico-wheel
