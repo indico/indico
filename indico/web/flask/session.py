@@ -20,7 +20,9 @@ from werkzeug.utils import cached_property
 
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
+from indico.core.db import db
 from indico.modules.users import User
+from indico.modules.users.models.sessions import UserSession
 from indico.util.date_time import get_display_tz, utc_to_server
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
@@ -164,7 +166,8 @@ class IndicoSessionInterface(SessionInterface):
     temporary_session_lifetime = timedelta(days=7)
 
     def __init__(self):
-        self.storage = make_scoped_cache('flask-session')
+        #  We use redis for storing sessions that are not associated with a user
+        self.temp_storage = make_scoped_cache('flask-session')
 
     def generate_sid(self):
         return str(uuid.uuid4())
@@ -214,11 +217,43 @@ class IndicoSessionInterface(SessionInterface):
             return True
         return False
 
+    def get_stored_user_session(self, sid):
+        return UserSession.query.filter_by(sid=sid).one_or_none()
+
+    def get_session_data(self, sid):
+        data = None
+        stored_session = self.get_stored_user_session(sid)
+        if stored_session and stored_session.ttl > datetime.now():
+            data = stored_session.data
+        if not data:
+            data = self.temp_storage.get(sid)
+        return data
+
+    def store_session(self, session, storage_ttl):
+        if session.user:
+            if stored_session := self.get_stored_user_session(session.sid):
+                stored_session.data = self.serializer.dumps(dict(session))
+                stored_session.ttl = session['_expires']
+            else:
+                stored_session = UserSession(sid=session.sid, data=self.serializer.dumps(dict(session)),
+                                                         ttl=session['_expires'], user_id=session['_user_id'])
+                db.session.add(stored_session)
+            db.session.commit()
+        else:
+            self.temp_storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
+
+    def delete_session(self, sid):
+        if stored_session := self.get_stored_user_session(sid):
+            db.session.delete(stored_session)
+            db.session.commit()
+        else:
+            self.temp_storage.delete(sid)
+
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
         if not sid:
             return self.session_class(sid=self.generate_sid(), new=True)
-        data = self.storage.get(sid)
+        data = self.get_session_data(sid)
         if data is not None:
             try:
                 return self.session_class(self.serializer.loads(data), sid=sid)
@@ -233,9 +268,9 @@ class IndicoSessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         samesite = self.get_cookie_samesite(app)
         refresh_sid = self.should_refresh_sid(app, session)
-        if not session and not session.new:
+        if not session and not session.new:  # when does this happen? the user is logged out? w
             # empty session, delete it from storage and cookie
-            self.storage.delete(session.sid)
+            self.delete_session(session.sid)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             response.vary.add('Cookie')
             return
@@ -263,11 +298,11 @@ class IndicoSessionInterface(SessionInterface):
             session['_expires'] = datetime.now() + storage_ttl
 
         if refresh_sid:
-            self.storage.delete(session.sid)
+            self.delete_session(session.sid)
             session.sid = self.generate_sid()
 
         session['_secure'] = request.is_secure
-        self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
+        self.store_session(session, storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
                             secure=secure, samesite=samesite)
         response.vary.add('Cookie')
