@@ -70,6 +70,12 @@ def _inject_survey_announcement(event, **kwargs):
                                was_survey_submitted=was_survey_submitted)
 
 
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if event.has_feature('surveys') and event.can_manage(session.user, 'surveys'):
+        return url_for('surveys.manage_survey_list', event)
+
+
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return SurveysFeature
