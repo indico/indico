@@ -58,6 +58,8 @@ def _sidemenu_items(sender, category, **kwargs):
                        90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
+    yield SideMenuItem('privacy_dashboard', _('Privacy'),
+                           url_for('categories.manage_privacy_dashboard', category), 69, sui_icon='balance scale')
     if _is_moderation_visible(category):
         count = category.event_move_requests.filter_by(state=MoveRequestState.pending).count() or None
         yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),

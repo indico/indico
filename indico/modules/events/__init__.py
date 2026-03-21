@@ -16,7 +16,6 @@ from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.modules.events.cloning import get_event_cloners
-from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.settings import event_language_settings
@@ -174,13 +173,15 @@ def _topmenu_items(sender, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData, get_menu_entry_by_name
+    from indico.modules.events.operations import get_event_privacy
 
     def _my_conference_visible(event):
         return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
     def _visible_privacy_information(event):
-        return any(privacy_settings.get_all(event).values())
+        privacy_settings, _inherited = get_event_privacy(event)
+        return any(privacy_settings.values())
 
     yield MenuEntryData(_('Overview'), 'overview', 'events.display_overview', position=0, static_site=True)
     yield MenuEntryData(_('My Conference'), 'my_conference', position=7, visible=_my_conference_visible)
