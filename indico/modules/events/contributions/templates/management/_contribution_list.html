@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
-{% from 'events/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_person_affiliation %}
 
 {% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types) %}
     {% if contribs %}
@@ -135,7 +135,7 @@
                                                    title="{{ tooltip }}" data-qtip-position="bottom"></i>
                                                 {{ speaker.display_full_name }}
                                                 {% if speaker.affiliation %}
-                                                    <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
+                                                    <span class="text-superfluous">({{ render_person_affiliation(speaker) }})</span>
                                                 {% endif %}
                                             </div>
                                         {%- endfor %}
