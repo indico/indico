@@ -125,6 +125,7 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
     def view_data(self):
         data = dict(super().view_data,
                     field_is_required=self.personal_data_type.is_required,
+                    field_is_content_validation_protected=self.personal_data_type.is_content_validation_protected,
                     field_is_personal_data=True)
         return camelize_keys(data)
 
