@@ -41,12 +41,13 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <ind-with-tooltip>
-        <ind-menu>
+    <ind-menu>
+        <ind-with-tooltip>
             <button class="i-button text-color subtle icon-layout">
                 <span data-tip-content>{% trans %}Change theme{% endtrans %}</span>
             </button>
-            <menu>
+        </ind-with-tooltip>
+        <menu>
                 {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
                 {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
                    if group.grouper or event.can_manage(session.user) %}
@@ -64,8 +65,7 @@
                     {% endfor %}
                 {% endfor %}
             </menu>
-        </ind-menu>
-    </ind-with-tooltip>
+    </ind-menu>
 {%- endmacro -%}
 
 

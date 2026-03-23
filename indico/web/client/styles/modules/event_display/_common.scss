@@ -87,9 +87,17 @@
       border-right: 1px dotted $light-black;
     }
 
-    ind-with-tooltip,
     ind-menu {
       align-self: stretch;
+
+      > ind-with-tooltip {
+        align-self: stretch;
+        align-items: stretch;
+
+        > button.i-button {
+          align-self: stretch;
+        }
+      }
     }
 
     ind-menu > menu {
