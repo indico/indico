@@ -32,6 +32,7 @@ const isoToFlag = (country: string) =>
 
 const defaultValues: AffiliationFormValues = {
   name: '',
+  code: '',
   alt_names: [],
   street: '',
   postcode: '',
@@ -170,6 +171,11 @@ export default function AffiliationFormDialog({
       disabledUntilChange
     >
       <FinalInput name="name" label={Translate.string('Name')} required autoFocus />
+      <FinalInput
+        name="code"
+        label={Translate.string('Code')}
+        placeholder={Translate.string('Enter a short identifier for the affiliation')}
+      />
       <FinalStringListField
         name="alt_names"
         label={Translate.string('Alternative names')}

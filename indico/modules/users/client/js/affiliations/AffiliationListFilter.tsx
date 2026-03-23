@@ -83,6 +83,7 @@ export default function AffiliationListFilter({
         });
         const searchableFields = [
           affiliation.name,
+          affiliation.code,
           ...affiliation.alt_names,
           affiliation.street,
           affiliation.postcode,

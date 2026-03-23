@@ -31,6 +31,11 @@ class Affiliation(db.Model):
         nullable=False,
         index=True
     )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default='',
+    )
     alt_names = db.Column(
         ARRAY(db.String),
         nullable=False,
@@ -72,9 +77,7 @@ class Affiliation(db.Model):
     #: against it lets you do a substring search, and searching for ``|||foo|||`` lets you do an
     #: exact match.
     searchable_names = column_property(
-        db.func.indico.text_array_to_string(array(['']) +
-                                            db.func.indico.text_array_append(alt_names, name) +
-                                            array(['']), '|||'),
+        db.func.indico.text_array_to_string(array(['']) + alt_names + array([name, code, '']), '|||'),
         deferred=True,
     )
 

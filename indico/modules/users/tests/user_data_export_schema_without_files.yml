@@ -119,6 +119,7 @@ personal_data:
   affiliation: CERN
   affiliation_link:
     city: ''
+    code: ''
     country_code: ''
     country_name: ''
     id: <id>

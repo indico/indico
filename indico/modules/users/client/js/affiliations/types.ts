@@ -7,6 +7,7 @@
 
 interface AffiliationBase {
   name: string;
+  code: string;
   alt_names: string[];
   street: string;
   postcode: string;

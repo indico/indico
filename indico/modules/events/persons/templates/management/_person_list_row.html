@@ -46,7 +46,7 @@
         {{ person.email }}
     </td>
     <td class="i-table affiliation-column">
-        {{ render_affiliation(person) }}
+        {{ render_affiliation(person, compact=true) }}
     </td>
     <td class="i-table roles-column">
         {% for role, role_data in person_data.roles.items() %}
