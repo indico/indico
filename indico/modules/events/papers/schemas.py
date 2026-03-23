@@ -37,8 +37,8 @@ class CallForPapersSchema(mm.Schema):
     layout_review_questions = Nested('PaperReviewQuestionSchema', many=True)
     content_review_questions = Nested('PaperReviewQuestionSchema', many=True)
     rating_range = List(Integer())
-    enforce_evaluation_rounds = Boolean()
-    evaluation_rounds = Integer()
+    limit_review_cycles = Boolean()
+    max_review_cycles = Integer()
 
 
 class PaperEventSchema(mm.SQLAlchemyAutoSchema):
