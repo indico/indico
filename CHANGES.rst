@@ -21,6 +21,8 @@ Bugfixes
 - Fix selecting existing paper files when submitting an editable (:pr:`7381`)
 - Use symlink mtime instead of target mtime when cleaning up old temp/cache files
   (:pr:`7388`)
+- Fix fully conditional registration form sections not showing up correctly in
+  Safari (:issue:`7393`, :pr:`7398`)
 
 Accessibility
 ^^^^^^^^^^^^^

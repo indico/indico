@@ -9,7 +9,7 @@ import privacyNoticeURL from 'indico-url:events.display_privacy';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Message} from 'semantic-ui-react';
@@ -154,6 +154,20 @@ export default function RegistrationFormSubmission() {
   const hiddenItemHTMLNames = useSelector(getHiddenItemHTMLNames);
   const hiddenItemsInitialized = useSelector(getHiddenItemsInitialized);
 
+  // This is an absolutely awful hack for the fact that Safari doesn't correctly handle
+  // dynamic changes to elements using the :empty pseudo-class; see this issue for details:
+  // https://github.com/indico/indico/issues/7393
+  const formRef = React.useRef(null);
+  useEffect(() => {
+    if (window.safari !== undefined && formRef.current) {
+      const elems = formRef.current.querySelectorAll('.regform-section');
+      elems.forEach(elem => {
+        elem.style.display = 'initial';
+        elem.style.display = '';
+      });
+    }
+  });
+
   const onSubmit = async (data, form) => {
     // There is no need to store whether the user accepted the privacy policy
     // as it is not possible to submit the form without accepting it.
@@ -184,7 +198,7 @@ export default function RegistrationFormSubmission() {
       decorators={getPluginObjects('regformFormDecorators')}
     >
       {fprops => (
-        <form onSubmit={fprops.handleSubmit}>
+        <form onSubmit={fprops.handleSubmit} ref={formRef}>
           <ConditionalFieldsController />
           {hiddenItemsInitialized && (
             // avoid rendering the form until the conditional fields controller had the chance
