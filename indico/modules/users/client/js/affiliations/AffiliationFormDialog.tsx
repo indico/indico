@@ -171,16 +171,18 @@ export default function AffiliationFormDialog({
       disabledUntilChange
     >
       <FinalInput name="name" label={Translate.string('Name')} required autoFocus />
-      <FinalInput
-        name="code"
-        label={Translate.string('Code')}
-        placeholder={Translate.string('Enter a short identifier for the affiliation')}
-      />
-      <FinalStringListField
-        name="alt_names"
-        label={Translate.string('Alternative names')}
-        placeholder={Translate.string('Type a name and press Enter to add')}
-      />
+      <Form.Group widths="equal">
+        <FinalInput
+          name="code"
+          label={Translate.string('Short name')}
+          placeholder={Translate.string('Enter a short identifier for the affiliation')}
+        />
+        <FinalStringListField
+          name="alt_names"
+          label={Translate.string('Alternative names')}
+          placeholder={Translate.string('Type a name and press Enter to add')}
+        />
+      </Form.Group>
       <Accordion
         exclusive={false}
         panels={formSections}
