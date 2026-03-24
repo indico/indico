@@ -32,7 +32,7 @@ and you need to run the SELinux setup step once again; see the relevant docs for
 :ref:`nginx-based setup <rpm-nginx-selinux>` and an :ref:`Apache-based setup <rpm-apache-selinux>`.
 
 Afterwards, follow the :ref:`PDF generation guide <latex>` to install Podman and
-configure Indico to use it.
+configure Indico to use it then clear your cache and tmp files with `indico cleanup --cache --temp`.
 
 You can then remove the system-level TeXLive installation, either by deleting ``/opt/texlive``
 or by using your package manager to uninstall it.
