@@ -71,6 +71,8 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
 def _sidemenu_items(sender, user, **kwargs):
+    if not user.can_be_modified(session.user):
+        return
     yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100, disabled=user.is_system)
     yield SideMenuItem('personal_data', _('Personal data'), url_for('users.user_profile'), 90)
     yield SideMenuItem('profile_picture', _('Profile picture'), url_for('users.user_profile_picture_page'), 80,

@@ -60,5 +60,7 @@ def _extend_admin_menu(sender, **kwargs):
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
-def _extend_profile_sidemenu(sender, **kwargs):
+def _extend_profile_sidemenu(sender, user, **kwargs):
+    if not user.can_be_modified(session.user):
+        return
     yield SideMenuItem('api', _('HTTP API'), url_for('api.user_profile'), 30)

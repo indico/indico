@@ -113,6 +113,8 @@ def login_user(user, identity=None, admin_impersonation=False):
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
 def _extend_profile_sidemenu(sender, user, **kwargs):
+    if not user.can_be_modified(session.user):
+        return
     yield SideMenuItem('accounts', _('Accounts'), url_for('auth.accounts'), 50, disabled=user.is_system)
 
 
