@@ -43,9 +43,15 @@ div.timetableFullScreenHeader {
   color: #202020;
   box-shadow: 0 0 5px #ddd;
   min-height: 26px;
+}
+
+button.entry-content {
   padding: 0;
   font: inherit;
   text-align: left;
+  background: transparent;
+  border: none;
+  cursor: inherit;
 }
 
 .timetableBlockPileEffect {
@@ -131,7 +137,7 @@ div.timetableContribution {
   opacity: 0.5;
 }
 
-div.entry-content {
+.entry-content {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
