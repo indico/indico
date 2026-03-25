@@ -75,13 +75,15 @@ class RHEventLogs(RHManageEventBase):
                                            logs_api_url=url_for('.api_event_logs', self.event))
 
 
-class RHUserLogs(RHUserBase):
-    """Show the modification/action log for the user."""
-
+class RHUserLogsBase(RHUserBase):
     def _check_access(self):
         RHUserBase._check_access(self)
         if not session.user.is_admin:
             raise Forbidden
+
+
+class RHUserLogs(RHUserLogsBase):
+    """Show the modification/action log for the user."""
 
     def _process(self):
         metadata_query = _get_metadata_query()
@@ -180,7 +182,7 @@ class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
         return self.event.tzinfo
 
 
-class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
+class RHUserLogsJSON(LogsAPIMixin, RHUserLogsBase):
     model = UserLogEntry
     realm_enum = UserLogRealm
 

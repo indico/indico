@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Correctly restrict user access to their logs (:pr:`7404`)
 
 Accessibility
 ^^^^^^^^^^^^^
