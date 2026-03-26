@@ -46,7 +46,7 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.13.4
+coverage[toml]==7.13.4
     # via pytest-cov
 docker==7.1.0
     # via -r requirements.dev.in
@@ -122,7 +122,7 @@ port-for==1.0.0
     # via pytest-redis
 psutil==7.2.2
     # via mirakuru
-psycopg==3.3.3
+psycopg[pool]==3.3.3
     # via results
 psycopg-pool==3.3.0
     # via psycopg
@@ -143,7 +143,7 @@ pytest==9.0.2
     #   pytest-snapshot
 pytest-cov==7.0.0
     # via -r requirements.dev.in
-pytest-localserver==0.10.0
+pytest-localserver[smtp]==0.10.0
     # via -r requirements.dev.in
 pytest-mock==3.15.1
     # via -r requirements.dev.in
@@ -165,7 +165,7 @@ redis==6.4.0
     # via
     #   -c requirements.txt
     #   pytest-redis
-requests==2.32.5
+requests==2.33.0
     # via
     #   -c requirements.txt
     #   docker
