@@ -16,6 +16,7 @@ from reportlab.platypus import Table, TableStyle
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.legacy.pdfinterface.base import Paragraph, PDFBase
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -141,10 +142,13 @@ def get_events_with_linked_sessions(user, dt=None):
 def _query_sessions_for_user(event, user):
     return (Session.query.with_parent(event)
             .filter(Session.acl_entries.any(db.and_(SessionPrincipal.has_management_permission('coordinate'),
+                                                    SessionPrincipal.type == PrincipalType.user,
                                                     SessionPrincipal.user == user))))
 
 
 def get_sessions_for_user(event, user):
+    if user is None:
+        return []
     return (_query_sessions_for_user(event, user)
             .options(joinedload('acl_entries'))
             .order_by(db.func.lower(Session.title))
@@ -152,7 +156,7 @@ def get_sessions_for_user(event, user):
 
 
 def has_sessions_for_user(event, user):
-    return _query_sessions_for_user(event, user).has_rows()
+    return user is not None and _query_sessions_for_user(event, user).has_rows()
 
 
 def generate_session_pdf_timetable(sess):

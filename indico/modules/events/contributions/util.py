@@ -16,6 +16,7 @@ from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.abstracts.settings import BOASortField
@@ -210,11 +211,14 @@ def contribution_type_row(contrib_type):
 def _query_contributions_with_user_as_submitter(event, user):
     return (Contribution.query.with_parent(event)
             .filter(Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_permission('submit'),
+                                                         ContributionPrincipal.type == PrincipalType.user,
                                                          ContributionPrincipal.user == user))))
 
 
 def get_contributions_with_user_as_submitter(event, user):
     """Get a list of contributions in which the `user` has submission rights."""
+    if user is None:
+        return []
     return (_query_contributions_with_user_as_submitter(event, user)
             .options(joinedload('acl_entries'))
             .order_by(db.func.lower(Contribution.title))
@@ -222,7 +226,7 @@ def get_contributions_with_user_as_submitter(event, user):
 
 
 def has_contributions_with_user_as_submitter(event, user):
-    return _query_contributions_with_user_as_submitter(event, user).has_rows()
+    return user is not None and _query_contributions_with_user_as_submitter(event, user).has_rows()
 
 
 def get_contributions_for_person(event, person, only_speakers=False):
@@ -252,6 +256,7 @@ def _query_contributions_for_user(event, user):
     """
     condition = db.or_(EventPerson.user == user,
                        Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_permission('submit'),
+                                                            ContributionPrincipal.type == PrincipalType.user,
                                                             ContributionPrincipal.user == user)))
     return (Contribution.query.with_parent(event)
             .outerjoin(ContributionPersonLink)  # outer join in case there is a contribution with
@@ -261,11 +266,13 @@ def _query_contributions_for_user(event, user):
 
 def user_has_contributions(event, user):
     """Return True if a user has any contributions in the given event."""
-    return _query_contributions_for_user(event, user).has_rows()
+    return user is not None and _query_contributions_for_user(event, user).has_rows()
 
 
 def get_contributions_for_user(event, user):
     """Get all contributions for a user in the given event."""
+    if user is None:
+        return []
     return _query_contributions_for_user(event, user).all()
 
 
