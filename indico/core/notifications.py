@@ -244,7 +244,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
     bcc_list = {bcc_list} if isinstance(bcc_list, str) and bcc_list else (bcc_list or set())
     reply_address = {reply_address} if (isinstance(reply_address, str) and reply_address) else (reply_address or set())
     from_address, reply_address = get_actual_sender_address(sender_address, reply_address)
-    if config.MAX_EMAIL_ATTACHMENT_SIZE is not None and (attachments := attachments or []):
+    if config.MAX_EMAIL_ATTACHMENT_SIZE is not None and attachments:
         total = sum(_attachment_size(a) for a in attachments)
         if total > config.MAX_EMAIL_ATTACHMENT_SIZE * 1024 * 1024:
             raise ValueError(config.MAX_EMAIL_ATTACHMENT_SIZE)
