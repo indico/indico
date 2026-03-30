@@ -1,0 +1,6 @@
+{
+  "name": "affiliations",
+  "partials": {
+    "dashboard": "./index.tsx"
+  }
+}
