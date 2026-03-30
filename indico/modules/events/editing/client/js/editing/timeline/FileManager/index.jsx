@@ -341,7 +341,7 @@ export default function FileManager({
     maxTotalSize !== null && totalSize > maxTotalSize * 1024 * 1024
       ? Translate.string('Total attachment size ({current} MB) exceeds the {limit} MB limit', {
           current: (totalSize / 1024 / 1024).toFixed(1),
-          limit: Math.round(maxTotalSize),
+          limit: maxTotalSize % 1 === 0 ? maxTotalSize : maxTotalSize.toFixed(1),
         })
       : null;
   return (
