@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import countriesURL from 'indico-url:users.api_countries';
+import countriesURL from 'indico-url:affiliations.api_countries';
 
 import type {FormApi} from 'final-form';
 import React, {useCallback} from 'react';
