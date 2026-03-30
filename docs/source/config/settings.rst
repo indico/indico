@@ -586,7 +586,7 @@ Emails
     The maximum total size of attachments (in MB) that can be included when
     sending emails from Indico's email dialogs (e.g. emailing event participants).
 
-    If not set, it takes its default value of 10 MB, which is a reasonable size for most SMTPs.
+    If set to ``None``, there is no size limit on email attachments.
 
     Example: ``15`` for a 15 MB limit.
 
