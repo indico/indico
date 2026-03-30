@@ -420,6 +420,7 @@ export function FinalFileManager({
   uploadURL,
   uploadExistingURL = null,
   fileTypes: _fileTypes = [],
+  contributionCode = null,
   files = [],
   mustChange = false,
   uploadableFiles = [],
@@ -429,7 +430,14 @@ export function FinalFileManager({
   // When fileTypes is empty, there are no file type restrictions — any files can be uploaded.
   // The file type below is used to drive the existing logic to this purpose.
   const fileTypes = _fileTypes.length
-    ? _fileTypes
+    ? _fileTypes.map(fileType =>
+        fileType.filenameTemplate && contributionCode !== null && contributionCode !== undefined
+          ? {
+              ...fileType,
+              filenameTemplate: fileType.filenameTemplate.replace('{code}', contributionCode),
+            }
+          : fileType
+      )
     : [{name: '', extensions: [], allowMultipleFiles: true, filenameTemplate: null, id: -1}];
 
   // We do not use FinalField here since the file manager is more "standalone"
@@ -460,6 +468,7 @@ FinalFileManager.propTypes = {
   uploadURL: PropTypes.string.isRequired,
   uploadExistingURL: PropTypes.string,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)),
+  contributionCode: PropTypes.string,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   mustChange: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),

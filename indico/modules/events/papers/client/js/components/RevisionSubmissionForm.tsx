@@ -31,12 +31,14 @@ import './RevisionSubmissionForm.module.scss';
 interface RevisionSubmissionFormProps {
   eventId: number;
   contributionId: number;
+  contributionCode: string;
   children?: React.ReactNode;
 }
 
 export default function RevisionSubmissionForm({
   eventId,
   contributionId,
+  contributionCode,
   children,
 }: RevisionSubmissionFormProps) {
   const dispatch = useDispatch();
@@ -85,6 +87,7 @@ export default function RevisionSubmissionForm({
           <FinalFileManager
             name="files"
             fileTypes={fileTypes}
+            contributionCode={contributionCode}
             uploadURL={apiUploadURL({
               event_id: eventId,
               contrib_id: contributionId,
