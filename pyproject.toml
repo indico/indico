@@ -74,13 +74,13 @@ dependencies = ['babel==2.18.0']
 [tool.uv]
 # uv does not know about dynamic metadata so `pip install -e .` should always reinstall
 reinstall-package = ['indico']
-# let's reduce the risk of supply chain malware
-exclude-newer = '1 week'
 
 # whitelist packages over which the indico release manager has control to not be subject
 # to a cooldown. for any of these packages, we would be aware of unexpected releases, and
 # these are also packages where we are likely to want to use a newly released version
 # right away instead of waiting
+# XXX: the actual exclude-newer is set in compile-python-deps.py because we do not want it
+# to be applied when installing from our lock file
 [tool.uv.exclude-newer-package]
 flask-multipass = false
 flask-pluginengine = false
