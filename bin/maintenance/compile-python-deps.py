@@ -69,7 +69,8 @@ def _update_pyproject(pyproject_path: Path, context: str):
 @click.option('-U', '--upgrade', is_flag=True, help='Upgrade all packages')
 @click.option('-P', '--upgrade-package', 'upgrade_packages', multiple=True, help='Upgrade the specified packages')
 @click.option('-N', '--no-plugins', is_flag=True, help='Do not touch plugin pyproject.toml files')
-def main(upgrade, upgrade_packages, no_plugins):
+@click.option('--exclude-newer', default=None, help='Override the default (1-week) package cooldown period')
+def main(upgrade, upgrade_packages, no_plugins, exclude_newer):
     """Compiles/upgrades the transitive Python dependencies.
 
     This tool is a simple wrapper for `uv pip compile` that handles all the
@@ -82,6 +83,11 @@ def main(upgrade, upgrade_packages, no_plugins):
         '--custom-compile-command',
         './bin/maintenance/compile-python-deps.py',
     )
+    if exclude_newer:
+        if exclude_newer in ('0', 'off', 'false', 'none'):
+            # there's no nice way to disable the cooldown, so we just put 0 seconds...
+            exclude_newer = '0s'
+        args += ('--exclude-newer', exclude_newer)
     if upgrade:
         args += ('-U',)
     elif upgrade_packages:
