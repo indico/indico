@@ -12,7 +12,7 @@ Improvements
 
 - Include keywords in contribution CSV/Excel exports (:pr:`7421`)
 - Add new permission that grants only registration creation/editing permissions
-  (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
+  (:pr:`7419`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
