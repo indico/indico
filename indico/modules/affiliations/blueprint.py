@@ -6,7 +6,8 @@
 # LICENSE file for more details.
 
 from indico.modules.affiliations.controllers import (RHAffiliationAPI, RHAffiliationsAPI, RHAffiliationsDashboard,
-                                                     RHCountries, RHSearchAffiliations)
+                                                     RHAffiliationsMapping, RHAffiliationsMappingAPI, RHCountries,
+                                                     RHSearchAffiliations)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -15,7 +16,10 @@ _bp = IndicoBlueprint('affiliations', __name__, template_folder='templates', vir
 
 # Affiliations
 _bp.add_url_rule('!/admin/affiliations', 'dashboard', RHAffiliationsDashboard)
+_bp.add_url_rule('!/admin/affiliations/mapping', 'mapping', RHAffiliationsMapping)
 _bp.add_url_rule('!/api/admin/affiliations', 'api_admin_affiliations', RHAffiliationsAPI, methods=('GET', 'POST'))
+_bp.add_url_rule('!/api/admin/affiliations/mapping', 'api_admin_affiliations_mapping', RHAffiliationsMappingAPI,
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('!/api/admin/affiliations/<int:affiliation_id>', 'api_admin_affiliation', RHAffiliationAPI,
                  methods=('GET', 'PATCH', 'DELETE'))
 _bp.add_url_rule('!/api/countries', 'api_countries', RHCountries)

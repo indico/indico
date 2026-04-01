@@ -18,5 +18,5 @@ def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
         yield SideMenuItem('affiliations_list', _('List'), url_for('affiliations.dashboard'), 1,
                            section='affiliations')
-        yield SideMenuItem('affiliations_corr', _('Correspondence'), url_for('affiliations.dashboard'),
+        yield SideMenuItem('affiliations_mapping', _('Mapping'), url_for('affiliations.mapping'),
                            section='affiliations')

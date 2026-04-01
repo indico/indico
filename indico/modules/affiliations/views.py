@@ -8,6 +8,6 @@
 from indico.modules.admin.views import WPAdmin
 
 
-class WPAffiliationsDashboard(WPAdmin):
+class WPAffiliations(WPAdmin):
     template_prefix = 'affiliations/'
-    bundles = ('module_affiliations.dashboard.js', 'module_affiliations.dashboard.css')
+    bundles = ('module_affiliations.js', 'module_affiliations.css')

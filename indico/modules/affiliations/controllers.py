@@ -13,8 +13,11 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.searchable import fts_matches
 from indico.modules.admin.controllers.base import RHAdminBase
+from indico.modules.affiliations.matching import (get_affiliation_mappings, get_affiliation_mappings_date,
+                                                  get_affiliation_matches_from_mapping)
 from indico.modules.affiliations.schemas import AffiliationArgs
-from indico.modules.affiliations.views import WPAffiliationsDashboard
+from indico.modules.affiliations.tasks import generate_affiliation_matches
+from indico.modules.affiliations.views import WPAffiliations
 from indico.modules.logs.models.entries import AppLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.models.affiliations import Affiliation
@@ -72,7 +75,14 @@ class RHAffiliationsDashboard(RHAdminBase):
     """Entry point for the Affiliations admin dashboard."""
 
     def _process(self):
-        return WPAffiliationsDashboard.render_template('affiliations_dashboard.html', 'affiliations')
+        return WPAffiliations.render_template('affiliations_dashboard.html', 'affiliations')
+
+
+class RHAffiliationsMapping(RHAdminBase):
+    """Entry point for the Affiliations Mapping admin panel."""
+
+    def _process(self):
+        return WPAffiliations.render_template('affiliations_mapping.html', 'affiliations')
 
 
 class RHAffiliationsAPI(RHAdminBase):
@@ -140,6 +150,28 @@ class RHAffiliationAPI(RHAdminBase):
                              f'Affiliation "{self.affiliation.name}" deleted', session.user)
         search_affiliations.bump_version()
         return '', 204
+
+
+class RHAffiliationsMappingAPI(RHAdminBase):
+    def _process(self):
+        mapping = get_affiliation_mappings()
+        if mapping is None:
+            task = generate_affiliation_matches.delay()
+            return jsonify(task=task.id)
+
+        matches = get_affiliation_matches_from_mapping(mapping)
+
+        return jsonify({
+            'date': get_affiliation_mappings_date(),
+            'mapping': [{
+                'original_text': match_result.original_text,
+                'match_text': match_result.match_text,
+                'score': match_result.score,
+                'original_id': match_result.original_id,
+                'original_entity_type': match_result.original_entity_type,
+                'affiliation_id': match_result.affiliation_id,
+            } for match_result in matches],
+        })
 
 
 class RHCountries(RHAdminBase):
