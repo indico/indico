@@ -132,6 +132,7 @@ def generate_spreadsheet_from_contributions(contributions):
     """
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
+    has_keywords = any(c.keywords for c in contributions)
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters',
                'Presenters (affiliation)', 'Presenters (email)', 'Materials', 'Program Code']
     if has_authors:
@@ -139,6 +140,8 @@ def generate_spreadsheet_from_contributions(contributions):
                     'Co-Authors', 'Co-Authors (affiliation)', 'Co-Authors (email)']
     if has_board_number:
         headers.append('Board number')
+    if has_keywords:
+        headers.append('Keywords')
     rows = []
     for c in sort_contribs(contributions, sort_by='friendly_id'):
         contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
@@ -163,6 +166,8 @@ def generate_spreadsheet_from_contributions(contributions):
             })
         if has_board_number:
             contrib_data['Board number'] = c.board_number
+        if has_keywords:
+            contrib_data['Keywords'] = ', '.join(c.keywords)
 
         attached_items = get_attached_items(c, preload_event=(len(contributions) > 10))
         attachments = [att.absolute_download_url for att in attached_items.get('files', [])]
