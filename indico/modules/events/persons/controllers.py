@@ -365,7 +365,7 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
                     email = make_email(to_list=recipient.email, bcc_list=bcc, sender_address=sender_address,
                                        template=tpl, html=True, attachments=email_attachments)
                 except ValueError as e:
-                    abort(422, messages={'attachments': [_('Total attachment size exceeds the %s MB limit') % e]})
+                    abort(422, messages={'attachments': [str(e)]})
             send_email(email, self.event, 'Event Persons')
         return jsonify(count=len(self.recipients))
 
