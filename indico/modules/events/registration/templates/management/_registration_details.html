@@ -5,7 +5,6 @@
     {% set can_manage_registration = registration.event.can_manage(session.user, permission='registration') %}
     {% set can_moderate = registration.event.can_manage(session.user, permission='registration_moderation') %}
     {% set can_checkin = registration.event.can_manage(session.user, permission='registration_checkin') %}
-    {% set can_edit = registration.event.can_manage(session.user, permission='registration_edit') %}
     <div id="registration-details">
         {{ template_hook('before-registration-actions', registration=registration) }}
         <div class="action-box">
@@ -44,7 +43,7 @@
             </div>
         {% endif %}
         {% block render_view_logs scoped %}
-            {% if can_manage_registration or can_edit %}
+            {% if can_manage_registration %}
                 {{ _render_view_logs(registration) }}
             {% endif %}
         {% endblock %}

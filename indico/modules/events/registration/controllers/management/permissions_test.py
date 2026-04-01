@@ -10,20 +10,19 @@ import pytest
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration import _registration_permissions
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.controllers.management.regforms import (RHManageRegistrationForms,
-                                                                                RHManageParticipants,
+from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
+                                                                                RHManageRegistrationForms,
+                                                                                RHRegistrationFormClose,
                                                                                 RHRegistrationFormCreate,
                                                                                 RHRegistrationFormEdit,
                                                                                 RHRegistrationFormManage,
                                                                                 RHRegistrationFormOpen,
-                                                                                RHRegistrationFormClose,
                                                                                 RHRegistrationFormSchedule)
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCheckIn,
                                                                                 RHRegistrationCreate,
                                                                                 RHRegistrationCreateMultiple,
                                                                                 RHRegistrationDetails,
-                                                                                RHRegistrationEdit,
-                                                                                RHRegistrationHide,
+                                                                                RHRegistrationEdit, RHRegistrationHide,
                                                                                 RHRegistrationsApprove,
                                                                                 RHRegistrationsListCustomize,
                                                                                 RHRegistrationsListManage,
