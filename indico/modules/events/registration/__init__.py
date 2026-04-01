@@ -40,7 +40,7 @@ registration_settings = RegistrationSettingsProxy('registrations', {
     'participant_list_form_columns': {}
 })
 
-_registration_permissions = ('registration', 'registration_checkin', 'registration_moderation')
+_registration_permissions = ('registration', 'registration_checkin', 'registration_moderation', 'registration_edit')
 
 
 @signals.core.import_tasks.connect
@@ -226,6 +226,7 @@ def _get_management_permissions(sender, **kwargs):
     yield RegistrationPermission
     yield RegistrationModerationPermission
     yield RegistrationCheckinPermission
+    yield RegistrationEditPermission
 
 
 @signals.event_management.get_cloners.connect
@@ -264,6 +265,13 @@ class RegistrationCheckinPermission(ManagementPermission):
     name = 'registration_checkin'
     friendly_name = _('Registration (check-in only)')
     description = _('Grants access to view and check-in registrations.')
+    user_selectable = True
+
+
+class RegistrationEditPermission(ManagementPermission):
+    name = 'registration_edit'
+    friendly_name = _('Registration (create/edit only)')
+    description = _('Grants access to view, create and edit registrations.')
     user_selectable = True
 
 

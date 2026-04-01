@@ -34,6 +34,7 @@
     {% set can_manage_registration = event.can_manage(session.user, permission='registration') %}
     {% set can_moderate = event.can_manage(session.user, permission='registration_moderation') %}
     {% set can_checkin = event.can_manage(session.user, permission='registration_checkin') %}
+    {% set can_edit = event.can_manage(session.user, permission='registration_edit') %}
     <div class="list registrations">
         <div class="toolbars space-after">
             <div class="toolbar">
@@ -55,7 +56,7 @@
                         {% trans %}Customize list{% endtrans %}
                     </button>
                 </div>
-                {% if can_manage_registration %}
+                {% if can_manage_registration or can_edit %}
                     <div class="group hide-if-locked">
                         <button class="i-button arrow icon-plus" data-toggle="dropdown">
                             {% trans %}Register{% endtrans %}
@@ -83,12 +84,16 @@
                                 </a>
                             </li>
                         </ul>
-                        <button class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
-                           data-href="{{ url_for('.delete_registrations', regform) }}"
-                           data-method="POST">
-                            {%- trans %}Remove{% endtrans -%}
-                        </button>
+                        {% if can_manage_registration %}
+                            <button class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
+                               data-href="{{ url_for('.delete_registrations', regform) }}"
+                               data-method="POST">
+                                {%- trans %}Remove{% endtrans -%}
+                            </button>
+                        {% endif %}
                     </div>
+                {% endif %}
+                {% if can_manage_registration %}
                     <div class="group">
                         <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Export{% endtrans -%}

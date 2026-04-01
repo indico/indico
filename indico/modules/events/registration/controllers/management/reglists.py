@@ -99,7 +99,7 @@ def _render_registration_details(registration):
 class RHRegistrationsListManage(RHManageRegFormBase):
     """List all registrations of a specific registration form of an event."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
 
     def _process(self):
         if self.list_generator.static_link_used:
@@ -189,7 +189,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
     ALLOW_LOCKED = True
 
     def _process_GET(self):
@@ -210,7 +210,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 class RHRegistrationListStaticURL(RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
     ALLOW_LOCKED = True
 
     def _process(self):
@@ -220,7 +220,7 @@ class RHRegistrationListStaticURL(RHManageRegFormBase):
 class RHRegistrationDetails(RHManageRegistrationBase):
     """Display information about a registration."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
@@ -232,7 +232,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
     """Download a file attached to a registration."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
 
     normalize_url_spec = {
         'locators': {
@@ -256,6 +256,7 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
 class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
     """Edit the submitted information of a registration."""
 
+    PERMISSION = ('registration', 'registration_edit')
     view_class = WPManageRegistration
     template_file = 'management/registration_modify.html'
     management = True
@@ -397,6 +398,8 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
 class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)."""
 
+    PERMISSION = ('registration', 'registration_edit')
+
     @use_kwargs({
         'user': Principal(allow_external_users=True, load_default=None),
     }, location='query')
@@ -433,6 +436,8 @@ class RHRegistrationCreate(RHManageRegFormBase):
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
     """Create multiple registrations for Indico users (management area)."""
 
+    PERMISSION = ('registration', 'registration_edit')
+
     def _register_user(self, user, notify):
         # Fill only the personal data fields, custom fields are left empty.
         data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType}
@@ -457,6 +462,8 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 
 class RHRegistrationCheckEmail(CheckEmailMixin, RHManageRegFormBase):
     """Check how an email will affect the registration."""
+
+    PERMISSION = ('registration', 'registration_edit')
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
