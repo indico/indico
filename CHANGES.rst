@@ -21,7 +21,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Screen reader users can now navigate to the event page header as a banner
+  landmark (:pr:`7418`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

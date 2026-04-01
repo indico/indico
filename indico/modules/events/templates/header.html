@@ -188,7 +188,7 @@
 {{ render_impersonation(legacy=true) }}
 {{ render_announcements(legacy=true) }}
 
-<div class="page-header page-header-dark event-page-header">
+<header class="page-header page-header-dark event-page-header">
     <div class="main-action-bar flexrow f-j-space-between f-a-center">
         <div class="button-bar flexrow f-j-start">
             {% if event.type != 'conference' or show_nav_bar %}
@@ -256,7 +256,7 @@
 
     {# This div is used for inserting content under the header such as the filtering options for meetings #}
     <div id="pageSubHeader"></div>
-</div>
+</header>
 
 {% if event.type != 'conference' %}
     {%- include 'flashed_messages.html' -%}
