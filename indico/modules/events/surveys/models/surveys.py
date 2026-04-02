@@ -304,7 +304,7 @@ class Survey(db.Model):
         with self.event.force_event_locale():
             template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
             email = make_email(bcc_list=recipients, template=template_module)
-        send_email(email, event=self.event, module='Surveys')
+        send_email(email, obj=self.event, module='Surveys')
         logger.info('Sending start notification for survey %s', self)
         self.start_notification_sent = True
 
@@ -315,7 +315,7 @@ class Survey(db.Model):
             template_module = get_template_module('events/surveys/emails/new_submission_email.txt',
                                                   submission=submission)
             email = make_email(bcc_list=self.new_submission_emails, template=template_module)
-        send_email(email, event=self.event, module='Surveys')
+        send_email(email, obj=self.event, module='Surveys')
         logger.info('Sending submission notification for survey %s', self)
 
 
