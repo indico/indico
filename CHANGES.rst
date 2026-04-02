@@ -17,6 +17,7 @@ Bugfixes
 
 - Correctly restrict user access to their logs (:pr:`7404`)
 - Correctly restrict access to draft contribution list (:pr:`7408`)
+- Use new MS Outlook URL in the share widget (:pr:`7424`, thanks :user:`hirishh`)
 
 Accessibility
 ^^^^^^^^^^^^^

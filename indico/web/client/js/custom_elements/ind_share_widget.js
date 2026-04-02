@@ -75,7 +75,7 @@ function CalendarButtons({googleCalParams, outlookCalParams}) {
     {
       name: Translate.string('Outlook'),
       logo: `${Indico.Urls.ImagesBase}/outlook.svg`,
-      url: 'https://outlook.office.com/calendar/deeplink/compose?',
+      url: 'https://outlook.cloud.microsoft/calendar/deeplink/compose?',
       color: 'blue',
       params: outlookCalParams,
     },
