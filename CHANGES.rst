@@ -10,7 +10,8 @@ Version 3.3.13
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add support for **anonymous** accompanying with numeric count only in registration form
+  (:issue:`7383`)
 
 Bugfixes
 ^^^^^^^^

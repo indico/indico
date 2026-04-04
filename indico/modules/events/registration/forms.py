@@ -319,6 +319,7 @@ class TicketsForm(IndicoForm):
 
     def __init__(self, *args, event, regform, **kwargs):
         from indico.modules.designer.util import get_default_ticket_on_category, get_printable_event_templates
+        self.regform = regform
         super().__init__(*args, **kwargs)
         default_tpl = get_default_ticket_on_category(event.category)
         event_templates = get_printable_event_templates(regform)
@@ -332,6 +333,20 @@ class TicketsForm(IndicoForm):
             del self.ticket_google_wallet
         if not regform.is_apple_wallet_configured:
             del self.ticket_apple_wallet
+        if regform.has_anonymous_accompanying_persons_fields:
+            self.tickets_for_accompanying_persons.render_kw = {
+                **(self.tickets_for_accompanying_persons.render_kw or {}),
+                'disabled': True,
+            }
+            self.tickets_for_accompanying_persons.description = _(
+                'Create tickets for each of the users accompanying persons. This option is unavailable because '
+                'anonymous accompanying person registration is enabled.'
+            )
+
+    def validate_tickets_for_accompanying_persons(self, field):
+        if field.data and self.regform.has_anonymous_accompanying_persons_fields:
+            raise ValidationError(_('Tickets for accompanying persons cannot be enabled because the registration '
+                                    'form contains anonymous accompanying person registrations.'))
 
 
 class ParticipantsDisplayForm(IndicoForm):
