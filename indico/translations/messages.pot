@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.13-dev\n"
+"Project-Id-Version: Indico 3.3.12-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-04 20:26+0200\n"
+"POT-Creation-Date: 2026-03-18 16:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11985,18 +11985,6 @@ msgstr ""
 msgid "Default category template"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py
-msgid ""
-"Create tickets for each of the users accompanying persons. This option is unavailable because anonymous accompanying "
-"person registration is enabled."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid ""
-"Tickets for accompanying persons cannot be enabled because the registration form contains anonymous accompanying "
-"person registrations."
-msgstr ""
-
 #: indico/modules/events/registration/forms.py indico/modules/events/registration/templates/management/regform_list.html
 msgid "Registration managers"
 msgstr ""
@@ -12642,25 +12630,6 @@ msgstr ""
 #, python-brace-format
 msgid "Tag {} has been modified."
 msgstr ""
-
-#: indico/modules/events/registration/fields/accompanying.py
-msgid "Cannot be switched back to named mode when anonymous accompanying persons are registered."
-msgstr ""
-
-#: indico/modules/events/registration/fields/accompanying.py
-msgid "Anonymous accompanying persons cannot be enabled while tickets for accompanying persons are enabled."
-msgstr ""
-
-#: indico/modules/events/registration/fields/accompanying.py
-msgid "Cannot be enabled when accompanying persons are registered."
-msgstr ""
-
-#: indico/modules/events/registration/fields/accompanying.py indico/modules/events/roles/templates/_roles.html
-#, python-format
-msgid "1 person"
-msgid_plural "%(count)s people"
-msgstr[0] ""
-msgstr[1] ""
 
 #: indico/modules/events/registration/fields/accompanying.py indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
@@ -15022,6 +14991,13 @@ msgstr ""
 #: indico/modules/events/roles/templates/_roles.html
 msgid "There are no roles defined yet."
 msgstr ""
+
+#: indico/modules/events/roles/templates/_roles.html
+#, python-format
+msgid "1 person"
+msgid_plural "%(count)s people"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/roles/templates/_roles.html
 msgid "Edit role"

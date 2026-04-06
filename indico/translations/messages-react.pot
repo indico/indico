@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-04-26 20:26+0200\n"
+"POT-Creation-Date: 2026-03-26 16:20+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -2714,14 +2714,6 @@ msgid "You need to have at least one enabled option."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid "Number of accompanying persons"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid "{price} (Total: {totalPrice})"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
 msgstr ""
 
@@ -2742,12 +2734,6 @@ msgid "Edit accompanying person"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid ""
-"Disable tickets for accompanying persons to enable anonymous accompanying "
-"person registration."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
 msgstr ""
 
@@ -2760,20 +2746,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Accompanying persons count against registration limit"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid "Anonymous accompanying persons"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid "Collect only the number of accompanying persons instead of their names."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
-msgid ""
-"Tickets and badge printing are not available for anonymous accompanying "
-"persons."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
