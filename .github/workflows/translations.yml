@@ -47,7 +47,7 @@ jobs:
         run: ./bin/maintenance/update_moment_locales.py
       - name: Build wheel 🏗
         run: ./bin/maintenance/build-wheel.py indico --add-version-suffix --ignore-unclean
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         name: Upload build artifacts 📦
         with:
           name: indico-translation-wheel
