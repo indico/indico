@@ -116,19 +116,16 @@ def test_modifying_registration_field_untouched(db, dummy_event, dummy_regform, 
     validator(data)
 
 
-@pytest.mark.parametrize(
-    ('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'),
-    (
-        (0, False, None, None),
-        (5, False, None, 5),
-        (0, True, None, None),
-        (10, True, None, 10),
-        (10, True, 5, 4),
-        (10, True, 15, 10),
-        (0, False, 1, None),
-        (5, False, 1, 5),
-    ),
-)
+@pytest.mark.parametrize(('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'), (
+    (0, False, None, None),
+    (5, False, None, 5),
+    (0, True, None, None),
+    (10, True, None, 10),
+    (10, True, 5, 4),
+    (10, True, 15, 10),
+    (0, False, 1, None),
+    (5, False, 1, 5),
+))
 @pytest.mark.parametrize(('old_num_persons', 'new_num_persons'), (
     # Same or lower count
     (0, 0), (1, 1), (1, 0),
