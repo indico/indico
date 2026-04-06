@@ -985,9 +985,7 @@ def _mapper_configured():
                             RegistrationFormFieldData.field_id == RegistrationFormItem.id,
                             RegistrationFormItem.input_type == 'accompanying_persons',
                             ~RegistrationFormItem.is_deleted,
-                            db.cast(RegistrationFormItem.data['persons_count_against_limit'].astext, db.Boolean),
-                 )
-             )
+                            db.cast(RegistrationFormItem.data['persons_count_against_limit'].astext, db.Boolean)))
              .correlate_except(RegistrationData)
              .scalar_subquery())
     Registration.occupied_slots = column_property(query, deferred=True)
