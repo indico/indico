@@ -32,29 +32,20 @@ def create_registration_for_user(db, dummy_regform, create_user, create_registra
 
 def _assert_occupied_slots(registration, count):
     assert registration.occupied_slots == count
-    assert (
-        Registration.query.with_parent(registration.registration_form)
-        .filter(Registration.occupied_slots == count)
-        .count()
-        == 1
-    )
+    assert (Registration.query.with_parent(registration.registration_form)
+            .filter(Registration.occupied_slots == count)
+            .count() == 1)
 
 
 def _assert_registration_count(regform, count):
     assert regform.active_registration_count == count
-    assert (
-        RegistrationForm.query.with_parent(regform.event)
-        .filter(RegistrationForm.active_registration_count == count)
-        .count()
-        == 1
-    )
+    assert (RegistrationForm.query.with_parent(regform.event)
+            .filter(RegistrationForm.active_registration_count == count)
+            .count() == 1)
     assert regform.existing_registrations_count == count
-    assert (
-        RegistrationForm.query.with_parent(regform.event)
-        .filter(RegistrationForm.existing_registrations_count == count)
-        .count()
-        == 1
-    )
+    assert (RegistrationForm.query.with_parent(regform.event)
+            .filter(RegistrationForm.existing_registrations_count == count)
+            .count() == 1)
 
 
 def _anonymous_value(count):
@@ -102,32 +93,21 @@ def test_new_registration(
         validator(create_accompanying_persons(10))
 
 
-@pytest.mark.parametrize(
-    ('max_persons', 'persons_count_against_limit', 'registration_limit'),
-    (
-        (0, False, None),
-        (5, False, None),
-        (0, True, None),
-        (10, True, None),
-        (10, True, 5),
-        (10, True, 15),
-        (0, False, 1),
-        (5, False, 1),
-    ),
-)
+@pytest.mark.parametrize(('max_persons', 'persons_count_against_limit', 'registration_limit'), (
+    (0, False, None),
+    (5, False, None),
+    (0, True, None),
+    (10, True, None),
+    (10, True, 5),
+    (10, True, 15),
+    (0, False, 1),
+    (5, False, 1),
+))
 @pytest.mark.parametrize('num_persons', (0, 1, 5, 10, 15, 20))
 @pytest.mark.usefixtures('dummy_reg')
-def test_modifying_registration_field_untouched(
-    db,
-    dummy_event,
-    dummy_regform,
-    create_accompanying_persons_field,
-    create_accompanying_persons,
-    max_persons,
-    persons_count_against_limit,
-    registration_limit,
-    num_persons,
-):
+def test_modifying_registration_field_untouched(db, dummy_event, dummy_regform, create_accompanying_persons_field,
+                                                create_accompanying_persons, max_persons, persons_count_against_limit,
+                                                registration_limit, num_persons):
     set_feature_enabled(dummy_event, 'registration', True)
 
     dummy_regform.registration_limit = registration_limit
@@ -160,60 +140,30 @@ def test_modifying_registration_field_untouched(
         (5, False, 1, 5),
     ),
 )
-@pytest.mark.parametrize(
-    ('old_num_persons', 'new_num_persons'),
-    (
-        # Same or lower count
-        (0, 0),
-        (1, 1),
-        (1, 0),
-        (5, 5),
-        (5, 3),
-        (10, 10),
-        (10, 9),
-        (15, 15),
-        (15, 14),
-        (15, 9),
-        (20, 20),
-        (20, 19),
-        (20, 14),
-        (20, 9),
-        # Higher count
-        (0, 4),
-        (0, 5),
-        (0, 6),
-        (1, 4),
-        (1, 5),
-        (1, 11),
-        (5, 6),
-        (5, 10),
-        (5, 11),
-        (10, 11),
-        (10, 15),
-        (20, 21),
-    ),
-)
+@pytest.mark.parametrize(('old_num_persons', 'new_num_persons'), (
+    # Same or lower count
+    (0, 0), (1, 1), (1, 0),
+    (5, 5), (5, 3),
+    (10, 10), (10, 9),
+    (15, 15), (15, 14), (15, 9),
+    (20, 20), (20, 19), (20, 14), (20, 9),
+    # Higher count
+    (0, 4), (0, 5), (0, 6),
+    (1, 4), (1, 5), (1, 11),
+    (5, 6), (5, 10), (5, 11),
+    (10, 11), (10, 15), (20, 21),
+))
 @pytest.mark.usefixtures('dummy_reg')
-def test_modifying_registration_field_changed(
-    dummy_event,
-    dummy_regform,
-    create_accompanying_persons_field,
-    create_accompanying_persons,
-    max_persons,
-    persons_count_against_limit,
-    registration_limit,
-    expected_limit,
-    old_num_persons,
-    new_num_persons,
-):
+def test_modifying_registration_field_changed(dummy_event, dummy_regform, create_accompanying_persons_field,
+                                              create_accompanying_persons, max_persons, persons_count_against_limit,
+                                              registration_limit, expected_limit, old_num_persons, new_num_persons):
     set_feature_enabled(dummy_event, 'registration', True)
 
     dummy_regform.registration_limit = registration_limit
     expected_occupied_slots = 1 + old_num_persons if persons_count_against_limit else 1
     reg = dummy_event.registrations.one()
-    field = create_accompanying_persons_field(
-        max_persons, persons_count_against_limit, registration=reg, num_persons=old_num_persons
-    )
+    field = create_accompanying_persons_field(max_persons, persons_count_against_limit,
+                                              registration=reg, num_persons=old_num_persons)
     validator = field.field_impl.get_validators(reg)
 
     _assert_occupied_slots(reg, expected_occupied_slots)
@@ -230,9 +180,8 @@ def test_modifying_registration_field_changed(
         validator(create_accompanying_persons(new_num_persons))
 
 
-def test_registration_count_multiple_fields(
-    dummy_regform, create_accompanying_persons_field, create_registration_for_user
-):
+def test_registration_count_multiple_fields(dummy_regform, create_accompanying_persons_field,
+                                            create_registration_for_user):
     assert not dummy_regform.limit_reached
     dummy_regform.registration_limit = 5
     assert not dummy_regform.limit_reached

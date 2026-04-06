@@ -54,7 +54,6 @@ class RegistrationState(RichIntEnum):
 def _get_next_friendly_id(context):
     """Get the next friendly id for a registration."""
     from indico.modules.events import Event
-
     event_id = context.current_parameters['event_id']
     assert event_id is not None
     return increment_and_get(Event._last_friendly_registration_id, Event.id == event_id)
@@ -79,7 +78,7 @@ registrations_tags_table = db.Table(
         nullable=False,
         index=True,
     ),
-    schema='event_registration',
+    schema='event_registration'
 )
 
 
@@ -101,46 +100,64 @@ class Registration(db.Model):
     """Somebody's registration for an event through a registration form."""
 
     __tablename__ = 'registrations'
-    __table_args__ = (
-        db.CheckConstraint('email = lower(email)', 'lowercase_email'),
-        db.Index(None, 'friendly_id', 'event_id', unique=True, postgresql_where=db.text('NOT is_deleted')),
-        db.Index(
-            None,
-            'registration_form_id',
-            'user_id',
-            unique=True,
-            postgresql_where=db.text('NOT is_deleted AND (state NOT IN (3, 4))'),
-        ),
-        db.Index(
-            None,
-            'registration_form_id',
-            'email',
-            unique=True,
-            postgresql_where=db.text('NOT is_deleted AND (state NOT IN (3, 4))'),
-        ),
-        db.ForeignKeyConstraint(
-            ['event_id', 'registration_form_id'], ['event_registration.forms.event_id', 'event_registration.forms.id']
-        ),
-        {'schema': 'event_registration'},
-    )
+    __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
+                      db.Index(None, 'friendly_id', 'event_id', unique=True,
+                               postgresql_where=db.text('NOT is_deleted')),
+                      db.Index(None, 'registration_form_id', 'user_id', unique=True,
+                               postgresql_where=db.text('NOT is_deleted AND (state NOT IN (3, 4))')),
+                      db.Index(None, 'registration_form_id', 'email', unique=True,
+                               postgresql_where=db.text('NOT is_deleted AND (state NOT IN (3, 4))')),
+                      db.ForeignKeyConstraint(['event_id', 'registration_form_id'],
+                                              ['event_registration.forms.event_id', 'event_registration.forms.id']),
+                      {'schema': 'event_registration'})
 
     #: The ID of the object
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
     #: The unguessable ID for the object
-    uuid = db.Column(UUID, index=True, unique=True, nullable=False, default=lambda: str(uuid4()))
+    uuid = db.Column(
+        UUID,
+        index=True,
+        unique=True,
+        nullable=False,
+        default=lambda: str(uuid4())
+    )
     #: The human-friendly ID for the object
-    friendly_id = db.Column(db.Integer, nullable=False, default=_get_next_friendly_id)
+    friendly_id = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_friendly_id
+    )
     #: The ID of the event
-    event_id = db.Column(db.Integer, db.ForeignKey('events.events.id'), index=True, nullable=False)
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
     #: The ID of the registration form
     registration_form_id = db.Column(
-        db.Integer, db.ForeignKey('event_registration.forms.id'), index=True, nullable=False
+        db.Integer,
+        db.ForeignKey('event_registration.forms.id'),
+        index=True,
+        nullable=False
     )
     #: The ID of the user who registered
-    user_id = db.Column(db.Integer, db.ForeignKey('users.users.id'), index=True, nullable=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
     #: The ID of the latest payment transaction associated with this registration
     transaction_id = db.Column(
-        db.Integer, db.ForeignKey('events.payment_transactions.id'), index=True, unique=True, nullable=True
+        db.Integer,
+        db.ForeignKey('events.payment_transactions.id'),
+        index=True,
+        unique=True,
+        nullable=True
     )
     #: The state a registration is in
     state = db.Column(
@@ -151,16 +168,19 @@ class Registration(db.Model):
     base_price = db.Column(
         db.Numeric(11, 2),  # max. 999999999.99
         nullable=False,
-        default=0,
+        default=0
     )
     #: The price modifier applied to the final calculated price
     price_adjustment = db.Column(
         db.Numeric(11, 2),  # max. 999999999.99
         nullable=False,
-        default=0,
+        default=0
     )
     #: Registration price currency
-    currency = db.Column(db.String, nullable=False)
+    currency = db.Column(
+        db.String,
+        nullable=False
+    )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(
         UTCDateTime,
@@ -168,20 +188,46 @@ class Registration(db.Model):
         default=now_utc,
     )
     #: The email of the registrant
-    email = db.Column(db.String, nullable=False)
+    email = db.Column(
+        db.String,
+        nullable=False
+    )
     #: The first name of the registrant
-    first_name = db.Column(db.String, nullable=False)
+    first_name = db.Column(
+        db.String,
+        nullable=False
+    )
     #: The last name of the registrant
-    last_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(
+        db.String,
+        nullable=False
+    )
     #: If the registration has been deleted
-    is_deleted = db.Column(db.Boolean, nullable=False, default=False)
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The unique token used in tickets
-    ticket_uuid = db.Column(UUID, index=True, unique=True, nullable=False, default=lambda: str(uuid4()))
+    ticket_uuid = db.Column(
+        UUID,
+        index=True,
+        unique=True,
+        nullable=False,
+        default=lambda: str(uuid4())
+    )
     #: Whether the person has checked in. Setting this also sets or clears
     #: `checked_in_dt`.
-    checked_in = db.Column(db.Boolean, nullable=False, default=False)
+    checked_in = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The date/time when the person has checked in
-    checked_in_dt = db.Column(UTCDateTime, nullable=True)
+    checked_in_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
     #: If given a reason for rejection
     rejection_reason = db.Column(
         db.String,
@@ -190,32 +236,63 @@ class Registration(db.Model):
     )
     #: Type of consent given to publish this registration
     consent_to_publish = db.Column(
-        PyIntEnum(RegistrationVisibility), nullable=False, default=RegistrationVisibility.nobody
+        PyIntEnum(RegistrationVisibility),
+        nullable=False,
+        default=RegistrationVisibility.nobody
     )
     #: Management-set override for visibility
-    participant_hidden = db.Column(db.Boolean, nullable=False, default=False)
+    participant_hidden = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether the registration was created by a manager
-    created_by_manager = db.Column(db.Boolean, nullable=False, default=False)
+    created_by_manager = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The date/time until which the person can modify their registration
-    modification_end_dt = db.Column(UTCDateTime, nullable=True)
+    modification_end_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: The Event containing this registration
-    event = db.relationship('Event', lazy=True, backref=db.backref('registrations', lazy='dynamic'))
+    event = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'registrations',
+            lazy='dynamic'
+        )
+    )
     # The user linked to this registration
     user = db.relationship(
         'User',
         lazy=True,
         backref=db.backref(
             'registrations',
-            lazy='dynamic',
+            lazy='dynamic'
             # XXX: a delete-orphan cascade here would delete registrations when NULLing the user
-        ),
+        )
     )
     #: The latest payment transaction associated with this registration
-    transaction = db.relationship('PaymentTransaction', lazy=True, foreign_keys=[transaction_id], post_update=True)
+    transaction = db.relationship(
+        'PaymentTransaction',
+        lazy=True,
+        foreign_keys=[transaction_id],
+        post_update=True
+    )
     #: The registration this data is associated with
     data = db.relationship(
-        'RegistrationData', lazy=True, cascade='all, delete-orphan', backref=db.backref('registration', lazy=True)
+        'RegistrationData',
+        lazy=True,
+        cascade='all, delete-orphan',
+        backref=db.backref(
+            'registration',
+            lazy=True
+        )
     )
     #: The registration tags assigned to this registration
     tags = db.relationship(
@@ -224,7 +301,10 @@ class Registration(db.Model):
         passive_deletes=True,
         collection_class=set,
         order_by='RegistrationTag.title',
-        backref=db.backref('registrations', lazy=True),
+        backref=db.backref(
+            'registrations',
+            lazy=True
+        )
     )
     #: The serial number assigned to the Apple Wallet pass
     apple_wallet_serial = db.Column(
@@ -244,13 +324,12 @@ class Registration(db.Model):
         """Retrieve all registrations in all registration forms of an event."""
         from indico.modules.events.registration.models.forms import RegistrationForm
 
-        return (
-            Registration.query.filter(
-                Registration.is_active, ~RegistrationForm.is_deleted, RegistrationForm.event_id == event.id
-            )
-            .join(Registration.registration_form)
-            .all()
-        )
+        return (Registration.query
+                .filter(Registration.is_active,
+                        ~RegistrationForm.is_deleted,
+                        RegistrationForm.event_id == event.id)
+                .join(Registration.registration_form)
+                .all())
 
     @classmethod
     def merge_users(cls, target, source):
@@ -263,10 +342,8 @@ class Registration(db.Model):
     def is_publishable(self, is_participant):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
-        if (
-            self.registration_form.publish_registrations_duration is not None
-            and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()
-        ):
+        if (self.registration_form.publish_registrations_duration is not None
+                and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()):
             return False
         if self.visibility == RegistrationVisibility.participants:
             return is_participant
@@ -287,20 +364,18 @@ class Registration(db.Model):
 
         consent_criterion = (
             cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
-            if is_participant
-            else cls.consent_to_publish == RegistrationVisibility.all
+            if is_participant else
+            cls.consent_to_publish == RegistrationVisibility.all
         )
         return db.and_(
             ~cls.participant_hidden,
             cls.is_state_publishable,
-            cls.registration_form.has(
-                db.or_(
-                    RegistrationForm.publish_registrations_duration.is_(None),
-                    cls.event.has((Event.end_dt + RegistrationForm.publish_registrations_duration) > now_utc()),
-                )
-            ),
+            cls.registration_form.has(db.or_(
+                RegistrationForm.publish_registrations_duration.is_(None),
+                cls.event.has((Event.end_dt + RegistrationForm.publish_registrations_duration) > now_utc())
+            )),
             ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
-            _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion,
+            _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
         )
 
     @hybrid_property
@@ -340,18 +415,13 @@ class Registration(db.Model):
         to the currently logged-in user.
         """
         loc = self.registration_form.locator
-        if (
-            not self.user
-            or not has_request_context()
-            or self.user != session.user
-            or request.args.get('token') == self.uuid
-        ):
+        if (not self.user or not has_request_context() or self.user != session.user or
+                request.args.get('token') == self.uuid):
             loc['token'] = self.uuid
         return loc
 
     def is_field_shown(self, field):
         from indico.modules.events.registration.util import is_conditional_field_shown
-
         return is_conditional_field_shown(field, self.data_by_field, is_db_data=True)
 
     @locator.uuid
@@ -372,7 +442,6 @@ class Registration(db.Model):
     @property
     def can_be_withdrawn(self):
         from indico.modules.events.registration.models.forms import ModificationMode
-
         if not self.is_active:
             return False
         elif self.is_paid:
@@ -490,9 +559,8 @@ class Registration(db.Model):
 
     @property
     def sections_with_answered_fields(self):
-        return [
-            x for x in self.registration_form.sections if any(child.id in self.data_by_field for child in x.children)
-        ]
+        return [x for x in self.registration_form.sections
+                if any(child.id in self.data_by_field for child in x.children)]
 
     @property
     def visibility_before_override(self):
@@ -518,17 +586,12 @@ class Registration(db.Model):
     @property
     def accompanying_persons(self):
         from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
-
-        query = (
-            RegistrationData.query.with_parent(self)
-            .join(RegistrationFormFieldData)
-            .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons'))
-        )
-        return list(
-            itertools.chain.from_iterable(
-                d.data or [] for d in query.all() if not d.field_data.field.is_deleted and isinstance(d.data, list)
-            )
-        )
+        query = (RegistrationData.query
+                 .with_parent(self)
+                 .join(RegistrationFormFieldData)
+                 .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
+        return list(itertools.chain.from_iterable((d.data or []) for d in query.all()
+                                                  if not d.field_data.field.is_deleted and isinstance(d.data, list)))
 
     @property
     def published_receipts(self):
@@ -540,9 +603,8 @@ class Registration(db.Model):
         return db.func.lower(cls.last_name), db.func.lower(cls.first_name), cls.friendly_id
 
     def __repr__(self):
-        return format_repr(
-            self, 'id', 'registration_form_id', 'email', 'state', user_id=None, is_deleted=False, _text=self.full_name
-        )
+        return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
+                           user_id=None, is_deleted=False, _text=self.full_name)
 
     def get_full_name(self, *, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
         """Return the user's name in the specified notation.
@@ -556,13 +618,9 @@ class Registration(db.Model):
         :param abbrev_first_name: if the first name should be abbreviated to
                                   use only the first character
         """
-        return format_full_name(
-            self.first_name,
-            self.last_name,
-            last_name_first=last_name_first,
-            last_name_upper=last_name_upper,
-            abbrev_first_name=abbrev_first_name,
-        )
+        return format_full_name(self.first_name, self.last_name,
+                                last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                abbrev_first_name=abbrev_first_name)
 
     def get_personal_data(self):
         # the personal data picture is not included in this method since it's rather
@@ -590,7 +648,6 @@ class Registration(db.Model):
         :param personal_data_only: If True, return only the main picture from personal data
         """
         from indico.modules.events.registration.util import process_registration_picture
-
         picture_attachements = []
         for data in self.data:
             if not data.field_data.field.is_active or data.field_data.field.input_type != 'picture':
@@ -626,9 +683,8 @@ class Registration(db.Model):
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
-        moderation_required = (
-            regform.moderation_enabled and not _skip_moderation and (not invitation or not invitation.skip_moderation)
-        )
+        moderation_required = (regform.moderation_enabled and not _skip_moderation and
+                               (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and self.price and not self.is_paid
         if self.state is None:
@@ -658,9 +714,8 @@ class Registration(db.Model):
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation
-        moderation_required = (
-            regform.moderation_enabled and not _skip_moderation and (not invitation or not invitation.skip_moderation)
-        )
+        moderation_required = (regform.moderation_enabled and not _skip_moderation and
+                               (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and bool(self.price)
         if self.state == RegistrationState.pending:
@@ -706,12 +761,8 @@ class Registration(db.Model):
     def reset_state(self):
         """Reset the state of the registration back to pending."""
         if self.has_conflict():
-            raise IndicoError(
-                _(
-                    'Cannot reset this registration since there is another valid registration for the '
-                    'same user or email.'
-                )
-            )
+            raise IndicoError(_('Cannot reset this registration since there is another valid registration for the '
+                                'same user or email.'))
         if self.state in (RegistrationState.complete, RegistrationState.unpaid):
             self.update_state(approved=False)
         elif self.state == RegistrationState.rejected:
@@ -733,16 +784,13 @@ class Registration(db.Model):
         conflict_criteria = [Registration.email == self.email]
         if self.user_id is not None:
             conflict_criteria.append(Registration.user_id == self.user_id)
-        return (
-            Registration.query.with_parent(self.registration_form)
-            .filter(
-                Registration.id != self.id,
-                ~Registration.is_deleted,
-                db.or_(*conflict_criteria),
-                Registration.state.notin_([RegistrationState.rejected, RegistrationState.withdrawn]),
-            )
-            .has_rows()
-        )
+        return (Registration.query
+                .with_parent(self.registration_form)
+                .filter(Registration.id != self.id,
+                        ~Registration.is_deleted,
+                        db.or_(*conflict_criteria),
+                        Registration.state.notin_([RegistrationState.rejected, RegistrationState.withdrawn]))
+                .has_rows())
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the registration."""
@@ -783,20 +831,34 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     #: The ID of the registration
     registration_id = db.Column(
-        db.Integer, db.ForeignKey('event_registration.registrations.id'), primary_key=True, autoincrement=False
+        db.Integer,
+        db.ForeignKey('event_registration.registrations.id'),
+        primary_key=True,
+        autoincrement=False
     )
     #: The ID of the field data
     field_data_id = db.Column(
-        db.Integer, db.ForeignKey('event_registration.form_field_data.id'), primary_key=True, autoincrement=False
+        db.Integer,
+        db.ForeignKey('event_registration.form_field_data.id'),
+        primary_key=True,
+        autoincrement=False
     )
     #: The submitted data for the field
-    data = db.Column(JSONB, default=lambda: None, nullable=False)
+    data = db.Column(
+        JSONB,
+        default=lambda: None,
+        nullable=False
+    )
 
     #: The associated field data object
     field_data = db.relationship(
         'RegistrationFormFieldData',
         lazy=True,
-        backref=db.backref('registration_data', lazy=True, cascade='all, delete-orphan'),
+        backref=db.backref(
+            'registration_data',
+            lazy=True,
+            cascade='all, delete-orphan'
+        )
     )
 
     # relationship backrefs:
@@ -819,12 +881,8 @@ class RegistrationData(StoredFileMixin, db.Model):
         """A locator that points to the associated file for a registrant."""
         if not self.filename:
             raise Exception('The file locator is only available if there is a file.')
-        return dict(
-            self.registration.locator.registrant,
-            registration_id=self.registration.id,
-            field_data_id=self.field_data_id,
-            filename=self.filename,
-        )
+        return dict(self.registration.locator.registrant, registration_id=self.registration.id,
+                    field_data_id=self.field_data_id, filename=self.filename)
 
     @property
     def attachment_cid(self):
@@ -853,7 +911,6 @@ class RegistrationData(StoredFileMixin, db.Model):
     @property
     def user_data(self):
         from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
-
         if self.field_data.field.field_impl.is_file_field:
             return KEEP_EXISTING_FILE_UUID if self.storage_file_id is not None else None
         return self.data
@@ -880,13 +937,8 @@ class RegistrationData(StoredFileMixin, db.Model):
     def _build_storage_path(self):
         self.registration.registration_form.assign_id()
         self.registration.assign_id()
-        path_segments = [
-            'event',
-            strict_str(self.registration.event_id),
-            'registrations',
-            strict_str(self.registration.registration_form.id),
-            strict_str(self.registration.id),
-        ]
+        path_segments = ['event', strict_str(self.registration.event_id), 'registrations',
+                         strict_str(self.registration.registration_form.id), strict_str(self.registration.id)]
         assert None not in path_segments
         # add timestamp in case someone uploads the same file again
         filename = '{}-{}-{}'.format(self.field_data.field_id, int(time.time()), secure_filename(self.filename, 'file'))
@@ -960,10 +1012,9 @@ def _mapper_configured():
     )
     Registration.num_accompanying_persons = column_property(query, deferred=True)
 
-    query = (
-        select([db.func.coalesce(db.func.count(ReceiptFile.file_id), 0)])
-        .where(db.and_(ReceiptFile.registration_id == Registration.id, ~ReceiptFile.is_deleted))
-        .correlate_except(ReceiptFile)
-        .scalar_subquery()
-    )
+    query = (select([db.func.coalesce(db.func.count(ReceiptFile.file_id), 0)])
+             .where(db.and_(ReceiptFile.registration_id == Registration.id,
+                            ~ReceiptFile.is_deleted))
+             .correlate_except(ReceiptFile)
+             .scalar_subquery())
     Registration.num_receipt_files = column_property(query, deferred=True)
