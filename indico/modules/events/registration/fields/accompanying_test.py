@@ -52,29 +52,18 @@ def _anonymous_value(count):
     return count
 
 
-@pytest.mark.parametrize(
-    ('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'),
-    (
-        (0, False, None, None),
-        (5, False, None, 5),
-        (0, True, None, None),
-        (10, True, None, 10),
-        (10, True, 5, 4),
-        (10, True, 15, 10),
-        (0, False, 1, None),
-        (5, False, 1, 5),
-    ),
-)
-def test_new_registration(
-    dummy_event,
-    dummy_regform,
-    create_accompanying_persons_field,
-    max_persons,
-    create_accompanying_persons,
-    persons_count_against_limit,
-    registration_limit,
-    expected_limit,
-):
+@pytest.mark.parametrize(('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'), (
+    (0, False, None, None),
+    (5, False, None, 5),
+    (0, True, None, None),
+    (10, True, None, 10),
+    (10, True, 5, 4),
+    (10, True, 15, 10),
+    (0, False, 1, None),
+    (5, False, 1, 5),
+))
+def test_new_registration(dummy_event, dummy_regform, create_accompanying_persons_field, max_persons,
+                          create_accompanying_persons, persons_count_against_limit, registration_limit, expected_limit):
     set_feature_enabled(dummy_event, 'registration', True)
 
     field = create_accompanying_persons_field(max_persons, persons_count_against_limit)
