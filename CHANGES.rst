@@ -10,7 +10,7 @@ Version 3.3.13
 Improvements
 ^^^^^^^^^^^^
 
-- Include Keywords in contribution CSV exports (:pr:`7421`)
+- Include keywords in contribution CSV/Excel exports (:pr:`7421`)
 
 Bugfixes
 ^^^^^^^^
