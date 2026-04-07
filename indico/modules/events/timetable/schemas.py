@@ -77,6 +77,7 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    event_id = fields.Integer(dump_only=True)
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
     parent_id = fields.Integer(allow_none=True, load_only=True)
