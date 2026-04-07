@@ -477,7 +477,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     mm_field_class = fields.Nested
     mm_field_args = (AccommodationSchema,)
     allow_condition = True
-    _management = False
+    management = False
 
     def _get_default_value(self, *, ui):
         versioned_data = self.form_item.versioned_data
@@ -575,7 +575,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 if arrival_date > departure_date:
                     raise ValidationError(_("Arrival date can't be set after the departure date."))
                 # Managers can set dates outside the allowed range (e.g. for late arrivals or exceptions)
-                if not self._management:
+                if not self.management:
                     arrival_date_from = date.fromisoformat(self.form_item.data['arrival_date_from'])
                     arrival_date_to = date.fromisoformat(self.form_item.data['arrival_date_to'])
                     departure_date_from = date.fromisoformat(self.form_item.data['departure_date_from'])

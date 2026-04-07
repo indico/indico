@@ -165,7 +165,7 @@ class RegistrationFormFieldBase:
         :param registration: The previous registration if modifying an existing one, otherwise none
         :param management: Whether the field is being created in management context
         """
-        self._management = management
+        self.management = management
         validators = self.get_validators(registration) or []
         if not isinstance(validators, list):
             validators = [validators]
@@ -347,5 +347,5 @@ class InvalidRegistrationFormField(RegistrationFormFieldBase):
 
     is_invalid_field = True
 
-    def create_mm_field(self, registration=None, override_required=False):
+    def create_mm_field(self, registration=None, override_required=False, management=False):
         return None
