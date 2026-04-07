@@ -18,6 +18,8 @@ Bugfixes
 - Correctly restrict user access to their logs (:pr:`7404`)
 - Correctly restrict access to draft contribution list (:pr:`7408`)
 - Use new MS Outlook URL in the share widget (:pr:`7424`, thanks :user:`hirishh`)
+- Fix editing contribution time from timetable bubbles when the CSP is enabled
+  (:pr:`7432`)
 
 Accessibility
 ^^^^^^^^^^^^^
