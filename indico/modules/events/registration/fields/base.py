@@ -155,7 +155,7 @@ class RegistrationFormFieldBase:
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
         return schema(context=context)
 
-    def create_mm_field(self, registration=None, override_required=False):
+    def create_mm_field(self, registration=None, override_required=False, management=False):
         """
         Create a marshmallow field.
         When modifying an existing registration, the `registration` parameter is
@@ -163,7 +163,9 @@ class RegistrationFormFieldBase:
         some field validators need the old data.
 
         :param registration: The previous registration if modifying an existing one, otherwise none
+        :param management: Whether the field is being created in management context
         """
+        self._management = management
         validators = self.get_validators(registration) or []
         if not isinstance(validators, list):
             validators = [validators]
