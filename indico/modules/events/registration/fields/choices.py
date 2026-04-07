@@ -477,6 +477,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     mm_field_class = fields.Nested
     mm_field_args = (AccommodationSchema,)
     allow_condition = True
+    _management = False
 
     def _get_default_value(self, *, ui):
         versioned_data = self.form_item.versioned_data
