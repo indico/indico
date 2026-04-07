@@ -4,48 +4,50 @@
 
 {# Do not forget to update the conditions in the parent template when you add a new row in the details table. #}
 
-<div class="event-details">
+<dl class="event-details">
     {% if event.description %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}Description{% endtrans %}</div>
-            <div class="event-details-content">{{ render_description(event, class='event-description editor-output') }}</div>
+            <dt class="event-details-label">{% trans %}Description{% endtrans %}</dt>
+            <dd class="event-details-content">{{ render_description(event, class='event-description editor-output') }}</dd>
         </div>
     {% endif %}
     {% if event.references and event.type_.name == "meeting" %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}External references{% endtrans %}</div>
-            <div class="event-details-content">{{ render_references(event) }}</div>
+            <dt class="event-details-label">{% trans %}External references{% endtrans %}</dt>
+            <dd class="event-details-content">{{ render_references(event) }}</dd>
         </div>
     {% endif %}
     {% if files or folders %}
         <div class="event-details-row">
-            <div class="event-details-label icon-attachment inline-attachments-icon"></div>
-            <div class="event-details-content material-list">
+            <dt class="event-details-label icon-attachment inline-attachments-icon">
+                <span class="visually-hidden">{% trans %}Attachments{% endtrans %}</span>
+            </dt>
+            <dd class="event-details-content material-list">
                 {{ render_attachments_folders(files=files, folders=folders) }}
-            </div>
+            </dd>
         </div>
     {% endif %}
     {% if lectures %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}From the same series{% endtrans %}</div>
-            <div class="event-details-content">
+            <dt class="event-details-label">{% trans %}From the same series{% endtrans %}</dt>
+            <dd class="event-details-content">
                 {% for lecture in lectures %}
                     <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.series_pos }}</a>
                 {% endfor %}
-            </div>
+            </dd>
         </div>
     {% endif %}
     {% if event.organizer_info %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}Organized by{% endtrans %}</div>
-            <div class="event-details-content">{{ event.organizer_info | markdown }}</div>
+            <dt class="event-details-label">{% trans %}Organized by{% endtrans %}</dt>
+            <dd class="event-details-content">{{ event.organizer_info | markdown }}</dd>
         </div>
     {% endif %}
 
     {% if event.contact_emails or event.contact_phones %}
         <div class="event-details-row">
-            <div class="event-details-label">{{ event.contact_title }}</div>
-            <div class="event-details-content">
+            <dt class="event-details-label">{{ event.contact_title }}</dt>
+            <dd class="event-details-content">
                 {% for email in event.contact_emails %}
                     <div>
                         <i class="icon-mail"></i>
@@ -58,9 +60,9 @@
                         <a href="tel:{{ phone }}">{{ phone }}</a>
                     </div>
                 {% endfor %}
-            </div>
+            </dd>
         </div>
     {% endif %}
+</dl>
 
-    {{ hook_event_header }}
-</div>
+{{ hook_event_header }}
