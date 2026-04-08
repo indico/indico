@@ -700,7 +700,9 @@ class Registration(db.Model):
             if not self.price:
                 self.state = RegistrationState.complete
         elif self.state == RegistrationState.complete:
-            if payment_required:
+            if moderation_required:
+                self.state = RegistrationState.pending
+            elif payment_required:
                 self.state = RegistrationState.unpaid
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)

@@ -553,7 +553,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if consent_to_publish is not None:
             update_registration_consent_to_publish(registration, consent_to_publish)
 
-    registration.sync_state()
+    registration.sync_state(_skip_moderation=management)
     registration.set_modified()
     db.session.flush()
     # sanity check
