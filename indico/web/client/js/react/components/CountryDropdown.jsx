@@ -13,7 +13,7 @@ import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 const isoToFlag = code =>
   String.fromCodePoint(...code.split('').map(c => c.charCodeAt(0) + 0x1f1a5));
@@ -24,7 +24,13 @@ function useCountries() {
   const [countries, setCountries] = React.useState(null);
   React.useEffect(() => {
     if (!countriesPromise) {
-      countriesPromise = indicoAxios.get(countriesURL({})).then(({data}) => data);
+      countriesPromise = indicoAxios
+        .get(countriesURL({}))
+        .then(({data}) => data)
+        .catch(error => {
+          countriesPromise = null;
+          handleAxiosError(error);
+        });
     }
     countriesPromise.then(setCountries);
   }, []);
