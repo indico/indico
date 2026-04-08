@@ -131,14 +131,18 @@
                                     {{ event.get_label_markup('mini') }}
                                 </span>
                                 <span class="item-legend">
-                                    <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}"{% endif %}
-                                            class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
-                                    <span {% if roles.reviewing %}title="{% trans %}You are a reviewer{% endtrans %}"{% endif %}
-                                            class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
-                                    <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}"{% endif %}
-                                            class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
-                                    <span {% if roles.favorited %}title="{% trans %}You have favorited this event{% endtrans %}"{% endif %}
-                                            class="icon-star contextHelp {% if roles.favorited %}active{% endif %}"></span>
+                                    <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}" 
+                                        {% else %} title="{% trans %}You do not have management rights{% endtrans %}" {% endif %}
+                                        class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
+                                    <span {% if roles.reviewing %}title="{% trans %}You are a reviewer{% endtrans %}" 
+                                        {% else %} title="{% trans %}You are not a reviewer{% endtrans %}" {% endif %}
+                                        class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
+                                    <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}" 
+                                        {% else %} title="{% trans %}You are not an attendee{% endtrans %}" {% endif %}
+                                        class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
+                                    <span {% if roles.favorited %}title="{% trans %}You have favorited this event{% endtrans %}" 
+                                        {% else %} title="{% trans %}You have not favorited this event{% endtrans %}" {% endif %}
+                                        class="icon-star contextHelp {% if roles.favorited %}active{% endif %}"></span>
                                 </span>
                             </li>
                         {% else %}
