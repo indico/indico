@@ -13,6 +13,7 @@ from marshmallow import ValidationError
 
 from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationData
 
 
@@ -42,6 +43,38 @@ def multi_choice_field():
         },
         'max_choices': None
     }
+    return field
+
+
+@pytest.fixture
+def single_choice_field(db, dummy_regform):
+    section = RegistrationFormSection(
+        registration_form=dummy_regform,
+        title='Section'
+    )
+    db.session.add(section)
+    db.session.flush()
+    field = RegistrationFormField(
+        input_type='single_choice',
+        title='Field',
+        parent=section,
+        registration_form=dummy_regform
+    )
+    field.versioned_data = {
+        'choices': [
+            {'id': _id(1), 'places_limit': 0, 'price': 0},
+            {'id': _id(2), 'places_limit': 0, 'price': 0},
+        ]
+    }
+    field.data = {
+        'captions': {
+            _id(1): 'Alpha',
+            _id(2): 'Beta',
+            _id(3): 'Gamma',
+        }
+    }
+    db.session.add(field)
+    db.session.flush()
     return field
 
 
@@ -323,3 +356,31 @@ def test_accommodation_validators(dummy_accommodation_field, value, error):
         with pytest.raises(ValidationError) as exc_info:
             _validate(value)
         assert exc_info.value.messages == [error]
+
+
+def test_filter_choices_hide_unused_deleted_choice(single_choice_field):
+    choices = single_choice_field.field_impl.filter_choices
+    assert set(choices) == {_id(1), _id(2)}
+    assert _id(3) not in choices
+
+
+def test_filter_choices_show_used_deleted_choice(single_choice_field, create_registration, db, dummy_user,
+                                                 dummy_regform):
+    reg = create_registration(dummy_user, dummy_regform)
+    db.session.add(reg)
+    reg.data.append(RegistrationData(field_data=single_choice_field.current_data, data={_id(3): 1}))
+    db.session.flush()
+
+    choices = single_choice_field.field_impl.filter_choices
+    assert _id(3) in choices
+
+
+def test_filter_choices_show_used_deleted_choice_legacy(single_choice_field, create_registration, db, dummy_user,
+                                                        dummy_regform):
+    reg = create_registration(dummy_user, dummy_regform)
+    db.session.add(reg)
+    reg.data.append(RegistrationData(field_data=single_choice_field.current_data, data={'choice': _id(3)}))
+    db.session.flush()
+
+    choices = single_choice_field.field_impl.filter_choices
+    assert _id(3) in choices

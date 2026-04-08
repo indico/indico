@@ -22,7 +22,7 @@ from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
-from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.date_time import format_date
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import UUIDString, not_empty
@@ -134,7 +134,22 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     @property
     def filter_choices(self):
         captions = self.form_item.data['captions']
-        return dict(sorted(captions.items(), key=lambda item: natural_sort_key(item[1])))
+        current_choice_ids = {c['id'] for c in self.form_item.versioned_data['choices']}
+        deleted_ids = set(captions) - current_choice_ids
+        hidden_ids = {cid for cid in deleted_ids if not self._is_choice_used(cid)}
+        visible_choices = [(k, v) for k, v in captions.items() if k not in hidden_ids]
+        return dict(sorted(visible_choices, key=lambda item: natural_sort_key(item[1])))
+
+    def _is_choice_used(self, choice_id):
+        query = (RegistrationData.query
+                .join(RegistrationData.registration)
+                .filter(Registration.registration_form == self.form_item.registration_form,
+                        ~Registration.is_deleted,
+                        RegistrationData.field_data.has(field_id=self.form_item.id)))
+        has_key = RegistrationData.data.op('?')(choice_id)
+        is_legacy = db.and_(RegistrationData.data.op('?')('choice'),
+                            RegistrationData.data['choice'].astext == choice_id)
+        return query.filter(has_key | is_legacy).has_rows()
 
     @property
     def view_data(self):
