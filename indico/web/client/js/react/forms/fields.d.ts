@@ -8,6 +8,7 @@
 import {Moment} from 'moment/moment';
 import {ComponentType} from 'react';
 
+// TODO look into using FieldProps from react-final-form
 interface SharedFieldProps {
   name: string;
   description?: React.ReactNode;
