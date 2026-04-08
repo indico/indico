@@ -15,6 +15,11 @@ interface SharedFieldProps {
   required?: boolean | 'no-validator';
   disabled?: boolean;
   initialValue?: any;
+  className?: string;
+  formatOnBlur?: boolean;
+  parse?: (value: any) => any;
+  format?: (value: any) => any;
+  validate?: (value: any) => string | undefined;
 }
 
 interface FinalFieldProps extends SharedFieldProps {
@@ -33,8 +38,10 @@ interface FinalInputProps extends SharedFieldProps {
 
 interface FinalTextAreaProps extends SharedFieldProps {
   label?: string | null;
+  placeholder?: string;
   nullIfEmpty?: boolean;
   action?: object;
+  rows?: number;
 }
 
 interface FinalCheckboxProps extends SharedFieldProps {
@@ -51,6 +58,8 @@ interface FinalDropdownProps extends SharedFieldProps {
   options: object[];
   placeholder?: string;
   label?: string | null;
+  fluid?: boolean;
+  loading?: boolean;
   multiple?: boolean;
   selection?: boolean;
   search?: boolean | ((options: DropdownItemProps[], value: string) => DropdownItemProps[]);
@@ -60,8 +69,6 @@ interface FinalDropdownProps extends SharedFieldProps {
     data: DropdownOnSearchChangeData
   ) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
-  parse?: (value: any) => any;
-  format?: (value: any) => any;
 }
 
 interface FinalComboDropdownProps extends SharedFieldProps {
