@@ -199,7 +199,7 @@ function EntryPopupContent({
               size="tiny"
               style={{...session.colors}}
             >
-              <Translate>{session.title}</Translate>
+              {session.title}
             </Label>
           )}
           <Header as="h5" color={!title ? 'grey' : null}>
