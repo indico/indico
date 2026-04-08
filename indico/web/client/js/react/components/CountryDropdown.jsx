@@ -12,11 +12,24 @@ import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
-import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 
 const isoToFlag = code =>
   String.fromCodePoint(...code.split('').map(c => c.charCodeAt(0) + 0x1f1a5));
+
+let countriesPromise = null;
+
+function useCountries() {
+  const [countries, setCountries] = React.useState(null);
+  React.useEffect(() => {
+    if (!countriesPromise) {
+      countriesPromise = indicoAxios.get(countriesURL({})).then(({data}) => data);
+    }
+    countriesPromise.then(setCountries);
+  }, []);
+  return countries;
+}
 
 export function FinalCountryDropdown({name, ...rest}) {
   return <FinalField name={name} component={CountryDropdown} {...rest} />;
@@ -27,7 +40,7 @@ FinalCountryDropdown.propTypes = {
 };
 
 export default function CountryDropdown({value, onChange, fluid}) {
-  const {data: countries} = useIndicoAxios(countriesURL({}));
+  const countries = useCountries();
 
   return (
     <Dropdown
