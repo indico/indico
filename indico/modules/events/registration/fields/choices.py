@@ -26,7 +26,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.date_time import format_date
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import UUIDString, not_empty
-from indico.util.string import camelize_keys, snakify_keys
+from indico.util.string import camelize_keys, natural_sort_key, snakify_keys
 
 
 def get_field_merged_options(field, registration_data):
@@ -133,7 +133,8 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
     @property
     def filter_choices(self):
-        return self.form_item.data['captions']
+        captions = self.form_item.data['captions']
+        return dict(sorted(captions.items(), key=lambda item: natural_sort_key(item[1])))
 
     @property
     def view_data(self):
