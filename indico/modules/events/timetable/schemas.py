@@ -17,7 +17,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.util.locations import LocationDataSchema, LocationParentSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField
+from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested
 
 
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
@@ -71,12 +71,12 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     start_dt = EventTimezoneDateTimeField()
     _description = fields.String(attribute='description')
     # TODO: filter inactive and restricted contrib fields
-    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
-    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
-    references = fields.List(fields.Nested(ContributionReferenceSchema))
-    location_data = fields.Nested(LocationDataSchema)
-    location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
-    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    custom_fields = fields.List(NonPartialNested(ContribFieldValueSchema), attribute='field_values')
+    person_links = NonPartialNested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
+    references = fields.List(NonPartialNested(ContributionReferenceSchema))
+    location_data = NonPartialNested(LocationDataSchema)
+    location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
+    session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
     event_id = fields.Integer(dump_only=True)
     session_id = fields.Integer(dump_only=True)
     duration = fields.TimeDelta(required=True)
