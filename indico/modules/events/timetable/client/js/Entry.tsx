@@ -170,7 +170,7 @@ export default function Entry({
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
-  const colors = getEntryColors({type, sessionBlockId, customColors}, session);
+  const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
 
   let style: Record<string, string | number | undefined> = transform
