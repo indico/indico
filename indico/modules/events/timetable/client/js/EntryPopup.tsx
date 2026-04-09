@@ -22,6 +22,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
+import {mapDataToEntry} from './mapperUtils';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {
@@ -34,7 +35,7 @@ import {
   isChildEntry,
   SessionBlockId,
 } from './types';
-import {getIconByEntryType, getEntryColors, mapTTDataToEntry} from './utils';
+import {getIconByEntryType, getEntryColors} from './utils';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
@@ -97,7 +98,7 @@ function EntryPopupContent({
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapTTDataToEntry(data);
+    const draftEntry = mapDataToEntry(data);
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;
