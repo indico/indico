@@ -159,7 +159,7 @@ customElements.define(
           editURLFn={editFileTypeURL}
           createURLFn={createFileTypeURL}
           allowDeleteLastType
-          autoSubmissionFromPeerReviewURLfn={() =>
+          autoSubmissionFromPeerReviewURLFn={() =>
             autoSubmissionFromPeerReviewURL({
               type: 'paper',
               event_id: +this.getAttribute('event-id'),
