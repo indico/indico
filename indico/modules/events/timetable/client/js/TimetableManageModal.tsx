@@ -5,13 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import breakCreateURL from 'indico-url:timetable.tt_break_create';
-import breakURL from 'indico-url:timetable.tt_break_rest';
-import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
-import contributionURL from 'indico-url:timetable.tt_contrib_rest';
-import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
-import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
-
 import _ from 'lodash';
 import moment from 'moment';
 import React, {useState} from 'react';
@@ -24,15 +17,16 @@ import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBloc
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
+import {mapDataToEntry, mapEntryToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT, mapSessionToTTData, mapTTDataToEntry, shiftEntries} from './utils';
+import {DATE_KEY_FORMAT, mapSessionToTTData} from './utils';
 
 // Generic models
 
@@ -165,6 +159,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
   const sessionsObj = useSelector(selectors.getSessions);
   const sessions: Session[] = Object.values(sessionsObj);
+  const session = sessions.find(s => s.id === entry.sessionId);
 
   const forms: {[key in EntryType]: React.ReactElement} = {
     [EntryType.Contribution]: (
@@ -207,147 +202,58 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     isEditing ? entry.type : Object.keys(forms)[0]
   );
 
-  const _handleCreateContribution = async (data: any) => {
-    data = _.pick(data, [
-      'title',
-      'description',
-      'duration',
-      'person_links',
-      'keywords',
-      'references',
-      'location_data',
-      'inheriting',
-      'start_dt',
-      'keywords',
-      'board_number',
-      'code',
-      'session_block_id',
-    ]);
-    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
-  };
-
-  const _handleCreateSessionBlock = async (data: any) => {
-    data.conveners = data.person_links;
-    data = _.pick(data, [
-      'session_id',
-      'title',
-      'description',
-      'duration',
-      'location_data',
-      'inheriting',
-      'start_dt',
-      'conveners',
-      'code',
-    ]);
-    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
-  };
-
-  // TODO: Implement logic for breaks
-  const _handleCreateBreak = async (data: any) => {
-    data = _.pick(data, [
-      'title',
-      'description',
-      'break',
-      'duration',
-      'location_data',
-      'inheriting',
-      'start_dt',
-      'colors',
-      'session_block_id',
-    ]);
-    return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
-  };
-
-  const _handleEditContribution = async (data: any) => {
-    return indicoAxios.patch(contributionURL({event_id: eventId, contrib_id: objId}), data);
-  };
-
-  const _handleEditSessionBlock = async (data: any) => {
-    return indicoAxios.patch(sessionBlockURL({event_id: eventId, session_block_id: objId}), data);
-  };
-
-  const _handleEditBreak = async (data: any) => {
-    return indicoAxios.patch(breakURL({event_id: eventId, break_id: objId}), data);
-  };
-
-  const _findOrCreateSession = async sessionObject => {
-    const session = sessions.find(s => s.id === sessionObject.id);
-
-    if (session) {
-      return session;
+  const _createSession = async sessionObject => {
+    try {
+      // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
+      const data = mapSessionToTTData(sessionObject);
+      const {session: resSession} = await dispatch(actions.createSession(_.omit(data, 'id')));
+      return resSession;
+    } catch (error) {
+      handleAxiosError(error, true);
     }
-
-    // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
-    const data = mapSessionToTTData(sessionObject);
-    const {session: resSession} = await dispatch(actions.createSession(_.omit(data, 'id')));
-
-    return resSession;
   };
 
   const handleSubmit = async (data: any, form: any) => {
-    const submitHandlers = isEditing
-      ? {
-          [EntryType.Contribution]: _handleEditContribution,
-          [EntryType.SessionBlock]: _handleEditSessionBlock,
-          [EntryType.Break]: _handleEditBreak,
-        }
-      : {
-          [EntryType.Contribution]: _handleCreateContribution,
-          [EntryType.SessionBlock]: _handleCreateSessionBlock,
-          [EntryType.Break]: _handleCreateBreak,
-        };
-
-    const submitHandler = submitHandlers[activeType];
-    if (!submitHandler) {
-      throw new Error('Invalid form or no submit function found');
-    }
-
-    if (isEditing) {
-      data = getChangedValues(data, form);
-    }
-
-    if (data.start_dt) {
-      data.start_dt = moment(data.start_dt).format('YYYY-MM-DDTHH:mm:ss');
-    }
+    const sessionObj = data.session_object;
+    delete data.session_object;
 
     if (parent) {
       data.session_block_id = parent.objId;
     }
 
-    let session: Session = sessions.find(s => s.id === entry.sessionId);
+    if (sessionObj) {
+      const sessionId = session?.id ?? sessionObj?.id;
 
-    if (data.session_object) {
-      try {
-        session = await _findOrCreateSession(data.session_object);
-        data.session_id = session?.id;
-      } catch (error) {
-        handleAxiosError(error, true);
-        return;
+      if (sessionId === -1) {
+        const newSession = await _createSession(sessionObj);
+        data.session_id = newSession.id;
+      } else {
+        data.session_id = sessionId;
       }
-
-      delete data.session_object; // Was used temporarily only for id or draft
     }
 
-    let resData;
+    // TODO:  (Ajob) The real solution would be to change the personlinkfield, but this
+    //        affects many other parts of the code and so for now we will do it like this.
+    if (data.person_links || data.conveners) {
+      const persons = data.person_links || data.conveners;
+      data.person_links = mapEntryToData({personLinks: persons}, true).person_links;
+    }
+
+    if (activeType === EntryType.SessionBlock && data.person_links) {
+      data.conveners = data.person_links;
+    }
+
     try {
-      resData = (await submitHandler(snakifyKeys(data))).data;
+      if (isEditing) {
+        const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
+        dispatch(
+          actions.updateEntry(activeType, updatedEntry, currentDay, getChangedValues(data, form))
+        );
+      } else {
+        dispatch(actions.createEntry(activeType, data));
+      }
     } catch (exc) {
       return handleSubmitError(exc);
-    }
-
-    resData.type = activeType;
-
-    const resEntry = mapTTDataToEntry(resData);
-
-    if (isEditing) {
-      if (resEntry.type === EntryType.SessionBlock) {
-        const deltaStartDt = moment(resEntry.startDt).diff(entry.startDt, 'minutes');
-        resEntry.children = shiftEntries(entry.children, deltaStartDt);
-      }
-      // TODO: (Ajob) Refactor to use updateEntry action, and remove api calls from this file
-      dispatch(actions._updateEntry(activeType, resEntry, currentDay));
-    } else {
-      dispatch(actions._createEntry(activeType, resEntry));
     }
 
     onSubmit();

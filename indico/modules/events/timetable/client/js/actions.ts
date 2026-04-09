@@ -7,9 +7,12 @@
 
 import createSessionURL from 'indico-url:sessions.api_create_session';
 import sessionURL from 'indico-url:sessions.api_manage_session';
+import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakURL from 'indico-url:timetable.tt_break_rest';
+import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
+import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import {Moment} from 'moment';
@@ -17,9 +20,9 @@ import {Dispatch} from 'redux';
 import {ThunkDispatch} from 'redux-thunk/es';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 
 import {getRandomColors, parseColorsToSchema} from './colors';
+import {mapDataToEntry} from './mapperUtils';
 import {
   TopLevelEntry,
   BlockEntry,
@@ -59,7 +62,6 @@ export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
-export const EDIT_ENTRY = 'Edit entry';
 
 interface SetTimetableDataAction {
   type: typeof SET_TIMETABLE_DATA;
@@ -411,12 +413,29 @@ export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
 
-export function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
+function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
   return {type: CREATE_ENTRY, entryType, entry};
 }
 
-export function editEntry(entryType: EntryType, entry: Entry) {
-  return {type: EDIT_ENTRY, entryType, entry};
+export function createEntry(entryType: EntryType, payload: any) {
+  return async (
+    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
+    getState: () => ReduxState
+  ) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const createURL = {
+      [EntryType.Contribution]: contributionCreateURL({event_id: eventId}),
+      [EntryType.SessionBlock]: sessionBlockCreateURL({event_id: eventId}),
+      [EntryType.Break]: breakCreateURL({event_id: eventId}),
+    }[entryType];
+
+    const data = (await indicoAxios.post(createURL, payload))?.data;
+    data.type = entryType;
+    const resEntry = mapDataToEntry(data);
+    return dispatch(_createEntry(resEntry.type, resEntry as Entry));
+  };
 }
 
 export function _updateEntry(
@@ -434,16 +453,17 @@ export function updateEntry(
   customPayload = null
 ) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
-    const {staticData} = getState();
-    const eventId = staticData.eventId;
+    const {
+      staticData: {eventId},
+    } = getState();
     const updateURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
       [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
       [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
-    }[entry.type];
+    }[entryType];
 
     const action = synchronizedAjaxAction(
-      () => indicoAxios.patch(updateURL, customPayload ?? snakifyKeys(entry)),
+      () => indicoAxios.patch(updateURL, customPayload ?? entry),
       _updateEntry(entryType, entry, currentDay)
     );
     return dispatch(action);
