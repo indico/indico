@@ -125,3 +125,8 @@ The `event` object is the sender.
 The signal should return a bool to determine if the Participant list menu
 should be displayed on the Event page.
 ''')
+
+paper_accepted = _signals.signal('paper-accepted', '''
+Called when a paper is accepted. The `sender` is the event.
+The accepted files are passed in the `files` kwarg.
+''')

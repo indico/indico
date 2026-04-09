@@ -75,6 +75,16 @@ class BaseFileType(db.Model):
         return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
                            publishable=False, filename_template=None, _text=self.name)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'extensions': self.extensions,
+            'allow_multiple_files': self.allow_multiple_files,
+            'required': self.required,
+            'publishable': self.publishable,
+            'filename_template': self.filename_template
+        }
+
 
 class EditingFileType(BaseFileType):
     event_backref_name = 'editing_file_types'
@@ -99,6 +109,7 @@ class EditingFileType(BaseFileType):
     # relationship backrefs:
     # - files (EditingRevisionFile.file_type)
     # - review_conditions (EditingReviewCondition.file_types)
+    # - source_paper_file_type (PaperFileType.source_editing_file_type)
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the file type."""
