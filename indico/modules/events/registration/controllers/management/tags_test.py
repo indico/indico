@@ -19,24 +19,21 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.fixture
-def tag_a(db, dummy_event):
-    tag = RegistrationTag(event=dummy_event, title='Alpha', color='#ff0000')
-    db.session.add(tag)
-    db.session.flush()
-    return tag
-
-
-@pytest.fixture
-def tag_b(db, dummy_event):
-    tag = RegistrationTag(event=dummy_event, title='Beta', color='#0000ff')
-    db.session.add(tag)
-    db.session.flush()
-    return tag
+def create_tag(db, dummy_event):
+    """Return a callable that lets you create a registration tag."""
+    def _create_tag(title, color='#ff0000'):
+        tag = RegistrationTag(event=dummy_event, title=title, color=color)
+        db.session.add(tag)
+        db.session.flush()
+        return tag
+    return _create_tag
 
 
 @pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_added(db, dummy_reg, dummy_user, tag_a, tag_b):
+def test_assign_tags_logs_added(db, dummy_reg, dummy_user, create_tag):
     session.set_session_user(dummy_user)
+    tag_a = create_tag('Alpha')
+    tag_b = create_tag('Beta')
 
     _assign_registration_tags([dummy_reg], add={tag_a, tag_b}, remove=set())
 
@@ -53,8 +50,9 @@ def test_assign_tags_logs_added(db, dummy_reg, dummy_user, tag_a, tag_b):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_removed(db, dummy_reg, dummy_user, tag_a):
+def test_assign_tags_logs_removed(db, dummy_reg, dummy_user, create_tag):
     session.set_session_user(dummy_user)
+    tag_a = create_tag('Alpha')
     dummy_reg.tags.add(tag_a)
     db.session.flush()
 
@@ -72,8 +70,10 @@ def test_assign_tags_logs_removed(db, dummy_reg, dummy_user, tag_a):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_both(db, dummy_reg, dummy_user, tag_a, tag_b):
+def test_assign_tags_logs_both(db, dummy_reg, dummy_user, create_tag):
     session.set_session_user(dummy_user)
+    tag_a = create_tag('Alpha')
+    tag_b = create_tag('Beta')
     dummy_reg.tags.add(tag_a)
     db.session.flush()
 
