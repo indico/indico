@@ -128,5 +128,6 @@ should be displayed on the Event page.
 
 paper_accepted = _signals.signal('paper-accepted', '''
 Called when a paper is accepted. The `sender` is the event.
+The contribution associated with the paper is passed in the `contribution` kwarg,
 The accepted files are passed in the `files` kwarg.
 ''')
