@@ -163,7 +163,7 @@ customElements.define(
           autoSubmissionFromPeerReviewURLfn={() =>
             autoSubmissionFromPeerReviewURL({
               type: 'paper',
-              event_id: +this.getAttribute('event-id')
+              event_id: +this.getAttribute('event-id'),
             })
           }
         />,
@@ -181,7 +181,7 @@ customElements.define(
   'ind-auto-submission-checkbox',
   class extends HTMLElement {
     connectedCallback() {
-      ReactDOM.render(<AutoSubmissionCheckbox eventId={+this.getAttribute('event-id')}/>, this);
+      ReactDOM.render(<AutoSubmissionCheckbox eventId={+this.getAttribute('event-id')} />, this);
     }
 
     disconnectedCallback() {
