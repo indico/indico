@@ -16,10 +16,10 @@ import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
+import {mapDataToEntry} from './mapperUtils';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {BlockEntry, ContribEntry, EntryType, ReduxState, SessionBlockId} from './types';
-import {mapTTDataToEntry} from './utils';
 
 import './TimetablePosterBlockModal.module.scss';
 
@@ -44,7 +44,7 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
     const {data} = await indicoAxios.get(editURL);
     data.type = EntryType.Contribution;
 
-    const draftEntry = mapTTDataToEntry(data);
+    const draftEntry = mapDataToEntry(data, true) as ContribEntry;
     dispatch(actions.setDraftEntry(draftEntry));
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,

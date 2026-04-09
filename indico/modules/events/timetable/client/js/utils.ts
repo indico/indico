@@ -16,7 +16,8 @@ import {SemanticICONS} from 'semantic-ui-react';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, HexColor, Session} from './types';
+import {mapDataToEntry} from './mapperUtils';
+import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, Session} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -83,14 +84,12 @@ export function getDefaultColorByType(type: Exclude<EntryType, 'block'>): Colors
   }[type];
 }
 
-export function mapTTColor(dbColors: {text: HexColor; background: HexColor}): Colors {
-  return {color: dbColors.text, backgroundColor: dbColors.background};
-}
-
 export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
   const {type, colors} = dbEntry;
 
-  const fallbackColor = colors ? mapTTColor(colors) : getDefaultColorByType(dbEntry.type);
+  const fallbackColor = colors
+    ? mapDataToEntry({colors}, true).colors
+    : getDefaultColorByType(dbEntry.type);
 
   if (type === EntryType.SessionBlock) {
     return session?.colors ?? fallbackColor;
@@ -123,9 +122,10 @@ export const getEntryUniqueId = (type: EntryType, id: number): EntryUniqueID => 
 
 export const mapTTDataToSession = (data: any): Session => {
   data = camelizeKeys(data);
+
   return {
     ...data,
-    ...(data.colors && {colors: mapTTColor(data.colors)}),
+    ...(data.colors && mapDataToEntry({colors: data.colors}, true)),
     ...(data.defaultContributionDuration && {
       defaultContribDurationMinutes: data.defaultContributionDuration / 60,
     }),
@@ -144,59 +144,6 @@ export const mapSessionToTTData = (data): any => {
       default_contribution_duration: data.defaultContribDurationMinutes * 60,
     }),
   };
-};
-
-export const mapTTDataToEntry = (data: any): Entry => {
-  data = camelizeKeys(data);
-  const {
-    type,
-    startDt,
-    id,
-    duration,
-    title,
-    description,
-    conveners,
-    personLinks,
-    boardNumber,
-    locationData,
-    locationParent,
-    childLocationParent,
-    code,
-    keywords,
-    sessionId,
-    colors,
-    sessionBlockId,
-  } = data;
-
-  const mappedObj = {
-    id: getEntryUniqueId(type, id),
-    objId: id,
-    type,
-    title,
-    description,
-    duration: duration / 60,
-    startDt: moment(startDt),
-    x: 0,
-    y: 0,
-    personLinks: personLinks || conveners || [],
-    boardNumber,
-    locationData,
-    locationParent,
-    childLocationParent,
-    code,
-    keywords,
-    column: 0,
-    maxColumn: 0,
-    children: [],
-    sessionId: sessionId || null,
-    ...(colors && {colors}),
-    ...(sessionId && {sessionId}),
-    ...(sessionBlockId && {
-      sessionBlockId: getEntryUniqueId(EntryType.SessionBlock, sessionBlockId),
-    }),
-  };
-
-  return mappedObj;
 };
 
 export function getIconByEntryType(type: EntryType) {
