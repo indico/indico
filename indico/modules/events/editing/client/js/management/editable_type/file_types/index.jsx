@@ -8,6 +8,7 @@
 import createFileTypeURL from 'indico-url:event_editing.api_add_file_type';
 import editFileTypeURL from 'indico-url:event_editing.api_edit_file_type';
 import fileTypeURL from 'indico-url:event_editing.api_file_types';
+import autoSubmissionFromPeerReviewURL from 'indico-url:papers.manage_submission_settings';
 
 import React from 'react';
 import {useParams} from 'react-router-dom';
@@ -31,6 +32,9 @@ export default function FileTypeManagement() {
         getAllURLFn={params => fileTypeURL({type, ...params})}
         editURLFn={params => editFileTypeURL({type, ...params})}
         createURLFn={params => createFileTypeURL({type, ...params})}
+        autoSubmissionFromPeerReviewURLfn={params =>
+          autoSubmissionFromPeerReviewURL({type, ...params})
+        }
       />
     </>
   );
