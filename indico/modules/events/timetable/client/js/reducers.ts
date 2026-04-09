@@ -13,7 +13,7 @@ import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
-import {getDateKey, setCurrentDateLocalStorage} from './utils';
+import {getDateKey, setCurrentDateLocalStorage, shiftEntries} from './utils';
 
 export default {
   entries: (
@@ -103,6 +103,12 @@ export default {
         const currentDayKey = currentDay;
         const dayEntries = [...newEntries[currentDayKey]];
         const newDayKey = getDateKey(startDt);
+
+        if (!isChildEntry(entry) && entry.type === EntryType.SessionBlock) {
+          const oldEntry = dayEntries.find(e => e.id === entry.id);
+          const deltaStartDt = moment(entry.startDt).diff(oldEntry.startDt, 'minutes');
+          entry.children = shiftEntries(entry.children, deltaStartDt);
+        }
 
         if (currentDayKey !== newDayKey) {
           newEntries[newDayKey] = layout([...newEntries[newDayKey], entry]);
