@@ -49,6 +49,7 @@ Improvements
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
 - Add "Affiliation" field type to regforms (:pr:`7352`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Log tag assignment and removal for registrations in the event log (:pr:`7446`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
