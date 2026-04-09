@@ -18,12 +18,8 @@ import {Translate} from 'indico/react/i18n';
 import './AutoSubmissionCheckbox.module.scss';
 
 export default function AutoSubmissionCheckbox({eventId}) {
-  const [
-    autoSubmissionEnabled,
-    toggleAutoSubmission,
-    autoSubmissionLoading,
-    autosSubmissionSaving,
-  ] = useTogglableValue(autoSubmissionURL({event_id: eventId}));
+  const [autoSubmissionEnabled, toggleAutoSubmission, autoSubmissionLoading, autoSubmissionSaving] =
+    useTogglableValue(autoSubmissionURL({event_id: eventId}));
 
   return (
     <div styleName="informative-checkbox">
@@ -31,7 +27,7 @@ export default function AutoSubmissionCheckbox({eventId}) {
         styleName="toolbar-checkbox toolbar-checkbox--no-padding"
         showAsToggle
         checked={autoSubmissionEnabled}
-        onChange={!autosSubmissionSaving ? toggleAutoSubmission : null}
+        onChange={!autoSubmissionSaving ? toggleAutoSubmission : null}
         label={Translate.string('Enable auto submission from peer-review')}
         disabled={autoSubmissionLoading}
       />
