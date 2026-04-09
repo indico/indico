@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, render_template, request, session
+from flask import flash, jsonify, render_template, request, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.errors import UserValueError
@@ -25,10 +25,11 @@ from indico.modules.events.papers.models.reviews import PaperReview, PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.papers.operations import (close_cfp, create_competences, create_new_file_type,
                                                      delete_file_type, open_cfp, schedule_cfp, set_deadline,
-                                                     set_reviewing_state, update_competences, update_file_type,
-                                                     update_team_members)
+                                                     set_reviewing_state, sync_file_types_with_editing,
+                                                     update_competences, update_file_type, update_team_members)
 from indico.modules.events.papers.schemas import PaperFileTypeArgs, PaperFileTypeSchema
-from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
+from indico.modules.events.papers.settings import (PaperReviewingRole, paper_reviewing_settings,
+                                                   paper_submission_settings)
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.modules.users.models.users import User
@@ -224,6 +225,20 @@ class RHManageReviewingSettings(RHManagePapersBase):
         return jsonify_form(form)
 
 
+class RHManageSubmissionSettings(RHManagePapersBase):
+    def _process_GET(self):
+        return jsonify(paper_submission_settings.get(self.event, 'auto_submission_to_editing'))
+
+    def _process_PUT(self):
+        paper_submission_settings.set(self.event, 'auto_submission_to_editing', True)
+        sync_file_types_with_editing(self.event)
+        return '', 204
+
+    def _process_DELETE(self):
+        paper_submission_settings.set(self.event, 'auto_submission_to_editing', False)
+        return '', 204
+
+
 class RHSetDeadline(RHManagePapersBase):
     def _process(self):
         role = PaperReviewingRole[request.view_args['role']]
@@ -328,6 +343,8 @@ class RHPapersCreateFileType(RHManagePapersBase):
 
     @use_rh_args(PaperFileTypeArgs)
     def _process(self, data):
+        if paper_submission_settings.get(self.event, 'auto_submission_to_editing'):
+            raise UserValueError(_('Cannot create paper file types when auto-submission to editing is enabled.'))
         file_type = create_new_file_type(self.event, **data)
         return PaperFileTypeSchema().jsonify(file_type)
 
@@ -344,10 +361,14 @@ class RHPapersEditFileType(RHManagePapersBase):
 
     @use_rh_args(PaperFileTypeArgs, partial=True)
     def _process_PATCH(self, data):
+        if self.file_type.source_editing_file_type_id:
+            raise UserValueError(_('This file type is synced from editing file types and cannot be edited directly.'))
         update_file_type(self.file_type, **data)
         return PaperFileTypeSchema().jsonify(self.file_type)
 
     def _process_DELETE(self):
+        if self.file_type.source_editing_file_type_id:
+            raise UserValueError(_('This file type is synced from editing file types and cannot be deleted directly.'))
         if PaperFile.query.with_parent(self.file_type).has_rows():
             raise UserValueError(_('Cannot delete file type which already has files'))
 
