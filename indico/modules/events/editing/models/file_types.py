@@ -108,8 +108,8 @@ class EditingFileType(BaseFileType):
 
     # relationship backrefs:
     # - files (EditingRevisionFile.file_type)
+    # - paper_file_type (PaperFileType.source_editing_file_type)
     # - review_conditions (EditingReviewCondition.file_types)
-    # - source_paper_file_type (PaperFileType.source_editing_file_type)
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the file type."""
