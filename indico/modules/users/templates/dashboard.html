@@ -130,18 +130,21 @@
                                     </a>
                                     {{ event.get_label_markup('mini') }}
                                 </span>
+                                {% set role_titles = {
+                                    'management': _("You have management rights") if roles.management else _("You do not have management rights"),
+                                    'reviewing': _("You are a reviewer") if roles.reviewing else _("You are not a reviewer"),
+                                    'attendance': _("You are an attendee") if roles.attendance else _("You are not an attendee"),
+                                    'favorited': _("You have favorited this event") if roles.favorited else _("You have not favorited this event")
+                                    } 
+                                %}
                                 <span class="item-legend">
-                                    <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}" 
-                                        {% else %} title="{% trans %}You do not have management rights{% endtrans %}" {% endif %}
+                                    <span title="{{ role_titles.management }}" 
                                         class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
-                                    <span {% if roles.reviewing %}title="{% trans %}You are a reviewer{% endtrans %}" 
-                                        {% else %} title="{% trans %}You are not a reviewer{% endtrans %}" {% endif %}
+                                    <span title="{{ role_titles.reviewing }}" 
                                         class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
-                                    <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}" 
-                                        {% else %} title="{% trans %}You are not an attendee{% endtrans %}" {% endif %}
+                                    <span title="{{ role_titles.attendance }}" 
                                         class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
-                                    <span {% if roles.favorited %}title="{% trans %}You have favorited this event{% endtrans %}" 
-                                        {% else %} title="{% trans %}You have not favorited this event{% endtrans %}" {% endif %}
+                                    <span title="{{ role_titles.favorited }}" 
                                         class="icon-star contextHelp {% if roles.favorited %}active{% endif %}"></span>
                                 </span>
                             </li>
