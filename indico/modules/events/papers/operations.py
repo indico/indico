@@ -440,3 +440,6 @@ def sync_file_types_with_editing(event):
         else:
             new_paper_ft = create_new_file_type(event, **editing_ft_dict)
             new_paper_ft.source_editing_file_type_id = editing_ft.id
+
+    for orphan in existing_synced_file_types.values():
+        delete_file_type(orphan)
