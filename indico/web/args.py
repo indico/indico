@@ -128,7 +128,9 @@ def use_rh_args(schema_cls, **kwargs):
     """Similar to ``use_args`` but populates the context from RH attributes.
 
     The Schema needs a Meta class with an ``rh_context`` attribute specifying
-    which attributes should be taken from the current RH.
+    which attributes should be taken from the current RH. The last value can
+    be a dict instead of a string to use RH attributes with names not matching
+    the context key.
 
     :param schema_cls: A marshmallow Schema or an argmap dict.
     :param rh_context: When using an argmap, this argument is required and behaves
@@ -149,9 +151,16 @@ def use_rh_args(schema_cls, **kwargs):
             raise TypeError('The `rh_context` kwarg is only supported when passing an argmap')
         rh_context_attrs = schema_cls.Meta.rh_context
 
+    mapped_attrs = {}
+    assert not any(isinstance(x, dict) for x in rh_context_attrs[:-1])
+    if isinstance(rh_context_attrs[-1], dict):
+        rh_context_attrs, mapped_attrs = rh_context_attrs[:-1], rh_context_attrs[-1]
+        assert not mapped_attrs.keys() & set(rh_context_attrs)
+
     def factory(req):
         context = dict(default_context)
         context.update((arg, getattr(g.rh, arg, None)) for arg in rh_context_attrs)
+        context.update((ctx_name, getattr(g.rh, rh_name, None)) for ctx_name, rh_name in mapped_attrs.items())
         return schema_cls(context=context, **schema_kwargs)
 
     return parser.use_args(factory, **webargs_kwargs)
