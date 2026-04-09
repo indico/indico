@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Include keywords in contribution CSV/Excel exports (:pr:`7421`)
+- Log tag assignment and removal for registrations in the event log (:pr:`7446`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
