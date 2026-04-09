@@ -140,6 +140,9 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
 
         files_by_type.setdefault(editing_file_type, []).append(editing_file)
 
+    if not files_by_type:
+        return
+
     user = User.get_system_user()
     create_new_editable(
         contribution,
