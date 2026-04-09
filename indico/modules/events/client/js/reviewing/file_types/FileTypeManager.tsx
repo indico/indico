@@ -32,7 +32,7 @@ interface FileTypeManagerProps {
   getAllURLFn: (params?) => string;
   createURLFn: (params?) => string;
   editURLFn: (params?) => string;
-  autoSubmissionFromPeerReviewURLfn: (params?) => string;
+  autoSubmissionFromPeerReviewURLFn: (params?) => string;
   hideAccepted?: boolean;
   allowDeleteLastType?: boolean;
 }
@@ -73,7 +73,7 @@ export default function FileTypeManager({
   getAllURLFn,
   createURLFn,
   editURLFn,
-  autoSubmissionFromPeerReviewURLfn,
+  autoSubmissionFromPeerReviewURLFn,
   hideAccepted = false,
   allowDeleteLastType = false,
 }: FileTypeManagerProps) {
@@ -85,7 +85,7 @@ export default function FileTypeManager({
     lastData,
   } = useIndicoAxios(getAllURLFn({event_id: eventId}), {camelize: true});
   const {data: autoSubmissionFromPeerReview} = useIndicoAxios(
-    autoSubmissionFromPeerReviewURLfn({event_id: eventId}),
+    autoSubmissionFromPeerReviewURLFn({event_id: eventId}),
     {
       camelize: true,
     }
