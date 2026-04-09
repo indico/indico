@@ -33,11 +33,10 @@ export interface PersonLink {
   affiliation: string;
   avatarURL: string;
   email: string;
-  emailHash: string;
-  familyName: string;
+  lastName: string;
   firstName: string;
   name: string;
-  roles: PersonLinkRole[];
+  roles?: PersonLinkRole[];
 }
 
 export interface Colors {
@@ -49,7 +48,7 @@ export interface LocationData {
   address: string;
   venueId?: number;
   venueName: string;
-  roomId?: string;
+  roomId?: number;
   roomName: string;
   inheriting?: boolean;
 }
@@ -105,6 +104,8 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   type: EntryType.Contribution;
   attachments?: Attachment[];
   sessionId?: number;
+  boardNumber?: string;
+  keywords?: string[];
 }
 
 export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
@@ -123,6 +124,7 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
   childLocationParent: LocationParent;
   attachments?: Attachment[];
   colors?: Colors;
+  code?: string;
 }
 
 export interface ChildBaseEntry {
