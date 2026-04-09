@@ -435,8 +435,8 @@ def sync_file_types_with_editing(event):
     for editing_ft in editing_paper_file_types:
         editing_ft_dict = editing_ft.to_dict()
         if editing_ft.id in existing_synced_file_types:
-            editing_ft = existing_synced_file_types.pop(editing_ft.id)
-            update_file_type(editing_ft, **editing_ft_dict)
+            synced_paper_ft = existing_synced_file_types.pop(editing_ft.id)
+            update_file_type(synced_paper_ft, **editing_ft_dict)
         else:
             new_paper_ft = create_new_file_type(event, **editing_ft_dict)
             new_paper_ft.source_editing_file_type_id = editing_ft.id
