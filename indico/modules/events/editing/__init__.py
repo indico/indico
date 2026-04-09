@@ -149,7 +149,7 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
         RevisionType.ready_for_review
     )
 
-    return '', 201
+    return None
 
 
 class EditingManagerPermission(ManagementPermission):
