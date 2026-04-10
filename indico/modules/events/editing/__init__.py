@@ -127,7 +127,7 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
 
     files_by_type = {}
     for paper_file in files:
-        if not (editing_file_type := paper_file.file_type.source_editing_file_type):
+        if not paper_file.file_type or not (editing_file_type := paper_file.file_type.source_editing_file_type):
             continue
 
         with paper_file.open() as f:
@@ -144,13 +144,17 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
         return
 
     user = User.get_system_user()
-    create_new_editable(
-        contribution,
-        EditableType.paper,
-        user,
-        files_by_type,
-        RevisionType.ready_for_review
-    )
+    try:
+        create_new_editable(
+            contribution,
+            EditableType.paper,
+            user,
+            files_by_type,
+            RevisionType.ready_for_review
+        )
+    except Exception:
+        logger.exception('Failed to create editable for accepted paper %r in contribution %r',
+                         contribution, contribution.id)
 
 
 class EditingManagerPermission(ManagementPermission):
