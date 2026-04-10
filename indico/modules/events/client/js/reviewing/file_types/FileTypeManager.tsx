@@ -205,7 +205,7 @@ export default function FileTypeManager({
         <Segment key={fileType.id} styleName="filetype-segment">
           <div
             styleName={
-              !fileType.sourceEditingFileTypeId &&
+              fileType.sourceEditingFileTypeId &&
               autoSubmissionFromPeerReview &&
               !fileType.url.includes('editing')
                 ? 'filetype-striped'
@@ -214,10 +214,7 @@ export default function FileTypeManager({
           >
             <Label ribbon>
               <StatusIcon
-                active={
-                  (fileType.required && !!fileType.sourceEditingFileTypeId) ||
-                  fileType.url.includes('editing')
-                }
+                active={fileType.required || fileType.url.includes('editing')}
                 icon="asterisk"
                 text={Translate.string('File required')}
               />
