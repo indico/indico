@@ -33,7 +33,7 @@ interface SchemaDate {
 }
 
 interface SchemaEntry {
-  startDate: SchemaDate;
+  startDt: SchemaDate;
   id: EntryUniqueID;
   objId: number;
   title: string;
@@ -109,6 +109,7 @@ export function preprocessTimetableEntries(
       // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
       const entry: any = data[day][_id];
 
+      console.log('oldEntry', entry);
       const {
         duration,
         description = '',
@@ -130,7 +131,7 @@ export function preprocessTimetableEntries(
         objId,
         title,
         description,
-        startDt: dateToMoment(entry.startDate),
+        startDt: dateToMoment(entry.startDt),
         duration,
         x: 0,
         y: 0,
@@ -161,7 +162,7 @@ export function preprocessTimetableEntries(
             title: c.title,
             description: c.description || '',
             personLinks: c.personLinks || [],
-            startDt: dateToMoment(c.startDate),
+            startDt: dateToMoment(c.startDt),
             duration: c.duration,
             sessionBlockId: dayEntries[day].at(-1).id,
             y: 0,
@@ -183,6 +184,7 @@ export function preprocessTimetableEntries(
         });
         dayEntries[day].at(-1).children = children;
       }
+      console.log('new entry', dayEntries[day].at(-1));
     }
   }
 
