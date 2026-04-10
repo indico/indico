@@ -349,8 +349,6 @@ class RHPapersCreateFileType(RHManagePapersBase):
 
     @use_rh_args(PaperFileTypeArgs)
     def _process(self, data):
-        if paper_submission_settings.get(self.event, 'auto_submission_to_editing'):
-            raise UserValueError(_('Cannot create paper file types when auto-submission to editing is enabled.'))
         file_type = create_new_file_type(self.event, **data)
         return PaperFileTypeSchema().jsonify(file_type)
 
