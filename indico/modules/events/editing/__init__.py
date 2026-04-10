@@ -152,8 +152,6 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
         RevisionType.ready_for_review
     )
 
-    return None
-
 
 class EditingManagerPermission(ManagementPermission):
     name = 'editing_manager'
