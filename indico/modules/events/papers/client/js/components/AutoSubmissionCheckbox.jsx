@@ -35,16 +35,16 @@ export default function AutoSubmissionCheckbox({eventId}) {
         size="mini"
         trigger={<Icon styleName="informative-icon" name="info circle" />}
         content={
-          <Message negative icon>
+          <Message info icon>
             <Icon name="warning sign" />
             <Message.Content>
               <Message.Header>
                 <Translate>Auto submission from peer-review</Translate>
               </Message.Header>
               <Translate>
-                When enabled, configurations of file types will be synchronized from the editing
-                system, the synchronized file types won't be editable or deletable on the peer
-                review module.
+                When enabled, file types from the Editing module are synchronized to the Peer Review
+                module. Synchronized file types cannot be modified in Peer Review; they can only be
+                managed in Editing.
               </Translate>
             </Message.Content>
           </Message>
