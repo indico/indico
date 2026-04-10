@@ -34,6 +34,7 @@ export default function FileTypeManagement() {
         autoSubmissionFromPeerReviewURLFn={params =>
           autoSubmissionFromPeerReviewURL({type, ...params})
         }
+        source="editing"
       />
     </>
   );

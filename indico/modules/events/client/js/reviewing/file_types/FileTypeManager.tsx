@@ -35,6 +35,7 @@ interface FileTypeManagerProps {
   autoSubmissionFromPeerReviewURLFn: (params?) => string;
   hideAccepted?: boolean;
   allowDeleteLastType?: boolean;
+  source: 'editing' | 'peer-review';
 }
 
 interface FileTypeManagerState {
@@ -76,6 +77,7 @@ export default function FileTypeManager({
   autoSubmissionFromPeerReviewURLFn,
   hideAccepted = false,
   allowDeleteLastType = false,
+  source,
 }: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {
@@ -205,16 +207,12 @@ export default function FileTypeManager({
         <Segment key={fileType.id} styleName="filetype-segment">
           <div
             styleName={
-              fileType.sourceEditingFileTypeId &&
-              autoSubmissionFromPeerReview &&
-              !fileType.url.includes('editing')
-                ? 'filetype-striped'
-                : ''
+              fileType.sourceEditingFileTypeId && source !== 'editing' ? 'filetype-striped' : ''
             }
           >
             <Label ribbon>
               <StatusIcon
-                active={fileType.required || fileType.url.includes('editing')}
+                active={fileType.required || source === 'editing'}
                 icon="asterisk"
                 text={Translate.string('File required')}
               />
@@ -229,24 +227,16 @@ export default function FileTypeManager({
                 text={Translate.string('File publishable')}
               />
               {fileType.sourceEditingFileTypeId && (
-                <StatusIcon
-                  active={!!fileType.sourceEditingFileTypeId}
-                  icon="sync"
-                  text={Translate.string('File type synced from editing')}
+                <Icon
+                  disabled={!autoSubmissionFromPeerReview}
+                  size="small"
+                  name="sync"
+                  color="red"
+                  title={Translate.string(
+                    'This is a synchronized file type, it should be managed in the editing module and cannot be modified here.'
+                  )}
                 />
               )}
-              {!fileType.sourceEditingFileTypeId &&
-                autoSubmissionFromPeerReview &&
-                !fileType.url.includes('editing') && (
-                  <Icon
-                    size="small"
-                    name="warning"
-                    color="red"
-                    title={Translate.string(
-                      'Auto-submission from peer review is enabled, manually created file types will not be used'
-                    )}
-                  />
-                )}
             </Label>
             <Popup
               on="hover"
