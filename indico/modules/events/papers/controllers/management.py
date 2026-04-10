@@ -230,6 +230,12 @@ class RHManageSubmissionSettings(RHManagePapersBase):
         return jsonify(paper_submission_settings.get(self.event, 'auto_submission_to_editing'))
 
     def _process_PUT(self):
+        if not self.event.has_feature('editing'):
+            return jsonify(error={
+                'title': _('Editing is disabled'),
+                'message': _('Enable the editing module to allow automatic submission of accepted papers.')
+            }), 409
+
         paper_submission_settings.set(self.event, 'auto_submission_to_editing', True)
         sync_file_types_with_editing(self.event)
         return '', 204
