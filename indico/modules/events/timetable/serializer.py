@@ -160,9 +160,7 @@ class TimetableSerializer:
         else:
             entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
-        data.update({'entryType': 'Session',
-                     'sessionId': block.session_id,
-                     'sessionCode': block.session.code,
+        data.update({'sessionId': block.session_id,
                      'sessionTitle': block.session.title,
                      'title': block.title,
                      'attachments': self._get_attachment_data(block.session),
@@ -175,7 +173,6 @@ class TimetableSerializer:
                      'entries': entries,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'friendlyId': block.session.friendly_id,
                      'locationData': camelize_keys(LocationDataSchema().dump(block)),
                      'childLocationParent': LocationParentSchema().dump(block.child_location_parent),
                      **get_color_data(block.session)})
@@ -188,23 +185,18 @@ class TimetableSerializer:
         contribution = entry.contribution
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update({'entryType': 'Contribution',
-                     '_type': 'ContribSchEntry',
-                     '_fossil': 'contribSchEntryDisplay',
-                     'attachments': self._get_attachment_data(contribution),
+        data.update({'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds / 60,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
                      'personLinks': [self._get_person_data(x) for x in contribution.person_links],
                      'code': contribution.code,
-                     'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
                      # 'sessionSlotId': block.id if block else None,
                      # 'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
-                     'friendlyId': contribution.friendly_id,
                      'references': list(map(SerializerBase.serialize_reference, contribution.references)),
                      'boardNumber': contribution.board_number})
         if self.api:
@@ -220,15 +212,9 @@ class TimetableSerializer:
         break_ = entry.break_
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update({'entryType': 'Break',
-                     '_type': 'BreakTimeSchEntry',
-                     '_fossil': 'breakTimeSchEntry',
-                     'description': break_.description,
+        data.update({'description': break_.description,
                      'duration': break_.duration.seconds / 60,
                      'sessionId': block.session_id if block else None,
-                     'sessionCode': block.session.code if block else None,
-                    #  'sessionSlotId': block.id if block else None,
-                    #  'sessionSlotEntryId': entry.parent.id if entry.parent else None,
                      'title': break_.title,
                      'locationData': camelize_keys(LocationDataSchema().dump(break_)),
                      **get_color_data(break_)})
@@ -253,30 +239,23 @@ class TimetableSerializer:
 
         return files + folders
 
-    def _get_date_data(self, entry):
+    def _get_start_dt(self, entry):
         if self.management:
             tzinfo = entry.event.tzinfo
         else:
             tzinfo = entry.event.display_tzinfo
         if entry.type == TimetableEntryType.CONTRIBUTION:
             start_dt = entry.contribution.start_dt_display
-            end_dt = entry.contribution.end_dt_display
         else:
             start_dt = entry.start_dt
-            end_dt = entry.end_dt
-        return {'startDate': self._get_entry_date_dt(start_dt, tzinfo),
-                'endDate': self._get_entry_date_dt(end_dt, tzinfo)}
+
+        return self._get_entry_date_dt(start_dt, tzinfo)
 
     def _get_entry_data(self, entry):
         data = {}
-        data.update(self._get_date_data(entry))
+        data['startDt'] = self._get_start_dt(entry)
         data['id'] = get_unique_key(entry)
         data['objId'] = get_obj_id(entry)
-        data['conferenceId'] = entry.event_id
-        if self.management:
-            data['isParallel'] = entry.is_parallel()
-            data['isParallelInSession'] = entry.is_parallel(in_session=True)
-            data['scheduleEntryId'] = entry.id
         return data
 
     def _get_entry_date_dt(self, dt, tzinfo):
@@ -305,10 +284,7 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
     }
     if contribution.session:
         data.update(get_color_data(contribution.session))
-    data.update({'entryType': 'Contribution',
-                 '_type': 'ContribSchEntry',
-                 '_fossil': 'contribSchEntryDisplay',
-                 'contributionId': contribution.id,
+    data.update({'contributionId': contribution.id,
                  'attachments': [],
                  'description': contribution.description,
                  'duration': contribution.duration_display.seconds / 60,
@@ -317,13 +293,9 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
                  'personLinks': [_get_person_data(x, can_manage_event=can_manage_event)
                                  for x in contribution.person_links],
                  'code': contribution.code,
-                 'sessionCode': None,
                  'sessionId': contribution.session.id if contribution.session else None,
-                 'sessionSlotId': None,
-                 'sessionSlotEntryId': None,
                  'title': contribution.title,
                  'url': url_for('contributions.display_contribution', contribution),
-                 'friendlyId': contribution.friendly_id,
                  'references': [],
                  'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
                  'board_number': contribution.board_number})
@@ -333,8 +305,7 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
 def serialize_event_info(event, *, management=False, user=None):
     from indico.modules.events.contributions import Contribution, contribution_settings
     can_manage_event = event.can_manage(user)
-    return {'_type': 'Conference',
-            'id': str(event.id),
+    return {'id': str(event.id),
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,
@@ -351,7 +322,6 @@ def serialize_event_info(event, *, management=False, user=None):
 def serialize_session(sess):
     """Return data for a single session."""
     return {
-        '_type': 'Session',
         'description': sess.description,
         'id': sess.id,
         'isPoster': sess.is_poster,
