@@ -166,6 +166,7 @@ customElements.define(
               event_id: +this.getAttribute('event-id'),
             })
           }
+          source="peer-review"
         />,
         this
       );
