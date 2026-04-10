@@ -197,17 +197,16 @@ def judge_paper(paper, judgment, comment, judge):
     paper.last_revision.judgment_dt = now_utc()
     db.session.flush()
 
-    if judgment == PaperAction.accept and paper_submission_settings.get(paper.event, 'auto_submission_to_editing'):
-        signals.event.paper_accepted.send(
-            paper.event, contribution=paper.contribution, files=paper.last_revision.files
-        )
-
     log_data = {'New state': orig_string(judgment.title)}
     notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event.log(EventLogRealm.reviewing, LogKind.change, 'Papers',
                     f'Paper "{orig_string(paper.verbose_title)}" was judged', judge,
                     data=log_data)
+    if judgment == PaperAction.accept:
+        signals.event.paper_accepted.send(
+            paper.event, contribution=paper.contribution, files=paper.last_revision.files
+        )
 
 
 def reset_paper_state(paper):
@@ -422,7 +421,11 @@ def delete_file_type(file_type):
     db.session.delete(file_type)
 
 
+@signals.event.core.editing_file_types_changed.connect
 def sync_file_types_with_editing(event):
+    if not paper_submission_settings.get(event, 'auto_submission_to_editing'):
+        return
+
     editing_paper_file_types = [
         editable_ft for editable_ft in event.editing_file_types if editable_ft.type == EditableType.paper
     ]

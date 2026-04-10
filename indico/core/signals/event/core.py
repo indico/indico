@@ -131,3 +131,7 @@ Called when a paper is accepted. The `sender` is the event.
 The contribution associated with the paper is passed in the `contribution` kwarg,
 The accepted files are passed in the `files` kwarg.
 ''')
+
+editing_file_types_changed = _signals.signal('editing-file-types-changed', '''
+Called when editing file types are changed. The `sender` is the event.
+''')
