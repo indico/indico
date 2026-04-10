@@ -5,13 +5,15 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import jsonify, session
+from flask import jsonify, request, session
+from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
+from indico.core.celery import AsyncResult
 from indico.core.db import db
 from indico.modules.admin.controllers.base import RHAdminBase
 from indico.modules.affiliations.matching import (get_affiliation_mappings, get_affiliation_mappings_date,
-                                                  get_affiliation_matches_from_mapping)
+                                                  get_affiliation_matches_from_mapping, get_class_from_entity_type)
 from indico.modules.affiliations.schemas import AffiliationArgs
 from indico.modules.affiliations.tasks import generate_affiliation_matches
 from indico.modules.affiliations.util import SearchAffiliationsMixin, search_affiliations
@@ -21,6 +23,7 @@ from indico.modules.logs.util import make_diff_log
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.countries import get_countries
+from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.web.args import use_args, use_kwargs
 from indico.web.rh import RH
@@ -108,7 +111,7 @@ class RHAffiliationAPI(RHAdminBase):
 
 
 class RHAffiliationsMappingAPI(RHAdminBase):
-    def _process(self):
+    def _process_GET(self):
         mapping = get_affiliation_mappings()
         if mapping is None:
             task = generate_affiliation_matches.delay()
@@ -125,8 +128,49 @@ class RHAffiliationsMappingAPI(RHAdminBase):
                 'original_id': match_result.original_id,
                 'original_entity_type': match_result.original_entity_type,
                 'affiliation_id': match_result.affiliation_id,
+                'display': match_result.display,
             } for match_result in matches],
         })
+
+    def _process_POST(self):
+        task = generate_affiliation_matches.delay()
+        return jsonify(task=task.id)
+
+
+class RHAffiliationsMappingStatusAPI(RHAdminBase):
+    def _process(self):
+        task_id = request.view_args.get('task_id')
+        if task_id is None:
+            raise BadRequest(_('No task ID provided'))
+        task = AsyncResult(task_id)
+        if task.state == 'FAILURE':
+            exception = task.get()
+            assert isinstance(exception, Exception)
+            raise exception
+        return {'status': task.state}
+
+
+class RHAffiliationsMappingApplyAPI(RHAdminBase):
+    def _process(self):
+        mapping = get_affiliation_mappings()
+        if mapping is None:
+            # Maybe return error instead of exception?
+            raise Exception('No mapping exists')
+
+        original_ids = set(request.json.get('original_ids'))
+        approved_matches = [
+            match for match in get_affiliation_matches_from_mapping(mapping)
+            if match.original_id in original_ids
+        ]
+
+        # FIXME: bulk update?
+        for match in approved_matches:
+            entry_class = get_class_from_entity_type(match.original_entity_type)
+            db.session.query(entry_class).filter_by(id=match.original_id).update(
+                {'affiliation_id': match.affiliation_id}
+            )
+
+        return 'success'
 
 
 class RHCountries(RHAdminBase):

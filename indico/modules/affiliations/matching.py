@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
 
 affiliation_mappings_cache = make_scoped_cache('affiliation-mapping')
 
-AFFILIATION_BACKREF_CLASSES = [
+AFFILIATION_BACKREF_CLASSES = (
     AbstractPersonLink,
     ContributionPersonLink,
     EventPersonLink,
@@ -32,7 +32,7 @@ AFFILIATION_BACKREF_CLASSES = [
     SessionBlockPersonLink,
     SubContributionPersonLink,
     User,
-]
+)
 
 type AffiliationEntityType = typing.Literal[
     'AbstractPersonLink',
@@ -53,25 +53,27 @@ class AffiliationMatch:
     original_id: int
     original_entity_type: AffiliationEntityType
     affiliation_id: int
+    display: str
 
 
 def get_affiliation_entity_type(entity: object) -> AffiliationEntityType:
-    match entity:
-        case AbstractPersonLink():
-            return 'AbstractPersonLink'
-        case ContributionPersonLink():
-            return 'ContributionPersonLink'
-        case EventPersonLink():
-            return 'EventPersonLink'
-        case EventPerson():
-            return 'EventPerson'
-        case SessionBlockPersonLink():
-            return 'SessionBlockPersonLink'
-        case SubContributionPersonLink():
-            return 'SubContributionPersonLink'
-        case User():
-            return 'User'
-    raise ValueError(f'type {type(entity)} is not a valid affiliation entity type')
+    if not isinstance(entity, AFFILIATION_BACKREF_CLASSES):
+        raise TypeError(f'type {type(entity)} is not a valid affiliation entity type')
+    return str(type(entity).__name__)
+
+
+def get_class_from_entity_type(entity_type: AffiliationEntityType) -> object:
+    for cls in AFFILIATION_BACKREF_CLASSES:
+        if cls.__name__ == entity_type:
+            return cls
+    raise TypeError(f'type {entity_type!r} is not a valid affiliation entity type')
+
+
+def get_entity_display(entity: object) -> str:
+    # FIXME: implement this for real
+    if not isinstance(entity, AFFILIATION_BACKREF_CLASSES):
+        raise TypeError(f'type {type(entity).__name__} is not a valid affiliation entity type')
+    return str(entity)
 
 
 def get_affiliation_mappings() -> dict[str, 'AffiliationSearchMatch'] | None:
@@ -91,7 +93,8 @@ def get_affiliation_matches_from_mapping(
     for cls in AFFILIATION_BACKREF_CLASSES:
         affiliations.extend(
             cwa for cwa in cls.query.filter(
-                cls.affiliation.is_not(None), cls.affiliation.in_(matched_affiliation_texts)
+                cls.affiliation.is_not(None), cls.affiliation_id.is_(None),
+                cls.affiliation.in_(matched_affiliation_texts)
             ).all()
         )
 
@@ -103,6 +106,7 @@ def get_affiliation_matches_from_mapping(
             original_text=affiliation.affiliation,
             original_id=affiliation.id,
             original_entity_type=get_affiliation_entity_type(affiliation),
+            display=get_entity_display(affiliation),
         )
         for affiliation in affiliations
     ]
