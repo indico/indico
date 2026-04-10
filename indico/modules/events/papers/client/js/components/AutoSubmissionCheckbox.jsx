@@ -43,7 +43,8 @@ export default function AutoSubmissionCheckbox({eventId}) {
               </Message.Header>
               <Translate>
                 When enabled, configurations of file types will be synchronized from the editing
-                system, disabling the creation and edition of file types on the editing module.
+                system, the synchronized file types won't be editable or deletable on the peer
+                review module.
               </Translate>
             </Message.Content>
           </Message>
