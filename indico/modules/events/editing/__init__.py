@@ -122,7 +122,7 @@ def _extend_event_menu(sender, **kwargs):
 def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
     from indico.modules.events.editing.operations import create_new_editable
 
-    if EditableType.paper.name not in contribution.allowed_types_for_editable:
+    if contribution.get_editable(EditableType.paper):
         return
 
     files_by_type = {}
