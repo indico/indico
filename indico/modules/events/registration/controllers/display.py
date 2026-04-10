@@ -18,6 +18,7 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
+from indico.modules.events.registration.constants import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
@@ -412,12 +413,22 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _process_GET(self):
         user_data = get_user_data(self.regform, session.user, self.invitation)
         initial_values = get_initial_form_values(self.regform) | user_data
+        file_data = {}
+        if session.user and user_data.get('picture'):
+            metadata = session.user.picture_metadata or {}
+            file_data['picture'] = {
+                'filename': metadata.get('filename', 'profile_picture.jpg'),
+                'size': metadata.get('size', 0),
+                'uuid': PROFILE_PICTURE_SENTINEL,
+                'previewUrl': session.user.avatar_url,
+            }
         if self._captcha_required:
             initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
                                                initial_values=initial_values,
+                                               file_data=file_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                invitation=self.invitation,

@@ -57,6 +57,8 @@ export default function PictureInput({
     uploadUrlParams.form_token = formToken;
   }
   const previewUrlParams = initialPictureDetails ? initialPictureDetails.locator : null;
+  const resolvedPreviewUrl =
+    initialPictureDetails?.previewUrl || (previewUrlParams ? previewURL(previewUrlParams) : '');
 
   return (
     <div styleName="file-field" id={htmlId}>
@@ -65,7 +67,7 @@ export default function PictureInput({
         disabled={disabled}
         required={isRequired}
         uploadURL={uploadURL(uploadUrlParams)}
-        previewURL={previewUrlParams ? previewURL(previewUrlParams) : ''}
+        previewURL={resolvedPreviewUrl}
         initialPictureDetails={initialPictureDetails}
         minPictureSize={minPictureSize}
       />

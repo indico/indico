@@ -754,6 +754,32 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     assert get_user_data(dummy_regform, dummy_user, invitation) == {}
 
 
+def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):
+    from io import BytesIO
+
+    from PIL import Image
+
+    from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
+    img = Image.new('RGB', (100, 100), color=(200, 100, 50))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'JPEG')
+    dummy_user.picture = img_bytes.getvalue()
+    dummy_user.picture_metadata = {'hash': 0, 'size': len(dummy_user.picture), 'filename': 'test.jpg',
+                                   'content_type': 'image/jpeg',
+                                   'lastmod': 'Thu, 01 Jan 2026 00:00:00 GMT'}
+    db.session.flush()
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+
+    assert user_data.get('picture') == PROFILE_PICTURE_SENTINEL
+
+
+def test_get_user_data_skips_picture_when_no_profile_picture(dummy_regform, dummy_user):
+    assert dummy_user.picture_metadata is None
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'picture' not in user_data
+
+
 @pytest.mark.parametrize(('url', 'ticket_uuid', 'person_id'), (
     ('https://indico.cern.ch', '9982be4e-32cf-4656-a781-62ad45609d12', None),
     ('http://indico.cern.ch', '9982be4e-32cf-4656-a781-62ad45609d12', None),

@@ -33,7 +33,8 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
+from indico.modules.events.registration.constants import (PROFILE_PICTURE_SENTINEL, REGISTRATION_PICTURE_SIZE,
+                                                          REGISTRATION_PICTURE_THUMBNAIL_SIZE)
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
@@ -233,6 +234,9 @@ def get_user_data(regform, user, invitation=None):
 
     active_fields = {item.personal_data_type.name for item in regform.active_fields
                      if item.type == RegistrationFormItemType.field_pd}
+
+    if user and user.has_picture and 'picture' in active_fields:
+        user_data['picture'] = PROFILE_PICTURE_SENTINEL
 
     return {name: value for name, value in user_data.items() if name in active_fields}
 
