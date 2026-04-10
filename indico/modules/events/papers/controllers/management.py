@@ -364,17 +364,15 @@ class RHPapersEditFileType(RHManagePapersBase):
                           .with_parent(self.event)
                           .filter_by(id=request.view_args['file_type_id'])
                           .first_or_404())
+        if self.file_type.source_editing_file_type_id:
+            raise UserValueError(_('This file type is synced from editing file types and cannot be modified directly.'))
 
     @use_rh_args(PaperFileTypeArgs, partial=True)
     def _process_PATCH(self, data):
-        if self.file_type.source_editing_file_type_id:
-            raise UserValueError(_('This file type is synced from editing file types and cannot be edited directly.'))
         update_file_type(self.file_type, **data)
         return PaperFileTypeSchema().jsonify(self.file_type)
 
     def _process_DELETE(self):
-        if self.file_type.source_editing_file_type_id:
-            raise UserValueError(_('This file type is synced from editing file types and cannot be deleted directly.'))
         if PaperFile.query.with_parent(self.file_type).has_rows():
             raise UserValueError(_('Cannot delete file type which already has files'))
 
