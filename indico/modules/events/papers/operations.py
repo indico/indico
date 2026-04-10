@@ -203,7 +203,7 @@ def judge_paper(paper, judgment, comment, judge):
     paper.event.log(EventLogRealm.reviewing, LogKind.change, 'Papers',
                     f'Paper "{orig_string(paper.verbose_title)}" was judged', judge,
                     data=log_data)
-    if judgment == PaperAction.accept:
+    if judgment == PaperAction.accept and paper_submission_settings.get(paper.event, 'auto_submission_to_editing'):
         signals.event.paper_accepted.send(
             paper.event, contribution=paper.contribution, files=paper.last_revision.files
         )
@@ -421,11 +421,7 @@ def delete_file_type(file_type):
     db.session.delete(file_type)
 
 
-@signals.event.core.editing_file_types_changed.connect
 def sync_file_types_with_editing(event):
-    if not paper_submission_settings.get(event, 'auto_submission_to_editing'):
-        return
-
     editing_paper_file_types = [
         editable_ft for editable_ft in event.editing_file_types if editable_ft.type == EditableType.paper
     ]
@@ -446,3 +442,9 @@ def sync_file_types_with_editing(event):
 
     for orphan in existing_synced_file_types.values():
         delete_file_type(orphan)
+
+
+@signals.event.core.editing_file_types_changed.connect
+def sync_file_types_on_editing_file_types_changed(event, **kwargs):
+    if paper_submission_settings.get(event, 'auto_submission_to_editing'):
+        sync_file_types_with_editing(event)
