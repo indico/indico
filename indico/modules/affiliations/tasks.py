@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:
 logger = Logger.get('affiliations')
 
 
-@celery.periodic_task(name='generate_affiliation_matches', run_every=crontab(minute='0', hour='3'))
+@celery.periodic_task(name='generate_affiliation_matches', run_every=crontab(minute='0', hour='3'), ignore_result=False)
 def generate_affiliation_matches(
     search_engine: 'AffiliationSearch | None' = None, batch_size: int = 100, cache: bool = True
 ) -> dict[str, 'AffiliationSearchMatch']:
