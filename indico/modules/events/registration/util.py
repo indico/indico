@@ -50,6 +50,7 @@ from indico.modules.events.registration.notifications import (notify_invitation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
@@ -235,7 +236,7 @@ def get_user_data(regform, user, invitation=None):
     active_fields = {item.personal_data_type.name for item in regform.active_fields
                      if item.type == RegistrationFormItemType.field_pd}
 
-    if user and user.has_picture and 'picture' in active_fields:
+    if user and user.picture_source == ProfilePictureSource.custom and 'picture' in active_fields:
         user_data['picture'] = PROFILE_PICTURE_SENTINEL
 
     return {name: value for name, value in user_data.items() if name in active_fields}

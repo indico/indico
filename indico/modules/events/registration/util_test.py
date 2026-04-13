@@ -11,6 +11,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pytest
+from PIL import Image
 from flask import session
 
 from indico.core.db import db
@@ -26,7 +27,8 @@ from indico.modules.events.registration.util import (create_registration, get_ev
                                                      get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration)
-from indico.modules.users.models.users import UserTitle
+from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
+from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
 
@@ -755,11 +757,6 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
 
 
 def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):
-    from io import BytesIO
-
-    from PIL import Image
-
-    from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
     img = Image.new('RGB', (100, 100), color=(200, 100, 50))
     img_bytes = BytesIO()
     img.save(img_bytes, 'JPEG')
@@ -767,11 +764,33 @@ def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):
     dummy_user.picture_metadata = {'hash': 0, 'size': len(dummy_user.picture), 'filename': 'test.jpg',
                                    'content_type': 'image/jpeg',
                                    'lastmod': 'Thu, 01 Jan 2026 00:00:00 GMT'}
+    dummy_user.picture_source = ProfilePictureSource.custom
     db.session.flush()
 
     user_data = get_user_data(dummy_regform, dummy_user)
 
     assert user_data.get('picture') == PROFILE_PICTURE_SENTINEL
+
+
+@pytest.mark.parametrize('source', [
+    pytest.param('standard', id='standard'),
+    pytest.param('identicon', id='identicon'),
+    pytest.param('gravatar', id='gravatar'),
+])
+def test_get_user_data_skips_picture_for_non_custom_source(dummy_regform, dummy_user, db, source):
+    img = Image.new('RGB', (100, 100), color=(200, 100, 50))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'JPEG')
+    dummy_user.picture = img_bytes.getvalue()
+    dummy_user.picture_metadata = {'hash': 0, 'size': len(dummy_user.picture), 'filename': 'test.jpg',
+                                   'content_type': 'image/jpeg',
+                                   'lastmod': 'Thu, 01 Jan 2026 00:00:00 GMT'}
+    dummy_user.picture_source = ProfilePictureSource[source]
+    db.session.flush()
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+
+    assert 'picture' not in user_data
 
 
 def test_get_user_data_skips_picture_when_no_profile_picture(dummy_regform, dummy_user):
