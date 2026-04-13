@@ -153,8 +153,8 @@ def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
             RevisionType.ready_for_review
         )
     except Exception:
-        logger.exception('Failed to create editable for accepted paper %r in contribution %r',
-                         contribution, contribution.id)
+        logger.exception('Failed to create editable for accepted paper, in contribution %r',
+                         contribution.verbose_title)
 
 
 class EditingManagerPermission(ManagementPermission):
