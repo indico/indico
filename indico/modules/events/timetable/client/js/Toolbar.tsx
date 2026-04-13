@@ -68,8 +68,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const eventStart = useSelector(selectors.getEventStartDt);
   const eventEnd = useSelector(selectors.getEventEndDt);
   const numDays = useSelector(selectors.getEventNumDays);
-  const canUndo = useSelector(selectors.canUndo);
-  const canRedo = useSelector(selectors.canRedo);
+  // const canUndo = useSelector(selectors.canUndo);
+  // const canRedo = useSelector(selectors.canRedo);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
@@ -177,7 +177,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
             <Icon name="grid layout" />
           </Icon.Group>
         </Menu.Item>
-        <Menu.Item
+        {/* TODO: (Ajob) Evaluate whether we want undo/redo or not. It is a lot of extra work */}
+        {/* <Menu.Item
           onClick={() => dispatch(actions.undoChange())}
           disabled={!canUndo}
           title={Translate.string('Undo change')}
@@ -190,7 +191,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
           title={Translate.string('Redo change')}
           icon="redo"
           styleName="action"
-        />
+        /> */}
         <Menu.Item className="right" styleName="action">
           <PublicationStateSwitch
             eventId={eventId}
