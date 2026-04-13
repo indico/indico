@@ -34,11 +34,31 @@ export function DraggableUnscheduledContributionEntry({
   const droppableData = useDroppableData({id: 'calendar'});
 
   const draggableId = `unscheduled-${id}`;
-  const {listeners, setNodeRef, transform, isDragging, rect, initialScroll, mouse, offset, ref} =
-    useDraggable({
-      id: draggableId,
-      fixed: true,
-    });
+  const {
+    listeners: _listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+    rect,
+    initialScroll,
+    mouse,
+    offset,
+    ref,
+  } = useDraggable({
+    id: draggableId,
+    fixed: true,
+  });
+
+  const listeners = {
+    ..._listeners,
+    onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      _listeners.onMouseDown(event);
+    },
+  };
 
   let timeRange = `${duration} minutes`;
   if (transform && droppableData && ref.current) {
