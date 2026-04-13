@@ -6,25 +6,18 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment from 'moment';
 
-import {camelizeKeys} from 'indico/utils/case';
-
+import {mapDataToEntry} from './mapperUtils';
 import {
   Attachment,
-  BreakId,
-  ChildEntry,
   Colors,
-  ContribId,
   DayEntries,
-  EntryType,
   EntryUniqueID,
   LocationData,
   PersonLink,
   Session,
   UnscheduledContribEntry,
 } from './types';
-import {getDefaultColorByType} from './utils';
 
 interface SchemaDate {
   date: string;
@@ -48,10 +41,6 @@ interface SchemaEntry {
   attachments?: Attachment[];
 }
 
-interface SchemaChild extends Omit<SchemaEntry, 'id'> {
-  id: ContribId | BreakId;
-}
-
 interface SchemaSession extends SchemaEntry {
   isPoster: boolean;
   defaultContribDurationMinutes: number;
@@ -64,12 +53,6 @@ interface SchemaBlock extends SchemaEntry {
   personLinks?: PersonLink[];
   attachments?: Attachment[];
 }
-
-const entryTypeMapping = {
-  s: EntryType.SessionBlock,
-  c: EntryType.Contribution,
-  b: EntryType.Break,
-};
 
 export function preprocessSessionData(
   data: Record<string, SchemaSession>
@@ -86,8 +69,6 @@ export function preprocessSessionData(
   );
 }
 
-const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.tz);
-
 export function preprocessTimetableEntries(
   data: Record<string, Record<string, SchemaBlock>>,
   eventInfo: {
@@ -103,124 +84,13 @@ export function preprocessTimetableEntries(
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContribEntry[]} {
   const dayEntries = {};
   for (const day in data) {
-    dayEntries[day] = [];
-    for (const _id in data[day]) {
-      const type = entryTypeMapping[_id[0]];
-      // TODO: (Ajob) Instead of 'any', clean up interfaces and assign one for consistency
-      const entry: any = data[day][_id];
-
-      console.log('oldEntry', entry);
-      const {
-        duration,
-        description = '',
-        locationData,
-        childLocationParent,
-        personLinks,
-        boardNumber = '',
-        code,
-        title,
-        id,
-        objId,
-        attachments,
-        colors,
-      } = entry;
-
-      dayEntries[day].push({
-        type,
-        id,
-        objId,
-        title,
-        description,
-        startDt: dateToMoment(entry.startDt),
-        duration,
-        x: 0,
-        y: 0,
-        width: 0,
-        column: 0,
-        maxColumn: 0,
-        // TODO: (Ajob) Get other attributes such as person_links
-        personLinks,
-        boardNumber,
-        code,
-        locationData,
-        childLocationParent,
-        attachments,
-        ...(colors && {colors}),
-      });
-
-      if (entry.sessionId) {
-        dayEntries[day].at(-1).sessionId = entry.sessionId;
-      }
-
-      if (type === EntryType.SessionBlock) {
-        const children = Object.values(entry.entries).map((c: SchemaChild) => {
-          const childType = entryTypeMapping[c.id[0]];
-          const childEntry: ChildEntry = {
-            type: childType,
-            objId: c.objId,
-            id: c.id,
-            title: c.title,
-            description: c.description || '',
-            personLinks: c.personLinks || [],
-            startDt: dateToMoment(c.startDt),
-            duration: c.duration,
-            sessionBlockId: dayEntries[day].at(-1).id,
-            y: 0,
-            locationData: c.locationData,
-            column: 0,
-            maxColumn: 0,
-          };
-
-          if (childEntry.type === EntryType.Contribution) {
-            childEntry.attachments = c.attachments;
-            childEntry.personLinks = c.personLinks;
-          }
-
-          if (entry.sessionId) {
-            childEntry.sessionId = entry.sessionId;
-          }
-
-          return childEntry;
-        });
-        dayEntries[day].at(-1).children = children;
-      }
-      console.log('new entry', dayEntries[day].at(-1));
-    }
+    dayEntries[day] = Object.values(data[day]).map((entryData: any) => mapDataToEntry(entryData));
   }
 
   return {
     dayEntries,
-    unscheduled: (eventInfo.contributions || [])
-      .map(c => camelizeKeys(c))
-      .map(
-        ({
-          id,
-          objId,
-          sessionId,
-          title,
-          description,
-          duration,
-          personLinks,
-          boardNumber,
-          code,
-          locationData,
-          attachments,
-          colors = getDefaultColorByType(EntryType.Contribution),
-        }) => ({
-          id,
-          objId,
-          type: EntryType.Contribution,
-          sessionId,
-          title,
-          description,
-          duration,
-          personLinks,
-          boardNumber,
-          code,
-          locationData,
-          attachments,
-          colors,
-        })
-      ),
+    unscheduled: (eventInfo.contributions || []).map(
+      (c: any) => mapDataToEntry(c) as UnscheduledContribEntry
+    ),
   };
 }
