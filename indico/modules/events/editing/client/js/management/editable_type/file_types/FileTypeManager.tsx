@@ -88,9 +88,7 @@ export default function FileTypeManager({
   } = useIndicoAxios(getAllURLFn({event_id: eventId}), {camelize: true});
   const {data: autoSubmissionFromPeerReview} = useIndicoAxios(
     autoSubmissionFromPeerReviewURLFn({event_id: eventId}),
-    {
-      camelize: true,
-    }
+    {camelize: true}
   );
   const createFileType = async formData => {
     try {
