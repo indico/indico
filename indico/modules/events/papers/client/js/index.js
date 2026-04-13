@@ -158,7 +158,6 @@ customElements.define(
           allowDeleteLastType
           autoSubmissionFromPeerReviewURLFn={() =>
             autoSubmissionFromPeerReviewURL({
-              type: 'paper',
               event_id: +this.getAttribute('event-id'),
             })
           }

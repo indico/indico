@@ -32,9 +32,7 @@ export default function FileTypeManagement() {
         getAllURLFn={params => fileTypeURL({type, ...params})}
         editURLFn={params => editFileTypeURL({type, ...params})}
         createURLFn={params => createFileTypeURL({type, ...params})}
-        autoSubmissionFromPeerReviewURLFn={params =>
-          autoSubmissionFromPeerReviewURL({type, ...params})
-        }
+        autoSubmissionFromPeerReviewURLFn={params => autoSubmissionFromPeerReviewURL({...params})}
         source="editing"
       />
     </>
