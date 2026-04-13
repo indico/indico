@@ -7,7 +7,6 @@
 
 import autoSubmissionURL from 'indico-url:papers.manage_submission_settings';
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Popup, Message} from 'semantic-ui-react';
 
@@ -17,7 +16,11 @@ import {Translate} from 'indico/react/i18n';
 
 import './AutoSubmissionCheckbox.module.scss';
 
-export default function AutoSubmissionCheckbox({eventId}) {
+interface AutoSumbissionCheckboxProps {
+  eventId: number;
+}
+
+export default function AutoSubmissionCheckbox({eventId}: AutoSumbissionCheckboxProps) {
   const [autoSubmissionEnabled, toggleAutoSubmission, autoSubmissionLoading, autoSubmissionSaving] =
     useTogglableValue(autoSubmissionURL({event_id: eventId}));
 
@@ -30,6 +33,9 @@ export default function AutoSubmissionCheckbox({eventId}) {
         onChange={!autoSubmissionSaving ? toggleAutoSubmission : null}
         label={Translate.string('Enable auto submission from peer-review')}
         disabled={autoSubmissionLoading}
+        indeterminate={false}
+        className=""
+        style={{}}
       />
       <Popup
         size="mini"
@@ -53,7 +59,3 @@ export default function AutoSubmissionCheckbox({eventId}) {
     </div>
   );
 }
-
-AutoSubmissionCheckbox.propTypes = {
-  eventId: PropTypes.number.isRequired,
-};
