@@ -212,7 +212,7 @@ export default function FileTypeManager({
           >
             <Label ribbon>
               <StatusIcon
-                active={fileType.required || source === 'editing'}
+                active={fileType.required}
                 icon="asterisk"
                 text={Translate.string('File required')}
               />
