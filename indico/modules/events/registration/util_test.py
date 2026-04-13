@@ -11,13 +11,14 @@ from io import BytesIO
 from pathlib import Path
 
 import pytest
-from PIL import Image
 from flask import session
+from PIL import Image
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
@@ -27,7 +28,6 @@ from indico.modules.events.registration.util import (create_registration, get_ev
                                                      get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration)
-from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
@@ -772,11 +772,11 @@ def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):
     assert user_data.get('picture') == PROFILE_PICTURE_SENTINEL
 
 
-@pytest.mark.parametrize('source', [
+@pytest.mark.parametrize('source', (
     pytest.param('standard', id='standard'),
     pytest.param('identicon', id='identicon'),
     pytest.param('gravatar', id='gravatar'),
-])
+))
 def test_get_user_data_skips_picture_for_non_custom_source(dummy_regform, dummy_user, db, source):
     img = Image.new('RGB', (100, 100), color=(200, 100, 50))
     img_bytes = BytesIO()
