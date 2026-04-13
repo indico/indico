@@ -76,15 +76,16 @@ function GlobalEvents() {
 
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
-      if (e.ctrlKey && e.key === 'z') {
-        dispatch(actions.undoChange());
-      } else if (e.ctrlKey && e.key === 'y') {
-        dispatch(actions.redoChange());
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         // deselect selected entry
         if (selectedEntry) {
           dispatch(actions.deselectEntry());
         }
+        // TODO: (Ajob) Evaluate need for undo/redo
+        // } else if (e.ctrlKey && e.key === 'z') {
+        //   dispatch(actions.undoChange());
+        // } else if (e.ctrlKey && e.key === 'y') {
+        //   dispatch(actions.redoChange());
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedEntry) {
           switch (selectedEntry.type) {
