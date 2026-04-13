@@ -689,18 +689,34 @@ class ZipGeneratorMixin:
         Windows' built-in ZIP tool doesn't like files whose
         total path exceeds ~260 chars. Here we progressively
         shorten the total until it matches that constraint.
-        """
-        result = []
-        total_len = sum(len(seg) for seg in segments) + len(segments) - 1
-        excess = (total_len - 255) if total_len > 255 else 0
 
-        for seg in reversed(segments):
-            fname, ext = os.path.splitext(seg)
-            cut = min(excess, (len(fname) - 10) if len(fname) > 14 else 0)
-            if cut:
+        We try to preserve the filename if possible by first
+        truncating the directories (in reverse order). If this
+        is not enough, we truncate the filename as well.
+        """
+        filename = segments[-1]
+        directories = segments[:-1]
+
+        result = [filename]
+        total_path_separators = len(segments) - 1
+        total_segments_len = sum(len(seg) for seg in segments)
+        total_len = total_segments_len + total_path_separators
+        excess = max(0, total_len - 255)
+
+        for seg in reversed(directories):
+            cut = max(0, min(excess, len(seg) - 10))
+            if cut > 0:
                 excess -= cut
+                seg = seg[:-cut]
+            result.append(seg)
+
+        if excess:
+            # If there's still excess, we need to truncate the filename
+            fname, ext = os.path.splitext(filename)
+            cut = max(0, min(excess, len(fname) - 10))
+            if cut > 0:
                 fname = fname[:-cut]
-            result.append(fname + ext)
+                result[0] = fname + ext
 
         return reversed(result)
 
