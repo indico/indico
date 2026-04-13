@@ -16,17 +16,16 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.date_time import iterdays
 from indico.util.locations import LocationDataSchema, LocationParentSchema
-from indico.util.string import camelize_keys
 from indico.web.flask.util import url_for
 
 
-def get_obj_id(entry):
-    if entry.type == TimetableEntryType.SESSION_BLOCK:
-        return entry.session_block.id
-    elif entry.type == TimetableEntryType.CONTRIBUTION:
-        return entry.contribution.id
-    elif entry.type == TimetableEntryType.BREAK:
-        return entry.break_.id
+def get_entry_type(entry_type):
+    if entry_type == TimetableEntryType.SESSION_BLOCK:
+        return 'block'
+    elif entry_type == TimetableEntryType.CONTRIBUTION:
+        return 'contrib'
+    elif entry_type == TimetableEntryType.BREAK:
+        return 'break'
     else:
         raise ValueError
 
@@ -45,8 +44,8 @@ def get_unique_key(entry):
 def get_color_data(obj):
     return {
         'colors': {
-            'backgroundColor': f'#{obj.background_color}',
-            'color': f'#{obj.text_color}',
+            'background': f'#{obj.background_color}',
+            'text': f'#{obj.text_color}',
         }
     }
 
@@ -121,7 +120,7 @@ class TimetableSerializer:
             key = get_unique_key(entry)
             if entry.parent:
                 parent_code = get_unique_key(entry.parent)
-                timetable[date_str][parent_code]['entries'][key] = data
+                timetable[date_str][parent_code]['children'][key] = data
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
                         entry.start_dt.astimezone(tzinfo).date() != entry.end_dt.astimezone(tzinfo).date()):
@@ -156,25 +155,27 @@ class TimetableSerializer:
         block = entry.session_block
         data = {}
         if not load_children:
-            entries = defaultdict(dict)
+            children = defaultdict(dict)
         else:
-            entries = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
+            children = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
         data.update(self._get_entry_data(entry))
-        data.update({'sessionId': block.session_id,
-                     'sessionTitle': block.session.title,
+        data.update({'id': block.id,
+                     'type': get_entry_type(TimetableEntryType.SESSION_BLOCK),
+                     'session_id': block.session_id,
+                     'session_title': block.session.title,
                      'title': block.title,
                      'attachments': self._get_attachment_data(block.session),
                      'code': block.session.code,
-                     'contribDuration': block.session.default_contribution_duration.seconds / 60,
-                     'personLinks': [self._get_person_data(x) for x in block.person_links],
+                     'contrib_duration': block.session.default_contribution_duration.seconds,
+                     'person_links': [self._get_person_data(x) for x in block.person_links],
                      'description': block.session.description,
-                     'duration': block.duration.seconds / 60,
-                     'isPoster': block.session.is_poster,
-                     'entries': entries,
+                     'duration': block.duration.seconds,
+                     'is_poster': block.session.is_poster,
+                     'children': children,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'locationData': camelize_keys(LocationDataSchema().dump(block)),
-                     'childLocationParent': LocationParentSchema().dump(block.child_location_parent),
+                     'location_data': LocationDataSchema().dump(block),
+                     'child_location_parent': LocationParentSchema().dump(block.child_location_parent),
                      **get_color_data(block.session)})
         return data
 
@@ -185,20 +186,20 @@ class TimetableSerializer:
         contribution = entry.contribution
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update({'attachments': self._get_attachment_data(contribution),
+        data.update({'id': contribution.id,
+                     'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
+                     'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
-                     'duration': contribution.duration_display.seconds / 60,
+                     'duration': contribution.duration_display.seconds,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
-                     'personLinks': [self._get_person_data(x) for x in contribution.person_links],
+                     'person_links': [self._get_person_data(x) for x in contribution.person_links],
                      'code': contribution.code,
-                     'sessionId': block.session_id if block else None,
-                     # 'sessionSlotId': block.id if block else None,
-                     # 'sessionSlotEntryId': entry.parent.id if entry.parent else None,
-                     'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
+                     'session_id': block.session_id if block else None,
+                     'location_data': LocationDataSchema().dump(contribution),
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'references': list(map(SerializerBase.serialize_reference, contribution.references)),
-                     'boardNumber': contribution.board_number})
+                     'board_number': contribution.board_number})
         if self.api:
             data['authors'] = list(map(self._get_person_data,
                                        sorted((p for p in contribution.person_links if not p.is_speaker),
@@ -212,11 +213,13 @@ class TimetableSerializer:
         break_ = entry.break_
         data = {}
         data.update(self._get_entry_data(entry))
-        data.update({'description': break_.description,
-                     'duration': break_.duration.seconds / 60,
-                     'sessionId': block.session_id if block else None,
+        data.update({'id': break_.id,
+                     'type': get_entry_type(TimetableEntryType.BREAK),
+                     'description': break_.description,
+                     'duration': break_.duration.seconds,
+                     'session_id': block.session_id if block else None,
                      'title': break_.title,
-                     'locationData': camelize_keys(LocationDataSchema().dump(break_)),
+                     'location_data': LocationDataSchema().dump(break_),
                      **get_color_data(break_)})
         return data
 
@@ -253,15 +256,11 @@ class TimetableSerializer:
 
     def _get_entry_data(self, entry):
         data = {}
-        data['startDt'] = self._get_start_dt(entry)
-        data['id'] = get_unique_key(entry)
-        data['objId'] = get_obj_id(entry)
+        data['start_dt'] = self._get_start_dt(entry)
         return data
 
     def _get_entry_date_dt(self, dt, tzinfo):
-        return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
-                'time': dt.astimezone(tzinfo).strftime('%H:%M:%S'),
-                'tz': str(tzinfo)}
+        return dt.astimezone(tzinfo).isoformat()
 
     def _get_person_data(self, person_link):
         return _get_person_data(person_link, can_manage_event=self.can_manage_event)
@@ -280,24 +279,25 @@ def serialize_contribution(contribution):
 def serialize_unscheduled_contribution(contribution, *, management=False, can_manage_event=False):
     data = {
         'id': f'c{contribution.id}',
-        'objId': contribution.id
     }
     if contribution.session:
         data.update(get_color_data(contribution.session))
-    data.update({'contributionId': contribution.id,
+    data.update({'id': contribution.id,
+                 'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
+                 'contribution_id': contribution.id,
                  'attachments': [],
                  'description': contribution.description,
-                 'duration': contribution.duration_display.seconds / 60,
+                 'duration': contribution.duration_display.seconds,
                  'pdf': url_for('contributions.export_pdf', contribution),
                  'presenters': [],
-                 'personLinks': [_get_person_data(x, can_manage_event=can_manage_event)
+                 'person_links': [_get_person_data(x, can_manage_event=can_manage_event)
                                  for x in contribution.person_links],
                  'code': contribution.code,
-                 'sessionId': contribution.session.id if contribution.session else None,
+                 'session_id': contribution.session.id if contribution.session else None,
                  'title': contribution.title,
                  'url': url_for('contributions.display_contribution', contribution),
                  'references': [],
-                 'locationData': camelize_keys(LocationDataSchema().dump(contribution)),
+                 'location_data': LocationDataSchema().dump(contribution),
                  'board_number': contribution.board_number})
     return data
 
@@ -328,5 +328,8 @@ def serialize_session(sess):
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
         'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60,
-        **get_color_data(sess),
+        'colors': {
+            'backgroundColor': f'#{sess.background_color}',
+            'color': f'#{sess.text_color}',
+        }
     }

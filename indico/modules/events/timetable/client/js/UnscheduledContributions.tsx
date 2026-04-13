@@ -48,6 +48,7 @@ function UnscheduledContributionList({
           title={contrib.title}
           duration={contrib.duration}
           colors={contrib.colors}
+          sessionId={contrib.sessionId}
         />
       ))}
     </div>
