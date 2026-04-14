@@ -68,10 +68,10 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   }
 
   function onDoubleClick(evt: React.MouseEvent<HTMLElement>) {
+    evt.stopPropagation();
     if (rest.type !== EntryType.SessionBlock || isPosterBlock) {
       return;
     }
-    evt.stopPropagation();
     dispatch(actions.deselectEntry());
     dispatch(actions.setExpandedSessionBlock(id));
   }
