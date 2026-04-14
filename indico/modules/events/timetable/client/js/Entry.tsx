@@ -53,6 +53,9 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
+  const isPosterBlock = useSelector((state: ReduxState) =>
+    selectors.isPosterSessionBlock(state, id)
+  );
   // Used to determine whether the entry was just clicked or actually dragged
   // if dragged, this prevents selecting the entry on drag end (and thus showing the popup)
   const isClick = useRef<boolean>(true);
@@ -64,6 +67,15 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
     }
   }
 
+  function onDoubleClick(evt: React.MouseEvent<HTMLElement>) {
+    evt.stopPropagation();
+    if (rest.type !== EntryType.SessionBlock || isPosterBlock) {
+      return;
+    }
+    dispatch(actions.deselectEntry());
+    dispatch(actions.setExpandedSessionBlock(id));
+  }
+
   function onMouseDown() {
     isClick.current = true;
   }
@@ -71,6 +83,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const listeners = {
     ..._listeners,
     onClick,
+    onDoubleClick,
     onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
       if (event.button !== 0) {
         return;
