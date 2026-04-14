@@ -63,12 +63,7 @@ function SessionBlockToolbar() {
       <Header as="h3" styleName="header">
         <span>{title}</span>
       </Header>
-      <Button
-        basic
-        size="mini"
-        onClick={closeExpandedBlock}
-        styleName="close-btn"
-      >
+      <Button basic size="mini" onClick={closeExpandedBlock} styleName="close-btn">
         <Icon name="close" />
         <Translate>Close session block view</Translate>
       </Button>
