@@ -7,26 +7,33 @@
 
 import moment from 'moment';
 
-import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
-
-import {Entry, EntryType} from './types';
+import {Entry, EntryType, Session} from './types';
 import {getEntryUniqueId} from './utils';
 
 // (Ajob) We have to use AllKeys instead of keyof Entry, because keyof Entry
 //        will be either keyof TopLevelEntry or keyof ChildEntry, instead of
 //        a recursive union of both types and deeper nested ones.
 type AllKeys<T> = T extends unknown ? keyof T : never;
-type EntryKey = AllKeys<Entry>;
 
-interface MapperEntry {
-  from: string;
-  to: EntryKey;
-  fromTransform?: (value: unknown) => unknown;
-  toTransform?: (value: unknown) => unknown;
+interface MapperEntry<From, To> {
+  from: AllKeys<From>;
+  to: AllKeys<To>;
+  fromTransform?: (value: any, data: From) => any;
+  toTransform?: (value: any, data: To) => any;
+  delete?: boolean;
 }
 
-const mapperConfig: MapperEntry[] = [
-  {from: 'id', to: 'objId'},
+type MapperConfig<From, To> = MapperEntry<From, To>[];
+
+// Mapper configurations for various timetable objects
+const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
+  {from: 'id', to: 'objId', toTransform: () => undefined},
+  {
+    from: 'id',
+    to: 'id',
+    fromTransform: (v: number, data) => (v ? getEntryUniqueId(data.type as EntryType, v) : null),
+    toTransform: (v: string) => +v.slice(1),
+  },
   {from: 'type', to: 'type'},
   {from: 'title', to: 'title'},
   {from: 'description', to: 'description'},
@@ -73,62 +80,90 @@ const mapperConfig: MapperEntry[] = [
     fromTransform: (v: unknown) => (typeof v === 'string' ? moment(v) : v),
     toTransform: (v: unknown) => (v as moment.Moment)?.toISOString?.() ?? v,
   },
+  {
+    from: 'children',
+    to: 'children',
+    // TODO: (Ajob) Find a clean way to fix this use-before-define error...
+    // eslint-disable-next-line no-use-before-define
+    fromTransform: (children: Record<string, unknown>[]) => children.map(c => mapDataToEntry(c)),
+    // eslint-disable-next-line no-use-before-define
+    toTransform: (children: Entry[]) => children.map(c => mapEntryToData(c)),
+  },
 ];
 
-export function mapDataToEntry(data: Record<string, unknown>, partial: true): Partial<Entry>;
-export function mapDataToEntry(data: Record<string, unknown>, partial?: false): Entry;
-export function mapDataToEntry(
-  data: Record<string, unknown>,
-  partial = false
-): Entry | Partial<Entry> {
-  const result: Partial<Entry> = {};
+const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
+  {from: 'id', to: 'id'},
+  {from: 'title', to: 'title'},
+  {from: 'is_poster', to: 'isPoster'},
+  {
+    from: 'colors',
+    to: 'colors',
+    toTransform: (colors: {color: string; backgroundColor: string}) => ({
+      text: colors.color,
+      background: colors.backgroundColor,
+    }),
+    fromTransform: (colors: {text: string; background: string}) => ({
+      color: colors.text,
+      backgroundColor: colors.background,
+    }),
+  },
+  {
+    from: 'default_contribution_duration',
+    to: 'defaultContribDurationMinutes',
+    toTransform: (minutes: number) => minutes / 60,
+    fromTransform: (seconds: number) => seconds * 60,
+  },
+];
 
-  for (const {from, to, fromTransform} of mapperConfig) {
-    const rawValue = data[from];
-    if (rawValue === undefined) {
-      continue;
+// Generic mapper
+function createMapper<From, To>(config: MapperConfig<From, To>) {
+  function mapDataToObj(data: From, partial = false): To | Partial<To> {
+    const result: Partial<To> = {};
+    for (const {from, to, fromTransform} of config) {
+      // TODO: (Ajob) Resolve this any issue
+      if (partial && !(from in (data as any))) {
+        continue;
+      }
+      const rawValue = data[from];
+      if (rawValue === undefined) {
+        continue;
+      }
+      const value = fromTransform ? fromTransform(rawValue, data) : rawValue;
+      if (value !== undefined) {
+        result[to] = value;
+      }
     }
-    if (partial && !Object.prototype.hasOwnProperty.call(data, from)) {
-      continue;
-    }
-
-    const value = fromTransform ? fromTransform(rawValue) : camelizeKeys(rawValue);
-    if (value !== undefined) {
-      result[to] = value;
-    }
+    return partial ? result : (result as To);
   }
 
-  if (data.type && data.id) {
-    result.id = getEntryUniqueId(data.type as EntryType, data.id as number);
+  function mapObjToData(obj: Partial<To>, partial = false): Partial<From> | From {
+    const result: Partial<From> = {};
+    for (const {from, to, toTransform} of config) {
+      if (partial && !(to in obj)) {
+        continue;
+      }
+      const value = obj[to];
+      if (value === undefined) {
+        continue;
+      }
+      const rawValue = toTransform ? toTransform(value, obj as To) : value;
+      result[from] = rawValue;
+    }
+    return partial ? result : (result as From);
   }
 
-  if (!partial) {
-    Object.assign(result, {
-      x: 0,
-      y: 0,
-      column: 0,
-      maxColumn: 0,
-      children: [],
-    });
-  }
-
-  return result;
+  return {mapDataToObj, mapObjToData};
 }
 
-export function mapEntryToData(data: Partial<Entry>, partial = false): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
+// Custom mappers
+const {mapDataToObj: mapDataToEntry, mapObjToData: mapEntryToData} = createMapper<
+  Record<string, unknown>,
+  Entry
+>(entryMapperConfig);
+const {mapDataToObj: mapDataToSession, mapObjToData: mapSessionToData} = createMapper<
+  Record<string, unknown>,
+  Session
+>(sessionMapperConfig);
 
-  for (const {from, to, toTransform} of mapperConfig) {
-    const value = data[to];
-    if (value === undefined) {
-      continue;
-    }
-    if (partial && !Object.prototype.hasOwnProperty.call(data, to)) {
-      continue;
-    }
-    const rawValue = toTransform ? toTransform(value) : snakifyKeys(value);
-    result[from] = rawValue;
-  }
-
-  return result;
-}
+export {mapDataToEntry, mapEntryToData};
+export {mapDataToSession, mapSessionToData};
