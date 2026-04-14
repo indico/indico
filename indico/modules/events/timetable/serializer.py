@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import defaultdict
 from hashlib import md5
 
 from flask import has_request_context, session
@@ -120,10 +119,12 @@ class TimetableSerializer:
             key = get_unique_key(entry)
             if entry.parent:
                 parent_code = get_unique_key(entry.parent)
-                timetable[date_str][parent_code]['children'][key] = data
+                data['session_block_id'] = entry.parent.session_block.id
+                timetable[date_str][parent_code]['children'].append(data)
             else:
                 if (entry.type == TimetableEntryType.SESSION_BLOCK and
                         entry.start_dt.astimezone(tzinfo).date() != entry.end_dt.astimezone(tzinfo).date()):
+                    # (Ajob) TODO: Evaluate if comment below is actually something we want to do
                     # If a session block lasts into another day we need to add it to that day, too
                     timetable[entry.end_dt.astimezone(tzinfo).date().strftime('%Y%m%d')][key] = data
                 timetable[date_str][key] = data
@@ -155,9 +156,9 @@ class TimetableSerializer:
         block = entry.session_block
         data = {}
         if not load_children:
-            children = defaultdict(dict)
+            children = []
         else:
-            children = {get_unique_key(x): self.serialize_timetable_entry(x) for x in entry.children}
+            children = [self.serialize_timetable_entry(x) for x in entry.children]
         data.update(self._get_entry_data(entry))
         data.update({'id': block.id,
                      'type': get_entry_type(TimetableEntryType.SESSION_BLOCK),
@@ -175,8 +176,7 @@ class TimetableSerializer:
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
                      'location_data': LocationDataSchema().dump(block),
-                     'child_location_parent': LocationParentSchema().dump(block.child_location_parent),
-                     **get_color_data(block.session)})
+                     'child_location_parent': LocationParentSchema().dump(block.child_location_parent)})
         return data
 
     def serialize_contribution_entry(self, entry):
