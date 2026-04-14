@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {Button, Divider, Header, Segment} from 'semantic-ui-react';
@@ -263,6 +263,17 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const changeForm = (key: EntryType) => {
     setActiveType(key);
   };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [onClose]);
 
   return (
     <FinalModalForm
