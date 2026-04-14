@@ -64,6 +64,15 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
     }
   }
 
+  function onDoubleClick(evt: React.MouseEvent<HTMLElement>) {
+    if (rest.type !== EntryType.SessionBlock) {
+      return;
+    }
+    evt.stopPropagation();
+    dispatch(actions.deselectEntry());
+    dispatch(actions.setExpandedSessionBlock(id));
+  }
+
   function onMouseDown() {
     isClick.current = true;
   }
@@ -71,6 +80,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const listeners = {
     ..._listeners,
     onClick,
+    onDoubleClick,
     onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
       if (event.button !== 0) {
         return;
