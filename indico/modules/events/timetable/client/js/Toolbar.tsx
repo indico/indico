@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Header, Icon, Label, Menu} from 'semantic-ui-react';
 
@@ -28,6 +28,24 @@ function SessionBlockToolbar() {
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors(expandedSessionBlock, session);
 
+  const closeExpandedBlock = useCallback(
+    () => dispatch(actions.setExpandedSessionBlock(null)),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (!expandedSessionBlock) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeExpandedBlock();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [expandedSessionBlock, closeExpandedBlock]);
+
   if (!expandedSessionBlock) {
     return null;
   }
@@ -48,7 +66,7 @@ function SessionBlockToolbar() {
       <Button
         basic
         size="mini"
-        onClick={() => dispatch(actions.setExpandedSessionBlock(null))}
+        onClick={closeExpandedBlock}
         styleName="close-btn"
       >
         <Icon name="close" />
