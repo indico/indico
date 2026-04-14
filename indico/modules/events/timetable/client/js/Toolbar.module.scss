@@ -64,6 +64,15 @@ $toolbar-bg-color: $raincloud-gray;
           box-shadow: none;
           margin: 0;
           padding: 2px;
+
+          kbd {
+            font-size: 0.75em;
+            padding: 1px 5px;
+            margin-left: 6px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            background-color: #f9f9f9;
+          }
         }
       }
 
