@@ -47,13 +47,6 @@ interface SchemaSession extends SchemaEntry {
   colors: Colors;
 }
 
-interface SchemaBlock extends SchemaEntry {
-  sessionId?: number;
-  entries?: Record<string, SchemaEntry>;
-  personLinks?: PersonLink[];
-  attachments?: Attachment[];
-}
-
 export function preprocessSessionData(
   data: Record<string, SchemaSession>
 ): Record<string, Session> {
@@ -70,7 +63,7 @@ export function preprocessSessionData(
 }
 
 export function preprocessTimetableEntries(
-  data: Record<string, Record<string, SchemaBlock>>,
+  data: Record<string, unknown>,
   eventInfo: {
     contributions?: {
       id: string;
@@ -82,15 +75,17 @@ export function preprocessTimetableEntries(
     }[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContribEntry[]} {
-  const dayEntries = {};
-  for (const day in data) {
-    dayEntries[day] = Object.values(data[day]).map((entryData: any) => mapDataToEntry(entryData));
-  }
+  const dayEntries = Object.fromEntries(
+    Object.entries(data).map(([day, entries]) => [
+      day,
+      Object.values(entries).map((entryData: Record<string, unknown>) => mapDataToEntry(entryData)),
+    ])
+  );
 
   return {
     dayEntries,
     unscheduled: (eventInfo.contributions || []).map(
-      (c: any) => mapDataToEntry(c) as UnscheduledContribEntry
+      (c: Record<string, unknown>) => mapDataToEntry(c) as UnscheduledContribEntry
     ),
   };
 }
