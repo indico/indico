@@ -36,6 +36,15 @@ export interface PersonLink {
   lastName: string;
   firstName: string;
   name: string;
+  address?: string;
+  affiliationId?: number;
+  avatarUrl?: string;
+  displayOrder?: number;
+  personId?: number;
+  phone?: `+${number}`;
+  title?: string;
+  userId?: number;
+  userIdentifier?: `User:${string}`;
   roles?: PersonLinkRole[];
 }
 
