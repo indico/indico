@@ -54,8 +54,7 @@ class TestRegistrationEditPermissionDefinition:
     reglists.RHRegistrationDelete,
 ))
 def test_edit_permission_granted(rh):
-    assert isinstance(rh.PERMISSION, tuple)
-    assert 'registration_edit' in rh.PERMISSION
+    assert set(rh.PERMISSION) >= {'registration', 'registration_edit'}
 
 
 @pytest.mark.parametrize('rh', (
