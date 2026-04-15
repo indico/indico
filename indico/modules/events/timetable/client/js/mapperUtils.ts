@@ -133,7 +133,6 @@ const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> 
   {from: 'address', to: 'address'},
   {from: 'affiliation', to: 'affiliation'},
   {from: 'affiliation_id', to: 'affiliationId'},
-  {from: 'affiliation_meta', to: 'affiliationMeta'},
   {from: 'avatar_url', to: 'avatarUrl'},
   {from: 'display_order', to: 'displayOrder'},
   {from: 'email', to: 'email'},
@@ -144,7 +143,6 @@ const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> 
   {from: 'phone', to: 'phone'},
   {from: 'roles', to: 'roles'},
   {from: 'title', to: 'title'},
-  {from: 'type', to: 'type'},
   {from: 'user_id', to: 'userId'},
   {from: 'user_identifier', to: 'userIdentifier'},
 ];
