@@ -8,7 +8,7 @@
 import moment from 'moment';
 
 import {mapDataToEntry, mapEntryToData} from './mapperUtils';
-import {BlockEntry, BreakEntry, ContribEntry, EntryType} from './types';
+import {BlockEntry, BreakEntry, ContribEntry, EntryType, PersonLink} from './types';
 
 const dataLocationData = {
   address: 'Avenue du Jura',
@@ -32,7 +32,6 @@ const dataPersonLink = {
   address: '',
   affiliation: '',
   affiliation_id: null,
-  affiliation_meta: null,
   avatar_url: '/user/1/picture-default/xxx',
   display_order: 0,
   email: 'john.doe@cern.ch',
@@ -42,16 +41,14 @@ const dataPersonLink = {
   person_id: 1,
   phone: '+3131313131',
   title: null,
-  type: 'person_link',
   user_id: 1,
   user_identifier: 'User:1:xxx',
 };
 
-const entryPersonLink = {
+const entryPersonLink: PersonLink = {
   address: '',
   affiliation: '',
   affiliationId: null,
-  affiliationMeta: null,
   avatarURL: '/user/1/picture-default/xxx',
   displayOrder: 0,
   email: 'john.doe@cern.ch',
@@ -61,7 +58,6 @@ const entryPersonLink = {
   personId: 1,
   phone: '+3131313131',
   title: null,
-  type: 'person_link',
   userId: 1,
   userIdentifier: 'User:1:xxx',
 };
