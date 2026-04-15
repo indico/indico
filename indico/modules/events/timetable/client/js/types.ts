@@ -31,14 +31,13 @@ export type EntryUniqueID = SessionBlockId | BreakId | ContribId;
 
 export interface PersonLink {
   affiliation: string;
-  avatarURL: string;
   email: string;
   lastName: string;
   firstName: string;
   name: string;
   address?: string;
   affiliationId?: number;
-  avatarUrl?: string;
+  avatarURL?: string;
   displayOrder?: number;
   personId?: number;
   phone?: `+${number}`;
