@@ -22,7 +22,7 @@ import {ThunkDispatch} from 'redux-thunk/es';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {getRandomColors, parseColorsToSchema} from './colors';
-import {mapDataToEntry} from './mapperUtils';
+import {mapDataToEntry, mapDataToSession} from './mapperUtils';
 import {
   TopLevelEntry,
   BlockEntry,
@@ -36,7 +36,7 @@ import {
   Session,
   ReduxState,
 } from './types';
-import {getEntryURLByObjId, mapTTDataToSession} from './utils';
+import {getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -217,18 +217,18 @@ export function setSessionData(data: any): SetSessionDataAction {
   return {type: SET_SESSION_DATA, data};
 }
 
-export function editSession(sessionId: number, session: Partial<Session>) {
+export function editSession(sessionId: number, payload: Record<string, unknown>) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
       sessions,
     } = getState();
     const url = sessionURL({event_id: eventId, session_id: sessionId});
-    const newSessionObj = mapTTDataToSession(session);
-    const changedSession = {...sessions[sessionId], ...newSessionObj};
+    const partialSession = mapDataToSession(payload, true);
+    const changedSession = {...sessions[sessionId], ...partialSession};
 
     return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.patch(url, session), {
+      synchronizedAjaxAction(() => indicoAxios.patch(url, payload), {
         type: EDIT_SESSION,
         session: changedSession,
       })
@@ -253,11 +253,10 @@ export function createSession(session) {
       }
 
       const {data: newSession} = await indicoAxios.post(url, session);
-      const mappedSession = mapTTDataToSession(newSession);
 
       return dispatch({
         type: CREATE_SESSION,
-        session: mappedSession,
+        session: mapDataToSession(newSession),
       });
     } catch (e) {
       handleAxiosError(e);
