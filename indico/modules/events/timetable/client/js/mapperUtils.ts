@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 
-import {Entry, EntryType, Session} from './types';
+import {Entry, EntryType, PersonLink, Session} from './types';
 import {getEntryUniqueId} from './utils';
 
 // (Ajob) We have to use AllKeys instead of keyof Entry, because keyof Entry
@@ -20,13 +20,18 @@ interface MapperEntry<From, To> {
   to: AllKeys<To>;
   fromTransform?: (value: any, data: From) => any;
   toTransform?: (value: any, data: To) => any;
-  delete?: boolean;
 }
 
 type MapperConfig<From, To> = MapperEntry<From, To>[];
 
+// (Ajob) We are assigning it at the bottom
+// eslint-disable-next-line prefer-const
+let mapDataToPersonLink, mapPersonLinkToData;
+
 // Mapper configurations for various timetable objects
 const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
+  // {from: 'type', to: 'type'},
+  {from: 'type', to: 'type'},
   {from: 'id', to: 'objId', toTransform: () => undefined},
   {
     from: 'id',
@@ -34,7 +39,6 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: (v: number, data) => (v ? getEntryUniqueId(data.type as EntryType, v) : null),
     toTransform: (v: string) => +v.slice(1),
   },
-  {from: 'type', to: 'type'},
   {from: 'title', to: 'title'},
   {from: 'description', to: 'description'},
   {from: 'board_number', to: 'boardNumber'},
@@ -42,8 +46,18 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
   // 							back-end, and only personLinks in front-end. This is
   // 							causing inconsistency here. We should probably not
   // 							be using person_links for conveners on the front-end.
-  {from: 'person_links', to: 'personLinks'},
-  {from: 'conveners', to: 'personLinks'},
+  {
+    from: 'person_links',
+    to: 'personLinks',
+    fromTransform: p => p.map(mapDataToPersonLink),
+    toTransform: p => p.map(mapPersonLinkToData),
+  },
+  {
+    from: 'conveners',
+    to: 'personLinks',
+    fromTransform: p => p.map(mapDataToPersonLink),
+    toTransform: p => p.map(mapPersonLinkToData),
+  },
   {from: 'location_data', to: 'locationData'},
   {from: 'location_parent', to: 'locationParent'},
   {from: 'child_location_parent', to: 'childLocationParent'},
@@ -61,7 +75,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
       text: c.color,
     }),
   },
-  {from: 'session_id', to: 'sessionId', fromTransform: (v: unknown) => v ?? null},
+  {from: 'session_id', to: 'sessionId'},
   {
     from: 'session_block_id',
     to: 'sessionBlockId',
@@ -98,27 +112,49 @@ const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
   {
     from: 'colors',
     to: 'colors',
-    toTransform: (colors: {color: string; backgroundColor: string}) => ({
-      text: colors.color,
-      background: colors.backgroundColor,
+    fromTransform: (c: {background: string; text: string}) => ({
+      backgroundColor: c.background,
+      color: c.text,
     }),
-    fromTransform: (colors: {text: string; background: string}) => ({
-      color: colors.text,
-      backgroundColor: colors.background,
+    toTransform: (c: {backgroundColor: string; color: string}) => ({
+      background: c.backgroundColor,
+      text: c.color,
     }),
   },
   {
     from: 'default_contribution_duration',
     to: 'defaultContribDurationMinutes',
-    toTransform: (minutes: number) => minutes / 60,
-    fromTransform: (seconds: number) => seconds * 60,
+    toTransform: (minutes: number) => minutes * 60,
+    fromTransform: (seconds: number) => seconds / 60,
   },
 ];
 
+const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> = [
+  {from: 'address', to: 'address'},
+  {from: 'affiliation', to: 'affiliation'},
+  {from: 'affiliation_id', to: 'affiliationId'},
+  {from: 'affiliation_meta', to: 'affiliationMeta'},
+  {from: 'avatar_url', to: 'avatarUrl'},
+  {from: 'display_order', to: 'displayOrder'},
+  {from: 'email', to: 'email'},
+  {from: 'first_name', to: 'firstName'},
+  {from: 'last_name', to: 'lastName'},
+  {from: 'name', to: 'name'},
+  {from: 'person_id', to: 'personId'},
+  {from: 'phone', to: 'phone'},
+  {from: 'roles', to: 'roles'},
+  {from: 'title', to: 'title'},
+  {from: 'type', to: 'type'},
+  {from: 'user_id', to: 'userId'},
+  {from: 'user_identifier', to: 'userIdentifier'},
+];
+
 // Generic mapper
-function createMapper<From, To>(config: MapperConfig<From, To>) {
+function createMapper<From, To>(config: MapperConfig<From, To>, defaults?: Partial<To>) {
+  function mapDataToObj(data: From, partial: true): Partial<To>;
+  function mapDataToObj(data: From, partial?: false): To;
   function mapDataToObj(data: From, partial = false): To | Partial<To> {
-    const result: Partial<To> = {};
+    const result: Partial<To> = defaults ? {...defaults} : {};
     for (const {from, to, fromTransform} of config) {
       // TODO: (Ajob) Resolve this any issue
       if (partial && !(from in (data as any))) {
@@ -136,6 +172,8 @@ function createMapper<From, To>(config: MapperConfig<From, To>) {
     return partial ? result : (result as To);
   }
 
+  function mapObjToData(obj: Partial<To>, partial: true): Partial<From>;
+  function mapObjToData(obj: Partial<To>, partial?: false): From;
   function mapObjToData(obj: Partial<To>, partial = false): Partial<From> | From {
     const result: Partial<From> = {};
     for (const {from, to, toTransform} of config) {
@@ -156,14 +194,30 @@ function createMapper<From, To>(config: MapperConfig<From, To>) {
 }
 
 // Custom mappers
-const {mapDataToObj: mapDataToEntry, mapObjToData: mapEntryToData} = createMapper<
-  Record<string, unknown>,
-  Entry
->(entryMapperConfig);
 const {mapDataToObj: mapDataToSession, mapObjToData: mapSessionToData} = createMapper<
   Record<string, unknown>,
   Session
 >(sessionMapperConfig);
+({mapDataToObj: mapDataToPersonLink, mapObjToData: mapPersonLinkToData} = createMapper<
+  Record<string, unknown>,
+  PersonLink
+>(personLinkMapperConfig));
+// (Ajob) As we need to define some defaults, we need to re-apply some of the function types
+const {mapObjToData: mapEntryToData} = createMapper<Record<string, unknown>, Entry>(
+  entryMapperConfig
+);
+function mapDataToEntry(data: Record<string, unknown>, partial: true): Partial<Entry>;
+function mapDataToEntry(data: Record<string, unknown>, partial?: false): Entry;
+function mapDataToEntry(data: Record<string, unknown>, partial = false): Entry | Partial<Entry> {
+  const entryDefaults: Partial<Record<EntryType, Partial<Entry>>> = {
+    [EntryType.SessionBlock]: {children: []},
+  };
+  const defaults = entryDefaults[data.type as EntryType] ?? {};
+  const {mapDataToObj} = createMapper<Record<string, unknown>, Entry>(entryMapperConfig, defaults);
+
+  // (Ajob) Had to do this otherwise type complains (boolean is not specific enough)
+  return partial ? mapDataToObj(data, true) : mapDataToObj(data, false);
+}
 
 export {mapDataToEntry, mapEntryToData};
 export {mapDataToSession, mapSessionToData};
