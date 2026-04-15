@@ -22,7 +22,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {formatTimeRange} from './i18n';
-import {mapDataToEntry, mapEntryToData} from './mapperUtils';
+import {mapDataToEntry} from './mapperUtils';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {
@@ -57,8 +57,6 @@ function EntryPopupContent({
   entry: BreakEntry | ContribEntry | BlockEntry;
   onClose: () => void;
 }) {
-  console.log('popup entry', entry);
-  console.log('popup entry reverse', mapEntryToData(entry));
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const {objId, type, title, attachments, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
