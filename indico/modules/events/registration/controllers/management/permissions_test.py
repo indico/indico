@@ -71,6 +71,4 @@ def test_edit_permission_granted(rh):
     reglists.RHRegistrationHide,
 ))
 def test_edit_permission_excluded(rh):
-    perm = rh.PERMISSION
-    perm_tuple = perm if isinstance(perm, tuple) else (perm,)
-    assert 'registration_edit' not in perm_tuple
+    assert 'registration_edit' not in set(rh.PERMISSION)
