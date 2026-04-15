@@ -9,25 +9,8 @@ import pytest
 
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration import _registration_permissions
-from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
-                                                                                RHManageRegistrationForms,
-                                                                                RHRegistrationFormClose,
-                                                                                RHRegistrationFormCreate,
-                                                                                RHRegistrationFormEdit,
-                                                                                RHRegistrationFormManage,
-                                                                                RHRegistrationFormOpen,
-                                                                                RHRegistrationFormSchedule)
-from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCheckIn,
-                                                                                RHRegistrationCreate,
-                                                                                RHRegistrationCreateMultiple,
-                                                                                RHRegistrationDelete,
-                                                                                RHRegistrationDetails,
-                                                                                RHRegistrationEdit, RHRegistrationHide,
-                                                                                RHRegistrationsApprove,
-                                                                                RHRegistrationsListCustomize,
-                                                                                RHRegistrationsListManage,
-                                                                                RHRegistrationsReject)
+from indico.modules.events.registration.controllers import management
+from indico.modules.events.registration.controllers.management import regforms, reglists
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -59,131 +42,36 @@ class TestRegistrationEditPermissionDefinition:
         assert dummy_event.can_manage(user, permission='registration_edit')
 
 
-class TestRegistrationEditPermissionOnViewEndpoints:
-    """Test that registration_edit grants access to view-only endpoints."""
-
-    def test_regform_list_allows_edit_permission(self):
-        perm = RHManageRegistrationForms.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_registration_list_allows_edit_permission(self):
-        perm = RHRegistrationsListManage.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_registration_list_customize_allows_edit_permission(self):
-        perm = RHRegistrationsListCustomize.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_registration_details_allows_edit_permission(self):
-        perm = RHRegistrationDetails.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_participants_allows_edit_permission(self):
-        perm = RHManageParticipants.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
+@pytest.mark.parametrize('rh', (
+    regforms.RHManageRegistrationForms,
+    regforms.RHManageParticipants,
+    reglists.RHRegistrationsListManage,
+    reglists.RHRegistrationsListCustomize,
+    reglists.RHRegistrationDetails,
+    reglists.RHRegistrationCreate,
+    reglists.RHRegistrationCreateMultiple,
+    reglists.RHRegistrationEdit,
+    reglists.RHRegistrationDelete,
+))
+def test_edit_permission_granted(rh):
+    assert isinstance(rh.PERMISSION, tuple)
+    assert 'registration_edit' in rh.PERMISSION
 
 
-class TestRegistrationEditPermissionOnWriteEndpoints:
-    """Test that registration_edit grants access to create, edit and delete registrations."""
-
-    def test_create_registration_allows_edit_permission(self):
-        perm = RHRegistrationCreate.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_create_multiple_allows_edit_permission(self):
-        perm = RHRegistrationCreateMultiple.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_edit_registration_allows_edit_permission(self):
-        perm = RHRegistrationEdit.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-    def test_delete_registration_allows_edit_permission(self):
-        perm = RHRegistrationDelete.PERMISSION
-        assert isinstance(perm, tuple)
-        assert 'registration_edit' in perm
-
-
-class TestRegistrationEditPermissionRestrictions:
-    """Test that registration_edit does NOT grant access to form management or other actions."""
-
-    def test_form_management_base_excludes_edit_permission(self):
-        """Form management base should only allow full registration permission."""
-        perm = RHManageRegFormBase.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_create_excludes_edit_permission(self):
-        perm = RHRegistrationFormCreate.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_edit_excludes_edit_permission(self):
-        perm = RHRegistrationFormEdit.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_manage_excludes_edit_permission(self):
-        perm = RHRegistrationFormManage.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_open_excludes_edit_permission(self):
-        perm = RHRegistrationFormOpen.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_close_excludes_edit_permission(self):
-        perm = RHRegistrationFormClose.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_form_schedule_excludes_edit_permission(self):
-        perm = RHRegistrationFormSchedule.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
-
-    def test_approve_excludes_edit_permission(self):
-        perm = RHRegistrationsApprove.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-
-    def test_reject_excludes_edit_permission(self):
-        perm = RHRegistrationsReject.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-
-    def test_checkin_excludes_edit_permission(self):
-        perm = RHRegistrationCheckIn.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-
-    def test_hide_registration_excludes_edit_permission(self):
-        """Hiding from participant list should remain full-permission only."""
-        perm = RHRegistrationHide.PERMISSION
-        if isinstance(perm, tuple):
-            assert 'registration_edit' not in perm
-        else:
-            assert perm == 'registration'
+@pytest.mark.parametrize('rh', (
+    management.RHManageRegFormBase,
+    regforms.RHRegistrationFormCreate,
+    regforms.RHRegistrationFormEdit,
+    regforms.RHRegistrationFormManage,
+    regforms.RHRegistrationFormOpen,
+    regforms.RHRegistrationFormClose,
+    regforms.RHRegistrationFormSchedule,
+    reglists.RHRegistrationsApprove,
+    reglists.RHRegistrationsReject,
+    reglists.RHRegistrationCheckIn,
+    reglists.RHRegistrationHide,
+))
+def test_edit_permission_excluded(rh):
+    perm = rh.PERMISSION
+    perm_tuple = perm if isinstance(perm, tuple) else (perm,)
+    assert 'registration_edit' not in perm_tuple
