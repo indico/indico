@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 
-import {Entry, EntryType, PersonLink, Session} from './types';
+import {Entry, EntryType, LocationData, PersonLink, Session} from './types';
 import {getEntryUniqueId} from './utils';
 
 // (Ajob) We have to use AllKeys instead of keyof Entry, because keyof Entry
@@ -24,9 +24,9 @@ interface MapperEntry<From, To> {
 
 type MapperConfig<From, To> = MapperEntry<From, To>[];
 
-// (Ajob) We are assigning it at the bottom
+// (Ajob) We put the instantiation above so we can use them in other mappers
 // eslint-disable-next-line prefer-const
-let mapDataToPersonLink, mapPersonLinkToData;
+let mapDataToPersonLink, mapPersonLinkToData, mapDataToLocationData, mapLocationDataToData;
 
 // Mapper configurations for various timetable objects
 const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
@@ -58,8 +58,18 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: p => p.map(mapDataToPersonLink),
     toTransform: p => p.map(mapPersonLinkToData),
   },
-  {from: 'location_data', to: 'locationData'},
-  {from: 'location_parent', to: 'locationParent'},
+  {
+    from: 'location_data',
+    to: 'locationData',
+    fromTransform: l => mapDataToLocationData(l),
+    toTransform: l => mapLocationDataToData(l),
+  },
+  {
+    from: 'location_parent',
+    to: 'locationParent',
+    fromTransform: l => mapDataToLocationData(l),
+    toTransform: l => mapLocationDataToData(l),
+  },
   {from: 'child_location_parent', to: 'childLocationParent'},
   {from: 'code', to: 'code'},
   {from: 'keywords', to: 'keywords'},
@@ -133,7 +143,7 @@ const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> 
   {from: 'address', to: 'address'},
   {from: 'affiliation', to: 'affiliation'},
   {from: 'affiliation_id', to: 'affiliationId'},
-  {from: 'avatar_url', to: 'avatarUrl'},
+  {from: 'avatar_url', to: 'avatarURL'},
   {from: 'display_order', to: 'displayOrder'},
   {from: 'email', to: 'email'},
   {from: 'first_name', to: 'firstName'},
@@ -145,6 +155,15 @@ const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> 
   {from: 'title', to: 'title'},
   {from: 'user_id', to: 'userId'},
   {from: 'user_identifier', to: 'userIdentifier'},
+];
+
+const locationDataMapperConfig: MapperConfig<Record<string, unknown>, LocationData> = [
+  {from: 'address', to: 'address'},
+  {from: 'inheriting', to: 'inheriting'},
+  {from: 'room_id', to: 'roomId'},
+  {from: 'room_name', to: 'roomName'},
+  {from: 'venue_id', to: 'venueId'},
+  {from: 'venue_name', to: 'venueName'},
 ];
 
 // Generic mapper
@@ -200,6 +219,10 @@ const {mapDataToObj: mapDataToSession, mapObjToData: mapSessionToData} = createM
   Record<string, unknown>,
   PersonLink
 >(personLinkMapperConfig));
+({mapDataToObj: mapDataToLocationData, mapObjToData: mapLocationDataToData} = createMapper<
+  Record<string, unknown>,
+  LocationData
+>(locationDataMapperConfig));
 // (Ajob) As we need to define some defaults, we need to re-apply some of the function types
 const {mapObjToData: mapEntryToData} = createMapper<Record<string, unknown>, Entry>(
   entryMapperConfig
