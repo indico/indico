@@ -13,11 +13,8 @@ import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
 import {SemanticICONS} from 'semantic-ui-react';
 
-import {camelizeKeys} from 'indico/utils/case';
-
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {mapDataToEntry} from './mapperUtils';
-import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, Session} from './types';
+import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -86,19 +83,6 @@ export function getDefaultColorByType(type: Exclude<EntryType, 'block'>): Colors
   }[type];
 }
 
-export function mapTTEntryColor(dbEntry: any, session: Session): Colors {
-  const {type, colors} = dbEntry;
-
-  const fallbackColor = colors
-    ? mapDataToEntry({colors}, true).colors
-    : getDefaultColorByType(dbEntry.type);
-
-  if (type === EntryType.SessionBlock) {
-    return session?.colors ?? fallbackColor;
-  }
-  return fallbackColor;
-}
-
 export function getEntryColors(entry, session) {
   const {colors, type, sessionBlockId} = entry;
 
@@ -120,32 +104,6 @@ export const getEntryUniqueId = (type: EntryType, id: number): EntryUniqueID => 
     case EntryType.Break:
       return `b${id}`;
   }
-};
-
-export const mapTTDataToSession = (data: any): Session => {
-  data = camelizeKeys(data);
-
-  return {
-    ...data,
-    ...(data.colors && mapDataToEntry({colors: data.colors}, true)),
-    ...(data.defaultContributionDuration && {
-      defaultContribDurationMinutes: data.defaultContributionDuration / 60,
-    }),
-  };
-};
-
-export const mapSessionToTTData = (data): any => {
-  return {
-    id: data.id,
-    title: data.title,
-    is_poster: data.isPoster,
-    ...(data.colors && {
-      colors: {text: data.colors.color, background: data.colors.backgroundColor},
-    }),
-    ...(data.defaultContribDurationMinutes && {
-      default_contribution_duration: data.defaultContribDurationMinutes * 60,
-    }),
-  };
 };
 
 export function getIconByEntryType(type: EntryType) {
