@@ -381,6 +381,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
 class RHRegistrationDelete(RHRegistrationsActionBase):
     """Delete selected registrations."""
 
+    PERMISSION = ('registration', 'registration_edit')
+
     def _process(self):
         for registration in self.registrations:
             registration.is_deleted = True

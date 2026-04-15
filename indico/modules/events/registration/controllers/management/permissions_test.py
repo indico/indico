@@ -21,6 +21,7 @@ from indico.modules.events.registration.controllers.management.regforms import (
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCheckIn,
                                                                                 RHRegistrationCreate,
                                                                                 RHRegistrationCreateMultiple,
+                                                                                RHRegistrationDelete,
                                                                                 RHRegistrationDetails,
                                                                                 RHRegistrationEdit, RHRegistrationHide,
                                                                                 RHRegistrationsApprove,
@@ -87,8 +88,8 @@ class TestRegistrationEditPermissionOnViewEndpoints:
         assert 'registration_edit' in perm
 
 
-class TestRegistrationEditPermissionOnCreateEditEndpoints:
-    """Test that registration_edit grants access to create and edit registrations."""
+class TestRegistrationEditPermissionOnWriteEndpoints:
+    """Test that registration_edit grants access to create, edit and delete registrations."""
 
     def test_create_registration_allows_edit_permission(self):
         perm = RHRegistrationCreate.PERMISSION
@@ -102,6 +103,11 @@ class TestRegistrationEditPermissionOnCreateEditEndpoints:
 
     def test_edit_registration_allows_edit_permission(self):
         perm = RHRegistrationEdit.PERMISSION
+        assert isinstance(perm, tuple)
+        assert 'registration_edit' in perm
+
+    def test_delete_registration_allows_edit_permission(self):
+        perm = RHRegistrationDelete.PERMISSION
         assert isinstance(perm, tuple)
         assert 'registration_edit' in perm
 

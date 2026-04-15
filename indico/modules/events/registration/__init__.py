@@ -270,8 +270,8 @@ class RegistrationCheckinPermission(ManagementPermission):
 
 class RegistrationEditPermission(ManagementPermission):
     name = 'registration_edit'
-    friendly_name = _('Registration (create/edit only)')
-    description = _('Grants access to view, create and edit registrations.')
+    friendly_name = _('Registration (manage participants only)')
+    description = _('Grants access to view, create, edit and delete registrations.')
     user_selectable = True
 
 
