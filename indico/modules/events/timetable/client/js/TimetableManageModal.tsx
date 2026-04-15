@@ -22,11 +22,11 @@ import {snakifyKeys} from 'indico/utils/case';
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {mapDataToEntry, mapEntryToData} from './mapperUtils';
+import {mapDataToEntry, mapEntryToData, mapSessionToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT, mapSessionToTTData} from './utils';
+import {DATE_KEY_FORMAT} from './utils';
 
 // Generic models
 
@@ -205,7 +205,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const _createSession = async sessionObject => {
     try {
       // TODO: (Ajob) Replace once the back-end schemas allow us a more consistent mapping
-      const data = mapSessionToTTData(sessionObject);
+      const data = mapSessionToData(sessionObject);
       const {session: resSession} = await dispatch(actions.createSession(_.omit(data, 'id')));
       return resSession;
     } catch (error) {
