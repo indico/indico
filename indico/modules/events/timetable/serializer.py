@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from hashlib import md5
 
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
@@ -64,15 +63,14 @@ def _get_person_link_roles(person_link):
 def _get_person_data(person_link, *, can_manage_event=False):
     person = person_link.person
 
-    data = {'firstName': person_link.first_name,
-            'familyName': person_link.last_name,
+    data = {'first_name': person_link.first_name,
+            'last_name': person_link.last_name,
             'affiliation': person_link.affiliation,
-            'emailHash': md5(person.email.encode()).hexdigest() if person.email else None,
             'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
                                               abbrev_first_name=False, show_title=person.event.show_titles),
-            'displayOrderKey': person_link.display_order_key}
+            'display_order_key': person_link.display_order_key}
     if person.user:
-        data['avatarURL'] = person.user.avatar_url
+        data['avatar_url'] = person.user.avatar_url
 
     if can_manage_event:
         data['email'] = person.email
@@ -167,7 +165,6 @@ class TimetableSerializer:
                      'title': block.title,
                      'attachments': self._get_attachment_data(block.session),
                      'code': block.session.code,
-                     'contrib_duration': block.session.default_contribution_duration.seconds,
                      'person_links': [self._get_person_data(x) for x in block.person_links],
                      'description': block.session.description,
                      'duration': block.duration.seconds,
@@ -208,7 +205,7 @@ class TimetableSerializer:
                                                              x.display_order_key))))
         return data
 
-    def serialize_break_entry(self, entry, management=False):
+    def serialize_break_entry(self, entry):
         block = entry.parent.session_block if entry.parent else None
         break_ = entry.break_
         data = {}
@@ -276,7 +273,7 @@ def serialize_contribution(contribution):
 
 # TODO: This is only temporary to get unscheduled contributions working
 # before we rewrite the timetable serializer
-def serialize_unscheduled_contribution(contribution, *, management=False, can_manage_event=False):
+def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
     data = {
         'id': f'c{contribution.id}',
     }
@@ -302,7 +299,7 @@ def serialize_unscheduled_contribution(contribution, *, management=False, can_ma
     return data
 
 
-def serialize_event_info(event, *, management=False, user=None):
+def serialize_event_info(event, *, user=None):
     from indico.modules.events.contributions import Contribution, contribution_settings
     can_manage_event = event.can_manage(user)
     return {'id': str(event.id),
@@ -314,8 +311,7 @@ def serialize_event_info(event, *, management=False, user=None):
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
             'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
             'locationParent': LocationParentSchema().dump(event),
-            'contributions': [serialize_unscheduled_contribution(c, management=management,
-                                                                 can_manage_event=can_manage_event)
+            'contributions': [serialize_unscheduled_contribution(c, can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
 
 
@@ -324,12 +320,9 @@ def serialize_session(sess):
     return {
         'description': sess.description,
         'id': sess.id,
-        'isPoster': sess.is_poster,
+        'is_poster': sess.is_poster,
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
-        'defaultContribDurationMinutes': sess.default_contribution_duration.total_seconds() / 60,
-        'colors': {
-            'backgroundColor': f'#{sess.background_color}',
-            'color': f'#{sess.text_color}',
-        }
+        'default_contribution_duration': sess.default_contribution_duration.total_seconds(),
+        **get_color_data(sess)
     }
