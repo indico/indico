@@ -68,10 +68,22 @@ function SessionBlockToolbar() {
         size="mini"
         onClick={closeExpandedBlock}
         styleName="close-btn"
-        title={Translate.string('Close session block view (Press ESC)')}
+        title={Translate.string('Close session block view')}
       >
         <Icon name="close" />
         <Translate>Close session block view</Translate>
+        <kbd
+          style={{
+            fontSize: '0.75em',
+            padding: '1px 5px',
+            marginLeft: '6px',
+            border: '1px solid #aaa',
+            borderRadius: '3px',
+            backgroundColor: '#f9f9f9',
+          }}
+        >
+          Esc
+        </kbd>
       </Button>
     </Menu>
   );
