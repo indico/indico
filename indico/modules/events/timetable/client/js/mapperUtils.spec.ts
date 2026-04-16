@@ -244,7 +244,7 @@ describe('mapperUtils', () => {
     });
   });
 
-    describe('mapDataToSession', () => {
+  describe('mapDataToSession', () => {
     it('should map API session data to Session object', () => {
       const data = {
         id: 11,
