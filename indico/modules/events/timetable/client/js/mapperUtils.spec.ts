@@ -7,8 +7,8 @@
 
 import moment from 'moment';
 
-import {mapDataToEntry, mapEntryToData} from './mapperUtils';
-import {BlockEntry, BreakEntry, ContribEntry, EntryType, PersonLink} from './types';
+import {mapDataToEntry, mapDataToSession, mapEntryToData, mapSessionToData} from './mapperUtils';
+import {BlockEntry, BreakEntry, ContribEntry, EntryType, PersonLink, Session} from './types';
 
 const dataLocationData = {
   address: 'Avenue du Jura',
@@ -241,6 +241,46 @@ describe('mapperUtils', () => {
       expect(data.start_dt).toBe('2024-01-03T11:00:00.000Z');
       expect(data.location_data).toEqual(dataLocationData);
       expect(data.colors).toEqual({background: '#efefef', text: '#fefefe'});
+    });
+  });
+
+    describe('mapDataToSession', () => {
+    it('should map API session data to Session object', () => {
+      const data = {
+        id: 11,
+        title: 'Session Title',
+        is_poster: true,
+        colors: {background: '#112233', text: '#445566'},
+        default_contribution_duration: 1500,
+      };
+
+      const session = mapDataToSession(data) as Session;
+
+      expect(session.id).toBe(11);
+      expect(session.title).toBe('Session Title');
+      expect(session.isPoster).toBe(true);
+      expect(session.colors).toEqual({backgroundColor: '#112233', color: '#445566'});
+      expect(session.defaultContribDurationMinutes).toBe(25);
+    });
+  });
+
+  describe('mapSessionToData', () => {
+    it('should map Session object to API session data', () => {
+      const session: Session = {
+        id: 22,
+        title: 'Another Session',
+        isPoster: false,
+        colors: {backgroundColor: '#aabbcc', color: '#ddeeff'},
+        defaultContribDurationMinutes: 10,
+      };
+
+      const data = mapSessionToData(session);
+
+      expect(data.id).toBe(22);
+      expect(data.title).toBe('Another Session');
+      expect(data.is_poster).toBe(false);
+      expect(data.colors).toEqual({background: '#aabbcc', text: '#ddeeff'});
+      expect(data.default_contribution_duration).toBe(600);
     });
   });
 });
