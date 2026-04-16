@@ -101,8 +101,8 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
   {
     from: 'start_dt',
     to: 'startDt',
-    fromTransform: (v: unknown) => (typeof v === 'string' ? moment(v) : v),
-    toTransform: (v: unknown) => (v as moment.Moment)?.toISOString?.() ?? v,
+    fromTransform: v => moment(v),
+    toTransform: v => v.toISOString(),
   },
   {
     from: 'children',
