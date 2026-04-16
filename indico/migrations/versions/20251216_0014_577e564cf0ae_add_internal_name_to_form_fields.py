@@ -42,10 +42,16 @@ def upgrade():
     )
     case_expr = ' '.join(f"WHEN {e.value} THEN '{e.name}'" for e in _PersonalDataType)
     op.execute(f'''
-    UPDATE event_registration.form_items
-    SET internal_name = CASE personal_data_type {case_expr} END
-    WHERE personal_data_type IS NOT NULL;
+        UPDATE event_registration.form_items
+        SET internal_name = CASE personal_data_type {case_expr} END
+        WHERE personal_data_type IS NOT NULL;
     ''')  # noqa: S608
+    op.create_check_constraint(
+        'pd_internal_name_required',
+        'form_items',
+        '(internal_name IS NOT NULL) OR (personal_data_type IS NULL)',
+        schema='event_registration'
+    )
 
 
 def downgrade():

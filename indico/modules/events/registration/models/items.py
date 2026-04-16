@@ -193,6 +193,8 @@ class RegistrationFormItem(db.Model):
                                    required_fields=','.join([str(f.value) for f in PersonalDataType if f.is_required])),
                            name='retention_period_allowed_fields'),
         db.CheckConstraint("internal_name != ''", name='internal_name_not_empty'),
+        db.CheckConstraint('(internal_name IS NOT NULL) OR (personal_data_type IS NULL)',
+                           name='pd_internal_name_required'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
                  postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
