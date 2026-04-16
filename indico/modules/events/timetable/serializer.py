@@ -84,19 +84,17 @@ def _get_person_data(person_link, *, can_manage_event=False):
 
 
 class TimetableSerializer:
-    def __init__(self, event, management=False, user=None, api=False):
-        self.management = management
+    def __init__(self, event, user=None, api=False):
         self.user = user if user is not None or not has_request_context() else session.user
         self.event = event
         self.can_manage_event = self.event.can_manage(self.user)
         self.api = api
 
-    def serialize_timetable(self, days=None, hide_weekends=False, strip_empty_days=False):
-        tzinfo = self.event.tzinfo if self.management else self.event.display_tzinfo
+    def serialize_timetable(self, strip_empty_days=False):
+        tzinfo = self.event.tzinfo
         self.event.preload_all_acl_entries()
         timetable = {}
-        for day in iterdays(self.event.start_dt.astimezone(tzinfo), self.event.end_dt.astimezone(tzinfo),
-                            skip_weekends=hide_weekends, day_whitelist=days):
+        for day in iterdays(self.event.start_dt.astimezone(tzinfo), self.event.end_dt.astimezone(tzinfo)):
             date_str = day.strftime('%Y%m%d')
             timetable[date_str] = {}
         contributions_strategy = defaultload('contribution')
@@ -241,21 +239,14 @@ class TimetableSerializer:
         return files + folders
 
     def _get_start_dt(self, entry):
-        if self.management:
-            tzinfo = entry.event.tzinfo
-        else:
-            tzinfo = entry.event.display_tzinfo
+        tzinfo = entry.event.tzinfo
+
         if entry.type == TimetableEntryType.CONTRIBUTION:
             start_dt = entry.contribution.start_dt_display
         else:
             start_dt = entry.start_dt
 
         return self._get_entry_date_dt(start_dt, tzinfo)
-
-    def _get_entry_data(self, entry):
-        data = {}
-        data['start_dt'] = self._get_start_dt(entry)
-        return data
 
     def _get_entry_date_dt(self, dt, tzinfo):
         return dt.astimezone(tzinfo).isoformat()
@@ -264,54 +255,40 @@ class TimetableSerializer:
         return _get_person_data(person_link, can_manage_event=self.can_manage_event)
 
 
-def serialize_contribution(contribution):
-    return {'id': contribution.id,
-            'friendly_id': contribution.friendly_id,
-            'title': contribution.title}
-
-
 # Event related functions:
-
-# TODO: This is only temporary to get unscheduled contributions working
-# before we rewrite the timetable serializer
 def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
-    data = {
-        'id': f'c{contribution.id}',
-    }
-    if contribution.session:
-        data.update(get_color_data(contribution.session))
-    data.update({'id': contribution.id,
-                 'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
-                 'contribution_id': contribution.id,
-                 'attachments': [],
-                 'description': contribution.description,
-                 'duration': contribution.duration_display.seconds,
-                 'pdf': url_for('contributions.export_pdf', contribution),
-                 'presenters': [],
-                 'person_links': [_get_person_data(x, can_manage_event=can_manage_event)
-                                 for x in contribution.person_links],
-                 'code': contribution.code,
-                 'session_id': contribution.session.id if contribution.session else None,
-                 'title': contribution.title,
-                 'url': url_for('contributions.display_contribution', contribution),
-                 'references': [],
-                 'location_data': LocationDataSchema().dump(contribution),
-                 'board_number': contribution.board_number})
-    return data
+    return {'id': contribution.id,
+            'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
+            'contribution_id': contribution.id,
+            'attachments': [],
+            'description': contribution.description,
+            'duration': contribution.duration_display.seconds,
+            'pdf': url_for('contributions.export_pdf', contribution),
+            'presenters': [],
+            'person_links': [_get_person_data(x, can_manage_event=can_manage_event)
+                            for x in contribution.person_links],
+            'code': contribution.code,
+            'session_id': contribution.session.id if contribution.session else None,
+            'title': contribution.title,
+            'url': url_for('contributions.display_contribution', contribution),
+            'references': [],
+            'location_data': LocationDataSchema().dump(contribution),
+            'board_number': contribution.board_number}
 
 
 def serialize_event_info(event, *, user=None):
     from indico.modules.events.contributions import Contribution, contribution_settings
     can_manage_event = event.can_manage(user)
+
     return {'id': str(event.id),
             'title': event.title,
-            'startDate': event.start_dt_local,
-            'endDate': event.end_dt_local,
+            'start_dt_local': event.start_dt_local.isoformat(),
+            'end_dt_local': event.end_dt_local.isoformat(),
             'type': event.type,
-            'isDraft': should_show_draft_warning(event),
+            'is_draft': should_show_draft_warning(event),
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
-            'defaultContribDurationMinutes': contribution_settings.get(event, 'default_duration').total_seconds() / 60,
-            'locationParent': LocationParentSchema().dump(event),
+            'default_contribution_duration': contribution_settings.get(event, 'default_duration').total_seconds(),
+            'location_parent': LocationParentSchema().dump(event),
             'contributions': [serialize_unscheduled_contribution(c, can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
 
