@@ -9,12 +9,12 @@ from datetime import datetime
 
 import pytest
 import pytz
-from marshmallow import ValidationError
+from marshmallow import Schema, ValidationError, fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.users.models.users import User
-from indico.util.marshmallow import ModelField, ModelList, NaiveDateTime
+from indico.util.marshmallow import ModelField, ModelList, NaiveDateTime, NonPartialNested
 
 
 def test_NaiveDateTime_serialize():
@@ -135,3 +135,17 @@ def test_ModelList_serialize(dummy_user):
 
     field = ModelList(User, column='first_name')
     assert field.serialize('users', obj) == [dummy_user.first_name, dummy_user.first_name]
+
+
+def test_NonPartialNested():
+    class InnerSchema(Schema):
+        foo = fields.String(load_default='meow')
+
+    class OuterSchema(Schema):
+        n = fields.Nested(InnerSchema)
+        npn = NonPartialNested(InnerSchema)
+
+    assert InnerSchema().load({}) == {'foo': 'meow'}
+    assert InnerSchema(partial=True).load({}) == {}
+    assert OuterSchema().load({'n': {}}) == {'n': {'foo': 'meow'}}
+    assert OuterSchema(partial=True).load({'n': {}, 'npn': {}}) == {'n': {}, 'npn': {'foo': 'meow'}}
