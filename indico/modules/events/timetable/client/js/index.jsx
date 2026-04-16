@@ -27,26 +27,19 @@ import {getCurrentDateLocalStorage} from './utils';
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
-      const eventType = eventInfo.type;
-      const startDt = moment.tz(
-        `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
-        eventInfo.startDate.tz
-      );
+      const startDt = moment(eventInfo.start_dt_local);
       const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
       const initialData = {
         staticData: {
           eventId,
-          eventType,
-          startDt,
-          endDt: moment.tz(
-            `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
-            eventInfo.endDate.tz
-          ),
-          defaultContribDurationMinutes: eventInfo.defaultContribDurationMinutes,
-          eventLocationParent: eventInfo.locationParent,
+          eventType: eventInfo.type,
+          startDt: moment(eventInfo.start_dt_local),
+          endDt: moment(eventInfo.end_dt_local),
+          defaultContribDurationMinutes: eventInfo.default_contribution_duration / 60,
+          eventLocationParent: eventInfo.location_parent,
         },
         navigation: {
-          isDraft: eventInfo.isDraft,
+          isDraft: eventInfo.is_draft,
           currentDate,
           // Refers to when a user clicks to view a session block as a timetable
           expandedSessionBlockId: null,
