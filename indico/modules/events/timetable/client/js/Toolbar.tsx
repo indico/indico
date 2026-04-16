@@ -71,7 +71,7 @@ function SessionBlockToolbar() {
         title={Translate.string('Close session block view')}
       >
         <Icon name="close" />
-        <Translate>Close session block view</Translate>
+        <Translate>Close session block view or press</Translate>
         <kbd
           style={{
             fontSize: '0.75em',
