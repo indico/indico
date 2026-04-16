@@ -158,9 +158,9 @@ class TimetableSerializer:
             children = []
         else:
             children = [self.serialize_timetable_entry(x) for x in entry.children]
-        data.update(self._get_entry_data(entry))
         data.update({'id': block.id,
                      'type': get_entry_type(TimetableEntryType.SESSION_BLOCK),
+                     'start_dt': self._get_start_dt(entry),
                      'session_id': block.session_id,
                      'session_title': block.session.title,
                      'title': block.title,
@@ -183,9 +183,9 @@ class TimetableSerializer:
         block = entry.parent.session_block if entry.parent else None
         contribution = entry.contribution
         data = {}
-        data.update(self._get_entry_data(entry))
         data.update({'id': contribution.id,
                      'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
+                     'start_dt': self._get_start_dt(entry),
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds,
@@ -210,9 +210,9 @@ class TimetableSerializer:
         block = entry.parent.session_block if entry.parent else None
         break_ = entry.break_
         data = {}
-        data.update(self._get_entry_data(entry))
         data.update({'id': break_.id,
                      'type': get_entry_type(TimetableEntryType.BREAK),
+                     'start_dt': self._get_start_dt(entry),
                      'description': break_.description,
                      'duration': break_.duration.seconds,
                      'session_id': block.session_id if block else None,
