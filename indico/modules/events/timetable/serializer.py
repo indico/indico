@@ -63,7 +63,8 @@ def _get_person_link_roles(person_link):
 def _get_person_data(person_link, *, can_manage_event=False):
     person = person_link.person
 
-    data = {'first_name': person_link.first_name,
+    data = {'person_id': person.id,
+            'first_name': person_link.first_name,
             'last_name': person_link.last_name,
             'affiliation': person_link.affiliation,
             'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
