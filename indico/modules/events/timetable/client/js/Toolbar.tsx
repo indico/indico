@@ -72,18 +72,7 @@ function SessionBlockToolbar() {
       >
         <Icon name="close" />
         <Translate>Close session block view or press</Translate>
-        <kbd
-          style={{
-            fontSize: '0.75em',
-            padding: '1px 5px',
-            marginLeft: '6px',
-            border: '1px solid #aaa',
-            borderRadius: '3px',
-            backgroundColor: '#f9f9f9',
-          }}
-        >
-          Esc
-        </kbd>
+        <kbd>Esc</kbd>
       </Button>
     </Menu>
   );
