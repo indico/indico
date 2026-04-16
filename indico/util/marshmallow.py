@@ -627,3 +627,19 @@ class YAML(I18nAwareField):
             return value if self.keep_text else data
         except yaml.YAMLError:
             raise self.make_error('invalid_yaml')
+
+
+class NonPartialNested(fields.Nested):
+    """Like Nested, but not propagating partial.
+
+    This field should be used in place of the standard `Nested` in most places where
+    one may set `partial` on the Schema, but doesn't want it to propagate into nested
+    schemas (ie requiring full values for nested data even if the outer schema is partial).
+
+    This is especially important when the nested schema uses `load_default`, because these
+    values are ignored in partial mode.
+    """
+
+    def deserialize(self, value, attr=None, data=None, **kwargs):
+        kwargs['partial'] = None
+        return super().deserialize(value, attr, data, **kwargs)

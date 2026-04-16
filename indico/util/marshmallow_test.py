@@ -9,9 +9,9 @@ from datetime import datetime
 
 import pytest
 import pytz
-from marshmallow import ValidationError
+from marshmallow import Schema, ValidationError, fields
 
-from indico.util.marshmallow import NaiveDateTime
+from indico.util.marshmallow import NaiveDateTime, NonPartialNested
 
 
 def test_NaiveDateTime_serialize():
@@ -34,3 +34,17 @@ def test_NaiveDateTime_deserialize():
     assert field.deserialize(now.isoformat()) == now
     with pytest.raises(ValidationError):
         field.deserialize(utc_now.isoformat())
+
+
+def test_NonPartialNested():
+    class InnerSchema(Schema):
+        foo = fields.String(load_default='meow')
+
+    class OuterSchema(Schema):
+        n = fields.Nested(InnerSchema)
+        npn = NonPartialNested(InnerSchema)
+
+    assert InnerSchema().load({}) == {'foo': 'meow'}
+    assert InnerSchema(partial=True).load({}) == {}
+    assert OuterSchema().load({'n': {}}) == {'n': {'foo': 'meow'}}
+    assert OuterSchema(partial=True).load({'n': {}, 'npn': {}}) == {'n': {}, 'npn': {'foo': 'meow'}}
