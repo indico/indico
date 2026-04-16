@@ -29,6 +29,8 @@ Accessibility
 
 - Screen reader users can now navigate to the event page header as a banner
   landmark (:pr:`7418`, thanks :user:`foxbunny`)
+- The abstract submission ID is now easier to read for users with low vision
+  (:pr:`7463`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
