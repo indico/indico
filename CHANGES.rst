@@ -128,6 +128,8 @@ Accessibility
 - Screen reader users can now navigate to the main page heading on the dashboard,
   user profile, preferences and category pages, which previously showed the page
   title as plain text with no heading (:pr:`7617`, thanks :user:`foxbunny`)
+- The abstract submission ID is now easier to read for users with low vision
+  (:pr:`7463`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
