@@ -14,7 +14,7 @@ import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
 import {Colors, EntryType} from './types';
-import {minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
+import {MIN_DURATION, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 import './Entry.module.scss';
 
@@ -153,7 +153,7 @@ export function UnscheduledContributionEntry({
     ...colors,
     cursor: isDragging ? 'grabbing' : 'grab',
     userSelect: 'none' as const,
-    height: minutesToPixels(Math.max(duration, minutesToPixels(10)) - 1),
+    height: minutesToPixels(Math.max(duration, minutesToPixels(MIN_DURATION)) - 1),
   };
 
   return (

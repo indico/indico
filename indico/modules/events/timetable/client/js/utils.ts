@@ -21,6 +21,7 @@ import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID, Session} from './ty
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
+export const MIN_DURATION = 10;
 export const GRID_SIZE_MINUTES = 5;
 export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
 export const HOUR_SIZE = minutesToPixels(60);
