@@ -7,7 +7,7 @@
 
 import React, {MouseEvent as SyntheticMouseEvent} from 'react';
 
-import {minutesToPixels, pixelsToMinutes} from './utils';
+import {MIN_DURATION, minutesToPixels, pixelsToMinutes} from './utils';
 
 import './DayTimetable.module.scss';
 
@@ -15,7 +15,7 @@ const gridSize = minutesToPixels(5);
 
 export default function ResizeHandle({
   duration,
-  minDuration = 10,
+  minDuration = MIN_DURATION,
   maxDuration,
   resizeStartRef,
   setLocalDuration,
