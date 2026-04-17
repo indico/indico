@@ -34,6 +34,7 @@ import {
   formatBlockTitle,
   getIconByEntryType,
   getEntryColors,
+  MIN_DURATION,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -322,7 +323,7 @@ export default function Entry({
       />
       <ResizeHandle
         duration={duration}
-        minDuration={latestChildEndDt.diff(startDt, 'minutes')}
+        minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}
         maxDuration={parentEndDt ? moment(parentEndDt).diff(startDt, 'minutes') : undefined}
         resizeStartRef={resizeStartRef}
         setLocalDuration={setDuration}

@@ -35,6 +35,7 @@ import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
   GRID_SIZE_MINUTES,
+  MIN_DURATION,
   getDateKey,
   isWithinLimits,
   minutesToPixels,
@@ -311,19 +312,18 @@ export function DayTimetable({
     duration?: number;
     y?: number;
   } | null {
-    const minDraftDuration = 10;
     const rect = calendarRef.current.getBoundingClientRect();
     const minutesDelta =
       Math.round(pixelsToMinutes(clientY - rect.top - draggingStartPos) / GRID_SIZE_MINUTES) *
       GRID_SIZE_MINUTES;
 
-    let duration = Math.max(Math.abs(minutesDelta), minDraftDuration);
+    let duration = Math.max(Math.abs(minutesDelta), MIN_DURATION);
     let startDt = moment(dt)
       .startOf('days')
       .add(minHour, 'hours')
       .add(pixelsToMinutes(draggingStartPos), 'minutes');
 
-    if (minutesDelta <= -minDraftDuration) {
+    if (minutesDelta <= -MIN_DURATION) {
       // Dragging up
       const y = Math.max(
         minutesToPixels(
