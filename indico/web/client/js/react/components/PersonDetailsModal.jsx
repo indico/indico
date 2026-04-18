@@ -18,7 +18,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import {Param, Translate} from '../i18n';
 
-import FinalAffiliationField from './FinalAffiliationField';
+import FinalAffiliationField from './AffiliationField';
 
 import './PersonDetailsModal.module.scss';
 

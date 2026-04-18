@@ -13,7 +13,7 @@ import {Form, Popup} from 'semantic-ui-react';
 import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import FinalAffiliationField from './FinalAffiliationField';
+import FinalAffiliationField from './AffiliationField';
 
 import './syncedInputs.module.scss';
 
