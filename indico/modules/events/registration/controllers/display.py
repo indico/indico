@@ -412,8 +412,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
     def _process_GET(self):
         user_data = get_user_data(self.regform, session.user, self.invitation)
-        initial_values = get_initial_form_values(self.regform) | user_data
         file_data = {}
+
         if session.user and user_data.get('picture'):
             metadata = session.user.picture_metadata or {}
             file_data['picture'] = {
@@ -422,6 +422,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                 'uuid': PROFILE_PICTURE_SENTINEL,
                 'previewUrl': session.user.avatar_url,
             }
+
+        initial_values = get_initial_form_values(self.regform, file_data=file_data) | user_data
+
         if self._captcha_required:
             initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,

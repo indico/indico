@@ -200,7 +200,19 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
     return {'sections': section_data, 'items': item_data}
 
 
-def get_initial_form_values(regform, *, management=False):
+@make_interceptable
+def get_initial_form_values(regform, *, management=False, **kwargs):
+    """Return the initial values for registration form fields.
+
+    This function can be intercepted by plugins, which may extend or modify
+    the returned values using the provided keyword arguments.
+
+    :param regform: The ``RegistrationForm`` whose fields are being initialized.
+    :param management: If ``True``, include manager-only sections.
+    :param kwargs: Additional context passed to plugin hooks.
+    :returns: A dict mapping each field's ``html_field_name`` to its default
+            value in camelCase format.
+    """
     initial_values = {}
     for item in regform.active_fields:
         can_modify = management or not item.parent.is_manager_only
