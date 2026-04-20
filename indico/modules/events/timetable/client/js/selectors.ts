@@ -18,6 +18,7 @@ import {
   sortEntriesByStartDt,
   computeOverlappingEntryIds,
   flattenEntries,
+  V_SPACE_BETWEEN_ENTRIES_PX,
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -151,6 +152,9 @@ export const getCurrentLimits = createSelector(
     if (endDt.isSame(currentDate, 'day')) {
       limits[1] = minutesToPixels(moment.duration(endDt.format('HH:mm')).asMinutes());
     }
+
+    // (Ajob) Accounts for entries hitting the bottom limit
+    limits[1] -= V_SPACE_BETWEEN_ENTRIES_PX;
 
     return limits;
   }

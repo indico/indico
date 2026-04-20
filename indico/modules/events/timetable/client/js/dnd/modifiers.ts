@@ -31,7 +31,9 @@ function restrictToBoundingRect(transform: Transform, rect: Rect, boundingRect: 
     value.x = boundingRect.left + boundingRect.width - rect.right;
   }
 
-  return value;
+  // (Ajob) Necessary to round as decimals cause issues in positioning
+  //        of elements in timetable
+  return {x: Math.round(value.x), y: Math.round(value.y)};
 }
 
 /**
