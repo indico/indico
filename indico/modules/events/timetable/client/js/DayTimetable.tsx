@@ -323,10 +323,11 @@ export function DayTimetable({
       .startOf('days')
       .add(minHour, 'hours')
       .add(pixelsToMinutes(draggingStartPos), 'minutes');
+    let y;
 
     if (minutesDelta <= -MIN_DURATION) {
       // Dragging up
-      const y = Math.max(
+      y = Math.max(
         minutesToPixels(
           Math.round(pixelsToMinutes(clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
         ),
@@ -334,13 +335,13 @@ export function DayTimetable({
       );
       duration = Math.min(duration, pixelsToMinutes(draggingStartPos - limitTop));
       startDt = moment(startDt).subtract(duration, 'minutes');
-
-      return {startDt, duration, y};
     } else {
       // Dragging down
       duration = Math.min(duration, pixelsToMinutes(limitBottom - draggingStartPos));
-      return {startDt, duration, y: draggingStartPos};
+      y = draggingStartPos;
     }
+
+    return {startDt, duration: Math.max(duration, MIN_DURATION), y};
   }
 
   useEffect(() => {
