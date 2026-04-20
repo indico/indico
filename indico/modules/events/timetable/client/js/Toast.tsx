@@ -25,17 +25,26 @@ interface ToastProps {
   type: ToastType;
   message: React.ReactNode;
   duration: number;
+  leaving?: boolean;
   onClose: (id: number) => void;
 }
 
-export function Toast({id, type, message, duration, onClose}: ToastProps) {
+export function Toast({id, type, message, duration, leaving, onClose}: ToastProps) {
   useEffect(() => {
+    if (leaving) {
+      return undefined;
+    }
     const timeoutId = window.setTimeout(() => onClose(id), duration);
     return () => window.clearTimeout(timeoutId);
-  }, [id, duration, onClose]);
+  }, [id, duration, leaving, onClose]);
 
   return (
-    <div styleName="toast" data-type={type} role="status" aria-live="polite">
+    <div
+      styleName={leaving ? 'toast toast-leaving' : 'toast'}
+      data-type={type}
+      role="status"
+      aria-live="polite"
+    >
       <Icon name={ICONS[type]} styleName="toast-icon" />
       <div styleName="toast-message">{message}</div>
       <button

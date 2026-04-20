@@ -60,6 +60,10 @@
     background: #fff;
     border-radius: 6px;
     border: 1px solid rgba(0, 0, 0, 0.12);
+
+    &.toast-leaving {
+        animation: toastCollapse 0.2s ease-in forwards;
+    }
 }
 
 .toast-container {
@@ -91,7 +95,7 @@
 
 .toast-message {
     flex: 1;
-    font-size: 0.9em;
+    font-size: 1em;
     line-height: 1.4;
     color: #333;
     word-break: break-word;

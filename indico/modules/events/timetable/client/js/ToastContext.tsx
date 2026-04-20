@@ -12,6 +12,8 @@ import './Toast.module.scss';
 import {Toast, ToastType} from './Toast';
 
 export type ToastPosition = 'bottom-center' | 'top-center';
+
+const TOAST_EXIT_DURATION = 200;
 const DEFAULT_TOAST_DURATION = 3000;
 
 export interface ToastOptions {
@@ -23,6 +25,7 @@ interface ToastItem extends ToastOptions {
   id: number;
   duration: number;
   type: ToastType;
+  leaving?: boolean;
 }
 
 interface ToastContextValue {
@@ -37,11 +40,15 @@ interface ToastProviderProps {
   position?: ToastPosition;
 }
 
-export function ToastProvider({children, position = 'bottom-center'}: ToastProviderProps) {
+export function ToastProvider({children, position = 'top-center'}: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const removeToast = (id: number) => {
-    setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id));
+    setToasts(current => current.map(t => (t.id === id ? {...t, leaving: true} : t)));
+    window.setTimeout(
+      () => setToasts(current => current.filter(t => t.id !== id)),
+      TOAST_EXIT_DURATION
+    );
   };
 
   const addToast = (options: ToastOptions) => {
@@ -69,6 +76,7 @@ export function ToastProvider({children, position = 'bottom-center'}: ToastProvi
                 type={toast.type}
                 message={toast.message}
                 duration={toast.duration}
+                leaving={toast.leaving}
                 onClose={removeToast}
               />
             ))}
