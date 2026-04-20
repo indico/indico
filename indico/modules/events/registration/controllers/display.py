@@ -208,7 +208,8 @@ class ParticipantListMixin:
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count()}
+                'num_participants': query.count(),
+                'num_anonymous_participants': query.count() - len(registrations)}
 
     def _participant_list_table(self, regform, *, is_participant):
         def _process_registration(reg, column_ids, active_fields, picture_ids):
@@ -261,10 +262,10 @@ class ParticipantListMixin:
                 'rows': registrations,
                 'title': regform.title,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count()}
+                'num_participants': query.count(),
+                'num_anonymous_participants': query.count() - len(registrations)}
 
-    def _process(self):
-        is_participant = self.is_participant(session.user)
+    def _get_participant_list_tables(self, is_participant):
         regforms = (RegistrationForm.query.with_parent(self.event)
                     .filter(RegistrationForm.is_participant_list_visible(is_participant),
                             ~RegistrationForm.participant_list_disabled)
@@ -288,6 +289,13 @@ class ParticipantListMixin:
             tables.extend(self._participant_list_table(regform, is_participant=is_participant)
                           for regform in regforms_dict.values())
 
+        return tables, merged, regforms
+
+    def _process(self):
+        is_participant = self.is_participant(session.user)
+
+        tables, merged, regforms = self._get_participant_list_tables(is_participant)
+
         num_participants = sum(table['num_participants'] for table in tables)
 
         return self.view_class.render_template(
@@ -299,6 +307,26 @@ class ParticipantListMixin:
             published=bool(regforms),
             num_participants=num_participants
         )
+
+
+class RHParticipantListREST(ParticipantListMixin, RHRegistrationFormDisplayBase):
+    """REST API for the participant list."""
+
+    def is_participant(self, user):
+        return self.event.is_user_registered(user)
+
+    def _process(self):
+        is_participant = self.is_participant(session.user)
+        tables, merged, regforms = self._get_participant_list_tables(is_participant)
+
+        num_participants = sum(table['num_participants'] for table in tables)
+
+        return jsonify({
+            'published': bool(regforms),
+            'merged': merged,
+            'num_participants': num_participants,
+            'tables': tables
+        })
 
 
 class RHParticipantList(ParticipantListMixin, RHRegistrationFormDisplayBase):
