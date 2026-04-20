@@ -5,11 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
 from datetime import timedelta
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validates, validates_schema
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validate, validates, validates_schema
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -46,7 +45,7 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
-    internal_name = fields.String(allow_none=True)
+    internal_name = fields.String(allow_none=True, validate=validate.Regexp(r'[a-z0-9_]+$'))
 
     @pre_load
     def _avoid_resetting_advanced_settings(self, data, **kwargs):
@@ -121,8 +120,6 @@ class GeneralFieldDataSchema(mm.Schema):
             raise ValidationError(_('Changing internal name for personal data field is not allowed.'))
         if internal_name is None:
             return
-        if not re.match(r'^[a-z0-9_]+$', internal_name):
-            raise ValidationError(_('Only lowercase alphanumeric characters and underscore ("_") are allowed.'))
         if field.is_enabled is not False:  # None for new field
             # unique on form
             query = (RegistrationFormItem.query
