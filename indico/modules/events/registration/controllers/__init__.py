@@ -17,6 +17,7 @@ from indico.modules.events.registration.util import (check_registration_email, g
                                                      make_registration_schema, modify_registration,
                                                      process_registration_picture)
 from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.users.models.affiliations import Affiliation
 from indico.util.i18n import _
 from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.web.args import use_kwargs
@@ -84,9 +85,11 @@ class RegistrationEditMixin:
         form_data = get_flat_section_submission_data(self.regform, management=self.management,
                                                      registration=self.registration)
         registration_data = get_form_registration_data(self.regform, self.registration, management=self.management)
+        has_predefined_affiliations = Affiliation.query.filter_by(is_deleted=False).has_rows()
         return self.view_class.render_template(self.template_file, self.event,
                                                regform=self.regform,
                                                form_data=form_data,
+                                               has_predefined_affiliations=has_predefined_affiliations,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                registration=self.registration,

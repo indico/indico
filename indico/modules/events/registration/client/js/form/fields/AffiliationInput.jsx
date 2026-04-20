@@ -59,7 +59,6 @@ export default function AffiliationInput({
       validate={value =>
         isRequired && !value?.text ? Translate.string('This field is required.') : undefined
       }
-      includeMeta
     />
   );
 }
