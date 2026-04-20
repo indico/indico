@@ -242,11 +242,21 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 }
               }}
               description={
-                <Translate>
-                  Used for identifying the same field across registration forms regardless of the
-                  title. This can also be used across events if you make sure to use the same
-                  internal name.
-                </Translate>
+                <>
+                  <Translate>
+                    Used for identifying the same field across registration forms regardless of the
+                    title. This can also be used across events if you make sure to use the same
+                    internal name.
+                  </Translate>
+                  {itemData.fieldIsPersonalData && (
+                    <>
+                      {' '}
+                      <Translate>
+                        The internal name for a personal data field cannot be changed.
+                      </Translate>
+                    </>
+                  )}
+                </>
               }
             />
           </Fieldset>
