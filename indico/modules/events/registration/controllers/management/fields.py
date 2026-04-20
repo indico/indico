@@ -8,7 +8,7 @@
 from datetime import timedelta
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validate, validates, validates_schema
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, validate, validates, validates_schema
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -45,15 +45,7 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
-    internal_name = fields.String(allow_none=True, validate=validate.Regexp(r'[a-z0-9-]+$'))
-
-    @pre_load
-    def _avoid_resetting_advanced_settings(self, data, **kwargs):
-        # fields of collapsed (hidden) advanced settings are not in the payload
-        field = self.context['field']
-        if 'internal_name' not in data and field.internal_name:
-            data['internal_name'] = field.internal_name
-        return data
+    internal_name = fields.String(required=True, allow_none=True, validate=validate.Regexp(r'[a-z0-9-]+$'))
 
     @validates('title')
     @no_autoflush

@@ -26,7 +26,8 @@ class TestGeneralFieldDataSchema:
         new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
         with pytest.raises(ValidationError) as exc_info:
-            schema.load({'input_type': 'text', 'title': first_name_field.title})
+            schema.load({'input_type': 'text', 'title': first_name_field.title,
+                         'internal_name': None})
         assert exc_info.value.messages == {'title': 'There is already a field in this section with the same title.'}
 
     def test_update_field_with_same_title_in_same_section(self, dummy_regform):
@@ -37,7 +38,8 @@ class TestGeneralFieldDataSchema:
                                 if field.personal_data_type == PersonalDataType.last_name), None)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': last_name_field})
         with pytest.raises(ValidationError) as exc_info:
-            schema.load({'input_type': last_name_field.input_type, 'title': first_name_field.title})
+            schema.load({'input_type': last_name_field.input_type, 'title': first_name_field.title,
+                         'internal_name': last_name_field.internal_name})
         assert exc_info.value.messages == {'title': 'There is already a field in this section with the same title.'}
 
     def test_update_title_of_disabled_field(self, dummy_regform):
@@ -47,7 +49,8 @@ class TestGeneralFieldDataSchema:
         disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False,
                                                id=1337)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': disabled_field})
-        assert schema.load({'input_type': 'text', 'title': position_field.title})
+        assert schema.load({'input_type': 'text', 'title': position_field.title,
+                            'internal_name': position_field.internal_name})
 
     def test_new_field_with_same_title_but_disabled(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -57,7 +60,7 @@ class TestGeneralFieldDataSchema:
         db.session.flush()
         new_affiliation_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_affiliation_field})
-        assert schema.load({'input_type': 'text', 'title': affiliation_field.title})
+        assert schema.load({'input_type': 'text', 'title': affiliation_field.title, 'internal_name': None})
 
     def test_new_field_with_same_title_in_other_section(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -68,7 +71,7 @@ class TestGeneralFieldDataSchema:
         )
         new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
-        assert schema.load({'input_type': 'text', 'title': first_name_field.title})
+        assert schema.load({'input_type': 'text', 'title': first_name_field.title, 'internal_name': None})
 
     # internal_name tests
 
