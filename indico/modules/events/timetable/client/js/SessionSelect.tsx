@@ -14,6 +14,7 @@ import {FormFieldAdapter} from 'indico/react/forms';
 import {FinalField} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
+import {useToast} from './ToastContext';
 import {Colors, Session} from './types';
 
 import './SessionSelect.module.scss';
@@ -82,6 +83,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
   sessions = [...sessions]; // Avoid mutating the original array when adding draft session
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<SessionOption[]>(_mapSessionsToOptions(sessions || []));
+  const toast = useToast();
 
   const _onChangeValue = (id: number) => {
     const selectedSession = sessions.find(s => s.id === id);
@@ -110,6 +112,13 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
 
     setOptions([draftSessionOption, ...newOptions.toSorted(_sortOptionsFn)]);
     _onChangeValue(draftSession.id);
+    toast?.addToast({
+      type: 'warning',
+      message: Translate.string(
+        'The session "{title}" will only be created once you click Submit.',
+        {title: draftSession.title}
+      ),
+    });
   };
 
   return (
