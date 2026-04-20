@@ -123,8 +123,8 @@ class GeneralFieldDataSchema(mm.Schema):
         if field.is_enabled is not False:  # None for new field
             # unique on form
             query = (RegistrationFormItem.query
-                     .filter(RegistrationFormItem.parent_id == field.parent.id,
-                             RegistrationFormItem.internal_name == internal_name,
+                     .with_parent(field.registration_form)
+                     .filter(RegistrationFormItem.internal_name == internal_name,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted))
             if field.id:
@@ -304,8 +304,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 )
             # check unique internal name in form
             query = (RegistrationFormItem.query
-                     .filter(RegistrationFormItem.parent_id == self.field.parent.id,
-                             RegistrationFormItem.internal_name == self.field.internal_name,
+                     .with_parent(self.field.registration_form)
+                     .filter(RegistrationFormItem.internal_name == self.field.internal_name,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted))
             if same_field := query.first():
