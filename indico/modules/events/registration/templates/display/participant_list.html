@@ -44,11 +44,7 @@
 
 {% block content %}
     <ind-conference-participant-list
-        tables="{{ tables | tojson | forceescape }}"
-        total-participant-count="{{ num_participants }}"
         event-id="{{ event.id }}"
-        {% if merged %}merged{% endif %}
-        {% if published %}published{% endif %}
         {% if preview %}preview="{{ preview }}"{% endif %}
     ></ind-conference-participant-list>
 {% endblock %}

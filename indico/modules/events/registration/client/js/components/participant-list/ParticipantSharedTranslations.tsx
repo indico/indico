@@ -7,21 +7,27 @@
 
 import React from 'react';
 
-import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 interface ParticipantCountHiddenProps {
   count: number;
+  countHidden: number;
 }
 
-export function ParticipantCountHidden({count}: ParticipantCountHiddenProps) {
+export function ParticipantCountHidden({count, countHidden}: ParticipantCountHiddenProps) {
   return (
-    <PluralTranslate count={count}>
-      <Singular>
-        <Param name="count" value={count} /> participant registered anonymously.
-      </Singular>
-      <Plural>
-        <Param name="count" value={count} /> participants registered anonymously.
-      </Plural>
-    </PluralTranslate>
+    <div>
+      <PluralTranslate count={countHidden}>
+        <Singular>
+          <Param name="count" value={countHidden} /> participant registered anonymously.
+        </Singular>
+        <Plural>
+          <Param name="count" value={countHidden} /> participants registered anonymously.
+        </Plural>
+      </PluralTranslate>{' '}
+      <Translate>
+        Total amount of participants is <Param name="total" value={count} />.
+      </Translate>
+    </div>
   );
 }

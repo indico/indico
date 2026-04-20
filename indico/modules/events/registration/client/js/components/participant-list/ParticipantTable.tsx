@@ -149,7 +149,10 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
         <TableFooter fullWidth>
           <TableRow>
             <TableHeaderCell colSpan={table.headers.length + Number(table.show_checkin)}>
-              <ParticipantCountHidden count={hiddenParticipantsCount} />
+              <ParticipantCountHidden
+                count={table.num_participants}
+                countHidden={table.num_anonymous_participants}
+              />
             </TableHeaderCell>
           </TableRow>
         </TableFooter>
@@ -158,7 +161,10 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   ) : (
     <Message>
       {totalParticipantCount > 0 ? (
-        <ParticipantCountHidden count={hiddenParticipantsCount} />
+        <ParticipantCountHidden
+          count={table.num_participants}
+          countHidden={table.num_anonymous_participants}
+        />
       ) : (
         <Translate>No participants registered.</Translate>
       )}

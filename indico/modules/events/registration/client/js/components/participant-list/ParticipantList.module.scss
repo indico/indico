@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 :global(.ui.header .content).header-text {
   display: flex;
 }
@@ -26,4 +28,22 @@
 
 :global(section .ui.button).view-toggle {
   margin-bottom: 20px;
+}
+
+.participants-count-wrapper {
+  display: flex;
+  gap: 5px;
+}
+
+.tab-menu :global(.ui.menu) {
+  flex-wrap: wrap;
+}
+
+.hidden {
+  color: $dark-gray;
+}
+
+.tab-menu :global(.ui.menu) .tab-title {
+  gap: 0.5em;
+  border: 1px solid $separator-color;
 }
