@@ -307,7 +307,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 )
             # consistent type on forms of the same event
             query = (RegistrationFormItem.query
-                     .join(RegistrationForm, Event)
+                     .join(RegistrationFormItem.registration_form)
+                     .join(RegistrationForm.event)
                      .filter(RegistrationFormItem.internal_name == self.field.internal_name,
                              RegistrationFormItem.registration_form_id != self.field.registration_form.id,
                              RegistrationFormItem.input_type != self.field.input_type,
