@@ -905,7 +905,7 @@ export function Fieldset({legend, children, active, compact}) {
 }
 
 Fieldset.propTypes = {
-  legend: PropTypes.string.isRequired,
+  legend: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   children: PropTypes.node.isRequired,
   active: PropTypes.bool,
   compact: PropTypes.bool,
