@@ -25,6 +25,7 @@ import {BreakFormFields} from './BreakForm';
 import {mapDataToEntry, mapEntryToData, mapSessionToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
+import {useToast} from './ToastContext';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
 import {DATE_KEY_FORMAT} from './utils';
 
@@ -91,6 +92,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const toast = useToast();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   // Within this timetable we only care about the database ID,
@@ -229,6 +231,12 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       if (sessionId === -1) {
         const newSession = await _createSession(sessionObj);
         data.session_id = newSession.id;
+        toast?.addToast({
+          type: 'success',
+          message: Translate.string('Session "{title}" was created.', {
+            title: newSession.title,
+          }),
+        });
       } else {
         data.session_id = sessionId;
       }
