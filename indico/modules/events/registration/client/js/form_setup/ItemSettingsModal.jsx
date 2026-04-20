@@ -232,7 +232,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 name="internalName"
                 type="text"
                 label={Translate.string('Internal name')}
-                disabled={itemData.fieldIsPersonalData}
+                readOnly={itemData.fieldIsPersonalData}
                 nullIfEmpty
                 validate={val => {
                   if (val && !/^[a-z0-9_]+$/.test(val)) {
