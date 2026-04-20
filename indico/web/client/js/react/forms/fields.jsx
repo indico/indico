@@ -264,97 +264,110 @@ DropdownAdapter.defaultProps = {
   action: null,
 };
 
-function ComboDropdownAdapter(props) {
-  const {
-    input,
-    required,
-    clearable,
-    width,
-    action,
-    options,
-    renderCustomOptionContent,
-    includeMeta,
-    ...rest
-  } = props;
-  const fieldProps = width !== null ? {width} : {};
+export function ComboDropdown({
+  value,
+  search,
+  required,
+  clearable,
+  disabled,
+  action,
+  options,
+  renderCustomOptionContent,
+  includeMeta,
+  readOnly,
+  onChange,
+  ...rest
+}) {
+  const dropdownValue =
+    value && typeof value === 'object' ? (value.id === null ? value.text : value.id) : value;
 
   let fullOptions = options;
-  if (typeof input.value === 'string' && input.value) {
+  if (typeof dropdownValue === 'string' && dropdownValue) {
     fullOptions = [
       {
         key: 'custom',
-        value: input.value,
-        text: input.value,
-        content: renderCustomOptionContent(input.value),
+        value: dropdownValue,
+        text: dropdownValue,
+        content: renderCustomOptionContent(dropdownValue),
       },
       ...options,
     ];
   }
 
+  const handleChange = (_event, {value: selectedValue}) => {
+    if (typeof selectedValue === 'number') {
+      const opt = options.find(x => x.value === selectedValue);
+      const nextValue = {
+        id: selectedValue,
+        text: opt.text,
+      };
+      if (includeMeta) {
+        nextValue.meta = opt.meta;
+      }
+      onChange(nextValue);
+      return;
+    }
+
+    const nextValue = {
+      id: null,
+      text: selectedValue,
+    };
+    if (includeMeta) {
+      nextValue.meta = null;
+    }
+    onChange(nextValue);
+  };
+
+  const Component = action ? DropdownAction : Dropdown;
   return (
-    <FormFieldAdapter
-      input={input}
+    <Component
       {...rest}
       options={fullOptions}
-      required={required}
-      as={action ? DropdownAction : Dropdown}
+      search={search}
+      selection
       clearable={clearable === undefined ? !required : clearable}
       multiple={false}
       action={action}
-      undefinedValue={null}
+      value={dropdownValue ?? null}
+      disabled={action ? disabled : disabled || readOnly}
+      readOnly={readOnly}
       selectOnBlur={false}
       selectOnNavigation={false}
-      fieldProps={fieldProps}
-      getValue={(__, {value}) => {
-        if (typeof value === 'number') {
-          const opt = options.find(x => x.value === value);
-          const rv = {
-            id: value,
-            text: opt.text,
-          };
-          if (includeMeta) {
-            rv.meta = opt.meta;
-          }
-          return rv;
-        } else {
-          const rv = {
-            id: null,
-            text: value,
-          };
-          if (includeMeta) {
-            rv.meta = null;
-          }
-          return rv;
-        }
-      }}
-      onAddItem={(e, {value}) => {
-        input.onChange({
+      onChange={handleChange}
+      onAddItem={(e, {value: addedValue}) =>
+        onChange({
           id: null,
-          text: value,
-        });
-      }}
+          text: addedValue,
+        })
+      }
     />
   );
 }
 
-ComboDropdownAdapter.propTypes = {
-  input: PropTypes.object.isRequired,
+ComboDropdown.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string, PropTypes.number]),
   options: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+  search: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
   required: PropTypes.bool,
   clearable: PropTypes.bool,
-  width: PropTypes.number,
   action: PropTypes.object,
   renderCustomOptionContent: PropTypes.func,
   includeMeta: PropTypes.bool,
+  readOnly: PropTypes.bool,
 };
 
-ComboDropdownAdapter.defaultProps = {
+ComboDropdown.defaultProps = {
+  value: null,
+  disabled: false,
+  search: true,
   required: false,
   clearable: undefined,
-  width: null,
   action: null,
   renderCustomOptionContent: () => undefined,
   includeMeta: false,
+  readOnly: false,
 };
 
 /**
@@ -646,17 +659,18 @@ FinalDropdown.defaultProps = {
 /**
  * Like `FinalField` but for a dropdown with support for adding a custom freetext item.
  */
-export function FinalComboDropdown({name, label, allowAdditions, ...rest}) {
+export function FinalComboDropdown({name, label, allowAdditions, width, ...rest}) {
+  const fieldProps = width !== null ? {width} : {};
+
   return (
     <FinalField
       name={name}
-      adapter={ComboDropdownAdapter}
+      component={ComboDropdown}
       label={label}
-      format={x => (x.id === null ? x.text : x.id)}
       parse={identity}
       allowAdditions={allowAdditions}
-      search
-      selection
+      undefinedValue={null}
+      fieldProps={fieldProps}
       {...rest}
     />
   );
@@ -666,11 +680,13 @@ FinalComboDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   allowAdditions: PropTypes.bool,
+  width: PropTypes.number,
 };
 
 FinalComboDropdown.defaultProps = {
   label: null,
   allowAdditions: true,
+  width: null,
 };
 
 /**

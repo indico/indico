@@ -9,10 +9,9 @@ import defaultSearchAffiliationURL from 'indico-url:users.api_affiliations';
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
-import {useField} from 'react-final-form';
 import {Header} from 'semantic-ui-react';
 
-import {FinalComboDropdown, FinalInput} from 'indico/react/forms';
+import {ComboDropdown, FinalField, FinalInput} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
@@ -28,20 +27,15 @@ const getSubheader = ({city, countryName, country_name: countryNameSnake}) => {
   return city || country;
 };
 
-export default function FinalAffiliationField({
-  name,
+export function AffiliationField({
+  value,
+  onChange,
   allowCustomAffiliations,
-  hasPredefinedAffiliations,
   currentAffiliation,
   includeMeta,
   searchAffiliationURL,
-  noPredefinedInputName,
   ...rest
 }) {
-  const valueFieldName = hasPredefinedAffiliations ? name : noPredefinedInputName || name;
-  const {
-    input: {value: currentValue},
-  } = useField(valueFieldName, {subscription: {value: true}});
   const [searchQuery, setSearchQuery] = useState('');
   const {data: fetchedAffiliationResults} = useIndicoAxios(searchAffiliationURL({q: searchQuery}), {
     manual: !searchQuery,
@@ -55,8 +49,8 @@ export default function FinalAffiliationField({
   const affiliationOptions = useMemo(() => {
     const selectedAffiliation =
       currentAffiliation ||
-      (currentValue && typeof currentValue === 'object' && currentValue.id !== null
-        ? {id: currentValue.id, name: currentValue.text, ...(currentValue.meta || {})}
+      (value && typeof value === 'object' && value.id !== null
+        ? {id: value.id, name: value.text, ...(value.meta || {})}
         : null);
     const results =
       selectedAffiliation && !affiliationResults.find(x => x.id === selectedAffiliation.id)
@@ -75,7 +69,7 @@ export default function FinalAffiliationField({
         />
       ),
     }));
-  }, [affiliationResults, currentAffiliation, currentValue]);
+  }, [affiliationResults, currentAffiliation, value]);
 
   const searchAffiliationChange = (e, {searchQuery: query}) => {
     if (!query) {
@@ -85,24 +79,10 @@ export default function FinalAffiliationField({
     debounce(() => setSearchQuery(query));
   };
 
-  if (!hasPredefinedAffiliations) {
-    if (noPredefinedInputName) {
-      return <FinalInput name={noPredefinedInputName} {...rest} />;
-    }
-    return (
-      <FinalInput
-        name={name}
-        {...rest}
-        format={value => (value && typeof value === 'object' ? value.text || '' : value || '')}
-        parse={value => ({id: null, text: value})}
-        formatOnBlur={false}
-      />
-    );
-  }
-
   return (
-    <FinalComboDropdown
-      name={name}
+    <ComboDropdown
+      value={value}
+      onChange={onChange}
       options={affiliationOptions}
       allowAdditions={allowCustomAffiliations}
       includeMeta={includeMeta}
@@ -122,9 +102,71 @@ export default function FinalAffiliationField({
           ? Translate.string('Search an affiliation or enter one manually')
           : Translate.string('Search an affiliation')
       }
-      renderCustomOptionContent={value => (
-        <Header content={value} subheader={Translate.string('You entered this option manually')} />
+      renderCustomOptionContent={customValue => (
+        <Header
+          content={customValue}
+          subheader={Translate.string('You entered this option manually')}
+        />
       )}
+      {...rest}
+    />
+  );
+}
+
+AffiliationField.propTypes = {
+  value: PropTypes.shape({
+    id: PropTypes.number,
+    text: PropTypes.string,
+    meta: PropTypes.object,
+  }),
+  onChange: PropTypes.func.isRequired,
+  allowCustomAffiliations: PropTypes.bool,
+  currentAffiliation: PropTypes.object,
+  includeMeta: PropTypes.bool,
+  searchAffiliationURL: PropTypes.func,
+};
+
+AffiliationField.defaultProps = {
+  value: null,
+  allowCustomAffiliations: true,
+  currentAffiliation: null,
+  includeMeta: false,
+  searchAffiliationURL: defaultSearchAffiliationURL,
+};
+
+export default function FinalAffiliationField({
+  name,
+  allowCustomAffiliations,
+  hasPredefinedAffiliations,
+  currentAffiliation,
+  includeMeta,
+  searchAffiliationURL,
+  noPredefinedInputName,
+  ...rest
+}) {
+  if (!hasPredefinedAffiliations) {
+    if (noPredefinedInputName) {
+      return <FinalInput name={noPredefinedInputName} {...rest} />;
+    }
+    return (
+      <FinalInput
+        name={name}
+        {...rest}
+        format={value => (value && typeof value === 'object' ? value.text || '' : value || '')}
+        parse={value => ({id: null, text: value})}
+        formatOnBlur={false}
+      />
+    );
+  }
+
+  return (
+    <FinalField
+      name={name}
+      component={AffiliationField}
+      allowCustomAffiliations={allowCustomAffiliations}
+      currentAffiliation={currentAffiliation}
+      includeMeta={includeMeta}
+      searchAffiliationURL={searchAffiliationURL}
       {...rest}
     />
   );
