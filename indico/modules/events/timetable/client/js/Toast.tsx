@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Icon} from 'semantic-ui-react';
 
 import './Toast.module.scss';
@@ -29,10 +29,10 @@ interface ToastProps {
 }
 
 export function Toast({id, type, message, duration, onClose}: ToastProps) {
-  // useEffect(() => {
-  //   const timeoutId = window.setTimeout(() => onClose(id), duration);
-  //   return () => window.clearTimeout(timeoutId);
-  // }, [id, duration, onClose]);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => onClose(id), duration);
+    return () => window.clearTimeout(timeoutId);
+  }, [id, duration, onClose]);
 
   return (
     <div styleName="toast" data-type={type} role="status" aria-live="polite">
@@ -40,6 +40,7 @@ export function Toast({id, type, message, duration, onClose}: ToastProps) {
       <div styleName="toast-message">{message}</div>
       <button
         type="button"
+        styleName="toast-close"
         onClick={() => onClose(id)}
         aria-label={Translate.string('Close notification')}
       >
