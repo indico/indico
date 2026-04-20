@@ -236,7 +236,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 nullIfEmpty
                 validate={val => {
                   if (val && !/^[a-z0-9_]+$/.test(val)) {
-                    Translate.string(
+                    return Translate.string(
                       'Only lowercase alphanumeric characters and underscore are allowed.'
                     );
                   }
