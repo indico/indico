@@ -45,7 +45,7 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
-    internal_name = fields.String(allow_none=True, validate=validate.Regexp(r'[a-z0-9_]+$'))
+    internal_name = fields.String(allow_none=True, validate=validate.Regexp(r'[a-z0-9-]+$'))
 
     @pre_load
     def _avoid_resetting_advanced_settings(self, data, **kwargs):
@@ -116,7 +116,7 @@ class GeneralFieldDataSchema(mm.Schema):
     @no_autoflush
     def _check_internal_name(self, internal_name, **kwargs):
         field = self.context['field']
-        if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.name:
+        if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.internal_name:
             raise ValidationError(_('Changing internal name for personal data field is not allowed.'))
         if internal_name is None:
             return

@@ -83,23 +83,23 @@ class TestGeneralFieldDataSchema:
         assert exc_info.value.messages == {'internal_name': [f'The field "{position_field.title}" on this form '
                                                              f'has the same internal name.']}
 
-    @pytest.mark.parametrize('internal_name', ('internal name', 'InternalName', 'internal.name'))
+    @pytest.mark.parametrize('internal_name', ('internal name', 'InternalName', 'internal.name', 'internal_name', ''))
     def test_update_internal_name_with_not_allowed_chars(self, dummy_regform, internal_name):
         pd_section = dummy_regform.sections[0]
         new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
         with pytest.raises(ValidationError) as exc_info:
             schema.load({'input_type': 'text', 'title': 'New field', 'internal_name': internal_name})
-        assert exc_info.value.messages == {'internal_name': 'Only lowercase alphanumeric characters '
-                                                            'and underscore ("_") are allowed.'}
+        assert exc_info.value.messages == {'internal_name': ['String does not match expected pattern.']}
 
-    def test_update_internal_name_of_personal_data_field(self, dummy_regform):
+    @pytest.mark.parametrize('internal_name', ('alt-position', None))
+    def test_update_internal_name_of_personal_data_field(self, dummy_regform, internal_name):
         pd_section = dummy_regform.sections[0]
         position_field = next((field for field in pd_section.fields
                                if field.personal_data_type == PersonalDataType.position), None)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': position_field})
         with pytest.raises(ValidationError) as exc_info:
-            assert schema.load({'input_type': 'text', 'title': position_field.title, 'internal_name': 'alt_position'})
+            assert schema.load({'input_type': 'text', 'title': position_field.title, 'internal_name': internal_name})
         assert exc_info.value.messages == {'internal_name': 'Changing internal name for personal data field '
                                                             'is not allowed.'}
 

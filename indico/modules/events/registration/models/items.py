@@ -142,6 +142,10 @@ class PersonalDataType(IndicoIntEnum):
         return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
 
     @property
+    def internal_name(self):
+        return self.name.replace('_', '-')
+
+    @property
     def column(self):
         """
         The Registration column in which the value is stored in

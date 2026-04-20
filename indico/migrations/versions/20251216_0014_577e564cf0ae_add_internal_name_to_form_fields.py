@@ -40,7 +40,7 @@ def upgrade():
         "internal_name != ''",
         schema='event_registration'
     )
-    case_expr = ' '.join(f"WHEN {e.value} THEN '{e.name}'" for e in _PersonalDataType)
+    case_expr = ' '.join(f"WHEN {e.value} THEN '{e.name.replace('_', '-')}'" for e in _PersonalDataType)
     op.execute(f'''
         UPDATE event_registration.form_items
         SET internal_name = CASE personal_data_type {case_expr} END

@@ -235,9 +235,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               readOnly={itemData.fieldIsPersonalData}
               nullIfEmpty
               validate={val => {
-                if (val && !/^[a-z0-9_]+$/.test(val)) {
+                if (val && !/^[a-z0-9-]+$/.test(val)) {
                   return Translate.string(
-                    'Only lowercase alphanumeric characters and underscore are allowed.'
+                    'Only lowercase alphanumeric characters and dashes are allowed.'
                   );
                 }
               }}
