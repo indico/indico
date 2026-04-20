@@ -35,6 +35,7 @@ import {
   getIconByEntryType,
   getEntryColors,
   MIN_DURATION,
+  V_SPACE_BETWEEN_ENTRIES_PX,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -195,7 +196,7 @@ export default function Entry({
     : {};
 
   const minHeight = minutesToPixels(5);
-  const height = minutesToPixels(Math.max(duration, minHeight)) - 1;
+  const height = minutesToPixels(Math.max(duration, minHeight)) - V_SPACE_BETWEEN_ENTRIES_PX;
 
   style = {
     ...style,
