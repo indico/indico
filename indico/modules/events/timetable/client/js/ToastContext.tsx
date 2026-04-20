@@ -11,21 +11,18 @@ import ReactDOM from 'react-dom';
 import './Toast.module.scss';
 import {Toast, ToastType} from './Toast';
 
-export type ToastPosition = 'bottom-center';
-const TOAST_POSITIONS: ToastPosition[] = ['bottom-center'];
+export type ToastPosition = 'bottom-center' | 'top-center';
 const DEFAULT_TOAST_DURATION = 3000;
 
 export interface ToastOptions {
   type?: ToastType;
   message: ReactNode;
   duration?: number;
-  position?: ToastPosition;
 }
 interface ToastItem extends ToastOptions {
   id: number;
   duration: number;
   type: ToastType;
-  position: ToastPosition;
 }
 
 interface ToastContextValue {
@@ -35,7 +32,12 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-export function ToastProvider({children}: {children: ReactNode}) {
+interface ToastProviderProps {
+  children: ReactNode;
+  position?: ToastPosition;
+}
+
+export function ToastProvider({children, position = 'bottom-center'}: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const removeToast = (id: number) => {
@@ -49,7 +51,6 @@ export function ToastProvider({children}: {children: ReactNode}) {
       type: options.type ?? 'info',
       message: options.message,
       duration: options.duration ?? DEFAULT_TOAST_DURATION,
-      position: options.position ?? 'bottom-center',
     };
     setToasts(current => [...current, toast]);
     return id;
@@ -58,31 +59,22 @@ export function ToastProvider({children}: {children: ReactNode}) {
   return (
     <ToastContext.Provider value={{addToast, removeToast}}>
       {children}
-      {ReactDOM.createPortal(
-        <>
-          {TOAST_POSITIONS.map(position => {
-            const positionToasts = toasts.filter(t => t.position === position);
-            if (positionToasts.length === 0) {
-              return null;
-            }
-            return (
-              <div key={position} styleName="toast-container" data-position={position}>
-                {positionToasts.map(toast => (
-                  <Toast
-                    key={toast.id}
-                    id={toast.id}
-                    type={toast.type}
-                    message={toast.message}
-                    duration={toast.duration}
-                    onClose={removeToast}
-                  />
-                ))}
-              </div>
-            );
-          })}
-        </>,
-        document.body
-      )}
+      {toasts.length > 0 &&
+        ReactDOM.createPortal(
+          <div styleName="toast-container" data-position={position}>
+            {toasts.map(toast => (
+              <Toast
+                key={toast.id}
+                id={toast.id}
+                type={toast.type}
+                message={toast.message}
+                duration={toast.duration}
+                onClose={removeToast}
+              />
+            ))}
+          </div>,
+          document.body
+        )}
     </ToastContext.Provider>
   );
 }

@@ -80,6 +80,13 @@
         align-items: center;
         flex-direction: column-reverse;
     }
+
+    &[data-position='top-center'] {
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        align-items: center;
+    }
 }
 
 .toast-message {
