@@ -45,7 +45,7 @@ class GeneralFieldDataSchema(mm.Schema):
     input_type = fields.String(required=True, validate=not_empty)
     show_if_id = fields.Integer(required=False, load_default=None, data_key='show_if_field_id')
     show_if_values = fields.List(fields.Raw(), required=False, data_key='show_if_field_values')
-    internal_name = fields.String(required=True, allow_none=True, validate=validate.Regexp(r'[a-z0-9-]+$'))
+    internal_name = fields.String(allow_none=True, validate=validate.Regexp(r'[a-z0-9-]+$'))
 
     @validates('title')
     @no_autoflush

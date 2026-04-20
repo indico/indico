@@ -26,8 +26,7 @@ class TestGeneralFieldDataSchema:
         new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
         with pytest.raises(ValidationError) as exc_info:
-            schema.load({'input_type': 'text', 'title': first_name_field.title,
-                         'internal_name': None})
+            schema.load({'input_type': 'text', 'title': first_name_field.title})
         assert exc_info.value.messages == {'title': 'There is already a field in this section with the same title.'}
 
     def test_update_field_with_same_title_in_same_section(self, dummy_regform):
@@ -60,7 +59,7 @@ class TestGeneralFieldDataSchema:
         db.session.flush()
         new_affiliation_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_affiliation_field})
-        assert schema.load({'input_type': 'text', 'title': affiliation_field.title, 'internal_name': None})
+        assert schema.load({'input_type': 'text', 'title': affiliation_field.title})
 
     def test_new_field_with_same_title_in_other_section(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -71,7 +70,7 @@ class TestGeneralFieldDataSchema:
         )
         new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
-        assert schema.load({'input_type': 'text', 'title': first_name_field.title, 'internal_name': None})
+        assert schema.load({'input_type': 'text', 'title': first_name_field.title})
 
     # internal_name tests
 
