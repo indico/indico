@@ -227,29 +227,28 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
             }
             compact
           >
-            {advancedSettingsOpen && (
-              <FinalInput
-                name="internalName"
-                type="text"
-                label={Translate.string('Internal name')}
-                readOnly={itemData.fieldIsPersonalData}
-                nullIfEmpty
-                validate={val => {
-                  if (val && !/^[a-z0-9_]+$/.test(val)) {
-                    return Translate.string(
-                      'Only lowercase alphanumeric characters and underscore are allowed.'
-                    );
-                  }
-                }}
-                description={
-                  <Translate>
-                    Used for identifying the same field across registration forms regardless of the
-                    title. This can also be used across events if you make sure to use the same
-                    internal name.
-                  </Translate>
+            <FinalInput
+              fieldProps={advancedSettingsOpen ? {} : {style: {display: 'none'}}}
+              name="internalName"
+              type="text"
+              label={Translate.string('Internal name')}
+              readOnly={itemData.fieldIsPersonalData}
+              nullIfEmpty
+              validate={val => {
+                if (val && !/^[a-z0-9_]+$/.test(val)) {
+                  return Translate.string(
+                    'Only lowercase alphanumeric characters and underscore are allowed.'
+                  );
                 }
-              />
-            )}
+              }}
+              description={
+                <Translate>
+                  Used for identifying the same field across registration forms regardless of the
+                  title. This can also be used across events if you make sure to use the same
+                  internal name.
+                </Translate>
+              }
+            />
           </Fieldset>
           {isUnsupportedField && (
             <Message visible warning>
