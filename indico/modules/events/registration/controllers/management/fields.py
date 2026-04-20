@@ -380,6 +380,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             'description': {'title': 'Description'},
             'is_required': {'title': 'Required'},
             'retention_period': {'title': 'Retention period'},
+            'internal_name': {'title': 'Internal name', 'type': 'string'},
         })
         self.field.log(
             EventLogRealm.management, LogKind.change, 'Registration',
