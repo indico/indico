@@ -5,6 +5,50 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toastCollapse {
+    from {
+        opacity: 1;
+        max-height: 200px;
+        margin-bottom: 0;
+        padding-top: 12px;
+        padding-bottom: 14px;
+        border-top-width: 1px;
+        border-bottom-width: 1px;
+    }
+
+    to {
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: -10px;
+        padding-top: 0;
+        padding-bottom: 0;
+        border-top-width: 0;
+        border-bottom-width: 0;
+    }
+}
+
+@keyframes toastProgress {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
 .toast {
     position: relative;
     display: flex;

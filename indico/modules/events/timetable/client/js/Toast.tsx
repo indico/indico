@@ -14,10 +14,10 @@ import {Translate} from 'indico/react/i18n';
 export type ToastType = 'info' | 'success' | 'warning' | 'error';
 
 const ICONS: Record<ToastType, string> = {
-  info: 'info',
-  success: 'check',
-  warning: 'warning',
-  error: 'times',
+  info: 'info circle',
+  success: 'check circle',
+  warning: 'warning sign',
+  error: 'times circle',
 };
 
 interface ToastProps {
