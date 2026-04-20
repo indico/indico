@@ -133,7 +133,8 @@ class GeneralFieldDataSchema(mm.Schema):
                              RegistrationFormItem.input_type != field.input_type,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted,
-                             ~RegistrationForm.is_deleted))
+                             ~RegistrationForm.is_deleted,
+                             Event.id == field.registration_form.event_id))
             if field.id:
                 query = query.filter(RegistrationFormItem.id != field.id)
             if inconsistent_field := query.first():

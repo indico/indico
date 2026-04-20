@@ -147,3 +147,19 @@ class TestGeneralFieldDataSchema:
         other_form.is_deleted = True
         db.session.flush()
         assert schema.load({'input_type': 'text', 'title': 'text', 'internal_name': 'title'})
+
+    def test_internal_name_with_different_input_type_on_other_event(self, db, create_event, dummy_regform,
+                                                                    create_regform):
+        # create field in dummy event
+        new_field = RegistrationFormField(parent=dummy_regform.sections[0], registration_form=dummy_regform,
+                                          title='test', input_type='text', internal_name='test')
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        schema.load({'input_type': 'text', 'title': 'test', 'internal_name': 'test'})
+        db.session.flush()
+        # create field in another event
+        other_event = create_event()
+        other_form = create_regform(other_event, title='Other Form')
+        other_field = RegistrationFormField(parent=other_form.sections[0], registration_form=other_form,
+                                            title='test', input_type='checkbox')
+        schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
+        schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
