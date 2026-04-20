@@ -134,13 +134,14 @@ class GeneralFieldDataSchema(mm.Schema):
                                       .format(same_field.title))
             # consistent type on forms of the same event
             query = (RegistrationFormItem.query
-                     .join(RegistrationForm, Event)
+                     .join(RegistrationFormItem.registration_form)
+                     .join(RegistrationForm.event)
                      .filter(RegistrationFormItem.internal_name == internal_name,
                              RegistrationFormItem.registration_form_id != field.registration_form.id,
                              RegistrationFormItem.input_type != field.input_type,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted,
-                             Event.id == field.registration_form.event_id))
+                             ~RegistrationForm.is_deleted))
             if field.id:
                 query = query.filter(RegistrationFormItem.id != field.id)
             if inconsistent_field := query.first():
