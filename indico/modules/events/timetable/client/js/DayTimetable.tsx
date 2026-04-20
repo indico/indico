@@ -36,6 +36,7 @@ import {
   DAY_SIZE,
   GRID_SIZE_MINUTES,
   MIN_DURATION,
+  V_SPACE_BETWEEN_ENTRIES_PX,
   getDateKey,
   isWithinLimits,
   minutesToPixels,
@@ -357,10 +358,7 @@ export function DayTimetable({
     function onMouseDown(event: MouseEvent) {
       const clientY = event.clientY + wrapperRef.current.scrollTop;
       const offsetY = clientY - wrapperRef.current.offsetTop;
-      const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY, [
-        0,
-        minutesToPixels(defaultContributionDuration),
-      ]);
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
       const clickedOnCalendar =
         event.target === calendarRef.current || event.target === innerWrapperRef.current;
@@ -453,7 +451,11 @@ export function DayTimetable({
   }, [wrapperRef]);
 
   const restrictToCalendar = useMemo(() => {
-    const limitsDelta: [number, number] = [limitTop, DAY_SIZE - limitBottom];
+    const limitsDelta: [number, number] = [
+      limitTop,
+      DAY_SIZE - limitBottom + V_SPACE_BETWEEN_ENTRIES_PX,
+    ];
+
     return createRestrictToCalendar(calendarRef, limitsDelta);
   }, [limitTop, limitBottom]);
 
