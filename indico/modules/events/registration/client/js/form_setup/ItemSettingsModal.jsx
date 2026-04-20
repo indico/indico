@@ -46,12 +46,12 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
     fieldIsRequired,
     ...itemData
   } = useSelector(state => (editing ? getItemById(state, id) : EMPTY_DATA));
+  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();
   const isUnsupportedField = !(inputType in fieldRegistry);
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
-  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
 
   const handleSubmit = async (formData, form) => {
     const data = getValuesForFields(formData, form);
