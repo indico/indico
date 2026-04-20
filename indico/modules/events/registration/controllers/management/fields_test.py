@@ -131,12 +131,17 @@ class TestGeneralFieldDataSchema:
                             if field.personal_data_type == PersonalDataType.title), None)
         title_field.is_enabled = False
         db.session.flush()
-        new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        new_section = RegistrationFormSection(registration_form=dummy_regform, title='New Section',
+                                              is_manager_only=False)
+        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform, title='test',
+                                          input_type='text')
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
         with pytest.raises(ValidationError) as exc_info:
-            assert schema.load({'input_type': 'text', 'title': title_field.title,
-                                'internal_name': title_field.internal_name})
+            schema.load({'input_type': 'text', 'title': 'test', 'internal_name': 'title'})
         assert exc_info.value.messages == {
-            'internal_name': [f'The field "{title_field.title}" with the same internal name on form '
+            'internal_name': [f'The field "Title" with the same internal name on form '
                               f'"{other_form.title}" uses a different input type which is not allowed.']
         }
+        other_form.is_deleted = True
+        db.session.flush()
+        assert schema.load({'input_type': 'text', 'title': 'text', 'internal_name': 'title'})
