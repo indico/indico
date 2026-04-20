@@ -22,6 +22,7 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
+import {useToast} from './ToastContext';
 
 interface TimetableSessionEditModalProps {
   sessionId: number;
@@ -85,6 +86,7 @@ export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateMod
   const dispatch = useDispatch<any>();
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
+  const toast = useToast();
 
   const {data: sessionTypesData, loading: typesLoading} = useIndicoAxios(
     typesURL({event_id: eventId})
@@ -98,6 +100,10 @@ export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateMod
 
   const handleSubmit = (formData: any) => {
     dispatch(actions.createSession(formData));
+    toast?.addToast({
+      type: 'success',
+      message: Translate.string('Session "{title}" was created.', {title: formData.title}),
+    });
     onClose();
   };
 

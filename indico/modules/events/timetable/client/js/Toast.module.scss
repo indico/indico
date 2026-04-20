@@ -1,0 +1,98 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 12px;
+    padding: 12px 14px 14px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.toast-container {
+    position: fixed;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 40px);
+
+    &[data-position='bottom-center'] {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        align-items: center;
+        flex-direction: column-reverse;
+    }
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.9em;
+    line-height: 1.4;
+    color: #333;
+    word-break: break-word;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    margin: 0 !important;
+    font-size: 1.2em !important;
+
+    .toast[data-type='info'] & {
+        color: #2185d0;
+    }
+
+    .toast[data-type='success'] & {
+        color: #21ba45;
+    }
+
+    .toast[data-type='warning'] & {
+        color: #f2a33c;
+    }
+
+    .toast[data-type='error'] & {
+        color: #db2828;
+    }
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    transform-origin: left center;
+    animation-name: toastProgress;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+
+    .toast[data-type='info'] & {
+        background: #2185d0;
+    }
+
+    .toast[data-type='success'] & {
+        background: #21ba45;
+    }
+
+    .toast[data-type='warning'] & {
+        background: #f2a33c;
+    }
+
+    .toast[data-type='error'] & {
+        background: #db2828;
+    }
+}
