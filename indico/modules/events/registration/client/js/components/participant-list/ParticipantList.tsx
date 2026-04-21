@@ -40,14 +40,20 @@ interface ParticipantCounterProps {
 }
 
 function ParticipantCounter({table}: ParticipantCounterProps) {
-  const participantCounterElement = (
-    <div styleName="participants-count-wrapper">
-      <span styleName="hidden"> {table.num_anonymous_participants}</span> / {table.num_participants}
-      <Icon name="user" />
-    </div>
-  );
+  const participantCounterElement =
+    table.num_anonymous_participants > 0 ? (
+      <div styleName="participants-count-wrapper">
+        <span styleName="hidden">{table.num_anonymous_participants}</span>/ {table.num_participants}
+        <Icon name="user" />
+      </div>
+    ) : (
+      <div styleName="participants-count-wrapper">
+        {table.num_participants}
+        <Icon name="user" />
+      </div>
+    );
 
-  return table.num_anonymous_participants > 0 ? (
+  return (
     <Popup
       position="left center"
       content={
@@ -58,8 +64,6 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
       }
       trigger={participantCounterElement}
     />
-  ) : (
-    participantCounterElement
   );
 }
 

@@ -15,6 +15,9 @@ interface ParticipantCountHiddenProps {
 }
 
 export function ParticipantCountHidden({count, countHidden}: ParticipantCountHiddenProps) {
+  if (count === 0) {
+    return <Translate>No participants registered.</Translate>;
+  }
   return (
     <div>
       <PluralTranslate count={countHidden}>

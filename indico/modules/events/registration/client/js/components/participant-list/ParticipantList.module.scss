@@ -15,7 +15,7 @@
   align-items: center;
   position: relative;
 
-  > a {
+  >a {
     position: absolute;
     transform: translateX(-80%);
     opacity: 0.5;
@@ -35,15 +35,18 @@
   gap: 5px;
 }
 
-.tab-menu :global(.ui.menu) {
+.tab-menu> :global(.ui.menu) {
   flex-wrap: wrap;
+  margin-top: 30px;
+  margin-bottom: 30px;
+
+  >.tab-title {
+    gap: 10px;
+    border: 1px solid $separator-color;
+    margin: 5px;
+  }
 }
 
 .hidden {
-  color: $dark-gray;
-}
-
-.tab-menu :global(.ui.menu) .tab-title {
-  gap: 0.5em;
-  border: 1px solid $separator-color;
+  color: $light-black;
 }
