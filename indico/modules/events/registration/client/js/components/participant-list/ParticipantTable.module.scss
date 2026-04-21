@@ -19,7 +19,7 @@
 .participant-table-row {
   position: relative;
 
-  > p {
+  >p {
     width: 100%;
     line-height: 1em;
     display: inline-block;
@@ -33,7 +33,7 @@
   }
 
   &:not(.unsortable) {
-    > p {
+    >p {
       width: calc(100% - 12px);
     }
   }
@@ -43,4 +43,13 @@
   display: inline-block;
   content: '\f0dc';
   opacity: 0.4;
+}
+
+.paginator-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.paginator-dropdown {
+  margin-left: 10px;
 }
