@@ -23,6 +23,8 @@ Bugfixes
 - Use new MS Outlook URL in the share widget (:pr:`7424`, thanks :user:`hirishh`)
 - Fix editing contribution time from timetable bubbles when the CSP is enabled
   (:pr:`7432`)
+- Fix error when copying a paper file with an unguessable MIME type to the editing
+  module (:pr:`7475`)
 
 Accessibility
 ^^^^^^^^^^^^^

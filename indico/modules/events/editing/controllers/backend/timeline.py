@@ -52,6 +52,12 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
         return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
+class _FileWrapper:
+    def __init__(self, file):
+        self.filename = file.filename
+        self.mimetype = file.content_type
+
+
 class RHEditingUploadContributionFile(RHEditingUploadFile):
     @use_kwargs({
         'id': fields.Int(load_default=None),
@@ -68,7 +74,7 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
             files = last_rev.files
         if found := next((f for f in files if f.id == (id or paper_id)), None):
             with found.open() as stream:
-                return self._save_file(found, stream)
+                return self._save_file(_FileWrapper(found), stream)
         raise UserValueError(_('No such file was found within the paper'))
 
 
