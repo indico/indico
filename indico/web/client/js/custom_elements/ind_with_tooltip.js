@@ -45,6 +45,8 @@ CustomElementBase.defineWhenDomReady(
         this.show();
         this.addEventListener('focusout', this.hide);
       });
+
+      this.addEventListener('click', this.hide, {capture: true});
     }
   }
 );

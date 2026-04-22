@@ -38,6 +38,9 @@ Accessibility
 
 - Screen reader users can now navigate to the event page header as a banner
   landmark (:pr:`7418`, thanks :user:`foxbunny`)
+- Icon-only buttons on the abstract detail page now have proper accessible names
+  and tooltips instead of relying on the ``title`` attribute (:pr:`7474`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
