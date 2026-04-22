@@ -257,6 +257,11 @@ class Registration(db.Model):
         UTCDateTime,
         nullable=True
     )
+    #: The date/time when the registration was last modified
+    modified_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: The Event containing this registration
     event = db.relationship(
@@ -814,6 +819,12 @@ class Registration(db.Model):
         awm = AppleWalletManager(self.event)
         if awm.is_configured:
             return awm.get_ticket(self)
+
+    def set_modified(self):
+        """Set the registration modified date at the current time. This function is only meant
+        to be called when the registration is modified by the user or an admin, not on automatic state changes.
+        """
+        self.modified_dt = now_utc()
 
 
 class RegistrationData(StoredFileMixin, db.Model):

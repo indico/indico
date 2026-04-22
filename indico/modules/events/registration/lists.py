@@ -60,6 +60,9 @@ class RegistrationListGenerator(ListGeneratorBase):
             'payment_date': {
                 'title': _('Payment date'),
             },
+            'modified_dt': {
+                'title': _('Last modified'),
+            },
             'visibility': {
                 'title': _('Visibility'),
             },
