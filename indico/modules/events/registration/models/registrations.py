@@ -821,8 +821,10 @@ class Registration(db.Model):
             return awm.get_ticket(self)
 
     def set_modified(self):
-        """Set the registration modified date at the current time. This function is only meant
-        to be called when the registration is modified by the user or an admin, not on automatic state changes.
+        """Update the modification date.
+
+        This function is only meant to be called when the registration is modified
+        by the user or an admin, not on automatic state changes.
         """
         self.modified_dt = now_utc()
 
