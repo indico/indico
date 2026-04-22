@@ -26,6 +26,8 @@ Bugfixes
   (:pr:`7432`)
 - Fix error when copying a paper file with an unguessable MIME type to the editing
   module (:pr:`7475`)
+- Fix date picker showing January instead of the selected month when the user
+  language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -207,13 +207,15 @@ export function toOptionalDate(dateString) {
 
   const formats = [
     'YYYY-MM-DD', // ISO date format
-    'ddd MMM DD YYYY', // toDateString() format
+    'ddd MMM DD YYYY', // toDateString() format (always English per ECMAScript spec)
   ];
 
-  // Parses the date string with each format, returning the first valid one
-  const parsedDate = formats.map(format => moment(dateString, format)).find(date => date.isValid());
+  // Parse using English locale in strict mode: toDateString() output is always English,
+  // and non-strict parsing under a non-English moment locale silently falls back to
+  // month 0 when the month abbreviation doesn't match the locale.
+  const parsedDate = moment(dateString, formats, 'en', true);
 
-  if (!parsedDate) {
+  if (!parsedDate.isValid()) {
     return;
   }
 

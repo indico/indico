@@ -816,8 +816,8 @@ CustomElementBase.define(
             grid.year = gridDate.getFullYear();
             grid.month = gridDate.getMonth();
           }
-          grid.rangeStart = markedRange.start?.toString() || '';
-          grid.rangeEnd = markedRange.end?.toString() || '';
+          grid.rangeStart = markedRange.start?.toDateString() || '';
+          grid.rangeEnd = markedRange.end?.toDateString() || '';
           grid.setAllowableSelectionRange(indCalendar.allowableSelectionRange);
         });
       }
