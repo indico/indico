@@ -14,7 +14,7 @@ import {Toast, ToastType} from './Toast';
 export type ToastPosition = 'bottom-center' | 'top-center';
 
 const TOAST_EXIT_DURATION = 200;
-const DEFAULT_TOAST_DURATION = 3000;
+const DEFAULT_TOAST_DURATION = 5000;
 
 export interface ToastOptions {
   type?: ToastType;
