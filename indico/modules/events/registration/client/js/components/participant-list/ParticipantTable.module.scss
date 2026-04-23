@@ -16,7 +16,7 @@
   width: 50px;
 }
 
-.participant-table-row {
+.participant-table-header {
   position: relative;
 
   >p {
@@ -39,17 +39,25 @@
   }
 }
 
-:global(.ui.sortable.table) .participant-table-row:not(.unsortable):not(:global(.sorted))::after {
+:global(.ui.sortable.table) .participant-table-header:not(.unsortable):not(:global(.sorted))::after {
   display: inline-block;
   content: '\f0dc';
   opacity: 0.4;
 }
 
-.paginator-wrapper {
-  display: flex;
-  justify-content: space-between;
+.participant-list-pagination-dropdown {
+  margin-left: 10px;
 }
 
-.paginator-dropdown {
-  margin-left: 10px;
+.participant-list-pagination {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+
+.participant-list-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
 }

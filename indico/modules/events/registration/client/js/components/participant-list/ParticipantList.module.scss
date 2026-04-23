@@ -33,6 +33,7 @@
 .participants-count-wrapper {
   display: flex;
   gap: 5px;
+  word-break: keep-all;
 }
 
 .tab-menu> :global(.ui.menu) {
@@ -44,6 +45,9 @@
     gap: 10px;
     border: 1px solid $separator-color;
     margin: 5px;
+
+    flex: 0 1 auto;
+    overflow-wrap: break-word; // same as in the accordion before
   }
 }
 

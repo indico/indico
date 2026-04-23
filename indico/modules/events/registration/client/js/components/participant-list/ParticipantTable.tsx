@@ -12,7 +12,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  // TableFooter,
   TableHeader,
   TableHeaderCell,
   TableRow,
@@ -31,61 +30,9 @@ interface ParticipantTableProps {
   table: TableObj;
 }
 
-interface PaginatorProps {
-  currentPage: number;
-  totalPages: number;
-  perPage: number | 'all';
-  perPageOptions?: (number | 'all')[];
-  onPageChange: (page: number) => void;
-  onPerPageChange: (perPage: number | 'all') => void;
-}
-
-export function Paginator({
-  currentPage,
-  totalPages,
-  perPage,
-  perPageOptions = [2, 10, 25, 50, 100, 'all'],
-  onPageChange,
-  onPerPageChange,
-}: PaginatorProps) {
-  return (
-    <div styleName="paginator-wrapper">
-      <Pagination
-        activePage={currentPage}
-        onPageChange={(e, {activePage}) => onPageChange(Number(activePage))}
-        totalPages={totalPages}
-        ellipsisItem={{content: <Icon name="ellipsis horizontal" />, icon: true}}
-        firstItem={null}
-        lastItem={null}
-        prevItem={{content: <Icon name="angle left" />, icon: true}}
-        nextItem={{content: <Icon name="angle right" />, icon: true}}
-      />
-
-      <span>
-        Rows per page:
-        <Dropdown
-          selection
-          compact
-          floating
-          styleName="paginator-dropdown"
-          options={perPageOptions.map(n => ({
-            key: n,
-            value: n,
-            text: String(n),
-          }))}
-          value={perPage}
-          onChange={(e, {value}) => onPerPageChange(value as number | 'all')}
-        />
-      </span>
-    </div>
-  );
-}
-
 export default function ParticipantTable({table}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
-  // const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
-  // const hasInvisibleParticipants = hiddenParticipantsCount > 0;
 
   type sortDirectionType = 'ascending' | 'descending' | null;
 
@@ -94,7 +41,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   const [sortedRows, setSortedRows] = useState([...table.rows]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState<number | 'all'>(2);
+  const [perPage, setPerPage] = useState<number | 'all'>('all');
 
   const isColumnSortable = (colIndex: number) => {
     const {rows} = table;
@@ -139,6 +86,9 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     setSortedRows(sortedData);
   };
 
+  const totalPages = perPage === 'all' ? 1 : Math.ceil(sortedRows.length / perPage);
+  const perPageOptions = [1, 10, 25, 50, 100, 'all'];
+
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
       return sortedRows;
@@ -150,20 +100,64 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     return sortedRows.slice(start, end);
   }, [sortedRows, currentPage, perPage]);
 
-  const totalPages = perPage === 'all' ? 1 : Math.ceil(sortedRows.length / perPage);
-
   useEffect(() => {
     setCurrentPage(1);
-  }, [perPage, sortColumn, sortDirection]);
+  }, [perPage, sortedRows]);
+
+  function useWindowWidth() {
+    const [width, setWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+      const handleResize = () => setWidth(window.innerWidth);
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return width;
+  }
+
+  const width = useWindowWidth();
+
+  const siblingRange = useMemo(() => {
+    if (width < 624) {
+      return 0;
+    } else if (width < 768) {
+      return 1;
+    } else if (width < 992) {
+      return 2;
+    } else if (width < 1200) {
+      return 3;
+    }
+    return 4;
+  }, [width]);
 
   return visibleParticipantsCount > 0 ? (
     <>
+      <div styleName="participant-list-top">
+        <span>
+          Rows per page:
+          <Dropdown
+            selection
+            compact
+            floating
+            styleName="participant-list-pagination-dropdown "
+            options={perPageOptions.map(n => ({
+              key: n,
+              value: n,
+              text: String(n),
+            }))}
+            value={perPage}
+            onChange={(e, {value}) => setPerPage(value as number | 'all')}
+          />
+        </span>
+      </div>
       <Table fixed celled sortable>
         <TableHeader>
           <TableRow>
             {table.show_checkin && ( // For checkin status
               <TableHeaderCell
-                styleName="participant-table-row icon-cell"
+                styleName="participant-table-header icon-cell"
                 onClick={() => handleSort('checked_in')}
                 sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
                 title={Translate.string('Check-in status')}
@@ -178,7 +172,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
                 <TableHeaderCell
                   // eslint-disable-next-line react/no-array-index-key
                   key={i}
-                  styleName={`participant-table-row ${isSortable ? '' : 'unsortable'}`}
+                  styleName={`participant-table-header ${isSortable ? '' : 'unsortable'}`}
                   onClick={isSortable ? () => handleSort(i) : undefined}
                   sorted={isSortable && sortColumn === i ? sortDirection : undefined}
                   title={headerText}
@@ -219,12 +213,34 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
           ))}
         </TableBody>
       </Table>
-      <Paginator
-        currentPage={currentPage}
+      <Pagination
+        styleName="participant-list-pagination"
+        activePage={currentPage}
+        onPageChange={(e, {activePage}) => setCurrentPage(Number(activePage))}
         totalPages={totalPages}
-        perPage={perPage}
-        onPageChange={setCurrentPage}
-        onPerPageChange={setPerPage}
+        ellipsisItem={null}
+        firstItem={{
+          content: <Icon name="angle double left" />,
+          icon: true,
+          disabled: currentPage === 1,
+        }}
+        lastItem={{
+          content: <Icon name="angle double right" />,
+          icon: true,
+          disabled: currentPage === totalPages,
+        }}
+        boundaryRange={0}
+        siblingRange={siblingRange}
+        prevItem={{
+          content: <Icon name="angle left" />,
+          icon: true,
+          disabled: currentPage === 1,
+        }}
+        nextItem={{
+          content: <Icon name="angle right" />,
+          icon: true,
+          disabled: currentPage === totalPages,
+        }}
       />
     </>
   ) : (
