@@ -45,7 +45,7 @@ def _pop_injected_js():
 def jsonify_form(form, *, fields=None, submit=None, back=None, back_url=None, back_button=True,
                  disabled_until_change=True, disabled_fields=(), form_header_kwargs=None, skip_labels=False,
                  save_reminder=False, footer_align_right=False, disable_if_locked=True, message=None, fieldsets=None,
-                 template_name=None):
+                 template_name='forms/_form.html'):
     """Return a json response containing a rendered WTForm.
 
     This is shortcut to the ``simple_form`` jinja macro to avoid
@@ -87,8 +87,6 @@ def jsonify_form(form, *, fields=None, submit=None, back=None, back_url=None, ba
         back = _('Cancel')
     if form_header_kwargs is None:
         form_header_kwargs = {}
-    if template_name is None:
-        template_name = 'forms/_form.html'
     tpl = get_template_module(template_name)
     html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
