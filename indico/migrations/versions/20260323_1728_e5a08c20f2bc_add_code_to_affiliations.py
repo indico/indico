@@ -1,7 +1,7 @@
 """Add code to affiliations
 
 Revision ID: e5a08c20f2bc
-Revises: af9d03d7073c
+Revises: 577e564cf0ae
 Create Date: 2026-03-23 17:28:10.101572
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'e5a08c20f2bc'
-down_revision = 'af9d03d7073c'
+down_revision = '577e564cf0ae'
 branch_labels = None
 depends_on = None
 

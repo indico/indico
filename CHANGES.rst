@@ -15,7 +15,7 @@ Improvements
   delete registrations) without access to the registration form configuration
   (:pr:`7419`, thanks :user:`moliholy, unconventionaldotdev`)
 - Add internal name for registration form fields (:pr:`7276`, thanks :user:`tomako`)
-- Add a "Code" column to predefined affiliations (:pr:`7400`, thanks
+- Add a "Code" (short name) to predefined affiliations (:pr:`7400`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
