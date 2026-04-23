@@ -277,6 +277,48 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
 class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
     """Enable/Disable a field."""
 
+    def check_title_on_enable(self):
+        # check unique internal name in section
+        query = (RegistrationFormItem.query
+                 .filter(RegistrationFormItem.parent_id == self.field.parent.id,
+                         db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
+                         RegistrationFormItem.is_enabled,
+                         ~RegistrationFormItem.is_deleted))
+        if query.has_rows():
+            raise NoReportError.wrap_exc(
+                BadRequest(_('There is already a field in this section with the same title.'))
+            )
+
+    def check_internal_name_on_enable(self):
+        if self.field.internal_name:
+            # check unique internal name on form
+            query = (RegistrationFormItem.query
+                     .with_parent(self.field.registration_form)
+                     .filter(RegistrationFormItem.internal_name == self.field.internal_name,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted))
+            if same_field := query.first():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('The field "{}" on this form has the same internal name.')
+                               .format(same_field.title))
+                )
+            # consistent type on forms of the same event
+            query = (RegistrationFormItem.query
+                     .join(RegistrationFormItem.registration_form)
+                     .join(RegistrationForm.event)
+                     .filter(RegistrationFormItem.internal_name == self.field.internal_name,
+                             RegistrationFormItem.registration_form_id != self.field.registration_form.id,
+                             RegistrationFormItem.input_type != self.field.input_type,
+                             RegistrationFormItem.is_enabled,
+                             ~RegistrationFormItem.is_deleted,
+                             Event.id == self.field.registration_form.event_id))
+            if inconsistent_field := query.first():
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('The field "{}" with the same internal name on form "{}" '
+                                 'uses a different input type which is not allowed.')
+                               .format(inconsistent_field.title, inconsistent_field.registration_form.title))
+                )
+
     def _process(self):
         enabled = request.args.get('enable') == 'true'
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
@@ -285,44 +327,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if not enabled and self.field.condition_for:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         if enabled:
-            # check unique title in section
-            query = (RegistrationFormItem.query
-                     .filter(RegistrationFormItem.parent_id == self.field.parent.id,
-                             db.func.lower(RegistrationFormItem.title) == self.field.title.lower(),
-                             RegistrationFormItem.is_enabled,
-                             ~RegistrationFormItem.is_deleted))
-            if query.has_rows():
-                raise NoReportError.wrap_exc(
-                    BadRequest(_('There is already a field in this section with the same title.'))
-                )
-            if self.field.internal_name:
-                # check unique internal name on form
-                query = (RegistrationFormItem.query
-                         .with_parent(self.field.registration_form)
-                         .filter(RegistrationFormItem.internal_name == self.field.internal_name,
-                                 RegistrationFormItem.is_enabled,
-                                 ~RegistrationFormItem.is_deleted))
-                if same_field := query.first():
-                    raise NoReportError.wrap_exc(
-                        BadRequest(_('The field "{}" on this form has the same internal name.')
-                                   .format(same_field.title))
-                    )
-                # consistent type on forms of the same event
-                query = (RegistrationFormItem.query
-                         .join(RegistrationFormItem.registration_form)
-                         .join(RegistrationForm.event)
-                         .filter(RegistrationFormItem.internal_name == self.field.internal_name,
-                                 RegistrationFormItem.registration_form_id != self.field.registration_form.id,
-                                 RegistrationFormItem.input_type != self.field.input_type,
-                                 RegistrationFormItem.is_enabled,
-                                 ~RegistrationFormItem.is_deleted,
-                                 Event.id == self.field.registration_form.event_id))
-                if inconsistent_field := query.first():
-                    raise NoReportError.wrap_exc(
-                        BadRequest(_('The field "{}" with the same internal name on form "{}" '
-                                     'uses a different input type which is not allowed.')
-                                   .format(inconsistent_field.title, inconsistent_field.registration_form.title))
-                    )
+            self.check_title_on_enable()
+            self.check_internal_name_on_enable()
 
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)

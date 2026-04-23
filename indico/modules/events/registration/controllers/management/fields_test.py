@@ -7,8 +7,10 @@
 
 import pytest
 from marshmallow import ValidationError
+from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
+                                                                              RHRegistrationFormToggleFieldState,
                                                                               _fill_form_field_with_data)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormSection
@@ -185,3 +187,130 @@ class TestGeneralFieldDataSchema:
                                             title='test', input_type='checkbox')
         schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
         schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
+
+
+class TestRegistrationFormToggleFieldState:
+    # title tests
+
+    def test_unique_title_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Unique Title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_title_on_enable() is None
+
+    def test_same_title_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False,
+                                               id=1337)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        with pytest.raises(BadRequest, match='There is already a field in this section with the same title'):
+            rh.check_title_on_enable()
+
+    def test_same_title_in_other_section_on_enable(self, db, dummy_regform):
+        other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
+                                                is_manager_only=False)
+        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False,
+                                               id=1337)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_title_on_enable() is None
+
+    # internal_name tests
+
+    def test_empty_internal_name_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_internal_name_on_enable() is None
+
+    def test_multiple_fields_with_empty_internal_name_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        enabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(enabled_field, {'input_type': 'text', 'title': 'Enabled Field Title'})
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Disabled Field Title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_internal_name_on_enable() is None
+
+    def test_unique_internal_name_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title',
+                                                    'internal_name': 'unique-internal-name'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_internal_name_on_enable() is None
+
+    def test_same_internal_name_on_enable(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title',
+                                                    'internal_name': 'title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        with pytest.raises(BadRequest, match='The field "Title" on this form has the same internal name'):
+            rh.check_internal_name_on_enable()
+
+    def test_same_internal_name_in_other_section_on_enable(self, db, dummy_regform):
+        other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
+                                                is_manager_only=False)
+        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False,
+                                               id=1337)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title',
+                                                    'internal_name': 'title'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        with pytest.raises(BadRequest, match='The field "Title" on this form has the same internal name'):
+            rh.check_internal_name_on_enable()
+
+    def test_consistent_type_on_enabled(self, db, dummy_regform, create_regform):
+        other_regform = create_regform(dummy_regform.event, title='Other Form')
+        other_pd_section = other_regform.sections[0]
+        other_field = RegistrationFormField(parent=other_pd_section, registration_form=other_regform)
+        _fill_form_field_with_data(other_field, {'input_type': 'text', 'title': 'Field Title',
+                                                 'internal_name': 'unique-internal-name'})
+        db.session.flush()
+
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title',
+                                                    'internal_name': 'unique-internal-name'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        assert rh.check_internal_name_on_enable() is None
+
+    def test_inconsistent_type_on_enabled(self, db, dummy_regform, create_regform):
+        other_regform = create_regform(dummy_regform.event, title='Other Form')
+        other_pd_section = other_regform.sections[0]
+        other_field = RegistrationFormField(parent=other_pd_section, registration_form=other_regform)
+        _fill_form_field_with_data(other_field, {'input_type': 'text', 'title': 'Field Title',
+                                                 'internal_name': 'unique-internal-name'})
+        db.session.flush()
+
+        pd_section = dummy_regform.sections[0]
+        disabled_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform, is_enabled=False)
+        _fill_form_field_with_data(disabled_field, {'input_type': 'textarea', 'title': 'Field Title',
+                                                    'internal_name': 'unique-internal-name'})
+        db.session.flush()
+        rh = RHRegistrationFormToggleFieldState()
+        rh.field = disabled_field
+        with pytest.raises(BadRequest, match='The field "Field Title" with the same internal name on form "Other Form" '
+                                             'uses a different input type which is not allowed'):
+            rh.check_internal_name_on_enable()
