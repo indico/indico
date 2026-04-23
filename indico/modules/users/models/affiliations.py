@@ -77,7 +77,12 @@ class Affiliation(db.Model):
     #: against it lets you do a substring search, and searching for ``|||foo|||`` lets you do an
     #: exact match.
     searchable_names = column_property(
-        db.func.indico.text_array_to_string(array(['']) + alt_names + array([name, code, '']), '|||'),
+        db.func.indico.text_array_to_string(
+            array(['']) +
+            db.func.indico.text_array_append(db.func.indico.text_array_append(alt_names, name), code) +
+            array(['']),
+            '|||'
+        ),
         deferred=True,
     )
 
