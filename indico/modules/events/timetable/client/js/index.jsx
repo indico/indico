@@ -28,7 +28,10 @@ import {getCurrentDateLocalStorage} from './utils';
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
       const startDt = moment(eventInfo.start_dt_local);
-      const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
+      const currentDate = moment.tz(
+        getCurrentDateLocalStorage(eventId) || startDt,
+        eventInfo.startDate.tz
+      );
       const initialData = {
         staticData: {
           eventId,
