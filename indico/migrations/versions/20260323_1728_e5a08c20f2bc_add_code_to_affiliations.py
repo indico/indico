@@ -19,7 +19,31 @@ depends_on = None
 def upgrade():
     op.add_column('affiliations', sa.Column('code', sa.String(), nullable=False, server_default=''), schema='indico')
     op.alter_column('affiliations', 'code', server_default=None, schema='indico')
+    op.drop_index('ix_affiliations_searchable_names_unaccent', table_name='affiliations', schema='indico')
+    op.drop_index('ix_affiliations_searchable_names_fts', table_name='affiliations', schema='indico')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_unaccent
+        ON indico.affiliations
+        USING gin (indico.indico_unaccent(lower(indico.text_array_to_string(((ARRAY[''::text] || (alt_names)::text[]) || (ARRAY[name, code, ''::character varying])::text[]), '|||'::text))) gin_trgm_ops);
+    ''')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_fts
+        ON indico.affiliations
+        USING gin (to_tsvector('simple'::regconfig, indico.text_array_to_string(((ARRAY[''::text] || (alt_names)::text[]) || (ARRAY[name, code, ''::character varying])::text[]), '|||'::text)));
+    ''')
 
 
 def downgrade():
+    op.drop_index('ix_affiliations_searchable_names_unaccent', table_name='affiliations', schema='indico')
+    op.drop_index('ix_affiliations_searchable_names_fts', table_name='affiliations', schema='indico')
     op.drop_column('affiliations', 'code', schema='indico')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_unaccent
+        ON indico.affiliations
+        USING gin (indico.indico_unaccent(lower(indico.text_array_to_string(((ARRAY[''::text] || indico.text_array_append((alt_names)::text[], (name)::text)) || ARRAY[''::text]), '|||'::text))) gin_trgm_ops);
+    ''')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_fts
+        ON indico.affiliations
+        USING gin (to_tsvector('simple'::regconfig, indico.text_array_to_string(((ARRAY[''::text] || indico.text_array_append((alt_names)::text[], (name)::text)) || ARRAY[''::text]), '|||'::text)));
+    ''')
