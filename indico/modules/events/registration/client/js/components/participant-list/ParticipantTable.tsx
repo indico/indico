@@ -73,7 +73,13 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             } else if (comparedVals.every(el => typeof el === 'boolean')) {
               sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
             } else {
-              sortResult = comparedVals[0].localeCompare(comparedVals[1]);
+              const aNum = Number(comparedVals[0]);
+              const bNum = Number(comparedVals[1]);
+              if (!isNaN(aNum) && !isNaN(bNum)) {
+                sortResult = aNum - bNum;
+              } else {
+                sortResult = comparedVals[0].localeCompare(comparedVals[1]);
+              }
             }
 
             return sortResult * (direction === 'ascending' ? 1 : -1);
