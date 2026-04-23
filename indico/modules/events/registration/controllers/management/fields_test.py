@@ -199,7 +199,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_title_on_enable() is None
+        assert rh._check_unique_title_in_section() is None
 
     def test_same_title_on_enable(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -210,7 +210,7 @@ class TestRegistrationFormToggleFieldState:
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
         with pytest.raises(BadRequest, match='There is already a field in this section with the same title'):
-            rh.check_title_on_enable()
+            rh._check_unique_title_in_section()
 
     def test_same_title_in_other_section_on_enable(self, db, dummy_regform):
         other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
@@ -221,7 +221,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_title_on_enable() is None
+        assert rh._check_unique_title_in_section() is None
 
     # internal_name tests
 
@@ -232,7 +232,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_internal_name_on_enable() is None
+        assert rh._check_internal_name() is None
 
     def test_multiple_fields_with_empty_internal_name_on_enable(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -243,7 +243,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_internal_name_on_enable() is None
+        assert rh._check_internal_name() is None
 
     def test_unique_internal_name_on_enable(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -253,7 +253,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_internal_name_on_enable() is None
+        assert rh._check_internal_name() is None
 
     def test_same_internal_name_on_enable(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -264,7 +264,7 @@ class TestRegistrationFormToggleFieldState:
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
         with pytest.raises(BadRequest, match='The field "Title" on this form has the same internal name'):
-            rh.check_internal_name_on_enable()
+            rh._check_internal_name()
 
     def test_same_internal_name_in_other_section_on_enable(self, db, dummy_regform):
         other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
@@ -277,7 +277,7 @@ class TestRegistrationFormToggleFieldState:
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
         with pytest.raises(BadRequest, match='The field "Title" on this form has the same internal name'):
-            rh.check_internal_name_on_enable()
+            rh._check_internal_name()
 
     def test_consistent_type_on_enabled(self, db, dummy_regform, create_regform):
         other_regform = create_regform(dummy_regform.event, title='Other Form')
@@ -294,7 +294,7 @@ class TestRegistrationFormToggleFieldState:
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
         rh.field = disabled_field
-        assert rh.check_internal_name_on_enable() is None
+        assert rh._check_internal_name() is None
 
     def test_inconsistent_type_on_enabled(self, db, dummy_regform, create_regform):
         other_regform = create_regform(dummy_regform.event, title='Other Form')
@@ -313,4 +313,4 @@ class TestRegistrationFormToggleFieldState:
         rh.field = disabled_field
         with pytest.raises(BadRequest, match='The field "Field Title" with the same internal name on form "Other Form" '
                                              'uses a different input type which is not allowed'):
-            rh.check_internal_name_on_enable()
+            rh._check_internal_name()
