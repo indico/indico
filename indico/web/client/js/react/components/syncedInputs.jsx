@@ -123,6 +123,7 @@ export function SyncedFinalDropdown(props) {
 }
 
 // TODO: see if we can't converge with FinalAffiliationField to remove the duplicated code...
+const formatAffiliationName = ({name, code}) => (code ? `${name} (${code})` : name);
 export function SyncedFinalAffiliationDropdown({
   name,
   required,
@@ -145,8 +146,6 @@ export function SyncedFinalAffiliationDropdown({
     }
     return city || countryName;
   };
-
-  const formatAffiliationName = ({name: name_, code}) => (code ? `${name_} (${code})` : name_);
 
   const affiliationOptions = affiliationResults.map(res => ({
     key: res.id,
