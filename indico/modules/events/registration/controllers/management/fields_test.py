@@ -8,7 +8,8 @@
 import pytest
 from marshmallow import ValidationError
 
-from indico.modules.events.registration.controllers.management.fields import GeneralFieldDataSchema
+from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
+                                                                              _fill_form_field_with_data)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormSection
 
@@ -73,6 +74,27 @@ class TestGeneralFieldDataSchema:
         assert schema.load({'input_type': 'text', 'title': first_name_field.title})
 
     # internal_name tests
+
+    def test_new_field_with_empty_internal_name(self, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        assert schema.load({'input_type': 'text', 'title': 'New field'})
+
+    def test_multiple_fields_with_empty_internal_name(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_field_1 = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(new_field_1, {'input_type': 'text', 'title': 'New field 1'})
+        db.session.flush()
+        new_field_2 = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field_2})
+        assert schema.load({'input_type': 'text', 'title': 'New field 2'})
+
+    def test_new_field_with_unique_internal_name(self, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_field = RegistrationFormField(parent=pd_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        assert schema.load({'input_type': 'text', 'title': 'New field', 'internal_name': 'unique-internal-name'})
 
     def test_new_field_with_same_internal_name(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
