@@ -118,14 +118,16 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   };
 
   const processedRows = useMemo(() => {
-    let rows = sortRows(table.rows, sortColumn, sortDirection);
-    rows = filterRows(rows, search);
+    setCurrentPage(1);
+
+    let rows = filterRows(table.rows, search);
+    rows = sortRows(rows, sortColumn, sortDirection);
 
     return rows;
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [25, 50, 100, 'all'];
+  const perPageOptions = [10, 25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
