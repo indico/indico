@@ -14,7 +14,8 @@ Improvements
 - Add new permission that grants only participant management (create, edit and
   delete registrations) without access to the registration form configuration
   (:pr:`7419`, thanks :user:`moliholy, unconventionaldotdev`)
-- Add internal name for registration form fields (:pr:`7276`, thanks :user:`tomako`)
+- Add internal name for registration form fields (:pr:`7276`, :pr:`7485`, thanks
+  :user:`tomako`)
 - Add a "Code" (short name) to predefined affiliations (:pr:`7400`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 
