@@ -125,7 +125,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [1, 10, 25, 50, 100, 'all'];
+  const perPageOptions = [25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
