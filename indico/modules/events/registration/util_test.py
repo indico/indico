@@ -27,7 +27,7 @@ from indico.modules.events.registration.util import (create_registration, get_ev
                                                      get_registered_event_persons, get_ticket_qr_code_data,
                                                      get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
-                                                     modify_registration)
+                                                     modify_registration, process_registration_picture)
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
@@ -797,6 +797,17 @@ def test_get_user_data_skips_picture_when_no_profile_picture(dummy_regform, dumm
     assert dummy_user.picture_metadata is None
     user_data = get_user_data(dummy_regform, dummy_user)
     assert 'picture' not in user_data
+
+
+def test_process_registration_picture_png_format():
+    img = Image.new('RGBA', (100, 100), color=(200, 100, 50, 128))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'PNG')
+    img_bytes.seek(0)
+    result = process_registration_picture(img_bytes, target_format='PNG')
+    assert result is not None
+    result_img = Image.open(result)
+    assert result_img.format == 'PNG'
 
 
 @pytest.mark.parametrize(('url', 'ticket_uuid', 'person_id'), (

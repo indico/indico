@@ -417,7 +417,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if session.user and user_data.get('picture'):
             metadata = session.user.picture_metadata or {}
             file_data['picture'] = {
-                'filename': metadata.get('filename', 'profile_picture.jpg'),
+                'filename': metadata.get('filename', 'profile_picture.png'),
                 'size': metadata.get('size', 0),
                 'uuid': PROFILE_PICTURE_SENTINEL,
                 'previewUrl': session.user.avatar_url,
