@@ -404,7 +404,6 @@ class RHRegistrationCreate(RHManageRegFormBase):
 
     PERMISSION = ('registration', 'registration_edit')
 
-
     def _process_POST(self):
         if self.regform.is_purged:
             raise Forbidden(_('Registration is disabled due to an expired retention period'))
