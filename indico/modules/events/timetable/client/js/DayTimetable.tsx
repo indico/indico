@@ -10,6 +10,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
+import {Translate} from 'indico/react/i18n';
+
 import './DayTimetable.module.scss';
 import './Entry.module.scss';
 
@@ -30,13 +32,23 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {ReduxState, TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {useToast} from './ToastContext';
+import {
+  ReduxState,
+  TopLevelEntry,
+  BlockEntry,
+  Entry,
+  isChildEntry,
+  EntryType,
+  Session,
+} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
   GRID_SIZE_MINUTES,
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
+  flattenEntries,
   getDateKey,
   isWithinLimits,
   minutesToPixels,
@@ -108,6 +120,7 @@ export function DayTimetable({
   entries,
   scrollPosition = 0,
 }: DayTimetableProps) {
+  const toast = useToast();
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
@@ -132,6 +145,42 @@ export function DayTimetable({
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
   const {openModal} = useModal();
+
+  const sessions: Record<number, Session> = useSelector(selectors.getSessions);
+
+  function showToastIfContribSessionChanged(
+    contribTitle: string | undefined,
+    oldSessionId: number | null | undefined,
+    newSessionId: number | null | undefined
+  ) {
+    const oldId = oldSessionId ?? null;
+    const newId = newSessionId ?? null;
+    if (oldId === newId) {
+      return;
+    }
+    const oldSessionTitle = oldId !== null ? sessions[oldId]?.title : null;
+    const newSessionTitle = newId !== null ? sessions[newId]?.title : null;
+    const title = contribTitle || Translate.string('the contribution');
+    let message: React.ReactNode;
+    if (oldSessionTitle && newSessionTitle) {
+      message = Translate.string(
+        '"{title}" was moved from session "{oldSession}" to session "{newSession}".',
+        {title, oldSession: oldSessionTitle, newSession: newSessionTitle}
+      );
+    } else if (newSessionTitle) {
+      message = Translate.string('"{title}" is now part of session "{newSession}".', {
+        title,
+        newSession: newSessionTitle,
+      });
+    } else {
+      return;
+    }
+    toast.addToast({type: 'info', message});
+  }
+
+  function findEntryById(id: string): Entry | undefined {
+    return flattenEntries(currentDayEntries).find(e => e.id === id);
+  }
 
   function handleOpenDraftModal() {
     openModal(DRAFT_ENTRY_MODAL, {
@@ -226,6 +275,8 @@ export function DayTimetable({
         ) || [];
       // TODO(tomas): use something better than 'unscheduled-' prefix
       const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      const fromContrib = unscheduled.find(c => c.id === `c${contribId}`);
+      showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
       dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
     }
   }
@@ -259,12 +310,22 @@ export function DayTimetable({
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
     const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+    const fromContrib = unscheduled.find(c => c.id === `c${contribId}`);
+    const targetBlock = currentDayEntries.find(
+      e => e.type === EntryType.SessionBlock && e.objId === blockId
+    ) as BlockEntry | undefined;
+    showToastIfContribSessionChanged(
+      fromContrib?.title,
+      fromContrib?.sessionId,
+      targetBlock?.sessionId
+    );
     dispatch(
       actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
     );
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
+    const originalEntry = findEntryById(who);
     const sessionBlockId = expandedSessionBlock?.id;
     if (sessionBlockId) {
       const [newLayout, movedEntry] = layoutAfterDropOnBlock(
@@ -275,6 +336,13 @@ export function DayTimetable({
         mouse,
         over
       );
+      if (originalEntry?.type === EntryType.Contribution) {
+        showToastIfContribSessionChanged(
+          originalEntry.title,
+          originalEntry.sessionId,
+          expandedSessionBlock?.sessionId
+        );
+      }
       dispatch(
         actions.changeEntryLayout(
           movedEntry,
@@ -291,6 +359,9 @@ export function DayTimetable({
         delta,
         mouse
       );
+      if (originalEntry?.type === EntryType.Contribution) {
+        showToastIfContribSessionChanged(originalEntry.title, originalEntry.sessionId, null);
+      }
       dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
     }
   }
@@ -302,10 +373,21 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
+    const originalEntry = findEntryById(who);
     const [newLayout, movedEntry, blockId] =
       layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar) || [];
     if (!newLayout) {
       return;
+    }
+    if (originalEntry?.type === EntryType.Contribution) {
+      const targetBlock = entries.find(
+        e => e.type === EntryType.SessionBlock && e.objId === blockId
+      ) as BlockEntry | undefined;
+      showToastIfContribSessionChanged(
+        originalEntry.title,
+        originalEntry.sessionId,
+        targetBlock?.sessionId
+      );
     }
     dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }
