@@ -18,6 +18,7 @@ Improvements
   :user:`tomako`)
 - Add a "Code" (short name) to predefined affiliations (:pr:`7400`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Track the last modified timestamp of registrations (:pr:`7478`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^

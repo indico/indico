@@ -1,6 +1,6 @@
 """Add modified_dt column to registrations
 
-Revision ID: add_registration_modified_dt
+Revision ID: 5843fe23c03c
 Revises: e5a08c20f2bc
 Create Date: 2026-04-22 12:00:00.000000
 """
@@ -12,7 +12,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_registration_modified_dt'
+revision = '5843fe23c03c'
 down_revision = 'e5a08c20f2bc'
 branch_labels = None
 depends_on = None
