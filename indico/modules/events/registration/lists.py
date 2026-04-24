@@ -40,6 +40,9 @@ class RegistrationListGenerator(ListGeneratorBase):
             'reg_date': {
                 'title': _('Registration date'),
             },
+            'mod_date': {
+                'title': _('Modification date'),
+            },
             'price': {
                 'title': _('Price'),
             },
@@ -59,9 +62,6 @@ class RegistrationListGenerator(ListGeneratorBase):
             },
             'payment_date': {
                 'title': _('Payment date'),
-            },
-            'modified_dt': {
-                'title': _('Last modified'),
             },
             'visibility': {
                 'title': _('Visibility'),
