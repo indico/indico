@@ -32,14 +32,14 @@ interface ParticipantTableProps {
   table: TableObj;
 }
 
+type SortDirectionType = 'ascending' | 'descending' | null;
+
 export default function ParticipantTable({table}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
 
-  type sortDirectionType = 'ascending' | 'descending' | null;
-
   const [sortColumn, setSortColumn] = useState<number | string | null>(null);
-  const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState<number | 'all'>('all');
@@ -67,32 +67,10 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     );
   }
 
-  const isColumnSortable = (colIndex: number) => {
-    const {rows} = table;
-    // More conditions could be added, but by that time I hope we have replaced the
-    // data structure coming from the back-end, which does not make sense.
-    return !rows || !rows.length || !rows[0].columns[colIndex].is_picture;
-  };
-
-  const handleSort = (column: number | string | null) => {
-    const directions: Record<sortDirectionType, sortDirectionType> = {
-      [null as sortDirectionType]: 'ascending',
-      ascending: 'descending',
-      descending: null,
-    };
-
-    const direction: sortDirectionType =
-      sortColumn === column ? directions[sortDirection] : 'ascending';
-
-    setSortColumn(column);
-    setSortDirection(direction);
-    setCurrentPage(1);
-  };
-
   function sortRows(
     rows: TableRowObj[],
     column: number | string | null,
-    direction: sortDirectionType
+    direction: SortDirectionType
   ): TableRowObj[] {
     if (direction === null || column === null) {
       return rows;
@@ -117,9 +95,32 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     });
   }
 
+  const isColumnSortable = (colIndex: number) => {
+    const {rows} = table;
+    // More conditions could be added, but by that time I hope we have replaced the
+    // data structure coming from the back-end, which does not make sense.
+    return !rows || !rows.length || !rows[0].columns[colIndex].is_picture;
+  };
+
+  const handleSort = (column: number | string | null) => {
+    const directions: Record<SortDirectionType, SortDirectionType> = {
+      [null as SortDirectionType]: 'ascending',
+      ascending: 'descending',
+      descending: null,
+    };
+
+    const direction: SortDirectionType =
+      sortColumn === column ? directions[sortDirection] : 'ascending';
+
+    setSortColumn(column);
+    setSortDirection(direction);
+    setCurrentPage(1);
+  };
+
   const processedRows = useMemo(() => {
-    let rows = filterRows(table.rows, search);
-    rows = sortRows(rows, sortColumn, sortDirection);
+    let rows = sortRows(table.rows, sortColumn, sortDirection);
+    rows = filterRows(rows, search);
+
     return rows;
   }, [table.rows, search, sortColumn, sortDirection]);
 
@@ -139,8 +140,8 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
 
   return visibleParticipantsCount > 0 ? (
     <>
-      <div styleName="participant-list-top">
-        <label>
+      <section styleName="participant-list-top">
+        <div>
           Rows per page:
           <Dropdown
             selection
@@ -158,7 +159,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
               setCurrentPage(1);
             }}
           />
-        </label>
+        </div>
         <div>
           <Popup
             content={
@@ -174,7 +175,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             icon={<Icon name="search" />}
           />
         </div>
-      </div>
+      </section>
       <Table fixed celled sortable>
         <TableHeader>
           <TableRow>
@@ -237,7 +238,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
         </TableBody>
       </Table>
       {totalPages > 1 && (
-        <div styleName="participant-list-pagination-wrapper">
+        <section styleName="participant-list-pagination-wrapper">
           <Pagination
             styleName="participant-list-pagination"
             activePage={currentPage}
@@ -267,7 +268,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
               disabled: currentPage === totalPages,
             }}
           />{' '}
-        </div>
+        </section>
       )}
     </>
   ) : (

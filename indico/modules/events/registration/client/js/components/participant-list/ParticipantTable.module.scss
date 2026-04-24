@@ -52,14 +52,15 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
+
+  :global(i.icon).search-hint {
+    color: $gray;
+    margin-right: 10px;
+  }
 }
 
 .participant-list-dropdown {
   margin-left: 10px;
-}
-
-.search-hint {
-  color: $gray;
 }
 
 .participant-list-pagination-wrapper {
