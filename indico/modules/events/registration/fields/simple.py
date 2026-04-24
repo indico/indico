@@ -11,7 +11,6 @@ from datetime import date, datetime
 from decimal import Decimal
 from io import BytesIO
 
-from flask import session
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
 
@@ -510,18 +509,17 @@ class PictureField(FileField):
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         if value == PROFILE_PICTURE_SENTINEL:
-            value = self._create_file_from_profile_picture()
+            value = self._create_file_from_profile_picture(registration.user)
         return super().process_form_data(registration, value, old_data, billable_items_locked)
 
-    def _create_file_from_profile_picture(self):
-        user = session.user
+    def _create_file_from_profile_picture(self, user):
         if not user or not user.has_picture or not user.picture:
             return None
-        processed = process_registration_picture(BytesIO(user.picture))
+        processed = process_registration_picture(BytesIO(user.picture), target_format='PNG')
         if not processed:
             return None
         regform = self.form_item.registration_form
-        file = File(filename='profile_picture.jpg', content_type='image/jpeg')
+        file = File(filename='profile_picture.png', content_type='image/png')
         file.save(('event', regform.event_id, 'regform', regform.id, 'registration'), processed)
         if not file.size:
             file.delete()

@@ -37,6 +37,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
+from indico.modules.events.registration.constants import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
@@ -65,6 +66,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.util.date_time import format_currency, now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -402,11 +404,6 @@ class RHRegistrationCreate(RHManageRegFormBase):
 
     PERMISSION = ('registration', 'registration_edit')
 
-    @use_kwargs({
-        'user': Principal(allow_external_users=True, load_default=None),
-    }, location='query')
-    def _get_user_data(self, user):
-        return get_user_data(self.regform, user)
 
     def _process_POST(self):
         if self.regform.is_purged:
@@ -419,14 +416,27 @@ class RHRegistrationCreate(RHManageRegFormBase):
         flash(_('The registration was created.'), 'success')
         return jsonify({'redirect': url_for('event_registration.manage_reglist', self.regform)})
 
-    def _process_GET(self):
-        user_data = self._get_user_data()
+    @use_kwargs({
+        'user': Principal(allow_external_users=True, load_default=None),
+    }, location='query')
+    def _process_GET(self, user):
+        user_data = get_user_data(self.regform, user)
         initial_values = get_initial_form_values(self.regform, management=True) | user_data
         form_data = get_flat_section_submission_data(self.regform, management=True)
+        file_data = {}
+        if user and user_data.get('picture'):
+            metadata = user.picture_metadata or {}
+            file_data['picture'] = {
+                'filename': metadata.get('filename', 'profile_picture.jpg'),
+                'size': metadata.get('size', 0),
+                'uuid': PROFILE_PICTURE_SENTINEL,
+                'previewUrl': user.avatar_url,
+            }
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
                                                     form_data=form_data,
                                                     initial_values=initial_values,
+                                                    file_data=file_data,
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,
@@ -442,7 +452,11 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 
     def _register_user(self, user, notify):
         # Fill only the personal data fields, custom fields are left empty.
-        data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType}
+        # Picture is excluded from getattr loop: user.picture is raw bytes, not a file UUID.
+        data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType
+                if pdt != PersonalDataType.picture}
+        if user.picture_source == ProfilePictureSource.custom and user.has_picture:
+            data['picture'] = PROFILE_PICTURE_SENTINEL
         data['title'] = get_title_uuid(self.regform, data['title'])
         with db.session.no_autoflush:
             create_registration(self.regform, data, management=True, notify_user=notify)
