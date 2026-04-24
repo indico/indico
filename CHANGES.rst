@@ -10,6 +10,8 @@ Version 3.3.13
 Improvements
 ^^^^^^^^^^^^
 
+- Pre-fill the picture field in registration forms with the user's profile
+  picture when available (:pr:`7447`, thanks :user:`moliholy, unconventionaldotdev`)
 - Include keywords in contribution CSV/Excel exports (:pr:`7421`)
 - Add new permission that grants only participant management (create, edit and
   delete registrations) without access to the registration form configuration
