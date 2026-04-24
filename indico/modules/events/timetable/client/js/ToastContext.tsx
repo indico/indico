@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {createContext, useContext, useState, ReactNode} from 'react';
+import React, {createContext, useCallback, useContext, useState, ReactNode} from 'react';
 import ReactDOM from 'react-dom';
 
 import './Toast.module.scss';
@@ -43,15 +43,15 @@ interface ToastProviderProps {
 export function ToastProvider({children, position = 'top-center'}: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const removeToast = (id: number) => {
+  const removeToast = useCallback((id: number) => {
     setToasts(current => current.map(t => (t.id === id ? {...t, leaving: true} : t)));
     window.setTimeout(
       () => setToasts(current => current.filter(t => t.id !== id)),
       TOAST_EXIT_DURATION
     );
-  };
+  }, []);
 
-  const addToast = (options: ToastOptions) => {
+  const addToast = useCallback((options: ToastOptions) => {
     const id = Date.now() + Math.random();
     const toast: ToastItem = {
       id,
@@ -61,7 +61,7 @@ export function ToastProvider({children, position = 'top-center'}: ToastProvider
     };
     setToasts(current => [...current, toast]);
     return id;
-  };
+  }, []);
 
   return (
     <ToastContext.Provider value={{addToast, removeToast}}>
@@ -89,5 +89,8 @@ export function ToastProvider({children, position = 'top-center'}: ToastProvider
 
 export function useToast() {
   const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
   return context;
 }
