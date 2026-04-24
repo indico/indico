@@ -6,14 +6,14 @@
 // LICENSE file for more details.
 
 import React, {useEffect} from 'react';
-import {Icon} from 'semantic-ui-react';
+import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import './Toast.module.scss';
 import {Translate} from 'indico/react/i18n';
 
 export type ToastType = 'info' | 'success' | 'warning' | 'error';
 
-const ICONS: Record<ToastType, string> = {
+const ICONS: Record<ToastType, SemanticICONS> = {
   info: 'info circle',
   success: 'check circle',
   warning: 'warning sign',
