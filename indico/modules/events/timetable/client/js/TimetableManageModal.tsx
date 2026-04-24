@@ -91,8 +91,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onClose = () => null,
   onSubmit = () => null,
 }) => {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const toast = useToast();
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   // Within this timetable we only care about the database ID,
@@ -231,12 +231,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       if (sessionId === -1) {
         const newSession = await _createSession(sessionObj);
         data.session_id = newSession.id;
-        toast?.addToast({
-          type: 'success',
-          message: Translate.string('Session "{title}" was created.', {
-            title: newSession.title,
-          }),
-        });
       } else {
         data.session_id = sessionId;
       }
@@ -251,9 +245,31 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     try {
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
+        const oldDayKey = moment(entry.startDt).format(DATE_KEY_FORMAT);
+        const newDayKey = moment(updatedEntry.startDt).format(DATE_KEY_FORMAT);
         dispatch(
           actions.updateEntry(activeType, updatedEntry, currentDay, getChangedValues(data, form))
         );
+        if (
+          (activeType === EntryType.SessionBlock || activeType === EntryType.Contribution) &&
+          oldDayKey !== newDayKey
+        ) {
+          const oldDayLabel = moment(entry.startDt).format('ll');
+          const newDayLabel = moment(updatedEntry.startDt).format('ll');
+          const fallbackTitle =
+            activeType === EntryType.SessionBlock
+              ? session?.title || Translate.string('Session block')
+              : Translate.string('Contribution');
+          const entryTitle = updatedEntry.title || entry.title || fallbackTitle;
+          toast.addToast({
+            type: 'info',
+            message: Translate.string('"{title}" was moved from {oldDay} to {newDay}.', {
+              title: entryTitle,
+              oldDay: oldDayLabel,
+              newDay: newDayLabel,
+            }),
+          });
+        }
       } else {
         dispatch(actions.createEntry(activeType, data));
       }
