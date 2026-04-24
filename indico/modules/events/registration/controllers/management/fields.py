@@ -288,10 +288,9 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 BadRequest(_('There is already a field in this section with the same title.'))
             )
 
-    def _check_internal_name(self):
+    def _check_unique_internal_name_in_form(self):
         if not self.field.internal_name:
             return
-        # check unique internal name on form
         query = (RegistrationFormItem.query
                  .with_parent(self.field.registration_form)
                  .filter(RegistrationFormItem.internal_name == self.field.internal_name,
@@ -302,7 +301,10 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 BadRequest(_('The field "{}" on this form has the same internal name.')
                            .format(same_field.title))
             )
-        # consistent type on forms of the same event
+
+    def _check_internal_name_type_consistency_in_event(self):
+        if not self.field.internal_name:
+            return
         query = (RegistrationFormItem.query
                  .join(RegistrationFormItem.registration_form)
                  .join(RegistrationForm.event)
@@ -328,7 +330,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         if enabled:
             self._check_unique_title_in_section()
-            self._check_internal_name()
+            self._check_unique_internal_name_in_form()
+            self._check_internal_name_type_consistency_in_event()
 
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
