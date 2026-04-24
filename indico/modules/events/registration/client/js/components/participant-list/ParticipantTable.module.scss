@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .cell-img {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -18,12 +20,12 @@
 
 .participant-table-header {
   position: relative;
+  overflow-x: hidden;
 
   >p {
     width: 100%;
     line-height: 1em;
     display: inline-block;
-    overflow: hidden;
     text-overflow: ellipsis;
   }
 
@@ -45,19 +47,32 @@
   opacity: 0.4;
 }
 
-.participant-list-pagination-dropdown {
+.participant-list-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.participant-list-dropdown {
   margin-left: 10px;
+}
+
+.search-hint {
+  color: $gray;
+}
+
+.participant-list-pagination-wrapper {
+  display: flex;
+  justify-content: center;
 }
 
 .participant-list-pagination {
   display: flex;
   flex: 0 1 auto;
   flex-wrap: wrap;
-}
 
-.participant-list-top {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 10px;
+  >a {
+    border-bottom: 0.1px solid $separator-color;
+  }
 }

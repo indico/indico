@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Icon,
   Message,
@@ -17,6 +17,8 @@ import {
   TableRow,
   Pagination,
   Dropdown,
+  Input,
+  Popup,
 } from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -38,10 +40,32 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
 
   const [sortColumn, setSortColumn] = useState<number | string | null>(null);
   const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
-  const [sortedRows, setSortedRows] = useState([...table.rows]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState<number | 'all'>('all');
+
+  const [search, setSearch] = useState('');
+
+  function filterRows(rows: TableRowObj[], searchString: string): TableRowObj[] {
+    const query = searchString.trim().toLowerCase();
+
+    if (!query) {
+      return rows;
+    }
+    // Exact search:
+    if (
+      (query.startsWith('"') && query.endsWith('"')) ||
+      (query.startsWith("'") && query.endsWith("'"))
+    ) {
+      const value = query.slice(1, -1).toLowerCase();
+
+      return rows.filter(row => row.columns.some(col => (col.text || '').toLowerCase() === value));
+    }
+    // Normal search
+    return rows.filter(row =>
+      row.columns.some(col => (col.text || '').toLowerCase().includes(query))
+    );
+  }
 
   const isColumnSortable = (colIndex: number) => {
     const {rows} = table;
@@ -60,97 +84,96 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     const direction: sortDirectionType =
       sortColumn === column ? directions[sortDirection] : 'ascending';
 
-    const sortedData =
-      direction === null
-        ? [...table.rows]
-        : [...sortedRows].sort((a, b) => {
-            const comparedVals = [a, b].map(el =>
-              typeof column === 'string' ? el[column] : el.columns[column].text
-            );
-
-            let sortResult;
-
-            if (comparedVals[0] === comparedVals[1]) {
-              return 0;
-            } else if (comparedVals.every(el => typeof el === 'boolean')) {
-              sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
-            } else {
-              sortResult = comparedVals[0].localeCompare(comparedVals[1]);
-            }
-
-            return sortResult * (direction === 'ascending' ? 1 : -1);
-          });
-
     setSortColumn(column);
     setSortDirection(direction);
-    setSortedRows(sortedData);
+    setCurrentPage(1);
   };
 
-  const totalPages = perPage === 'all' ? 1 : Math.ceil(sortedRows.length / perPage);
+  function sortRows(
+    rows: TableRowObj[],
+    column: number | string | null,
+    direction: sortDirectionType
+  ): TableRowObj[] {
+    if (direction === null || column === null) {
+      return rows;
+    }
+
+    return [...rows].sort((a, b) => {
+      const comparedVals = [a, b].map(el =>
+        typeof column === 'string' ? el[column] : el.columns[column].text
+      );
+
+      let sortResult;
+
+      if (comparedVals[0] === comparedVals[1]) {
+        return 0;
+      } else if (comparedVals.every(el => typeof el === 'boolean')) {
+        sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
+      } else {
+        sortResult = comparedVals[0].localeCompare(comparedVals[1]);
+      }
+
+      return sortResult * (direction === 'ascending' ? 1 : -1);
+    });
+  }
+
+  const processedRows = useMemo(() => {
+    let rows = filterRows(table.rows, search);
+    rows = sortRows(rows, sortColumn, sortDirection);
+    return rows;
+  }, [table.rows, search, sortColumn, sortDirection]);
+
+  const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
   const perPageOptions = [1, 10, 25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
-      return sortedRows;
+      return processedRows;
     }
 
     const start = (currentPage - 1) * perPage;
     const end = start + perPage;
 
-    return sortedRows.slice(start, end);
-  }, [sortedRows, currentPage, perPage]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [perPage, sortedRows]);
-
-  function useWindowWidth() {
-    const [width, setWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-      const handleResize = () => setWidth(window.innerWidth);
-
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    return width;
-  }
-
-  const width = useWindowWidth();
-
-  const siblingRange = useMemo(() => {
-    if (width < 624) {
-      return 0;
-    } else if (width < 768) {
-      return 1;
-    } else if (width < 992) {
-      return 2;
-    } else if (width < 1200) {
-      return 3;
-    }
-    return 4;
-  }, [width]);
+    return processedRows.slice(start, end);
+  }, [processedRows, currentPage, perPage]);
 
   return visibleParticipantsCount > 0 ? (
     <>
       <div styleName="participant-list-top">
-        <span>
+        <label>
           Rows per page:
           <Dropdown
             selection
             compact
             floating
-            styleName="participant-list-pagination-dropdown "
+            styleName="participant-list-dropdown"
             options={perPageOptions.map(n => ({
               key: n,
               value: n,
               text: String(n),
             }))}
             value={perPage}
-            onChange={(e, {value}) => setPerPage(value as number | 'all')}
+            onChange={(e, {value}) => {
+              setPerPage(value as number | 'all');
+              setCurrentPage(1);
+            }}
           />
-        </span>
+        </label>
+        <div>
+          <Popup
+            content={
+              <Translate>
+                You can search for an exact match by wrapping the query in quotes (e.g. "John Doe")
+              </Translate>
+            }
+            trigger={<Icon name="question circle" styleName="search-hint" />}
+          />
+          <Input
+            value={search}
+            onChange={(e, {value}) => setSearch(value)}
+            icon={<Icon name="search" />}
+          />
+        </div>
       </div>
       <Table fixed celled sortable>
         <TableHeader>
@@ -213,35 +236,39 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
           ))}
         </TableBody>
       </Table>
-      <Pagination
-        styleName="participant-list-pagination"
-        activePage={currentPage}
-        onPageChange={(e, {activePage}) => setCurrentPage(Number(activePage))}
-        totalPages={totalPages}
-        ellipsisItem={null}
-        firstItem={{
-          content: <Icon name="angle double left" />,
-          icon: true,
-          disabled: currentPage === 1,
-        }}
-        lastItem={{
-          content: <Icon name="angle double right" />,
-          icon: true,
-          disabled: currentPage === totalPages,
-        }}
-        boundaryRange={0}
-        siblingRange={siblingRange}
-        prevItem={{
-          content: <Icon name="angle left" />,
-          icon: true,
-          disabled: currentPage === 1,
-        }}
-        nextItem={{
-          content: <Icon name="angle right" />,
-          icon: true,
-          disabled: currentPage === totalPages,
-        }}
-      />
+      {totalPages > 1 && (
+        <div styleName="participant-list-pagination-wrapper">
+          <Pagination
+            styleName="participant-list-pagination"
+            activePage={currentPage}
+            onPageChange={(e, {activePage}) => setCurrentPage(Number(activePage))}
+            totalPages={totalPages}
+            ellipsisItem={null}
+            firstItem={{
+              content: <Icon name="angle double left" />,
+              icon: true,
+              disabled: currentPage === 1,
+            }}
+            lastItem={{
+              content: <Icon name="angle double right" />,
+              icon: true,
+              disabled: currentPage === totalPages,
+            }}
+            boundaryRange={0}
+            siblingRange={4}
+            prevItem={{
+              content: <Icon name="angle left" />,
+              icon: true,
+              disabled: currentPage === 1,
+            }}
+            nextItem={{
+              content: <Icon name="angle right" />,
+              icon: true,
+              disabled: currentPage === totalPages,
+            }}
+          />{' '}
+        </div>
+      )}
     </>
   ) : (
     <Message>
