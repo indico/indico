@@ -10,6 +10,7 @@
 
 {% block content %}
     {% set can_manage_registration = event.can_manage(session.user, permission='registration') %}
+    {% set can_edit = event.can_manage(session.user, permission='registration_edit') %}
     {{ registration_details_html | safe }}
 
     {% if can_manage_registration %}
@@ -26,7 +27,7 @@
     {% endif %}
 
     <div class="right">
-        {% if can_manage_registration %}
+        {% if can_manage_registration or can_edit %}
             <button data-href="{{ url_for('.edit_registration', registration) }}" data-method="GET"
                     class="i-button big highlight hide-if-locked" {% if registration.is_cancelled %} disabled{% endif %}>
                 {%- trans %}Modify{% endtrans -%}

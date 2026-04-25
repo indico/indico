@@ -22,6 +22,8 @@ def package_is_editable(package):
             return True
         if (Path(path_item) / f'_{dist.name}.pth').is_file():  # hatchling
             return True
+        if (Path(path_item) / f'_editable_impl_{dist.name}.pth').is_file():  # editables
+            return True
     return False
 
 

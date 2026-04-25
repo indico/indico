@@ -327,7 +327,7 @@ class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
         res = search_affiliations(q)
-        basic_fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+        basic_fields = ('id', 'name', 'code', 'street', 'postcode', 'city', 'country_code', 'meta')
         return AffiliationSchema(many=True, only=basic_fields).jsonify(res)
 
 

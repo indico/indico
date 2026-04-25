@@ -187,9 +187,15 @@
         <div class="label">
             {% trans %}This registration is complete{% endtrans %}
         </div>
-        {% trans submitted=registration.submitted_dt|format_date(timezone=registration.event.tzinfo) -%}
+        {% trans submitted=registration.submitted_dt|format_datetime(timezone=registration.event.tzinfo) -%}
             Submitted: {{ submitted }}
         {%- endtrans %}
+        {% if registration.modified_dt %}
+            —
+            {% trans modified=registration.modified_dt|format_datetime(timezone=registration.event.tzinfo) -%}
+                Modified: {{ modified }}
+            {%- endtrans %}
+        {% endif %}
     </div>
     {% set can_reset = can_moderate and registration.registration_form.moderation_enabled and not registration.is_paid %}
     {% set ticket_template = registration.registration_form.get_ticket_template() %}
@@ -271,7 +277,7 @@
                 <div class="label">
                     {% trans %}Checked in{% endtrans %}
                 </div>
-                {% trans checked_in_dt=registration.checked_in_dt|format_date(timezone=registration.event.tzinfo) -%}
+                {% trans checked_in_dt=registration.checked_in_dt|format_datetime(timezone=registration.event.tzinfo) -%}
                     Checked in: {{ checked_in_dt }}
                 {%- endtrans %}
                 <span class="hide-if-locked">

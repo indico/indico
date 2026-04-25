@@ -54,7 +54,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
 
     def _process(self):
         regforms = (RegistrationForm.query
@@ -168,7 +168,7 @@ def _get_regform_creation_log_data(regform):
 class RHManageParticipants(RHManageRegFormsBase):
     """Show and enable the dummy registration form for participants."""
 
-    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin')
+    PERMISSION = ('registration', 'registration_moderation', 'registration_checkin', 'registration_edit')
 
     def _process(self):
         regform = self.event.participation_regform

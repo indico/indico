@@ -42,6 +42,9 @@ import {$T} from '../../utils/i18n';
           show(evt, api) {
             $.ajax(
               $.extend(true, {}, ajaxOptions, {
+                headers: {
+                  'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+                },
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success(data, __, xhr) {
@@ -80,6 +83,9 @@ import {$T} from '../../utils/i18n';
                       url: $form.attr('action') || loadedURL,
                       method: 'POST',
                       error: handleAjaxError,
+                      headers: {
+                        'X-Indico-CSP-Nonce': window.IndicoCSPNonce,
+                      },
                       beforeSubmit() {
                         killProgress = IndicoUI.Dialogs.Util.progress();
                       },

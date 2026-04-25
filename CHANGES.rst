@@ -12,6 +12,15 @@ Improvements
 
 - Add support for **anonymous** accompanying with numeric count only in registration form
   (:issue:`7383`)
+- Include keywords in contribution CSV/Excel exports (:pr:`7421`)
+- Add new permission that grants only participant management (create, edit and
+  delete registrations) without access to the registration form configuration
+  (:pr:`7419`, thanks :user:`moliholy, unconventionaldotdev`)
+- Add internal name for registration form fields (:pr:`7276`, :pr:`7485`, thanks
+  :user:`tomako`)
+- Add a "Code" (short name) to predefined affiliations (:pr:`7400`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
+- Track the last modified timestamp of registrations (:pr:`7478`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^
@@ -19,11 +28,21 @@ Bugfixes
 - Correctly restrict user access to their logs (:pr:`7404`)
 - Correctly restrict access to draft contribution list (:pr:`7408`)
 - Use new MS Outlook URL in the share widget (:pr:`7424`, thanks :user:`hirishh`)
+- Fix editing contribution time from timetable bubbles when the CSP is enabled
+  (:pr:`7432`)
+- Fix error when copying a paper file with an unguessable MIME type to the editing
+  module (:pr:`7475`)
+- Fix date picker showing January instead of the selected month when the user
+  language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Screen reader users can now navigate to the event page header as a banner
+  landmark (:pr:`7418`, thanks :user:`foxbunny`)
+- Icon-only buttons on the abstract detail page now have proper accessible names
+  and tooltips instead of relying on the ``title`` attribute (:pr:`7474`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

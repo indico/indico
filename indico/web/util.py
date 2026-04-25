@@ -44,7 +44,8 @@ def _pop_injected_js():
 
 def jsonify_form(form, *, fields=None, submit=None, back=None, back_url=None, back_button=True,
                  disabled_until_change=True, disabled_fields=(), form_header_kwargs=None, skip_labels=False,
-                 save_reminder=False, footer_align_right=False, disable_if_locked=True, message=None, fieldsets=None):
+                 save_reminder=False, footer_align_right=False, disable_if_locked=True, message=None, fieldsets=None,
+                 template_name='forms/_form.html'):
     """Return a json response containing a rendered WTForm.
 
     This is shortcut to the ``simple_form`` jinja macro to avoid
@@ -71,6 +72,14 @@ def jsonify_form(form, *, fields=None, submit=None, back=None, back_url=None, ba
     :param disable_if_locked: Whether the form should be disabled when
                               the associated event is locked (based on
                               a CSS class in the DOM structure)
+    :param message: An optional warning message to display above the form
+    :param fieldsets: An optional list of fieldsets to display.
+                      Each fieldset is a tuple of the form ``(title, fields)``,
+                      where ``title`` is the title of the fieldset and ``fields`` is a list of field names
+                      to be included in the fieldset. If this parameter is not provided, all fields will be included
+                      in a single fieldset without a title.
+    :param template_name: The name of the template containing the ``simple_form`` macro.
+                          If not provided, it defaults to ``forms/_form.html``.
     """
     if submit is None:
         submit = _('Save')
@@ -78,7 +87,7 @@ def jsonify_form(form, *, fields=None, submit=None, back=None, back_url=None, ba
         back = _('Cancel')
     if form_header_kwargs is None:
         form_header_kwargs = {}
-    tpl = get_template_module('forms/_form.html')
+    tpl = get_template_module(template_name)
     html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
                            form_header_kwargs=form_header_kwargs, skip_labels=skip_labels, save_reminder=save_reminder,

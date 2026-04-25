@@ -92,6 +92,7 @@ class RegistrationFormField(RegistrationFormItem):
             is_required=self.is_required,
             retention_period=(self.retention_period.days // 7 if self.retention_period else None),
             input_type=self.input_type,
+            internal_name=self.internal_name,
             html_name=self.html_field_name,
             show_if_field_id=self.show_if_id,
             show_if_field_values=self.show_if_values,

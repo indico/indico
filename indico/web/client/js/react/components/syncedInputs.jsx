@@ -123,6 +123,7 @@ export function SyncedFinalDropdown(props) {
 }
 
 // TODO: see if we can't converge with FinalAffiliationField to remove the duplicated code...
+const formatAffiliationName = ({name, code}) => (code ? `${name} (${code})` : name);
 export function SyncedFinalAffiliationDropdown({
   name,
   required,
@@ -149,8 +150,15 @@ export function SyncedFinalAffiliationDropdown({
   const affiliationOptions = affiliationResults.map(res => ({
     key: res.id,
     value: res.id,
-    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
-    content: <Header style={{fontSize: 14}} content={res.name} subheader={getSubheader(res)} />,
+    // XXX: the space allows addition even if the entered text matches a result item
+    text: `${formatAffiliationName(res)} `,
+    content: (
+      <Header
+        style={{fontSize: 14}}
+        content={formatAffiliationName(res)}
+        subheader={getSubheader(res)}
+      />
+    ),
   }));
 
   const searchAffiliationChange = async (evt, {searchQuery}) => {

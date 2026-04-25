@@ -38,7 +38,10 @@ class RegistrationListGenerator(ListGeneratorBase):
         registration_tag_choices = self._get_registration_tag_choices()
         self.static_items = {
             'reg_date': {
-                'title': _('Registration Date'),
+                'title': _('Registration date'),
+            },
+            'mod_date': {
+                'title': _('Modification date'),
             },
             'price': {
                 'title': _('Price'),

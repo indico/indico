@@ -61,6 +61,14 @@
                                         <td class="i-table" data-text="{{ registration.submitted_dt }}">
                                             {{- registration.submitted_dt | format_datetime(timezone=registration.event.tzinfo) -}}
                                         </td>
+                                    {% elif item.id == 'mod_date' %}
+                                        <td class="i-table" data-text="{{ registration.modified_dt }}">
+                                            {%- if registration.modified_dt %}
+                                                {{- registration.modified_dt | format_datetime(timezone=registration.event.tzinfo) -}}
+                                            {%- else %}
+                                                -
+                                            {%- endif %}
+                                        </td>
                                     {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
                                     {% elif item.id == 'price' %}

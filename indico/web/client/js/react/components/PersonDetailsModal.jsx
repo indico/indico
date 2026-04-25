@@ -43,6 +43,8 @@ const FinalAffiliationField = ({hasPredefinedAffiliations, allowCustomAffiliatio
       ? [currentAffiliation, ..._affiliationResults]
       : _affiliationResults;
 
+  const formatAffiliationName = ({name, code}) => (code ? `${name} (${code})` : name);
+
   const getSubheader = ({city, countryName}) => {
     if (city && countryName) {
       return `${city}, ${countryName}`;
@@ -54,8 +56,15 @@ const FinalAffiliationField = ({hasPredefinedAffiliations, allowCustomAffiliatio
     key: res.id,
     value: res.id,
     meta: res,
-    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
-    content: <Header style={{fontSize: 14}} content={res.name} subheader={getSubheader(res)} />,
+    // XXX: the space allows addition even if the entered text matches a result item
+    text: `${formatAffiliationName(res)} `,
+    content: (
+      <Header
+        style={{fontSize: 14}}
+        content={formatAffiliationName(res)}
+        subheader={getSubheader(res)}
+      />
+    ),
   }));
 
   const searchAffiliationChange = async (evt, {searchQuery}) => {

@@ -19,7 +19,9 @@ function AffiliationPopup({affiliation, context, container}) {
 
   return (
     <Popup context={context} open={open}>
-      <Popup.Header>{affiliation.name}</Popup.Header>
+      <Popup.Header>
+        {affiliation.code ? `${affiliation.name} (${affiliation.code})` : affiliation.name}
+      </Popup.Header>
       <Popup.Content>
         <div>{affiliation.street}</div>
         <div>
@@ -34,6 +36,7 @@ function AffiliationPopup({affiliation, context, container}) {
 AffiliationPopup.propTypes = {
   affiliation: PropTypes.shape({
     name: PropTypes.string.isRequired,
+    code: PropTypes.string,
     street: PropTypes.string,
     postcode: PropTypes.string,
     city: PropTypes.string,

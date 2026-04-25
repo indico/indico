@@ -40,7 +40,7 @@ registration_settings = RegistrationSettingsProxy('registrations', {
     'participant_list_form_columns': {}
 })
 
-_registration_permissions = ('registration', 'registration_checkin', 'registration_moderation')
+REGISTRATION_PERMISSIONS = ('registration', 'registration_checkin', 'registration_moderation', 'registration_edit')
 
 
 @signals.core.import_tasks.connect
@@ -59,7 +59,7 @@ def _merge_users(target, source, **kwargs):
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     registration_section = 'organization' if event.type == 'conference' else 'advanced'
-    if not any(event.can_manage(session.user, permission=p) for p in _registration_permissions):
+    if not any(event.can_manage(session.user, permission=p) for p in REGISTRATION_PERMISSIONS):
         return
     if event.type != 'conference':
         yield SideMenuItem('participants', _('Participants'), url_for('event_participation.manage', event),
@@ -170,7 +170,7 @@ def _associate_registrations(user, silent=False, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if any(event.can_manage(session.user, permission=p) for p in _registration_permissions):
+    if any(event.can_manage(session.user, permission=p) for p in REGISTRATION_PERMISSIONS):
         return url_for('event_registration.manage_regform_list', event)
 
 
@@ -226,6 +226,7 @@ def _get_management_permissions(sender, **kwargs):
     yield RegistrationPermission
     yield RegistrationModerationPermission
     yield RegistrationCheckinPermission
+    yield RegistrationEditPermission
 
 
 @signals.event_management.get_cloners.connect
@@ -264,6 +265,13 @@ class RegistrationCheckinPermission(ManagementPermission):
     name = 'registration_checkin'
     friendly_name = _('Registration (check-in only)')
     description = _('Grants access to view and check-in registrations.')
+    user_selectable = True
+
+
+class RegistrationEditPermission(ManagementPermission):
+    name = 'registration_edit'
+    friendly_name = _('Registration (manage participants only)')
+    description = _('Grants access to view, create, edit and delete registrations.')
     user_selectable = True
 
 

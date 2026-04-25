@@ -135,7 +135,7 @@
                                                    title="{{ tooltip }}" data-qtip-position="bottom"></i>
                                                 {{ speaker.display_full_name }}
                                                 {% if speaker.affiliation %}
-                                                    <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
+                                                    <span class="text-superfluous">({{ render_affiliation(speaker, compact=true) }})</span>
                                                 {% endif %}
                                             </div>
                                         {%- endfor %}
