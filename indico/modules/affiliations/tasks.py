@@ -13,11 +13,11 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.logger import Logger
 from indico.modules.affiliations.matching import AFFILIATION_BACKREF_CLASSES, affiliation_mappings_cache
-from indico.modules.affiliations.search import StringMatchAffiliationSearch
+from indico.modules.affiliations.search import get_search_provider
 
 
 if typing.TYPE_CHECKING:
-    from indico.modules.affiliations.search import AffiliationSearch, AffiliationSearchMatch
+    from indico.modules.affiliations.search import AffiliationSearchMatch
 
 
 logger = Logger.get('affiliations')
@@ -25,16 +25,17 @@ logger = Logger.get('affiliations')
 
 @celery.periodic_task(name='generate_affiliation_matches', run_every=crontab(minute='0', hour='3'), ignore_result=False)
 def generate_affiliation_matches(
-    search_engine: 'AffiliationSearch | None' = None, batch_size: int = 100, cache: bool = True,
+    batch_size: int = 100, cache: bool = True,
 ) -> dict[str, 'AffiliationSearchMatch']:
     """
     This task goes through each database object that includes a "free-text" affiliation, gathers each unique string,
     and tries to find a matching affiliation for it, storing the results in the affiliation mappings cache.
     """
     logger.info('starting matching')
-    search_engine: AffiliationSearch = (
-        StringMatchAffiliationSearch() if search_engine is None else search_engine
-    )
+
+    search_provider = get_search_provider()
+    search_engine = search_provider()
+
     affiliations: set[str] = set()
     for cls in AFFILIATION_BACKREF_CLASSES:
         filters = [

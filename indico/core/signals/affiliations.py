@@ -27,3 +27,9 @@ Called when searching and validating affiliations in an affiliations field. The
 is passed via ``context``. Expected to return a list of SQLAlchemy filters to
 restrict results.
 ''')
+
+get_affiliation_search_providers = _signals.signal('get-affiliation-search-providers', '''
+Expected to return exactly one `AffiliationSearchProvider` subclass. No more than one
+handler for this signal may return one as using multiple affiliation search providers
+at the same time is not possible.
+''')
