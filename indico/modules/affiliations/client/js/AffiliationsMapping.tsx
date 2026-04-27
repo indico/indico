@@ -43,10 +43,11 @@ interface IndicoAxiosAffiliationData {
 }
 
 type TableSortDirection = 'ascending' | 'descending';
+type TableColumn = keyof AffiliationMappingResult['mapping'][number];
 
 interface TableReducerChangeSortAction {
   type: 'CHANGE_SORT';
-  column: keyof AffiliationMappingResult['mapping'][number] | null;
+  column: TableColumn;
 }
 
 interface TableReducerSetDataAction {
@@ -59,7 +60,7 @@ type TableReducerAction = TableReducerChangeSortAction | TableReducerSetDataActi
 interface TableReducerState {
   data: AffiliationMappingResult['mapping'] | null;
   direction: TableSortDirection | null;
-  column: TableReducerChangeSortAction['column'];
+  column: TableColumn | null;
 }
 
 function isMapping(
@@ -79,13 +80,25 @@ function nextDirection(direction: TableSortDirection | null): TableSortDirection
   }
 }
 
+function orderTableData(
+  data: AffiliationMappingResult['mapping'] | null,
+  column: TableColumn | null,
+  direction: TableSortDirection | null
+) {
+  if (data === null || column === null || direction === null) {
+    return data;
+  }
+  const lodashDirection = direction === 'ascending' ? 'asc' : 'desc';
+  return _.orderBy(data, [column], [lodashDirection]);
+}
+
 function tableReducer(state: TableReducerState, action: TableReducerAction): TableReducerState {
   switch (action.type) {
     case 'CHANGE_SORT': {
       const newDirection =
         state.column !== action.column ? 'ascending' : nextDirection(state.direction);
       return {
-        data: _.sortBy(state.data, [action.column]),
+        data: orderTableData(state.data, action.column, newDirection),
         column: action.column,
         direction: newDirection,
       };
@@ -93,7 +106,7 @@ function tableReducer(state: TableReducerState, action: TableReducerAction): Tab
     case 'SET_DATA':
       return {
         ...state,
-        data: action.data,
+        data: orderTableData(action.data, state.column, state.direction),
       };
   }
 }
