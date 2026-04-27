@@ -9,7 +9,8 @@ import affiliationsMappingURL from 'indico-url:affiliations.api_admin_affiliatio
 import affiliationsMappingApplyURL from 'indico-url:affiliations.api_admin_affiliations_mapping_apply';
 import affiliationsMappingStatusURL from 'indico-url:affiliations.api_admin_affiliations_mapping_status';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import _ from 'lodash';
+import React, {Reducer, useCallback, useEffect, useReducer, useState} from 'react';
 import {Button, Checkbox, Loader, Table} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -41,10 +42,60 @@ interface IndicoAxiosAffiliationData {
   reFetch: () => void;
 }
 
+type TableSortDirection = 'ascending' | 'descending';
+
+interface TableReducerChangeSortAction {
+  type: 'CHANGE_SORT';
+  column: keyof AffiliationMappingResult['mapping'][number] | null;
+}
+
+interface TableReducerSetDataAction {
+  type: 'SET_DATA';
+  data: AffiliationMappingResult['mapping'];
+}
+
+type TableReducerAction = TableReducerChangeSortAction | TableReducerSetDataAction;
+
+interface TableReducerState {
+  data: AffiliationMappingResult['mapping'] | null;
+  direction: TableSortDirection | null;
+  column: TableReducerChangeSortAction['column'];
+}
+
 function isMapping(
   maybeMapping: AffiliationMappingTask | AffiliationMappingResult
 ): maybeMapping is AffiliationMappingResult {
   return (maybeMapping as AffiliationMappingResult).mapping !== undefined;
+}
+
+function nextDirection(direction: TableSortDirection | null): TableSortDirection | null {
+  switch (direction) {
+    case 'ascending':
+      return 'descending';
+    case 'descending':
+      return null;
+    case null:
+      return 'ascending';
+  }
+}
+
+function tableReducer(state: TableReducerState, action: TableReducerAction): TableReducerState {
+  switch (action.type) {
+    case 'CHANGE_SORT': {
+      const newDirection =
+        state.column !== action.column ? 'ascending' : nextDirection(state.direction);
+      return {
+        data: _.sortBy(state.data, [action.column]),
+        column: action.column,
+        direction: newDirection,
+      };
+    }
+    case 'SET_DATA':
+      return {
+        ...state,
+        data: action.data,
+      };
+  }
 }
 
 export default function AffiliationsMapping() {
@@ -54,17 +105,20 @@ export default function AffiliationsMapping() {
     reFetch,
   } = useIndicoAxios(affiliationsMappingURL({})) as IndicoAxiosAffiliationData;
 
-  const [mapping, setMapping] = useState<AffiliationMappingResult>();
   const [loading, setLoading] = useState(true);
   const [generatingMappings, setGeneratingMappings] = useState(false);
   const [taskID, setTaskID] = useState<string | null>(null);
   const [approvedMatches, setApprovedMatches] = useState<number[]>([]);
   const [applyingMatches, setApplyingMatches] = useState(false);
+  const [tableState, dispatch] = useReducer<Reducer<TableReducerState, TableReducerAction>>(
+    tableReducer,
+    {data: null, column: null, direction: null}
+  );
 
-  if (mapping !== undefined) {
+  if (tableState.data !== null) {
     const toRemove: number[] = [];
     for (const element of approvedMatches) {
-      if (mapping.mapping.find(m => m.original_id === element) === undefined) {
+      if (tableState.data.find(m => m.original_id === element) === undefined) {
         toRemove.push(element);
       }
     }
@@ -78,7 +132,7 @@ export default function AffiliationsMapping() {
       return;
     }
     if (isMapping(affiliationsData)) {
-      setMapping(affiliationsData);
+      dispatch({type: 'SET_DATA', data: affiliationsData.mapping});
       setLoading(false);
     } else {
       setLoading(true);
@@ -158,7 +212,7 @@ export default function AffiliationsMapping() {
 
   return (
     <div>
-      {mapping !== undefined ? (
+      {tableState.data !== null ? (
         <>
           <div styleName="table-buttons">
             <Button
@@ -178,19 +232,38 @@ export default function AffiliationsMapping() {
               loading={applyingMatches}
             />
           </div>
-          <Table celled padded striped selectable>
+          <Table celled padded striped selectable sortable>
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell>
+                <Table.HeaderCell
+                  onClick={() => dispatch({type: 'CHANGE_SORT', column: 'original_text'})}
+                  sorted={
+                    tableState.column === 'original_text'
+                      ? (tableState.direction ?? undefined)
+                      : undefined
+                  }
+                >
                   <Translate>Original Text</Translate>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell
+                  onClick={() => dispatch({type: 'CHANGE_SORT', column: 'match_text'})}
+                  sorted={
+                    tableState.column === 'match_text'
+                      ? (tableState.direction ?? undefined)
+                      : undefined
+                  }
+                >
                   <Translate>Matched Text</Translate>
                 </Table.HeaderCell>
                 <Table.HeaderCell>
                   <Translate>Entity Type</Translate>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell
+                  onClick={() => dispatch({type: 'CHANGE_SORT', column: 'score'})}
+                  sorted={
+                    tableState.column === 'score' ? (tableState.direction ?? undefined) : undefined
+                  }
+                >
                   <Translate>Match Score</Translate>
                 </Table.HeaderCell>
                 <Table.HeaderCell collapsing>
@@ -199,7 +272,7 @@ export default function AffiliationsMapping() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {mapping.mapping.map(entry => (
+              {tableState.data.map(entry => (
                 <Table.Row key={`${entry.original_id}`}>
                   <Table.Cell>{entry.original_text}</Table.Cell>
                   <Table.Cell>{entry.match_text}</Table.Cell>
