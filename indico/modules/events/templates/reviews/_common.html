@@ -125,9 +125,24 @@
     {% endset %}
 
     <section>
-        {% call render_steps() %}
-            {{ render_step(_("Opening day"), text=start_date, completed=cfp.has_started) }}
-            {{ render_step(_("Submission deadline"), text=end_date, completed=cfp.has_ended) }}
-        {% endcall %}
+        <p class="submission-timeline-summary">
+            {%- if cfp.has_ended -%}
+                {%- trans %}The submission period has ended.{% endtrans -%}
+            {%- elif cfp.has_started -%}
+                {%- if cfp.end_dt -%}
+                    {%- trans %}The submission period is open until the submission deadline.{% endtrans -%}
+                {%- else -%}
+                    {%- trans %}The submission period is open. No submission deadline is set.{% endtrans -%}
+                {%- endif -%}
+            {%- else -%}
+                {%- trans %}The submission period has not yet opened.{% endtrans -%}
+            {%- endif -%}
+        </p>
+        <div aria-hidden="true">
+            {% call render_steps() %}
+                {{ render_step(_("Opening day"), text=start_date, completed=cfp.has_started) }}
+                {{ render_step(_("Submission deadline"), text=end_date, completed=cfp.has_ended) }}
+            {% endcall %}
+        </div>
     </section>
 {% endmacro %}
