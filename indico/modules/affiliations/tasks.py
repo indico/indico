@@ -13,7 +13,7 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.logger import Logger
 from indico.modules.affiliations.matching import AFFILIATION_BACKREF_CLASSES, affiliation_mappings_cache
-from indico.modules.affiliations.search import PSQLVectorStoreBackedAffiliationSearch
+from indico.modules.affiliations.search import StringMatchAffiliationSearch
 
 
 if typing.TYPE_CHECKING:
@@ -25,7 +25,7 @@ logger = Logger.get('affiliations')
 
 @celery.periodic_task(name='generate_affiliation_matches', run_every=crontab(minute='0', hour='3'), ignore_result=False)
 def generate_affiliation_matches(
-    search_engine: 'AffiliationSearch | None' = None, batch_size: int = 100, cache: bool = True
+    search_engine: 'AffiliationSearch | None' = None, batch_size: int = 100, cache: bool = True,
 ) -> dict[str, 'AffiliationSearchMatch']:
     """
     This task goes through each database object that includes a "free-text" affiliation, gathers each unique string,
@@ -33,7 +33,7 @@ def generate_affiliation_matches(
     """
     logger.info('starting matching')
     search_engine: AffiliationSearch = (
-        PSQLVectorStoreBackedAffiliationSearch() if search_engine is None else search_engine
+        StringMatchAffiliationSearch() if search_engine is None else search_engine
     )
     affiliations: set[str] = set()
     for cls in AFFILIATION_BACKREF_CLASSES:
@@ -41,7 +41,7 @@ def generate_affiliation_matches(
             cls.affiliation.is_not(None), cls.affiliation != ''  # noqa: PLC1901
         ]
         if hasattr(cls, 'is_deleted'):
-            filters.append(cls.is_deleted.is_not(False))
+            filters.append(cls.is_deleted.is_(False))
 
         affiliations = affiliations.union(
             str(cwa.affiliation)

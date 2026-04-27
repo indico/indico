@@ -87,7 +87,7 @@ def get_affiliation_mappings_date() -> 'datetime':
 def get_affiliation_matches_from_mapping(
     mapping: dict[str, 'AffiliationSearchMatch']
 ) -> list[AffiliationMatch]:
-    matched_affiliation_texts = [search_match.text for search_match in mapping.values()]
+    matched_affiliation_texts = list(mapping.keys())
 
     affiliations = []
     for cls in AFFILIATION_BACKREF_CLASSES:

@@ -192,7 +192,7 @@ export default function AffiliationsMapping() {
             reFetch();
             return;
           }
-          timeoutID = setTimeout(callback, delay);
+          timeoutID = window.setTimeout(callback, delay);
         })
         .catch(e => {
           setTaskID(null);
@@ -201,7 +201,7 @@ export default function AffiliationsMapping() {
         });
     };
 
-    timeoutID = setTimeout(callback, delay);
+    timeoutID = window.setTimeout(callback, delay);
 
     return () => clearInterval(timeoutID);
   }, [taskID, reFetch]);

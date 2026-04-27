@@ -5,8 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import jsonify, request, session
-from werkzeug.exceptions import BadRequest
+from uuid import UUID
+
+from flask import jsonify, session
+from marshmallow import fields
 
 from indico.core import signals
 from indico.core.celery import AsyncResult
@@ -23,7 +25,6 @@ from indico.modules.logs.util import make_diff_log
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.countries import get_countries
-from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.web.args import use_args, use_kwargs
 from indico.web.rh import RH
@@ -138,26 +139,25 @@ class RHAffiliationsMappingAPI(RHAdminBase):
 
 
 class RHAffiliationsMappingStatusAPI(RHAdminBase):
-    def _process(self):
-        task_id = request.view_args.get('task_id')
-        if task_id is None:
-            raise BadRequest(_('No task ID provided'))
-        task = AsyncResult(task_id)
+    @use_kwargs({'task_id': fields.UUID(required=True)}, location='view_args')
+    def _process(self, task_id: UUID):
+        task = AsyncResult(str(task_id))
         if task.state == 'FAILURE':
             exception = task.get()
+            task.forget()
             assert isinstance(exception, Exception)
             raise exception
         return {'status': task.state}
 
 
 class RHAffiliationsMappingApplyAPI(RHAdminBase):
-    def _process(self):
+    @use_kwargs({'original_ids': fields.List(fields.Integer(), required=True)})
+    def _process(self, original_ids: list[int]):
         mapping = get_affiliation_mappings()
         if mapping is None:
             # Maybe return error instead of exception?
             raise Exception('No mapping exists')
 
-        original_ids = set(request.json.get('original_ids'))
         approved_matches = [
             match for match in get_affiliation_matches_from_mapping(mapping)
             if match.original_id in original_ids
