@@ -25,7 +25,7 @@ from indico.web.flask.app import configure_db
 
 
 @contextmanager
-def local_postgresql():
+def local_postgresql(extensions):
     db_name = 'test'
 
     # Ensure we have initdb and a recent enough postgres version
@@ -46,6 +46,8 @@ def local_postgresql():
         silent_check_call(['createdb', '-h', temp_dir, db_name])
         silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION unaccent;'])
         silent_check_call(['psql', '-h', temp_dir, db_name, '-c', 'CREATE EXTENSION pg_trgm;'])
+        for ext in extensions:
+            silent_check_call(['psql', '-h', temp_dir, db_name, '-c', f'CREATE EXTENSION {ext};'])
     except Exception as e:
         shutil.rmtree(temp_dir)
         pytest.skip(f'Could not init/start PostgreSQL: {e}')
@@ -68,7 +70,7 @@ def local_postgresql():
 
 
 @pytest.fixture(scope='session')
-def postgresql():
+def postgresql(pytestconfig):
     """Provide a clean temporary PostgreSQL server/database.
 
     If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
@@ -92,12 +94,12 @@ def postgresql():
     else:
         postgres_impl = local_postgresql
 
-    with postgres_impl() as dsn:
+    with postgres_impl(pytestconfig.indico_pg_extensions) as dsn:
         yield dsn
 
 
 @pytest.fixture(scope='session')
-def database(app, postgresql):
+def database(app, postgresql, pytestconfig):
     """Create a test database which is destroyed afterwards.
 
     Used only internally, if you need to access the database use `db` instead to ensure
@@ -109,6 +111,9 @@ def database(app, postgresql):
         yield db_
         return
     with app.app_context():
+        pg_extensions = {x.extname for x in db_.engine.execute('SELECT extname FROM pg_extension').fetchall()}
+        if missing := sorted(set(pytestconfig.indico_pg_extensions) - pg_extensions):
+            pytest.fail(f'Missing Postgres extensions in existing DB: {', '.join(missing)}')
         create_all_tables(db_)
     yield db_
     with app.app_context():
