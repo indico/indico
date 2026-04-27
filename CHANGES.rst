@@ -41,6 +41,10 @@ Accessibility
 - Icon-only buttons on the abstract detail page now have proper accessible names
   and tooltips instead of relying on the ``title`` attribute (:pr:`7474`, thanks
   :user:`foxbunny`)
+- Screen reader users are now given a plain-text summary of the call for
+  abstracts / call for papers submission period instead of hearing the
+  decorative opening-day / deadline timeline graphic (:pr:`7487`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
