@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import jsonify, request, session
+from uuid import UUID
+
+from flask import jsonify, session
 from marshmallow import fields
-from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.celery import AsyncResult
@@ -18,6 +19,7 @@ from indico.modules.admin.controllers.base import RHAdminBase
 from indico.modules.affiliations.matching import (get_affiliation_mappings, get_affiliation_mappings_date,
                                                   get_affiliation_matches_from_mapping, get_class_from_entity_type)
 from indico.modules.affiliations.schemas import AffiliationArgs
+from indico.modules.affiliations.search import match_search, weighted_score
 from indico.modules.affiliations.tasks import generate_affiliation_matches
 from indico.modules.affiliations.views import WPAffiliations
 from indico.modules.logs.models.entries import AppLogRealm, LogKind
@@ -26,40 +28,25 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.caching import memoize_redis
 from indico.util.countries import get_countries, get_countries_regex, get_country_reverse
-from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.web.args import use_args, use_kwargs
 from indico.web.rh import RH
 
 
-def _match_search(q, exact=False, prefix=False):
-    if exact:
-        match_str = f'|||{q}|||'
-    elif prefix:
-        match_str = f'|||{q}'
-    else:
-        match_str = q
-    return unaccent_match(Affiliation.searchable_names, match_str, exact=False)
-
-
-def _weighted_score(*params):
-    return sum(db.cast(param, db.Integer) * weight for param, weight in params)
-
-
 @memoize_redis(3600, versioned=True)
 def search_affiliations(q):
-    exact_match = _match_search(q, exact=True)
-    score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
+    exact_match = match_search(q, exact=True)
+    score = weighted_score((exact_match, 150), (match_search(q, prefix=True), 60), (match_search(q), 20))
     countries = set(get_countries_regex().findall(q))
     for country in countries:
         q = q.replace(country, '')
         if (country_code := get_country_reverse(country, case_sensitive=False)):
-            score += _weighted_score((Affiliation.country_code.ilike(country_code), 50))
+            score += weighted_score((Affiliation.country_code.ilike(country_code), 50))
     for word in q.split():
-        score += _weighted_score((unaccent_match(Affiliation.city, word, exact=False), 20),
-                                    (_match_search(word, exact=True), 40),
-                                    (_match_search(word, prefix=True), 30),
-                                    (_match_search(word), 10),
+        score += weighted_score((unaccent_match(Affiliation.city, word, exact=False), 20),
+                                    (match_search(word, exact=True), 40),
+                                    (match_search(word, prefix=True), 30),
+                                    (match_search(word), 10),
                                     (Affiliation.popularity, 1))
     q_filter = fts_matches(Affiliation.searchable_names, q)
     return (
@@ -183,26 +170,25 @@ class RHAffiliationsMappingAPI(RHAdminBase):
 
 
 class RHAffiliationsMappingStatusAPI(RHAdminBase):
-    def _process(self):
-        task_id = request.view_args.get('task_id')
-        if task_id is None:
-            raise BadRequest(_('No task ID provided'))
-        task = AsyncResult(task_id)
+    @use_kwargs({'task_id': fields.UUID(required=True)}, location='view_args')
+    def _process(self, task_id: UUID):
+        task = AsyncResult(str(task_id))
         if task.state == 'FAILURE':
             exception = task.get()
+            task.forget()
             assert isinstance(exception, Exception)
             raise exception
         return {'status': task.state}
 
 
 class RHAffiliationsMappingApplyAPI(RHAdminBase):
-    def _process(self):
+    @use_kwargs({'original_ids': fields.List(fields.Integer(), required=True)})
+    def _process(self, original_ids: list[int]):
         mapping = get_affiliation_mappings()
         if mapping is None:
             # Maybe return error instead of exception?
             raise Exception('No mapping exists')
 
-        original_ids = set(request.json.get('original_ids'))
         approved_matches = [
             match for match in get_affiliation_matches_from_mapping(mapping)
             if match.original_id in original_ids
