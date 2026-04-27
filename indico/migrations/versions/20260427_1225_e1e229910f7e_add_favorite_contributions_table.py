@@ -1,7 +1,7 @@
 """Add favorite contributions table
 
 Revision ID: e1e229910f7e
-Revises: 932389d22b1f
+Revises: 5843fe23c03c
 Create Date: 2026-01-08 16:51:44.198924
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'e1e229910f7e'
-down_revision = '932389d22b1f'
+down_revision = '5843fe23c03c'
 branch_labels = None
 depends_on = None
 
