@@ -21,6 +21,7 @@ Improvements
 - Track the last modified timestamp of registrations (:pr:`7478`, thanks :user:`jbtwist`)
 - Pre-fill the registration form picture field with the user's custom profile
   picture when available (:pr:`7447`, thanks :user:`moliholy, unconventionaldotdev`)
+- Allow users to mark contributions as favorites (:issue:`3524`, :pr:`7256`)
 
 Bugfixes
 ^^^^^^^^
