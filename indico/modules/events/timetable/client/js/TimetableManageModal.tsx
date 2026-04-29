@@ -48,9 +48,9 @@ interface PersonLink {
   email: string;
   first_name: string;
   last_name: string;
-  roles: string[];
   title: string;
   type: string;
+  roles?: string[];
   phone?: string;
   address?: string;
   affiliation?: string;
@@ -236,13 +236,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     // TODO:  (Ajob) The real solution would be to change the personlinkfield, but this
     //        affects many other parts of the code and so for now we will do it like this.
-    if (data.person_links || data.conveners) {
-      const persons = data.person_links || data.conveners;
-      data.person_links = mapEntryToData({personLinks: persons}, true).person_links;
-    }
-
-    if (activeType === EntryType.SessionBlock && data.person_links) {
-      data.conveners = data.person_links;
+    if (data.person_links) {
+      data.person_links = mapEntryToData({personLinks: data.person_links}, true).person_links;
     }
 
     try {

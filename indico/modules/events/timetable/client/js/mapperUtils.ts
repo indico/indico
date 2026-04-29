@@ -42,18 +42,8 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
   {from: 'title', to: 'title'},
   {from: 'description', to: 'description'},
   {from: 'board_number', to: 'boardNumber'},
-  // TODO: (Ajob) Currently we use conveners and person_links in the
-  // 							back-end, and only personLinks in front-end. This is
-  // 							causing inconsistency here. We should probably not
-  // 							be using person_links for conveners on the front-end.
   {
     from: 'person_links',
-    to: 'personLinks',
-    fromTransform: p => p.map(mapDataToPersonLink),
-    toTransform: p => p.map(mapPersonLinkToData),
-  },
-  {
-    from: 'conveners',
     to: 'personLinks',
     fromTransform: p => p.map(mapDataToPersonLink),
     toTransform: p => p.map(mapPersonLinkToData),
