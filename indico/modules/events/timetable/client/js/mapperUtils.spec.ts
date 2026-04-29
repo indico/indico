@@ -211,7 +211,7 @@ describe('mapperUtils', () => {
       expect(data.location_data).toEqual(dataLocationData);
       expect(data.duration).toBe(120);
       expect(data.start_dt).toBe('2024-01-02T10:00:00.000Z');
-      expect(data.conveners).toEqual([dataPersonLink]);
+      expect(data.person_links).toEqual([dataPersonLink]);
       expect(data.colors).toEqual({background: '#000000', text: '#ddd000'});
     });
 
