@@ -267,7 +267,7 @@ function PersonLinkField({
   const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
   const [autoSort, _setAutoSort] = useState(_persons.every(p => p.displayOrder === 0));
-  const sections = roles.filter(x => x.section);
+  const sections = roles?.filter(x => x.section) ?? [];
   const sectionKeys = new Set(sections.map(x => x.name));
   const othersCondition = p => !p.roles || !p.roles.find(r => sectionKeys.has(r));
   searchToken ??= searchTokenFromContext;
@@ -344,7 +344,9 @@ function PersonLinkField({
     const hooks = getPluginObjects('onAddPersonLink');
     values.forEach(p => {
       p.name = formatName(p);
-      p.roles = roles.filter(x => x.default).map(x => x.name);
+      if (p.roles) {
+        p.roles = roles.filter(x => x.default).map(x => x.name);
+      }
       hooks.forEach(f => f(p));
     });
     onChange(
@@ -625,7 +627,7 @@ FinalContributionPersonLinkField.defaultProps = {
 };
 
 export function FinalSessionBlockPersonLinkField(props) {
-  return <FinalPersonLinkField roles={[]} {...props} />;
+  return <FinalPersonLinkField {...props} />;
 }
 
 export function WTFPersonLinkField({
