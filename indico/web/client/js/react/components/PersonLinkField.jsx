@@ -344,7 +344,7 @@ function PersonLinkField({
     const hooks = getPluginObjects('onAddPersonLink');
     values.forEach(p => {
       p.name = formatName(p);
-      if (p.roles) {
+      if (roles) {
         p.roles = roles.filter(x => x.default).map(x => x.name);
       }
       hooks.forEach(f => f(p));
@@ -378,7 +378,7 @@ function PersonLinkField({
       <DndProvider backend={HTML5Backend}>
         <Segment attached="top" styleName="segment">
           {sections.map(({name, label, plural}) => {
-            const filterCondition = p => p.roles?.includes(name);
+            const filterCondition = p => p.roles.includes(name);
             const filtered = persons.filter(filterCondition);
             return filtered.length === 0 ? null : (
               <PersonLinkSection
@@ -408,7 +408,7 @@ function PersonLinkField({
               dragType="other"
               label={sections.length > 0 ? Translate.string('Others') : undefined}
               persons={others}
-              defaultRoles={roles}
+              defaultRoles={roles ?? []}
               onEdit={(idx, scope) =>
                 onEdit(
                   persons.findIndex(p => p === others[idx]),
@@ -627,7 +627,7 @@ FinalContributionPersonLinkField.defaultProps = {
 };
 
 export function FinalSessionBlockPersonLinkField(props) {
-  return <FinalPersonLinkField {...props} />;
+  return <FinalPersonLinkField {...props} roles={null} />;
 }
 
 export function WTFPersonLinkField({
