@@ -68,6 +68,10 @@ class IndicoPlugin(Plugin):
     settings_form: IndicoForm | None = None
     #: A dictionary which can contain the kwargs for a specific field in the `settings_form`.
     settings_form_field_opts = {}
+    #: A dictionary of file-backed config defaults exposed via ``indico.conf``.
+    #: Keys are unprefixed (e.g. ``API_KEY``); the full key in the global config
+    #: is ``{PLUGIN_NAME_UPPER}_{KEY}`` (e.g. ``DEMO_API_KEY`` for plugin ``demo``).
+    plugin_config_defaults = {}
     #: A dictionary containing default values for settings
     default_settings = {}
     #: A dictionary containing default values for event-specific settings
@@ -142,6 +146,15 @@ class IndicoPlugin(Plugin):
     def get_vars_js(self):
         """Return a dictionary with variables to be added to vars.js file."""
         return None
+
+    @property
+    def plugin_config(self):
+        """Read-only proxy over file-backed config scoped to this plugin.
+
+        ``self.plugin_config.API_KEY`` reads ``config.<NAME>_API_KEY``.
+        """
+        from indico.core.config import config
+        return PluginConfigProxy(config, self.name.upper())
 
     @cached_property
     def translation_path(self):
@@ -280,6 +293,26 @@ def get_plugin_template_module(template_name, **context):
     """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates."""
     template_name = f'{current_plugin.name}:{template_name}'
     return get_template_module(template_name, **context)
+
+
+class PluginConfigProxy:
+    """Read-only view over the global config scoped to a plugin's prefix.
+
+    Allows ``plugin.plugin_config.API_KEY`` to read ``config.<PREFIX>_API_KEY``.
+    """
+
+    __slots__ = ('_config', '_prefix')
+
+    def __init__(self, config, prefix):
+        object.__setattr__(self, '_config', config)
+        object.__setattr__(self, '_prefix', prefix)
+
+    def __getattr__(self, name):
+        full = f'{self._prefix}_{name}'
+        try:
+            return getattr(self._config, full)
+        except AttributeError:
+            raise AttributeError(f'no such plugin config key: {name}')
 
 
 class IndicoPluginEngine(PluginEngine):
