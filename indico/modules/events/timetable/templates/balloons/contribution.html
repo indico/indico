@@ -54,7 +54,9 @@
         <div class="expand">
             {{ render_time_and_location(contrib, editable=(editable and can_manage_contributions), use_event_tz=editable) }}
         </div>
-        <ind-favorite-contribution-icon contribution-id="{{ contrib.id }}" event-id="{{ contrib.event.id }}"></ind-favorite-contribution-icon>
+        {% if not editable %}
+            <ind-favorite-contribution-icon contribution-id="{{ contrib.id }}" event-id="{{ contrib.event.id }}"></ind-favorite-contribution-icon>
+        {% endif %}
     </div>
     {% if contrib.speakers or (editable and can_manage_contributions) %}
         <span class="hr"></span>

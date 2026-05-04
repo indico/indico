@@ -38,9 +38,6 @@
                             <th class="i-table">
                                 {% trans %}Subcontributions{% endtrans %}
                             </th>
-                            <th class="i-table favorites-column">
-                                {% trans %}Interested{% endtrans %}
-                            </th>
                             {% for item in static_columns if has_types or item.id != 'type' %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
@@ -169,11 +166,6 @@
                                         </span>
                                     </a>
                                 </td>
-                                <td class="i-table favorites-column" data-text="{{ contrib.favorite_count }}" data-searchable="{{ contrib.favorite_count|lower }}">
-                                    <span class="vertical-aligner">
-                                        {{ contrib.favorite_count }}
-                                    </span>
-                                </td>
                                 {% for item in static_columns %}
                                     {% if item.id == 'session' %}
                                         <td class="i-table">
@@ -198,6 +190,12 @@
                                             {% else %}
                                                 {%- trans %}No session{% endtrans -%}
                                             {% endif %}
+                                        </td>
+                                    {% elif item.id == 'favorites' %}
+                                        <td class="i-table favorites-column" data-text="{{ contrib.favorite_count }}">
+                                            <span class="vertical-aligner">
+                                                {{ contrib.favorite_count }}
+                                            </span>
                                         </td>
                                     {% elif item.id == 'track' %}
                                         <td class="i-table">

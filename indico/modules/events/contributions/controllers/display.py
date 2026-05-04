@@ -98,8 +98,7 @@ class RHMyContributions(RHDisplayProtectionBase):
             raise Forbidden
 
     def _process(self):
-        return WPMyContributions.render_template('display/user_contribution_list.html', self.event,
-                                                 user_id=session.user.id)
+        return WPMyContributions.render_template('display/user_contribution_list.html', self.event)
 
 
 class RHMyTimetable(RHDisplayProtectionBase):
@@ -113,8 +112,7 @@ class RHMyTimetable(RHDisplayProtectionBase):
             raise Forbidden
 
     def _process(self):
-        return WPMyTimetable.render_template('display/user_timetable.html', self.event,
-                                                 user_id=session.user.id)
+        return WPMyTimetable.render_template('display/user_timetable.html', self.event)
 
 
 class RHContributionList(RHDisplayProtectionBase):
@@ -158,7 +156,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                                                field_values=field_values,
                                                page_title=contrib.title,
                                                published=contribution_settings.get(self.event, 'published'),
-                                               favorite=contrib in session.user.favorite_contributions)
+                                               favorite=(contrib in session.user.favorite_contributions))
 
 
 class RHContributionJSON(RHContributionDisplayBase):

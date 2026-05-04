@@ -81,11 +81,10 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
                   'start_dt', 'end_dt', 'url', 'edit_url')
 
     def _get_edit_url(self, contribution):
-        user = self.context.get('user')
-        event = self.context.get('event')
-        if event is None or user is None or not contribution.can_edit(user):
+        user = self.context['user']
+        if not contribution.can_edit(user):
             return None
-        return url_for('.manage_update_contrib', standalone=True, contrib_id=contribution.id, event_id=event.id)
+        return url_for('contributions.manage_update_contrib', contribution, standalone=True)
 
     edit_url = fields.Method('_get_edit_url')
 

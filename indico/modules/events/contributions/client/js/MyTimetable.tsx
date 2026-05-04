@@ -69,7 +69,10 @@ customElements.define(
   'ind-my-timetable',
   class extends HTMLElement {
     connectedCallback() {
-      ReactDOM.render(<MyTimetable eventId={JSON.parse(this.getAttribute('event-id'))} />, this);
+      ReactDOM.render(
+        <MyTimetable eventId={JSON.parse(this.getAttribute('event-id') ?? '')} />,
+        this
+      );
     }
   }
 );

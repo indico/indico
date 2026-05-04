@@ -46,6 +46,7 @@ class ContributionListGenerator(ListGeneratorBase):
         track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
         type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
         self.static_items = {
+            'favorites': {'title': _('Interested')},
             'type': {'title': _('Type'),
                      'filter_choices': type_empty | type_choices},
             'session': {'title': _('Session'),

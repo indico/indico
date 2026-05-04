@@ -8,23 +8,24 @@
 from collections import defaultdict
 
 from flask import jsonify, session
-from marshmallow import fields
 from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.modules.events.contributions.controllers.management import RHManageContributionsBase
+from indico.modules.events.contributions.controllers.display import RHDisplayProtectionBase
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import UserContributionSchema
 from indico.modules.events.contributions.util import get_contributions_for_user
 from indico.modules.events.controllers.base import RHProtectedEventBase
-from indico.web.args import use_kwargs
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_rh_kwargs
 
 
-# FIXME: Use another base class
-class RHAPIMyContributions(RHManageContributionsBase):
+class RHAPIMyContributions(RHDisplayProtectionBase):
     """API endpoint to get a user's contributions."""
+
+    MENU_ENTRY_NAME = 'my_timetable'
 
     def _process(self):
         contribs = get_contributions_for_user(self.event, session.user)
@@ -48,25 +49,28 @@ class RHAPIMyContributions(RHManageContributionsBase):
 
         return jsonify({
             category: UserContributionSchema(
-                context={'user': session.user, 'event': self.event}, many=True
+                context={'user': session.user}, many=True
             ).dump(contributions) for category, contributions in categorized.items()
         })
 
 
 class RHFavoriteContributionsAPI(RHProtectedEventBase):
-    @use_kwargs({
-        'contrib_id': fields.Integer()
-    }, location='view_args')
-    def _process_args(self, contrib_id=None):
+    def _process_args(self):
         RHProtectedEventBase._process_args(self)
-        self.contribution = (
-            Contribution.get_or_404(contrib_id) if contrib_id is not None else None
-        )
+
+    @use_rh_kwargs({
+        'contribution': ModelField(Contribution, with_parent='event', data_key='contrib_id')
+    }, location='view_args', rh_context=('event',))
+    def _process(self, contribution=None):
+        self.contribution = contribution
+        return super()._process()
 
     def _process_GET(self):
         if self.contribution is None:
-            return jsonify({c.id: UserContributionSchema().dump(c) for c in session.user.favorite_contributions
-                            if c.event_id == self.event.id and not c.is_deleted})
+            return jsonify({
+                c.id: UserContributionSchema(exclude=('edit_url',)).dump(c)
+                for c in session.user.favorite_contributions if c.event_id == self.event.id and not c.is_deleted
+            })
         return jsonify(self.contribution in session.user.favorite_contributions)
 
     def _process_PUT(self):

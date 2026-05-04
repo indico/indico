@@ -13,15 +13,15 @@ import ReactDOM from 'react-dom';
 import {useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-interface ScheduleContributionIconProps {
+interface FavoriteContributionIconProps {
   contributionId: number;
   eventId: number;
 }
 
-export default function ScheduleContributionIcon({
+export default function FavoriteContributionIcon({
   contributionId,
   eventId,
-}: ScheduleContributionIconProps) {
+}: FavoriteContributionIconProps) {
   const [scheduled, toggleScheduled, loading, saving] = useTogglableValue(
     contributionURL({contrib_id: contributionId, event_id: eventId})
   );
@@ -47,9 +47,9 @@ customElements.define(
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(
-        <ScheduleContributionIcon
-          contributionId={JSON.parse(this.getAttribute('contribution-id'))}
-          eventId={JSON.parse(this.getAttribute('event-id'))}
+        <FavoriteContributionIcon
+          contributionId={JSON.parse(this.getAttribute('contribution-id') ?? '')}
+          eventId={JSON.parse(this.getAttribute('event-id') ?? '')}
         />,
         this
       );

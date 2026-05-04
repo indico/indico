@@ -115,7 +115,7 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.contributions.util import user_has_contributions, user_has_scheduled_contributions
+    from indico.modules.events.contributions.util import user_has_contributions, user_has_favorite_contributions
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_contributions(event):
@@ -126,7 +126,7 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_my_timetable(event):
         if not session.user:
             return False
-        return user_has_scheduled_contributions(event, session.user)
+        return user_has_favorite_contributions(event, session.user)
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')

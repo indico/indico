@@ -27,11 +27,11 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import PublicationButton from './PublicationButton';
+import PublicationSwitch from './PublicationSwitch';
 import './MyContributions';
 import './MyTimetable';
 import './ScheduleContributionIcon';
-import PublicationButton from './PublicationButton';
-import PublicationSwitch from './PublicationSwitch';
 
 document.addEventListener('DOMContentLoaded', () => {
   customElements.define(

@@ -12,8 +12,9 @@ import {List, Loader} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import './ContributionList.module.scss';
 import {Contribution, ContributionRecord} from './types';
+
+import './ContributionList.module.scss';
 
 interface ContributionList {
   loading?: boolean;
@@ -70,9 +71,7 @@ export function ContributionList({
                           )}
                         </span>
                         <span styleName="contribution-name-box">
-                          <a href={contribution.url} target="_blank" rel="noopener noreferrer">
-                            {contribution.title}
-                          </a>
+                          <a href={contribution.url}>{contribution.title}</a>
                           <br />
                           <TooltipIfTruncated>
                             <span styleName="detail">{contribution.description ?? ''}</span>
