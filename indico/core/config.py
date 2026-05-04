@@ -271,7 +271,11 @@ def load_config(only_defaults=False, override=None):
     if not only_defaults:
         path = get_config_path()
         raw_config = _parse_config(path)
-    plugins = set(raw_config.get('PLUGINS') or set()) | set((override or {}).get('PLUGINS') or set())
+    env_override = {}
+    if not only_defaults and (env_override_value := os.environ.get('INDICO_CONF_OVERRIDE')):
+        env_override = ast.literal_eval(env_override_value)
+    plugins = (set(raw_config.get('PLUGINS') or set()) | set(env_override.get('PLUGINS') or set()) |
+               set((override or {}).get('PLUGINS') or set()))
     plugin_cfg_defaults = _load_plugin_config_defaults(plugins)
     extra_keys = frozenset(plugin_cfg_defaults)
 
@@ -279,9 +283,8 @@ def load_config(only_defaults=False, override=None):
     if not only_defaults:
         config = _sanitize_data(raw_config, extra_keys=extra_keys)
         data.update(config)
-        env_override = os.environ.get('INDICO_CONF_OVERRIDE')
         if env_override:
-            data.update(_sanitize_data(ast.literal_eval(env_override), extra_keys=extra_keys))
+            data.update(_sanitize_data(env_override, extra_keys=extra_keys))
         resolved_path = resolve_link(path) if os.path.islink(path) else path
         resolved_path = None if resolved_path == os.devnull else resolved_path
         data['CONFIG_PATH'] = path
