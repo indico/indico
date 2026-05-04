@@ -38,7 +38,7 @@ import {getCurrentDateLocalStorage} from './utils';
       const startDt = moment(eventInfo.start_dt_local);
       const currentDate = moment.tz(
         getCurrentDateLocalStorage(eventId) || startDt,
-        eventInfo.startDate.tz
+        eventInfo.timezone
       );
       const initialData = {
         staticData: {
