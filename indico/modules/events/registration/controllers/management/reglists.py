@@ -711,6 +711,8 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
 class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegistrationFieldActionBase):
     """Upload a file from a registration form."""
 
+    PERMISSION = ('registration', 'registration_edit')
+
 
 class RHRegistrationUploadPicture(UploadRegistrationPictureMixin, RHRegistrationUploadFile):
     """Upload a picture from a registration form."""
