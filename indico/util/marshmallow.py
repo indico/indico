@@ -231,11 +231,12 @@ class ModelField(I18nAwareField):
     }
 
     def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, filter_deleted=False,
-                 none_if_missing=False, **kwargs):
+                 none_if_missing=False, with_parent=None, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
         self.none_if_missing = none_if_missing
+        self.with_parent = with_parent
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -259,6 +260,8 @@ class ModelField(I18nAwareField):
         except (TypeError, ValueError):
             self.fail('type')
         query = self.get_query(self.model, self.context).filter(self.column == value)
+        if self.with_parent:
+            query = query.with_parent(self.context[self.with_parent])
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         obj = query.one_or_none()
@@ -283,11 +286,12 @@ class ModelList(fields.Field):
     }
 
     def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, collection_class=list,
-                 filter_deleted=False, **kwargs):
+                 filter_deleted=False, with_parent=None, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
         self.collection_class = collection_class
+        self.with_parent = with_parent
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -312,6 +316,8 @@ class ModelList(fields.Field):
             self.fail('type')
         requested = set(value)
         query = self.get_query(self.model, self.context).filter(self.column.in_(value))
+        if self.with_parent:
+            query = query.with_parent(self.context[self.with_parent])
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         objs = query.all()

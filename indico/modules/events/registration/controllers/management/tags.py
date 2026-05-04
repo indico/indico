@@ -102,13 +102,13 @@ class RHAPIRegistrationTagsAssign(RHRegistrationsActionBase):
 
     @use_rh_kwargs({
         'add': ModelList(RegistrationTag,
-                         get_query=lambda m, ctx: m.query.with_parent(ctx['event']),
                          collection_class=set,
-                         load_default=lambda: set()),
+                         load_default=lambda: set(),
+                         with_parent='event'),
         'remove': ModelList(RegistrationTag,
-                            get_query=lambda m, ctx: m.query.with_parent(ctx['event']),
                             collection_class=set,
-                            load_default=lambda: set())
+                            load_default=lambda: set(),
+                            with_parent='event')
     }, rh_context=('event',))
     def _process_POST(self, add, remove):
         _assign_registration_tags(self.registrations, add, remove)
