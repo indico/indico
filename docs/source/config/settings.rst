@@ -1191,6 +1191,11 @@ These keys participate in the same machinery as core settings: defaults are
 applied when omitted, unknown plugin-prefixed keys produce an "Ignoring unknown
 config key" warning, and ``INDICO_CONF_OVERRIDE`` can override them.
 
+If a plugin declares a key that collides with a core config key, the plugin
+default is ignored and a warning is emitted; the core default stays
+authoritative. If two plugins declare the same prefixed key, a warning is
+emitted and the latter declaration wins.
+
 
 .. data:: CATEGORY_CLEANUP
 
