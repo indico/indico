@@ -34,6 +34,7 @@ Bugfixes
   module (:pr:`7475`)
 - Fix date picker showing January instead of the selected month when the user
   language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
+- Do not show "Clone Abstract" icon outside management area (:pr:`7493`)
 
 Accessibility
 ^^^^^^^^^^^^^
