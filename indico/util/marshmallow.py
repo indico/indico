@@ -258,7 +258,7 @@ class ModelField(I18nAwareField):
         try:
             value = self.column_type(value)
         except (TypeError, ValueError):
-            self.fail('type')
+            raise self.make_error('type')
         query = self.get_query(self.model, self.context).filter(self.column == value)
         if self.with_parent:
             query = query.with_parent(self.context[self.with_parent])
@@ -268,7 +268,7 @@ class ModelField(I18nAwareField):
         if obj is None:
             if self.none_if_missing:
                 return None
-            self.fail('not_found', value=value)
+            raise self.make_error('not_found', value=value)
         return obj
 
 
@@ -313,7 +313,7 @@ class ModelList(fields.Field):
         try:
             value = list(map(self.column_type, value))
         except (TypeError, ValueError):
-            self.fail('type')
+            raise self.make_error('type')
         requested = set(value)
         query = self.get_query(self.model, self.context).filter(self.column.in_(value))
         if self.with_parent:
@@ -324,7 +324,7 @@ class ModelList(fields.Field):
         found = {getattr(x, self.column.key) for x in objs}
         invalid = requested - found
         if invalid:
-            self.fail('not_found', value=next(iter(invalid)))
+            raise self.make_error('not_found', value=next(iter(invalid)))
         assert found == requested, 'Unexpected objects found'
         return self.collection_class(objs)
 
@@ -474,7 +474,7 @@ class FilesField(ModelList):
     def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and any(f.claimed for f in rv):
-            self.fail('claimed')
+            raise self.make_error('claimed')
         return rv
 
 
@@ -494,7 +494,7 @@ class FileField(ModelField):
     def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and rv is not None and rv.claimed:
-            self.fail('claimed')
+            raise self.make_error('claimed')
         return rv
 
 
