@@ -115,6 +115,14 @@ def test_indico_conf_override_env_passes_plugin_key(fake_entry_points, write_con
     assert data['DEMO_API_KEY'] == 'fromenv'
 
 
+def test_indico_conf_override_env_can_enable_plugin_and_pass_plugin_key(fake_entry_points, write_config, monkeypatch):
+    fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None}))
+    write_config('PLUGINS = set()\n')
+    monkeypatch.setenv('INDICO_CONF_OVERRIDE', "{'PLUGINS': {'demo'}, 'DEMO_API_KEY': 'fromenv'}")
+    data = load_config()
+    assert data['DEMO_API_KEY'] == 'fromenv'
+
+
 def test_missing_entry_point_graceful(fake_entry_points, write_config):
     # 'ghost' has no registered entry-point; should not crash, key absent from result.
     write_config("PLUGINS = {'ghost'}\n")
