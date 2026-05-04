@@ -29,7 +29,7 @@ def fake_entry_points(monkeypatch):
             return []
         return list(eps.values())
 
-    monkeypatch.setattr(config_module, 'entry_points', _entry_points, raising=False)
+    monkeypatch.setattr(config_module, 'entry_points', _entry_points)
     return eps
 
 
@@ -85,14 +85,26 @@ def test_only_defaults_with_plugin_override_carries_keys(fake_entry_points):
     assert data['DEMO_API_KEY'] == 'x'
 
 
-def test_plugin_config_collision_warns(fake_entry_points, write_config):
-    # Two plugins both contributing the same prefixed key (e.g. plugin name `un` and `un_extras`
-    # would resolve to UN_*; here we force collision via overlapping prefixes through duplicate names
-    # is not possible, so simulate a collision with a core key.
-    fake_entry_points['base'] = _FakeEntryPoint('base', _make_plugin({'URL': 'x'}))  # BASE_URL collides
-    write_config("PLUGINS = {'base'}\n")
-    with pytest.warns(UserWarning, match='BASE_URL'):
-        load_config()
+def test_plugin_config_collision_with_core_key_warns_and_is_ignored(fake_entry_points, write_config):
+    # Plugin 'external' declaring 'REGISTRATION_URL' would shadow the core EXTERNAL_REGISTRATION_URL
+    # default. The user's indico.conf does not set this key, so the plugin default would otherwise win.
+    fake_entry_points['external'] = _FakeEntryPoint(
+        'external', _make_plugin({'REGISTRATION_URL': 'plugin-default'}))
+    write_config("PLUGINS = {'external'}\n")
+    with pytest.warns(UserWarning, match='EXTERNAL_REGISTRATION_URL'):
+        data = load_config()
+    # Core default wins; the plugin's value is dropped.
+    assert data['EXTERNAL_REGISTRATION_URL'] is None
+
+
+def test_plugin_config_collision_between_plugins_warns_and_latter_wins(fake_entry_points, write_config):
+    # Plugin 'a' declaring 'B_C' and plugin 'a_b' declaring 'C' both resolve to A_B_C.
+    fake_entry_points['a'] = _FakeEntryPoint('a', _make_plugin({'B_C': 'first'}))
+    fake_entry_points['a_b'] = _FakeEntryPoint('a_b', _make_plugin({'C': 'second'}))
+    write_config("PLUGINS = {'a', 'a_b'}\n")
+    with pytest.warns(UserWarning, match='A_B_C'):
+        data = load_config()
+    assert data['A_B_C'] == 'second'
 
 
 def test_indico_conf_override_env_passes_plugin_key(fake_entry_points, write_config, monkeypatch):
