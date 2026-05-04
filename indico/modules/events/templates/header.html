@@ -2,188 +2,189 @@
 {% from 'core/impersonation.html' import render_impersonation %}
 
 {%- macro _render_nav_bar() -%}
-    {% set rel = event.get_relative_event_ids() %}
+{% set rel = event.get_relative_event_ids() %}
 
-    <a class="i-button text-color subtle icon-home" href="{{ url_for_index() }}"
-       title="{% trans %}Go to the Indico Home Page{% endtrans %}"></a>
+<a class="i-button text-color subtle icon-home" href="{{ url_for_index() }}"
+    title="{% trans %}Go to the Indico Home Page{% endtrans %}"></a>
 
-    <span class="separator"></span>
+<span class="separator"></span>
 
-    {% if rel.first is not none %}
-        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', event_id=rel.first) }}"
-           title="{% trans %}Oldest event{% endtrans %}"></a>
-    {% endif %}
+{% if rel.first is not none %}
+<a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', event_id=rel.first) }}"
+    title="{% trans %}Oldest event{% endtrans %}"></a>
+{% endif %}
 
-    {% if rel.prev is not none %}
-        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', event_id=rel.prev) }}"
-           title="{% trans %}Older event{% endtrans %}"></a>
-    {% endif %}
+{% if rel.prev is not none %}
+<a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', event_id=rel.prev) }}"
+    title="{% trans %}Older event{% endtrans %}"></a>
+{% endif %}
 
-    {% if event.category %}
-        <a class="i-button text-color subtle icon-collapse" href="{{ event.category.url }}"
-           title="{% trans %}Up to category{% endtrans %}"></a>
-    {% endif %}
+{% if event.category %}
+<a class="i-button text-color subtle icon-collapse" href="{{ event.category.url }}"
+    title="{% trans %}Up to category{% endtrans %}"></a>
+{% endif %}
 
-    {% if rel.next is not none %}
-        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
-           title="{% trans %}Newer event{% endtrans %}"></a>
-    {% endif %}
+{% if rel.next is not none %}
+<a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
+    title="{% trans %}Newer event{% endtrans %}"></a>
+{% endif %}
 
-    {% if rel.last is not none %}
-        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', event_id=rel.last) }}"
-           title="{% trans %}Newest event{% endtrans %}"></a>
-    {% endif %}
+{% if rel.last is not none %}
+<a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', event_id=rel.last) }}"
+    title="{% trans %}Newest event{% endtrans %}"></a>
+{% endif %}
 
-    {% if event.category or rel.first or rel.prev or rel.next or rel.last %}
-        <span class="separator"></span>
-    {% endif %}
+{% if event.category or rel.first or rel.prev or rel.next or rel.last %}
+<span class="separator"></span>
+{% endif %}
 {%- endmacro -%}
 
 
 {%- macro _render_theme_selector() -%}
-    <button class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
-       title="{% trans %}Change theme{% endtrans %}"></button>
-    <ul class="i-dropdown">
-        {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
-        {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
-           if group.grouper or event.can_manage(session.user) %}
-            {% if not group.grouper %}
-                <li class="themes-separator"></li>
-            {% endif %}
-            {% for id, data in group.list %}
-                <li>
-                    {% if id == theme %}
-                        <a class="disabled"><strong>{{ data.name }}</strong></a>
-                    {% else %}
-                        <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        {% endfor %}
-    </ul>
+<button class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
+    title="{% trans %}Change theme{% endtrans %}"></button>
+<ul class="i-dropdown">
+    {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
+    {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
+    if group.grouper or event.can_manage(session.user) %}
+    {% if not group.grouper %}
+    <li class="themes-separator"></li>
+    {% endif %}
+    {% for id, data in group.list %}
+    <li>
+        {% if id == theme %}
+        <a class="disabled"><strong>{{ data.name }}</strong></a>
+        {% else %}
+        <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    {% endfor %}
+</ul>
 {%- endmacro -%}
 
 
 {%- macro _render_filters() -%}
-    {%- set filter_link_tooltip -%}
-        {%- if filters_active -%}
-            {%- trans %}Filtering is enabled{% endtrans -%}
-        {%- else -%}
-            {%- trans %}Add a filter{% endtrans -%}
-        {%- endif -%}
-    {%- endset -%}
+{%- set filter_link_tooltip -%}
+{%- if filters_active -%}
+{%- trans %}Filtering is enabled{% endtrans -%}
+{%- else -%}
+{%- trans %}Add a filter{% endtrans -%}
+{%- endif -%}
+{%- endset -%}
 
-    <button class="i-button text-color subtle icon-filter filter-link {{ 'active' if filters_active }}"
-       title="{{ filter_link_tooltip|forceescape }}"></button>
+<button class="i-button text-color subtle icon-filter filter-link {{ 'active' if filters_active }}"
+    title="{{ filter_link_tooltip|forceescape }}"></button>
 
-    <div id="event-filters" class="event-filters">
-        <form id="filterForm" style="margin: 0;">
-            <div style="float: right;">
-                <input type="submit" class="btn" value="Apply filter">&nbsp;
-                <input type="button" id="removeFilterButton" class="btn" value="Remove filter">
-            </div>
+<div id="event-filters" class="event-filters">
+    <form id="filterForm" style="margin: 0;">
+        <div style="float: right;">
+            <input type="submit" class="btn" value="Apply filter">&nbsp;
+            <input type="button" id="removeFilterButton" class="btn" value="Remove filter">
+        </div>
 
-            <strong>{% trans %}Focus on:{% endtrans %}&nbsp;</strong>
+        <strong>{% trans %}Focus on:{% endtrans %}&nbsp;</strong>
 
-            {% if dates|length > 1 %}
-                <select id="datesSelect" name="showDate" style="font-size: 8pt;">
-                    {% set selected_date = request.args.get('showDate', 'all') %}
-                    <option value="all" {{ 'checked' if selected_date == 'all' }}>
-                        {%- trans %}All days{% endtrans -%}
-                    </option>
-                    {% for date in dates %}
-                        <option value="{{ date.isoformat() }}" {{ 'selected' if selected_date == date.isoformat() }}>
-                            {{- date|format_date() -}}
-                        </option>
-                    {% endfor %}
-                </select>
-            {% endif %}
+        {% if dates|length > 1 %}
+        <select id="datesSelect" name="showDate" style="font-size: 8pt;">
+            {% set selected_date = request.args.get('showDate', 'all') %}
+            <option value="all" {{ 'checked' if selected_date=='all' }}>
+                {%- trans %}All days{% endtrans -%}
+            </option>
+            {% for date in dates %}
+            <option value="{{ date.isoformat() }}" {{ 'selected' if selected_date==date.isoformat() }}>
+                {{- date|format_date() -}}
+            </option>
+            {% endfor %}
+        </select>
+        {% endif %}
 
-            {% if event.sessions %}
-                <select id="showSessionSelect" name="showSession" style="font-size: 8pt;">
-                    {% set selected_session = request.args.get('showSession', 'all') %}
-                    <option value="all" {{ 'checked' if selected_session == 'all' }}>
-                        {%- trans %}All sessions{% endtrans -%}
-                    </option>
-                    {% for s in event.sessions|sort(attribute='title') %}
-                        <option value="{{ s.friendly_id }}" {{ 'selected' if selected_session == s.friendly_id|string }}>
-                            {{- s.title|truncate(50) -}}
-                        </option>
-                    {% endfor %}
-                </select>
+        {% if event.sessions %}
+        <select id="showSessionSelect" name="showSession" style="font-size: 8pt;">
+            {% set selected_session = request.args.get('showSession', 'all') %}
+            <option value="all" {{ 'checked' if selected_session=='all' }}>
+                {%- trans %}All sessions{% endtrans -%}
+            </option>
+            {% for s in event.sessions|sort(attribute='title') %}
+            <option value="{{ s.friendly_id }}" {{ 'selected' if selected_session==s.friendly_id|string }}>
+                {{- s.title|truncate(50) -}}
+            </option>
+            {% endfor %}
+        </select>
 
-                <span style="white-space: nowrap; margin-left: 65px;">
-                    {% set hide_contribs = event.sessions and request.args.detailLevel == 'session' %}
-                    <input id="hideContributionsCheckbox" type="checkbox" name="detailLevel" style="margin-right: 5px;"
-                           value="session" {{ 'checked' if hide_contribs }}>
-                    <strong id="hideContributionsLabel" style="cursor: pointer;">
-                        {%- trans %}Hide Contributions{% endtrans -%}
-                    </strong>
-                </span>
-            {% endif %}
-        </form>
-    </div>
+        <span style="white-space: nowrap; margin-left: 65px;">
+            {% set hide_contribs = event.sessions and request.args.detailLevel == 'session' %}
+            <input id="hideContributionsCheckbox" type="checkbox" name="detailLevel" style="margin-right: 5px;"
+                value="session" {{ 'checked' if hide_contribs }}>
+            <strong id="hideContributionsLabel" style="cursor: pointer;">
+                {%- trans %}Hide Contributions{% endtrans -%}
+            </strong>
+        </span>
+        {% endif %}
+    </form>
+</div>
 
-    {# TODO: get rid of this awful legacy js... #}
-    <script>
-        (function() {
-            'use strict';
+{# TODO: get rid of this awful legacy js... #}
+<script>
+    (function () {
+        'use strict';
 
-            var filterButtonClicked = false;
-            var filterButtonState = false;
-            var filtersActive = {{ filters_active|tojson }};
+        var filterButtonClicked = false;
+        var filterButtonState = false;
+        var filtersActive = {{ filters_active| tojson
+    }};
 
-            function filterToggle() {
-                if (!filterButtonClicked) {
-                    // When clicked for the first time append the div to the correct container
-                    $('#pageSubHeader').append($('#event-filters').detach());
-                    filterButtonClicked = true;
-                }
+    function filterToggle() {
+        if (!filterButtonClicked) {
+            // When clicked for the first time append the div to the correct container
+            $('#pageSubHeader').append($('#event-filters').detach());
+            filterButtonClicked = true;
+        }
 
-                filterButtonState = !filterButtonState;
-                $('#event-filters').toggle(filterButtonState);
-            }
+        filterButtonState = !filterButtonState;
+        $('#event-filters').toggle(filterButtonState);
+    }
 
-            // Setup the filter button in the toolbar
-            $('.filter-link').on('click', function(e) {
-                e.preventDefault();
-                filterToggle();
-            });
+    // Setup the filter button in the toolbar
+    $('.filter-link').on('click', function (e) {
+        e.preventDefault();
+        filterToggle();
+    });
 
-            // When remove filter button clicked, if needed reset the form and do submit otherwise
-            // just hide the filter div
-            $('#removeFilterButton').on('click', function() {
-                // Reset the form
-                $('#hideContributionsCheckbox').prop('checked', false);
-                $('#datesSelect').val('all');
-                $('#showSessionSelect').val('all');
+    // When remove filter button clicked, if needed reset the form and do submit otherwise
+    // just hide the filter div
+    $('#removeFilterButton').on('click', function () {
+        // Reset the form
+        $('#hideContributionsCheckbox').prop('checked', false);
+        $('#datesSelect').val('all');
+        $('#showSessionSelect').val('all');
 
-                if (filtersActive) {
-                    $('#filterForm').submit();
-                } else {
-                    filterToggle();
-                }
-            });
+        if (filtersActive) {
+            $('#filterForm').submit();
+        } else {
+            filterToggle();
+        }
+    });
 
-            // Make the hide contributions label clickable
-            $('#hideContributionsLabel').on('click', function() {
-                $('#hideContributionsCheckbox').trigger('click');
-            });
+    // Make the hide contributions label clickable
+    $('#hideContributionsLabel').on('click', function () {
+        $('#hideContributionsCheckbox').trigger('click');
+    });
 
-            if (filtersActive) {
-                _.defer(filterToggle);
-            }
-        })();
-    </script>
+    if (filtersActive) {
+        _.defer(filterToggle);
+    }
+        }) ();
+</script>
 {%- endmacro -%}
 
 
 {%- set dates = event.iter_days(tzinfo=event.tzinfo)|list -%}
 {%- set show_filter_button = (event.type == 'meeting' or (event.type == 'conference' and theme))
-                             and (dates|length > 1 or event.sessions) -%}
+and (dates|length > 1 or event.sessions) -%}
 {%- set filters_active = show_filter_button and (request.args.get('showDate', 'all') != 'all' or
-                                                 request.args.get('showSession', 'all') != 'all' or
-                                                 request.args.get('detailLevel', 'contribution') != 'contribution') -%}
+request.args.get('showSession', 'all') != 'all' or
+request.args.get('detailLevel', 'contribution') != 'contribution') -%}
 
 {{ render_impersonation(legacy=true) }}
 {{ render_announcements(legacy=true) }}
@@ -192,66 +193,78 @@
     <div class="main-action-bar flexrow f-j-space-between f-a-center">
         <div class="button-bar flexrow f-j-start">
             {% if event.type != 'conference' or show_nav_bar %}
-                {{ _render_nav_bar() }}
+            {{ _render_nav_bar() }}
             {% endif %}
 
             {% if event.can_access(session.user) %}
-                {% if print_url %}
-                    <a class="i-button text-color subtle icon-printer" href="{{ print_url }}"
-                       title="{% trans %}Printable version{% endtrans %}"></a>
-                {% endif %}
+            {% if print_url %}
+            <a class="i-button text-color subtle icon-printer" href="{{ print_url }}"
+                title="{% trans %}Printable version{% endtrans %}"></a>
+            {% endif %}
 
-                {% if show_filter_button %}
-                    {{ _render_filters() }}
-                {% endif %}
+            {% if show_filter_button %}
+            {{ _render_filters() }}
+            {% endif %}
 
-                <div id="event-calendar-link" data-event-id="{{ event.id }}"
-                     data-event-contrib-count="{{ event.contributions_count }}"
-                     data-event-session-block-count="{{ event.session_block_count }}"
-                     {% if event.series %}data-event-in-series{% endif %}></div>
+            <div id="event-calendar-link" data-event-id="{{ event.id }}"
+                data-event-contrib-count="{{ event.contributions_count }}"
+                data-event-session-block-count="{{ event.session_block_count }}" {% if event.series
+                %}data-event-in-series{% endif %}></div>
 
-                {% if event.type == 'meeting' %}
-                    <button class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
-                       data-href="{{ url_for('timetable.export_pdf', event) }}"
-                       data-ajax-dialog></button>
-                {% endif %}
+            {% if event.type == 'meeting' %}
+            <button class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
+                data-href="{{ url_for('timetable.export_pdf', event) }}" data-ajax-dialog></button>
+            {% endif %}
 
-                {% if event.can_generate_attachment_package(session.user) %}
-                    <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
-                       title="{% trans %}Download material{% endtrans %}"></a>
-                {% endif %}
+            {% if event.can_generate_attachment_package(session.user) %}
+            <a class="i-button text-color subtle icon-package-download"
+                href="{{ url_for('attachments.package', event) }}"
+                title="{% trans %}Download material{% endtrans %}"></a>
+            {% endif %}
 
-                {{ _render_theme_selector() }}
-                {% if session.user %}
-                    <span class="separator"></span>
+            {{ _render_theme_selector() }}
+            {% if session.user %}
+            <span class="separator"></span>
 
-                    <div id="favorite-link" data-event-id="{{ event.id }}"
-                        {{ 'data-favorited' if event in session.user.favorite_events }}></div>
-                {% endif %}
+            <div id="favorite-link" data-event-id="{{ event.id }}" {{ 'data-favorited' if event in
+                session.user.favorite_events }}></div>
+            {% endif %}
 
-                <span class="separator"></span>
+            <span class="separator"></span>
+
+            <div class="event-rating-stars">
+                {% set user_rating = event.get_user_rating(session.user) or 0 %}
+
+                {% for rating in range(1, 6) %}
+                <a href="{{ url_for('events.rate_event', event_id=event.id, rating=rating) }}"
+                    class="i-button {{ 'icon-star' if rating <= user_rating else 'icon-star-empty' }}">
+                </a>
+                {% endfor %}
+            </div>
+
+            <span class="separator"></span>
             {% endif %}
 
             {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-link') }}
 
             {% block management_button %}
-                {% if show_management_button %}
-                    <a class="i-button text-color subtle icon-edit"
-                       href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
-                       title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
-                {% endif %}
+            {% if show_management_button %}
+            <a class="i-button text-color subtle icon-edit"
+                href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
+                title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+            {% endif %}
             {% endblock %}
 
             {% if event.type == 'conference' and theme %}
-                <span class="separator"></span>
-                <a href="{{ event.url }}" class="i-button text-color subtle">
-                    {%- trans %}Back to Conference View{% endtrans -%}
-                </a>
+            <span class="separator"></span>
+            <a href="{{ event.url }}" class="i-button text-color subtle">
+                {%- trans %}Back to Conference View{% endtrans -%}
+            </a>
             {% endif %}
         </div>
 
         {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone, force_locale=force_locale,
-                              force_locale_alts=force_locale_alts) }}
+        force_locale_alts=force_locale_alts) }}
     </div>
 
     {# This div is used for inserting content under the header such as the filtering options for meetings #}
@@ -259,5 +272,5 @@
 </header>
 
 {% if event.type != 'conference' %}
-    {%- include 'flashed_messages.html' -%}
+{%- include 'flashed_messages.html' -%}
 {% endif %}

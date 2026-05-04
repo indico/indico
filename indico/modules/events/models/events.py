@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 import pytz
 from flask import has_request_context, render_template, session
 from markupsafe import Markup
-from sqlalchemy import DDL, and_, or_, orm
+from sqlalchemy import DDL, and_, func, or_, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -24,7 +24,7 @@ from sqlalchemy.orm import column_property, joinedload
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
-from indico.core import signals
+from indico.core import db, signals
 from indico.core.config import config
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -40,6 +40,7 @@ from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkMixin
+from indico.modules.events.models.ratings import EventRating
 from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.persons import persons_settings
 from indico.modules.events.settings import (EventSettingProperty, event_contact_settings, event_core_settings,
@@ -74,8 +75,16 @@ class _EventSettingProperty(EventSettingProperty):
     attr = staticmethod(lambda x: x)
 
 
-class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
-            AttachedNotesMixin, PersonLinkMixin, db.Model):
+class Event(
+    SearchableTitleMixin,
+    DescriptionMixin,
+    LocationMixin,
+    ProtectionManagersMixin,
+    AttachedItemsMixin,
+    AttachedNotesMixin,
+    PersonLinkMixin,
+    db.Model,
+):
     """An Indico event.
 
     This model contains the most basic information related to an event.
@@ -103,66 +112,45 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        return (db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
-                db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
-                db.Index('ix_events_not_deleted_category', cls.is_deleted, cls.category_id),
-                db.Index('ix_events_not_deleted_category_dates',
-                         cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
-                db.Index('ix_uq_events_url_shortcut', db.func.lower(cls.url_shortcut), unique=True,
-                         postgresql_where=db.text('NOT is_deleted')),
-                db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
-                db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
-                                   'valid_stylesheet'),
-                db.CheckConstraint('end_dt >= start_dt', 'valid_dates'),
-                db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
-                db.CheckConstraint('cloned_from_id != id', 'not_cloned_from_self'),
-                db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
-                db.CheckConstraint('is_deleted OR category_id IS NOT NULL OR protection_mode = 1',
-                                   'unlisted_events_always_inherit'),
-                {'schema': 'events'})
+        return (
+            db.Index('ix_events_start_dt_desc', cls.start_dt.desc()),
+            db.Index('ix_events_end_dt_desc', cls.end_dt.desc()),
+            db.Index('ix_events_not_deleted_category', cls.is_deleted, cls.category_id),
+            db.Index('ix_events_not_deleted_category_dates', cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
+            db.Index(
+                'ix_uq_events_url_shortcut',
+                db.func.lower(cls.url_shortcut),
+                unique=True,
+                postgresql_where=db.text('NOT is_deleted'),
+            ),
+            db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
+            db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')", 'valid_stylesheet'),
+            db.CheckConstraint('end_dt >= start_dt', 'valid_dates'),
+            db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
+            db.CheckConstraint('cloned_from_id != id', 'not_cloned_from_self'),
+            db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
+            db.CheckConstraint(
+                'is_deleted OR category_id IS NOT NULL OR protection_mode = 1', 'unlisted_events_always_inherit'
+            ),
+            {'schema': 'events'},
+        )
 
     @declared_attr
     def __table_args__(cls):
         return auto_table_args(cls)
 
     #: The ID of the event
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
     #: If the event has been deleted
-    is_deleted: t.Any = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
+    is_deleted: t.Any = db.Column(db.Boolean, nullable=False, default=False)
     #: If the event is locked (read-only mode)
-    is_locked = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
+    is_locked = db.Column(db.Boolean, nullable=False, default=False)
     #: The ID of the user who created the event
-    creator_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
-        nullable=False,
-        index=True
-    )
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.users.id'), nullable=False, index=True)
     #: The ID of immediate parent category of the event
-    category_id = db.Column(
-        db.Integer,
-        db.ForeignKey('categories.categories.id'),
-        nullable=True,
-        index=True
-    )
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.categories.id'), nullable=True, index=True)
     #: The ID of the series this events belongs to
-    series_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.series.id'),
-        nullable=True,
-        index=True
-    )
+    series_id = db.Column(db.Integer, db.ForeignKey('events.series.id'), nullable=True, index=True)
     #: If this event was cloned, the id of the parent event
     cloned_from_id = db.Column(
         db.Integer,
@@ -171,52 +159,24 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         index=True,
     )
     #: The ID of the label assigned to the event
-    label_id = db.Column(
-        db.ForeignKey('events.labels.id'),
-        index=True,
-        nullable=True
-    )
+    label_id = db.Column(db.ForeignKey('events.labels.id'), index=True, nullable=True)
     label_message = db.Column(
         db.Text,
         nullable=False,
         default='',
     )
     #: The creation date of the event
-    created_dt = db.Column(
-        UTCDateTime,
-        nullable=False,
-        index=True,
-        default=now_utc
-    )
+    created_dt = db.Column(UTCDateTime, nullable=False, index=True, default=now_utc)
     #: The start date of the event
-    start_dt = db.Column(
-        UTCDateTime,
-        nullable=False,
-        index=True
-    )
+    start_dt = db.Column(UTCDateTime, nullable=False, index=True)
     #: The end date of the event
-    end_dt = db.Column(
-        UTCDateTime,
-        nullable=False,
-        index=True
-    )
+    end_dt = db.Column(UTCDateTime, nullable=False, index=True)
     #: The timezone of the event
-    timezone = db.Column(
-        db.String,
-        nullable=False
-    )
+    timezone = db.Column(db.String, nullable=False)
     #: The type of the event
-    _type = db.Column(
-        'type',
-        PyIntEnum(EventType),
-        nullable=False
-    )
+    _type = db.Column('type', PyIntEnum(EventType), nullable=False)
     #: The visibility depth in category overviews
-    visibility = db.Column(
-        db.Integer,
-        nullable=True,
-        default=None
-    )
+    visibility = db.Column(db.Integer, nullable=True, default=None)
     #: A list of tags/keywords for the event
     keywords = db.Column(
         ARRAY(db.String),
@@ -224,81 +184,37 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         default=[],
     )
     #: The URL shortcut for the event
-    url_shortcut = db.Column(
-        db.String,
-        nullable=True
-    )
+    url_shortcut = db.Column(db.String, nullable=True)
     #: The metadata of the logo (hash, size, filename, content_type)
-    logo_metadata = db.Column(
-        JSONB,
-        nullable=False,
-        default=lambda: None
-    )
+    logo_metadata = db.Column(JSONB, nullable=False, default=lambda: None)
     #: The logo's raw image data
-    logo = db.deferred(db.Column(
-        db.LargeBinary,
-        nullable=True
-    ))
+    logo = db.deferred(db.Column(db.LargeBinary, nullable=True))
     #: The metadata of the stylesheet (hash, size, filename)
-    stylesheet_metadata = db.Column(
-        JSONB,
-        nullable=False,
-        default=lambda: None
-    )
+    stylesheet_metadata = db.Column(JSONB, nullable=False, default=lambda: None)
     #: The stylesheet's raw image data
-    stylesheet = db.deferred(db.Column(
-        db.Text,
-        nullable=True
-    ))
+    stylesheet = db.deferred(db.Column(db.Text, nullable=True))
     #: The ID of the event's default page (conferences only)
-    default_page_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.pages.id'),
-        index=True,
-        nullable=True
-    )
+    default_page_id = db.Column(db.Integer, db.ForeignKey('events.pages.id'), index=True, nullable=True)
     #: The url to a map for the event
-    own_map_url = db.Column(
-        'map_url',
-        db.String,
-        nullable=False,
-        default=''
-    )
+    own_map_url = db.Column('map_url', db.String, nullable=False, default='')
 
     #: The ID of the uploaded custom book of abstracts (if available)
-    custom_boa_id = db.Column(
-        db.Integer,
-        db.ForeignKey('indico.files.id'),
-        nullable=True
-    )
+    custom_boa_id = db.Column(db.Integer, db.ForeignKey('indico.files.id'), nullable=True)
     #: The protection setting for speaker submissions
-    subcontrib_speakers_can_submit = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=True
-    )
+    subcontrib_speakers_can_submit = db.Column(db.Boolean, nullable=False, default=True)
 
     #: The last user-friendly registration ID
-    _last_friendly_registration_id = db.deferred(db.Column(
-        'last_friendly_registration_id',
-        db.Integer,
-        nullable=False,
-        default=0
-    ))
+    _last_friendly_registration_id = db.deferred(
+        db.Column('last_friendly_registration_id', db.Integer, nullable=False, default=0)
+    )
     #: The last user-friendly contribution ID
-    _last_friendly_contribution_id = db.deferred(db.Column(
-        'last_friendly_contribution_id',
-        db.Integer,
-        nullable=False,
-        default=0
-    ))
+    _last_friendly_contribution_id = db.deferred(
+        db.Column('last_friendly_contribution_id', db.Integer, nullable=False, default=0)
+    )
     #: The last user-friendly session ID
-    _last_friendly_session_id = db.deferred(db.Column(
-        'last_friendly_session_id',
-        db.Integer,
-        nullable=False,
-        default=0
-    ))
+    _last_friendly_session_id = db.deferred(
+        db.Column('last_friendly_session_id', db.Integer, nullable=False, default=0)
+    )
 
     #: The category containing the event
     category = db.relationship(
@@ -308,28 +224,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             'events',
             primaryjoin='(Category.id == Event.category_id) & ~Event.is_deleted',
             order_by=(start_dt, id),
-            lazy=True
-        )
+            lazy=True,
+        ),
     )
     #: The user who created the event
-    creator = db.relationship(
-        'User',
-        lazy=True,
-        backref=db.backref(
-            'created_events',
-            lazy='dynamic'
-        )
-    )
+    creator = db.relationship('User', lazy=True, backref=db.backref('created_events', lazy='dynamic'))
     #: The event this one was cloned from
     cloned_from = db.relationship(
-        'Event',
-        lazy=True,
-        remote_side='Event.id',
-        backref=db.backref(
-            'clones',
-            lazy=True,
-            order_by=start_dt
-        )
+        'Event', lazy=True, remote_side='Event.id', backref=db.backref('clones', lazy=True, order_by=start_dt)
     )
     #: The event's default page (conferences only)
     default_page = db.relationship(
@@ -339,24 +241,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         post_update=True,
         # don't use this backref. we just need it so SA properly NULLs
         # this column when deleting the default page
-        backref=db.backref('_default_page_of_event', lazy=True)
+        backref=db.backref('_default_page_of_event', lazy=True),
     )
     #: The ACL entries for the event
-    acl_entries = db.relationship(
-        'EventPrincipal',
-        backref='event',
-        cascade='all, delete-orphan',
-        collection_class=set
-    )
+    acl_entries = db.relationship('EventPrincipal', backref='event', cascade='all, delete-orphan', collection_class=set)
     #: External references associated with this event
     references = db.relationship(
-        'EventReference',
-        lazy=True,
-        cascade='all, delete-orphan',
-        backref=db.backref(
-            'event',
-            lazy=True
-        )
+        'EventReference', lazy=True, cascade='all, delete-orphan', backref=db.backref('event', lazy=True)
     )
     #: The series this event is part of
     series = db.relationship(
@@ -367,34 +258,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             lazy=True,
             order_by=(start_dt, id),
             primaryjoin='(Event.series_id == EventSeries.id) & ~Event.is_deleted',
-        )
+        ),
     )
     #: The label assigned to the event
-    label = db.relationship(
-        'EventLabel',
-        lazy=True,
-        backref=db.backref(
-            'events',
-            lazy=True
-        )
-    )
+    label = db.relationship('EventLabel', lazy=True, backref=db.backref('events', lazy=True))
     #: The custom book of abstracts
-    custom_boa = db.relationship(
-        'File',
-        lazy=True,
-        backref=db.backref(
-            'custom_boa_of',
-            lazy=True
-        )
-    )
+    custom_boa = db.relationship('File', lazy=True, backref=db.backref('custom_boa_of', lazy=True))
     #: The current pending move request
     pending_move_request = db.relationship(
         'EventMoveRequest',
         lazy=True,
         viewonly=True,
         uselist=False,
-        primaryjoin=lambda: db.and_(EventMoveRequest.event_id == Event.id,
-                                    EventMoveRequest.state == MoveRequestState.pending)
+        primaryjoin=lambda: db.and_(
+            EventMoveRequest.event_id == Event.id, EventMoveRequest.state == MoveRequestState.pending
+        ),
     )
 
     # relationship backrefs:
@@ -479,6 +357,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                              category id
         """
         from indico.modules.categories import Category
+
         if not isinstance(category_ids, (list, tuple, set)):
             category_ids = [category_ids]
         cte = Category.get_subtree_ids_cte(category_ids)
@@ -491,9 +370,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         the specified category.
         """
         cte = Category.get_visible_categories_cte(category_id)
-        return (db.exists(db.select([1]))
-                .where(db.and_(cte.c.id == Event.category_id,
-                               db.or_(Event.visibility.is_(None), Event.visibility > cte.c.level))))
+        return db.exists(db.select([1])).where(
+            db.and_(cte.c.id == Event.category_id, db.or_(Event.visibility.is_(None), Event.visibility > cte.c.level))
+        )
 
     @property
     def event(self):
@@ -511,6 +390,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def theme(self):
         from indico.modules.events.layout import layout_settings, theme_settings
+
         theme = layout_settings.get(self, 'timetable_theme')
         if theme and theme in theme_settings.get_themes_for(self.type):
             return theme
@@ -531,8 +411,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def external_signed_logo_url(self):
-        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'],
-                       token=secure_serializer.dumps(self.id, salt='event-logo-download'), _external=True)
+        return url_for(
+            'event_images.logo_display',
+            self,
+            slug=self.logo_metadata['hash'],
+            token=secure_serializer.dumps(self.id, salt='event-logo-download'),
+            _external=True,
+        )
 
     @property
     def participation_regform(self):
@@ -541,12 +426,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @memoize_request
     def get_published_registrations(self, user):
         from indico.modules.events.registration.util import get_published_registrations
+
         is_participant = self.is_user_registered(user)
         return get_published_registrations(self, is_participant)
 
     @memoize_request
     def count_hidden_registrations(self, user):
         from indico.modules.events.registration.util import count_hidden_registrations
+
         is_participant = self.is_user_registered(user)
         return count_hidden_registrations(self, is_participant)
 
@@ -648,6 +535,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def editable_types(self):
         from indico.modules.events.editing.settings import editing_settings
+
         return editing_settings.get(self, 'editable_types')
 
     @property
@@ -753,6 +641,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def can_generate_attachment_package(self, user):
         """Check whether the user can generate an attachment package."""
         from indico.modules.attachments.util import can_generate_attachment_package
+
         return can_generate_attachment_package(self, user)
 
     @materialize_iterable()
@@ -783,20 +672,33 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             return {'first': None, 'last': None, 'prev': None, 'next': None}
         else:
             category_filters = [Event.category_id == self.category_id]
-        subquery = (select([Event.id,
-                            db.func.first_value(Event.id).over(order_by=(Event.start_dt, Event.id)).label('first'),
-                            db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
-                                                              range_=(None, None)).label('last'),
-                            db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
-                            db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
-                    .where(db.and_(*category_filters,
-                                   ~Event.is_deleted,
-                                   (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id))))
-                    .alias())
-        rv = (db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
-              .filter(subquery.c.id == self.id)
-              .one()
-              ._asdict())
+        subquery = (
+            select(
+                [
+                    Event.id,
+                    db.func.first_value(Event.id).over(order_by=(Event.start_dt, Event.id)).label('first'),
+                    db.func.last_value(Event.id)
+                    .over(order_by=(Event.start_dt, Event.id), range_=(None, None))
+                    .label('last'),
+                    db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
+                    db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next'),
+                ]
+            )
+            .where(
+                db.and_(
+                    *category_filters,
+                    ~Event.is_deleted,
+                    (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id)),
+                )
+            )
+            .alias()
+        )
+        rv = (
+            db.session.query(subquery.c.first, subquery.c.last, subquery.c.prev, subquery.c.next)
+            .filter(subquery.c.id == self.id)
+            .one()
+            ._asdict()
+        )
         if rv['first'] == self.id:
             rv['first'] = None
         if rv['last'] == self.id:
@@ -830,6 +732,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def is_not_happening(self):
         return self.label is not None and self.label.is_event_not_happening
 
+    def get_average_rating(self):
+        avg = db.session.query(func.avg(EventRating.rating)).filter(EventRating.event_id == self.id).scalar()
+        return float(avg) if avg is not None else None
+
+    def get_user_rating(self, user):
+        if not user:
+            return None
+        rating = EventRating.query.filter_by(event_id=self.id, user_id=user.id).first()
+        return rating.rating if rating else None
+
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
@@ -857,15 +769,26 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def get_session_block(self, id_, scheduled_only=False):
         """Get a session block of the event."""
         from indico.modules.events.sessions.models.blocks import SessionBlock
-        query = SessionBlock.query.filter(SessionBlock.id == id_,
-                                          SessionBlock.session.has(event=self, is_deleted=False))
+
+        query = SessionBlock.query.filter(
+            SessionBlock.id == id_, SessionBlock.session.has(event=self, is_deleted=False)
+        )
         if scheduled_only:
             query.filter(SessionBlock.timetable_entry != None)  # noqa: E711
         return query.first()
 
-    def get_allowed_sender_emails(self, *, include_current_user=True, include_creator=True, include_managers=True,
-                                  include_contact=True, include_chairs=True, include_noreply=False, extra=None,
-                                  _for_sending=False):
+    def get_allowed_sender_emails(
+        self,
+        *,
+        include_current_user=True,
+        include_creator=True,
+        include_managers=True,
+        include_contact=True,
+        include_chairs=True,
+        include_noreply=False,
+        extra=None,
+        _for_sending=False,
+    ):
         """
         Return the emails of people who can be used as senders (or
         rather Reply-to contacts) in emails sent from within an event.
@@ -902,9 +825,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             emails[self.creator.email] = self.creator.full_name
         # Managers
         if include_managers:
-            emails.update((p.principal.email, p.principal.full_name)
-                          for p in self.acl_entries
-                          if p.type == PrincipalType.user and p.full_access)
+            emails.update(
+                (p.principal.email, p.principal.full_name)
+                for p in self.acl_entries
+                if p.type == PrincipalType.user and p.full_access
+            )
         # Chairs
         if include_chairs:
             emails.update((pl.email, pl.full_name) for pl in self.person_links if pl.email)
@@ -917,8 +842,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         # Sanitize and format emails
         emails = {
             email.strip().lower(): (
-                formataddr((name, email.strip().lower())) if _for_sending
-                else (f'{name} <{email}>' if name else email)
+                formataddr((name, email.strip().lower())) if _for_sending else (f'{name} <{email}>' if name else email)
             )
             for email, name in emails.items()
             if email and email.strip()
@@ -941,12 +865,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_feature(self, feature):
         """Check if a feature is enabled for the event."""
         from indico.modules.events.features.util import is_feature_enabled
+
         return is_feature_enabled(self, feature)
 
     @property
     @memoize_request
     def scheduled_notes(self):
         from indico.modules.events.notes.util import get_scheduled_notes
+
         return get_scheduled_notes(self)
 
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
@@ -974,8 +900,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         if self._logging_disabled:
             return
-        entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
-                              data=(data or {}), meta=(meta or {}))
+        entry = EventLogEntry(
+            user=user,
+            realm=realm,
+            kind=kind,
+            module=module,
+            type=type_,
+            summary=summary,
+            data=(data or {}),
+            meta=(meta or {}),
+        )
         self.log_entries.append(entry)
         return entry
 
@@ -1009,6 +943,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def move(self, category, *, log_meta=None):
         from indico.modules.events import EventLogRealm
         from indico.modules.logs import LogKind
+
         user = session.user if session else None
         if self.pending_move_request:
             self.pending_move_request.withdraw(user=user)
@@ -1020,22 +955,57 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
         if old_category:
-            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', user,
-                     data={'From': old_path, 'To': new_path}, meta=log_meta)
-            old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                             user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
-            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                         user, data={'From': old_path}, meta=log_meta)
+            self.log(
+                EventLogRealm.management,
+                LogKind.change,
+                'Category',
+                'Event moved',
+                user,
+                data={'From': old_path, 'To': new_path},
+                meta=log_meta,
+            )
+            old_category.log(
+                CategoryLogRealm.events,
+                LogKind.negative,
+                'Content',
+                f'Event moved out: "{self.title}"',
+                user,
+                data={'ID': self.id, 'To': new_path},
+                meta=log_meta,
+            )
+            category.log(
+                CategoryLogRealm.events,
+                LogKind.positive,
+                'Content',
+                f'Event moved in: "{self.title}"',
+                user,
+                data={'From': old_path},
+                meta=log_meta,
+            )
         else:
             notify_event_creation(self)
-            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', user,
-                     data={'To': new_path}, meta=log_meta)
-            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event published here: "{self.title}"',
-                         user, meta=log_meta)
+            self.log(
+                EventLogRealm.management,
+                LogKind.change,
+                'Category',
+                'Event published',
+                user,
+                data={'To': new_path},
+                meta=log_meta,
+            )
+            category.log(
+                CategoryLogRealm.events,
+                LogKind.positive,
+                'Content',
+                f'Event published here: "{self.title}"',
+                user,
+                meta=log_meta,
+            )
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger
         from indico.modules.logs import LogKind
+
         self.is_deleted = True
         if self.pending_move_request:
             self.pending_move_request.withdraw(user=user)
@@ -1044,12 +1014,19 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         logger.info('Event %r deleted [%s]', self, reason)
         self.log(EventLogRealm.event, LogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
         if self.category:
-            self.category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event deleted: "{self.title}"',
-                              user, data={'ID': self.id, 'Reason': reason})
+            self.category.log(
+                CategoryLogRealm.events,
+                LogKind.negative,
+                'Content',
+                f'Event deleted: "{self.title}"',
+                user,
+                data={'ID': self.id, 'Reason': reason},
+            )
 
     def restore(self, reason=None, user=None):
         from indico.modules.events import EventLogRealm, logger
         from indico.modules.logs import LogKind
+
         if not self.is_deleted:
             return
         self.is_deleted = False
@@ -1059,8 +1036,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         data = {'Reason': reason} if reason else None
         self.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event restored', user=user, data=data)
         if self.category:
-            self.category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event restored: "{self.title}"',
-                              user, data={'ID': self.id, 'Reason': reason})
+            self.category.log(
+                CategoryLogRealm.events,
+                LogKind.positive,
+                'Content',
+                f'Event restored: "{self.title}"',
+                user,
+                data={'ID': self.id, 'Reason': reason},
+            )
 
     def refresh_event_persons(self, *, notify=True):
         """Update the data for all EventPersons based on the linked Users.
@@ -1074,12 +1057,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @memoize_request
     def cfa(self):
         from indico.modules.events.abstracts.models.call_for_abstracts import CallForAbstracts
+
         return CallForAbstracts(self)
 
     @property
     @memoize_request
     def cfp(self):
         from indico.modules.events.papers.models.call_for_papers import CallForPapers
+
         return CallForPapers(self)
 
     @property
@@ -1089,14 +1074,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def session_block_count(self):
         from indico.modules.events.sessions.models.blocks import SessionBlock
-        return (SessionBlock.query
-                .filter(SessionBlock.session.has(event=self, is_deleted=False),
-                        SessionBlock.timetable_entry != None)  # noqa: E711
-                .count())
+
+        return SessionBlock.query.filter(
+            SessionBlock.session.has(event=self, is_deleted=False), SessionBlock.timetable_entry != None
+        ).count()
 
     def __repr__(self):
-        return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
-                           _text=text_to_repr(self.title, max_length=75))
+        return format_repr(
+            self,
+            'id',
+            'start_dt',
+            'end_dt',
+            is_deleted=False,
+            is_locked=False,
+            _text=text_to_repr(self.title, max_length=75),
+        )
 
     def is_user_registered(self, user):
         """Check whether the user is registered in the event.
@@ -1105,46 +1097,59 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+
         if user is None:
             return False
-        return (Registration.query.with_parent(self)
-                .join(Registration.registration_form)
-                .filter(Registration.user == user,
-                        Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
-                        ~Registration.is_deleted,
-                        ~RegistrationForm.is_deleted)
-                .has_rows())
+        return (
+            Registration.query.with_parent(self)
+            .join(Registration.registration_form)
+            .filter(
+                Registration.user == user,
+                Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                ~Registration.is_deleted,
+                ~RegistrationForm.is_deleted,
+            )
+            .has_rows()
+        )
 
     def is_user_speaker(self, user):
         from indico.modules.events.contributions import Contribution
         from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
         from indico.modules.events.contributions.models.subcontributions import SubContribution
         from indico.modules.events.models.persons import EventPerson
+
         if user is None:
             return False
-        return (EventPerson.query
-                .with_parent(self)
-                .with_parent(user)
-                .filter(or_(
-                    EventPerson.contribution_links.any(and_(
-                        ContributionPersonLink.is_speaker,
-                        ContributionPersonLink.contribution.has(~Contribution.is_deleted)
-                    )),
-                    EventPerson.subcontribution_links.any(
-                        SubContributionPersonLink.subcontribution.has(and_(
-                            ~SubContribution.is_deleted,
-                            SubContribution.contribution.has(~Contribution.is_deleted)
-                        ))
+        return (
+            EventPerson.query.with_parent(self)
+            .with_parent(user)
+            .filter(
+                or_(
+                    EventPerson.contribution_links.any(
+                        and_(
+                            ContributionPersonLink.is_speaker,
+                            ContributionPersonLink.contribution.has(~Contribution.is_deleted),
+                        )
                     ),
-                    EventPerson.event_links.any()
-                ))
-                .has_rows())
+                    EventPerson.subcontribution_links.any(
+                        SubContributionPersonLink.subcontribution.has(
+                            and_(
+                                ~SubContribution.is_deleted, SubContribution.contribution.has(~Contribution.is_deleted)
+                            )
+                        )
+                    ),
+                    EventPerson.event_links.any(),
+                )
+            )
+            .has_rows()
+        )
 
     @property
     def supported_languages(self):
         locales = get_all_locales()
-        supported_locales = [locales.get(code, ('', '', False)) for code in self.supported_locales
-                             if code != self.default_locale]
+        supported_locales = [
+            locales.get(code, ('', '', False)) for code in self.supported_locales if code != self.default_locale
+        ]
         return [f'{name} ({territory})' if territory else name for name, territory, __ in supported_locales]
 
     @property
@@ -1181,6 +1186,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_receipt_templates(self):
         """Check if the event has any receipt document templates."""
         from indico.modules.receipts.util import has_any_templates
+
         return has_any_templates(self)
 
     @property
@@ -1212,35 +1218,52 @@ def _mappers_configured():
     # Event.effective_protection_mode -- the effective protection mode
     # (public/protected) of the event, even if it's inheriting it from its
     # parent category
-    query = (select([db.case({ProtectionMode.inheriting.value: Category.effective_protection_mode},
-                             else_=Event.protection_mode, value=Event.protection_mode)])
-             .where(Category.id == Event.category_id)
-             .correlate(Event)
-             .scalar_subquery())
+    query = (
+        select(
+            [
+                db.case(
+                    {ProtectionMode.inheriting.value: Category.effective_protection_mode},
+                    else_=Event.protection_mode,
+                    value=Event.protection_mode,
+                )
+            ]
+        )
+        .where(Category.id == Event.category_id)
+        .correlate(Event)
+        .scalar_subquery()
+    )
     Event.effective_protection_mode = column_property(query, deferred=True)
 
     # Event.series_pos -- the position of the event in its series
-    subquery = (select([event_alias.id,
-                        db.func.row_number().over(order_by=(event_alias.start_dt, event_alias.id)).label('pos')])
-                .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
-                .correlate(Event)
-                .alias())
+    subquery = (
+        select(
+            [event_alias.id, db.func.row_number().over(order_by=(event_alias.start_dt, event_alias.id)).label('pos')]
+        )
+        .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
+        .correlate(Event)
+        .alias()
+    )
     query = select([subquery.c.pos]).where(subquery.c.id == Event.id).correlate_except(subquery).scalar_subquery()
     Event.series_pos = column_property(query, group='series', deferred=True)
 
     # Event.series_count -- the number of events in the event's series
-    query = (db.select([db.func.count(event_alias.id)])
-             .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
-             .correlate_except(event_alias)
-             .scalar_subquery())
+    query = (
+        db.select([db.func.count(event_alias.id)])
+        .where((event_alias.series_id == Event.series_id) & ~event_alias.is_deleted)
+        .correlate_except(event_alias)
+        .scalar_subquery()
+    )
     Event.series_count = column_property(query, group='series', deferred=True)
 
     # Event.contributions_count -- the number of contributions in the event
     from indico.modules.events.contributions.models.contributions import Contribution
-    query = (db.select([db.func.count(Contribution.id)])
-             .where((Contribution.event_id == Event.id) & ~Contribution.is_deleted)
-             .correlate_except(Contribution)
-             .scalar_subquery())
+
+    query = (
+        db.select([db.func.count(Contribution.id)])
+        .where((Contribution.event_id == Event.id) & ~Contribution.is_deleted)
+        .correlate_except(Contribution)
+        .scalar_subquery()
+    )
     Event.contributions_count = db.column_property(query, deferred=True)
 
 
@@ -1248,6 +1271,7 @@ def _mappers_configured():
 @listens_for(Event.end_dt, 'set')
 def _set_start_end_dt(target, value, oldvalue, *unused):
     from indico.modules.events.util import register_event_time_change
+
     if oldvalue in (NEVER_SET, NO_VALUE):
         return
     if value != oldvalue:

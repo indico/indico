@@ -10,26 +10,31 @@ from io import BytesIO
 from flask import jsonify, redirect, request, session
 from webargs import fields
 
+from indico.core.db import db
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_ical
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.management.settings import privacy_settings
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import Event, EventType
+from indico.modules.events.models.ratings import EventRating
 from indico.modules.events.settings import autolinker_settings
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
-from indico.web.rh import RHProtected, allow_signed_url
+from indico.web.rh import RH, RHProtected, allow_signed_url
 
 
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
-    @use_kwargs({
-        'scope': fields.Enum(CalendarScope, load_default=None),
-        'detail': fields.String(load_default=None),
-        'series': fields.Boolean(load_default=False)  # Export the full event series
-    }, location='query')
+    @use_kwargs(
+        {
+            'scope': fields.Enum(CalendarScope, load_default=None),
+            'detail': fields.String(load_default=None),
+            'series': fields.Boolean(load_default=False),  # Export the full event series
+        },
+        location='query',
+    )
     def _process(self, scope, detail, series):
         if not scope and detail == 'contributions':
             scope = CalendarScope.contribution
@@ -39,6 +44,24 @@ class RHExportEventICAL(RHDisplayEventBase):
         else:
             events_ical = events_to_ical(self.event.series.events, session.user, scope)
             return send_file('event-series.ics', BytesIO(events_ical), 'text/calendar')
+
+
+class RHRateEvent(RH):
+    def _process(self):
+        event_id = request.view_args['event_id']
+        rating = request.view_args['rating']
+
+        event = Event.get_or_404(event_id)
+
+        existing = EventRating.query.filter_by(event_id=event.id, user_id=session.user.id).first()
+
+        if existing:
+            existing.rating = rating
+        else:
+            db.session.add(EventRating(event_id=event.id, user_id=session.user.id, rating=rating))
+
+        db.session.flush()
+        return redirect(event.url)
 
 
 class RHDisplayEvent(RHDisplayEventBase):
@@ -59,9 +82,9 @@ class RHDisplayEvent(RHDisplayEventBase):
             if self.theme_override:
                 return redirect(url_for('timetable.timetable', self.event, view=self.theme_id))
             elif (
-                not self.force_overview and
-                self.event.default_page and
-                self.event.default_page.menu_entry.can_access(session.user)
+                not self.force_overview
+                and self.event.default_page
+                and self.event.default_page.menu_entry.can_access(session.user)
             ):
                 return self._display_conference_page()
             else:
@@ -97,7 +120,7 @@ class RHDisplayPrivacyPolicy(RHDisplayEventBase):
         return self.view_class.render_template(
             'privacy_policy.html' if request.is_xhr else 'privacy.html',
             self.event,
-            privacy_info=privacy_settings.get_all(self.event)
+            privacy_info=privacy_settings.get_all(self.event),
         )
 
 

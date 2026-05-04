@@ -380,3 +380,33 @@ input[type='submit']::-moz-focus-inner,
 input[type='reset']::-moz-focus-inner {
   border: 0 none !important;
 }
+
+
+// Copyright (C) 2026 Nick Hoitink
+.event-rating-stars {
+  display: inline-flex;
+  flex-direction: row-reverse; // 👈 key trick
+}
+
+.event-rating-stars a {
+  font-size: 18px;
+  text-decoration: none;
+}
+
+/* Hover effect (preview) */
+.event-rating-stars a:hover,
+.event-rating-stars a:hover ~ a {
+  color: #fad74c !important;
+}
+
+/* Saved rating */
+.event-rating-stars a.filled {
+  color: #fad74c !important;
+}
+
+.event-rating-stars a.i-button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px 6px;
+}

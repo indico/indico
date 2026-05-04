@@ -13,7 +13,7 @@ from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerC
 from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
-                                                       RHExportEventICAL)
+                                                       RHExportEventICAL, RHRateEvent)
 from indico.modules.events.controllers.entry import event_or_shorturl
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -51,6 +51,7 @@ _bp.add_url_rule('/api/autolinker-rules', 'autolinker_rules', RHAutoLinkerRules)
 
 # Event ICS/iCal
 _bp.add_url_rule('/event/<int:event_id>/event.ics', 'export_event_ical', RHExportEventICAL)
+_bp.add_url_rule('/event/<int:event_id>/rate/<int:rating>', 'rate_event', RHRateEvent, methods=('GET',))
 
 # Creation
 _bp.add_url_rule('/event/create/<any(lecture,meeting,conference):event_type>', 'create', RHCreateEvent,
