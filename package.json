@@ -149,7 +149,7 @@
     "monaco-editor-webpack-plugin": "^7.1.0",
     "node-glob": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "postcss": "^8.4.14",
+    "postcss": "^8.5.13",
     "postcss-loader": "^8.1.1",
     "postcss-scss": "^4.0.4",
     "postcss-url": "^10.1.3",
