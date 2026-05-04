@@ -235,14 +235,15 @@ def _load_plugin_config_defaults(plugin_names):
         except Exception as exc:
             warnings.warn(f'Could not load plugin entry-point {ep.name!r}: {exc}', stacklevel=2)
             continue
-        defaults = getattr(plugin_class, 'plugin_config_defaults', None) or {}
+        defaults = plugin_class.plugin_config_defaults
         prefix = ep.name.upper()
         for key, value in defaults.items():
             full = f'{prefix}_{key}'
             if full in DEFAULTS:
-                warnings.warn(f'Plugin {ep.name!r} config key {full!r} collides with a core config key',
-                              stacklevel=2)
-            elif full in result:
+                warnings.warn(f'Plugin {ep.name!r} config key {full!r} collides with a core config key; '
+                              f'plugin default ignored', stacklevel=2)
+                continue
+            if full in result:
                 warnings.warn(f'Plugin {ep.name!r} config key {full!r} collides with another plugin',
                               stacklevel=2)
             result[full] = value
