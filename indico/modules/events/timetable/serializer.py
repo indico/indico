@@ -283,6 +283,7 @@ def serialize_event_info(event, *, user=None):
             'title': event.title,
             'start_dt_local': event.start_dt_local.isoformat(),
             'end_dt_local': event.end_dt_local.isoformat(),
+            'timezone': event.timezone,
             'type': event.type,
             'is_draft': should_show_draft_warning(event),
             'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
