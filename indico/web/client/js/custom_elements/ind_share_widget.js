@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import urlQrCodeImage from 'indico-url:events.url_qr_code_image';
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
 import _ from 'lodash';
@@ -22,6 +23,8 @@ import {
   Grid,
   GridColumn,
   Message,
+  Menu,
+  Dropdown,
 } from 'semantic-ui-react';
 
 import {FinalInput, handleSubmitError} from 'indico/react/forms';
@@ -30,8 +33,14 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function CopyToClipboard({eventUrl}) {
+function CopyToClipboardAndQR({eventUrl, eventId}) {
   const [isCopied, setCopied] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+
+  const qrUrlImage = urlQrCodeImage({
+    event_id: eventId,
+  });
+
   useEffect(() => {
     if (isCopied) {
       const timer = setTimeout(() => setCopied(false), 2000);
@@ -40,8 +49,16 @@ function CopyToClipboard({eventUrl}) {
   }, [isCopied]);
 
   return (
-    <Input
-      label={
+    <div styleName="copy-to-clipboard-container">
+      <div>
+        <Input
+          labelPosition="right"
+          defaultValue={eventUrl}
+          readOnly
+          // fluid
+        />
+        <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
+
         <Button
           icon={isCopied ? 'check' : 'copy'}
           positive={isCopied}
@@ -49,20 +66,53 @@ function CopyToClipboard({eventUrl}) {
             navigator.clipboard.writeText(eventUrl);
             setCopied(true);
           }}
-          content={isCopied ? Translate.string('Copied!') : Translate.string('Copy Link')}
+          content={isCopied ? Translate.string('Copied!') : Translate.string('Copy')}
         />
-      }
-      labelPosition="right"
-      defaultValue={eventUrl}
-      readOnly
-      fluid
-    />
+      </div>
+      {showQR && (
+        <div styleName="qr-code-container">
+          <img styleName="qr-code-img" src={qrUrlImage} alt={Translate.string('QR Code')} />
+          <Menu compact>
+            <Dropdown icon="download" content={Translate.string('Download')}>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  icon="image"
+                  text={Translate.string('Download QR Code Image')}
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = qrUrlImage;
+                    link.download = 'qr-code.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          </Menu>
+        </div>
+      )}
+    </div>
   );
 }
 
-CopyToClipboard.propTypes = {
+CopyToClipboardAndQR.propTypes = {
   eventUrl: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
 };
+
+// function DisplayQR({eventId}) {
+
+//   return (
+//     <>
+
+//     </>
+//   );
+// }
+
+// DisplayQR.propTypes = {
+
+// };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
   const calendars = [
@@ -315,6 +365,7 @@ function ShareWidget({
   eventName,
   eventStartDt,
   eventUrl,
+  eventId,
   shareIcon,
   googleCalParams,
   outlookCalParams,
@@ -346,7 +397,10 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <CopyToClipboard eventUrl={eventUrl} />
+          <div>
+            <CopyToClipboardAndQR eventUrl={eventUrl} eventId={eventId} />
+            {/* <DisplayQR eventId={eventId} /> */}
+          </div>
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
@@ -382,6 +436,7 @@ ShareWidget.propTypes = {
   eventName: PropTypes.string.isRequired,
   eventStartDt: PropTypes.string.isRequired,
   eventUrl: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
   shareIcon: PropTypes.string.isRequired,
   googleCalParams: PropTypes.string.isRequired,
   outlookCalParams: PropTypes.string.isRequired,
@@ -396,6 +451,7 @@ customElements.define(
           eventName={this.getAttribute('event-name')}
           eventStartDt={this.getAttribute('event-start-dt')}
           eventUrl={this.getAttribute('event-url')}
+          eventId={this.getAttribute('event-id')}
           shareIcon={this.getAttribute('share-icon')}
           googleCalParams={this.getAttribute('google-cal-params')}
           outlookCalParams={this.getAttribute('outlook-cal-params')}

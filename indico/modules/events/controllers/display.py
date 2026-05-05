@@ -7,7 +7,11 @@
 
 from io import BytesIO
 
+import qrcode
 from flask import jsonify, redirect, request, session
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.colormasks import SolidFillColorMask
+from qrcode.image.styles.moduledrawers.pil import SquareModuleDrawer
 from webargs import fields
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
@@ -106,3 +110,36 @@ class RHAutoLinkerRules(RHProtected):
 
     def _process(self):
         return jsonify(autolinker_settings.get_all())
+
+
+class RHTQRCodeImage(RHDisplayEventBase):
+    """Display QRCode for event URL."""
+
+    def _process(self):
+        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
+        qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=15, border=4)
+
+        print('--------------------')
+        print(self.event.url)
+        print(self.event.external_url)
+        print(self.event.short_url)
+        print(self.event.short_external_url)
+        print('--------------------')
+
+        qr.add_data(self.event.external_url)  # short_external_url
+        qr.make(fit=True)
+
+        qr_img = qr.make_image(
+            image_factory=StyledPilImage,
+            module_drawer=SquareModuleDrawer(),
+            embeded_image_ratio=0.25,
+            color_mask=SolidFillColorMask(back_color=(255, 255, 255), front_color=(0, 0, 0)),
+            # embeded_image_path=f'{config.IMAGES_BASE_URL}/logo_indico_small_white_bg.png',
+             embeded_image_path='indico/web/static/images/logo_indico_small_white_bg.png'
+        )
+
+        output = BytesIO()
+        qr_img.save(output)
+        output.seek(0)
+
+        return send_file('qrcode.png', output, 'image/png')
