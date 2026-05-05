@@ -69,6 +69,20 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         logger.info('Section %s deleted by %s', self.section, session.user)
         return jsonify(success=True)
 
+    def _check_field_condition_relations(self):
+        # Check that no field in this section is conditionally shown
+        if any(field.show_if_id is not None for field in self.section.children if not field.is_deleted):
+            raise ValidationError('Sections with conditional fields cannot be made manager-only')
+        # Check no conditional fields depend on this section if it is becoming manager-only now
+        critical_fields_ids = {field.id for field in self.section.children if not field.is_deleted}
+        for section in self.regform.sections:
+            if section.is_deleted:
+                continue
+            fields_ids = {field.show_if_id for field in section.children
+                            if field.show_if_id is not None and not field.is_deleted}
+            if critical_fields_ids & fields_ids:
+                raise ValidationError('Cannot make section manager-only due to conditional field relations')
+
     def _process_PATCH(self):
         changes = request.json['changes']
         if set(changes.keys()) > {'title', 'description', 'is_manager_only'}:
@@ -77,18 +91,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             raise BadRequest
         changes = self.section.populate_from_dict(changes)
         if changes.get('is_manager_only') == (False, True):
-            # Check that no field in this section is conditionally shown
-            if any(field.show_if_id is not None for field in self.section.children if not field.is_deleted):
-                raise ValidationError('Sections with conditional fields cannot be made manager-only')
-            # Check no conditional fields depend on this section if it is becoming manager-only now
-            critical_fields_ids = {field.id for field in self.section.children if not field.is_deleted}
-            for section in self.regform.sections:
-                if section.is_deleted:
-                    continue
-                fields_ids = {field.show_if_id for field in section.children
-                              if field.show_if_id is not None and not field.is_deleted}
-                if critical_fields_ids & fields_ids:
-                    raise ValidationError('Cannot make section manager-only due to conditional field relations')
+            self._check_field_condition_relations()
         db.session.flush()
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
