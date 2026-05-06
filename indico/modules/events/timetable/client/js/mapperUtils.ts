@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {ISO_8601} from 'moment';
+import moment from 'moment';
 
 import {Entry, EntryType, LocationData, PersonLink, Session} from './types';
 import {getEntryUniqueId} from './utils';
