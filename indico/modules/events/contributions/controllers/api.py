@@ -47,11 +47,8 @@ class RHAPIMyContributions(RHDisplayProtectionBase):
             if not added and contrib.can_manage(session.user, 'submit', allow_admin=False, check_parent=False):
                 categorized['submitter'].add(contrib)
 
-        return jsonify({
-            category: UserContributionSchema(
-                context={'user': session.user}, many=True
-            ).dump(contributions) for category, contributions in categorized.items()
-        })
+        schema = UserContributionSchema(context={'user': session.user}, many=True)
+        return jsonify({category: schema.dump(contributions) for category, contributions in categorized.items()})
 
 
 class RHFavoriteContributionsAPI(RHProtectedEventBase):
