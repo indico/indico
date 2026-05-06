@@ -136,6 +136,10 @@ export const getCustomContribFields = createSelector(
   getStaticData,
   staticData => staticData.customFields
 );
+export const getEventTimezone = createSelector(
+  getStaticData,
+  staticData => staticData.timezone
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt

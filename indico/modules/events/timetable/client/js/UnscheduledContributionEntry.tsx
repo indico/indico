@@ -51,6 +51,7 @@ export function DraggableUnscheduledContributionEntry({
   duration: number;
   sessionId?: number;
 }) {
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const droppableData = useDroppableData({id: 'calendar'});
 
   const draggableId = `unscheduled-${id}`;
@@ -89,7 +90,7 @@ export function DraggableUnscheduledContributionEntry({
       const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
       const startDt = moment(dt).startOf('day').add(start, 'minutes');
       const newEnd = moment(startDt).add(duration, 'minutes');
-      timeRange = formatTimeRange(moment.locale().replace('_', '-'), startDt, newEnd);
+      timeRange = formatTimeRange(moment.locale().replace('_', '-'), startDt, newEnd, eventTimezone);
     }
   }
 
