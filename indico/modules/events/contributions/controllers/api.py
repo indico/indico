@@ -67,10 +67,9 @@ class RHFavoriteContributionsAPI(RHProtectedEventBase):
 
     def _process_GET(self):
         if self.contribution is None:
-            return jsonify({
-                c.id: UserContributionSchema(exclude=('edit_url',)).dump(c)
-                for c in session.user.favorite_contributions if c.event_id == self.event.id and not c.is_deleted
-            })
+            favorites = Contribution.query.with_parent(session.user).with_parent(self.event).all()
+            schema = UserContributionSchema(exclude=('edit_url',))
+            return jsonify({c.id: schema.dump(c) for c in favorites})
         return jsonify(self.contribution in session.user.favorite_contributions)
 
     def _process_PUT(self):
