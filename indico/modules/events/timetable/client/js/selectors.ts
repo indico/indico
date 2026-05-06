@@ -76,6 +76,10 @@ export const getEventType = createSelector(
   getStaticData,
   staticData => staticData.eventType
 );
+export const getEventTimezone = createSelector(
+  getStaticData,
+  staticData => staticData.timezone
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt

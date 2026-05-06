@@ -180,6 +180,7 @@ export interface Entries {
 
 interface StaticData {
   eventId: number;
+  timezone: string;
   startDt: Moment;
   endDt: Moment;
   defaultContribDurationMinutes: number;

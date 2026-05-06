@@ -60,6 +60,7 @@ function EntryPopupContent({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const {objId, type, title, attachments, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const isPosterBlock = useSelector((state: ReduxState) =>
@@ -231,7 +232,7 @@ function EntryPopupContent({
         )}
         <List.Item title={Translate.string('Date and time')}>
           <Icon name="clock outline" />
-          {formatTimeRange('en', startTime, endTime)}
+          {formatTimeRange('en', startTime, endTime, eventTimezone)}
         </List.Item>
         {parent?.title && (
           <List.Item title={Translate.string('Session block title')}>

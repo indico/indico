@@ -109,6 +109,7 @@ export function DayTimetable({
   scrollPosition = 0,
 }: DayTimetableProps) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const mouseEventRef = useRef<MouseEvent | null>(null);
@@ -504,7 +505,8 @@ export function DayTimetable({
                   ? formatTimeRange(
                       'en',
                       draftEntry.startDt,
-                      moment(draftEntry.startDt).add(draftEntry.duration, 'minutes')
+                      moment(draftEntry.startDt).add(draftEntry.duration, 'minutes'),
+                      eventTimezone
                     )
                   : null}
               </div>
