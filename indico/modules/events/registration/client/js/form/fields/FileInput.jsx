@@ -14,7 +14,7 @@ import {useSelector} from 'react-redux';
 
 import {FinalSingleFileManager} from 'indico/react/components';
 
-import {getManagement, getUpdateMode} from '../../form_submission/selectors';
+import {getManagement} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
@@ -22,14 +22,13 @@ import './FileInput.module.scss';
 
 export default function FileInput({fieldId, htmlId, htmlName, disabled, isRequired}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
-  const isUpdateMode = useSelector(getUpdateMode);
   const isManagement = useSelector(getManagement);
   const [invitationToken, formToken] = useMemo(() => {
     const params = new URLSearchParams(location.search);
     return [params.get('invitation'), params.get('form_token')];
   }, []);
 
-  const initialFileDetails = isUpdateMode ? fileData[htmlName] || null : null;
+  const initialFileDetails = fileData ? fileData[htmlName] || null : null;
 
   const urlParams = {
     event_id: eventId,

@@ -21,6 +21,8 @@ Improvements
 - Add a "Code" (short name) to predefined affiliations (:pr:`7400`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
 - Track the last modified timestamp of registrations (:pr:`7478`, thanks :user:`jbtwist`)
+- Pre-fill the registration form picture field with the user's custom profile
+  picture when available (:pr:`7447`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -34,6 +36,7 @@ Bugfixes
   module (:pr:`7475`)
 - Fix date picker showing January instead of the selected month when the user
   language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
+- Do not show "Clone Abstract" icon outside management area (:pr:`7493`)
 
 Accessibility
 ^^^^^^^^^^^^^

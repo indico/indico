@@ -128,7 +128,7 @@ def kill_containers(containers: set[Container], *, warn: bool = False):
 
 
 @contextmanager
-def docker_postgresql() -> Iterator[str]:
+def docker_postgresql(extensions) -> Iterator[str]:
     """Docker-based PostgreSQL server.
 
     This fixture runs a PostgreSQL server in a Docker container for tests.
@@ -186,6 +186,8 @@ def docker_postgresql() -> Iterator[str]:
         # Run DB setup commands using the UNIX socket inside the container
         exec_in_container(container, ['psql', DB_NAME, '-U', 'postgres', '-c', 'CREATE EXTENSION unaccent;'])
         exec_in_container(container, ['psql', DB_NAME, '-U', 'postgres', '-c', 'CREATE EXTENSION pg_trgm;'])
+        for ext in extensions:
+            exec_in_container(container, ['psql', DB_NAME, '-U', 'postgres', '-c', f'CREATE EXTENSION {ext};'])
 
         yield f'postgresql://postgres:postgres@/{DB_NAME}?host={socket_dir}'
     finally:

@@ -33,7 +33,8 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
+from indico.modules.events.registration.constants import (PROFILE_PICTURE_SENTINEL, REGISTRATION_PICTURE_SIZE,
+                                                          REGISTRATION_PICTURE_THUMBNAIL_SIZE)
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
@@ -49,6 +50,7 @@ from indico.modules.events.registration.notifications import (notify_invitation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
+from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
@@ -198,7 +200,19 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
     return {'sections': section_data, 'items': item_data}
 
 
-def get_initial_form_values(regform, *, management=False):
+@make_interceptable
+def get_initial_form_values(regform, *, management=False, **kwargs):
+    """Return the initial values for registration form fields.
+
+    This function can be intercepted by plugins, which may extend or modify
+    the returned values using the provided keyword arguments.
+
+    :param regform: The ``RegistrationForm`` whose fields are being initialized.
+    :param management: If ``True``, include manager-only sections.
+    :param kwargs: Additional context passed to plugin hooks.
+    :returns: A dict mapping each field's ``html_field_name`` to its default
+            value in camelCase format.
+    """
     initial_values = {}
     for item in regform.active_fields:
         can_modify = management or not item.parent.is_manager_only
@@ -233,6 +247,9 @@ def get_user_data(regform, user, invitation=None):
 
     active_fields = {item.personal_data_type.name for item in regform.active_fields
                      if item.type == RegistrationFormItemType.field_pd}
+
+    if user and user.picture_source == ProfilePictureSource.custom and user.has_picture and 'picture' in active_fields:
+        user_data['picture'] = PROFILE_PICTURE_SENTINEL
 
     return {name: value for name, value in user_data.items() if name in active_fields}
 
@@ -1106,22 +1123,22 @@ def get_persons(registrations, include_accompanying_persons=False):
 
 
 @make_interceptable
-def process_registration_picture(source, *, thumbnail=False):
-    """Resize the picture to a maximum size and save it as JPEG."""
+def process_registration_picture(source, *, thumbnail=False, target_format='JPEG'):
+    """Resize the picture to a maximum size and save it in the target format."""
     max_size = REGISTRATION_PICTURE_THUMBNAIL_SIZE if thumbnail else REGISTRATION_PICTURE_SIZE
     try:
         picture = Image.open(source)
     except (OSError, Image.DecompressionBombError):
         return None
     picture = ImageOps.exif_transpose(picture)
-    if picture.mode != 'RGB':
+    if target_format == 'JPEG' and picture.mode != 'RGB':
         picture = picture.convert('RGB')
     size_x, size_y = picture.size
     if max(size_x, size_y) > max_size:
         ratio = max_size / max(size_x, size_y)
         picture = picture.resize((max(1, int(ratio * size_x)), max(1, int(ratio * size_y))), Image.Resampling.BICUBIC)
     image_bytes = BytesIO()
-    picture.save(image_bytes, 'JPEG')
+    picture.save(image_bytes, target_format)
     image_bytes.seek(0)
     return image_bytes
 

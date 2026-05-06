@@ -28,12 +28,16 @@ pytest_plugins = ('indico.testing.fixtures.abstract', 'indico.testing.fixtures.a
                   'indico.testing.fixtures.requests')
 
 
+def _get_ini_list_opt(config, key):
+    return [_f for _f in [x.strip() for x in re.split(r'[\s,;]+', config.getini(key))] if _f]
+
+
 def pytest_configure(config):
     # Load all the plugins defined in pytest_plugins
     config.pluginmanager.consider_module(sys.modules[__name__])
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
-    config.indico_plugins = [_f for _f in [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))]
-                             if _f]
+    config.indico_plugins = _get_ini_list_opt(config, 'indico_plugins')
+    config.indico_pg_extensions = _get_ini_list_opt(config, 'indico_pg_extensions')
     # Make sure we don't write any log files (or worse: send emails)
     assert not logging.root.handlers
     logging.root.addHandler(logging.NullHandler())
@@ -47,3 +51,4 @@ def pytest_unconfigure(config):
 
 def pytest_addoption(parser):
     parser.addini('indico_plugins', 'List of indico plugins to load')
+    parser.addini('indico_pg_extensions', 'List of postgres extensions to enable')

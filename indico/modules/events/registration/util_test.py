@@ -12,11 +12,13 @@ from pathlib import Path
 
 import pytest
 from flask import session
+from PIL import Image
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
@@ -25,8 +27,8 @@ from indico.modules.events.registration.util import (create_registration, get_ev
                                                      get_registered_event_persons, get_ticket_qr_code_data,
                                                      get_user_data, import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
-                                                     modify_registration)
-from indico.modules.users.models.users import UserTitle
+                                                     modify_registration, process_registration_picture)
+from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
 
@@ -752,6 +754,60 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
 
     assert get_user_data(dummy_regform, dummy_user) == {}
     assert get_user_data(dummy_regform, dummy_user, invitation) == {}
+
+
+def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):
+    img = Image.new('RGB', (100, 100), color=(200, 100, 50))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'JPEG')
+    dummy_user.picture = img_bytes.getvalue()
+    dummy_user.picture_metadata = {'hash': 0, 'size': len(dummy_user.picture), 'filename': 'test.jpg',
+                                   'content_type': 'image/jpeg',
+                                   'lastmod': 'Thu, 01 Jan 2026 00:00:00 GMT'}
+    dummy_user.picture_source = ProfilePictureSource.custom
+    db.session.flush()
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+
+    assert user_data.get('picture') == PROFILE_PICTURE_SENTINEL
+
+
+@pytest.mark.parametrize('source', (
+    pytest.param('standard', id='standard'),
+    pytest.param('identicon', id='identicon'),
+    pytest.param('gravatar', id='gravatar'),
+))
+def test_get_user_data_skips_picture_for_non_custom_source(dummy_regform, dummy_user, db, source):
+    img = Image.new('RGB', (100, 100), color=(200, 100, 50))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'JPEG')
+    dummy_user.picture = img_bytes.getvalue()
+    dummy_user.picture_metadata = {'hash': 0, 'size': len(dummy_user.picture), 'filename': 'test.jpg',
+                                   'content_type': 'image/jpeg',
+                                   'lastmod': 'Thu, 01 Jan 2026 00:00:00 GMT'}
+    dummy_user.picture_source = ProfilePictureSource[source]
+    db.session.flush()
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+
+    assert 'picture' not in user_data
+
+
+def test_get_user_data_skips_picture_when_no_profile_picture(dummy_regform, dummy_user):
+    assert dummy_user.picture_metadata is None
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'picture' not in user_data
+
+
+def test_process_registration_picture_png_format():
+    img = Image.new('RGBA', (100, 100), color=(200, 100, 50, 128))
+    img_bytes = BytesIO()
+    img.save(img_bytes, 'PNG')
+    img_bytes.seek(0)
+    result = process_registration_picture(img_bytes, target_format='PNG')
+    assert result is not None
+    result_img = Image.open(result)
+    assert result_img.format == 'PNG'
 
 
 @pytest.mark.parametrize(('url', 'ticket_uuid', 'person_id'), (

@@ -9,13 +9,17 @@ import re
 from calendar import monthrange
 from datetime import date, datetime
 from decimal import Decimal
+from io import BytesIO
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
 
+from indico.core.db import db
+from indico.modules.events.registration.constants import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
+from indico.modules.events.registration.util import process_registration_picture
 from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
@@ -476,7 +480,7 @@ class PictureField(FileField):
 
     def get_validators(self, existing_registration):
         def _picture_size_and_type(value):
-            if not value:
+            if not value or value == PROFILE_PICTURE_SENTINEL:
                 return
             file = File.query.filter(File.uuid == value, ~File.claimed).first()
             if not file:
@@ -494,7 +498,36 @@ class PictureField(FileField):
             if min_picture_size and min(pic.size) < min_picture_size:
                 raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
                                       .format(min_picture_size))
-        return [_picture_size_and_type, *super().get_validators(existing_registration)]
+
+        def _skip_sentinel(validator):
+            def _wrapped(value):
+                if value != PROFILE_PICTURE_SENTINEL:
+                    validator(value)
+            return _wrapped
+
+        return [_picture_size_and_type, *(_skip_sentinel(v) for v in super().get_validators(existing_registration))]
+
+    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
+        if value == PROFILE_PICTURE_SENTINEL:
+            value = self._create_file_from_profile_picture(registration.user)
+        return super().process_form_data(registration, value, old_data, billable_items_locked)
+
+    def _create_file_from_profile_picture(self, user):
+        if not user or not user.has_picture or not user.picture:
+            return None
+        processed = process_registration_picture(BytesIO(user.picture), target_format='PNG')
+        if not processed:
+            return None
+        regform = self.form_item.registration_form
+        file = File(filename='profile_picture.png', content_type='image/png')
+        file.save(('event', regform.event_id, 'regform', regform.id, 'registration'), processed)
+        if not file.size:
+            file.delete()
+            return None
+        file.meta = {'regform_field_id': self.form_item.id, 'registration_picture_checked': True}
+        db.session.add(file)
+        db.session.flush([file])
+        return str(file.uuid)
 
     @make_interceptable
     def _get_min_size(self):

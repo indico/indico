@@ -231,11 +231,12 @@ class ModelField(I18nAwareField):
     }
 
     def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, filter_deleted=False,
-                 none_if_missing=False, **kwargs):
+                 none_if_missing=False, with_parent=None, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
         self.none_if_missing = none_if_missing
+        self.with_parent = with_parent
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -257,15 +258,17 @@ class ModelField(I18nAwareField):
         try:
             value = self.column_type(value)
         except (TypeError, ValueError):
-            self.fail('type')
+            raise self.make_error('type')
         query = self.get_query(self.model, self.context).filter(self.column == value)
+        if self.with_parent:
+            query = query.with_parent(self.context[self.with_parent])
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         obj = query.one_or_none()
         if obj is None:
             if self.none_if_missing:
                 return None
-            self.fail('not_found', value=value)
+            raise self.make_error('not_found', value=value)
         return obj
 
 
@@ -283,11 +286,12 @@ class ModelList(fields.Field):
     }
 
     def __init__(self, model, *, column=None, column_type=None, get_query=lambda m, ctx: m.query, collection_class=list,
-                 filter_deleted=False, **kwargs):
+                 filter_deleted=False, with_parent=None, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
         self.collection_class = collection_class
+        self.with_parent = with_parent
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -309,16 +313,18 @@ class ModelList(fields.Field):
         try:
             value = list(map(self.column_type, value))
         except (TypeError, ValueError):
-            self.fail('type')
+            raise self.make_error('type')
         requested = set(value)
         query = self.get_query(self.model, self.context).filter(self.column.in_(value))
+        if self.with_parent:
+            query = query.with_parent(self.context[self.with_parent])
         if self.filter_deleted:
             query = query.filter(~self.model.is_deleted)
         objs = query.all()
         found = {getattr(x, self.column.key) for x in objs}
         invalid = requested - found
         if invalid:
-            self.fail('not_found', value=next(iter(invalid)))
+            raise self.make_error('not_found', value=next(iter(invalid)))
         assert found == requested, 'Unexpected objects found'
         return self.collection_class(objs)
 
@@ -468,7 +474,7 @@ class FilesField(ModelList):
     def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and any(f.claimed for f in rv):
-            self.fail('claimed')
+            raise self.make_error('claimed')
         return rv
 
 
@@ -488,7 +494,7 @@ class FileField(ModelField):
     def _deserialize(self, value, attr, data, **kwargs):
         rv = super()._deserialize(value, attr, data)
         if not self.allow_claimed and rv is not None and rv.claimed:
-            self.fail('claimed')
+            raise self.make_error('claimed')
         return rv
 
 
