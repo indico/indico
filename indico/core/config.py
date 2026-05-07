@@ -218,10 +218,11 @@ def _sanitize_data(data, allow_internal=False, extra_keys=frozenset()):
 def _load_plugin_config_defaults(plugin_names):
     """Collect file-backed config defaults declared by the given plugins.
 
-    Returns a flat dict mapping prefixed keys (``<NAME>_<KEY>``) to default values.
-    Plugins whose entry-point is missing are silently skipped (the regular plugin
-    loader will surface the failure later). Collisions with core ``DEFAULTS`` or
-    between plugins are reported via ``warnings.warn`` and the latter wins.
+    Returns a flat dict mapping prefixed keys (``PLUGIN_<NAME>_<KEY>``) to default
+    values. Plugins whose entry-point is missing are silently skipped (the regular
+    plugin loader will surface the failure later). Collisions with core ``DEFAULTS``
+    are reported via ``warnings.warn`` and the plugin default is ignored. Collisions
+    between plugins raise ``RuntimeError``.
     """
     if not plugin_names:
         return {}
@@ -236,7 +237,7 @@ def _load_plugin_config_defaults(plugin_names):
             warnings.warn(f'Could not load plugin entry-point {ep.name!r}: {exc}', stacklevel=2)
             continue
         defaults = plugin_class.plugin_config_defaults
-        prefix = ep.name.upper()
+        prefix = f'PLUGIN_{ep.name.upper()}'
         for key, value in defaults.items():
             full = f'{prefix}_{key}'
             if full in DEFAULTS:
@@ -244,8 +245,7 @@ def _load_plugin_config_defaults(plugin_names):
                               f'plugin default ignored', stacklevel=2)
                 continue
             if full in result:
-                warnings.warn(f'Plugin {ep.name!r} config key {full!r} collides with another plugin',
-                              stacklevel=2)
+                raise RuntimeError(f'Plugin {ep.name!r} config key {full!r} collides with another plugin')
             result[full] = value
     return result
 
