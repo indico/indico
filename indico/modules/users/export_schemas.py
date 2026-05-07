@@ -275,13 +275,15 @@ class PersonalDataExportSchema(mm.SQLAlchemyAutoSchema):
         model = User
         fields = ('first_name', 'last_name', 'full_name', 'title', 'email', 'secondary_emails',
                   'affiliation', 'affiliation_link', 'phone', 'avatar_url', 'picture_metadata', 'picture_source',
-                  'favorite_events', 'favorite_categories')
+                  'favorite_events', 'favorite_categories', 'favorite_contributions')
 
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
     secondary_emails = fields.Function(lambda user: list(user.secondary_emails))
     affiliation_link = fields.Nested(BasicAffiliationSchema)
     favorite_events = fields.List(fields.Nested(EventExportSchema))
     favorite_categories = fields.List(fields.Nested(CategoryExportSchema))
+    favorite_contributions = fields.List(fields.Nested(ContributionExportSchema,
+                                                       only=('id', 'event_id', 'title', 'url')))
 
 
 class RoomBookingExportSchema(Schema):
