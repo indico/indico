@@ -14,17 +14,18 @@ import {Header} from 'semantic-ui-react';
 import {ComboDropdown, FinalField, FinalInput} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {camelizeKeys} from 'indico/utils/case';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 const debounce = makeAsyncDebounce(250);
 const formatAffiliationName = ({name, code}) => (code ? `${name} (${code})` : name);
+const normalizeAffiliation = affiliation => (affiliation ? camelizeKeys(affiliation) : null);
 
-const getSubheader = ({city, countryName, country_name: countryNameSnake}) => {
-  const country = countryName || countryNameSnake;
-  if (city && country) {
-    return `${city}, ${country}`;
+const getSubheader = ({city, countryName}) => {
+  if (city && countryName) {
+    return `${city}, ${countryName}`;
   }
-  return city || country;
+  return city || countryName;
 };
 
 export function AffiliationField({
@@ -48,9 +49,9 @@ export function AffiliationField({
 
   const affiliationOptions = useMemo(() => {
     const selectedAffiliation =
-      currentAffiliation ||
+      normalizeAffiliation(currentAffiliation) ||
       (value && typeof value === 'object' && value.id !== null
-        ? {id: value.id, name: value.text, ...(value.meta || {})}
+        ? normalizeAffiliation({id: value.id, name: value.text, ...(value.meta || {})})
         : null);
     const results =
       selectedAffiliation && !affiliationResults.find(x => x.id === selectedAffiliation.id)
@@ -167,6 +168,7 @@ export default function FinalAffiliationField({
       currentAffiliation={currentAffiliation}
       includeMeta={includeMeta}
       searchAffiliationURL={searchAffiliationURL}
+      format={value => (value && typeof value === 'object' ? value : {id: null, text: value || ''})}
       {...rest}
     />
   );

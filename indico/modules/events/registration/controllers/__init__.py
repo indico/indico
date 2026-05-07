@@ -44,6 +44,11 @@ class RegistrationFormMixin:
             .one()
         )
 
+    @property
+    def has_predefined_affiliations(self):
+        return (any(field.input_type == 'affiliation' for field in self.regform.active_fields) and
+                Affiliation.query.filter_by(is_deleted=False).has_rows())
+
 
 class RegistrationEditMixin:
     def _get_file_data(self):
@@ -85,11 +90,10 @@ class RegistrationEditMixin:
         form_data = get_flat_section_submission_data(self.regform, management=self.management,
                                                      registration=self.registration)
         registration_data = get_form_registration_data(self.regform, self.registration, management=self.management)
-        has_predefined_affiliations = Affiliation.query.filter_by(is_deleted=False).has_rows()
         return self.view_class.render_template(self.template_file, self.event,
                                                regform=self.regform,
                                                form_data=form_data,
-                                               has_predefined_affiliations=has_predefined_affiliations,
+                                               has_predefined_affiliations=self.has_predefined_affiliations,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                registration=self.registration,

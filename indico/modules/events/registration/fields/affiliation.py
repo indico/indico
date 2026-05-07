@@ -79,7 +79,7 @@ class AffiliationField(RegistrationFormFieldBase):
             'field': self
         }
         filters = values_from_signal(signals.affiliations.get_affiliation_filters.send(self, context=context),
-                                        as_list=True, multi_value_types=list)
+                                     as_list=True, multi_value_types=list)
         query = Affiliation.query.filter_by(id=value['id'], is_deleted=False)
         if filters:
             query = query.filter(*filters)
@@ -96,6 +96,8 @@ class AffiliationField(RegistrationFormFieldBase):
         return data or ''
 
     def _render_affiliation(self, value):
+        if not value:
+            return ''
         details = _get_affiliation_details(value['id']) if value['id'] is not None else None
         return get_template_module('events/_affiliation.html').render_affiliation(value['text'], details)
 

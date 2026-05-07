@@ -66,7 +66,6 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.util.date_time import format_currency, format_date, now_utc, relativedelta
 from indico.util.fs import secure_filename
@@ -432,13 +431,12 @@ class RHRegistrationCreate(RHManageRegFormBase):
                 'uuid': PROFILE_PICTURE_SENTINEL,
                 'previewUrl': user.avatar_url,
             }
-        has_predefined_affiliations = Affiliation.query.filter_by(is_deleted=False).has_rows()
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
                                                     form_data=form_data,
                                                     initial_values=initial_values,
                                                     file_data=file_data,
-                                                    has_predefined_affiliations=has_predefined_affiliations,
+                                                    has_predefined_affiliations=self.has_predefined_affiliations,
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,

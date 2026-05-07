@@ -633,8 +633,7 @@ def _weighted_score(*params):
     return sum(db.cast(param, db.Integer) * weight for param, weight in params)
 
 
-@memoize_redis(3600, versioned=True)
-def search_affiliations(q, *, filters=()):
+def _search_affiliations(q, *, filters=()):
     exact_match = _match_search(q, exact=True)
     score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
     countries = set(get_countries_regex().findall(q))
@@ -661,6 +660,22 @@ def search_affiliations(q, *, filters=()):
     )
 
 
+@memoize_redis(3600, versioned=True)
+def _cached_search_affiliations(q):
+    return _search_affiliations(q)
+
+
+def search_affiliations(q, *, filters=()):
+    if filters:
+        return _search_affiliations(q, filters=filters)
+    return _cached_search_affiliations(q)
+
+
+search_affiliations.clear_cached = _cached_search_affiliations.clear_cached
+search_affiliations.is_cached = _cached_search_affiliations.is_cached
+search_affiliations.bump_version = _cached_search_affiliations.bump_version
+
+
 class SearchAffiliationsMixin:
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
@@ -673,6 +688,11 @@ class SearchAffiliationsMixin:
 
     @property
     def context(self):
+        """Return the context dict passed to affiliation filter signal receivers.
+
+        The dict should contain any objects relevant to the current search,
+        keyed by descriptive names.
+        """
         raise NotImplementedError
 
 
