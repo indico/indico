@@ -49,9 +49,9 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Allow plugins to declare file-backed config keys via the
-  ``plugin_config_defaults`` class attribute. Keys are auto-prefixed with the
-  plugin's entry-point name and exposed in ``indico.conf`` alongside core
-  settings, with parity for defaults, sanitization and ``INDICO_CONF_OVERRIDE``
+  ``plugin_config_defaults`` class attribute. Keys are exposed in ``indico.conf``
+  under the reserved ``PLUGIN_<NAME>_`` namespace, with parity for defaults,
+  sanitization and ``INDICO_CONF_OVERRIDE``
   (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 
 

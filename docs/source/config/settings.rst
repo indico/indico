@@ -1165,9 +1165,10 @@ not be editable at runtime (e.g. credentials managed by infrastructure tooling).
 
 A plugin declares its file-backed config keys via the ``plugin_config_defaults``
 class attribute on its :class:`IndicoPlugin` subclass. Keys are written
-**unprefixed** in the plugin and exposed in ``indico.conf`` with the plugin's
-entry-point name uppercased as a prefix. For example, plugin ``zoom`` declaring
-``API_KEY`` becomes ``ZOOM_API_KEY``::
+**unprefixed** in the plugin and exposed in ``indico.conf`` with the
+``PLUGIN_<NAME>_`` prefix, where ``<NAME>`` is the plugin's entry-point name
+uppercased. For example, plugin ``zoom`` declaring ``API_KEY`` becomes
+``PLUGIN_ZOOM_API_KEY``::
 
     class ZoomPlugin(IndicoPlugin):
         plugin_config_defaults = {
@@ -1179,22 +1180,23 @@ entry-point name uppercased as a prefix. For example, plugin ``zoom`` declaring
 In ``indico.conf``::
 
     PLUGINS = {'zoom'}
-    ZOOM_API_KEY = 'xxxxxxxx'
-    ZOOM_API_SECRET = 'yyyyyyyy'
+    PLUGIN_ZOOM_API_KEY = 'xxxxxxxx'
+    PLUGIN_ZOOM_API_SECRET = 'yyyyyyyy'
 
 Plugin code reads these via the ``plugin_config`` proxy on the plugin
 instance, which strips the prefix::
 
-    self.plugin_config.API_KEY  # reads ZOOM_API_KEY
+    self.plugin_config.API_KEY  # reads PLUGIN_ZOOM_API_KEY
 
 These keys participate in the same machinery as core settings: defaults are
-applied when omitted, unknown plugin-prefixed keys produce an "Ignoring unknown
-config key" warning, and ``INDICO_CONF_OVERRIDE`` can override them.
+applied when omitted, unknown ``PLUGIN_*`` keys produce an "Ignoring unknown
+config key" warning, and ``INDICO_CONF_OVERRIDE`` can override them. The
+``PLUGIN_*`` namespace is reserved for plugins; core config keys never use it.
 
 If a plugin declares a key that collides with a core config key, the plugin
 default is ignored and a warning is emitted; the core default stays
-authoritative. If two plugins declare the same prefixed key, a warning is
-emitted and the latter declaration wins.
+authoritative. If two plugins declare the same prefixed key, loading raises a
+``RuntimeError``.
 
 
 .. data:: CATEGORY_CLEANUP
