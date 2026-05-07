@@ -18,14 +18,16 @@ from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
-from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     get_registered_event_persons, get_ticket_qr_code_data,
-                                                     get_user_data, import_invitations_from_user_records,
+from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
+                                                     get_event_regforms_registrations, get_registered_event_persons,
+                                                     get_ticket_qr_code_data, get_user_data,
+                                                     import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration, process_registration_picture)
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
@@ -997,3 +999,35 @@ def test_modify_registration_conditional(monkeypatch, dummy_user, dummy_regform)
     assert not reg.data_by_field[boolean_field.id].data
     assert boolean_field_2.id not in reg.data_by_field
     assert text_field.id not in reg.data_by_field
+
+
+class _FakeExtraColumn:
+    """Minimal stand-in for CustomRegistrationListItem for spreadsheet tests."""
+
+    filter_only = False
+    title = 'Custom Column'
+
+    def __init__(self, data=None):
+        self.data = data or {}
+
+
+def test_generate_spreadsheet_extra_column_value(dummy_reg):
+    col = _FakeExtraColumn({dummy_reg: RegistrationListColumn(content='ACME', text_value='ACME')})
+    headers, rows = generate_spreadsheet_from_registrations([dummy_reg], [], set(), extra_columns=[col])
+    assert 'Custom Column' in headers
+    assert rows[0]['Custom Column'] == 'ACME'
+
+
+def test_generate_spreadsheet_extra_column_missing_data_is_empty(dummy_reg):
+    """Registration absent from col.data produces an empty string cell, not a KeyError."""
+    col = _FakeExtraColumn(data={})
+    headers, rows = generate_spreadsheet_from_registrations([dummy_reg], [], set(), extra_columns=[col])
+    assert 'Custom Column' in headers
+    assert rows[0]['Custom Column'] == ''
+
+
+def test_generate_spreadsheet_no_extra_columns_backward_compat(dummy_reg):
+    """Calling without extra_columns (default None) must not raise."""
+    headers, rows = generate_spreadsheet_from_registrations([dummy_reg], [], set())
+    assert 'ID' in headers
+    assert len(rows) == 1
