@@ -6,9 +6,10 @@
 # LICENSE file for more details.
 
 from io import BytesIO
+from pathlib import Path
 
 import qrcode
-from flask import jsonify, redirect, request, session
+from flask import current_app, jsonify, redirect, request, session
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import SolidFillColorMask
 from qrcode.image.styles.moduledrawers.pil import SquareModuleDrawer
@@ -112,34 +113,98 @@ class RHAutoLinkerRules(RHProtected):
         return jsonify(autolinker_settings.get_all())
 
 
-class RHTQRCodeImage(RHDisplayEventBase):
+class QRCodeMixin:
+    border = 4
+    error_correction = qrcode.constants.ERROR_CORRECT_H
+    qr_target_sizes = {
+        'small': 270,
+        'medium': 675,
+        'large': 1024,
+        'extra-large': 1920,
+    }
+
+    def _build_qr(self, box_size):
+        qr = qrcode.QRCode(
+            version=None,
+            error_correction=self.error_correction,
+            box_size=box_size,
+            border=self.border,
+        )
+
+        qr.add_data(self.event.external_url)
+        qr.make(fit=True)
+
+        return qr
+
+    def _calculate_possible_sizes(self, qr):
+        total_squares = qr.modules_count + self.border * 2
+
+        sizes = {}
+
+        for name, target_pixels in self.qr_target_sizes.items():
+            box_size = max(1, target_pixels // total_squares)
+            actual_pixels = total_squares * box_size
+
+            sizes[name] = {
+                'target_pixels': target_pixels,
+                'actual_pixels': actual_pixels,
+                'box_size': box_size,
+            }
+
+        return sizes
+
+
+class RHQRCodeSizesAvailable(QRCodeMixin, RHDisplayEventBase):
+    """Return QR metadata."""
+
+    def _process(self):
+        qr = self._build_qr(box_size=10)
+
+        sizes = self._calculate_possible_sizes(qr)
+
+        return jsonify(
+            {
+                'sizes': sizes,
+            }
+        )
+
+
+class RHQRCodeImage(QRCodeMixin, RHDisplayEventBase):
     """Display QRCode for event URL."""
 
     def _process(self):
-        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
-        qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=15, border=4)
+        size_name = request.args.get('size')
 
-        print('--------------------')
-        print(self.event.url)
-        print(self.event.external_url)
-        print(self.event.short_url)
-        print(self.event.short_external_url)
-        print('--------------------')
+        if size_name:
+            temp_qr = self._build_qr(box_size=10)
+            sizes = self._calculate_possible_sizes(temp_qr)
+            size_data = sizes.get(size_name, sizes['medium'])
+            box_size = size_data['box_size']
+        else:
+            size_name = 'medium'
+            box_size = 10
 
-        qr.add_data(self.event.external_url)  # short_external_url
-        qr.make(fit=True)
+        qr = self._build_qr(box_size=box_size)
 
         qr_img = qr.make_image(
             image_factory=StyledPilImage,
             module_drawer=SquareModuleDrawer(),
             embeded_image_ratio=0.25,
-            color_mask=SolidFillColorMask(back_color=(255, 255, 255), front_color=(0, 0, 0)),
-            # embeded_image_path=f'{config.IMAGES_BASE_URL}/logo_indico_small_white_bg.png',
-             embeded_image_path='indico/web/static/images/logo_indico_small_white_bg.png'
+            color_mask=SolidFillColorMask(
+                back_color=(255, 255, 255),
+                front_color=(0, 0, 0),
+            ),
+            embeded_image_path=(
+                Path(current_app.root_path) / 'web' / 'static' / 'images' / 'logo_indico_small_white_bg.png'
+            ),
         )
 
         output = BytesIO()
-        qr_img.save(output)
+        qr_img.save(output, format='PNG')
         output.seek(0)
 
-        return send_file('qrcode.png', output, 'image/png')
+        return send_file(
+            f'event-qrcode-{size_name}.png',
+            output,
+            'image/png',
+        )

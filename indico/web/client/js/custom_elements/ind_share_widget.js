@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import urlQrCodeImage from 'indico-url:events.url_qr_code_image';
+import urlQrCodeSizesAvailable from 'indico-url:events.url_qr_code_sizes_available';
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
 import _ from 'lodash';
@@ -23,23 +24,73 @@ import {
   Grid,
   GridColumn,
   Message,
-  Menu,
   Dropdown,
+  DropdownMenu,
+  DropdownItem,
 } from 'semantic-ui-react';
 
 import {FinalInput, handleSubmitError} from 'indico/react/forms';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function CopyToClipboardAndQR({eventUrl, eventId}) {
+function QrDisplayAndDownload({eventId}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const imageBaseUrl = urlQrCodeImage({event_id: eventId});
+
+  const {data: qrSizeData} = useIndicoAxios(
+    {url: urlQrCodeSizesAvailable({event_id: eventId})},
+    {camelize: true}
+  );
+
+  return (
+    <div styleName="qr-wrapper">
+      <img
+        styleName="qr-code-img"
+        src={`${imageBaseUrl}?size=medium`}
+        alt={Translate.string('QR Code')}
+      />
+
+      <Dropdown
+        icon="download"
+        floating
+        button
+        direction="left"
+        styleName={`download-dropdown-menu ${isOpen ? 'open' : ''}`}
+        onOpen={() => setIsOpen(true)}
+        onClose={() => setIsOpen(false)}
+        className="icon"
+      >
+        <DropdownMenu>
+          {qrSizeData?.sizes &&
+            Object.entries(qrSizeData.sizes).map(([sizeName, sizeData]) => (
+              <DropdownItem
+                key={sizeName}
+                as="a"
+                href={`${imageBaseUrl}?size=${sizeName}`}
+                download={`event-qrcode-${sizeName}.png`}
+                icon="picture"
+                text={Translate.string('{size} ({pixels}×{pixels}px)', {
+                  size: _.capitalize(sizeName),
+                  pixels: sizeData.actualPixels,
+                })}
+              />
+            ))}
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  );
+}
+
+QrDisplayAndDownload.propTypes = {
+  eventId: PropTypes.number.isRequired,
+};
+
+function UrlCopyAndQrDownload({eventUrl, eventId}) {
   const [isCopied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
-
-  const qrUrlImage = urlQrCodeImage({
-    event_id: eventId,
-  });
 
   useEffect(() => {
     if (isCopied) {
@@ -50,69 +101,34 @@ function CopyToClipboardAndQR({eventUrl, eventId}) {
 
   return (
     <div styleName="copy-to-clipboard-container">
-      <div>
+      <div styleName="input-copy-qr-container">
         <Input
+          label={
+            <Button
+              icon={isCopied ? 'check' : 'copy'}
+              positive={isCopied}
+              onClick={() => {
+                navigator.clipboard.writeText(eventUrl);
+                setCopied(true);
+              }}
+            />
+          }
           labelPosition="right"
           defaultValue={eventUrl}
           readOnly
-          // fluid
+          fluid
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
-
-        <Button
-          icon={isCopied ? 'check' : 'copy'}
-          positive={isCopied}
-          onClick={() => {
-            navigator.clipboard.writeText(eventUrl);
-            setCopied(true);
-          }}
-          content={isCopied ? Translate.string('Copied!') : Translate.string('Copy')}
-        />
       </div>
-      {showQR && (
-        <div styleName="qr-code-container">
-          <img styleName="qr-code-img" src={qrUrlImage} alt={Translate.string('QR Code')} />
-          <Menu compact>
-            <Dropdown icon="download" content={Translate.string('Download')}>
-              <Dropdown.Menu>
-                <Dropdown.Item
-                  icon="image"
-                  text={Translate.string('Download QR Code Image')}
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = qrUrlImage;
-                    link.download = 'qr-code.png';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                />
-              </Dropdown.Menu>
-            </Dropdown>
-          </Menu>
-        </div>
-      )}
+      {showQR && <QrDisplayAndDownload eventId={eventId} />}
     </div>
   );
 }
 
-CopyToClipboardAndQR.propTypes = {
+UrlCopyAndQrDownload.propTypes = {
   eventUrl: PropTypes.string.isRequired,
   eventId: PropTypes.number.isRequired,
 };
-
-// function DisplayQR({eventId}) {
-
-//   return (
-//     <>
-
-//     </>
-//   );
-// }
-
-// DisplayQR.propTypes = {
-
-// };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
   const calendars = [
@@ -397,10 +413,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <div>
-            <CopyToClipboardAndQR eventUrl={eventUrl} eventId={eventId} />
-            {/* <DisplayQR eventId={eventId} /> */}
-          </div>
+          <UrlCopyAndQrDownload eventUrl={eventUrl} eventId={eventId} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">

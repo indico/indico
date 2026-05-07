@@ -13,7 +13,7 @@ from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerC
 from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
-                                                       RHExportEventICAL, RHTQRCodeImage)
+                                                       RHExportEventICAL, RHQRCodeSizesAvailable, RHQRCodeImage)
 from indico.modules.events.controllers.entry import event_or_shorturl
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -91,9 +91,11 @@ for object_type, prefix in _event_object_url_prefixes.items():
 # Privacy policy
 _bp.add_url_rule('/event/<int:event_id>/privacy', 'display_privacy', RHDisplayPrivacyPolicy)
 
-# QR code for url
-_bp.add_url_rule('/event/<int:event_id>/qr/qrcode.png', 'url_qr_code_image',
-                 RHTQRCodeImage)
+# QR available download sizes
+_bp.add_url_rule('/event/<int:event_id>/qr/info', 'url_qr_code_sizes_available', RHQRCodeSizesAvailable)
+
+# QR image
+_bp.add_url_rule('/event/<int:event_id>/qr/qrcode.png', 'url_qr_code_image', RHQRCodeImage)
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_events', __name__)
