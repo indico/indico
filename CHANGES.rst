@@ -25,7 +25,11 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Allow plugins to declare file-backed config keys via the
+  ``plugin_config_defaults`` class attribute. Keys are exposed in ``indico.conf``
+  under the reserved ``PLUGIN_<NAME>_`` namespace, with parity for defaults,
+  sanitization and ``INDICO_CONF_OVERRIDE``
+  (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.13
@@ -214,11 +218,6 @@ Internal Changes
   (:pr:`7694`)
 - Use the latest TeXLive container image (``TL2026-2026-08-09-full``) for LaTeX-based
   PDF builds (:pr:`7699`)
-- Allow plugins to declare file-backed config keys via the
-  ``plugin_config_defaults`` class attribute. Keys are auto-prefixed with the
-  plugin's entry-point name and exposed in ``indico.conf`` alongside core
-  settings, with parity for defaults, sanitization and ``INDICO_CONF_OVERRIDE``
-  (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.12

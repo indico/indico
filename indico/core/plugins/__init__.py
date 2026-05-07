@@ -70,7 +70,8 @@ class IndicoPlugin(Plugin):
     settings_form_field_opts = {}
     #: A dictionary of file-backed config defaults exposed via ``indico.conf``.
     #: Keys are unprefixed (e.g. ``API_KEY``); the full key in the global config
-    #: is ``{PLUGIN_NAME_UPPER}_{KEY}`` (e.g. ``DEMO_API_KEY`` for plugin ``demo``).
+    #: is ``PLUGIN_{PLUGIN_NAME_UPPER}_{KEY}`` (e.g. ``PLUGIN_DEMO_API_KEY`` for
+    #: plugin ``demo``).
     plugin_config_defaults = {}
     #: A dictionary containing default values for settings
     default_settings = {}
@@ -151,10 +152,10 @@ class IndicoPlugin(Plugin):
     def plugin_config(self):
         """Read-only proxy over file-backed config scoped to this plugin.
 
-        ``self.plugin_config.API_KEY`` reads ``config.<NAME>_API_KEY``.
+        ``self.plugin_config.API_KEY`` reads ``config.PLUGIN_<NAME>_API_KEY``.
         """
         from indico.core.config import config
-        return PluginConfigProxy(config, self.name.upper())
+        return PluginConfigProxy(config, f'PLUGIN_{self.name.upper()}')
 
     @cached_property
     def translation_path(self):
@@ -298,7 +299,7 @@ def get_plugin_template_module(template_name, **context):
 class PluginConfigProxy:
     """Read-only view over the global config scoped to a plugin's prefix.
 
-    Allows ``plugin.plugin_config.API_KEY`` to read ``config.<PREFIX>_API_KEY``.
+    Allows ``plugin.plugin_config.API_KEY`` to read ``config.PLUGIN_<NAME>_API_KEY``.
     """
 
     __slots__ = ('_config', '_prefix')
