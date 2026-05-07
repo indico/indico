@@ -14,6 +14,7 @@ favorite_categories:
 - id: <id>
   title: dummy
   url: http://localhost/category/42/
+favorite_contributions: []
 favorite_events:
 - id: <id>
   title: dummy#0
