@@ -55,24 +55,24 @@ def test_plugin_config_default_loaded(fake_entry_points, write_config):
     fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None, 'TIMEOUT': 30}))
     write_config("PLUGINS = {'demo'}\n")
     data = load_config()
-    assert data['DEMO_API_KEY'] is None
-    assert data['DEMO_TIMEOUT'] == 30
+    assert data['PLUGIN_DEMO_API_KEY'] is None
+    assert data['PLUGIN_DEMO_TIMEOUT'] == 30
 
 
 def test_plugin_config_user_value_overrides_default(fake_entry_points, write_config):
     fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None, 'TIMEOUT': 30}))
-    write_config("PLUGINS = {'demo'}\nDEMO_API_KEY = 'secret'\nDEMO_TIMEOUT = 5\n")
+    write_config("PLUGINS = {'demo'}\nPLUGIN_DEMO_API_KEY = 'secret'\nPLUGIN_DEMO_TIMEOUT = 5\n")
     data = load_config()
-    assert data['DEMO_API_KEY'] == 'secret'
-    assert data['DEMO_TIMEOUT'] == 5
+    assert data['PLUGIN_DEMO_API_KEY'] == 'secret'
+    assert data['PLUGIN_DEMO_TIMEOUT'] == 5
 
 
 def test_plugin_config_unknown_key_warns(fake_entry_points, write_config):
     fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None}))
-    write_config("PLUGINS = {'demo'}\nDEMO_BOGUS = 'x'\n")
-    with pytest.warns(UserWarning, match='DEMO_BOGUS'):
+    write_config("PLUGINS = {'demo'}\nPLUGIN_DEMO_BOGUS = 'x'\n")
+    with pytest.warns(UserWarning, match='PLUGIN_DEMO_BOGUS'):
         data = load_config()
-    assert 'DEMO_BOGUS' not in data
+    assert 'PLUGIN_DEMO_BOGUS' not in data
 
 
 def test_only_defaults_with_plugin_override_carries_keys(fake_entry_points):
@@ -80,47 +80,45 @@ def test_only_defaults_with_plugin_override_carries_keys(fake_entry_points):
     data = load_config(only_defaults=True, override={
         'BASE_URL': 'https://example.test',
         'PLUGINS': {'demo'},
-        'DEMO_API_KEY': 'x',
+        'PLUGIN_DEMO_API_KEY': 'x',
     })
-    assert data['DEMO_API_KEY'] == 'x'
+    assert data['PLUGIN_DEMO_API_KEY'] == 'x'
 
 
-def test_plugin_config_collision_with_core_key_warns_and_is_ignored(fake_entry_points, write_config):
-    # Plugin 'external' declaring 'REGISTRATION_URL' would shadow the core EXTERNAL_REGISTRATION_URL
-    # default. The user's indico.conf does not set this key, so the plugin default would otherwise win.
-    fake_entry_points['external'] = _FakeEntryPoint(
-        'external', _make_plugin({'REGISTRATION_URL': 'plugin-default'}))
-    write_config("PLUGINS = {'external'}\n")
-    with pytest.warns(UserWarning, match='EXTERNAL_REGISTRATION_URL'):
+def test_plugin_config_collision_with_core_key_warns_and_is_ignored(fake_entry_points, write_config, monkeypatch):
+    # Inject a fake PLUGIN_* core default to exercise the safety branch (no real core key uses the
+    # PLUGIN_ prefix, but the check stays as defense-in-depth against future drift).
+    monkeypatch.setitem(config_module.DEFAULTS, 'PLUGIN_DEMO_API_KEY', 'core-default')
+    fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': 'plugin-default'}))
+    write_config("PLUGINS = {'demo'}\n")
+    with pytest.warns(UserWarning, match='PLUGIN_DEMO_API_KEY'):
         data = load_config()
-    # Core default wins; the plugin's value is dropped.
-    assert data['EXTERNAL_REGISTRATION_URL'] is None
+    assert data['PLUGIN_DEMO_API_KEY'] == 'core-default'
 
 
-def test_plugin_config_collision_between_plugins_warns_and_latter_wins(fake_entry_points, write_config):
-    # Plugin 'a' declaring 'B_C' and plugin 'a_b' declaring 'C' both resolve to A_B_C.
+def test_plugin_config_collision_between_plugins_raises(fake_entry_points, write_config):
+    # Plugin 'a' declaring 'B_C' and plugin 'a_b' declaring 'C' both resolve to PLUGIN_A_B_C.
     fake_entry_points['a'] = _FakeEntryPoint('a', _make_plugin({'B_C': 'first'}))
     fake_entry_points['a_b'] = _FakeEntryPoint('a_b', _make_plugin({'C': 'second'}))
     write_config("PLUGINS = {'a', 'a_b'}\n")
-    with pytest.warns(UserWarning, match='A_B_C'):
-        data = load_config()
-    assert data['A_B_C'] == 'second'
+    with pytest.raises(RuntimeError, match='PLUGIN_A_B_C'):
+        load_config()
 
 
 def test_indico_conf_override_env_passes_plugin_key(fake_entry_points, write_config, monkeypatch):
     fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None}))
     write_config("PLUGINS = {'demo'}\n")
-    monkeypatch.setenv('INDICO_CONF_OVERRIDE', "{'DEMO_API_KEY': 'fromenv'}")
+    monkeypatch.setenv('INDICO_CONF_OVERRIDE', "{'PLUGIN_DEMO_API_KEY': 'fromenv'}")
     data = load_config()
-    assert data['DEMO_API_KEY'] == 'fromenv'
+    assert data['PLUGIN_DEMO_API_KEY'] == 'fromenv'
 
 
 def test_indico_conf_override_env_can_enable_plugin_and_pass_plugin_key(fake_entry_points, write_config, monkeypatch):
     fake_entry_points['demo'] = _FakeEntryPoint('demo', _make_plugin({'API_KEY': None}))
     write_config('PLUGINS = set()\n')
-    monkeypatch.setenv('INDICO_CONF_OVERRIDE', "{'PLUGINS': {'demo'}, 'DEMO_API_KEY': 'fromenv'}")
+    monkeypatch.setenv('INDICO_CONF_OVERRIDE', "{'PLUGINS': {'demo'}, 'PLUGIN_DEMO_API_KEY': 'fromenv'}")
     data = load_config()
-    assert data['DEMO_API_KEY'] == 'fromenv'
+    assert data['PLUGIN_DEMO_API_KEY'] == 'fromenv'
 
 
 def test_missing_entry_point_graceful(fake_entry_points, write_config):
