@@ -173,6 +173,12 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
         if picture := registration.get_personal_data_picture():
             return url_for('.api_checkin_registration_picture', picture.locator.file)
 
+    @staticmethod
+    def _get_checkin_field_data(input_type, value):
+        if input_type == 'affiliation' and isinstance(value, dict):
+            return value['text']
+        return value
+
     def _get_registration_data(self, registration: Registration):
         regform = registration.registration_form
         form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
@@ -197,15 +203,17 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 # Do not include labels in the response
                 continue
 
+            input_type = field['inputType']
+            api_input_type = 'text' if input_type == 'affiliation' else input_type
             section = data[field['sectionId']]
             field_data = {
                 'id': field['id'],
                 'position': field['position'],
                 'title': field['title'],
                 'description': field['description'],
-                'input_type': field['inputType'],
-                'data': reg_data[field['htmlName']],
-                'default_value': field['defaultValue'],
+                'input_type': api_input_type,
+                'data': self._get_checkin_field_data(input_type, reg_data[field['htmlName']]),
+                'default_value': self._get_checkin_field_data(input_type, field['defaultValue']),
             }
             if 'price' in field:
                 field_data['price'] = field['price']
