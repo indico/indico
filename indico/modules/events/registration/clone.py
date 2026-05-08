@@ -22,14 +22,22 @@ from indico.util.i18n import _
 class RegistrationTagCloner(EventCloner):
     name = 'registration_tags'
     friendly_name = _('Registration tags')
-    is_internal = True
+    is_default = True
 
-    # We do not override `is_available` as we have cloners depending
-    # on this internal cloner even if it won't clone anything.
+    @property
+    def is_visible(self):
+        return is_feature_enabled(self.old_event, 'registration')
+
+    @property
+    def is_available(self):
+        return self._has_content(self.old_event)
 
     def get_conflicts(self, target_event):
-        if target_event.registration_tags:
+        if self._has_content(target_event):
             return [_('The target event already has registration tags')]
+
+    def _has_content(self, event):
+        return bool(event.registration_tags)
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._tag_map = {}
@@ -48,7 +56,7 @@ class RegistrationTagCloner(EventCloner):
 class RegistrationFormCloner(EventCloner):
     name = 'registration_forms'
     friendly_name = _('Registration forms')
-    requires = {'registration_tags'}
+    uses = {'registration_tags'}
 
     @property
     def is_visible(self):
@@ -149,8 +157,8 @@ class RegistrationFormCloner(EventCloner):
 class RegistrationCloner(EventCloner):
     name = 'registrations'
     friendly_name = _('Registrations')
-    requires = {'registration_forms', 'registration_tags'}
-    uses = {'sessions'}
+    requires = {'registration_forms'}
+    uses = {'sessions', 'registration_tags'}
 
     @property
     def is_visible(self):
@@ -174,7 +182,7 @@ class RegistrationCloner(EventCloner):
         form_map = shared_data['registration_forms']['form_map']
         field_data_map = shared_data['registration_forms']['field_data_map']
         block_map = shared_data['sessions']['session_block_map'] if 'sessions' in shared_data else None
-        tag_map = shared_data['registration_tags']['tag_map']
+        tag_map = shared_data['registration_tags']['tag_map'] if 'registration_tags' in shared_data else None
         for old_form, new_form in form_map.items():
             self._clone_registrations(old_form, new_form, field_data_map, block_map, tag_map)
         self._synchronize_registration_friendly_id(new_event)
@@ -197,7 +205,8 @@ class RegistrationCloner(EventCloner):
                 continue
             new_registration = Registration(user=old_registration.user, registration_form=new_form,
                                             **{attr: getattr(old_registration, attr) for attr in registration_attrs})
-            new_registration.tags = {tag_map[tag] for tag in old_registration.tags}
+            if tag_map is not None:
+                new_registration.tags = {tag_map[tag] for tag in old_registration.tags}
             reg_data_attrs = get_attrs_to_clone(RegistrationData, skip={'storage_file_id', 'storage_backend', 'size'})
             for old_registration_data in old_registration.data:
                 new_registration_data = RegistrationData(registration=new_registration,
