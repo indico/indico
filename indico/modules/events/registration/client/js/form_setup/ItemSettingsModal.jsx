@@ -47,7 +47,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
     ...itemData
   } = useSelector(state => (editing ? getItemById(state, id) : EMPTY_DATA));
   const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(
-    !!(editing && itemData.internalName)
+    editing && !!itemData.internalName && !itemData.fieldIsPersonalData
   );
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();
