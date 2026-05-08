@@ -470,7 +470,7 @@ class EventTimezoneDateTimeField(fields.DateTime):
     def _serialize(self, value, attr, obj, **kwargs):
         if value is None:
             return None
-        new_value = value.astimezone(self.context['event'].tzinfo).replace(tzinfo=None)
+        new_value = value.astimezone(self.context['event'].tzinfo)
         return super()._serialize(new_value, attr, obj, **kwargs)
 
     def _deserialize(self, value, attr, data, **kwargs):

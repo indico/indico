@@ -122,7 +122,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // Don't include timezone offset in string
     initialStartDt = moment
       .min(
-        moment(initialStartDt),
+        moment.parseZone(initialStartDt),
         moment(extraOptions.maxEndDt).subtract(entry.duration, 'minutes')
       )
       .format('YYYY-MM-DDTHH:mm:ss');
