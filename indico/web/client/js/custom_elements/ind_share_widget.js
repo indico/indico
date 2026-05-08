@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import urlQrCode from 'indico-url:events.url_qr_code';
-import urlQrCodeSizesAvailable from 'indico-url:events.url_qr_code_sizes_available';
+import urlQrCodeImage from 'indico-url:events.url_qr_code_image';
+import urlQrCodeMetadata from 'indico-url:events.url_qr_code_metadata';
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
 import _ from 'lodash';
@@ -38,21 +38,18 @@ import './ind_share_widget.module.scss';
 
 function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
   const [isOpen, setIsOpen] = useState(false);
-  const imageBaseUrl = urlQrCode();
 
-  const buildQrUrl = (size, url) => `${imageBaseUrl}?size=${size}&url=${encodeURIComponent(url)}`;
+  const buildDownloadUrl = boxSize =>
+    `${urlQrCodeImage()}?url=${encodeURIComponent(eventUrl)}&box_size=${boxSize}`;
 
-  const {data: qrSizeData} = useIndicoAxios({url: urlQrCodeSizesAvailable()}, {camelize: true});
-
-  console.log(eventUrl);
+  const {data: qrData} = useIndicoAxios(
+    {url: urlQrCodeMetadata(), params: {url: eventUrl}},
+    {camelize: true}
+  );
 
   return (
     <div styleName="qr-wrapper">
-      <img
-        styleName="qr-code-img"
-        src={buildQrUrl('medium', eventUrl)}
-        alt={Translate.string('QR Code')}
-      />
+      <img styleName="qr-code-img" src={qrData?.imageSourceURL} alt={Translate.string('QR Code')} />
 
       {showDownloadMenu && (
         <Dropdown
@@ -66,12 +63,12 @@ function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
           className="icon"
         >
           <DropdownMenu>
-            {qrSizeData?.sizes &&
-              Object.entries(qrSizeData.sizes).map(([sizeName, sizeData]) => (
+            {qrData?.downloadSized &&
+              Object.entries(qrData.downloadSized).map(([sizeName, sizeData]) => (
                 <DropdownItem
                   key={sizeName}
                   as="a"
-                  href={buildQrUrl(sizeName, eventUrl)}
+                  href={buildDownloadUrl(sizeData.boxSize)}
                   download={`event-qrcode-${sizeName}.png`}
                   icon="picture"
                   text={Translate.string('{size} ({pixels}×{pixels}px)', {

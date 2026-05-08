@@ -154,38 +154,39 @@ class QRCodeMixin:
         return sizes
 
 
-class RHQRCodeSizesAvailable(QRCodeMixin, RH):  # RH protected?
+class RHQRCodeAndMetadata(QRCodeMixin, RH):  # RH protected?
     """Return QR metadata."""
 
     def _process(self):
+        size_name = request.args.get('size')
+        source_url = request.args.get('url')
 
-        url = request.args.get('url')
-        qr = self._build_qr(url, box_size=10)
-
+        qr = self._build_qr(source_url, box_size=10)
         sizes = self._calculate_possible_sizes(qr)
+        size_data = sizes.get(size_name, sizes['medium'])
+        box_size = size_data['box_size']
 
         return jsonify(
             {
-                'sizes': sizes,
+                'image_source_url': url_for('events.url_qr_code_image',
+                                            url=source_url,
+                                            box_size=box_size,
+                                            _external=True),
+                'qr_displayed_url': source_url,
+                'extension': 'png',
+                'download_sized': sizes,
+                'dimensions': {'width': sizes['medium']['actual_pixels'],
+                               'height': sizes['medium']['actual_pixels']},
             }
         )
 
 
-class RHQRCode(QRCodeMixin, RH):  # RH protected?
+class RHQRCodeImage(QRCodeMixin, RH):  # RH protected?
     """Display QRCode for event URL."""
 
     def _process(self):
-        size_name = request.args.get('size')
+        box_size = request.args.get('box_size', 10, type=int)
         url = request.args.get('url')
-
-        if size_name:
-            temp_qr = self._build_qr(url, box_size=10)
-            sizes = self._calculate_possible_sizes(temp_qr)
-            size_data = sizes.get(size_name, sizes['medium'])
-            box_size = size_data['box_size']
-        else:
-            size_name = 'medium'
-            box_size = 10
 
         qr = self._build_qr(url, box_size=box_size)
 
@@ -207,7 +208,22 @@ class RHQRCode(QRCodeMixin, RH):  # RH protected?
         output.seek(0)
 
         return send_file(
-            f'event-qrcode-{size_name}.png',
+            'event-qrcode.png',
             output,
             'image/png',
         )
+# {
+#     sourceUrl: 'https://example.com/source',
+#     qrUrl: 'https://example.com/qr-code',
+#     downloadSizes: {
+#         small: 'https://example.com/download/small',
+#         medium: 'https://example.com/download/medium',
+#         large: 'https://example.com/download/large'
+#     },
+#     extension: 'png',
+#     fileSize: '2MB',
+#     dimensions: {
+#         width: 800,
+#         height: 600
+#     },
+# }
