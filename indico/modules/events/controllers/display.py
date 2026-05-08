@@ -25,7 +25,7 @@ from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
-from indico.web.rh import RHProtected, allow_signed_url
+from indico.web.rh import RH, RHProtected, allow_signed_url
 
 
 @allow_signed_url
@@ -123,7 +123,7 @@ class QRCodeMixin:
         'extra-large': 1920,
     }
 
-    def _build_qr(self, box_size):
+    def _build_qr(self, url, box_size):
         qr = qrcode.QRCode(
             version=None,
             error_correction=self.error_correction,
@@ -131,7 +131,7 @@ class QRCodeMixin:
             border=self.border,
         )
 
-        qr.add_data(self.event.external_url)
+        qr.add_data(url)
         qr.make(fit=True)
 
         return qr
@@ -154,11 +154,13 @@ class QRCodeMixin:
         return sizes
 
 
-class RHQRCodeSizesAvailable(QRCodeMixin, RHDisplayEventBase):
+class RHQRCodeSizesAvailable(QRCodeMixin, RH):  # RH protected?
     """Return QR metadata."""
 
     def _process(self):
-        qr = self._build_qr(box_size=10)
+
+        url = request.args.get('url')
+        qr = self._build_qr(url, box_size=10)
 
         sizes = self._calculate_possible_sizes(qr)
 
@@ -169,14 +171,15 @@ class RHQRCodeSizesAvailable(QRCodeMixin, RHDisplayEventBase):
         )
 
 
-class RHQRCodeImage(QRCodeMixin, RHDisplayEventBase):
+class RHQRCode(QRCodeMixin, RH):  # RH protected?
     """Display QRCode for event URL."""
 
     def _process(self):
         size_name = request.args.get('size')
+        url = request.args.get('url')
 
         if size_name:
-            temp_qr = self._build_qr(box_size=10)
+            temp_qr = self._build_qr(url, box_size=10)
             sizes = self._calculate_possible_sizes(temp_qr)
             size_data = sizes.get(size_name, sizes['medium'])
             box_size = size_data['box_size']
@@ -184,7 +187,7 @@ class RHQRCodeImage(QRCodeMixin, RHDisplayEventBase):
             size_name = 'medium'
             box_size = 10
 
-        qr = self._build_qr(box_size=box_size)
+        qr = self._build_qr(url, box_size=box_size)
 
         qr_img = qr.make_image(
             image_factory=StyledPilImage,

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import urlQrCodeImage from 'indico-url:events.url_qr_code_image';
+import urlQrCode from 'indico-url:events.url_qr_code';
 import urlQrCodeSizesAvailable from 'indico-url:events.url_qr_code_sizes_available';
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
@@ -36,20 +36,21 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplayAndDownload({eventId}) {
+function QrDisplayAndDownload({eventUrl}) {
   const [isOpen, setIsOpen] = useState(false);
-  const imageBaseUrl = urlQrCodeImage({event_id: eventId});
+  const imageBaseUrl = urlQrCode();
 
-  const {data: qrSizeData} = useIndicoAxios(
-    {url: urlQrCodeSizesAvailable({event_id: eventId})},
-    {camelize: true}
-  );
+  const buildQrUrl = (size, url) => `${imageBaseUrl}?size=${size}&url=${encodeURIComponent(url)}`;
+
+  const {data: qrSizeData} = useIndicoAxios({url: urlQrCodeSizesAvailable()}, {camelize: true});
+
+  console.log(eventUrl);
 
   return (
     <div styleName="qr-wrapper">
       <img
         styleName="qr-code-img"
-        src={`${imageBaseUrl}?size=medium`}
+        src={buildQrUrl('medium', eventUrl)}
         alt={Translate.string('QR Code')}
       />
 
@@ -69,7 +70,7 @@ function QrDisplayAndDownload({eventId}) {
               <DropdownItem
                 key={sizeName}
                 as="a"
-                href={`${imageBaseUrl}?size=${sizeName}`}
+                href={buildQrUrl(sizeName, eventUrl)}
                 download={`event-qrcode-${sizeName}.png`}
                 icon="picture"
                 text={Translate.string('{size} ({pixels}×{pixels}px)', {
@@ -85,10 +86,10 @@ function QrDisplayAndDownload({eventId}) {
 }
 
 QrDisplayAndDownload.propTypes = {
-  eventId: PropTypes.number.isRequired,
+  eventUrl: PropTypes.string.isRequired,
 };
 
-function UrlCopyAndQrDownload({eventUrl, eventId}) {
+function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
   const [isCopied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -120,14 +121,14 @@ function UrlCopyAndQrDownload({eventUrl, eventId}) {
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
       </div>
-      {showQR && <QrDisplayAndDownload eventId={eventId} />}
+      {showQR && <QrDisplayAndDownload eventUrl={eventExternalUrl} />}
     </div>
   );
 }
 
 UrlCopyAndQrDownload.propTypes = {
   eventUrl: PropTypes.string.isRequired,
-  eventId: PropTypes.number.isRequired,
+  eventExternalUrl: PropTypes.string.isRequired,
 };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
@@ -381,7 +382,7 @@ function ShareWidget({
   eventName,
   eventStartDt,
   eventUrl,
-  eventId,
+  eventExternalUrl,
   shareIcon,
   googleCalParams,
   outlookCalParams,
@@ -413,7 +414,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <UrlCopyAndQrDownload eventUrl={eventUrl} eventId={eventId} />
+          <UrlCopyAndQrDownload eventUrl={eventUrl} eventExternalUrl={eventExternalUrl} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
@@ -449,7 +450,7 @@ ShareWidget.propTypes = {
   eventName: PropTypes.string.isRequired,
   eventStartDt: PropTypes.string.isRequired,
   eventUrl: PropTypes.string.isRequired,
-  eventId: PropTypes.number.isRequired,
+  eventExternalUrl: PropTypes.string.isRequired,
   shareIcon: PropTypes.string.isRequired,
   googleCalParams: PropTypes.string.isRequired,
   outlookCalParams: PropTypes.string.isRequired,
@@ -464,7 +465,7 @@ customElements.define(
           eventName={this.getAttribute('event-name')}
           eventStartDt={this.getAttribute('event-start-dt')}
           eventUrl={this.getAttribute('event-url')}
-          eventId={this.getAttribute('event-id')}
+          eventExternalUrl={this.getAttribute('event-external-url')}
           shareIcon={this.getAttribute('share-icon')}
           googleCalParams={this.getAttribute('google-cal-params')}
           outlookCalParams={this.getAttribute('outlook-cal-params')}
