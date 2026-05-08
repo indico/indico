@@ -36,7 +36,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplayAndDownload({eventUrl}) {
+function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
   const [isOpen, setIsOpen] = useState(false);
   const imageBaseUrl = urlQrCode();
 
@@ -54,39 +54,42 @@ function QrDisplayAndDownload({eventUrl}) {
         alt={Translate.string('QR Code')}
       />
 
-      <Dropdown
-        icon="download"
-        floating
-        button
-        direction="left"
-        styleName={`download-dropdown-menu ${isOpen ? 'open' : ''}`}
-        onOpen={() => setIsOpen(true)}
-        onClose={() => setIsOpen(false)}
-        className="icon"
-      >
-        <DropdownMenu>
-          {qrSizeData?.sizes &&
-            Object.entries(qrSizeData.sizes).map(([sizeName, sizeData]) => (
-              <DropdownItem
-                key={sizeName}
-                as="a"
-                href={buildQrUrl(sizeName, eventUrl)}
-                download={`event-qrcode-${sizeName}.png`}
-                icon="picture"
-                text={Translate.string('{size} ({pixels}×{pixels}px)', {
-                  size: _.capitalize(sizeName),
-                  pixels: sizeData.actualPixels,
-                })}
-              />
-            ))}
-        </DropdownMenu>
-      </Dropdown>
+      {showDownloadMenu && (
+        <Dropdown
+          icon="download"
+          floating
+          button
+          direction="left"
+          styleName={`download-dropdown-menu ${isOpen ? 'open' : ''}`}
+          onOpen={() => setIsOpen(true)}
+          onClose={() => setIsOpen(false)}
+          className="icon"
+        >
+          <DropdownMenu>
+            {qrSizeData?.sizes &&
+              Object.entries(qrSizeData.sizes).map(([sizeName, sizeData]) => (
+                <DropdownItem
+                  key={sizeName}
+                  as="a"
+                  href={buildQrUrl(sizeName, eventUrl)}
+                  download={`event-qrcode-${sizeName}.png`}
+                  icon="picture"
+                  text={Translate.string('{size} ({pixels}×{pixels}px)', {
+                    size: _.capitalize(sizeName),
+                    pixels: sizeData.actualPixels,
+                  })}
+                />
+              ))}
+          </DropdownMenu>
+        </Dropdown>
+      )}
     </div>
   );
 }
 
-QrDisplayAndDownload.propTypes = {
+QrDisplayAndOptionalDownload.propTypes = {
   eventUrl: PropTypes.string.isRequired,
+  showDownloadMenu: PropTypes.bool,
 };
 
 function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
@@ -121,7 +124,7 @@ function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
       </div>
-      {showQR && <QrDisplayAndDownload eventUrl={eventExternalUrl} />}
+      {showQR && <QrDisplayAndOptionalDownload eventUrl={eventExternalUrl} />}
     </div>
   );
 }
