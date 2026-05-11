@@ -519,6 +519,7 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
     def _process(self, export_type):
         static_items_order = [
             'reg_date',
+            'mod_date',
             'state',
             'price',
             'checked_in',
@@ -534,21 +535,22 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             reglist=self.registrations,
             display=self.export_config['regform_items'],
             static_items_ids=static_item_ids_from_config,
+            empty_value=('-' if export_type == 'table' else ''),
         )
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
 
         if export_type == 'table':
-            css_path = 'events/registration/pdf/participants_table.css'
-            template_path = 'events/registration/pdf/participants_table.html'
-            filename = 'RegistrantsList.pdf'
+            css_filename = 'participants_table.css'
+            template_filename = 'participants_table.html'
+            filename = 'registrants-list.pdf'
         else:  # book
-            css_path = 'events/registration/pdf/participants_book.css'
-            template_path = 'events/registration/pdf/participants_book.html'
-            filename = 'RegistrantsBook.pdf'
+            css_filename = 'participants_book.css'
+            template_filename = 'participants_book.html'
+            filename = 'registrants-book.pdf'
 
-        css = render_template(css_path)
+        css = render_template(f'events/registration/pdf/{css_filename}')
         html = render_template(
-            template_path,
+            f'events/registration/pdf/{template_filename}',
             event=self.event,
             primary_headers=primary_headers,
             dynamic_headers=dynamic_headers,

@@ -1219,7 +1219,7 @@ class CustomTicketCode:
         raise NotImplementedError
 
 
-def prepare_participant_list_data(reglist, display, static_items_ids):
+def prepare_participant_list_data(reglist, display, static_items_ids, *, empty_value='-'):
     primary_headers = ['ID', 'Name']
     dynamic_headers = [item.title for item in display]
 
@@ -1232,16 +1232,16 @@ def prepare_participant_list_data(reglist, display, static_items_ids):
         reg_data_by_field = registration.data_by_field
 
         for item in display:
-            reg_data = reg_data_by_field.get(item.id)
-            cell_data = None
-            if reg_data:
-                cell_data = item.field_impl.render_reglist_column(reg_data).text_value or '-'
-            row[item.title] = cell_data or '-'
+            cell_data = empty_value
+            if reg_data := reg_data_by_field.get(item.id):
+                row[item.title] = item.field_impl.render_reglist_column(reg_data).text_value or empty_value
 
         for item_id in static_items_ids:
             match item_id:
                 case 'reg_date':
                     cell_data = format_datetime(registration.submitted_dt)
+                case 'mod_date' if registration.modified_dt:
+                    cell_data = format_datetime(registration.modified_dt)
                 case 'state':
                     cell_data = registration.state.title
                 case 'price':
@@ -1254,7 +1254,7 @@ def prepare_participant_list_data(reglist, display, static_items_ids):
                     cell_data = ', '.join(sorted(t.title for t in registration.tags))
                 case _:
                     cell_data = None
-            row[item_id] = cell_data or '-'
+            row[item_id] = cell_data or empty_value
 
         rows.append(row)
 

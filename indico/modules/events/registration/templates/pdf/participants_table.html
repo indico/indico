@@ -21,10 +21,8 @@
                 {% for header in headers %}
                     <th>{{ header }}</th>
                 {% endfor %}
-                {% for static_item_id in static_headers %}
-                    {% if static_item_id in static_column_names %}
-                        <th>{{ static_column_names[static_item_id] }}</th>
-                    {% endif %}
+                {% for static_item_id in static_headers if static_item_id in static_column_names %}
+                    <th>{{ static_column_names[static_item_id] }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -34,10 +32,8 @@
                     {% for header in headers %}
                         <td>{{ row[header] }}</td>
                     {% endfor %}
-                    {% for static_item_id in static_headers %}
-                        {% if static_item_id in row %}
-                            <td>{{ row[static_item_id] }}</td>
-                        {% endif %}
+                    {% for static_item_id in static_headers if static_item_id in row %}
+                        <td>{{ row[static_item_id] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
