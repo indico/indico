@@ -61,9 +61,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
       return rows.filter(row => row.columns.some(col => col.text?.toLowerCase() === value));
     }
 
-    return rows.filter(row =>
-      row.columns.some(col => col.text?.toLowerCase().includes(query))
-    );
+    return rows.filter(row => row.columns.some(col => col.text?.toLowerCase().includes(query)));
   }
 
   function sortRows(
@@ -209,33 +207,44 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paginatedRows.map((row: TableRowObj) => (
-            <TableRow key={row.id}>
-              {table.show_checkin && (
-                <TableCell textAlign="center">
-                  {row.checked_in ? (
-                    <Icon name="check" color="green" />
-                  ) : (
-                    <Icon name="close" color="red" />
-                  )}
-                </TableCell>
-              )}
-              {row.columns.map((col: TableColumnObj, i: number) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <TableCell key={i} title={col.text}>
-                  {col.is_picture ? (
-                    col.text ? (
-                      <img src={col.text} styleName="cell-img" />
+          {paginatedRows.length > 0 ? (
+            paginatedRows.map((row: TableRowObj) => (
+              <TableRow key={row.id}>
+                {table.show_checkin && (
+                  <TableCell textAlign="center">
+                    {row.checked_in ? (
+                      <Icon name="check" color="green" />
                     ) : (
-                      <div styleName="cell-img" />
-                    )
-                  ) : (
-                    col.text
-                  )}
-                </TableCell>
-              ))}
+                      <Icon name="close" color="red" />
+                    )}
+                  </TableCell>
+                )}
+                {row.columns.map((col: TableColumnObj, i: number) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TableCell key={i} title={col.text}>
+                    {col.is_picture ? (
+                      col.text ? (
+                        <img src={col.text} styleName="cell-img" />
+                      ) : (
+                        <div styleName="cell-img" />
+                      )
+                    ) : (
+                      col.text
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                style={{textAlign: 'center'}}
+                colSpan={table.headers.length + (table.show_checkin ? 1 : 0)}
+              >
+                <Translate>No participants found.</Translate>
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
       {totalPages > 1 && (
