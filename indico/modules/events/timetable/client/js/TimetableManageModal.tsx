@@ -112,7 +112,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     minStartDt: useSelector(selectors.getEventStartDt),
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
-  let initialStartDt = moment.parseZone(entry.startDt).format();
+  let initialStartDt = entry.startDt.format();
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
