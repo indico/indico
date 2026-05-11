@@ -40,19 +40,6 @@ interface ParticipantCounterProps {
 }
 
 function ParticipantCounter({table}: ParticipantCounterProps) {
-  const participantCounterElement =
-    table.num_anonymous_participants > 0 ? (
-      <div styleName="participants-count-wrapper">
-        <span styleName="hidden">{table.num_anonymous_participants}</span>/ {table.num_participants}
-        <Icon name="user" />
-      </div>
-    ) : (
-      <div styleName="participants-count-wrapper">
-        {table.num_participants}
-        <Icon name="user" />
-      </div>
-    );
-
   return (
     <Popup
       position="left center"
@@ -62,7 +49,17 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
           countHidden={table.num_anonymous_participants}
         />
       }
-      trigger={participantCounterElement}
+      trigger={
+        <div styleName="participants-count-wrapper">
+          {table.num_anonymous_participants > 0 && (
+            <>
+              <span styleName="hidden">{table.num_anonymous_participants}</span>/
+            </>
+          )}
+          {table.num_participants}
+          <Icon name="user" />
+        </div>
+      }
     />
   );
 }
@@ -113,7 +110,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   if (!data?.published) {
     infoContent = <Translate>There are no published registrations.</Translate>;
-  } else if (data.num_participants <= 0) {
+  } else if (data.num_participants === 0) {
     infoContent = <Translate>There are no registrations yet.</Translate>;
   }
 
@@ -131,7 +128,6 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
   return (
     <section>
       {viewToggle}
-
       {data.merged ? (
         <ParticipantTable table={data.tables[0]} />
       ) : (
