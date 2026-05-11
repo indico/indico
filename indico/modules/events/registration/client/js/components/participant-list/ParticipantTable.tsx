@@ -23,7 +23,6 @@ import {
 
 import {Translate} from 'indico/react/i18n';
 
-import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import {TableColumnObj, TableObj, TableRowObj} from './types';
 
 import './ParticipantTable.module.scss';
@@ -37,7 +36,6 @@ type PerPageOptions = number | 'all';
 
 export default function ParticipantTable({table}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
-  const totalParticipantCount = table.num_participants;
 
   const [sortColumn, setSortColumn] = useState<number | string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
@@ -283,14 +281,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     </>
   ) : (
     <Message>
-      {totalParticipantCount > 0 ? (
-        <ParticipantCountHidden
-          count={table.num_participants}
-          countHidden={table.num_anonymous_participants}
-        />
-      ) : (
-        <Translate>No participants registered.</Translate>
-      )}
+      <Translate>No participants registered.</Translate>
     </Message>
   );
 }
