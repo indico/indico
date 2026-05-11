@@ -158,6 +158,18 @@
   .bottom-link {
     margin-top: 10px;
   }
+
+  .balloon-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 10px;
+
+    [class*=icon-] {
+      font-size: 1em;
+      line-height: 1;
+    }
+  }
 }
 
 .balloon-time-qtip {

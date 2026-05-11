@@ -42,8 +42,13 @@
                        data-confirm="{% trans title=contrib.title %}Are you sure you want to delete the contribution '{{ title }}'?{% endtrans %}"></a>
                 {% endif %}
             {% else %}
-                <a class="i-link icon-list" title="{% trans %}View contribution details{% endtrans %}"
-                   href="{{ url_for('contributions.display_contribution', contrib) }}"></a>
+                <div class="balloon-actions">
+                    {% if session.user %}
+                        <ind-favorite-contribution-icon contribution-id="{{ contrib.id }}" event-id="{{ contrib.event.id }}" variant="icon"></ind-favorite-contribution-icon>
+                    {% endif %}
+                    <a class="i-link icon-list" title="{% trans %}View contribution details{% endtrans %}" 
+                       href="{{ url_for('contributions.display_contribution', contrib) }}"></a>
+                </div>
             {% endif %}
         </div>
     </div>
@@ -54,9 +59,6 @@
         <div class="expand">
             {{ render_time_and_location(contrib, editable=(editable and can_manage_contributions), use_event_tz=editable) }}
         </div>
-        {% if session.user and not editable %}
-            <ind-favorite-contribution-icon contribution-id="{{ contrib.id }}" event-id="{{ contrib.event.id }}"></ind-favorite-contribution-icon>
-        {% endif %}
     </div>
     {% if contrib.speakers or (editable and can_manage_contributions) %}
         <span class="hr"></span>

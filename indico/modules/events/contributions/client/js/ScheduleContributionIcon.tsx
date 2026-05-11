@@ -13,14 +13,18 @@ import ReactDOM from 'react-dom';
 import {useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
+type FavoriteContributionIconVariant = 'button' | 'icon';
+
 interface FavoriteContributionIconProps {
   contributionId: number;
   eventId: number;
+  variant: FavoriteContributionIconVariant;
 }
 
 export default function FavoriteContributionIcon({
   contributionId,
   eventId,
+  variant,
 }: FavoriteContributionIconProps) {
   const [scheduled, toggleScheduled, loading, saving] = useTogglableValue(
     contributionURL({contrib_id: contributionId, event_id: eventId})
@@ -30,7 +34,7 @@ export default function FavoriteContributionIcon({
     <button
       type="button"
       disabled={saving || loading}
-      className={`i-button icon-calendar-${scheduled ? 'check' : 'plus'}-o ${scheduled ? 'highlight' : ''}`}
+      className={`i-button ${variant === 'icon' ? 'borderless inline' : ''} icon-calendar-${scheduled ? 'check' : 'plus'}-o ${scheduled ? 'highlight' : ''}`}
       onClick={saving || loading ? undefined : toggleScheduled}
       data-title
       title={
@@ -50,6 +54,7 @@ customElements.define(
         <FavoriteContributionIcon
           contributionId={JSON.parse(this.getAttribute('contribution-id') ?? '')}
           eventId={JSON.parse(this.getAttribute('event-id') ?? '')}
+          variant={(this.getAttribute('variant') ?? 'button') as FavoriteContributionIconVariant}
         />,
         this
       );
