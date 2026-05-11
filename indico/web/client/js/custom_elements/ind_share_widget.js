@@ -38,6 +38,7 @@ import './ind_share_widget.module.scss';
 
 function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const buildDownloadUrl = boxSize =>
     `${urlQrCodeImage()}?url=${encodeURIComponent(eventUrl)}&box_size=${boxSize}`;
@@ -49,9 +50,13 @@ function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
 
   return (
     <div styleName="qr-wrapper">
-      <img styleName="qr-code-img" src={qrData?.imageSourceURL} alt={Translate.string('QR Code')} />
+      <img
+        styleName="qr-code-img"
+        src={qrData?.imageSourceURL}
+        onLoad={() => setIsImageLoaded(true)}
+      />
 
-      {showDownloadMenu && (
+      {showDownloadMenu && isImageLoaded && (
         <Dropdown
           icon="download"
           floating
@@ -63,8 +68,8 @@ function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
           className="icon"
         >
           <DropdownMenu>
-            {qrData?.downloadSized &&
-              Object.entries(qrData.downloadSized).map(([sizeName, sizeData]) => (
+            {qrData?.downloadSizes &&
+              Object.entries(qrData.downloadSizes).map(([sizeName, sizeData]) => (
                 <DropdownItem
                   key={sizeName}
                   as="a"
@@ -89,7 +94,7 @@ QrDisplayAndOptionalDownload.propTypes = {
   showDownloadMenu: PropTypes.bool,
 };
 
-function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
+function UrlCopyAndQrDownload({eventShortUrl, eventExternalUrl}) {
   const [isCopied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -109,13 +114,13 @@ function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
               icon={isCopied ? 'check' : 'copy'}
               positive={isCopied}
               onClick={() => {
-                navigator.clipboard.writeText(eventUrl);
+                navigator.clipboard.writeText(eventShortUrl);
                 setCopied(true);
               }}
             />
           }
           labelPosition="right"
-          defaultValue={eventUrl}
+          defaultValue={eventShortUrl}
           readOnly
           fluid
         />
@@ -127,7 +132,7 @@ function UrlCopyAndQrDownload({eventUrl, eventExternalUrl}) {
 }
 
 UrlCopyAndQrDownload.propTypes = {
-  eventUrl: PropTypes.string.isRequired,
+  eventShortUrl: PropTypes.string.isRequired,
   eventExternalUrl: PropTypes.string.isRequired,
 };
 
@@ -381,7 +386,7 @@ SetupMastodonServer.propTypes = {
 function ShareWidget({
   eventName,
   eventStartDt,
-  eventUrl,
+  eventShortUrl,
   eventExternalUrl,
   shareIcon,
   googleCalParams,
@@ -389,7 +394,7 @@ function ShareWidget({
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMastodonOpen, setMastodonOpen] = useState(false);
-  const shareText = `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
+  const shareText = `${eventName} (${eventStartDt}) · Indico (${eventShortUrl})`;
   return (
     <Popup
       trigger={
@@ -414,7 +419,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <UrlCopyAndQrDownload eventUrl={eventUrl} eventExternalUrl={eventExternalUrl} />
+          <UrlCopyAndQrDownload eventShortUrl={eventShortUrl} eventExternalUrl={eventExternalUrl} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
@@ -449,7 +454,7 @@ function ShareWidget({
 ShareWidget.propTypes = {
   eventName: PropTypes.string.isRequired,
   eventStartDt: PropTypes.string.isRequired,
-  eventUrl: PropTypes.string.isRequired,
+  eventShortUrl: PropTypes.string.isRequired,
   eventExternalUrl: PropTypes.string.isRequired,
   shareIcon: PropTypes.string.isRequired,
   googleCalParams: PropTypes.string.isRequired,
@@ -464,7 +469,7 @@ customElements.define(
         <ShareWidget
           eventName={this.getAttribute('event-name')}
           eventStartDt={this.getAttribute('event-start-dt')}
-          eventUrl={this.getAttribute('event-url')}
+          eventShortUrl={this.getAttribute('event-short-url')}
           eventExternalUrl={this.getAttribute('event-external-url')}
           shareIcon={this.getAttribute('share-icon')}
           googleCalParams={this.getAttribute('google-cal-params')}

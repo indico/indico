@@ -91,10 +91,8 @@ for object_type, prefix in _event_object_url_prefixes.items():
 # Privacy policy
 _bp.add_url_rule('/event/<int:event_id>/privacy', 'display_privacy', RHDisplayPrivacyPolicy)
 
-# QR available download sizes
+# QR code generation
 _bp.add_url_rule('/qr/info', 'url_qr_code_metadata', RHQRCodeAndMetadata)
-
-# QR image
 _bp.add_url_rule('/qr/image', 'url_qr_code_image', RHQRCodeImage)
 
 # Legacy URLs
