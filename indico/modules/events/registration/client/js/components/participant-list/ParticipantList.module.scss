@@ -15,7 +15,7 @@
   align-items: center;
   position: relative;
 
-  >a {
+  > a {
     position: absolute;
     transform: translateX(-80%);
     opacity: 0.5;
@@ -47,7 +47,7 @@
     margin: 5px;
 
     flex: 0 1 auto;
-    overflow-wrap: break-word; // same as in the accordion before
+    overflow-wrap: break-word;
   }
 }
 
