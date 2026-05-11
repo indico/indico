@@ -62,7 +62,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Modernize the PDF registrant list generation using weasyprint (:pr:`7077`, thanks
+  :user:`abhinavohri`)
 
 
 Version 3.3.12
