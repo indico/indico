@@ -65,7 +65,7 @@ interface DraftEntry {
   keywords: string[];
   references: string[];
   location_data: LocationData;
-  start_dt: Date;
+  start_dt: string;
   person_links?: PersonLink[];
   description?: string;
   colors?: EntryColors;
