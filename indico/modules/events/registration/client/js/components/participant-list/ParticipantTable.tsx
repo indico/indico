@@ -33,6 +33,7 @@ interface ParticipantTableProps {
 }
 
 type SortDirectionType = 'ascending' | 'descending' | null;
+type PerPageOptions = number | 'all';
 
 export default function ParticipantTable({table}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
@@ -42,7 +43,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState<number | 'all'>('all');
+  const [perPage, setPerPage] = useState<PerPageOptions>('all');
 
   const [search, setSearch] = useState('');
 
@@ -52,18 +53,16 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
     if (!query) {
       return rows;
     }
-    // Exact search:
-    if (
-      (query.startsWith('"') && query.endsWith('"')) ||
-      (query.startsWith("'") && query.endsWith("'"))
-    ) {
+
+    const exactSearchRegex = /^(['"]).*\1$/;
+    if (exactSearchRegex.test(query)) {
       const value = query.slice(1, -1).toLowerCase();
 
-      return rows.filter(row => row.columns.some(col => (col.text || '').toLowerCase() === value));
+      return rows.filter(row => row.columns.some(col => col.text?.toLowerCase() === value));
     }
-    // Normal search
+
     return rows.filter(row =>
-      row.columns.some(col => (col.text || '').toLowerCase().includes(query))
+      row.columns.some(col => col.text?.toLowerCase().includes(query))
     );
   }
 
@@ -103,14 +102,14 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   };
 
   const handleSort = (column: number | string | null) => {
-    const directions: Record<SortDirectionType, SortDirectionType> = {
+    const nextDirection: Record<SortDirectionType, SortDirectionType> = {
       [null as SortDirectionType]: 'ascending',
       ascending: 'descending',
       descending: null,
     };
 
     const direction: SortDirectionType =
-      sortColumn === column ? directions[sortDirection] : 'ascending';
+      sortColumn === column ? nextDirection[sortDirection] : 'ascending';
 
     setSortColumn(column);
     setSortDirection(direction);
@@ -127,7 +126,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [10, 25, 50, 100, 'all'];
+  const perPageOptions = [25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
@@ -153,11 +152,11 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             options={perPageOptions.map(n => ({
               key: n,
               value: n,
-              text: String(n),
+              text: n,
             }))}
             value={perPage}
             onChange={(e, {value}) => {
-              setPerPage(value as number | 'all');
+              setPerPage(value as PerPageOptions);
               setCurrentPage(1);
             }}
           />
@@ -175,13 +174,14 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             value={search}
             onChange={(e, {value}) => setSearch(value)}
             icon={<Icon name="search" />}
+            placeholder={Translate.string('Search participants')}
           />
         </div>
       </section>
       <Table fixed celled sortable>
         <TableHeader>
           <TableRow>
-            {table.show_checkin && ( // For checkin status
+            {table.show_checkin && (
               <TableHeaderCell
                 styleName="participant-table-header icon-cell"
                 onClick={() => handleSort('checked_in')}
@@ -202,9 +202,8 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
                   onClick={isSortable ? () => handleSort(i) : undefined}
                   sorted={isSortable && sortColumn === i ? sortDirection : undefined}
                   title={headerText}
-                >
-                  <p>{headerText}</p>
-                </TableHeaderCell>
+                  content={headerText}
+                />
               );
             })}
           </TableRow>
@@ -226,7 +225,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
                 <TableCell key={i} title={col.text}>
                   {col.is_picture ? (
                     col.text ? (
-                      <img src={col.text} alt="" styleName="cell-img" />
+                      <img src={col.text} styleName="cell-img" />
                     ) : (
                       <div styleName="cell-img" />
                     )
