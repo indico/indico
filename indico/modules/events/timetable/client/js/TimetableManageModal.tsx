@@ -112,8 +112,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     minStartDt: useSelector(selectors.getEventStartDt),
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
-  // Don't include timezone offset in string
-  let initialStartDt = entry.startDt.format('YYYY-MM-DDTHH:mm:ss');
+  let initialStartDt = moment.parseZone(entry.startDt).format();
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
