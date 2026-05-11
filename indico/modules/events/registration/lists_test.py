@@ -25,14 +25,13 @@ class _TestColumn(CustomRegistrationListItem):
 
 
 @pytest.fixture
-def _connected_column():
+def connected_column():
     """Connect _TestColumn to the registrant_list_items signal for the duration of the test."""
     def _handler(sender, **kwargs):
         yield _TestColumn
 
-    signals.event.registrant_list_items.connect(_handler)
-    yield
-    signals.event.registrant_list_items.disconnect(_handler)
+    with signals.event.registrant_list_items.connected_to(_handler):
+        yield
 
 
 def test_get_list_export_config_always_has_extra_columns_key(dummy_regform, app_context):
@@ -45,7 +44,7 @@ def test_get_list_export_config_always_has_extra_columns_key(dummy_regform, app_
     assert isinstance(config['extra_columns'], list)
 
 
-@pytest.mark.usefixtures('_connected_column')
+@pytest.mark.usefixtures('connected_column')
 def test_get_list_export_config_includes_selected_extra_column(dummy_regform, app_context):
     """A custom column that the user has enabled appears in get_list_export_config.
 
@@ -68,7 +67,7 @@ def test_get_list_export_config_includes_selected_extra_column(dummy_regform, ap
     assert config['extra_columns'][0].title == 'Test Column'
 
 
-@pytest.mark.usefixtures('_connected_column')
+@pytest.mark.usefixtures('connected_column')
 def test_get_list_export_config_excludes_filter_only_column(dummy_regform, app_context):
     """filter_only columns must not appear in extra_columns even when selected."""
     class _FilterOnlyColumn(_TestColumn):
@@ -79,8 +78,7 @@ def test_get_list_export_config_excludes_filter_only_column(dummy_regform, app_c
     def _handler(sender, **kwargs):
         yield _FilterOnlyColumn
 
-    signals.event.registrant_list_items.connect(_handler)
-    try:
+    with signals.event.registrant_list_items.connected_to(_handler):
         with app_context.test_request_context():
             session[f'registration_config_{dummy_regform.id}'] = {
                 'items': ['ext__filter_col'],
@@ -88,7 +86,5 @@ def test_get_list_export_config_excludes_filter_only_column(dummy_regform, app_c
             }
             gen = RegistrationListGenerator(regform=dummy_regform)
             config = gen.get_list_export_config()
-    finally:
-        signals.event.registrant_list_items.disconnect(_handler)
 
     assert config['extra_columns'] == []
