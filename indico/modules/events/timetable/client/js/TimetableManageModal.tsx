@@ -93,6 +93,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId, sessionBlockId = expandedSessionBlock?.objId} = entry;
@@ -112,7 +113,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     minStartDt: useSelector(selectors.getEventStartDt),
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
-  let initialStartDt = entry.startDt.format();
+  let initialStartDt = moment.tz(entry.startDt, eventTimezone).format();
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
