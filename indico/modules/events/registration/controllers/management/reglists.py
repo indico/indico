@@ -53,12 +53,13 @@ from indico.modules.events.registration.notifications import (notify_registratio
 from indico.modules.events.registration.placeholders.registrations import PicturePlaceholder
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
+                                                     generate_pdf_data_from_registrations,
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_registration_spreadsheet_column_formats,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
                                                      import_registrations_from_csv, load_registration_schema,
-                                                     make_registration_schema, prepare_participant_list_data)
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.timetable.util import create_pdf
 from indico.modules.events.util import ZipGeneratorMixin
@@ -517,28 +518,14 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
         )
     }, location='view_args')
     def _process(self, export_type):
-        static_items_order = [
-            'reg_date',
-            'mod_date',
-            'state',
-            'price',
-            'checked_in',
-            'checked_in_date',
-            'tags_present'
-        ]
-        static_item_ids_from_config = self.export_config['static_item_ids']
-        static_column_names = {key: data['title']
-                               for key, data in self.list_generator.static_items.items()
-                               if key in static_item_ids_from_config}
-
-        primary_headers, dynamic_headers, rows = prepare_participant_list_data(
-            reglist=self.registrations,
-            display=self.export_config['regform_items'],
-            static_items_ids=static_item_ids_from_config,
-            extra_columns=self.export_config['extra_columns'],
-            empty_value=('-' if export_type == 'table' else ''),
+        headers, rows = generate_pdf_data_from_registrations(
+            self.event,
+            self.registrations,
+            self.export_config['regform_items'],
+            self.export_config['static_item_ids'],
+            self.export_config['extra_columns'],
+            '-' if export_type == 'table' else '',
         )
-        generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)
 
         if export_type == 'table':
             css_filename = 'participants_table.css'
@@ -553,12 +540,9 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
         html = render_template(
             f'events/registration/pdf/{template_filename}',
             event=self.event,
-            primary_headers=primary_headers,
-            dynamic_headers=dynamic_headers,
-            static_headers=static_items_order,
+            headers=headers,
             rows=rows,
-            generation_date=generation_date,
-            static_column_names=static_column_names
+            generation_date=format_date(now_utc(), format='full', timezone=self.event.tzinfo),
         )
         pdf = create_pdf(html, css, self.event)
         return send_file(f'{filename}', pdf, 'application/pdf')

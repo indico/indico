@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
+    <title>{%- trans %}Registrants List{% endtrans -%}</title>
 </head>
 
 <body>
@@ -13,42 +14,37 @@
 
     <section class="toc-page">
         <h2>{%- trans %}Table of Contents{% endtrans -%}</h2>
-        {% for row in rows %}
+        {% for (registration, __) in rows %}
             <div class="toc-entry">
-                <div class="toc-name">{{ row['Name'] }}</div>
+                <div class="toc-name">{{ registration.display_full_name }}</div>
                 <div class="toc-page-num">{{ loop.index }}</div>
             </div>
         {% endfor %}
     </section>
 
-    {% for row in rows %}
+    {% for (registration, row) in rows %}
         <section class="later-pages">
             <header>
                 <div class="header-title">{{ event.title }} / {% trans %}Registrants Book{% endtrans %}</div>
-                <div class="header-name">{{ row['Name'] }}</div>
+                <div class="header-name">{{ registration.display_full_name }}</div>
             </header>
             <div class="participant-title">
-                <h1>
-                    {%- if event.show_titles -%}
-                        {{ row['Title']|default('') }}
-                    {% endif %}
-                    {{ row['Name'] }}
-                </h1>
-                <h1>{{ row['ID'] }}</h1>
+                <h1>{{ registration.display_full_name }}</h1>
+                <h1>#{{ registration.friendly_id }}</h1>
             </div>
             <div class="sub-section">
-                <h2>{%- trans %}Registration Details{% endtrans -%}</h2>
+                <h2>{%- trans %}Registration details{% endtrans -%}</h2>
                 <div class="registration-details">
-                    {% for item_id in static_headers if item_id in static_column_names and row.get(item_id) %}
-                        <p><strong>{{ static_column_names[item_id] }}:</strong> {{ row[item_id] }}</p>
+                    {% for header in headers if header is string and row[header] %}
+                        <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
                     {% endfor %}
                 </div>
             </div>
             <div class="sub-section">
-                <h2>{%- trans %}Personal Details{% endtrans -%}</h2>
+                <h2>{%- trans %}Personal details{% endtrans -%}</h2>
                 <div class="personal-details">
-                    {% for header in dynamic_headers if row.get(header) %}
-                        <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
+                    {% for header in headers if header is not string and row[header] %}
+                        <p><strong>{{ header[0] }}:</strong> {{ row[header] }}</p>
                     {% endfor %}
                 </div>
             </div>

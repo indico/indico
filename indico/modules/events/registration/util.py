@@ -662,6 +662,88 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
     return field_names, rows
 
 
+def generate_pdf_data_from_registrations(event, registrations, regform_items, static_items, extra_columns, empty_value):
+    """Generate data for PDF creation for a given registration list.
+
+    :param event: The event containing the registrations
+    :param registrations: The list of registrations to include
+    :param regform_items: The registration form items to be used as columns
+    :param static_items: Registration form information as extra columns
+    :param extra_columns: Custom list items from the `registrant_list_items` signal
+    :param empty_value: Value to use when no data is available
+    """
+    field_names = [_('ID'), _('Name')]
+    special_item_mapping = {
+        'reg_date': (
+            _('Registration date'),
+            lambda x: format_datetime(x.submitted_dt, timezone=event.tzinfo),
+        ),
+        'mod_date': (
+            _('Modification date'),
+            lambda x: format_datetime(x.submitted_dt, timezone=event.tzinfo) if x.submitted_dt else empty_value,
+        ),
+        'state': (
+            _('Registration state'),
+            lambda x: x.state.title,
+        ),
+        'price': (
+            _('Price'),
+            lambda x: x.render_price(),
+        ),
+        'checked_in': (
+            _('Checked in'),
+            lambda x: x.checked_in,
+        ),
+        'checked_in_date': (
+            _('Check-in date'),
+            lambda x: format_datetime(x.checked_in_dt, timezone=event.tzinfo) if x.checked_in else '',
+        ),
+        'payment_date': (
+            _('Payment date'),
+            lambda x: (
+                format_datetime(x.transaction.timestamp, timezone=event.tzinfo)
+                if (x.transaction is not None and x.transaction.status == TransactionStatus.successful)
+                else ''
+            ),
+        ),
+        'tags_present': (
+            _('Tags'),
+            lambda x: [t.title for t in x.tags] if x.tags else '',
+        ),
+    }
+    field_names.extend(unique_col(item.title, item.id) for item in regform_items)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
+    field_names.extend(col.title for col in extra_columns)
+    rows = []
+    for registration in registrations:
+        data = registration.data_by_field
+        row_data = {
+            _('ID'): f'#{registration.friendly_id}',
+            _('Name'): f'{registration.first_name} {registration.last_name}'
+        }
+        for item in regform_items:
+            key = unique_col(item.title, item.id)
+            if item.id not in data:
+                row_data[key] = empty_value
+            else:
+                col = item.field_impl.render_reglist_column(data[item.id])
+                if item.input_type == 'accommodation':
+                    # XXX ugly hack, but the "content" for this field is a dict...
+                    row_data[key] = col.text_value
+                else:
+                    row_data[key] = col.content
+        for name, (title, fn) in special_item_mapping.items():
+            if name not in static_items:
+                continue
+            value = fn(registration)
+            row_data[title] = value
+        for col in extra_columns:
+            col_data = col.data.get(registration)
+            row_data[col.title] = col_data.text_value if col_data else empty_value
+        rows.append((registration, row_data))
+    return field_names, rows
+
+
 def get_registrations_with_tickets(user, event):
     query = (Registration.query.with_parent(event)
              .filter(Registration.user == user,
@@ -1217,51 +1299,3 @@ class CustomTicketCode:
     def lookup_registration(cls, data: str) -> Registration | None:
         """Lookup a registration based on custom ticket code data."""
         raise NotImplementedError
-
-
-def prepare_participant_list_data(reglist, display, static_items_ids, extra_columns, *, empty_value='-'):
-    primary_headers = ['ID', 'Name']
-    dynamic_headers = [item.title for item in display] + [col.title for col in extra_columns]
-
-    rows = []
-    for registration in reglist:
-        row = {
-            'ID': f'#{registration.friendly_id}',
-            'Name': registration.display_full_name
-        }
-        reg_data_by_field = registration.data_by_field
-
-        for item in display:
-            cell_data = empty_value
-            if reg_data := reg_data_by_field.get(item.id):
-                row[item.title] = item.field_impl.render_reglist_column(reg_data).text_value or empty_value
-
-        for col in extra_columns:
-            cell_data = empty_value
-            if reg_data := col.data.get(registration):
-                cell_data = reg_data.text_value
-            row[col.title] = cell_data
-
-        for item_id in static_items_ids:
-            match item_id:
-                case 'reg_date':
-                    cell_data = format_datetime(registration.submitted_dt)
-                case 'mod_date' if registration.modified_dt:
-                    cell_data = format_datetime(registration.modified_dt)
-                case 'state':
-                    cell_data = registration.state.title
-                case 'price':
-                    cell_data = registration.render_price()
-                case 'checked_in':
-                    cell_data = 'Yes' if registration.checked_in else 'No'
-                case 'checked_in_date' if registration.checked_in_dt:
-                    cell_data = format_datetime(registration.checked_in_dt)
-                case 'tags_present' if registration.tags:
-                    cell_data = ', '.join(sorted(t.title for t in registration.tags))
-                case _:
-                    cell_data = None
-            row[item_id] = cell_data or empty_value
-
-        rows.append(row)
-
-    return primary_headers, dynamic_headers, rows
