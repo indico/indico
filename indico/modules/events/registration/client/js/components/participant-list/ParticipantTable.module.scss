@@ -47,6 +47,12 @@
   opacity: 0.4;
 }
 
+.merged-view-hidden-participants-count {
+  div {
+    color: $dark-gray;
+  }
+}
+
 .participant-list-top {
   display: flex;
   flex-wrap: wrap;

@@ -143,7 +143,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
             ),
             render: () => (
               <TabPane key={table.title} attached={false}>
-                <ParticipantTable table={table} />
+                <ParticipantTable table={table} merged={data.merged} />
               </TabPane>
             ),
           }))}
