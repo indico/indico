@@ -10,3 +10,10 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+.table-buttons-group {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1em;
+}

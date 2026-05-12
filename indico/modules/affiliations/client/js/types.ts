@@ -23,3 +23,13 @@ export interface Affiliation extends AffiliationBase {
 }
 
 export type AffiliationFormValues = AffiliationBase;
+
+export interface AffiliationMapping {
+  original_text: string;
+  match_text: string;
+  score: number;
+  original_id: number;
+  original_entity_type: string;
+  affiliation_id: number;
+  display: string;
+}
