@@ -535,6 +535,7 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             reglist=self.registrations,
             display=self.export_config['regform_items'],
             static_items_ids=static_item_ids_from_config,
+            extra_columns=self.export_config['extra_columns'],
             empty_value=('-' if export_type == 'table' else ''),
         )
         generation_date = format_date(now_utc(), format='full', timezone=self.event.tzinfo)

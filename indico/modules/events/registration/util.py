@@ -1219,9 +1219,9 @@ class CustomTicketCode:
         raise NotImplementedError
 
 
-def prepare_participant_list_data(reglist, display, static_items_ids, *, empty_value='-'):
+def prepare_participant_list_data(reglist, display, static_items_ids, extra_columns, *, empty_value='-'):
     primary_headers = ['ID', 'Name']
-    dynamic_headers = [item.title for item in display]
+    dynamic_headers = [item.title for item in display] + [col.title for col in extra_columns]
 
     rows = []
     for registration in reglist:
@@ -1235,6 +1235,12 @@ def prepare_participant_list_data(reglist, display, static_items_ids, *, empty_v
             cell_data = empty_value
             if reg_data := reg_data_by_field.get(item.id):
                 row[item.title] = item.field_impl.render_reglist_column(reg_data).text_value or empty_value
+
+        for col in extra_columns:
+            cell_data = empty_value
+            if reg_data := col.data.get(registration):
+                cell_data = reg_data.text_value
+            row[col.title] = cell_data
 
         for item_id in static_items_ids:
             match item_id:
