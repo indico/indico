@@ -133,11 +133,12 @@ class ProgrammeToPDF(PDFBase):
 
 
 class RegistrantToPDF(PDFBase):
-    def __init__(self, event, reg, display, doc=None, story=None, static_items=None):
+    def __init__(self, event, reg, display, doc=None, story=None, static_items=None, extra_columns=None):
         self.event = event
         self._reg = reg
         self._display = display
         self.static_items = static_items
+        self.extra_columns = [col for col in (extra_columns or []) if not col.filter_only]
         if not story:
             story = [Spacer(inch, 5*cm)]
         PDFBase.__init__(self, doc, story)
@@ -255,17 +256,25 @@ class RegistrantToPDF(PDFBase):
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(item.title, value)
 
+        if self.extra_columns:
+            _print_section(_('Additional information'))
+            for col in self.extra_columns:
+                col_data = col.data.get(self._reg)
+                if col_data and col_data.text_value:
+                    _print_row(col.title, col_data.text_value)
+
         return story
 
 
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, event, regform, reglist, item_ids, static_item_ids):
+    def __init__(self, event, regform, reglist, item_ids, static_item_ids, extra_columns=None):
         self.event = event
         self._regform = regform
         self._regList = reglist
         self._item_ids = set(item_ids)
         self._title = _('Registrants Book')
         self._static_item_ids = static_item_ids
+        self._extra_columns = [col for col in (extra_columns or []) if not col.filter_only]
         PDFWithTOC.__init__(self)
 
     def firstPage(self, c, doc):
@@ -307,13 +316,14 @@ class RegistrantsListToBookPDF(PDFWithTOC):
             items.append(section)
             items += fields
         for reg in self._regList:
-            temp = RegistrantToPDF(self.event, reg, items, static_items=self._static_item_ids)
+            temp = RegistrantToPDF(self.event, reg, items, static_items=self._static_item_ids,
+                                   extra_columns=self._extra_columns)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
 
 class RegistrantsListToPDF(PDFBase):
-    def __init__(self, event, doc=None, story=None, reglist=None, display=None, static_items=None):
+    def __init__(self, event, doc=None, story=None, reglist=None, display=None, static_items=None, extra_columns=None):
         if display is None:
             display = []
         if story is None:
@@ -326,6 +336,7 @@ class RegistrantsListToPDF(PDFBase):
         self._PAGE_HEIGHT = landscape(A4)[1]
         self._PAGE_WIDTH = landscape(A4)[0]
         self.static_items = static_items
+        self.extra_columns = [col for col in (extra_columns or []) if not col.filter_only]
 
     def firstPage(self, c, doc):
         c.saveState()
@@ -400,6 +411,8 @@ class RegistrantsListToPDF(PDFBase):
             lp.append(Paragraph('<b>{}</b>'.format(_('Check-in date')), text_format))
         if 'tags_present' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Tags')), text_format))
+        # Add plugin-custom columns
+        lp.extend([Paragraph(f'<b>{escape(col.title)}</b>', text_format) for col in self.extra_columns])
         l.append(lp)
 
         for registration in self._regList:
@@ -454,8 +467,12 @@ class RegistrantsListToPDF(PDFBase):
             if 'tags_present' in self.static_items:
                 tags = ', '.join(sorted(t.title for t in registration.tags))
                 lp.append(Paragraph(escape(tags), text_format))
+            for col in self.extra_columns:
+                col_data = col.data.get(registration)
+                lp.append(Paragraph(escape(col_data.text_value if col_data else ''), text_format))
             l.append(lp)
-        noneList = (None,) * (len(self._display) + len(self.static_items) + (accommodation_col_counter * 2) + 2)
+        noneList = (None,) * (len(self._display) + len(self.static_items)
+                              + (accommodation_col_counter * 2) + len(self.extra_columns) + 2)
         t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story
