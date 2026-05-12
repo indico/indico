@@ -8,7 +8,6 @@
 import React, {useMemo, useState} from 'react';
 import {
   Icon,
-  Message,
   Table,
   TableBody,
   TableCell,
@@ -23,19 +22,22 @@ import {
 
 import {Translate} from 'indico/react/i18n';
 
+import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import {TableColumnObj, TableObj, TableRowObj} from './types';
-
 import './ParticipantTable.module.scss';
 
 interface ParticipantTableProps {
   table: TableObj;
+  merged?: boolean;
 }
 
 type SortDirectionType = 'ascending' | 'descending' | null;
 type PerPageOptions = number | 'all';
 
-export default function ParticipantTable({table}: ParticipantTableProps) {
+export default function ParticipantTable({table, merged = true}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
+  const totalParticipantsCount = table.num_participants;
+  const hiddenParticipantsCount = table.num_anonymous_participants;
 
   const [sortColumn, setSortColumn] = useState<number | string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
@@ -122,7 +124,7 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [25, 50, 100, 'all'];
+  const perPageOptions = [10, 25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
@@ -137,6 +139,15 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
 
   return visibleParticipantsCount > 0 ? (
     <>
+      {merged && hiddenParticipantsCount > 0 && (
+        <div styleName="merged-view-hidden-participants-count">
+          <ParticipantCountHidden
+            count={totalParticipantsCount}
+            countHidden={hiddenParticipantsCount}
+            displayTotal={false}
+          />
+        </div>
+      )}
       <section styleName="participant-list-top">
         <div>
           Rows per page:
@@ -280,8 +291,10 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
       )}
     </>
   ) : (
-    <Message>
-      <Translate>No participants registered.</Translate>
-    </Message>
+    <ParticipantCountHidden
+      count={totalParticipantsCount}
+      countHidden={hiddenParticipantsCount}
+      displayTotal={false}
+    />
   );
 }

@@ -12,9 +12,14 @@ import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/
 interface ParticipantCountHiddenProps {
   count: number;
   countHidden: number;
+  displayTotal?: boolean;
 }
 
-export function ParticipantCountHidden({count, countHidden}: ParticipantCountHiddenProps) {
+export function ParticipantCountHidden({
+  count,
+  countHidden,
+  displayTotal = true,
+}: ParticipantCountHiddenProps) {
   if (count === 0) {
     return <Translate>No participants registered.</Translate>;
   }
@@ -28,9 +33,11 @@ export function ParticipantCountHidden({count, countHidden}: ParticipantCountHid
           <Param name="count" value={countHidden} /> participants registered anonymously.
         </Plural>
       </PluralTranslate>{' '}
-      <Translate>
-        Total amount of participants is <Param name="total" value={count} />.
-      </Translate>
+      {displayTotal && (
+        <Translate>
+          Total amount of participants is <Param name="total" value={count} />.
+        </Translate>
+      )}
     </div>
   );
 }
