@@ -24,8 +24,8 @@ interface MyContributionsProps {
 
 const SECTIONS = {
   speaker: Translate.string('Speaker'),
-  author: Translate.string('Author'),
-  'co-author': Translate.string('Co-author'),
+  primary: Translate.string('Author'),
+  secondary: Translate.string('Co-author'),
   submitter: Translate.string('Submitter'),
 };
 
