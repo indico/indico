@@ -53,7 +53,7 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
         <div styleName="participants-count-wrapper">
           {table.num_anonymous_participants > 0 && (
             <>
-              <span styleName="hidden">{table.num_anonymous_participants}</span>/
+              <span styleName="hidden">{table.num_anonymous_participants}</span>/{' '}
             </>
           )}
           {table.num_participants}
