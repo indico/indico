@@ -593,7 +593,7 @@ def get_registration_spreadsheet_column_formats(regform_items):
     }
 
 
-def generate_spreadsheet_from_registrations(registrations, regform_items, static_items, extra_columns):
+def generate_spreadsheet_from_registrations(registrations, regform_items, static_items, extra_columns=()):
     """Generate a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
