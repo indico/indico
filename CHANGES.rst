@@ -58,6 +58,8 @@ Accessibility
 - Icon-only buttons on the abstract detail page now have proper accessible names
   and tooltips instead of relying on the ``title`` attribute (:pr:`7474`, thanks
   :user:`foxbunny`)
+- Screen reader users can now navigate to the footer link list as a named
+  navigation landmark (:pr:`7559`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
