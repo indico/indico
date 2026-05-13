@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import React from 'react';
-import {List, Loader} from 'semantic-ui-react';
+import {List} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -17,23 +17,19 @@ import {Contribution, ContributionRecord} from './types';
 import './ContributionList.module.scss';
 
 interface ContributionList {
-  loading?: boolean;
   contributions: ContributionRecord | null;
   title?: string;
   emptyText?: string;
   actionsElement?: (contribution: Contribution) => React.ReactNode;
-  hideWhenEmpty?: boolean;
 }
 
 export function ContributionList({
-  loading,
   contributions,
   title,
   actionsElement,
   emptyText,
-  hideWhenEmpty = true,
 }: ContributionList) {
-  if (hideWhenEmpty && contributions === null) {
+  if (contributions === null) {
     return null;
   }
 
@@ -49,9 +45,7 @@ export function ContributionList({
       <div styleName="contribution-container">
         <div className="i-box just-group-list">
           <div className="i-box-content">
-            {loading ? (
-              <Loader active inline styleName="contrib-loader" />
-            ) : contributions !== null && Object.keys(contributions).length > 0 ? (
+            {contributions !== null && Object.keys(contributions).length > 0 ? (
               <List celled styleName="contrib-list">
                 {Object.values(contributions).map(contribution => (
                   <List.Item key={contribution.id} styleName="contrib-item">

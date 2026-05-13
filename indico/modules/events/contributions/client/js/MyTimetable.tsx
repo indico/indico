@@ -10,7 +10,7 @@ import contributionFavoriteURL from 'indico-url:contributions.favorite_contribut
 import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Icon} from 'semantic-ui-react';
+import {Icon, Loader, Message} from 'semantic-ui-react';
 
 import {useIndicoAxiosWithMutation} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -47,9 +47,20 @@ export function MyTimetable({eventId}: MyTimetableProps) {
     }
   };
 
+  if (loading) {
+    return <Loader active size="massive" inline="centered" />;
+  }
+
+  if (scheduledContributions !== null && Object.keys(scheduledContributions).length === 0) {
+    return (
+      <Message info>
+        <Translate>There are no contributions in your timetable.</Translate>
+      </Message>
+    );
+  }
+
   return (
     <ContributionList
-      loading={loading}
       contributions={scheduledContributions}
       emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
