@@ -50,7 +50,7 @@
             </div>
             <footer>
                 <div class="footer-generation-date">{{ generation_date }}</div>
-                <div class="footer-page-num">Page {{ loop.index }}</div>
+                <div class="footer-page-num">{% trans page=loop.index %}Page {{ page }}{% endtrans %}</div>
             </footer>
         </section>
     {% endfor %}

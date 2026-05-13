@@ -679,5 +679,6 @@ class AccommodationField(RegistrationFormBillableItemsField):
 
     def render_reglist_column(self, data):
         content_dict = self.get_friendly_data(data)
-        text_val = f"{content_dict['choice']} ({content_dict['nights']} nights)"
+        nights = ngettext('{n} night', '{n} nights', content_dict['nights']).format(n=content_dict['nights'])
+        text_val = f"{content_dict['choice']} ({nights})"
         return RegistrationListColumn(content_dict, text_val)

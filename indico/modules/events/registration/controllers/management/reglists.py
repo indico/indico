@@ -545,7 +545,7 @@ class RHRegistrationsExportPDF(RHRegistrationsExportBase):
             generation_date=format_date(now_utc(), format='full', timezone=self.event.tzinfo),
         )
         pdf = create_pdf(html, css, self.event)
-        return send_file(f'{filename}', pdf, 'application/pdf')
+        return send_file(filename, pdf, 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
