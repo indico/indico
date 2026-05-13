@@ -9,6 +9,7 @@ import myContributionsURL from 'indico-url:contributions.my_contributions_api';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Loader, Message} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -52,16 +53,26 @@ export function MyContributions({eventId}: MyContributionsProps) {
     url: myContributionsURL({event_id: eventId}),
   });
 
+  if (loading) {
+    return <Loader active size="massive" inline="centered" />;
+  }
+
+  if (myContributions !== null && Object.keys(myContributions).length === 0) {
+    return (
+      <Message info>
+        <Translate>There are no contributions linked to your Indico profile.</Translate>
+      </Message>
+    );
+  }
+
   return (
     <>
       {Object.entries(SECTIONS).map(([section, title]) => (
         <ContributionList
           key={section}
-          loading={loading}
           title={title}
           contributions={myContributions?.[section] ?? null}
           actionsElement={editContribution}
-          hideWhenEmpty
         />
       ))}
     </>
