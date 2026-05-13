@@ -159,6 +159,7 @@ function EmailField({validateUrl, person, otherPersons, ...rest}) {
     email = email.trim();
 
     if (email === '' || email === person?.email) {
+      form.change('avatarURL', person?.avatarURL);
       setMessage({status: '', message: ''});
       return;
     }
