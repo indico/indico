@@ -8,7 +8,7 @@
 import countriesURL from 'indico-url:users.api_countries';
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
@@ -21,8 +21,8 @@ const isoToFlag = code =>
 let countriesPromise = null;
 
 function useCountries() {
-  const [countries, setCountries] = React.useState(null);
-  React.useEffect(() => {
+  const [countries, setCountries] = useState(null);
+  useEffect(() => {
     if (!countriesPromise) {
       countriesPromise = indicoAxios
         .get(countriesURL({}))
