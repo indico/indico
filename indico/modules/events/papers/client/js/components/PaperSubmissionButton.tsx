@@ -59,28 +59,6 @@ export default function PaperSubmissionButton({
     await new Promise(() => null);
   };
 
-  // TODO this could probably be moved into the FileManager to support (via a new prop or passing explicit
-  // `null` fileTypes) the case where no file types should be displayed. in this case the `name` can be
-  // something dummy/empty as it should not be displayed to users
-  const fileTypes = _fileTypes.length
-    ? _fileTypes.map(fileType =>
-        fileType.filenameTemplate
-          ? {
-              ...fileType,
-              filenameTemplate: fileType.filenameTemplate.replace('{code}', contributionCode),
-            }
-          : fileType
-      )
-    : [
-        {
-          name: Translate.string('Paper files'),
-          extensions: [],
-          allowMultipleFiles: true,
-          filenameTemplate: null,
-          id: -1,
-        },
-      ];
-
   return (
     <>
       {data && modalOpen ? (
@@ -91,12 +69,12 @@ export default function PaperSubmissionButton({
           initialValues={{files: {}}}
           header={<Translate>Submit paper</Translate>}
           onClose={() => setModalOpen(false)}
-          size={fileTypes.length > 1 ? 'large' : 'small'}
+          size={_fileTypes.length > 1 ? 'large' : 'small'}
         >
           <FinalFileManager
             name="files"
-            fileTypes={fileTypes}
-            files={[]}
+            fileTypes={_fileTypes}
+            contributionCode={contributionCode}
             uploadURL={apiUploadURL({
               event_id: eventId,
               contrib_id: contributionId,
