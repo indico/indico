@@ -162,32 +162,25 @@ class QRCodeMixin:
 class RHQRCodeMetadata(QRCodeMixin, RH):
     """Return QR Code for URL, size (small, medium, large, extra large)and its metadata."""
 
-    @use_kwargs(
-        {
-            'url': fields.String(required=True),
-            'size_name': fields.String(
-                load_default='medium', validate=validate.OneOf(QRCodeMixin.qr_target_sizes.keys())
-            ),
-        },
-        location='query',
-    )
+    @use_kwargs({
+        'url': fields.String(required=True),
+        'size_name': fields.String(load_default='medium', validate=validate.OneOf(QRCodeMixin.qr_target_sizes)),
+    }, location='query')
     def _process(self, url, size_name):
         source_url = self._checked_url(url)
         qr = self._build_qr(source_url, box_size=10)
         sizes = self._calculate_possible_sizes(qr)
         size_data = sizes.get(size_name)
         box_size = size_data['box_size']
-        return jsonify(
-            {
-                'image_source_url': url_for(
-                    'events.url_qr_code_image', url=source_url, box_size=box_size, _external=True
-                ),
-                'qr_displayed_url': source_url,
-                'extension': 'png',
-                'download_sizes': sizes,
-                'dimensions': {'width': size_data['actual_pixels'], 'height': size_data['actual_pixels']},
-            }
-        )
+        return jsonify({
+            'image_source_url': url_for(
+                'events.url_qr_code_image', url=source_url, box_size=box_size, _external=True
+            ),
+            'qr_displayed_url': source_url,
+            'extension': 'png',
+            'download_sizes': sizes,
+            'dimensions': {'width': size_data['actual_pixels'], 'height': size_data['actual_pixels']},
+        })
 
 
 class RHQRCodeImage(QRCodeMixin, RH):
@@ -220,8 +213,4 @@ class RHQRCodeImage(QRCodeMixin, RH):
         output = BytesIO()
         qr_img.save(output, format='PNG')
         output.seek(0)
-        return send_file(
-            'event-qrcode.png',
-            output,
-            'image/png',
-        )
+        return send_file('event-qrcode.png', output, 'image/png')
