@@ -11,12 +11,11 @@ from urllib.parse import urlsplit
 
 import qrcode
 from flask import current_app, jsonify, redirect, request, session
-from marshmallow import validate
+from marshmallow import ValidationError, validate
 from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.colormasks import SolidFillColorMask
 from qrcode.image.styles.moduledrawers.pil import SquareModuleDrawer
 from webargs import fields
-from werkzeug.exceptions import BadRequest
 
 from indico.core.config import config
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
@@ -30,6 +29,11 @@ from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacy
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH, RHProtected, allow_signed_url
+
+
+def _check_url(target_url):
+    if urlsplit(target_url).hostname != urlsplit(config.BASE_URL).hostname:
+        raise ValidationError('URL for QR Code does not belong to this server')
 
 
 @allow_signed_url
@@ -127,11 +131,6 @@ class QRCodeMixin:
         'extra-large': 1920,
     }
 
-    def _checked_url(self, target_url):
-        if urlsplit(target_url).hostname != urlsplit(config.BASE_URL).hostname:
-            raise BadRequest('URL for QR Code does not belong to this server')
-        return target_url
-
     def _build_qr(self, url, box_size):
         qr = qrcode.QRCode(
             version=None,
@@ -163,20 +162,19 @@ class RHQRCodeMetadata(QRCodeMixin, RH):
     """Return QR Code for URL, size (small, medium, large, extra large)and its metadata."""
 
     @use_kwargs({
-        'url': fields.String(required=True),
+        'url': fields.String(required=True, validate=_check_url),
         'size_name': fields.String(load_default='medium', validate=validate.OneOf(QRCodeMixin.qr_target_sizes)),
     }, location='query')
     def _process(self, url, size_name):
-        source_url = self._checked_url(url)
-        qr = self._build_qr(source_url, box_size=10)
+        qr = self._build_qr(url, box_size=10)
         sizes = self._calculate_possible_sizes(qr)
         size_data = sizes.get(size_name)
         box_size = size_data['box_size']
         return jsonify({
             'image_source_url': url_for(
-                'events.url_qr_code_image', url=source_url, box_size=box_size, _external=True
+                'events.url_qr_code_image', url=url, box_size=box_size, _external=True
             ),
-            'qr_displayed_url': source_url,
+            'qr_displayed_url': url,
             'extension': 'png',
             'download_sizes': sizes,
             'dimensions': {'width': size_data['actual_pixels'], 'height': size_data['actual_pixels']},
@@ -186,16 +184,12 @@ class RHQRCodeMetadata(QRCodeMixin, RH):
 class RHQRCodeImage(QRCodeMixin, RH):
     """Return QRCode image for URL, box_size."""
 
-    @use_kwargs(
-        {
-            'url': fields.String(required=True),
+    @use_kwargs({
+            'url': fields.String(required=True, validate=_check_url),
             'box_size': fields.Int(load_default=10, validate=validate.Range(min=1, max=100)),
-        },
-        location='query',
-    )
+        }, location='query')
     def _process(self, url, box_size):
-        checked_url = self._checked_url(url)
-        qr = self._build_qr(checked_url, box_size)
+        qr = self._build_qr(url, box_size)
 
         qr_img = qr.make_image(
             image_factory=StyledPilImage,
