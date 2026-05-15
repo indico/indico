@@ -36,7 +36,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplayOptionalDownload({eventUrl, showDownloadMenu = true}) {
+function QrDisplay({eventUrl, showDownloadMenu = true}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
@@ -89,7 +89,7 @@ function QrDisplayOptionalDownload({eventUrl, showDownloadMenu = true}) {
   );
 }
 
-QrDisplayOptionalDownload.propTypes = {
+QrDisplay.propTypes = {
   eventUrl: PropTypes.string.isRequired,
   showDownloadMenu: PropTypes.bool,
 };
@@ -126,7 +126,7 @@ function ShareURL({eventShortUrl, eventExternalUrl}) {
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
       </div>
-      {showQR && <QrDisplayOptionalDownload eventUrl={eventExternalUrl} />}
+      {showQR && <QrDisplay eventUrl={eventExternalUrl} />}
     </div>
   );
 }
