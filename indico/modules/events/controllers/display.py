@@ -159,7 +159,7 @@ class QRCodeMixin:
         return sizes
 
 
-class RHQRCodeAndMetadata(QRCodeMixin, RH):
+class RHQRCodeMetadata(QRCodeMixin, RH):
     """Return QR Code for URL, size (small, medium, large, extra large)and its metadata."""
 
     @use_kwargs(

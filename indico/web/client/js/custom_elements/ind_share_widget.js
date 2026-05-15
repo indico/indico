@@ -36,7 +36,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
+function QrDisplayOptionalDownload({eventUrl, showDownloadMenu = true}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
@@ -89,12 +89,12 @@ function QrDisplayAndOptionalDownload({eventUrl, showDownloadMenu = true}) {
   );
 }
 
-QrDisplayAndOptionalDownload.propTypes = {
+QrDisplayOptionalDownload.propTypes = {
   eventUrl: PropTypes.string.isRequired,
   showDownloadMenu: PropTypes.bool,
 };
 
-function UrlCopyAndQrDownload({eventShortUrl, eventExternalUrl}) {
+function ShareURL({eventShortUrl, eventExternalUrl}) {
   const [isCopied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -126,12 +126,12 @@ function UrlCopyAndQrDownload({eventShortUrl, eventExternalUrl}) {
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
       </div>
-      {showQR && <QrDisplayAndOptionalDownload eventUrl={eventExternalUrl} />}
+      {showQR && <QrDisplayOptionalDownload eventUrl={eventExternalUrl} />}
     </div>
   );
 }
 
-UrlCopyAndQrDownload.propTypes = {
+ShareURL.propTypes = {
   eventShortUrl: PropTypes.string.isRequired,
   eventExternalUrl: PropTypes.string.isRequired,
 };
@@ -419,7 +419,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <UrlCopyAndQrDownload eventShortUrl={eventShortUrl} eventExternalUrl={eventExternalUrl} />
+          <ShareURL eventShortUrl={eventShortUrl} eventExternalUrl={eventExternalUrl} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
