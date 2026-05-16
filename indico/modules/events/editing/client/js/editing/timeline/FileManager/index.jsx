@@ -290,6 +290,7 @@ export default function FileManager({
   finalFieldName,
   pristine,
   mustChange,
+  allowMissingRequiredFiles,
   uploadableFiles,
 }) {
   const lastPristineRef = useRef(pristine);
@@ -326,7 +327,7 @@ export default function FileManager({
   }, [onChange, state, value]);
 
   const uploading = isUploading(state);
-  const validationError = getValidationError(state);
+  const validationError = getValidationError(state, allowMissingRequiredFiles);
   return (
     <div styleName="file-manager-wrapper">
       <div styleName="file-manager">
@@ -380,6 +381,7 @@ FileManager.propTypes = {
   finalFieldName: PropTypes.string,
   pristine: PropTypes.bool,
   mustChange: PropTypes.bool,
+  allowMissingRequiredFiles: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };
 
@@ -399,6 +401,7 @@ export function FinalFileManager({
   fileTypes,
   files = [],
   mustChange = false,
+  allowMissingRequiredFiles = false,
   uploadableFiles = [],
   ...rest
 }) {
@@ -418,6 +421,7 @@ export function FinalFileManager({
           pristine={pristine}
           mustChange={mustChange}
           uploadableFiles={uploadableFiles}
+          allowMissingRequiredFiles={allowMissingRequiredFiles}
         />
       )}
     </Field>
@@ -431,5 +435,6 @@ FinalFileManager.propTypes = {
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
   mustChange: PropTypes.bool,
+  allowMissingRequiredFiles: PropTypes.bool,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
 };

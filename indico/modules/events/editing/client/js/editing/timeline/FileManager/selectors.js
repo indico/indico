@@ -35,7 +35,8 @@ export const getUploadedFileUUIDs = state => {
 
 export const getValidationError = createSelector(
   state => state.fileTypes,
-  fileTypes => {
+  (__, allowMissingRequiredFiles) => allowMissingRequiredFiles,
+  (fileTypes, allowMissingRequiredFiles) => {
     const invalid = fileTypes
       .filter(ft => ft.invalidFiles.some(f => f.length > 0))
       .map(ft => ft.invalidFiles)
@@ -52,7 +53,7 @@ export const getValidationError = createSelector(
       .filter(ft => ft.required)
       .filter(ft => !ft.files.some(f => f.state !== 'deleted'))
       .map(ft => ft.name);
-    if (!missing.length) {
+    if (!missing.length || allowMissingRequiredFiles) {
       return null;
     }
     return PluralTranslate.string(
