@@ -250,6 +250,7 @@ export default function ReviewForm() {
                             uploadChanges)
                         }
                         mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
+                        allowMissingRequiredFiles={judgmentType === EditingReviewAction.reject}
                         requirePublishable={[
                           EditingReviewAction.accept,
                           EditingReviewAction.update,
