@@ -239,24 +239,27 @@ export default function ReviewForm() {
                       showAsToggle
                     />
                   )}
-                  <Field name="upload_changes" subscription={{value: true}}>
-                    {({input: {value: uploadChanges}}) => (
-                      <UpdateFilesBox
-                        visible={
-                          judgmentType === EditingReviewAction.update ||
-                          ([EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
-                            judgmentType
-                          ) &&
-                            uploadChanges)
-                        }
-                        mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
-                        requirePublishable={[
-                          EditingReviewAction.accept,
-                          EditingReviewAction.update,
-                        ].includes(judgmentType)}
-                      />
-                    )}
-                  </Field>
+                  {judgmentType !== EditingReviewAction.reject && (
+                    <Field name="upload_changes" subscription={{value: true}}>
+                      {({input: {value: uploadChanges}}) => (
+                        <UpdateFilesBox
+                          visible={
+                            judgmentType === EditingReviewAction.update ||
+                            ([
+                              EditingReviewAction.accept,
+                              EditingReviewAction.requestUpdate,
+                            ].includes(judgmentType) &&
+                              uploadChanges)
+                          }
+                          mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
+                          requirePublishable={[
+                            EditingReviewAction.accept,
+                            EditingReviewAction.update,
+                          ].includes(judgmentType)}
+                        />
+                      )}
+                    </Field>
+                  )}
                   <FinalTagInput name="tags" options={tagOptions} />
                   <div styleName="judgment-submit-button">
                     <Popup
