@@ -572,6 +572,10 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     def url(self):
         return url_for('contributions.display_contribution', self)
 
+    @property
+    def external_url(self):
+        return url_for('contributions.display_contribution', self, _external=True)
+
     def can_edit(self, user):
         # Submitters can edit their own contributions if configured
         from indico.modules.events.contributions import contribution_settings

@@ -109,6 +109,32 @@ class ContributionCodePlaceholder(Placeholder):
         return str(contribution.code)
 
 
+class ContributionBoardNumberPlaceholder(Placeholder):
+    advanced = True
+    name = 'contribution_board_number'
+    description = _('The board number of the contribution')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        return contribution.board_number
+
+
+class ContributionLinkPlaceholder(ParametrizedPlaceholder):
+    name = 'contribution_link'
+    param_friendly_name = 'link title'
+
+    @classmethod
+    def render(cls, param, contribution, **kwargs):
+        return Markup('<a href="{url}" title="{title}">{text}</a>').format(url=contribution.external_url,
+                                                                           title=contribution.title,
+                                                                           text=(param or contribution.external_url))
+
+    @classmethod
+    def iter_param_info(cls, **kwargs):
+        yield None, _('Link to the contribution')
+        yield 'custom-text', _('Custom link text instead of the full URL')
+
+
 class ContributionDurationPlaceholder(Placeholder):
     name = 'contribution_duration'
     description = _('The duration of the contribution (e.g. "20 minutes")')
