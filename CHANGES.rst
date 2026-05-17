@@ -23,6 +23,8 @@ Improvements
   picture when available (:pr:`7447`, thanks :user:`moliholy, unconventionaldotdev`)
 - Allow users to mark contributions as favorites (:issue:`3524`, :pr:`7256`)
 - Allow choosing whether to clone registration tags (:pr:`7506`)
+- Add placeholders for contribution link and board number for emailing contributions
+  (:pr:`7525`, thanks :user:`duartegalvao`)
 
 Bugfixes
 ^^^^^^^^
