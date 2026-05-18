@@ -66,6 +66,9 @@ class Paper(ProposalMixin):
             return False
         if check_state and self.is_in_final_state:
             return False
+        if (self.cfp.disable_reviewer_comments and self.can_review(user)
+            and not self.can_judge(user) and not self.can_manage(user)):
+            return False
         return self.can_submit(user) or self.can_judge(user) or self.can_review(user)
 
     def can_submit(self, user):

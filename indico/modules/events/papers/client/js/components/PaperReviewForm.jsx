@@ -52,9 +52,11 @@ export default function PaperReviewForm() {
   const renderReviewTrigger = () => {
     return (
       <div className="review-trigger flexrow">
-        <span className="comment-or-review">
-          <Translate>or</Translate>
-        </span>
+        {canComment && (
+          <span className="comment-or-review">
+            <Translate>or</Translate>
+          </span>
+        )}
         {reviewGroups.length === 1 ? (
           <Button onClick={() => setReviewGroup(reviewGroups[0])}>
             {reviewGroups[0] in reviewerData.reviews ? (
@@ -125,6 +127,12 @@ export default function PaperReviewForm() {
             !isInFinalState &&
             canReview &&
             renderReviewTrigger()}
+        </div>
+      );
+    } else if (canReview) {
+      return (
+        <div className="flexrow">
+          {reviewGroups.length > 0 && !isInFinalState && renderReviewTrigger()}
         </div>
       );
     }
