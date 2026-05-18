@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {RequestConfirmDelete} from 'indico/react/components';
+import {RequestConfirm, RequestConfirmDelete} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -26,6 +26,7 @@ export default function FormItemSetupActions({
   const dispatch = useDispatch();
   const [settingsModalActive, setSettingsModalActive] = useState(false);
   const [confirmDeleteActive, setConfirmDeleteActive] = useState(false);
+  const [confirmDisableActive, setConfirmDisableActive] = useState(false);
   const isCondition = useSelector(state => isFieldConditionFor(state, id));
 
   const handleEnableClick = () => {
@@ -33,7 +34,11 @@ export default function FormItemSetupActions({
   };
 
   const handleDisableClick = () => {
-    dispatch(actions.disableItem(id));
+    if (isCondition) {
+      setConfirmDisableActive(true);
+    } else {
+      dispatch(actions.disableItem(id));
+    }
   };
 
   const handleRemoveClick = () => {
@@ -48,12 +53,8 @@ export default function FormItemSetupActions({
     <>
       {!fieldIsPersonalData && (
         <a
-          className={`icon-remove hide-if-locked ${isCondition ? 'disabled' : ''}`}
-          title={
-            isCondition
-              ? Translate.string('Fields that are a condition for other fields cannot be deleted.')
-              : Translate.string('Delete field')
-          }
+          className="icon-remove hide-if-locked"
+          title={Translate.string('Delete field')}
           onClick={handleRemoveClick}
         />
       )}
@@ -66,12 +67,8 @@ export default function FormItemSetupActions({
       )}
       {!fieldIsRequired && isEnabled && (
         <a
-          className={`icon-disable hide-if-locked ${isCondition ? 'disabled' : ''}`}
-          title={
-            isCondition
-              ? Translate.string('Fields that are a condition for other fields cannot be disabled.')
-              : Translate.string('Disable field')
-          }
+          className="icon-disable hide-if-locked"
+          title={Translate.string('Disable field')}
           onClick={handleDisableClick}
         />
       )}
@@ -83,8 +80,32 @@ export default function FormItemSetupActions({
       {settingsModalActive && (
         <ItemSettingsModal id={id} onClose={() => setSettingsModalActive(false)} />
       )}
+      <RequestConfirm
+        header={Translate.string('Are you sure you want to disable this field?')}
+        confirmText={Translate.string('Disable field')}
+        requestFunc={() => {
+          setConfirmDisableActive(false);
+          dispatch(actions.disableItem(id));
+        }}
+        onClose={() => setConfirmDisableActive(false)}
+        open={confirmDisableActive}
+        persistent
+      >
+        <Translate>
+          Are you sure you want to disable the field "
+          <Param name="field" value={title} wrapper={<strong />} />
+          "?
+        </Translate>
+        <Translate as="p">
+          This field is used as a condition for other fields. Disabling it will render those
+          conditions ineffective.
+        </Translate>
+      </RequestConfirm>
       <RequestConfirmDelete
-        requestFunc={() => dispatch(actions.removeItem(id))}
+        requestFunc={() => {
+          setConfirmDeleteActive(false);
+          dispatch(actions.removeItem(id));
+        }}
         onClose={() => setConfirmDeleteActive(false)}
         open={confirmDeleteActive}
         persistent
@@ -94,6 +115,12 @@ export default function FormItemSetupActions({
           <Param name="field" value={title} wrapper={<strong />} />
           "?
         </Translate>
+        {isCondition && (
+          <Translate as="p">
+            This field is used as a condition for other fields. Deleting it will permanently remove
+            those conditional relationships. This action cannot be undone.
+          </Translate>
+        )}
       </RequestConfirmDelete>
     </>
   );

@@ -10,14 +10,12 @@ from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
-from indico.core.errors import NoReportError
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
 
@@ -60,6 +58,15 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
     def _process_DELETE(self):
         if self.section.type == RegistrationFormItemType.section_pd:
             raise BadRequest
+        linked_fields = []
+        for field in self.section.children:
+            field.show_if_id = None
+            field.show_if_values = None
+            for linked_field in field.condition_for:
+                linked_field.show_if_id = None
+                linked_field.show_if_values = None
+                if linked_field.parent.is_enabled:
+                    linked_fields.append(linked_field)
         self.section.is_deleted = True
         db.session.flush()
         self.section.log(
@@ -67,7 +74,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             f'Section "{self.section.title}" in "{self.regform.title}" deleted', session.user
         )
         logger.info('Section %s deleted by %s', self.section, session.user)
-        return jsonify(success=True)
+        return jsonify(success=True, updated_items_view_data=[item.view_data for item in linked_fields])
 
     def _process_PATCH(self):
         changes = request.json['changes']
@@ -79,7 +86,8 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         if changes.get('is_manager_only') == (False, True):
             # Check that no field in this section is conditionally shown
             if any(field.show_if_id is not None for field in self.section.children if not field.is_deleted):
-                raise ValidationError('Sections with conditional fields cannot be made manager-only')
+                raise ValidationError('This section cannot be made manager-only because it contains fields that are '
+                                      'conditionally shown. Remove those dependencies first.')
             # Check no conditional fields depend on this section if it is becoming manager-only now
             critical_fields_ids = {field.id for field in self.section.children if not field.is_deleted}
             for section in self.regform.sections:
@@ -88,7 +96,8 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
                 fields_ids = {field.show_if_id for field in section.children
                               if field.show_if_id is not None and not field.is_deleted}
                 if critical_fields_ids & fields_ids:
-                    raise ValidationError('Cannot make section manager-only due to conditional field relations')
+                    raise ValidationError('This section cannot be made manager-only because other fields depend on '
+                                          'fields inside it. Remove those dependencies first.')
         db.session.flush()
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
@@ -109,13 +118,8 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
 
     def _process_POST(self):
         enabled = request.args.get('enable') == 'true'
-        if not enabled:
-            if self.section.type == RegistrationFormItemType.section_pd:
-                raise BadRequest
-            if any(f.condition_for for f in self.section.children):
-                raise NoReportError.wrap_exc(
-                    BadRequest(_('Sections with fields used as conditional cannot be disabled'))
-                )
+        if not enabled and self.section.type == RegistrationFormItemType.section_pd:
+            raise BadRequest
         self.section.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
@@ -131,8 +135,12 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
                 f'Section "{self.section.title}" in "{self.regform.title}" disabled', session.user
             )
             logger.info('Section %s disabled by %s', self.section, session.user)
+        linked_fields = [linked_field for field in self.section.children
+                         for linked_field in field.condition_for
+                         if linked_field.parent.is_enabled]
         return jsonify_data(view_data=self.section.view_data,
-                            positions=get_flat_section_positions_setup_data(self.regform))
+                            positions=get_flat_section_positions_setup_data(self.regform),
+                            updated_items_view_data=[item.view_data for item in linked_fields])
 
 
 class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):

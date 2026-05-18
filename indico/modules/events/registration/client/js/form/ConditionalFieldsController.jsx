@@ -24,7 +24,7 @@ export default function ConditionalFieldsController() {
   const fieldRegistry = getFieldRegistry();
 
   const hiddenItemIds = Object.values(fields)
-    .filter(field => field.showIfFieldId)
+    .filter(field => field.showIfFieldId && !field.isShowIfFieldDisabled)
     .map(field => {
       const conditionalField = fields[field.showIfFieldId];
       const conditionalValues = fieldRegistry[conditionalField.inputType].getDataForCondition(

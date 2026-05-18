@@ -1153,6 +1153,9 @@ def is_conditional_field_shown(field, data, *, is_db_data=False):
     # not conditional
     if not field.show_if_field:
         return True
+    # condition field's section is disabled
+    if field.is_show_if_field_disabled:
+        return True
     # condition field has no data
     if (show_if_data := data.get(field.show_if_id)) is None:
         return False

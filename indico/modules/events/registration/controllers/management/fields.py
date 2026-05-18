@@ -148,22 +148,23 @@ class GeneralFieldDataSchema(mm.Schema):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         if field_id is None:
             return
-        field = self.context['field']
-        if field.parent.is_manager_only:
+        current_field = self.context['field']
+        if current_field.parent.is_manager_only:
             raise ValidationError('Manager-only fields cannot be conditionally shown')
         used_field_ids = set()
-        if field.id is not None:
-            if field.id == field_id:
+        if current_field.id is not None:
+            if current_field.id == field_id:
                 raise ValidationError('The field cannot conditionally depend on itself to be shown')
-            used_field_ids.add(field.id)
+            used_field_ids.add(current_field.id)
         regform = self.context['regform']
         if not (condition_field := RegistrationFormItem.query.with_parent(regform).filter_by(id=field_id).first()):
             raise ValidationError('The field to show does not belong to the same registration form.')
         if not condition_field.field_impl.allow_condition:
             raise ValidationError('This field cannot be used as a condition.')
-        if not condition_field.is_enabled:
+        # if the field is already used as a condition, then don't check again whether it is disabled or not
+        if current_field.show_if_field != condition_field and not condition_field.is_enabled:
             raise ValidationError('Disabled fields cannot be used as a condition.')
-        if not condition_field.parent.is_enabled:
+        if current_field.show_if_field != condition_field and not condition_field.parent.is_enabled:
             raise ValidationError('Fields in disabled sections cannot be used as a condition.')
         # Avoid cycles
         next_field_id = field_id
@@ -175,8 +176,6 @@ class GeneralFieldDataSchema(mm.Schema):
             next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
             if next_field.parent.is_manager_only:
                 raise ValidationError('Field conditions may not depend on fields in manager-only sections')
-            if not next_field.is_enabled:
-                raise ValidationError('Field conditions may not depend on disabled fields')
             next_field_id = next_field.show_if_id
 
     @validates_schema(skip_on_field_errors=True)
@@ -326,13 +325,10 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
-        if not enabled and self.field.condition_for:
-            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         if enabled:
             self._check_unique_title_in_section()
             self._check_unique_internal_name_in_form()
             self._check_internal_name_type_consistency_in_event()
-
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
@@ -348,7 +344,10 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 EventLogRealm.management, LogKind.negative, 'Registration',
                 f'Field "{self.field.title}" in "{self.regform.title}" disabled', session.user
             )
-        return jsonify(view_data=self.field.view_data, positions=get_flat_section_positions_setup_data(self.regform))
+        linked_fields = [field for field in self.field.condition_for
+                         if field.parent.is_enabled]
+        return jsonify(view_data=self.field.view_data, positions=get_flat_section_positions_setup_data(self.regform),
+                       updated_items_view_data=[item.view_data for item in linked_fields])
 
 
 class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
@@ -357,8 +356,14 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
+        linked_fields = []
         if self.field.condition_for:
-            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
+            for linked_field in self.field.condition_for:
+                linked_field.show_if_id = None
+                linked_field.show_if_values = None
+                # Only checking that the section is enabled because fields in disabled sections are not shown in the UI
+                if linked_field.parent.is_enabled:
+                    linked_fields.append(linked_field)
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
         self.field.show_if_id = None
@@ -370,7 +375,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             f'Field "{self.field.title}" in "{self.regform.title}" deleted', session.user
         )
         logger.info('Field %s deleted by %s', self.field, session.user)
-        return jsonify()
+        return jsonify(updated_items_view_data=[item.view_data for item in linked_fields])
 
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
@@ -379,6 +384,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
+        old_show_if_id = self.field.show_if_id
         changes = _fill_form_field_with_data(self.field, field_data)
         signals.event.registration_form_field_changed.send(self.field)
         changes = make_diff_log(changes, {
@@ -388,12 +394,23 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             'retention_period': {'title': 'Retention period'},
             'internal_name': {'title': 'Internal name', 'type': 'string'},
         })
+        updated_items = []
+        new_show_if_id = self.field.show_if_id
+        if old_show_if_id != new_show_if_id:
+            if old_show_if_id is not None:
+                old_field = RegistrationFormItem.query.with_parent(self.regform).filter_by(id=old_show_if_id).first()
+                if old_field:
+                    updated_items.append(old_field.view_data)
+            if new_show_if_id is not None:
+                new_field = RegistrationFormItem.query.with_parent(self.regform).filter_by(id=new_show_if_id).first()
+                if new_field:
+                    updated_items.append(new_field.view_data)
         self.field.log(
             EventLogRealm.management, LogKind.change, 'Registration',
             f'Field "{self.field.title}" in "{self.regform.title}" modified', session.user,
             data={'Changes': changes}
         )
-        return jsonify(view_data=self.field.view_data)
+        return jsonify(view_data=self.field.view_data, updated_items_view_data=updated_items)
 
 
 class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
