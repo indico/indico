@@ -29,8 +29,6 @@ $(document).ready(() => {
     },
   });
 
-  $('.contextHelp[title]').qtip();
-
   /* Add qTips to elements with a title attribute. The position of the qTip
    * can be specified in the data-qtip-position attribute and is one of
    * "top", "left", "bottom" or "right". It defaults to "bottom".
@@ -170,14 +168,6 @@ $(document).ready(() => {
   // Prevent # in the URL when clicking disabled links
   $('body').on('click', 'a.disabled', evt => {
     evt.preventDefault();
-  });
-
-  $('.contextHelp[data-src]').qtip({
-    content: {
-      text() {
-        return $($(this).data('src')).removeClass('tip');
-      },
-    },
   });
 
   function initDropdowns($container) {
