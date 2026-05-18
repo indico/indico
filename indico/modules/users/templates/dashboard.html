@@ -140,7 +140,7 @@
                                     <span title="{{ role_titles.management }}" class="icon-medal {{ 'active' if roles.management }}"></span>
                                     <span title="{{ role_titles.reviewing }}" class="icon-user-reading {{ 'active' if roles.reviewing }}"></span>
                                     <span title="{{ role_titles.attendance }}" class="icon-ticket {{ 'active' if roles.attendance }}"></span>
-                                    <span title="{{ role_titles.favorited }}" class="icon-star {% if roles.favorited %}active{% endif %}"></span>
+                                    <span title="{{ role_titles.favorited }}" class="icon-star {{ 'active' if roles.favorited }}"></span>
                                 </span>
                             </li>
                         {% else %}
