@@ -14,7 +14,7 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-authlib==1.6.11
+authlib==1.7.2
     # via -r requirements.in
 babel==2.18.0
     # via
@@ -76,6 +76,7 @@ cryptography==46.0.7
     # via
     #   authlib
     #   google-auth
+    #   joserfc
 cssselect2==0.9.0
     # via weasyprint
 decorator==5.2.1
@@ -171,6 +172,8 @@ jinja2==3.1.6
     #   flask
     #   flask-babel
     #   flask-pluginengine
+joserfc==1.6.5
+    # via authlib
 jsonschema==4.26.0
     # via -r requirements.in
 jsonschema-specifications==2025.9.1
@@ -363,7 +366,7 @@ ua-parser==1.0.1
     # via -r requirements.in
 ua-parser-builtins==202602
     # via ua-parser
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   requests
     #   sentry-sdk
