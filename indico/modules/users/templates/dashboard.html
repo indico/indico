@@ -137,14 +137,10 @@
                                     'favorited': _('You have favorited this event') if roles.favorited else _('You have not favorited this event')
                                 } %}
                                 <span class="item-legend">
-                                    <span title="{{ role_titles.management }}"
-                                          class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
-                                    <span title="{{ role_titles.reviewing }}"
-                                          class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
-                                    <span title="{{ role_titles.attendance }}"
-                                          class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
-                                    <span title="{{ role_titles.favorited }}"
-                                          class="icon-star contextHelp {% if roles.favorited %}active{% endif %}"></span>
+                                    <span title="{{ role_titles.management }}" class="icon-medal {% if roles.management %}active{% endif %}"></span>
+                                    <span title="{{ role_titles.reviewing }}" class="icon-user-reading {% if roles.reviewing %}active{% endif %}"></span>
+                                    <span title="{{ role_titles.attendance }}" class="icon-ticket {% if roles.attendance %}active{% endif %}"></span>
+                                    <span title="{{ role_titles.favorited }}" class="icon-star {% if roles.favorited %}active{% endif %}"></span>
                                 </span>
                             </li>
                         {% else %}
