@@ -145,16 +145,26 @@ class ContributionDurationPlaceholder(Placeholder):
             return format_human_timedelta(contribution.duration, 'minutes')
 
 
-class ContributionSchedulePlaceholder(Placeholder):
+class ContributionSchedulePlaceholder(ParametrizedPlaceholder):
     name = 'contribution_schedule'
-    description = _('The scheduled date/time of the contribution, or "n/a" if unscheduled')
+    param_required = False
+    param_restricted = True
 
     @classmethod
-    def render(cls, contribution, **kwargs):
+    def iter_param_info(cls, **kwargs):
+        yield None, _('The scheduled date/time of the contribution, or "n/a" if unscheduled')
+        yield 'weekday', _('The scheduled date/time including the weekday, or "n/a" if unscheduled')
+
+    @classmethod
+    def render(cls, param, contribution, **kwargs):
         with contribution.event.force_event_locale():
             if not contribution.start_dt:
                 return _('n/a')
-            return format_datetime(contribution.start_dt, timezone=contribution.event.tzinfo)
+            scheduled = format_datetime(contribution.start_dt, timezone=contribution.event.tzinfo)
+            if param != 'weekday':
+                return scheduled
+            weekday = format_datetime(contribution.start_dt, format='EEEE', timezone=contribution.event.tzinfo)
+            return f'{weekday}, {scheduled}'
 
 
 class AbstractIDPlaceholder(Placeholder):
