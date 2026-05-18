@@ -26,7 +26,7 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
   const canReview = useSelector(canReviewPaper);
   const canJudge = useSelector(canJudgePaper);
-  const reviewersLimitedComments = useSelector(limitReviewerComments);
+  const disableContributorVisibility = useSelector(limitReviewerComments);
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible
     ? {autoFocus: true}
@@ -69,7 +69,7 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
   if (!canJudge) {
     delete visibilityOptions.judges;
   }
-  if (reviewersLimitedComments) {
+  if (disableContributorVisibility) {
     delete visibilityOptions.contributors;
   }
 
