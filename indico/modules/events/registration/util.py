@@ -389,7 +389,8 @@ def make_registration_schema(
 
         if mm_field := form_item.field_impl.create_mm_field(
             registration=registration,
-            override_required=(management and override_required)
+            override_required=(management and override_required),
+            management=management
         ):
             schema[form_item.html_field_name] = mm_field
 

@@ -35,6 +35,7 @@ export default function DateRangePicker({
   startDisabled,
   endDisabled,
   required,
+  allowOutOfRange,
   onChange,
   onFocus,
   onBlur,
@@ -91,6 +92,7 @@ export default function DateRangePicker({
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
       range-end-max={rangeEndMax}
+      allow-out-of-range={allowOutOfRange || undefined}
       format={format}
       onChange={handleChange}
     >
@@ -183,6 +185,7 @@ DateRangePicker.propTypes = {
   rangeEndMax: PropTypes.string,
   min: PropTypes.string,
   max: PropTypes.string,
+  allowOutOfRange: PropTypes.bool,
   filter: PropTypes.func,
 };
 
@@ -203,6 +206,7 @@ DateRangePicker.defaultProps = {
   rangeEndMax: '',
   min: '',
   max: '',
+  allowOutOfRange: false,
   filter: undefined,
 };
 
