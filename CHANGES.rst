@@ -10,8 +10,6 @@ Version 3.3.13
 Improvements
 ^^^^^^^^^^^^
 
-- Allow managers to override accommodation date range validation when editing
-  registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 - Include keywords in contribution CSV/Excel exports (:pr:`7421`)
 - Add new permission that grants only participant management (create, edit and
   delete registrations) without access to the registration form configuration
@@ -28,6 +26,8 @@ Improvements
 - Add placeholders for contribution link and board number for emailing contributions
   (:pr:`7525`, thanks :user:`duartegalvao`)
 - Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
+- Allow managers to override accommodation date range validation when editing
+  registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

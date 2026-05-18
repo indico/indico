@@ -263,7 +263,11 @@ export default function AccommodationInput({
         } else if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
           return Translate.string('You must select the arrival and departure date');
         }
-        if (!value.isNoAccommodation) {
+        if (
+          !value.isNoAccommodation &&
+          (existingValue?.arrivalDate !== value.arrivalDate ||
+            existingValue?.departureDate !== value.departureDate)
+        ) {
           const rangeValidators = makeAccommodationRangeValidators({
             required: true,
             rangeStartMin: management ? null : arrival.startDate,
