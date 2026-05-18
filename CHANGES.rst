@@ -25,6 +25,7 @@ Improvements
 - Allow choosing whether to clone registration tags (:pr:`7506`)
 - Add placeholders for contribution link and board number for emailing contributions
   (:pr:`7525`, thanks :user:`duartegalvao`)
+- Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
 
 Bugfixes
 ^^^^^^^^
