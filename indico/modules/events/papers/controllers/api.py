@@ -11,11 +11,10 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.controllers.display import RHSubmitPaperBase
-from indico.modules.events.papers.fields import PaperFilesField
+from indico.modules.events.papers.fields import PaperCommentVisibilityField, PaperFilesField
 from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
-from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
-                                                         PaperReviewType, PaperTypeProxy)
+from indico.modules.events.papers.models.reviews import PaperAction, PaperReview, PaperReviewType, PaperTypeProxy
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_comment, create_new_paper, create_paper_revision,
                                                      create_review, delete_comment, judge_paper, reset_paper_state,
@@ -50,10 +49,10 @@ class RHCreatePaperComment(RHPaperBase):
     def _check_paper_protection(self):
         return self.paper.can_comment(session.user)
 
-    @use_kwargs({
+    @use_rh_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': fields.Enum(PaperCommentVisibility, load_default=None)
-    })
+        'visibility': PaperCommentVisibilityField(required=True)
+    }, rh_context=('event', 'paper'))
     def _process(self, comment, visibility):
         create_comment(self.paper, comment, visibility, session.user)
         return '', 204
@@ -82,11 +81,12 @@ class RHCommentActions(RHPaperBase):
         delete_comment(self.comment)
         return '', 204
 
-    @use_kwargs({
+    @use_rh_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': fields.Enum(PaperCommentVisibility)
-    }, partial=True)
+        'visibility': PaperCommentVisibilityField(load_default=None)
+    }, partial=True, rh_context=('event', 'paper'))
     def _process_PATCH(self, comment=None, visibility=None):
+        print(comment, visibility)
         update_comment(self.comment, comment, visibility)
         return '', 204
 
