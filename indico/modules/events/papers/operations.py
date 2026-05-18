@@ -332,6 +332,10 @@ def update_review(review, review_data, questions_data):
 
 @no_autoflush
 def create_comment(paper, text, visibility, user):
+    if (paper.cfp.limit_reviewer_comments and paper.can_review(user)
+        and not paper.can_judge(user) and not paper.can_manage(user)
+        and visibility == PaperCommentVisibility.contributors):
+        visibility = PaperCommentVisibility.reviewers
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
     paper.last_revision.comments.append(comment)
     db.session.flush()
@@ -356,6 +360,10 @@ def update_comment(comment, text=None, visibility=None):
     if text:
         new_values['text'] = text
     if visibility is not None:
+        if (comment.paper.cfp.limit_reviewer_comments and comment.paper.can_review(session.user)
+            and not comment.paper.can_judge(session.user) and not comment.paper.can_manage(session.user)
+            and visibility == PaperCommentVisibility.contributors):
+            visibility = PaperCommentVisibility.reviewers
         new_values['visibility'] = visibility
     changes = comment.populate_from_dict(new_values)
     comment.modified_by = session.user
