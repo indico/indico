@@ -14,7 +14,7 @@ import {Button, Form} from 'semantic-ui-react';
 import {FinalDropdown, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {canJudgePaper, canReviewPaper, limitReviewerComments} from '../selectors';
+import {canJudgePaper, canReviewPaper, disableContributorVisibility} from '../selectors';
 
 /**
  * @param {Function} onSubmit - function invoked on the form submission
@@ -26,7 +26,7 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
   const canReview = useSelector(canReviewPaper);
   const canJudge = useSelector(canJudgePaper);
-  const disableContributorVisibility = useSelector(limitReviewerComments);
+  const disableContributorsVisibility = useSelector(disableContributorVisibility);
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible
     ? {autoFocus: true}
@@ -69,7 +69,7 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
   if (!canJudge) {
     delete visibilityOptions.judges;
   }
-  if (disableContributorVisibility) {
+  if (disableContributorsVisibility) {
     delete visibilityOptions.contributors;
   }
 
