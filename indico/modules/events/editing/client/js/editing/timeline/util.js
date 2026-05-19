@@ -16,10 +16,16 @@ import {filePropTypes} from './FileManager/util';
 // This method defines each revision as a block
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
+  const fileUploadDates = new Map();
   return revisions.map((revision, i) => {
     const previousRevision = getPreviousRevisionWithFiles(revisions, i);
     // Set the state on the files that were added/modified in this revision
-    let files = revision.files;
+    let files = revision.files?.map(file => {
+      if (!fileUploadDates.has(file.uuid)) {
+        fileUploadDates.set(file.uuid, revision.createdDt);
+      }
+      return {...file, uploadedDt: fileUploadDates.get(file.uuid)};
+    });
     if (previousRevision && files?.length) {
       const previousFilesUUIDs = new Set(previousRevision.files.map(f => f.uuid));
       const previousFilenames = new Set(previousRevision.files.map(f => f.filename));
