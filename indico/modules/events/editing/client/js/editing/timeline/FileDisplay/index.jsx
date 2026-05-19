@@ -13,6 +13,7 @@ import {Button, Icon, Message, Popup} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
+import {serializeDate} from 'indico/utils/date';
 
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
 import * as selectors from '../selectors';
@@ -35,10 +36,15 @@ function FileListDisplay({files}) {
 
   return (
     <ul styleName="file-list-display">
-      {files.map(({filename, uuid, downloadURL, state}) => (
+      {files.map(({filename, uuid, downloadURL, state, uploadedDt}) => (
         <li key={uuid} styleName="file-row">
           <TooltipIfTruncated>
-            <span styleName="file-name">
+            <span
+              styleName="file-name"
+              title={Translate.string('Uploaded on {date}', {
+                date: serializeDate(uploadedDt, 'LLL'),
+              })}
+            >
               {state && (
                 <Popup
                   trigger={<Icon name={stateIcon[state].icon} color={stateIcon[state].color} />}
