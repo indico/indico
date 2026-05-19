@@ -43,6 +43,10 @@ Bugfixes
   language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
 - Do not show "Clone Abstract" icon outside management area (:pr:`7493`)
 - Allow rejecting editables w/ missing required files (:pr:`7524`)
+- Fix select and combobox dropdowns appearing detached from their input on
+  mobile when the page is pinch-zoomed, when the input is near a viewport
+  edge, or when the virtual keyboard is open (:pr:`7529`, thanks
+  :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

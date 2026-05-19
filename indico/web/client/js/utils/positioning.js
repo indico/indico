@@ -5,50 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {domReady} from 'indico/utils/domstate';
-
-let viewportWidth = document.documentElement.clientWidth;
-let viewportHeight = document.documentElement.clientHeight;
-
-domReady.then(() => setTimeout(updateClientGeometry));
-window.addEventListener('resize', updateClientGeometry);
-
-function updateClientGeometry() {
-  viewportWidth = document.documentElement.clientWidth;
-  viewportHeight = document.documentElement.clientHeight;
-}
-
-// XXX: On Safari (and generally browsers that support visual viewports)
-// we use calculations based around the visual viewport offsets to account
-// for the UI overlays such as virtual keyboards. For efficiency, the following
-// functions have dual definitions based on whether the visual viewport is
-// supported, so that we don't test for it on every call.
-//
-// Visual viewport offsets determine how much the viewport is pushed uo (or
-// left) compared to its original location when the UI overlay is not shown.
-// Therefore we must *add* these offsets to compensate.
-//
-// Note that currently these calculations do not account for elastic scroll.
-// You should expect that the calculations are going to be off by some margin
-// while the elastic scroll is in effect. There is no known (to me) method that
-// accounts for these. If you find it, you should apply it to these functions,
-// as they represent the single source of truth for any kind of coordinate
-// adjustment.
-
-const hasVisualViewport = window.visualViewport !== undefined;
-
-const getScrollTop = hasVisualViewport
-  ? () => window.scrollY + visualViewport.offsetTop
-  : () => window.scrollY;
-
-const getScrollLeft = hasVisualViewport
-  ? () => window.scrollX + visualViewport.offsetLeft
-  : () => window.scrollX;
-
-const getVisualY = hasVisualViewport ? y => y + visualViewport.offsetTop : y => y;
-
-const getVisualX = hasVisualViewport ? x => x + visualViewport.offsetLeft : x => x;
-
 // Positioning strategies
 //
 // The mixins represent the generic positioning methods, while the
@@ -61,6 +17,22 @@ const getVisualX = hasVisualViewport ? x => x + visualViewport.offsetLeft : x =>
 //
 // The code in this module is used in conjunction with the CSS. It relies
 // on the following behavior:
+//
+// The dropdown / popup targets are positioned using `position: fixed`,
+// whose `top`/`left` resolve against the *layout* viewport. The geometry
+// reads (`getBoundingClientRect`, `window.scrollY/X`) are in the same
+// frame, so we do not need — and must not apply — any visual-viewport
+// compensation: doing so would double-shift the target by
+// `visualViewport.offsetTop`/`offsetLeft` whenever the user is
+// pinch-zoomed and panned (a common case on non-responsive pages
+// viewed on mobile).
+//
+// We do still listen for `visualViewport`'s resize/scroll events so
+// the position is recomputed when the visible area changes (virtual
+// keyboard, zoom in/out), but the offsets themselves are not folded
+// into the coordinates.
+//
+// Note that the calculations do not account for elastic scroll.
 
 const geometry = {
   setAnchorGeometry() {
@@ -78,21 +50,21 @@ const geometry = {
     // Vertical geometry
     this.targetHeight ??= this.targetRect.height;
     this.anchorHeight ??= this.anchorRect.height;
-    this.anchorTop ??= getVisualY(this.anchorRect.top);
-    this.anchorBottom ??= getVisualY(this.anchorRect.bottom);
+    this.anchorTop ??= this.getVisualY(this.anchorRect.top);
+    this.anchorBottom ??= this.getVisualY(this.anchorRect.bottom);
     // Horizontal geometry
     this.targetWidth ??= this.targetRect.width;
     this.anchorWidth ??= this.anchorRect.width;
-    this.anchorLeft ??= getVisualX(this.anchorRect.left);
-    this.anchorRight ??= getVisualX(this.anchorRect.right);
+    this.anchorLeft ??= this.getVisualX(this.anchorRect.left);
+    this.anchorRight ??= this.getVisualX(this.anchorRect.right);
     // Initial scroll positions
     // XXX: These are remembered because, instead of calculating the
     // positions of each element over and over for each scroll event,
     // we simply adjust the position based on scroll distance. This
     // prevents layout thrashing because scroll positions can be read
     // without forced reflow.
-    this.initialScrollTop = getScrollTop();
-    this.initialScrollLeft = getScrollLeft();
+    this.initialScrollTop = this.getScrollTop();
+    this.initialScrollLeft = this.getScrollLeft();
   },
   resetGeometry(callback) {
     delete this.anchorRect;
@@ -115,24 +87,22 @@ const geometry = {
     });
   },
   setTop(top) {
-    const scrollOffset = getScrollTop() - this.initialScrollTop;
-    this.target.style.setProperty(
-      '--target-top',
-      `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
-    );
+    const scrollOffset = this.getScrollTop() - this.initialScrollTop;
+    this.target.style.setProperty('--target-top', `${top - scrollOffset}px`);
   },
   setLeft(left) {
-    const scrollOffset = getScrollLeft() - this.initialScrollLeft;
-    this.target.style.setProperty(
-      '--target-left',
-      `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
-    );
+    const scrollOffset = this.getScrollLeft() - this.initialScrollLeft;
+    this.target.style.setProperty('--target-left', `${left - scrollOffset}px`);
   },
 };
 
 const verticalPreferAbovePosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.targetHeight <= this.anchorTop;
+    const roomAbove = this.anchorTop - this.visibleTop;
+    const roomBelow = this.visibleBottom - this.anchorBottom;
+    const fitsAbove = this.targetHeight <= roomAbove;
+    const fitsBelow = this.targetHeight <= roomBelow;
+    this.fitsPreferredDirection = fitsAbove || (!fitsBelow && roomAbove >= roomBelow);
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
@@ -145,8 +115,11 @@ const verticalPreferAbovePosition = {
 
 const verticalPreferBelowPosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.anchorBottom + this.targetHeight <= viewportHeight;
-    this.firsOppositeDirection = this.anchorTop - this.targetHeight > 0;
+    const roomBelow = this.visibleBottom - this.anchorBottom;
+    const roomAbove = this.anchorTop - this.visibleTop;
+    const fitsBelow = this.targetHeight <= roomBelow;
+    const fitsAbove = this.targetHeight <= roomAbove;
+    this.fitsPreferredDirection = fitsBelow || (!fitsAbove && roomBelow >= roomAbove);
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
@@ -178,7 +151,12 @@ const horizontalCenter = {
 
 const horizontalFlush = {
   calculateAlignment() {
-    this.alignsPreferredSide = this.anchorLeft + this.targetWidth <= viewportWidth;
+    const spaceForFlushLeft = this.visibleRight - this.anchorLeft;
+    const spaceForFlushRight = this.anchorRight - this.visibleLeft;
+    const flushLeftFits = this.targetWidth <= spaceForFlushLeft;
+    const flushRightFits = this.targetWidth <= spaceForFlushRight;
+    this.alignsPreferredSide =
+      flushLeftFits || (!flushRightFits && spaceForFlushLeft >= spaceForFlushRight);
   },
   setAlignment() {
     if (this.alignsPreferredSide) {
@@ -191,7 +169,11 @@ const horizontalFlush = {
 
 const horizontalTargetPosition = {
   calculateFit() {
-    this.fitsPreferredDirection = this.targetWidth <= viewportWidth - this.anchorRight;
+    const roomRight = this.visibleRight - this.anchorRight;
+    const roomLeft = this.anchorLeft - this.visibleLeft;
+    const fitsRight = this.targetWidth <= roomRight;
+    const fitsLeft = this.targetWidth <= roomLeft;
+    this.fitsPreferredDirection = fitsRight || (!fitsLeft && roomRight >= roomLeft);
   },
   setPosition() {
     if (this.fitsPreferredDirection) {
@@ -278,11 +260,66 @@ export const popupPositionStrategy = {
  *
  * The exact strategy for calculating these values is defined by the
  * `*Strategy` objects defined in this module.
+ *
+ * The fifth argument allows the caller to override the viewport
+ * accessors used by the strategies. The defaults read from the live
+ * `window` / `document.documentElement` / `window.visualViewport`,
+ * which is what production code wants. Tests can pass in fakes to
+ * exercise specific viewport scenarios without monkey-patching
+ * globals.
  */
-export function position(target, anchor, strategy, callback) {
+export function position(
+  target,
+  anchor,
+  strategy,
+  callback,
+  {
+    visualViewport = typeof window !== 'undefined' ? window.visualViewport : null,
+    documentElement = typeof document !== 'undefined' ? document.documentElement : null,
+    windowObj = typeof window !== 'undefined' ? window : null,
+  } = {}
+) {
   strategy = Object.create(strategy);
   strategy.target = target;
   strategy.anchor = anchor;
+
+  // Per-call viewport accessors. Defined as getters so the strategies
+  // see the current size on each access (the viewport can change
+  // mid-positioning due to scrollbar appearance, address-bar collapse,
+  // virtual keyboard show/hide, pinch-zoom pan, etc.).
+  //
+  // `viewportWidth`/`viewportHeight` are the LAYOUT viewport — the
+  // coordinate space `getBoundingClientRect` and `position: fixed` use.
+  // `visibleTop`/`visibleBottom`/`visibleLeft`/`visibleRight` are the
+  // edges of the currently-VISIBLE area expressed in the same layout
+  // coordinates. When there is a visual viewport (mobile, pinch-zoom,
+  // keyboard), the visible area is a window inside the layout viewport;
+  // when there is none, the two coincide. Strategies use the visible-area
+  // accessors when deciding whether the target fits on a given side.
+  Object.defineProperty(strategy, 'viewportWidth', {
+    get: () => documentElement.clientWidth,
+  });
+  Object.defineProperty(strategy, 'viewportHeight', {
+    get: () => documentElement.clientHeight,
+  });
+  Object.defineProperty(strategy, 'visibleTop', {
+    get: () => visualViewport?.offsetTop ?? 0,
+  });
+  Object.defineProperty(strategy, 'visibleBottom', {
+    get: () =>
+      (visualViewport?.offsetTop ?? 0) + (visualViewport?.height ?? documentElement.clientHeight),
+  });
+  Object.defineProperty(strategy, 'visibleLeft', {
+    get: () => visualViewport?.offsetLeft ?? 0,
+  });
+  Object.defineProperty(strategy, 'visibleRight', {
+    get: () =>
+      (visualViewport?.offsetLeft ?? 0) + (visualViewport?.width ?? documentElement.clientWidth),
+  });
+  strategy.getScrollTop = () => windowObj.scrollY;
+  strategy.getScrollLeft = () => windowObj.scrollX;
+  strategy.getVisualY = y => y;
+  strategy.getVisualX = x => x;
 
   const positioningAbortController = new AbortController();
   const adjustPosition = () => {
@@ -292,19 +329,19 @@ export function position(target, anchor, strategy, callback) {
   };
   const adjustWithFullGeometryReset = () => strategy.resetGeometry(adjustPosition);
 
-  window.addEventListener('resize', adjustWithFullGeometryReset, {
+  windowObj.addEventListener('resize', adjustWithFullGeometryReset, {
     signal: positioningAbortController.signal,
   });
-  window.addEventListener('scroll', adjustPosition, {
+  windowObj.addEventListener('scroll', adjustPosition, {
     signal: positioningAbortController.signal,
     passive: true,
   });
-  window.visualViewport?.addEventListener('resize', adjustWithFullGeometryReset, {
+  visualViewport?.addEventListener('resize', adjustWithFullGeometryReset, {
     signal: positioningAbortController.signal,
   });
   // XXX: This is not a standard scroll event. It only fires *once* after the
   // scroll is finished.
-  window.visualViewport?.addEventListener('scroll', adjustWithFullGeometryReset, {
+  visualViewport?.addEventListener('scroll', adjustWithFullGeometryReset, {
     signal: positioningAbortController.signal,
   });
 
