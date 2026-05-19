@@ -117,6 +117,7 @@ Improvements
   registration (:pr:`7434`, thanks :user:`moliholy`)
 - Add support for anonymous accompanying persons (numeric count only) in registration form
   (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
+- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
@@ -301,7 +302,6 @@ Improvements
   buttons for guests and users who do not have access to them (:pr:`7332`, thanks
   :user:`jbtwist, unconventionaldotdev`)
 - Add option to filter room booking calendar to show only unused rooms (:pr:`7350`)
-- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
