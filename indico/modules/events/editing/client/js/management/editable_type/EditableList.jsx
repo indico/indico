@@ -496,7 +496,7 @@ function EditableListDisplay({
     friendlyId: renderId,
     title: renderTitle,
     code: renderCode,
-    revision: editable => (editable ? editable.revisionCount : ''),
+    revision: (__, editable) => (editable ? editable.revisionCount : ''),
     status: renderStatus,
     editor: renderEditor,
     tags: renderTags,
