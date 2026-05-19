@@ -18,13 +18,18 @@ import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/
 import {FinalFileManager} from '../FileManager';
 import * as selectors from '../selectors';
 
-export default function UpdateFilesBox({visible, mustChange, requirePublishable}) {
+export default function UpdateFilesBox({
+  visible,
+  mustChange,
+  requirePublishable,
+  allowMissingRequiredFiles,
+}) {
   const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(selectors.getFileTypes);
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
-
+  const requiredFileTypes = useSelector(selectors.getRequiredFileTypes);
   return (
     <Form.Field style={{display: !visible ? 'none' : undefined}}>
       <FinalFileManager
@@ -37,6 +42,7 @@ export default function UpdateFilesBox({visible, mustChange, requirePublishable}
           type: editableType,
         })}
         mustChange={mustChange}
+        allowMissingRequiredFiles={allowMissingRequiredFiles}
       />
       <Field name="files" subscription={{value: true}}>
         {({input: {value: currentFiles}}) => {
@@ -79,6 +85,49 @@ export default function UpdateFilesBox({visible, mustChange, requirePublishable}
           );
         }}
       </Field>
+      <Field name="files" subscription={{value: true}}>
+        {({input: {value: currentFiles}}) => {
+          if (allowMissingRequiredFiles) {
+            return null;
+          }
+          const missingRequiredFileTypes = requiredFileTypes.filter(
+            fileType => !(fileType.id in currentFiles)
+          );
+          if (!missingRequiredFileTypes.length) {
+            return null;
+          }
+          return (
+            <>
+              <Message visible warning>
+                <PluralTranslate count={missingRequiredFileTypes.length}>
+                  <Singular>
+                    Required files are missing. Please upload a{' '}
+                    <Param
+                      name="types"
+                      wrapper={<strong />}
+                      value={missingRequiredFileTypes.map(ft => ft.name).join(', ')}
+                    />{' '}
+                    file.
+                  </Singular>
+                  <Plural>
+                    Required files are missing. Please upload files of the following types:{' '}
+                    <Param
+                      name="types"
+                      wrapper={<strong />}
+                      value={missingRequiredFileTypes.map(ft => ft.name).join(', ')}
+                    />
+                  </Plural>
+                </PluralTranslate>
+              </Message>
+              <Field
+                name="_norequired"
+                validate={() => Translate.string('Required file types are missing.')}
+                render={() => null}
+              />
+            </>
+          );
+        }}
+      </Field>
     </Form.Field>
   );
 }
@@ -87,4 +136,5 @@ UpdateFilesBox.propTypes = {
   visible: PropTypes.bool.isRequired,
   mustChange: PropTypes.bool.isRequired,
   requirePublishable: PropTypes.bool.isRequired,
+  allowMissingRequiredFiles: PropTypes.bool.isRequired,
 };

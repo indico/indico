@@ -39,6 +39,11 @@
       height: 2em;
     }
   }
+
+  img.plugin-logo {
+    height: 1em;
+    vertical-align: bottom;
+  }
 }
 
 @keyframes text-changed {

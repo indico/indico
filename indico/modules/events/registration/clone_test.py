@@ -18,16 +18,18 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 @pytest.mark.parametrize('has_tags', (False, True))
 def test_registration_clone(dummy_event, dummy_regform, dummy_reg, create_event, dummy_user, has_tags):
     set_feature_enabled(dummy_event, 'registration', True)
+    cloners = {'registrations', 'registration_forms'}
     if has_tags:
         tag = RegistrationTag(title='Foo', color='b33f69', event=dummy_event)
         dummy_reg.tags = {tag}
+        cloners.add('registration_tags')
 
     assert dummy_regform.event == dummy_event
     assert dummy_reg.user == dummy_user
     assert dummy_reg.checked_in
 
     copied_event = create_event()
-    EventCloner.run_cloners(dummy_event, copied_event, {'registrations', 'registration_forms'})
+    EventCloner.run_cloners(dummy_event, copied_event, cloners)
     copied_registration = copied_event.registrations.one()
 
     assert copied_registration.event == copied_event
@@ -47,7 +49,7 @@ def test_registration_tags_clone(dummy_event, create_event):
     dummy_event.registration_tags.append(tag)
 
     copied_event = create_event()
-    EventCloner.run_cloners(dummy_event, copied_event, {'registration_forms'})
+    EventCloner.run_cloners(dummy_event, copied_event, {'registration_tags'})
 
     assert len(copied_event.registration_tags) == 1
     copied_tag = copied_event.registration_tags[0]

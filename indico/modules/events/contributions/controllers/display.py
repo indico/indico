@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import defaultdict
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
@@ -22,9 +21,9 @@ from indico.modules.events.contributions.lists import ContributionDisplayListGen
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.contributions.util import (get_contributions_for_user,
-                                                      has_contributions_with_user_as_submitter)
-from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
+from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
+from indico.modules.events.contributions.views import (WPAuthorList, WPContributions, WPMyContributions, WPMyTimetable,
+                                                       WPSpeakerList)
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.events import EventType
@@ -99,26 +98,21 @@ class RHMyContributions(RHDisplayProtectionBase):
             raise Forbidden
 
     def _process(self):
-        contribs = get_contributions_for_user(self.event, session.user)
-        categorized = defaultdict(set)
-        for contrib in contribs:
-            added = False
-            links = [link for link in contrib.person_links if link.person.user == session.user]
-            for link in links:
-                if link.is_speaker:
-                    categorized['speaker'].add(contrib)
-                    added = True
-                if link.author_type == AuthorType.primary:
-                    categorized['primary'].add(contrib)
-                    added = True
-                if link.author_type == AuthorType.secondary:
-                    categorized['secondary'].add(contrib)
-                    added = True
-            # Only add contributions to the submitter category if they are not in any other category
-            if not added and contrib.can_manage(session.user, 'submit', allow_admin=False, check_parent=False):
-                categorized['submitter'].add(contrib)
-        return WPMyContributions.render_template('display/user_contribution_list.html', self.event,
-                                                 contributions=categorized)
+        return WPMyContributions.render_template('display/user_contribution_list.html', self.event)
+
+
+class RHMyTimetable(RHDisplayProtectionBase):
+    """Display list of contributions added to the user's timetable."""
+
+    MENU_ENTRY_NAME = 'my_timetable'
+
+    def _check_access(self):
+        RHDisplayProtectionBase._check_access(self)
+        if not session.user:
+            raise Forbidden
+
+    def _process(self):
+        return WPMyTimetable.render_template('display/user_timetable.html', self.event)
 
 
 class RHContributionList(RHDisplayProtectionBase):
@@ -156,12 +150,14 @@ class RHContributionDisplay(RHContributionDisplayBase):
         can_manage = self.event.can_manage(session.user, permission='contributions')
         owns_abstract = contrib.abstract.user_owns(session.user) if contrib.abstract else None
         field_values = filter_field_values(contrib.field_values, can_manage, owns_abstract)
+        is_favorite = session.user is not None and contrib in session.user.favorite_contributions
         return self.view_class.render_template('display/contribution_display.html', self.event,
                                                contribution=contrib,
                                                show_author_link=_author_page_active(self.event),
                                                field_values=field_values,
                                                page_title=contrib.title,
-                                               published=contribution_settings.get(self.event, 'published'))
+                                               published=contribution_settings.get(self.event, 'published'),
+                                               favorite=is_favorite)
 
 
 class RHContributionJSON(RHContributionDisplayBase):

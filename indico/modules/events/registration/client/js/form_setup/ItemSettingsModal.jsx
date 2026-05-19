@@ -46,7 +46,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
     fieldIsRequired,
     ...itemData
   } = useSelector(state => (editing ? getItemById(state, id) : EMPTY_DATA));
-  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
+  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(
+    editing && !!itemData.internalName && !itemData.fieldIsPersonalData
+  );
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();
   const isUnsupportedField = !(inputType in fieldRegistry);
@@ -234,6 +236,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               label={Translate.string('Internal name')}
               readOnly={itemData.fieldIsPersonalData}
               nullIfEmpty
+              hideValidationError="never"
               validate={val => {
                 if (val && !/^[a-z0-9-]+$/.test(val)) {
                   return Translate.string(

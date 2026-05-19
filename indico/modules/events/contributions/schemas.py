@@ -22,6 +22,7 @@ from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBl
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.marshmallow import SortedList
+from indico.web.flask.util import url_for
 
 
 class BasicContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -71,6 +72,21 @@ class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
             del data['address']
             del data['phone']
         return data
+
+
+class UserContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'title', 'description', 'friendly_id', 'code',
+                  'start_dt', 'end_dt', 'url', 'edit_url')
+
+    def _get_edit_url(self, contribution):
+        user = self.context['user']
+        if not contribution.can_edit(user):
+            return None
+        return url_for('contributions.manage_update_contrib', contribution, standalone=True)
+
+    edit_url = fields.Method('_get_edit_url')
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):

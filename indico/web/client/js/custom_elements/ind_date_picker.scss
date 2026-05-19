@@ -351,6 +351,10 @@ ind-date-grid {
       opacity: 0.2;
     }
 
+    &[data-out-of-range]:not([aria-disabled]) {
+      opacity: 0.35;
+    }
+
     &:hover,
     &:focus-visible {
       background-color: var(--control-clickable-surface-focus-color);

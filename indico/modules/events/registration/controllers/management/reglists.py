@@ -497,6 +497,8 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     def _process_args(self):
         RHRegistrationsActionBase._process_args(self)
         self.export_config = self.list_generator.get_list_export_config()
+        for col in self.export_config['extra_columns']:
+            col.data = col.load_data(self.registrations)
 
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
@@ -504,7 +506,8 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
-                                   static_items=self.export_config['static_item_ids'])
+                                   static_items=self.export_config['static_item_ids'],
+                                   extra_columns=self.export_config['extra_columns'])
         try:
             data = pdf.getPDFBin()
         except Exception:
@@ -520,7 +523,8 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
 
     def _process(self):
         static_item_ids, item_ids, _extra_item_ids = self.list_generator.get_item_ids()
-        pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids)
+        pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids,
+                                       extra_columns=self.export_config['extra_columns'])
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
 
@@ -529,7 +533,8 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
-                                                                self.export_config['static_item_ids'])
+                                                                self.export_config['static_item_ids'],
+                                                                extra_columns=self.export_config['extra_columns'])
         return send_csv('registrations.csv', headers, rows)
 
 
@@ -538,7 +543,8 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
-                                                                self.export_config['static_item_ids'])
+                                                                self.export_config['static_item_ids'],
+                                                                extra_columns=self.export_config['extra_columns'])
         column_formats = get_registration_spreadsheet_column_formats(self.export_config['regform_items'])
         return send_xlsx('registrations.xlsx', headers, rows, tz=self.event.tzinfo, column_formats=column_formats)
 

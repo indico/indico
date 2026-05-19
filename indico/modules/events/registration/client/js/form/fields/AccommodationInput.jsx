@@ -140,6 +140,7 @@ function AccommodationInputComponent({
             rangeStartMax={arrival.endDate}
             rangeEndMin={departure.startDate}
             rangeEndMax={departure.endDate}
+            allowOutOfRange={management}
           />
           {!!selectedChoice.price && (
             <Label pointing="left" styleName="price-tag">
@@ -242,6 +243,7 @@ export default function AccommodationInput({
   placesUsed,
 }) {
   const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {choice: null};
+  const management = useSelector(getManagement);
   return (
     <FinalField
       id={htmlId}
@@ -261,13 +263,17 @@ export default function AccommodationInput({
         } else if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
           return Translate.string('You must select the arrival and departure date');
         }
-        if (!value.isNoAccommodation) {
+        if (
+          !value.isNoAccommodation &&
+          (existingValue?.arrivalDate !== value.arrivalDate ||
+            existingValue?.departureDate !== value.departureDate)
+        ) {
           const rangeValidators = makeAccommodationRangeValidators({
             required: true,
-            rangeStartMin: arrival.startDate,
-            rangeStartMax: arrival.endDate,
-            rangeEndMin: departure.startDate,
-            rangeEndMax: departure.endDate,
+            rangeStartMin: management ? null : arrival.startDate,
+            rangeStartMax: management ? null : arrival.endDate,
+            rangeEndMin: management ? null : departure.startDate,
+            rangeEndMax: management ? null : departure.endDate,
           });
           return v.chain(...rangeValidators)(value);
         }

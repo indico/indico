@@ -152,6 +152,7 @@ CustomElementBase.define(
       rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
       rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
       format: String, // Date format
+      allowOutOfRange: Boolean, // Allow selecting dates outside the configured range
     };
 
     static observedAttributes = [
@@ -162,6 +163,7 @@ CustomElementBase.define(
       'range-end-min',
       'range-end-max',
       'format',
+      'allow-out-of-range',
     ];
 
     get value() {
@@ -253,6 +255,7 @@ CustomElementBase.define(
       this.addEventListener('x-attrchange.range-start-max', updateSelectionLimits);
       this.addEventListener('x-attrchange.range-end-min', updateSelectionLimits);
       this.addEventListener('x-attrchange.range-end-max', updateSelectionLimits);
+      this.addEventListener('x-attrchange.allow-out-of-range', updateSelectionLimits);
       rangeStartInput.addEventListener('input', () => {
         const date = parseDate(rangeStartInput.value);
         indCalendar.rangeStart = date;
@@ -312,9 +315,15 @@ CustomElementBase.define(
 
       function updateSelectionLimits() {
         if (selection.trigger === ds.LEFT) {
-          indCalendar.setAllowableSelectionRange(indDateRangePicker.startRange);
+          indCalendar.setAllowableSelectionRange(
+            indDateRangePicker.startRange,
+            indDateRangePicker.allowOutOfRange
+          );
         } else {
-          indCalendar.setAllowableSelectionRange(indDateRangePicker.endRange);
+          indCalendar.setAllowableSelectionRange(
+            indDateRangePicker.endRange,
+            indDateRangePicker.allowOutOfRange
+          );
         }
       }
 
@@ -574,8 +583,9 @@ CustomElementBase.define(
       );
     }
 
-    setAllowableSelectionRange(dateRange) {
+    setAllowableSelectionRange(dateRange, allowOutOfRange = false) {
       this.allowableSelectionRange = dateRange;
+      this.allowOutOfRange = allowOutOfRange;
       this.dispatchEvent(new Event('x-rangechange'));
     }
 
@@ -818,6 +828,7 @@ CustomElementBase.define(
           }
           grid.rangeStart = markedRange.start?.toDateString() || '';
           grid.rangeEnd = markedRange.end?.toDateString() || '';
+          grid.allowOutOfRange = indCalendar.allowOutOfRange;
           grid.setAllowableSelectionRange(indCalendar.allowableSelectionRange);
         });
       }
@@ -971,7 +982,8 @@ CustomElementBase.define(
                 locale: indDateGrid.locale,
                 weekInfo,
               });
-              const isSelectable = indDateGrid.allowableSelectionRange.includes(date) && isValid;
+              const inRange = indDateGrid.allowableSelectionRange.includes(date);
+              const isSelectable = (inRange || indDateGrid.allowOutOfRange) && isValid;
 
               calendarButton.textContent = date.getDate();
               calendarButton.setAttribute(
@@ -994,6 +1006,7 @@ CustomElementBase.define(
               } else {
                 calendarButton.setAttribute('aria-disabled', true);
               }
+              calendarButton.toggleAttribute('data-out-of-range', isValid && !inRange);
 
               if (selectedRange.includes(date)) {
                 calendarButton.setAttribute('aria-selected', true);

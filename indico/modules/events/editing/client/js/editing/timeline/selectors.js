@@ -105,6 +105,11 @@ export const getPublishableFileTypes = createSelector(
   fileTypes => fileTypes.filter(ft => ft.publishable)
 );
 
+export const getRequiredFileTypes = createSelector(
+  getFileTypes,
+  fileTypes => fileTypes.filter(ft => ft.required)
+);
+
 export const hasPublishableFiles = createSelector(
   getPublishableFileTypes,
   getLastRevisionWithFiles,

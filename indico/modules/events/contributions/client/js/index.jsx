@@ -29,6 +29,9 @@ import {$T} from 'indico/utils/i18n';
 
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
+import './MyContributions';
+import './MyTimetable';
+import './ScheduleContributionIcon';
 
 document.addEventListener('DOMContentLoaded', () => {
   customElements.define(

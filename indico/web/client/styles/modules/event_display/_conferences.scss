@@ -257,6 +257,7 @@
 .contrib-session,
 .contrib-track,
 .contrib-type,
+.contrib-favorites,
 .contrib-state {
   @include default-border-radius();
   @include ellipsis();
@@ -282,6 +283,11 @@
 
 .contrib-track {
   background: var(--text-secondary-color);
+  color: white;
+}
+
+.contrib-favorites {
+  background: $midnight-black;
   color: white;
 }
 

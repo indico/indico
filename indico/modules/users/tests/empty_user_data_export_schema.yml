@@ -18,6 +18,7 @@ personal_data:
   avatar_url: /user/1337/picture-default/signature
   email: 1337@example.test
   favorite_categories: []
+  favorite_contributions: []
   favorite_events: []
   first_name: Guinea
   full_name: Guinea Pig

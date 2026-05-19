@@ -237,7 +237,7 @@ typing-extensions==4.15.0
     #   starlette
 unbeheader==1.5.0
     # via -r requirements.dev.in
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -c requirements.txt
     #   docker

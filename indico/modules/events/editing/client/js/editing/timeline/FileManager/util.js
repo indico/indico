@@ -24,6 +24,7 @@ export const filePropTypes = {
   uuid: PropTypes.string.isRequired,
   claimed: PropTypes.bool,
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
+  uploadedDt: PropTypes.string,
 };
 
 export const uploadablePropTypes = {

@@ -23,6 +23,13 @@ Improvements
 - Track the last modified timestamp of registrations (:pr:`7478`, thanks :user:`jbtwist`)
 - Pre-fill the registration form picture field with the user's custom profile
   picture when available (:pr:`7447`, thanks :user:`moliholy, unconventionaldotdev`)
+- Allow users to mark contributions as favorites (:issue:`3524`, :pr:`7256`)
+- Allow choosing whether to clone registration tags (:pr:`7506`)
+- Add placeholders for contribution link and board number for emailing contributions
+  (:pr:`7525`, thanks :user:`duartegalvao`)
+- Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
+- Allow managers to override accommodation date range validation when editing
+  registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -37,6 +44,11 @@ Bugfixes
 - Fix date picker showing January instead of the selected month when the user
   language is not English (:issue:`7471`, :pr:`7476`, thanks :user:`foxbunny`)
 - Do not show "Clone Abstract" icon outside management area (:pr:`7493`)
+- Allow rejecting editables w/ missing required files (:pr:`7524`)
+- Fix select and combobox dropdowns appearing detached from their input on
+  mobile when the page is pinch-zoomed, when the input is near a viewport
+  edge, or when the virtual keyboard is open (:pr:`7529`, thanks
+  :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

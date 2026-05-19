@@ -1,0 +1,11 @@
+{% extends 'events/display/conference/base.html' %}
+
+{% block title -%}
+    {{- page_title -}}
+{%- endblock %}
+
+{% block content -%}
+    <ind-my-timetable
+        event-id="{{ event.id }}"
+    ></ind-my-timetable>
+{%- endblock %}

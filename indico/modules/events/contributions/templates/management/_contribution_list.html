@@ -191,6 +191,12 @@
                                                 {%- trans %}No session{% endtrans -%}
                                             {% endif %}
                                         </td>
+                                    {% elif item.id == 'favorites' %}
+                                        <td class="i-table favorites-column" data-text="{{ contrib.favorite_count }}">
+                                            <span class="vertical-aligner">
+                                                {{ contrib.favorite_count }}
+                                            </span>
+                                        </td>
                                     {% elif item.id == 'track' %}
                                         <td class="i-table">
                                             {% if event.can_manage(session.user) %}

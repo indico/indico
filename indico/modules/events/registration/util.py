@@ -389,7 +389,8 @@ def make_registration_schema(
 
         if mm_field := form_item.field_impl.create_mm_field(
             registration=registration,
-            override_required=(management and override_required)
+            override_required=(management and override_required),
+            management=management
         ):
             schema[form_item.html_field_name] = mm_field
 
@@ -593,12 +594,13 @@ def get_registration_spreadsheet_column_formats(regform_items):
     }
 
 
-def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
+def generate_spreadsheet_from_registrations(registrations, regform_items, static_items, extra_columns=()):
     """Generate a spreadsheet data from a given registration list.
 
     :param registrations: The list of registrations to include in the file
     :param regform_items: The registration form items to be used as columns
     :param static_items: Registration form information as extra columns
+    :param extra_columns: Custom list items from the `registrant_list_items` signal
     """
     field_names = ['ID', 'Name']
     special_item_mapping = {
@@ -620,6 +622,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
+    field_names.extend(col.title for col in extra_columns)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -652,6 +655,9 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 continue
             value = fn(registration)
             registration_dict[title] = value
+        for col in extra_columns:
+            col_data = col.data.get(registration)
+            registration_dict[col.title] = col_data.text_value if col_data else ''
         rows.append(registration_dict)
     return field_names, rows
 

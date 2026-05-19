@@ -52,6 +52,12 @@
             </div>
         {%- endif %}
         <div>
+            {% if contrib.favorite_count -%}
+                <div class="contrib-favorites icon-star small" data-title
+                    title="{% trans count=contrib.favorite_count %}One person has added this contribution to their timetable.{% pluralize %}{{ count }} people have added this contribution to their timetable.{% endtrans %}">
+                    {{ contrib.favorite_count }}
+                </div>
+            {%- endif %}
             {% if contrib.track -%}
                 <div class="contrib-track small"
                      data-searchable="{{ contrib.track.title|lower }}"

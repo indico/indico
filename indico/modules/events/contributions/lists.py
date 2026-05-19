@@ -46,6 +46,7 @@ class ContributionListGenerator(ListGeneratorBase):
         track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
         type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
         self.static_items = {
+            'favorites': {'title': _('Interested')},
             'type': {'title': _('Type'),
                      'filter_choices': type_empty | type_choices},
             'session': {'title': _('Session'),
@@ -111,7 +112,8 @@ class ContributionListGenerator(ListGeneratorBase):
                          subqueryload('person_links'),
                          db.undefer('subcontribution_count'),
                          db.undefer('attachment_count'),
-                         db.undefer('is_scheduled')))
+                         db.undefer('is_scheduled'),
+                         db.undefer('favorite_count')))
 
     def _build_registration_query(self, is_speaker=False):
         registration_join_criteria = [
