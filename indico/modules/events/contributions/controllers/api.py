@@ -17,7 +17,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import UserContributionSchema
 from indico.modules.events.contributions.util import get_contributions_for_user
-from indico.modules.events.controllers.base import RHProtectedEventBase
+from indico.modules.events.controllers.base import RHAuthenticatedEventBase
 from indico.util.marshmallow import ModelField
 from indico.web.args import use_rh_kwargs
 
@@ -51,10 +51,7 @@ class RHAPIMyContributions(RHDisplayProtectionBase):
         return jsonify({category: schema.dump(contributions) for category, contributions in categorized.items()})
 
 
-class RHFavoriteContributionsAPI(RHProtectedEventBase):
-    def _process_args(self):
-        RHProtectedEventBase._process_args(self)
-
+class RHFavoriteContributionsAPI(RHAuthenticatedEventBase):
     @use_rh_kwargs({
         'contribution': ModelField(Contribution, with_parent='event', data_key='contrib_id')
     }, location='view_args', rh_context=('event',))
