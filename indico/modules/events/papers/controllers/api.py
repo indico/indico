@@ -83,7 +83,7 @@ class RHCommentActions(RHPaperBase):
 
     @use_rh_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': PaperCommentVisibilityField(load_default=None)
+        'visibility': PaperCommentVisibilityField()
     }, partial=True, rh_context=('event', 'paper'))
     def _process_PATCH(self, comment=None, visibility=None):
         print(comment, visibility)
