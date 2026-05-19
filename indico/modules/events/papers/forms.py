@@ -95,8 +95,8 @@ class PaperReviewingSettingsForm(IndicoForm):
                                  description=_("Keep papers hidden from participants even after they've "
                                                'been accepted.'))
     disable_contributor_visibility = BooleanField(_('Disable contributors visibility'), widget=SwitchWidget(),
-                                            description=_('Prevent reviewers from leaving comments'
-                                            ' visible to contributors on papers.'))
+                                            description=_('Prevent reviewers from leaving comments '
+                                                          'visible to contributors on papers.'))
     authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
                                                allow_external_users=True, allow_groups=True,
                                                allow_event_roles=True, allow_category_roles=True,
