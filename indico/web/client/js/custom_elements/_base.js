@@ -161,9 +161,11 @@ export default class CustomElementBase extends HTMLElement {
     // and disconnect, and the setup() method is expected to set up
     // listeners that will perform such operations.
 
+    this.unmountController = new AbortController();
     this.setup?.();
     this.setup = null;
     this.dispatchEvent(new Event('x-connect'));
+    this.onconnect?.();
   }
 
   setup() {
@@ -171,7 +173,12 @@ export default class CustomElementBase extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this.unmountController.abort();
     this.dispatchEvent(new Event('x-disconnect'));
+  }
+
+  addUnmountEventListener(callback) {
+    this.unmountController.signal.addEventListener('abort', callback);
   }
 
   attributeChangedCallback(name) {

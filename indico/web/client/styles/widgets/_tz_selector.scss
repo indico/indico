@@ -14,11 +14,13 @@
 }
 
 #tz-selector-widget {
+  min-width: 24em;
+
   > div {
     text-align: left;
-    padding: var(--container-narrow-padding);
+    padding: 1em;
     @extend %flex-column;
-    --flex-gap: var(--container-padding);
+    --flex-gap: 0.5em;
   }
 
   form {

@@ -65,8 +65,12 @@
   }
 
   .main-action-bar {
-    height: 50px;
-    min-height: 50px;
+    gap: 1em;
+
+    min-height: 4em;
+    max-width: 100%;
+    padding-right: 1em;
+    overflow: hidden;
   }
 
   .button-bar {

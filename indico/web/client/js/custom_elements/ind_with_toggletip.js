@@ -6,50 +6,69 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
-import {TipBase} from 'indico/custom_elements/TipBase';
+import * as positioning from 'indico/utils/positioning';
 
-const liveRegionUpdateDelay = 100;
+import './tips.scss';
 
-CustomElementBase.define(
+CustomElementBase.defineWhenDomReady(
   'ind-with-toggletip',
-  class extends TipBase {
-    show() {
-      // XXX: We add a slight delay to ensure that the screen readers will be able to pick up
-      // the change to the live region.
-      setTimeout(() => {
-        this.$tip.innerHTML = this.tipContent;
-        this.shown = true;
-        this.updatePosition();
-      }, liveRegionUpdateDelay);
-    }
+  class extends CustomElementBase {
+    static observedAttributes = ['shown'];
 
-    hide() {
-      this.shown = false;
-      this.$tip.hidden = true;
-      this.$tip.innerHTML = '';
-    }
+    static attributes = {
+      shown: Boolean,
+    };
 
     setup() {
-      super.setup();
+      const trigger = this.querySelector('[data-trigger]');
+      const tip = this.querySelector('[data-tip-content]');
 
-      // NB: The tip is an aria-live region. Because of this, it is necessary to clear the content.
-      // Live regions are (usually) only announced when content changes. (See also the hide() method.)
-      this.tipContent = this.$tip.innerHTML;
-      this.$tip.innerHTML = '';
+      let stopPositioning;
+      const tipHTML = tip.innerHTML;
 
-      this.addEventListener('click', evt => {
-        // NB: The toggletip button can trigger the toggle tip even when it is still open,
-        // so we must clean up just in case.
-        this.removeEventListener('focusout', this.hide);
-        this.hide();
+      // Clear the tip initially so that the screen reader will announce it
+      // correctly when the tip is opened.
+      tip.innerHTML = '';
+      tip.tabIndex = -1;
 
-        const $target = evt.target.closest('button');
-        if (!$target || !this.contains($target)) {
-          return;
-        }
-        this.show();
-        this.addEventListener('focusout', this.hide, {once: true});
+      trigger.addEventListener('click', () => {
+        this.shown = !this.shown;
       });
+
+      trigger.addEventListener('blur', () => {
+        this.shown = false;
+      });
+
+      this.addEventListener('keydown', evt => {
+        if (evt.code === 'Escape') {
+          this.shown = false;
+        }
+      });
+
+      this.addEventListener('x-attrchange.shown', () => {
+        trigger.setAttribute('aria-expanded', this.shown);
+        if (this.shown) {
+          tip.innerHTML = tipHTML;
+          stopPositioning = positioning.position(
+            tip,
+            this,
+            positioning.verticalTooltipPositionStrategy,
+            () => {
+              tip.hidden = false;
+            }
+          );
+        } else {
+          stopPositioning?.();
+          tip.hidden = true;
+          tip.innerHTML = '';
+        }
+      });
+
+      this.onconnect = () => {
+        this.addUnmountEventListener(() => {
+          stopPositioning?.();
+        });
+      };
     }
   }
 );

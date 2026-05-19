@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-// eslint-disable-next-line import/unambiguous
-window.addEventListener('DOMContentLoaded', () => {
+import {domReady} from 'indico/utils/domstate';
+
+domReady.then(() => {
   const form = document.querySelector('#tz-selector-widget form');
   const tzModes = document.getElementById('tz-modes');
   const customRadio = document.getElementById('tz-mode-custom');
