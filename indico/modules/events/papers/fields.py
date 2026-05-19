@@ -11,8 +11,7 @@ import os
 
 from flask import session
 from marshmallow import ValidationError
-from marshmallow.fields import Dict
-from webargs import fields
+from marshmallow.fields import Dict, Enum
 
 from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.reviews import PaperCommentVisibility
@@ -121,7 +120,7 @@ class PaperFilesField(Dict):
             seen |= set(files)
 
 
-class PaperCommentVisibilityField(fields.Enum):
+class PaperCommentVisibilityField(Enum):
     def __init__(self, **kwargs):
         super().__init__(PaperCommentVisibility)
 
