@@ -15,18 +15,25 @@ env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '22.x'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build package 📦
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v6
         name: Set up Python 🐍
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
       - name: Install build deps 🔧
         run: sudo apt-get install libpq-dev
       - name: Check version 🔍
@@ -37,6 +44,7 @@ jobs:
         name: Setup Node
         with:
           node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
       - name: Install Indico + Python deps 🔧
         run: uv pip install --system -e '.[dev]'
       - name: Install npm deps ☕
@@ -70,9 +78,9 @@ jobs:
           gh release create
           --draft
           --repo ${{ github.repository }}
-          --title ${{ github.ref_name }}
+          --title ${GITHUB_REF_NAME}
           --notes-file changelog/changelog.md
-          ${{ github.ref_name }}
+          ${GITHUB_REF_NAME}
           indico-wheel/*
         env:
           GH_TOKEN: ${{ github.token }}
@@ -104,6 +112,6 @@ jobs:
           gh release edit
           --draft=false
           --repo ${{ github.repository }}
-          ${{ github.ref_name }}
+          ${GITHUB_REF_NAME}
         env:
           GH_TOKEN: ${{ github.token }}
