@@ -111,6 +111,6 @@ class Paper(ProposalMixin):
     def can_ask_corrections(self, user):
         if not user:
             return False
-        if self.cfp.limit_review_cycles and len(self.revisions) >= self.cfp.max_review_cycles - 1:
+        if self.cfp.limit_review_cycles and len(self.revisions) >= self.cfp.max_review_cycles:
             return False
-        return self.can_judge(user)
+        return self.can_judge(user, check_state=True)
