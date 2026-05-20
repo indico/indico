@@ -181,36 +181,30 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 class RHAddSurveySection(RHManageSurveyBase):
     """Add a new section to a survey."""
 
+    def _clone_section_children(self, source_section, target_section):
+        for old_item in source_section.children:
+            item_cls = type(old_item)
+            new_item = item_cls(survey=target_section.survey, parent=target_section)
+            attrs = get_attrs_to_clone(item_cls, skip={'id', 'parent_id'})
+            new_item.populate_from_attrs(old_item, attrs)
+            db.session.add(new_item)
+        db.session.flush()
+
     def _process(self):
         form = SectionForm()
-        old_section = None
-        print('request args', request.args)
+        section_to_clone = None
         clone_id = request.args.get('clone', type=int)
-
-        # cloning titlle, description, display as session
         if clone_id:
-            old_section = SurveySection.query.with_parent(self.survey).filter_by(id=clone_id).one_or_none()
-            print('cloning old section metadata', old_section)
-            if old_section:
-                form = SectionForm(obj=FormDefaults(old_section))
-
+            try:
+                section_to_clone = SurveySection.query.with_parent(self.survey).filter_by(id=clone_id).one()
+                if section_to_clone:
+                    form = SectionForm(obj=FormDefaults(section_to_clone))
+            except NoResultFound:
+                pass
         if form.validate_on_submit():
             section = add_survey_section(self.survey, form.data)
-
-            if old_section:
-                # clone questions/texts in section such as in event survey cloner
-                print('cloning old section items')
-                for old_item in old_section.children:
-                    print('cloning item', old_item)
-                    item_cls = type(old_item)
-                    new_item = item_cls(survey=self.survey, parent=section)
-
-                    attrs = get_attrs_to_clone(item_cls, skip={'id', 'parent_id'})
-                    new_item.populate_from_attrs(old_item, attrs)
-                    db.session.add(new_item)
-
-                db.session.flush()
-
+            if section_to_clone:
+                self._clone_section_children(section_to_clone, section)
             if section.title:
                 message = _('Section "{title}" added').format(title=section.title)
             else:
