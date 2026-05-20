@@ -36,7 +36,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplay({eventUrl, showDownloadMenu = true}) {
+function QrDisplay({eventUrl}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
@@ -56,7 +56,7 @@ function QrDisplay({eventUrl, showDownloadMenu = true}) {
         onLoad={() => setIsImageLoaded(true)}
       />
 
-      {showDownloadMenu && isImageLoaded && (
+      {isImageLoaded && (
         <Dropdown
           icon="download"
           floating
@@ -91,7 +91,6 @@ function QrDisplay({eventUrl, showDownloadMenu = true}) {
 
 QrDisplay.propTypes = {
   eventUrl: PropTypes.string.isRequired,
-  showDownloadMenu: PropTypes.bool,
 };
 
 function ShareURL({eventShortUrl, eventExternalUrl}) {

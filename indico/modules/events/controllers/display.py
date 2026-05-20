@@ -185,9 +185,9 @@ class RHQRCodeImage(QRCodeMixin, RH):
     """Return QRCode image for URL, box_size."""
 
     @use_kwargs({
-            'url': fields.String(required=True, validate=_check_url),
-            'box_size': fields.Int(load_default=10, validate=validate.Range(min=1, max=100)),
-        }, location='query')
+        'url': fields.String(required=True, validate=_check_url),
+        'box_size': fields.Int(load_default=10, validate=validate.Range(min=1, max=100)),
+    }, location='query')
     def _process(self, url, box_size):
         qr = self._build_qr(url, box_size)
 
