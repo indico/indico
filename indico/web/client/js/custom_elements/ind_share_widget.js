@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import urlQrCodeImage from 'indico-url:events.url_qr_code_image';
-import urlQrCodeMetadata from 'indico-url:events.url_qr_code_metadata';
+import qrCodeImageURL from 'indico-url:events.url_qr_code_image';
+import qrCodeMetadataURL from 'indico-url:events.url_qr_code_metadata';
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
 import _ from 'lodash';
@@ -41,10 +41,10 @@ function QrDisplay({eventUrl}) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const buildDownloadUrl = boxSize =>
-    `${urlQrCodeImage()}?url=${encodeURIComponent(eventUrl)}&box_size=${boxSize}`;
+    `${qrCodeImageURL()}?url=${encodeURIComponent(eventUrl)}&box_size=${boxSize}`;
 
   const {data: qrData} = useIndicoAxios(
-    {url: urlQrCodeMetadata(), params: {url: eventUrl}},
+    {url: qrCodeMetadataURL(), params: {url: eventUrl}},
     {camelize: true}
   );
 
