@@ -45,6 +45,31 @@ const InitialFormValuesContext = React.createContext({});
 export const UserSearchTokenContext = (window._UserSearchTokenContext =
   window._UserSearchTokenContext || React.createContext(null));
 
+const PasteHandler = ({onPaste, formApi}) => {
+  useEffect(() => {
+    if (!onPaste) {
+      return;
+    }
+
+    const _handler = evt => {
+      const data = evt.clipboardData.getData('text');
+      if (!data) {
+        return;
+      }
+      onPaste(evt, data, formApi);
+    };
+
+    document.addEventListener('paste', _handler);
+    return () => document.removeEventListener('paste', _handler);
+  }, [formApi, onPaste]);
+  return null;
+};
+
+PasteHandler.propTypes = {
+  onPaste: PropTypes.func.isRequired,
+  formApi: PropTypes.object.isRequired,
+};
+
 const searchFactory = config => {
   const {
     componentName,
@@ -57,6 +82,7 @@ const searchFactory = config => {
     favoriteKey,
     noResultsText,
     runSearch,
+    onPaste,
     validateForm,
   } = config;
 
@@ -118,6 +144,7 @@ const searchFactory = config => {
       >
         {fprops => (
           <Form onSubmit={fprops.handleSubmit}>
+            {config.onPaste && <PasteHandler onPaste={onPaste} formApi={fprops.form} />}
             {searchFields}
             <div styleName="search-buttons">
               <Button
@@ -669,6 +696,23 @@ const InnerUserSearch = searchFactory({
   resultIcon: 'user',
   favoriteKey: 'identifier',
   searchFields: <UserSearchFields />,
+  onPaste: (evt, content, form) => {
+    if (evt.target.name === 'affiliation') {
+      // affiliations can be anything so one COULD look like a valid email
+      return;
+    }
+    // look for classic name+email patterns to extract the email `Foo <foo@example.com>`
+    let match = content.match(/<([^@\s]+@[^>\s]+\.[^>\s]+)>/);
+    if (!match) {
+      // look for just a standalone email address
+      match = content.match(/^\s*([^@\s]+@\S+\.\S+)\s*$/);
+    }
+    if (!match) {
+      return;
+    }
+    form.change('email', match[1]);
+    evt.preventDefault();
+  },
   validateForm: values => {
     if (!values.first_name && !values.last_name && !values.email && !values.affiliation) {
       // no i18n needed, we do not show this error
