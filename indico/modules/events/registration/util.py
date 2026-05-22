@@ -53,7 +53,7 @@ from indico.modules.logs.util import make_diff_log
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
 from indico.util.signals import make_interceptable, named_objects_from_signal, values_from_signal
 from indico.util.spreadsheets import CSVFieldDelimiter, csv_text_io_wrapper, unique_col
@@ -659,6 +659,88 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             col_data = col.data.get(registration)
             registration_dict[col.title] = col_data.text_value if col_data else ''
         rows.append(registration_dict)
+    return field_names, rows
+
+
+def generate_pdf_data_from_registrations(event, registrations, regform_items, static_items, extra_columns, empty_value):
+    """Generate data for PDF creation for a given registration list.
+
+    :param event: The event containing the registrations
+    :param registrations: The list of registrations to include
+    :param regform_items: The registration form items to be used as columns
+    :param static_items: Registration form information as extra columns
+    :param extra_columns: Custom list items from the `registrant_list_items` signal
+    :param empty_value: Value to use when no data is available
+    """
+    field_names = [_('ID'), _('Name')]
+    special_item_mapping = {
+        'reg_date': (
+            _('Registration date'),
+            lambda x: format_datetime(x.submitted_dt, timezone=event.tzinfo),
+        ),
+        'mod_date': (
+            _('Modification date'),
+            lambda x: format_datetime(x.submitted_dt, timezone=event.tzinfo) if x.submitted_dt else empty_value,
+        ),
+        'state': (
+            _('Registration state'),
+            lambda x: x.state.title,
+        ),
+        'price': (
+            _('Price'),
+            lambda x: x.render_price(),
+        ),
+        'checked_in': (
+            _('Checked in'),
+            lambda x: x.checked_in,
+        ),
+        'checked_in_date': (
+            _('Check-in date'),
+            lambda x: format_datetime(x.checked_in_dt, timezone=event.tzinfo) if x.checked_in else '',
+        ),
+        'payment_date': (
+            _('Payment date'),
+            lambda x: (
+                format_datetime(x.transaction.timestamp, timezone=event.tzinfo)
+                if (x.transaction is not None and x.transaction.status == TransactionStatus.successful)
+                else ''
+            ),
+        ),
+        'tags_present': (
+            _('Tags'),
+            lambda x: [t.title for t in x.tags] if x.tags else '',
+        ),
+    }
+    field_names.extend(unique_col(item.title, item.id) for item in regform_items)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
+    field_names.extend(col.title for col in extra_columns)
+    rows = []
+    for registration in registrations:
+        data = registration.data_by_field
+        row_data = {
+            _('ID'): f'#{registration.friendly_id}',
+            _('Name'): f'{registration.first_name} {registration.last_name}'
+        }
+        for item in regform_items:
+            key = unique_col(item.title, item.id)
+            if item.id not in data:
+                row_data[key] = empty_value
+            else:
+                col = item.field_impl.render_reglist_column(data[item.id])
+                if item.input_type == 'accommodation':
+                    # XXX ugly hack, but the "content" for this field is a dict...
+                    row_data[key] = col.text_value
+                else:
+                    row_data[key] = col.content
+        for name, (title, fn) in special_item_mapping.items():
+            if name not in static_items:
+                continue
+            value = fn(registration)
+            row_data[title] = value
+        for col in extra_columns:
+            col_data = col.data.get(registration)
+            row_data[col.title] = col_data.text_value if col_data else empty_value
+        rows.append((registration, row_data))
     return field_names, rows
 
 

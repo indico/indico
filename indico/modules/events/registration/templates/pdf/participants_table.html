@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{%- trans %}Participant List{% endtrans -%}</title>
+</head>
+
+<body>
+    <div class="header">
+        <h1>{{ event.title }}</h1>
+        <div class="date">{{ generation_date }}</div>
+    </div>
+
+    <div class="sub-title">{%- trans %}List of registrants{% endtrans -%}</div>
+
+    <table>
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header if header is string else header[0] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for (__, row) in rows %}
+                <tr>
+                    {% for header in headers %}
+                        <td>{{ row[header] }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
