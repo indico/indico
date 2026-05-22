@@ -17,6 +17,7 @@ from speaklater import make_lazy_string
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.custom import RegistrationListColumn
@@ -40,7 +41,8 @@ from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
 
 
-pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
+pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
+                  'indico.modules.events.payment.testing.fixtures')
 
 
 INVITATION_COLUMNS = ['first_name', 'last_name', 'affiliation', 'email']
@@ -1184,4 +1186,14 @@ def test_sync_state_does_not_reset_when_toggle_disabled(dummy_reg, dummy_regform
     dummy_regform.reset_approval_on_modification = False
     dummy_reg.state = RegistrationState.complete
     dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+def test_update_state_approves_paid_pending_back_to_complete(dummy_reg, dummy_event, dummy_transaction):
+    set_feature_enabled(dummy_event, 'payment', True)
+    dummy_reg.transaction = dummy_transaction
+    dummy_reg.base_price = 100
+    dummy_reg.state = RegistrationState.pending
+    dummy_reg.update_state(approved=True)
     assert dummy_reg.state == RegistrationState.complete
