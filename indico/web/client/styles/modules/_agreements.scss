@@ -118,16 +118,6 @@
   }
 }
 
-.agreement-dashboard {
-  @extend .fixed-width;
-
-  .action-box {
-    .i-button {
-      width: 10em;
-    }
-  }
-}
-
 .agreement-list {
   .agreement-table {
     border-collapse: collapse;
