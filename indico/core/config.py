@@ -13,6 +13,7 @@ import socket
 import warnings
 from datetime import timedelta
 from functools import cache
+from importlib.metadata import entry_points
 from urllib.parse import urljoin, urlsplit
 
 import pytz
@@ -205,13 +206,48 @@ def _postprocess_config(data):
         data['DISABLE_CELERY_CHECK'] = data['DEBUG']
 
 
-def _sanitize_data(data, allow_internal=False):
-    allowed = set(DEFAULTS)
+def _sanitize_data(data, allow_internal=False, extra_keys=frozenset()):
+    allowed = set(DEFAULTS) | set(extra_keys)
     if allow_internal:
         allowed |= set(INTERNAL_DEFAULTS)
     for key in set(data) - allowed:
         warnings.warn(f'Ignoring unknown config key {key}', stacklevel=2)
     return {k: v for k, v in data.items() if k in allowed}
+
+
+def _load_plugin_config_defaults(plugin_names):
+    """Collect file-backed config defaults declared by the given plugins.
+
+    Returns a flat dict mapping prefixed keys (``PLUGIN_<NAME>_<KEY>``) to default
+    values. Plugins whose entry-point is missing are silently skipped (the regular
+    plugin loader will surface the failure later). Collisions with core ``DEFAULTS``
+    are reported via ``warnings.warn`` and the plugin default is ignored. Collisions
+    between plugins raise ``RuntimeError``.
+    """
+    if not plugin_names:
+        return {}
+    wanted = set(plugin_names)
+    result = {}
+    for ep in entry_points(group='indico.plugins'):
+        if ep.name not in wanted:
+            continue
+        try:
+            plugin_class = ep.load()
+        except Exception as exc:
+            warnings.warn(f'Could not load plugin entry-point {ep.name!r}: {exc}', stacklevel=2)
+            continue
+        defaults = plugin_class.plugin_config_defaults
+        prefix = f'PLUGIN_{ep.name.upper()}'
+        for key, value in defaults.items():
+            full = f'{prefix}_{key}'
+            if full in DEFAULTS:
+                warnings.warn(f'Plugin {ep.name!r} config key {full!r} collides with a core config key; '
+                              f'plugin default ignored', stacklevel=2)
+                continue
+            if full in result:
+                raise RuntimeError(f'Plugin {ep.name!r} config key {full!r} collides with another plugin')
+            result[full] = value
+    return result
 
 
 def _validate_config(data):
@@ -230,14 +266,25 @@ def load_config(only_defaults=False, override=None):
                      the configuration.  Any values provided here
                      will override values from the config file.
     """
-    data = DEFAULTS | INTERNAL_DEFAULTS
+    raw_config = {}
+    path = None
     if not only_defaults:
         path = get_config_path()
-        config = _sanitize_data(_parse_config(path))
+        raw_config = _parse_config(path)
+    env_override = {}
+    if not only_defaults and (env_override_value := os.environ.get('INDICO_CONF_OVERRIDE')):
+        env_override = ast.literal_eval(env_override_value)
+    plugins = (set(raw_config.get('PLUGINS') or set()) | set(env_override.get('PLUGINS') or set()) |
+               set((override or {}).get('PLUGINS') or set()))
+    plugin_cfg_defaults = _load_plugin_config_defaults(plugins)
+    extra_keys = frozenset(plugin_cfg_defaults)
+
+    data = DEFAULTS | INTERNAL_DEFAULTS | plugin_cfg_defaults
+    if not only_defaults:
+        config = _sanitize_data(raw_config, extra_keys=extra_keys)
         data.update(config)
-        env_override = os.environ.get('INDICO_CONF_OVERRIDE')
         if env_override:
-            data.update(_sanitize_data(ast.literal_eval(env_override)))
+            data.update(_sanitize_data(env_override, extra_keys=extra_keys))
         resolved_path = resolve_link(path) if os.path.islink(path) else path
         resolved_path = None if resolved_path == os.devnull else resolved_path
         data['CONFIG_PATH'] = path
@@ -246,7 +293,7 @@ def load_config(only_defaults=False, override=None):
             data['LOGGING_CONFIG_PATH'] = os.path.join(os.path.dirname(resolved_path), data['LOGGING_CONFIG_FILE'])
 
     if override:
-        data.update(_sanitize_data(override, allow_internal=True))
+        data.update(_sanitize_data(override, allow_internal=True, extra_keys=extra_keys))
     _postprocess_config(data)
     if not only_defaults:
         _validate_config(data)
