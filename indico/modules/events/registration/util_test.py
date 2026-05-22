@@ -1052,8 +1052,9 @@ def test_modify_registration_resets_to_pending_with_moderation(monkeypatch, dumm
     reg = create_registration(dummy_regform, data, management=True, notify_user=False)
     assert reg.state == RegistrationState.complete
 
-    # Enable moderation
+    # Enable moderation and approval reset on modification
     dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
     db.session.flush()
 
     # Registrant modifies their registration -> state should become pending
@@ -1067,3 +1068,21 @@ def test_modify_registration_resets_to_pending_with_moderation(monkeypatch, dumm
     # Manager modifies the registration -> state should stay complete
     modify_registration(reg, {boolean_field.html_field_name: True}, management=True, notify_user=False)
     assert reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+def test_sync_state_resets_unpaid_to_pending_with_moderation(dummy_reg, dummy_regform):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
+    dummy_reg.state = RegistrationState.unpaid
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.pending
+
+
+@pytest.mark.usefixtures('request_context')
+def test_sync_state_does_not_reset_when_toggle_disabled(dummy_reg, dummy_regform):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = False
+    dummy_reg.state = RegistrationState.complete
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.complete
