@@ -17,6 +17,7 @@ import {Contribution, ContributionRecord} from './types';
 import './ContributionList.module.scss';
 
 interface ContributionList {
+  timezone: string;
   contributions: ContributionRecord | null;
   title?: string;
   emptyText?: string;
@@ -24,6 +25,7 @@ interface ContributionList {
 }
 
 export function ContributionList({
+  timezone,
   contributions,
   title,
   actionsElement,
@@ -32,6 +34,8 @@ export function ContributionList({
   if (contributions === null) {
     return null;
   }
+
+  const localMoment = (dt: string) => moment(dt).tz(timezone);
 
   return (
     <section>
@@ -54,10 +58,10 @@ export function ContributionList({
                         <span styleName="date-span">
                           {contribution.start_dt ? (
                             <>
-                              <span>{moment(contribution.start_dt).format('D MMM YYYY')}</span>
+                              <span>{localMoment(contribution.start_dt).format('D MMM YYYY')}</span>
                               <br />
                               <span styleName="date-span-time">
-                                {moment(contribution.start_dt).format('HH:MM')}
+                                {localMoment(contribution.start_dt).format('HH:mm')}
                               </span>
                             </>
                           ) : (

@@ -7,5 +7,6 @@
 {% block content -%}
     <ind-my-timetable
         event-id="{{ event.id }}"
+        timezone="{{ event.display_tzinfo.zone }}"
     ></ind-my-timetable>
 {%- endblock %}
