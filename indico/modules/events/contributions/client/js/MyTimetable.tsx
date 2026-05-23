@@ -23,9 +23,10 @@ import './MyTimetable.module.scss';
 
 interface MyTimetableProps {
   eventId: number;
+  timezone: string;
 }
 
-export function MyTimetable({eventId}: MyTimetableProps) {
+export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   const {
     data: scheduledContributions,
     loading,
@@ -61,6 +62,7 @@ export function MyTimetable({eventId}: MyTimetableProps) {
 
   return (
     <ContributionList
+      timezone={timezone}
       contributions={scheduledContributions}
       emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
@@ -81,7 +83,10 @@ customElements.define(
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(
-        <MyTimetable eventId={JSON.parse(this.getAttribute('event-id') ?? '')} />,
+        <MyTimetable
+          eventId={JSON.parse(this.getAttribute('event-id') ?? '')}
+          timezone={this.getAttribute('timezone') ?? ''}
+        />,
         this
       );
     }

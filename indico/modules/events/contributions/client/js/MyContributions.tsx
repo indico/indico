@@ -20,6 +20,7 @@ import {Contribution} from './types';
 import './MyContributions.module.scss';
 
 interface MyContributionsProps {
+  timezone: string;
   eventId: number;
 }
 
@@ -48,7 +49,7 @@ function editContribution(contribution: Contribution) {
   return null;
 }
 
-export function MyContributions({eventId}: MyContributionsProps) {
+export function MyContributions({eventId, timezone}: MyContributionsProps) {
   const {loading, data: myContributions} = useIndicoAxios({
     url: myContributionsURL({event_id: eventId}),
   });
@@ -70,6 +71,7 @@ export function MyContributions({eventId}: MyContributionsProps) {
       {Object.entries(SECTIONS).map(([section, title]) => (
         <ContributionList
           key={section}
+          timezone={timezone}
           title={title}
           contributions={myContributions?.[section] ?? null}
           actionsElement={editContribution}
@@ -84,7 +86,10 @@ customElements.define(
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(
-        <MyContributions eventId={JSON.parse(this.getAttribute('event-id'))} />,
+        <MyContributions
+          eventId={JSON.parse(this.getAttribute('event-id') ?? '')}
+          timezone={this.getAttribute('timezone') ?? ''}
+        />,
         this
       );
     }
