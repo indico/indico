@@ -151,7 +151,8 @@ class EventProtectionCloner(EventCloner):
                                                 old_mode=None)
 
     def _clone_protection(self, new_event):
-        new_event.protection_mode = self.old_event.protection_mode
+        if not new_event.is_unlisted:
+            new_event.protection_mode = self.old_event.protection_mode
         new_event.access_key = self.old_event.access_key
         new_event.own_no_access_contact = self.old_event.own_no_access_contact
         new_event.public_regform_access = self.old_event.public_regform_access
