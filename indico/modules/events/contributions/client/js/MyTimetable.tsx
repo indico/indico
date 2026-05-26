@@ -8,7 +8,7 @@
 import contributionFavoriteURL from 'indico-url:contributions.favorite_contributions_api';
 
 import _ from 'lodash';
-import React from 'react';
+import React, {useMemo} from 'react';
 import ReactDOM from 'react-dom';
 import {Icon, Loader, Message} from 'semantic-ui-react';
 
@@ -35,6 +35,17 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   } = useIndicoAxiosWithMutation<ContributionRecord>({
     url: contributionFavoriteURL({event_id: eventId}),
   });
+
+  const sortedContributions = useMemo(() => {
+    if (favoriteContributions === null) {
+      return null;
+    }
+    return _.sortBy(Object.values(favoriteContributions), c => [
+      c.start_dt === null,
+      c.start_dt,
+      c.friendly_id,
+    ]);
+  }, [favoriteContributions]);
 
   const removeScheduledContribution = async (id: number) => {
     try {
@@ -63,7 +74,7 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   return (
     <ContributionList
       timezone={timezone}
-      contributions={favoriteContributions}
+      contributions={sortedContributions}
       emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
         <Icon
