@@ -115,6 +115,7 @@ extend-safe-fixes = [
 
 [format]
 quote-style = 'single'
+preview = true
 
 [lint.flake8-builtins]
 builtins-ignorelist = ['id', 'format', 'input', 'type', 'credits']

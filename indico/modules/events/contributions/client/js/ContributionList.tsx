@@ -12,13 +12,13 @@ import {List} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import {Contribution, ContributionRecord} from './types';
+import {Contribution} from './types';
 
 import './ContributionList.module.scss';
 
 interface ContributionList {
   timezone: string;
-  contributions: ContributionRecord | null;
+  contributions: Contribution[] | null;
   title?: string;
   emptyText?: string;
   actionsElement?: (contribution: Contribution) => React.ReactNode;
@@ -49,9 +49,9 @@ export function ContributionList({
       <div styleName="contribution-container">
         <div className="i-box just-group-list">
           <div className="i-box-content">
-            {contributions !== null && Object.keys(contributions).length > 0 ? (
+            {contributions.length > 0 ? (
               <List celled styleName="contrib-list">
-                {Object.values(contributions).map(contribution => (
+                {contributions.map(contribution => (
                   <List.Item key={contribution.id} styleName="contrib-item">
                     <List.Content>
                       <div styleName="list-flex">
