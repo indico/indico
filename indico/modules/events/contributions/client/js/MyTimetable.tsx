@@ -7,8 +7,7 @@
 
 import contributionFavoriteURL from 'indico-url:contributions.favorite_contributions_api';
 
-import _ from 'lodash';
-import React, {useMemo} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {Icon, Loader, Message} from 'semantic-ui-react';
 
@@ -17,7 +16,7 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {ContributionList} from './ContributionList';
-import {Contribution, ContributionRecord} from './types';
+import {Contribution} from './types';
 
 import './MyTimetable.module.scss';
 
@@ -32,26 +31,15 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
     loading,
     mutate,
     mutating,
-  } = useIndicoAxiosWithMutation<ContributionRecord>({
+  } = useIndicoAxiosWithMutation<Contribution[]>({
     url: contributionFavoriteURL({event_id: eventId}),
   });
-
-  const sortedContributions = useMemo(() => {
-    if (favoriteContributions === null) {
-      return null;
-    }
-    return _.sortBy(Object.values(favoriteContributions), c => [
-      c.start_dt === null,
-      c.start_dt,
-      c.friendly_id,
-    ]);
-  }, [favoriteContributions]);
 
   const removeScheduledContribution = async (id: number) => {
     try {
       await mutate(
         indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId})),
-        oldData => _.omit(oldData, id)
+        oldData => oldData.filter(c => c.id !== id)
       );
     } catch (error) {
       handleAxiosError(error);
@@ -63,7 +51,7 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
     return <Loader active size="massive" inline="centered" />;
   }
 
-  if (favoriteContributions !== null && Object.keys(favoriteContributions).length === 0) {
+  if (favoriteContributions !== null && favoriteContributions.length === 0) {
     return (
       <Message info>
         <Translate>There are no contributions in your timetable.</Translate>
@@ -74,7 +62,7 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   return (
     <ContributionList
       timezone={timezone}
-      contributions={sortedContributions}
+      contributions={favoriteContributions}
       emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
         <Icon

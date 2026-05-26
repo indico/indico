@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contributionURL from 'indico-url:contributions.favorite_contributions_api';
+import favoriteContributionURL from 'indico-url:contributions.favorite_contributions_api';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -27,7 +27,7 @@ export default function FavoriteContributionIcon({
   variant,
 }: FavoriteContributionIconProps) {
   const [scheduled, toggleScheduled, loading, saving] = useTogglableValue(
-    contributionURL({contrib_id: contributionId, event_id: eventId})
+    favoriteContributionURL({contrib_id: contributionId, event_id: eventId})
   );
 
   return (

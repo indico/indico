@@ -16,5 +16,3 @@ export interface Contribution {
   url?: string;
   edit_url?: string;
 }
-
-export type ContributionRecord = Record<string, Contribution>;

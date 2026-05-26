@@ -8,6 +8,7 @@
 from collections import defaultdict
 
 from flask import jsonify, session
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import Forbidden
 
@@ -18,7 +19,9 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import UserContributionSchema
 from indico.modules.events.contributions.util import get_contributions_for_user
 from indico.modules.events.controllers.base import RHAuthenticatedEventBase
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.marshmallow import ModelField
+from indico.util.string import natural_sort_key
 from indico.web.args import use_rh_kwargs
 
 
@@ -49,7 +52,7 @@ class RHAPIMyContributions(RHDisplayProtectionBase):
 
         schema = UserContributionSchema(context={'user': session.user}, many=True)
         return jsonify({
-            category: sorted(schema.dump(contributions), key=lambda x: (x['title'].lower(), x['friendly_id']))
+            category: sorted(schema.dump(contributions), key=lambda x: (natural_sort_key(x['title']), x['friendly_id']))
             for category, contributions in categorized.items()
         })
 
@@ -64,9 +67,16 @@ class RHFavoriteContributionsAPI(RHAuthenticatedEventBase):
 
     def _process_GET(self):
         if self.contribution is None:
-            favorites = Contribution.query.with_parent(session.user).with_parent(self.event).all()
-            schema = UserContributionSchema(exclude=('edit_url',))
-            return jsonify({c.id: schema.dump(c) for c in favorites})
+            favorites = (
+                Contribution.query
+                .with_parent(session.user)
+                .with_parent(self.event)
+                .outerjoin(Contribution.timetable_entry)
+                .options(contains_eager(Contribution.timetable_entry).lazyload('*'))
+                .order_by(TimetableEntry.start_dt.is_(None), TimetableEntry.start_dt, Contribution.friendly_id)
+                .all()
+            )
+            return UserContributionSchema(exclude=('edit_url',), many=True).jsonify(favorites)
         return jsonify(self.contribution in session.user.favorite_contributions)
 
     def _process_PUT(self):
