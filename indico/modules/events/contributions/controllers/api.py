@@ -48,7 +48,10 @@ class RHAPIMyContributions(RHDisplayProtectionBase):
                 categorized['submitter'].add(contrib)
 
         schema = UserContributionSchema(context={'user': session.user}, many=True)
-        return jsonify({category: schema.dump(contributions) for category, contributions in categorized.items()})
+        return jsonify({
+            category: sorted(schema.dump(contributions), key=lambda x: (x['title'].lower(), x['friendly_id']))
+            for category, contributions in categorized.items()
+        })
 
 
 class RHFavoriteContributionsAPI(RHAuthenticatedEventBase):
