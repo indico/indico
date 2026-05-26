@@ -49,6 +49,8 @@ Bugfixes
   mobile when the page is pinch-zoomed, when the input is near a viewport
   edge, or when the virtual keyboard is open (:pr:`7529`, thanks
   :user:`foxbunny`)
+- Fix database error when importing protection settings in an unlisted event
+  (:issue:`7550`, :pr:`7551`)
 
 Accessibility
 ^^^^^^^^^^^^^
