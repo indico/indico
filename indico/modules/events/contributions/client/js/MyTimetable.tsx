@@ -28,7 +28,7 @@ interface MyTimetableProps {
 
 export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   const {
-    data: scheduledContributions,
+    data: favoriteContributions,
     loading,
     mutate,
     mutating,
@@ -52,7 +52,7 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
     return <Loader active size="massive" inline="centered" />;
   }
 
-  if (scheduledContributions !== null && Object.keys(scheduledContributions).length === 0) {
+  if (favoriteContributions !== null && Object.keys(favoriteContributions).length === 0) {
     return (
       <Message info>
         <Translate>There are no contributions in your timetable.</Translate>
@@ -63,7 +63,7 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
   return (
     <ContributionList
       timezone={timezone}
-      contributions={scheduledContributions}
+      contributions={favoriteContributions}
       emptyText={Translate.string('You have not added any contributions to your timetable.')}
       actionsElement={(contribution: Contribution) => (
         <Icon
