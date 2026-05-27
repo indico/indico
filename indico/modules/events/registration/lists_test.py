@@ -7,6 +7,7 @@
 
 import pytest
 from flask import session
+from speaklater import make_lazy_string
 
 from indico.core import signals
 from indico.modules.events.registration.custom import CustomRegistrationListItem, RegistrationListColumn
@@ -18,7 +19,7 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 class _TestColumn(CustomRegistrationListItem):
     name = 'test_col'
-    title = 'Test Column'
+    title = make_lazy_string(lambda: 'Test Column')
 
     def load_data(self, registrations):
         return {reg: RegistrationListColumn(content='val', text_value='val') for reg in registrations}

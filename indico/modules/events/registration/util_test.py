@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 from flask import session
 from PIL import Image
+from speaklater import make_lazy_string
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
@@ -1005,7 +1006,7 @@ class _FakeExtraColumn:
     """Minimal stand-in for CustomRegistrationListItem for spreadsheet tests."""
 
     filter_only = False
-    title = 'Custom Column'
+    title = make_lazy_string(lambda: 'Custom Column')
 
     def __init__(self, data=None):
         self.data = data or {}
