@@ -622,7 +622,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
-    field_names.extend(col.title for col in extra_columns)
+    field_names.extend(str(col.title) for col in extra_columns)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -657,7 +657,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             registration_dict[title] = value
         for col in extra_columns:
             col_data = col.data.get(registration)
-            registration_dict[col.title] = col_data.text_value if col_data else ''
+            registration_dict[str(col.title)] = col_data.text_value if col_data else ''
         rows.append(registration_dict)
     return field_names, rows
 
@@ -713,7 +713,7 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
     }
     field_names.extend(unique_col(item.title, item.id) for item in regform_items)
     field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
-    field_names.extend(col.title for col in extra_columns)
+    field_names.extend(str(col.title) for col in extra_columns)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -739,7 +739,7 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
             row_data[title] = value
         for col in extra_columns:
             col_data = col.data.get(registration)
-            row_data[col.title] = col_data.text_value if col_data else empty_value
+            row_data[str(col.title)] = col_data.text_value if col_data else empty_value
         rows.append((registration, row_data))
     return field_names, rows
 
