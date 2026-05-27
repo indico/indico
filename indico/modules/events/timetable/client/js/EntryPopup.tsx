@@ -72,6 +72,13 @@ function EntryPopupContent({
   const colors = getEntryColors(entry, session);
   const {openModal} = useModal();
 
+  const entryLocatorKey = entry.type === EntryType.SessionBlock ? 'session_id' : 'contrib_id';
+  const entryLocatorValue = entry.type === EntryType.SessionBlock ? sessionId : objId;
+  const entryLocator = {
+    event_id: eventId,
+    [entryLocatorKey]: entryLocatorValue,
+  };
+
   const _getOrderedLocationArray = () => {
     const {address, venueName, roomName} = entry.locationData;
     return Object.values([address, venueName, roomName]).filter(Boolean);
@@ -316,6 +323,21 @@ function EntryPopupContent({
           content={Translate.string('Edit')}
           trigger={<Button basic icon="edit" onClick={onEdit} />}
         />
+        {type !== EntryType.Break && (
+          <ActionPopup
+            content={Translate.string('Materials')}
+            trigger={
+              <Button
+                as="a"
+                basic
+                icon="attach"
+                data-attachment-editor
+                data-locator={JSON.stringify(entryLocator)}
+                onClick={onClose}
+              />
+            }
+          />
+        )}
         {type === EntryType.Contribution ? (
           <ActionPopup
             content={<Translate>Unschedule contribution</Translate>}
