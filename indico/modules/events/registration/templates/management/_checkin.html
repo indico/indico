@@ -16,7 +16,7 @@
     </button>
 
     <script>
-        (function() {
+        $(function() {
             'use strict';
             const qrCodeButton = $('#qr-code');
             const checkinAppLink = $('#checkin-app-link');
@@ -39,6 +39,6 @@
                     checkinAppLink.toggle(data.tickets_enabled);
                 }
             });
-        })();
+        });
     </script>
 {% endmacro %}
