@@ -71,12 +71,6 @@ export interface LocationParent {
   type: string;
   title: string;
 }
-export interface Attachment {
-  type: 'attachment' | 'folder';
-  downloadURL: string;
-  id: number;
-  title: string;
-}
 
 export interface Session {
   id: number; // XXX probably we need an id-less variant during creation, but that should be a separate type
@@ -96,7 +90,6 @@ export interface BaseEntry {
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
-  attachments?: Attachment[];
 }
 
 export interface ScheduledMixin {
@@ -116,7 +109,7 @@ export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> 
 export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: ContribId;
   type: EntryType.Contribution;
-  attachments?: Attachment[];
+  attachmentCount: number;
   sessionId?: number;
   boardNumber?: string;
   keywords?: string[];
@@ -136,7 +129,7 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
   children: ChildEntry[];
   personLinks: PersonLink[];
   childLocationParent: LocationParent;
-  attachments?: Attachment[];
+  attachmentCount: number;
   colors?: Colors;
   code?: string;
 }
@@ -199,4 +192,9 @@ export interface ReduxState {
   navigation: Navigation;
   staticData: StaticData;
   display: {activePanel: SidePanelView};
+}
+
+export interface AttachmentUpdatedEventDetail {
+  type: EntryType;
+  id: number;
 }

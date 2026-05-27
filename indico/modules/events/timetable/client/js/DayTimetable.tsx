@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
+
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,6 +15,8 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {localeUses24HourTime} from 'indico/utils/date';
+
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
@@ -41,6 +46,7 @@ import {
   isChildEntry,
   EntryType,
   Session,
+  AttachmentUpdatedEventDetail,
 } from './types';
 import {
   DAY_SIZE,
@@ -50,10 +56,10 @@ import {
   V_SPACE_BETWEEN_ENTRIES_PX,
   flattenEntries,
   getDateKey,
+  getEntryUniqueId,
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
-  getEntryUniqueId,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -488,6 +494,28 @@ export function DayTimetable({
       document.removeEventListener('mousemove', onMouseMove);
     };
   }, []);
+
+  useEffect(() => {
+    async function handleMaterialsChanged(event: Event) {
+      const {type, id}: AttachmentUpdatedEventDetail = (event as CustomEvent).detail;
+      const url =
+        type === EntryType.SessionBlock
+          ? sessionBlockURL({event_id: eventId, session_block_id: id})
+          : contributionURL({event_id: eventId, contrib_id: id});
+      try {
+        const entry = await indicoAxios.get(url);
+        const attachmentCount = entry.data.attachment_count;
+        dispatch(actions.setEntryAttachments(type, getEntryUniqueId(type, id), attachmentCount));
+      } catch (e) {
+        handleAxiosError(e);
+      }
+    }
+
+    document.addEventListener('indico:attachmentsUpdate', handleMaterialsChanged);
+    return () => {
+      document.removeEventListener('indico:attachmentsUpdate', handleMaterialsChanged);
+    };
+  }, [dispatch, eventId]);
 
   useEffect(() => {
     let newEntryTimer: number | null = null;
