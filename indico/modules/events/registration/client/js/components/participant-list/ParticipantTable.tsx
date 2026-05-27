@@ -44,12 +44,10 @@ export default function ParticipantTable({table, merged = true}: ParticipantTabl
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState<PerPageOptions>('all');
-
   const [search, setSearch] = useState('');
 
   function filterRows(rows: TableRowObj[], searchString: string): TableRowObj[] {
     const query = searchString.trim().toLowerCase();
-
     if (!query) {
       return rows;
     }
@@ -57,11 +55,18 @@ export default function ParticipantTable({table, merged = true}: ParticipantTabl
     const exactSearchRegex = /^(['"]).*\1$/;
     if (exactSearchRegex.test(query)) {
       const value = query.slice(1, -1).toLowerCase();
-
       return rows.filter(row => row.columns.some(col => col.text?.toLowerCase() === value));
     }
 
-    return rows.filter(row => row.columns.some(col => col.text?.toLowerCase().includes(query)));
+    return rows.filter(row =>
+      row.columns.some(col =>
+        col.text
+          ?.toLowerCase()
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .includes(query)
+      )
+    );
   }
 
   function sortRows(
@@ -124,7 +129,7 @@ export default function ParticipantTable({table, merged = true}: ParticipantTabl
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [10, 25, 50, 100, 'all'];
+  const perPageOptions = [25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
