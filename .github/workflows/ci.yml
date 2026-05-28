@@ -65,6 +65,9 @@ jobs:
       - name: Check EOF linebreaks
         run: ./bin/maintenance/check_eof_linebreaks.sh
 
+      - name: Check trailing whitespace
+        run: ./bin/maintenance/check_trailing_whitespace.sh
+
       - name: Check import sorting
         if: success() || failure()
         run: isort --diff --check-only indico/
