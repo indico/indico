@@ -8,7 +8,7 @@
 import participantListDataURL from 'indico-url:event_registration.api_participant_list';
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
-import React, {ReactNode, useMemo} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 import {
   Button,
   Icon,
@@ -25,7 +25,7 @@ import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
 import {ParticipantCountHidden} from './ParticipantSharedTranslations';
-import ParticipantTable from './ParticipantTable';
+import ParticipantTable, {PerPageOptions} from './ParticipantTable';
 import {PreviewEnum, TableObj} from './types';
 
 import './ParticipantList.module.scss';
@@ -65,6 +65,10 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
 }
 
 export default function ParticipantList({eventId, preview}: ParticipantListProps) {
+  const [search, setSearch] = useState('');
+  const [perPage, setPerPage] = useState<PerPageOptions>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const url = useMemo(
     () =>
       participantListDataURL({
@@ -129,7 +133,15 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
     <section>
       {viewToggle}
       {data.merged ? (
-        <ParticipantTable table={data.tables[0]} />
+        <ParticipantTable
+          table={data.tables[0]}
+          search={search}
+          setSearch={setSearch}
+          perPage={perPage}
+          setPerPage={setPerPage}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       ) : (
         <Tab
           styleName="tab-menu"
@@ -147,7 +159,16 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
               ),
               render: () => (
                 <TabPane key={table.title} attached={false}>
-                  <ParticipantTable table={table} merged={data.merged} />
+                  <ParticipantTable
+                    table={table}
+                    merged={data.merged}
+                    search={search}
+                    setSearch={setSearch}
+                    perPage={perPage}
+                    setPerPage={setPerPage}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                  />
                 </TabPane>
               ),
             }))}

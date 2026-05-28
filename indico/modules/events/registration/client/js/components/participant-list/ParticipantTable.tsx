@@ -26,25 +26,36 @@ import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import {TableColumnObj, TableObj, TableRowObj} from './types';
 import './ParticipantTable.module.scss';
 
+type SortDirectionType = 'ascending' | 'descending' | null;
+export type PerPageOptions = number | 'all';
+
 interface ParticipantTableProps {
   table: TableObj;
   merged?: boolean;
+  search: string;
+  setSearch: (val: string) => void;
+  perPage: PerPageOptions;
+  setPerPage: (val: PerPageOptions) => void;
+  currentPage: number;
+  setCurrentPage: (val: number) => void;
 }
 
-type SortDirectionType = 'ascending' | 'descending' | null;
-type PerPageOptions = number | 'all';
-
-export default function ParticipantTable({table, merged = true}: ParticipantTableProps) {
+export default function ParticipantTable({
+  table,
+  merged = true,
+  search,
+  setSearch,
+  perPage,
+  setPerPage,
+  currentPage,
+  setCurrentPage,
+}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantsCount = table.num_participants;
   const hiddenParticipantsCount = table.num_anonymous_participants;
 
   const [sortColumn, setSortColumn] = useState<number | string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState<PerPageOptions>('all');
-  const [search, setSearch] = useState('');
 
   function filterRows(rows: TableRowObj[], searchString: string): TableRowObj[] {
     const query = searchString.trim().toLowerCase();
@@ -120,8 +131,6 @@ export default function ParticipantTable({table, merged = true}: ParticipantTabl
   };
 
   const processedRows = useMemo(() => {
-    setCurrentPage(1);
-
     let rows = filterRows(table.rows, search);
     rows = sortRows(rows, sortColumn, sortDirection);
 
@@ -184,7 +193,10 @@ export default function ParticipantTable({table, merged = true}: ParticipantTabl
           />
           <Input
             value={search}
-            onChange={(e, {value}) => setSearch(value)}
+            onChange={(e, {value}) => {
+              setSearch(value);
+              setCurrentPage(1);
+            }}
             icon={<Icon name="search" />}
             placeholder={Translate.string('Search participants')}
           />
