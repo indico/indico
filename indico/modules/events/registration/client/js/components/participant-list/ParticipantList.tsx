@@ -134,21 +134,23 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
         <Tab
           styleName="tab-menu"
           menu={{secondary: true}}
-          panes={data.tables.map((table: TableObj) => ({
-            menuItem: (
-              <MenuItem styleName="tab-title" key={table.title}>
-                <span styleName="title-text" title={table.title}>
-                  {table.title}
-                </span>
-                <ParticipantCounter table={table} />
-              </MenuItem>
-            ),
-            render: () => (
-              <TabPane key={table.title} attached={false}>
-                <ParticipantTable table={table} merged={data.merged} />
-              </TabPane>
-            ),
-          }))}
+          panes={[...data.tables]
+            .sort((a, b) => b.num_participants - a.num_participants)
+            .map((table: TableObj) => ({
+              menuItem: (
+                <MenuItem styleName="tab-title" key={table.title}>
+                  <span styleName="title-text" title={table.title}>
+                    {table.title}
+                  </span>
+                  <ParticipantCounter table={table} />
+                </MenuItem>
+              ),
+              render: () => (
+                <TabPane key={table.title} attached={false}>
+                  <ParticipantTable table={table} merged={data.merged} />
+                </TabPane>
+              ),
+            }))}
         />
       )}
     </section>
