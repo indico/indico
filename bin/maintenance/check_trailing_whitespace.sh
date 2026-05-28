@@ -6,7 +6,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-if ! output=$(rg --json -g '!*.{svg,md,po}' -g '!**/icomoon/selection.json' '[ \t]+$' .); then
+if ! output=$(rg --json -g '!*.{svg,md,po}' -g '!**/tests/**/*.txt' -g '!**/icomoon/selection.json' '[ \t]+$' .); then
     exit 0
 fi
 
