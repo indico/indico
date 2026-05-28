@@ -317,6 +317,7 @@ export function layoutAfterUnscheduledDrop(
     colors: DEFAULT_CONTRIB_COLORS,
     column: null,
     maxColumn: null,
+    attachmentCount: 0,
   };
   delete entry.sessionId;
 
@@ -384,6 +385,7 @@ export function layoutAfterUnscheduledDropOnBlock(
     sessionId: toBlock.sessionId,
     column: null,
     maxColumn: null,
+    attachmentCount: 0,
   };
 
   if ('backgroundColor' in draftEntry) {

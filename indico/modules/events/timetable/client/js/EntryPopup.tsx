@@ -61,7 +61,7 @@ function EntryPopupContent({
   onClose: () => void;
 }) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const {objId, type, title, attachmentCount, duration, startDt, sessionId} = entry;
+  const {objId, type, title, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
@@ -275,7 +275,7 @@ function EntryPopupContent({
             </List>
           </List.Item>
         )}
-        {attachmentCount !== undefined && (
+        {entry.type !== EntryType.Break && (
           <List.Item title={Translate.string('Attachments')}>
             <Icon name="copy outline" />
             <List styleName="inline">
@@ -287,9 +287,9 @@ function EntryPopupContent({
                 content={PluralTranslate.string(
                   '{attachmentCount} material',
                   '{attachmentCount} materials',
-                  attachmentCount,
+                  entry.attachmentCount,
                   {
-                    attachmentCount,
+                    attachmentCount: entry.attachmentCount,
                   }
                 )}
                 data-attachment-editor
