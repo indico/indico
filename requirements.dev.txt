@@ -71,7 +71,7 @@ hatchling==1.29.0
     # via
     #   -r requirements.dev.in
     #   hatch-requirements-txt
-idna==3.11
+idna==3.15
     # via
     #   -c requirements.txt
     #   anyio
