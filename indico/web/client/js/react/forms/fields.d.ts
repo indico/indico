@@ -32,6 +32,7 @@ interface FinalFieldProps extends SharedFieldProps {
 
 interface FinalInputProps extends SharedFieldProps {
   label?: string | null;
+  placeholder?: string;
   type?: 'text' | 'email' | 'number' | 'tel' | 'password';
   nullIfEmpty?: boolean;
   noAutoComplete?: boolean;
