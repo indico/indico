@@ -97,7 +97,7 @@ export default {
           .map(e => [e, ...(e.type === EntryType.SessionBlock ? e.children : [])])
           .flat();
         const entry = flatEntries.find(e => e.id === id);
-        if (!entry) {
+        if (!entry || entry.type === EntryType.Break) {
           return state;
         }
 
@@ -121,11 +121,21 @@ export default {
               ],
             },
           ];
-        } else {
+        } else if (entry.type === EntryType.Contribution) {
           newEntries[dateKey] = [
             ...dayEntries.filter(dayEntry => dayEntry.id !== id),
             {...entry, attachmentCount},
           ];
+        } else {
+          // attachments are linked to sessions, not session blocks, so we must update every
+          // session block that matches this sessionId
+          for (const key of Object.keys(newEntries)) {
+            newEntries[key] = newEntries[key].map(dayEntry =>
+              dayEntry.type === EntryType.SessionBlock && dayEntry.sessionId === entry.sessionId
+                ? {...dayEntry, attachmentCount}
+                : dayEntry
+            );
+          }
         }
 
         return {
