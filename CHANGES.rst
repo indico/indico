@@ -30,9 +30,6 @@ Improvements
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 - Automatically paste obvious email addresses into the email field when pasting in
   the user search dialog (:pr:`7538`)
-- Increase the videoconference name length limit to 255 characters, leaving
-  service-specific limits to each plugin (:pr:`7560`, thanks
-  :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -69,6 +66,9 @@ Internal Changes
 
 - Modernize the PDF registrant list generation using weasyprint (:pr:`7077`, thanks
   :user:`abhinavohri`)
+- Relax the videoconference name length limit to 255 characters, delegating
+  service-specific limits to each plugin (:pr:`7560`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.12
