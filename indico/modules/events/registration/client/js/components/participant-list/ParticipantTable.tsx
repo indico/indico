@@ -50,7 +50,6 @@ export default function ParticipantTable({
   currentPage,
   setCurrentPage,
 }: ParticipantTableProps) {
-  const visibleParticipantsCount = table.rows.length;
   const totalParticipantsCount = table.num_participants;
   const hiddenParticipantsCount = table.num_anonymous_participants;
 
@@ -62,13 +61,11 @@ export default function ParticipantTable({
     if (!query) {
       return rows;
     }
-
     const exactSearchRegex = /^(['"]).*\1$/;
     if (exactSearchRegex.test(query)) {
       const value = query.slice(1, -1).toLowerCase();
       return rows.filter(row => row.columns.some(col => col.text?.toLowerCase() === value));
     }
-
     return rows.filter(row =>
       row.columns.some(col =>
         col.text
@@ -88,14 +85,11 @@ export default function ParticipantTable({
     if (direction === null || column === null) {
       return rows;
     }
-
     return [...rows].sort((a, b) => {
       const comparedVals = [a, b].map(el =>
         typeof column === 'string' ? el[column] : el.columns[column].text
       );
-
       let sortResult;
-
       if (comparedVals[0] === comparedVals[1]) {
         return 0;
       } else if (comparedVals.every(el => typeof el === 'boolean')) {
@@ -103,7 +97,6 @@ export default function ParticipantTable({
       } else {
         sortResult = comparedVals[0].localeCompare(comparedVals[1]);
       }
-
       return sortResult * (direction === 'ascending' ? 1 : -1);
     });
   }
@@ -121,10 +114,8 @@ export default function ParticipantTable({
       ascending: 'descending',
       descending: null,
     };
-
     const direction: SortDirectionType =
       sortColumn === column ? nextDirection[sortDirection] : 'ascending';
-
     setSortColumn(column);
     setSortDirection(direction);
     setCurrentPage(1);
@@ -133,7 +124,6 @@ export default function ParticipantTable({
   const processedRows = useMemo(() => {
     let rows = filterRows(table.rows, search);
     rows = sortRows(rows, sortColumn, sortDirection);
-
     return rows;
   }, [table.rows, search, sortColumn, sortDirection]);
 
@@ -144,14 +134,12 @@ export default function ParticipantTable({
     if (perPage === 'all') {
       return processedRows;
     }
-
     const start = (currentPage - 1) * perPage;
     const end = start + perPage;
-
     return processedRows.slice(start, end);
   }, [processedRows, currentPage, perPage]);
 
-  return visibleParticipantsCount > 0 ? (
+  return (
     <>
       {merged && hiddenParticipantsCount > 0 && (
         <div styleName="merged-view-hidden-participants-count">
@@ -267,7 +255,7 @@ export default function ParticipantTable({
                 style={{textAlign: 'center'}}
                 colSpan={table.headers.length + (table.show_checkin ? 1 : 0)}
               >
-                <Translate>No participants found.</Translate>
+                <Translate>No participants to display.</Translate>
               </TableCell>
             </TableRow>
           )}
@@ -307,11 +295,5 @@ export default function ParticipantTable({
         </section>
       )}
     </>
-  ) : (
-    <ParticipantCountHidden
-      count={totalParticipantsCount}
-      countHidden={hiddenParticipantsCount}
-      displayTotal={false}
-    />
   );
 }
