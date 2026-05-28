@@ -26,6 +26,8 @@ from indico.modules.events.surveys.operations import add_survey_question, add_su
 from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -190,17 +192,13 @@ class RHAddSurveySection(RHManageSurveyBase):
             db.session.add(new_item)
         db.session.flush()
 
-    def _process(self):
+    @use_rh_kwargs({
+        'section_to_clone': ModelField(SurveySection, with_parent='survey', data_key='clone')
+    }, location='query', rh_context=('survey',))
+    def _process(self, section_to_clone=None):
         form = SectionForm()
-        section_to_clone = None
-        clone_id = request.args.get('clone', type=int)
-        if clone_id:
-            try:
-                section_to_clone = SurveySection.query.with_parent(self.survey).filter_by(id=clone_id).one()
-                if section_to_clone:
-                    form = SectionForm(obj=FormDefaults(section_to_clone))
-            except NoResultFound:
-                pass
+        if section_to_clone:
+            form = SectionForm(obj=FormDefaults(section_to_clone))
         if form.validate_on_submit():
             section = add_survey_section(self.survey, form.data)
             if section_to_clone:
