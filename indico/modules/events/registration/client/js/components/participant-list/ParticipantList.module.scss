@@ -43,13 +43,13 @@
   margin-bottom: 30px;
 
   .tab-title {
-    gap: 10px;
-    border: 1px solid $separator-color;
-    margin: 5px;
-
     display: flex;
     flex: 0 1 auto;
     min-width: 0;
+    max-width: 30em;
+    gap: 10px;
+    border: 1px solid $separator-color;
+    margin: 5px;
 
     .title-text {
       flex: 0 1 auto;
