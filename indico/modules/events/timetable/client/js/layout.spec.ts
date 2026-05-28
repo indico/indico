@@ -87,7 +87,7 @@ function contrib({
     title,
     description: '',
     personLinks: [],
-    attachments: [],
+    attachmentCount: 0,
     type: EntryType.Contribution,
     duration,
     ...scheduleMixin({time, column, maxColumn}),
@@ -144,7 +144,7 @@ function block({
     title,
     description: '',
     personLinks: [],
-    attachments: [],
+    attachmentCount: 0,
     type: EntryType.SessionBlock,
     sessionId: 0,
     childLocationParent: {
