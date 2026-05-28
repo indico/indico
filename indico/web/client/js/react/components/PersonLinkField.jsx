@@ -289,6 +289,7 @@ function PersonLinkField({
         'identifier',
         'type',
         'personId',
+        'userId',
         'avatarURL',
         ..._.flatten(getPluginObjects('personLinkCustomFields')),
       ])
