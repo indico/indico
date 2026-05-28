@@ -28,8 +28,8 @@
         </button>
     </div>
     <div class="group">
-        <button data-href="{{ url_for('.open_survey', survey) }}" 
-                data-method="POST" 
+        <button data-href="{{ url_for('.open_survey', survey) }}"
+                data-method="POST"
                 class="i-button highlight"
                 {% if survey.notifications_enabled %}
                     data-title="{% trans %}Confirm opening survey{% endtrans %}"

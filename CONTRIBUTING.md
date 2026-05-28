@@ -7,7 +7,7 @@ Contributing to Indico can mean so much more than writing code! There are many o
  * :beetle: Have you found a bug? Do you have a feature to suggest?
    - First of all, check whether there isn't already a similar issue;
    - If not, [open a GitHub issue](https://github.com/indico/indico/issues/new);
-   - *Please, follow the default templates we provide, they make things much easier!* 
+   - *Please, follow the default templates we provide, they make things much easier!*
  * 🚨 Have you found a security issue? → E-mail us at [indico-team@cern.ch](mailto:indico-team@cern.ch)
 
 ### Translation :earth_asia:
@@ -20,7 +20,7 @@ Would you like to to help us translate Indico to your language?
  * Then, [create an account on Transifex](https://www.transifex.com/indico/indico/) and ask to join the corresponding team in the `indico` project;
  * Someone from the team will be in contact with you as soon as possible;
 
-### Documentation :pencil: 
+### Documentation :pencil:
 
  * ❌ Have you found a typo, mistake, wrong information or an outdated screenshot?
  * :muscle: Do you think you can help us write better documentation or document a part of Indico that is not documented at all?
@@ -67,4 +67,3 @@ This checklist is meant to help you follow those practices:
 
 Indico is a CERN project and is thus subject to [CERN's Code of Conduct](https://hr.web.cern.ch/codeofconduct). Outside contributors are expected to act in accordance with the principles of the CoC that apply to them.
 The development team commits to ensuring that [CERN's values](https://hr.web.cern.ch/cerns-values) are respected and reserves the right to suspend from the community any contributors that are found to be engaged in harmful behaviour. Personal attacks or any other form of harassment will not be tolerated.
-
