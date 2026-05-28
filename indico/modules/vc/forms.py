@@ -116,7 +116,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
     skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60)],
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=255)],
                        description=_('The name of the videoconference.'))
 
     def validate_name(self, field):
