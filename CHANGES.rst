@@ -30,6 +30,7 @@ Improvements
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 - Automatically paste obvious email addresses into the email field when pasting in
   the user search dialog (:pr:`7538`)
+- Auto submit paper for editing after peer review is accepted (:pr:`7444`)
 
 Bugfixes
 ^^^^^^^^
