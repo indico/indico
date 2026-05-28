@@ -11,7 +11,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.controllers.display import RHSubmitPaperBase
-from indico.modules.events.papers.fields import PaperFilesField
+from indico.modules.events.papers.fields import PaperActionField, PaperFilesField
 from indico.modules.events.papers.file_types import PaperFileType
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
@@ -95,10 +95,10 @@ class RHJudgePaper(RHPaperBase):
     def _check_paper_protection(self):
         return self.paper.can_judge(session.user, check_state=True)
 
-    @use_kwargs({
-        'action': fields.Enum(PaperAction, required=True),
+    @use_rh_kwargs({
+        'action': PaperActionField(required=True),
         'comment': fields.String()
-    })
+    }, rh_context=('paper',))
     def _process(self, action, comment):
         judge_paper(self.paper, action, comment, judge=session.user)
         return '', 204

@@ -9,7 +9,7 @@ from datetime import time
 
 from flask import request
 from wtforms.fields import BooleanField, HiddenField, IntegerField, StringField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
 from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.reviews import PaperAction
@@ -94,6 +94,13 @@ class PaperReviewingSettingsForm(IndicoForm):
     hide_accepted = BooleanField(_('Keep papers hidden'), widget=SwitchWidget(),
                                  description=_("Keep papers hidden from participants even after they've "
                                                'been accepted.'))
+    limit_review_cycles = BooleanField(_('Limit review cycles'), widget=SwitchWidget(),
+                                       description=_('Restrict the amount of review cycles where the author can be '
+                                                     'asked to make changes to their paper.'))
+    max_review_cycles = IntegerField(_('Max. review cycles'), [HiddenUnless('limit_review_cycles'), NumberRange(min=1),
+                                                               InputRequired()],
+                                     description=_('The max number of review cycles after which a paper needs to be '
+                                                   'accepted or rejected.'))
     authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
                                                allow_external_users=True, allow_groups=True,
                                                allow_event_roles=True, allow_category_roles=True,

@@ -30,6 +30,7 @@ Improvements
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 - Automatically paste obvious email addresses into the email field when pasting in
   the user search dialog (:pr:`7538`)
+- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
