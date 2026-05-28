@@ -34,6 +34,21 @@ export default function ResizeHandle({
     e.stopPropagation();
     resizeStartRef.current = e.clientY;
     setIsResizing(true);
+    const handlers = new Map<keyof DocumentEventMap, (event: unknown) => void>();
+
+    function addEventListener<K extends keyof DocumentEventMap>(
+      type: K,
+      handler: (event: DocumentEventMap[K]) => void
+    ) {
+      handlers.set(type, handler);
+      document.addEventListener(type, handler);
+    }
+
+    function removeEventListeners() {
+      for (const [type, handler] of handlers.entries()) {
+        document.removeEventListener(type, handler);
+      }
+    }
 
     function mouseMoveHandler(moveEvent: MouseEvent) {
       if (resizeStartRef.current === null) {
@@ -57,8 +72,7 @@ export default function ResizeHandle({
     }
 
     const mouseUpHandler = (mouseUpEvent: MouseEvent) => {
-      document.removeEventListener('mouseup', mouseUpHandler);
-      document.removeEventListener('mousemove', mouseMoveHandler);
+      removeEventListeners();
 
       if (resizeStartRef.current === null) {
         return;
@@ -79,8 +93,23 @@ export default function ResizeHandle({
       setIsResizing(false);
     };
 
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
+    const keyDownHandler = (keyDownEvent: KeyboardEvent) => {
+      if (keyDownEvent.key !== 'Escape') {
+        return;
+      }
+
+      removeEventListeners();
+
+      if (resizeStartRef.current === null) {
+        return;
+      }
+      setIsResizing(false);
+      setLocalDuration(duration);
+    };
+
+    addEventListener('mousemove', mouseMoveHandler);
+    addEventListener('mouseup', mouseUpHandler);
+    addEventListener('keydown', keyDownHandler);
   }
 
   return (
