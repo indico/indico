@@ -165,6 +165,7 @@ describe('mapperUtils', () => {
         y: 0,
         column: 0,
         maxColumn: 0,
+        attachmentCount: 0,
       };
       const data = mapEntryToData(entry);
 
@@ -200,6 +201,7 @@ describe('mapperUtils', () => {
         y: 0,
         column: 0,
         maxColumn: 0,
+        attachmentCount: 0,
       };
       const data = mapEntryToData(entry);
 
