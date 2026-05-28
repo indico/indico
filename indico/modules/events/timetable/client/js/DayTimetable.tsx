@@ -124,6 +124,7 @@ export function DayTimetable({
   const draftEntry = useSelector(selectors.getDraftEntry);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
+  const selectedEntry = useSelector(selectors.getSelectedEntry);
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const isDragging = draggingStartPos !== null;
@@ -365,7 +366,12 @@ export function DayTimetable({
       const clickedOnCalendar =
         event.target === calendarRef.current || event.target === innerWrapperRef.current;
 
-      if (event.button !== 0 || !clickedOnCalendar || isWithinLimitsWithOffset) {
+      if (
+        event.button !== 0 ||
+        !clickedOnCalendar ||
+        isWithinLimitsWithOffset ||
+        selectedEntry?.id !== undefined
+      ) {
         return;
       }
 
@@ -441,7 +447,7 @@ export function DayTimetable({
       wrapper.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour, limits]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, selectedEntry]);
 
   useEffect(() => {
     if (wrapperRef.current) {
