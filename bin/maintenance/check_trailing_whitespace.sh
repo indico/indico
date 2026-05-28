@@ -10,7 +10,7 @@ if ! output=$(rg --json -g '!*.{svg,md,po}' -g '!**/tests/**/*.txt' -g '!**/icom
     exit 0
 fi
 
-output=$(echo $output | jq -r -s '(.[] | select(.type == "match").data | "file=\(.path.text[2:]),line=\(.line_number),col=\(.submatches[0].start+1),endColumn=\(.submatches[0].end+1)")')
+output=$(jq -r -s '(.[] | select(.type == "match").data | "file=\(.path.text[2:]),line=\(.line_number),col=\(.submatches[0].start+1),endColumn=\(.submatches[0].end+1)")' <<<"$output")
 
 while IFS= read -r line; do
     echo "::error $line::File contains trailing whitespace"
