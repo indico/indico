@@ -9,10 +9,12 @@ import fnmatch
 import json
 import os
 
+from flask import session
 from marshmallow import ValidationError
-from marshmallow.fields import Dict
+from marshmallow.fields import Dict, Enum
 
 from indico.modules.events.papers.file_types import PaperFileType
+from indico.modules.events.papers.models.reviews import PaperCommentVisibility
 from indico.modules.events.papers.settings import RoleConverter
 from indico.modules.events.papers.settings import paper_reviewing_settings as settings
 from indico.util.marshmallow import FilesField, ModelField
@@ -116,3 +118,21 @@ class PaperFilesField(Dict):
                 raise ValidationError(f'Duplicate filenames found in file type "{file_type.name}"')
 
             seen |= set(files)
+
+
+class PaperCommentVisibilityField(Enum):
+    def __init__(self, **kwargs):
+        super().__init__(PaperCommentVisibility)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        rv = super()._deserialize(value, attr, data, **kwargs)
+        event = self.context['event']
+        paper = self.context['paper']
+        if (
+            event.cfp.disable_contributor_visibility
+            and rv == PaperCommentVisibility.contributors
+            and not paper.can_judge(session.user)
+            and not paper.can_manage(session.user)
+        ):
+            raise ValidationError('This event does not allow reviewers to make comments visible to contributors.')
+        return rv
