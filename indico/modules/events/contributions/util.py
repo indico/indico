@@ -30,9 +30,8 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.util import track_time_changes
+from indico.modules.events.util import get_person_link_field_params, track_time_changes
 from indico.modules.users.models.users import User
-from indico.modules.events.util import get_person_link_field_params
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper
