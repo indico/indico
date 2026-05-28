@@ -16,25 +16,28 @@
                     <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
                 </div>
             </div>
-            <ul class="footer-links">
-                <li>
-                    <a href="{{ indico_config.HELP_URL }}">
-                        {% trans %}Help{% endtrans %}
-                    </a>
-                </li>
-                {% if indico_config.PUBLIC_SUPPORT_EMAIL %}
+            <nav>
+                <h2 class="footer-links-heading">{% trans %}Site links{% endtrans %}</h2>
+                <ul class="footer-links">
                     <li>
-                        <a href="{{ url_for('core.contact') }}">
-                            {% trans %}Contact{% endtrans %}
+                        <a href="{{ indico_config.HELP_URL }}">
+                            {% trans %}Help{% endtrans %}
                         </a>
                     </li>
-                {% endif %}
-                {% for item in template_hook('page-footer', as_list=true) %}
-                    <li>
-                        {{ item }}
-                    </li>
-                {% endfor %}
-            </ul>
+                    {% if indico_config.PUBLIC_SUPPORT_EMAIL %}
+                        <li>
+                            <a href="{{ url_for('core.contact') }}">
+                                {% trans %}Contact{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for item in template_hook('page-footer', as_list=true) %}
+                        <li>
+                            {{ item }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
             <div class="footer-extra f-self-stretch">
                 {% block footer_extra %}
                 {% endblock %}
