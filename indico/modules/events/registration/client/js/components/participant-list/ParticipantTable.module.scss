@@ -22,7 +22,7 @@
   position: relative;
   overflow-x: hidden;
 
-  >p {
+  > p {
     width: 100%;
     line-height: 1em;
     display: inline-block;
@@ -35,7 +35,7 @@
   }
 
   &:not(.unsortable) {
-    >p {
+    > p {
       width: calc(100% - 12px);
     }
   }
@@ -79,7 +79,7 @@
   flex: 0 1 auto;
   flex-wrap: wrap;
 
-  >a {
+  > a {
     border-bottom: 0.1px solid $separator-color;
   }
 }

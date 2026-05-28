@@ -36,18 +36,27 @@
   word-break: keep-all;
 }
 
-.tab-menu> :global(.ui.menu) {
+.tab-menu > :global(.ui.menu) {
+  display: flex;
   flex-wrap: wrap;
   margin-top: 30px;
   margin-bottom: 30px;
 
-  >.tab-title {
+  .tab-title {
     gap: 10px;
     border: 1px solid $separator-color;
     margin: 5px;
 
+    display: flex;
     flex: 0 1 auto;
-    overflow-wrap: break-word;
+    min-width: 0;
+
+    .title-text {
+      flex: 0 1 auto;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
   }
 }
 

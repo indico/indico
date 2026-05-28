@@ -137,7 +137,9 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
           panes={data.tables.map((table: TableObj) => ({
             menuItem: (
               <MenuItem styleName="tab-title" key={table.title}>
-                {table.title}
+                <span styleName="title-text" title={table.title}>
+                  {table.title}
+                </span>
                 <ParticipantCounter table={table} />
               </MenuItem>
             ),
