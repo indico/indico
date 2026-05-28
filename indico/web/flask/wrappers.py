@@ -166,8 +166,10 @@ class IndicoBlueprintSetupState(BlueprintSetupState):
     def _unprefixed(self):
         prefix = self.url_prefix
         self.url_prefix = None
-        yield
-        self.url_prefix = prefix
+        try:
+            yield
+        finally:
+            self.url_prefix = prefix
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         if rule.startswith('!/'):
@@ -232,9 +234,11 @@ class IndicoBlueprint(Blueprint):
         assert self.__prefix is None and not self.__default_prefix
         self.__prefix = prefix
         self.__default_prefix = default_prefix
-        yield
-        self.__prefix = None
-        self.__default_prefix = ''
+        try:
+            yield
+        finally:
+            self.__prefix = None
+            self.__default_prefix = ''
 
 
 class IndicoFileSystemLoader(FileSystemLoader):

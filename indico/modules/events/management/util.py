@@ -177,7 +177,7 @@ def flash_if_unregistered(event, get_person_links):
                              check
     """
     old_non_users = {pl for pl in get_person_links() if pl.person.user is None}
-    yield
+    yield  # noqa: RUF075
     new_non_users = {pl for pl in get_person_links() if pl.person.user is None}
     added_non_users = len(new_non_users - old_non_users)
     if not added_non_users:
