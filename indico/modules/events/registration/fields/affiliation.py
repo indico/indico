@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import ValidationError, fields
+from marshmallow import ValidationError, fields, pre_load
 
 from indico.core import signals
 from indico.core.db import db
@@ -34,6 +34,12 @@ class AffiliationFieldDataSchema(FieldSetupSchemaBase):
 class AffiliationValueSchema(mm.Schema):
     id = fields.Integer(required=True, allow_none=True)
     text = fields.String(required=True)
+
+    @pre_load
+    def handle_custom_affiliation(self, data, **kwargs):
+        if isinstance(data, str):
+            return {'id': None, 'text': data}
+        return data
 
 
 @memoize_request

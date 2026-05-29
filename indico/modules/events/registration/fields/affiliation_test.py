@@ -46,6 +46,12 @@ def test_affiliation_validate_errors(affiliation_field, is_required, mode, value
         validator(value)
 
 
+def test_affiliation_schema_loads_custom_affiliation_string(affiliation_field):
+    affiliation_field.data = {'affiliation_mode': AffiliationMode.custom}
+    field = affiliation_field.field_impl.create_mm_field()
+    assert field.deserialize('CERN') == {'id': None, 'text': 'CERN'}
+
+
 def test_affiliation_process_form_data_sets_canonical_text(db, affiliation_field, dummy_reg):
     affiliation_field.data = {'affiliation_mode': AffiliationMode.both}
     affiliation = Affiliation(name='CERN')
