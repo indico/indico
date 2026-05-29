@@ -8,10 +8,9 @@
 import json
 
 from flask import flash, jsonify, request, session
+from marshmallow import fields, validate
 from sqlalchemy.orm import contains_eager, joinedload
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
-from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.events.cloning import get_attrs_to_clone
@@ -286,24 +285,19 @@ class RHDeleteSurveyText(RHManageSurveyTextBase):
 class RHAddSurveyQuestion(RHManageSurveySectionBase):
     """Add a new question to a survey."""
 
-    def _process(self):
-        try:
-            field_cls = get_field_types()[request.view_args['type']]
-        except KeyError:
-            raise NotFound
-
+    @use_rh_kwargs({
+        'question_to_clone': ModelField(SurveyQuestion, with_parent='survey', data_key='clone')
+    }, rh_context=('survey',), location='query')
+    @use_rh_kwargs({
+        'field_type': fields.String(validate=validate.OneOf(get_field_types().keys()), data_key='type')
+    }, rh_context=('survey',), location='view_args')
+    def _process(self, field_type, question_to_clone=None):
+        field_cls = get_field_types()[field_type]
         form = field_cls.create_config_form()
-        try:
-            clone_id = int(request.args['clone'])
-        except (KeyError, ValueError):
-            pass
-        else:
-            try:
-                question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=clone_id).one()
-                form = question_to_clone.field.create_config_form(
+
+        if question_to_clone:
+            form = question_to_clone.field.create_config_form(
                     obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
-            except NoResultFound:
-                pass
 
         if form.validate_on_submit():
             question = add_survey_question(self.section, field_cls, form.data)
