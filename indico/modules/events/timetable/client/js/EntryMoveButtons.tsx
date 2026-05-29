@@ -13,7 +13,7 @@ import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import {ReduxState, BlockEntry, Entry, EntryType, Colors, EntryUniqueID} from './types';
+import {ReduxState, BlockEntry, Entry, Colors, EntryUniqueID} from './types';
 import {getDateKey} from './utils';
 
 import './Entry.module.scss';
@@ -91,23 +91,10 @@ export function EntryMoveButtons({
   const [above, below] = isOverlapping ? [null, null] : _getAdjacentEntries();
   const canMove = above || below;
 
-  const _getMovedChildrenByDelta = (parentEntry: BlockEntry, delta: number) =>
-    parentEntry?.children.map(child => ({
-      ...child,
-      startDt: moment(child.startDt).add(delta, 'minutes'),
-    }));
-
   const _moveEntry = (e: Entry, newStartDt: Moment) => {
     const newEntry = {...e, startDt: newStartDt};
 
     if (newStartDt) {
-      if (newEntry.type === EntryType.SessionBlock && newEntry.children) {
-        newEntry.children = _getMovedChildrenByDelta(
-          newEntry as BlockEntry,
-          newStartDt.diff(e.startDt, 'minutes')
-        );
-      }
-
       dispatch(
         actions.updateEntry(e.type, newEntry, dtKey, {
           start_dt: newEntry.startDt,
