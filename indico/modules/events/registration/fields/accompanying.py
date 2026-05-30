@@ -165,9 +165,10 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
             anonymous_lock_reason=self.anonymous_lock_reason,
         )
 
-    def create_mm_field(self, registration=None, override_required=False):
+    def create_mm_field(self, registration=None, override_required=False, management=False):
         if not self.is_anonymous:
-            return super().create_mm_field(registration=registration, override_required=override_required)
+            return super().create_mm_field(registration=registration, override_required=override_required,
+                                           management=management)
 
         validators = self.get_validators(registration) or []
         if not isinstance(validators, list):
