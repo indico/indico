@@ -28,7 +28,7 @@
     {% set pending = agreements | selectattr('pending') | list %}
     {% set signed = agreements | rejectattr('pending') | list %}
 
-    <div class="agreement-dashboard">
+    <div>
         <div class="action-box">
             <div class="section">
                 <div class="icon icon-bullhorn"></div>

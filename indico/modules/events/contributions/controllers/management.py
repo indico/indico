@@ -581,7 +581,8 @@ class RHContributionsExportTeXBook(RHManageContributionsExportActionsBase):
     """Handle export contributions via LaTeX."""
 
     def _process(self):
-        config_params = export_list_cache.get(request.view_args['uuid'])
+        if not (config_params := export_list_cache.get(request.view_args['uuid'])):
+            raise NotFound('Link expired')
         output_format = config_params['format']
         sort_by = config_params['sort_by']
         contribs = (Contribution.query.with_parent(self.event)

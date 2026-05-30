@@ -3,7 +3,7 @@
 #
 # The Unicode locales can be downloaded from: https://cldr.unicode.org/index/downloads
 # or scraped from https://icu4c-demos.unicode.org/icu-bin/locexp
-# The glibc locales can be scraped from: https://lh.2xlibre.net/locales/ 
+# The glibc locales can be scraped from: https://lh.2xlibre.net/locales/
 #
 - af
 - af_NA

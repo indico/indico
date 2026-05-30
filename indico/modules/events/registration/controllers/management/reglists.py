@@ -17,16 +17,14 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
-from webargs import fields
+from webargs import fields, validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.cache import make_scoped_cache
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError
 from indico.core.notifications import make_email, send_email
-from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -55,6 +53,7 @@ from indico.modules.events.registration.notifications import (notify_registratio
 from indico.modules.events.registration.placeholders.registrations import PicturePlaceholder
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
+                                                     generate_pdf_data_from_registrations,
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_registration_spreadsheet_column_formats,
@@ -62,12 +61,13 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      import_registrations_from_csv, load_registration_schema,
                                                      make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.events.timetable.util import create_pdf
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.models.users import ProfilePictureSource
-from indico.util.date_time import format_currency, now_utc, relativedelta
+from indico.util.date_time import format_currency, format_date, now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -501,31 +501,51 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
             col.data = col.load_data(self.registrations)
 
 
-class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
-    """Export registration list to a PDF in table style."""
+class RHRegistrationsExportPDF(RHRegistrationsExportBase):
+    """Export registration list to a PDF in table or book style."""
 
-    def _process(self):
-        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
-                                   static_items=self.export_config['static_item_ids'],
-                                   extra_columns=self.export_config['extra_columns'])
-        try:
-            data = pdf.getPDFBin()
-        except Exception:
-            if config.DEBUG:
-                raise
-            raise NoReportError(_('Text too large to generate a PDF with table style. '
-                                  'Please try again generating with book style.'))
-        return send_file('RegistrantsList.pdf', BytesIO(data), 'application/pdf')
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.regform
+        },
+        'preserved_args': {'export_type'}
+    }
 
+    @use_kwargs({
+        'export_type': fields.String(
+            required=True,
+            validate=validate.OneOf(['table', 'book'])
+        )
+    }, location='view_args')
+    def _process(self, export_type):
+        headers, rows = generate_pdf_data_from_registrations(
+            self.event,
+            self.registrations,
+            self.export_config['regform_items'],
+            self.export_config['static_item_ids'],
+            self.export_config['extra_columns'],
+            '-' if export_type == 'table' else '',
+        )
 
-class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
-    """Export registration list to a PDF in book style."""
+        if export_type == 'table':
+            css_filename = 'participants_table.css'
+            template_filename = 'participants_table.html'
+            filename = 'registrants-list.pdf'
+        else:  # book
+            css_filename = 'participants_book.css'
+            template_filename = 'participants_book.html'
+            filename = 'registrants-book.pdf'
 
-    def _process(self):
-        static_item_ids, item_ids, _extra_item_ids = self.list_generator.get_item_ids()
-        pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids,
-                                       extra_columns=self.export_config['extra_columns'])
-        return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        css = render_template(f'events/registration/pdf/{css_filename}')
+        html = render_template(
+            f'events/registration/pdf/{template_filename}',
+            event=self.event,
+            headers=headers,
+            rows=rows,
+            generation_date=format_date(now_utc(), format='full', timezone=self.event.tzinfo),
+        )
+        pdf = create_pdf(html, css, self.event)
+        return send_file(filename, pdf, 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):

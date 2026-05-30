@@ -30,6 +30,8 @@ Improvements
 - Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
 - Allow managers to override accommodation date range validation when editing
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
+- Automatically paste obvious email addresses into the email field when pasting in
+  the user search dialog (:pr:`7538`)
 
 Bugfixes
 ^^^^^^^^
@@ -49,6 +51,8 @@ Bugfixes
   mobile when the page is pinch-zoomed, when the input is near a viewport
   edge, or when the virtual keyboard is open (:pr:`7529`, thanks
   :user:`foxbunny`)
+- Fix database error when importing protection settings in an unlisted event
+  (:issue:`7550`, :pr:`7551`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -58,11 +62,17 @@ Accessibility
 - Icon-only buttons on the abstract detail page now have proper accessible names
   and tooltips instead of relying on the ``title`` attribute (:pr:`7474`, thanks
   :user:`foxbunny`)
+- Screen reader users can now navigate to the footer link list as a named
+  navigation landmark (:pr:`7559`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Modernize the PDF registrant list generation using weasyprint (:pr:`7077`, thanks
+  :user:`abhinavohri`)
+- Relax the videoconference name length limit to 255 characters, delegating
+  service-specific limits to each plugin (:pr:`7560`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.12

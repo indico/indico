@@ -187,7 +187,7 @@ def collect_static_files():
     g.custom_manifests = {None: RewrittenManifest(current_webpack.manifest)}
     g.used_url_for_assets = set()
     used_assets = set()
-    yield used_assets
+    yield used_assets  # noqa: RUF075
     for manifest in g.custom_manifests.values():
         used_assets |= {p for k in manifest.used_assets for p in manifest[k]._paths}
     used_assets |= {rewrite_static_url(url) for url in g.used_url_for_assets}

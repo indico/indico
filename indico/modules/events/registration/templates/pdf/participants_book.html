@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{%- trans %}Registrants List{% endtrans -%}</title>
+</head>
+
+<body>
+    <section class="title-page">
+        <div>{{ event.title }}</div>
+        <h1>{%- trans %}Registrants Book{% endtrans -%}</h1>
+    </section>
+
+    <section class="toc-page">
+        <h2>{%- trans %}Table of Contents{% endtrans -%}</h2>
+        {% for (registration, __) in rows %}
+            <div class="toc-entry">
+                <div class="toc-name">{{ registration.display_full_name }}</div>
+                <div class="toc-page-num">{{ loop.index }}</div>
+            </div>
+        {% endfor %}
+    </section>
+
+    {% for (registration, row) in rows %}
+        <section class="later-pages">
+            <header>
+                <div class="header-title">{{ event.title }} / {% trans %}Registrants Book{% endtrans %}</div>
+                <div class="header-name">{{ registration.display_full_name }}</div>
+            </header>
+            <div class="participant-title">
+                <h1>{{ registration.display_full_name }}</h1>
+                <h1>#{{ registration.friendly_id }}</h1>
+            </div>
+            <div class="sub-section">
+                <h2>{%- trans %}Registration details{% endtrans -%}</h2>
+                <div class="registration-details">
+                    {% for header in headers if header is string and row[header] %}
+                        <p><strong>{{ header }}:</strong> {{ row[header] }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="sub-section">
+                <h2>{%- trans %}Personal details{% endtrans -%}</h2>
+                <div class="personal-details">
+                    {% for header in headers if header is not string and row[header] %}
+                        <p><strong>{{ header[0] }}:</strong> {{ row[header] }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <footer>
+                <div class="footer-generation-date">{{ generation_date }}</div>
+                <div class="footer-page-num">{% trans page=loop.index %}Page {{ page }}{% endtrans %}</div>
+            </footer>
+        </section>
+    {% endfor %}
+</body>
+
+</html>

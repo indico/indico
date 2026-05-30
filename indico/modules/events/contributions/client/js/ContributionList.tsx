@@ -12,18 +12,20 @@ import {List} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import {Contribution, ContributionRecord} from './types';
+import {Contribution} from './types';
 
 import './ContributionList.module.scss';
 
 interface ContributionList {
-  contributions: ContributionRecord | null;
+  timezone: string;
+  contributions: Contribution[] | null;
   title?: string;
   emptyText?: string;
   actionsElement?: (contribution: Contribution) => React.ReactNode;
 }
 
 export function ContributionList({
+  timezone,
   contributions,
   title,
   actionsElement,
@@ -32,6 +34,8 @@ export function ContributionList({
   if (contributions === null) {
     return null;
   }
+
+  const localMoment = (dt: string) => moment(dt).tz(timezone);
 
   return (
     <section>
@@ -45,19 +49,19 @@ export function ContributionList({
       <div styleName="contribution-container">
         <div className="i-box just-group-list">
           <div className="i-box-content">
-            {contributions !== null && Object.keys(contributions).length > 0 ? (
+            {contributions.length > 0 ? (
               <List celled styleName="contrib-list">
-                {Object.values(contributions).map(contribution => (
+                {contributions.map(contribution => (
                   <List.Item key={contribution.id} styleName="contrib-item">
                     <List.Content>
                       <div styleName="list-flex">
                         <span styleName="date-span">
                           {contribution.start_dt ? (
                             <>
-                              <span>{moment(contribution.start_dt).format('D MMM YYYY')}</span>
+                              <span>{localMoment(contribution.start_dt).format('D MMM YYYY')}</span>
                               <br />
                               <span styleName="date-span-time">
-                                {moment(contribution.start_dt).format('HH:MM')}
+                                {localMoment(contribution.start_dt).format('HH:mm')}
                               </span>
                             </>
                           ) : (

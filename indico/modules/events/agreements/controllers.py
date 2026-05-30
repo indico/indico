@@ -132,8 +132,9 @@ class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
         raise NotImplementedError
 
     def _get_form(self):
-        template = self.definition.get_email_body_template(self.event)
-        form_defaults = FormDefaults(body=template.get_html_body())
+        with self.event.force_event_locale():
+            template = self.definition.get_email_body_template(self.event)
+            form_defaults = FormDefaults(body=template.get_html_body())
         return AgreementEmailForm(obj=form_defaults, definition=self.definition, event=self.event)
 
     def _process(self):

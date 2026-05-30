@@ -37,6 +37,10 @@
     line-height: 40px;
   }
 
+  .footer-links-heading {
+    @extend %visually-hidden;
+  }
+
   .footer-links {
     list-style-type: none;
     padding: 0;

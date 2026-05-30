@@ -52,21 +52,22 @@ def local_postgresql(extensions):
         shutil.rmtree(temp_dir)
         pytest.skip(f'Could not init/start PostgreSQL: {e}')
 
-    yield f'postgresql:///{db_name}?host={temp_dir}'
-
     try:
-        silent_check_call(['pg_ctl', '-D', temp_dir, '-m', 'immediate', 'stop'])
-    except Exception as e:
-        # If it failed for any reason, try killing it
-        try:
-            with open(os.path.join(temp_dir, 'postmaster.pid')) as f:
-                pid = int(f.readline().strip())
-                os.kill(pid, signal.SIGKILL)
-            pytest.skip(f'Could not stop postgresql; killed it instead: {e}')
-        except Exception as e:
-            pytest.skip(f'Could not stop/kill postgresql: {e}')
+        yield f'postgresql:///{db_name}?host={temp_dir}'
     finally:
-        shutil.rmtree(temp_dir)
+        try:
+            silent_check_call(['pg_ctl', '-D', temp_dir, '-m', 'immediate', 'stop'])
+        except Exception as e:
+            # If it failed for any reason, try killing it
+            try:
+                with open(os.path.join(temp_dir, 'postmaster.pid')) as f:
+                    pid = int(f.readline().strip())
+                    os.kill(pid, signal.SIGKILL)
+                pytest.skip(f'Could not stop postgresql; killed it instead: {e}')
+            except Exception as e:
+                pytest.skip(f'Could not stop/kill postgresql: {e}')
+        finally:
+            shutil.rmtree(temp_dir)
 
 
 @pytest.fixture(scope='session')
@@ -136,8 +137,10 @@ def db(database, monkeypatch):
     def _tmp_session():
         _old_commit = database.session.commit
         database.session.commit = lambda: None
-        yield database.session
-        database.session.commit = _old_commit
+        try:
+            yield database.session
+        finally:
+            database.session.commit = _old_commit
 
     monkeypatch.setattr(database, 'tmp_session', _tmp_session, lambda: None)
     yield database

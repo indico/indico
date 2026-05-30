@@ -8,5 +8,6 @@
     <ind-my-contributions
         user-id="{{ session.user.id }}"
         event-id="{{ event.id }}"
+        timezone="{{ event.display_tzinfo.zone }}"
     ></ind-my-contributions>
 {%- endblock %}
