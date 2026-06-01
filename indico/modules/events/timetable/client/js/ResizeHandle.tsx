@@ -31,6 +31,10 @@ export default function ResizeHandle({
   setIsResizing: (b: boolean) => void;
 }) {
   function resizeHandler(e: SyntheticMouseEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+
     e.stopPropagation();
     resizeStartRef.current = e.clientY;
     setIsResizing(true);

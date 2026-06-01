@@ -281,6 +281,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         <div
           styleName="pane-resize-handle"
           onMouseDown={e => {
+            if (e.button !== 0) {
+              return;
+            }
             resizing.current = true;
             initialPosition.current = e.pageX;
           }}
