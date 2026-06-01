@@ -11,6 +11,7 @@ import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import unscheduleContributionURL from 'indico-url:timetable.tt_contrib_unschedule';
 import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
@@ -51,6 +52,7 @@ export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
 export const DELETE_BREAK = 'Delete break';
+export const DELETE_UNSCHEDULED_CONTRIB = 'Delete contrib';
 export const DELETE_BLOCK = 'Delete block';
 export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
@@ -131,6 +133,12 @@ interface DeleteBlockAction {
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
 }
 
+interface DeleteUnscheduledContribAction {
+  type: typeof DELETE_UNSCHEDULED_CONTRIB;
+  entry: UnscheduledContribEntry;
+  eventId: number;
+}
+
 interface SetSessionDataAction {
   type: typeof SET_SESSION_DATA;
   data: any;
@@ -185,6 +193,7 @@ export type Action =
   | CreateEntryAction
   | UpdateEntryAction
   | DeleteBreakAction
+  | DeleteUnscheduledContribAction
   | DeleteBlockAction
   | SetDraftEntryAction
   | SetSessionDataAction
@@ -364,6 +373,15 @@ export function deleteBreak(entry: BreakEntry, eventId: number) {
   });
 }
 
+export function deleteUnscheduledContrib(entry: UnscheduledContribEntry, eventId: number) {
+  const unscheduledContribURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+  return synchronizedAjaxAction(() => indicoAxios.delete(unscheduledContribURL), {
+    type: DELETE_UNSCHEDULED_CONTRIB,
+    entry,
+    eventId,
+  });
+}
+
 export function deleteBlock(entry: BlockEntry, eventId: number) {
   const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
@@ -398,8 +416,8 @@ export function scheduleEntry(
 }
 
 export function unscheduleEntry(entry: ContribEntry, eventId: number) {
-  const entryURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
-  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
+  const entryURL = unscheduleContributionURL({event_id: eventId, contrib_id: entry.objId});
+  return synchronizedAjaxAction(() => indicoAxios.post(entryURL), {
     type: UNSCHEDULE_ENTRY,
     entry,
   });

@@ -78,7 +78,7 @@ function SessionBlockToolbar() {
   );
 }
 
-export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
+export default function Toolbar(dt: Moment, {onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
   const {openModal} = useModal();
 

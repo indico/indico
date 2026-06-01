@@ -14,16 +14,33 @@
 }
 
 .contributions-container {
+  overflow-y: scroll;
+  position: sticky;
+  top: 0;
+  padding: 1rem 0.5rem;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+
   width: min(320px, 100%);
   flex-shrink: 0;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  border: 1px solid $raincloud-gray;
+
+  :global(.ui.button) {
+      box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+    }
 
   .content {
-    overflow: visible;
-    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-x: visible;
+    overflow-y: scroll;
     height: 100%;
-    padding: 1em 1em 1em 0;
+    padding: 1rem;
 
     & > h4 {
       display: flex;
@@ -35,7 +52,7 @@
 
     .actions {
       display: flex;
-      margin-bottom: 20px;
+      gap: 0.5rem;
 
       :global(.ui.search.selection.dropdown) {
         width: 100%;
@@ -63,6 +80,10 @@
           flex-shrink: 0;
           flex-grow: 1;
         }
+
+        input {
+          width: 100%;
+        }
       }
 
       :global(.active),
@@ -76,12 +97,29 @@
 
       :global(.ui.button) {
         font-weight: normal;
+        aspect-ratio: 1;
+        max-height: 33px;
 
         &:active {
           background-color: transparent;
         }
       }
     }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      & > * {
+        margin: 0 !important;
+      }
+    }
+    // .contributions-container,
+    // .content,
+    // .actions {
+    //   overflow: visible;
+    // }
 
     .contribution {
       cursor: pointer;
@@ -107,29 +145,162 @@
   }
 }
 
+.title {
+    margin-bottom: 0;
+    font-size: 1.125rem;
+    font-weight: bold;
+    padding: 0 1rem;
+  }
+
 .pane-resize-handle {
   width: 12px;
   min-width: 12px;
   height: 100%;
   cursor: ew-resize;
   user-select: none;
-  border-right: 1px solid #d4d4d5;
+  border-right: 2px solid $raincloud-gray;
 
   &:hover {
     border-right: 4px solid #007cac;
   }
 }
 
-.session-filter:global(.ui.dropdown) {
-  display: flex;
+.filter-wrapper {
+  position: relative;
+  display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+
+  :global(.ui.label) {
+   position: absolute;
+   top: -5px;
+   right: -5px;
+  }
+}
+
+.session-filter {
+  position: relative;
 
   :global(.menu > .item) {
     display: flex;
     align-items: center;
   }
+
+  :global(.menu .item.active),
+  :global(.menu .item.selected) {
+    background: #eef6fa !important;
+    font-weight: bold;
+  }
 }
 
 .session {
   width: 100%;
+}
+
+.add-session-container {
+  display: flex;
+  width: auto;
+  padding: 0.5rem;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  outline: dashed 1px grey;
+}
+
+.session-wrapper {
+  position: relative;
+  display: flex;
+  margin: 0.5rem 0;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid $raincloud-gray;
+
+  .session-actions {
+    position: absolute;
+    right: 10px;
+    width: 100%;
+    justify-content: flex-end;
+
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px);
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    // TODO: (Marina) transform background into variable
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 32%,
+      rgba(255, 255, 255, 1) 66%,
+      rgba(255, 255, 255, 1) 100%
+    );
+  }
+
+  &:hover {
+    .session-actions {
+      height: 100%;
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
+}
+
+.session-content {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  width: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 5px;
+    border-radius: 4px;
+    background: var(--session-color);
+  }
+}
+
+.session-title {
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  font-weight: bold;
+  overflow: hidden;
+  word-break: break-word;
+  padding: 0.5rem 1rem;
+}
+
+.session-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.session-color {
+  height: 100%;
+  width: 5px;
+  border-radius: 4px;
+}
+
+.filter-clear {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
 }

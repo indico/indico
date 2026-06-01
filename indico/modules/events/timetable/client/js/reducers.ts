@@ -172,6 +172,21 @@ export default {
         return {...state, selectedId: action.id};
       case actions.DESELECT_ENTRY:
         return {...state, selectedId: null};
+      case actions.DELETE_UNSCHEDULED_CONTRIB: {
+        const {entry} = action;
+        return {
+          ...state,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx),
+            {
+              ...state.changes[state.currentChangeIdx],
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled.filter(
+                e => e.id !== entry.id
+              ),
+            },
+          ],
+        };
+      }
       case actions.DELETE_BREAK: {
         const {entry} = action;
         const {id} = entry;

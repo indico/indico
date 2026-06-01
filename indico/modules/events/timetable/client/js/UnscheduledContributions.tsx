@@ -7,11 +7,13 @@
 
 import {partition} from 'lodash';
 import {Moment} from 'moment';
-import React, {Fragment, ReactNode, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
+import {Button, Label, Input, Dropdown} from 'semantic-ui-react';
 
+import {CreateContributionButton} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
+import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -25,11 +27,7 @@ enum GenericFilterType {
   NO_SESSION = 'no-session',
 }
 
-type FilterType = GenericFilterType & number;
-
-function FragmentWithoutWarning({key, children}: {key: string; children: ReactNode}) {
-  return <Fragment key={key}>{children}</Fragment>;
-}
+type FilterType = GenericFilterType | number;
 
 function UnscheduledContributionList({
   dt,
@@ -38,11 +36,13 @@ function UnscheduledContributionList({
   dt: Moment;
   contribs: UnscheduledContribEntry[];
 }) {
+  const uniqueContribs = [...new Map(contribs.map(contrib => [contrib.id, contrib])).values()];
   return (
     <div styleName="contributions-list">
-      {contribs.map(contrib => (
+      {uniqueContribs.map(contrib => (
         <DraggableUnscheduledContributionEntry
           key={contrib.id}
+          contrib={contrib}
           dt={dt}
           id={contrib.id}
           title={contrib.title}
@@ -58,13 +58,16 @@ function UnscheduledContributionList({
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
   const minSidebarWidthPx = 320;
+  const eventId = useSelector(selectors.getEventId);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const resizing = useRef(false);
   const initialPosition = useRef<number>(0);
 
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>();
+  const [selectedFilter, setSelectedFilter] = useState<FilterType[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
+  const [draftSearchQuery, setDraftSearchQuery] = useState('');
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const contribs = useSelector(selectors.getUnscheduled).toSorted((c1, c2) => {
     // sort by sessionId then by title
@@ -78,16 +81,24 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const sessions = useSelector(selectors.getSessions);
   const prevSessions = useRef(sessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
+  const showSessions = useSelector(selectors.showSessions);
 
   const contribsGrouped = Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session');
 
-  const currentContribs = selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
+  const currentContribs =
+    selectedFilter.length > 0
+      ? selectedFilter.flatMap(filter => contribsGrouped[filter] ?? [])
+      : contribs;
+  const filteredContribs = currentContribs.filter(contrib =>
+    contrib.title.toLowerCase().includes(draftSearchQuery.toLowerCase())
+  );
 
   const [sessionsWithContribs, sessionsWithoutContribs] = partition(
     Object.values(sessions)
       .map(session => ({
         value: session.id,
         title: session.title,
+        color: session.colors,
         count: (contribsGrouped[session.id] ?? []).length,
         text: (
           <div styleName="session">
@@ -102,16 +113,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
   const dropdownSessions = [
     {
-      as: FragmentWithoutWarning,
-      key: 'sep-filters',
-      disabled: true,
-      content: (
-        <DropdownHeader>
-          <Translate>Filters</Translate>
-        </DropdownHeader>
-      ),
-    },
-    {
       value: 'no-session',
       title: Translate.string('No assigned session'),
       text: (
@@ -123,50 +124,22 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         </div>
       ),
     },
-    ...(sessionsWithContribs.length
-      ? [
-          {
-            as: FragmentWithoutWarning,
-            key: 'sep-with-contribs',
-            disabled: true,
-            content: (
-              <DropdownHeader>
-                <Translate>Sessions with contributions</Translate>
-              </DropdownHeader>
-            ),
-          },
-        ]
-      : []),
     ...sessionsWithContribs,
-    ...(sessionsWithoutContribs.length
-      ? [
-          {
-            as: FragmentWithoutWarning,
-            key: 'sep-without-contribs',
-            disabled: true,
-            content: (
-              <DropdownHeader>
-                <Translate>Empty sessions</Translate>
-              </DropdownHeader>
-            ),
-          },
-        ]
-      : []),
     ...sessionsWithoutContribs,
   ];
 
-  const sessionSearch = (options: DropdownItemProps[], value: string) =>
-    options
-      // Primary filter to match search term
-      .filter(
-        o => o.as === FragmentWithoutWarning || o.title.toLowerCase().includes(value.toLowerCase())
-      )
-      // Secondary filter to remove consecutive dividers
-      .filter(
-        (o, i, arr) =>
-          o.as !== FragmentWithoutWarning ||
-          (arr[i + 1] && arr[i + 1].as !== FragmentWithoutWarning)
-      );
+  // const sessionSearch = (options: DropdownItemProps[], value: string) =>
+  //   options
+  //     // Primary filter to match search term
+  //     .filter(
+  //       o => o.as === FragmentWithoutWarning || o.title.toLowerCase().includes(value.toLowerCase())
+  //     )
+  //     // Secondary filter to remove consecutive dividers
+  //     .filter(
+  //       (o, i, arr) =>
+  //         o.as !== FragmentWithoutWarning ||
+  //         (arr[i + 1] && arr[i + 1].as !== FragmentWithoutWarning)
+  // );
 
   function onMouseUp() {
     resizing.current = false;
@@ -213,91 +186,197 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
   //              I propose we have some kind of filter option to search by entry type,
   //              session, etc. If no filters are applied, everything is visible.
+  const [sessionSearchQuery, setSessionSearchQuery] = useState('');
+
+  const filteredSessions = Object.values(sessions).filter(session =>
+    session.title.toLowerCase().includes(sessionSearchQuery.toLowerCase())
+  );
+
+  if (!showUnscheduled && !showSessions) {
+    return null;
+  }
+
   return (
-    showUnscheduled && (
-      <>
-        <div
-          styleName="contributions-container"
-          style={{minWidth: `${minSidebarWidthPx}px`}}
-          ref={wrapperRef}
-        >
-          <div styleName="content">
-            <div styleName="actions">
-              <Select
-                button
-                placeholder={Translate.string('Filter sessions')}
-                value={selectedFilter}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-                search={sessionSearch}
-                noResultsMessage={Translate.string('No sessions found')}
-                clearable
-                onChange={(_, {value}: {_: unknown; value: FilterType}) => {
-                  // TODO: (Ajob) Fix bug where clicking enter on an option
-                  //              keeps dropdown open.
-                  setSelectedFilter(value);
-                }}
-                styleName="session-filter"
-                options={dropdownSessions}
-              />
-              {Number.isInteger(selectedFilter) && (
-                <Button
-                  basic
-                  type="button"
-                  title={Translate.string('Edit selected session')}
-                  icon="edit"
-                  size="small"
-                  onClick={() => setSelectedSessionId(selectedFilter)}
+    <>
+      <div
+        styleName="contributions-container"
+        style={{minWidth: `${minSidebarWidthPx}px`}}
+        ref={wrapperRef}
+      >
+        {showUnscheduled && (
+          <>
+            <h1 styleName="title">Unscheduled Contributions</h1>
+            <div styleName="content">
+              <div styleName="actions">
+                <Input
+                  // fluid
+                  icon="search"
+                  placeholder={Translate.string('Search unscheduled contributions')}
+                  value={draftSearchQuery}
+                  onChange={(_, {value}) => setDraftSearchQuery(value)}
                 />
-              )}
-              {Number.isInteger(selectedFilter) && (
-                <Button
-                  basic
-                  type="button"
-                  title={Translate.string('Delete selected session')}
-                  icon="trash"
-                  size="small"
-                  onClick={() => {
-                    dispatch(actions.deleteSession(selectedFilter));
-                  }}
+                <PopoverDropdownMenu
+                  open={filterOpen}
+                  onOpen={() => setFilterOpen(true)}
+                  onClose={() => setFilterOpen(false)}
+                  placement="bottom-end"
+                  overflow
+                  trigger={
+                    <Button
+                      basic
+                      type="button"
+                      icon="filter"
+                      title={Translate.string('Filter sessions')}
+                    />
+                  }
+                >
+                  {dropdownSessions.map(option => {
+                    const isSelected = selectedFilter.includes(option.value as FilterType);
+
+                    return (
+                      <Dropdown.Item
+                        key={option.value}
+                        active={isSelected}
+                        selected={isSelected}
+                        onClick={e => {
+                          e.stopPropagation();
+
+                          setSelectedFilter(prev =>
+                            isSelected
+                              ? prev.filter(value => value !== option.value)
+                              : [...prev, option.value as FilterType]
+                          );
+                        }}
+                      >
+                        {option.text}
+                      </Dropdown.Item>
+                    );
+                  })}
+                </PopoverDropdownMenu>
+                {selectedFilter.length > 0 && (
+                  <button
+                    type="button"
+                    styleName="filter-clear"
+                    title={Translate.string('Clear filters')}
+                    onClick={e => {
+                      e.stopPropagation();
+                      setSelectedFilter([]);
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {/* // TODO: change session creation modal to contribution creation modal */}
+              <div styleName="add-session-container">
+                <CreateContributionButton
+                  eventId={eventId}
+                  trigger={
+                    <Button
+                      basic
+                      type="button"
+                      title={Translate.string('Create new contribution')}
+                      icon="plus"
+                      size="small"
+                    />
+                  }
                 />
+              </div>
+
+              {filteredContribs.length > 0 ? (
+                <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
+              ) : (
+                <Translate>This session has no contributions</Translate>
               )}
-              <Button
-                basic
-                type="button"
-                title={Translate.string('Create new session')}
-                icon="plus"
-                size="small"
-                onClick={() => setSelectedSessionId('draft')}
-              />
             </div>
-            {currentContribs.length > 0 ? (
-              <UnscheduledContributionList dt={dt} contribs={currentContribs} />
-            ) : (
-              <Translate>This session has no contributions</Translate>
-            )}
-          </div>
-        </div>
-        <div
-          styleName="pane-resize-handle"
-          onMouseDown={e => {
-            if (e.button !== 0) {
-              return;
-            }
-            resizing.current = true;
-            initialPosition.current = e.pageX;
-          }}
-        />
-        {selectedSessionId &&
-          (selectedSessionId === 'draft' ? (
-            <TimetableSessionCreateModal onClose={() => setSelectedSessionId(null)} />
-          ) : (
-            <TimetableSessionEditModal
-              onClose={() => setSelectedSessionId(null)}
-              sessionId={selectedSessionId}
-            />
-          ))}
-      </>
-    )
+          </>
+        )}
+
+        {showSessions && (
+          <>
+            <h1 styleName="title">Your Sessions</h1>
+            <div styleName="content">
+              <div styleName="actions">
+                <Input
+                  // fluid
+                  icon="search"
+                  placeholder={Translate.string('Search sessions')}
+                  value={sessionSearchQuery}
+                  onChange={(_, {value}) => setSessionSearchQuery(value)}
+                />
+              </div>
+
+              <div styleName="add-session-container">
+                {/* TODO: Add nicer create session entry point here */}
+                <Button
+                  basic
+                  type="button"
+                  title={Translate.string('Create new session')}
+                  icon="plus"
+                  size="small"
+                  onClick={() => setSelectedSessionId('draft')}
+                />
+              </div>
+
+              {filteredSessions.length > 0 ? (
+                <div styleName="">
+                  {filteredSessions.map(session => (
+                    <div key={session.id} styleName="session-wrapper">
+                      <div
+                        styleName="session-content"
+                        style={
+                          {'--session-color': session.colors.backgroundColor} as React.CSSProperties
+                        }
+                      >
+                        <div styleName="session-title">{session.title}</div>
+                        <div styleName="session-actions">
+                          <Button
+                            basic
+                            type="button"
+                            title={Translate.string('Edit session')}
+                            icon="edit"
+                            size="small"
+                            onClick={() => setSelectedSessionId(session.id)}
+                          />
+                          <Button
+                            basic
+                            type="button"
+                            title={Translate.string('Delete selected session')}
+                            icon="trash"
+                            size="small"
+                            onClick={() => dispatch(actions.deleteSession(session.id))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Translate>No sessions found</Translate>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      <div
+        styleName="pane-resize-handle"
+        onMouseDown={e => {
+          resizing.current = true;
+          initialPosition.current = e.pageX;
+        }}
+      />
+
+      {selectedSessionId &&
+        (selectedSessionId === 'draft' ? (
+          <TimetableSessionCreateModal onClose={() => setSelectedSessionId(null)} />
+        ) : (
+          <TimetableSessionEditModal
+            onClose={() => setSelectedSessionId(null)}
+            sessionId={selectedSessionId}
+          />
+        ))}
+    </>
   );
 }
