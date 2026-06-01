@@ -81,7 +81,36 @@ $title-row-line-height: 1.2rem;
       transition-delay: 0.1s; // Prevent flickering when moving the mouse quickly
     }
   }
+
+  &:hover {
+    .entry-actions {
+      height: 100%;
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
 }
+
+.entry-actions {
+    position: absolute;
+    right: 10px;
+    width: 100%;
+    justify-content: flex-end;
+
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px);
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    :global(.ui.basic.button) {
+      color: var(--session-color) !important;
+    }
+  }
 
 .title-wrapper {
   overflow: hidden;
@@ -91,7 +120,7 @@ $title-row-line-height: 1.2rem;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  padding: $title-row-padding;
+  padding: 14px 10px;
   max-height: 100%;
 
   .title-overflow-wrapper {

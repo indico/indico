@@ -414,12 +414,14 @@ export function EditContributionButton({
   contribId,
   eventTitle,
   triggerSelector,
+  trigger,
   ...rest
 }: {
   eventId: number;
   contribId: number;
   eventTitle: string;
   triggerSelector?: string;
+  trigger?: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -427,23 +429,32 @@ export function EditContributionButton({
     if (!triggerSelector) {
       return;
     }
+
     const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
+
     if (!element) {
       console.error(`No element matched ${triggerSelector}`);
       return;
     }
+
     element.addEventListener('click', handler);
     return () => element.removeEventListener('click', handler);
   }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
+      {!triggerSelector &&
+        (trigger ? (
+          React.cloneElement(trigger, {
+            onClick: () => setOpen(true),
+          })
+        ) : (
+          <Button onClick={() => setOpen(true)} {...rest}>
+            <Translate>Edit contribution</Translate>
+          </Button>
+        ))}
+
       {open && (
         <ContributionEditForm
           eventId={eventId}
@@ -458,10 +469,12 @@ export function EditContributionButton({
 export function CreateContributionButton({
   eventId,
   triggerSelector,
+  trigger,
   ...rest
 }: {
   eventId: number;
   triggerSelector?: string;
+  trigger?: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -481,11 +494,17 @@ export function CreateContributionButton({
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
+      {!triggerSelector &&
+        (trigger ? (
+          React.cloneElement(trigger, {
+            onClick: () => setOpen(true),
+          })
+        ) : (
+          <Button onClick={() => setOpen(true)} {...rest}>
+            <Translate>Create contribution</Translate>
+          </Button>
+        ))}
+
       {open && (
         <ContributionCreateForm
           eventId={eventId}

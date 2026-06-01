@@ -51,6 +51,7 @@ export default function Timetable() {
     <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
       <GlobalEvents />
       <Toolbar
+        dt={currentDate}
         onNavigate={d => {
           dispatch(actions.setCurrentDate(d, eventId));
         }}
