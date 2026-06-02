@@ -462,6 +462,9 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
   const onMouseDown = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
+      if (e.target instanceof Node && !ref.current.contains(e.target)) {
+        return;
+      }
       const rect = e.currentTarget.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
       const offsetY = e.clientY - rect.top;
