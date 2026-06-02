@@ -84,7 +84,6 @@ $title-row-line-height: 1.2rem;
 
   &:hover {
     .entry-actions {
-      height: 100%;
       opacity: 1;
       visibility: visible;
       transform: translateX(0);
@@ -94,7 +93,8 @@ $title-row-line-height: 1.2rem;
 
 .entry-actions {
     position: absolute;
-    right: 10px;
+    top: 0;
+    right: 0;
     width: 100%;
     justify-content: flex-end;
 
@@ -109,6 +109,11 @@ $title-row-line-height: 1.2rem;
 
     :global(.ui.basic.button) {
       color: var(--session-color) !important;
+
+      &:hover {
+        background: transparent !important;
+        color: color-mix(in srgb, var(--session-color) 70%, transparent) !important;
+      }
     }
   }
 

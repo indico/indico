@@ -14,7 +14,6 @@
 }
 
 .contributions-container {
-  overflow-y: scroll;
   position: sticky;
   top: 0;
   padding: 1rem 0.5rem;
@@ -115,11 +114,6 @@
         margin: 0 !important;
       }
     }
-    // .contributions-container,
-    // .content,
-    // .actions {
-    //   overflow: visible;
-    // }
 
     .contribution {
       cursor: pointer;
