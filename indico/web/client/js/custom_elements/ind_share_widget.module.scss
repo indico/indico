@@ -92,14 +92,19 @@
     align-items: stretch;
     gap: 0.5rem;
     width: 100%;
+
+    :global(.ui.input) {
+      flex: 1;
+    }
+
+    input {
+      text-overflow: ellipsis;
+    }
   }
 
-  .input-copy-qr-container :global(.ui.input) {
-    flex: 1;
-  }
-
-  .input-copy-qr-container :global(.ui.input input) {
-    text-overflow: ellipsis;
+  .download-dropdown-menu {
+    background-color: $dark-blue;
+    color: $light-blue;
   }
 
   .qr-wrapper {
@@ -110,22 +115,6 @@
     .qr-code-img {
       width: 100%;
       max-width: 300px;
-    }
-
-    .download-dropdown-menu {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      opacity: 0.25; // Default 25%
-      transition: opacity 0.2s ease;
-
-      &.open {
-        opacity: 1;
-      }
-    }
-
-    &:hover .download-dropdown-menu {
-      opacity: 1;
     }
   }
 }

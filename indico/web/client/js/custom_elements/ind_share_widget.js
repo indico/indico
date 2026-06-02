@@ -36,66 +36,17 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function QrDisplay({eventUrl}) {
-  const [isOpen, setIsOpen] = useState(false);
+function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
+  const [isCopied, setCopied] = useState(false);
+  const [isQrShown, showQR] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const buildDownloadUrl = boxSize =>
-    qrCodeImageURL({url: eventUrl, box_size: boxSize});
+  const buildDownloadUrl = boxSize => qrCodeImageURL({url: eventQrUrl, box_size: boxSize});
 
-  const {data: qrData} = useIndicoAxios(
-    {url: qrCodeMetadataURL(), params: {url: eventUrl}},
-    {camelize: true}
-  );
-
-  return (
-    <div styleName="qr-wrapper">
-      <img
-        styleName="qr-code-img"
-        src={qrData?.imageSourceURL}
-        onLoad={() => setIsImageLoaded(true)}
-      />
-
-      {isImageLoaded && (
-        <Dropdown
-          icon="download"
-          floating
-          button
-          direction="left"
-          styleName={`download-dropdown-menu ${isOpen ? 'open' : ''}`}
-          onOpen={() => setIsOpen(true)}
-          onClose={() => setIsOpen(false)}
-          className="icon"
-        >
-          <DropdownMenu>
-            {qrData?.downloadSizes &&
-              Object.entries(qrData.downloadSizes).map(([sizeName, sizeData]) => (
-                <DropdownItem
-                  key={sizeName}
-                  as="a"
-                  href={buildDownloadUrl(sizeData.boxSize)}
-                  download={`event-qrcode-${sizeName}.png`}
-                  icon="picture"
-                  text={Translate.string('{size} ({pixels}×{pixels}px)', {
-                    size: _.capitalize(sizeName),
-                    pixels: sizeData.actualPixels,
-                  })}
-                />
-              ))}
-          </DropdownMenu>
-        </Dropdown>
-      )}
-    </div>
-  );
-}
-
-QrDisplay.propTypes = {
-  eventUrl: PropTypes.string.isRequired,
-};
-
-function ShareURL({eventShortUrl, eventQrUrl}) {
-  const [isCopied, setCopied] = useState(false);
-  const [showQR, setShowQR] = useState(false);
+  const {data: qrData} = useIndicoAxios(qrCodeMetadataURL({url: eventQrUrl}), {
+    camelize: true,
+    manual: !isQrShown,
+  });
 
   useEffect(() => {
     if (isCopied) {
@@ -111,6 +62,11 @@ function ShareURL({eventShortUrl, eventQrUrl}) {
           label={
             <Button
               icon={isCopied ? 'check' : 'copy'}
+              title={
+                isCopied
+                  ? Translate.string('Link copied to clipboard')
+                  : Translate.string('Copy link to clipboard')
+              }
               positive={isCopied}
               onClick={() => {
                 navigator.clipboard.writeText(eventShortUrl);
@@ -123,14 +79,55 @@ function ShareURL({eventShortUrl, eventQrUrl}) {
           readOnly
           fluid
         />
-        <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
+        {isImageLoaded && isQrShown ? (
+          <Dropdown
+            button
+            floating
+            className="ui primary icon"
+            icon="download"
+            title={Translate.string('Download QR code')}
+            direction="left"
+          >
+            <DropdownMenu>
+              {qrData?.downloadSizes &&
+                Object.entries(qrData.downloadSizes).map(([sizeName, sizeData]) => (
+                  <DropdownItem
+                    key={sizeName}
+                    as="a"
+                    href={buildDownloadUrl(sizeData.boxSize)}
+                    download={`event-qrcode-${sizeName}.png`}
+                    icon="picture"
+                    text={Translate.string('{size} ({pixels}x{pixels} px)', {
+                      size: _.capitalize(sizeName),
+                      pixels: sizeData.actualPixels,
+                    })}
+                  />
+                ))}
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <Button
+            icon="qrcode"
+            title={Translate.string('Show QR code')}
+            onClick={() => showQR(true)}
+          />
+        )}
       </div>
-      {showQR && <QrDisplay eventUrl={eventQrUrl} />}
+      {isQrShown && (
+        <div styleName="qr-wrapper">
+          <img
+            styleName="qr-code-img"
+            src={qrData?.imageSourceURL}
+            onLoad={() => setIsImageLoaded(true)}
+            style={{display: isImageLoaded ? 'block' : 'none'}}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-ShareURL.propTypes = {
+ShareURLDisplayQR.propTypes = {
   eventShortUrl: PropTypes.string.isRequired,
   eventQrUrl: PropTypes.string.isRequired,
 };
@@ -418,7 +415,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <ShareURL eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
+          <ShareURLDisplayQR eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
