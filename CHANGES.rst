@@ -34,6 +34,7 @@ Improvements
 - Add QR code generator to event share widget (:issue:`6796`, :pr:`7504`)
 - Add contribution link placeholder for emailing abstract roles (:issue:`3602`, :pr:`7569`)
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
+- Change accordion view to tabs view and add pagination and search in public participant list (:pr:`7472`)
 
 Bugfixes
 ^^^^^^^^
