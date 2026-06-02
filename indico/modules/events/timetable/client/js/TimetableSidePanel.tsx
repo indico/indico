@@ -32,7 +32,6 @@ export default function TimetableSidePanel() {
               name="sessions"
               active={showSessions}
               onClick={() => dispatch(actions.toggleShowSessions())}
-              styleName="tab-button"
             >
               <Icon name="calendar outline" size="large" />
             </Menu.Item>

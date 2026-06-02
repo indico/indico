@@ -128,19 +128,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     ...sessionsWithoutContribs,
   ];
 
-  // const sessionSearch = (options: DropdownItemProps[], value: string) =>
-  //   options
-  //     // Primary filter to match search term
-  //     .filter(
-  //       o => o.as === FragmentWithoutWarning || o.title.toLowerCase().includes(value.toLowerCase())
-  //     )
-  //     // Secondary filter to remove consecutive dividers
-  //     .filter(
-  //       (o, i, arr) =>
-  //         o.as !== FragmentWithoutWarning ||
-  //         (arr[i + 1] && arr[i + 1].as !== FragmentWithoutWarning)
-  // );
-
   function onMouseUp() {
     resizing.current = false;
     initialPosition.current = 0;
@@ -179,7 +166,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       newFilter = +newKeys.filter(k => !prevSessions.current[k])?.pop();
     }
 
-    setSelectedFilter(newFilter);
+    setSelectedFilter(newFilter ? [newFilter] : []);
     prevSessions.current = sessions;
   }, [sessions]);
 
@@ -209,7 +196,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
             <div styleName="content">
               <div styleName="actions">
                 <Input
-                  // fluid
                   icon="search"
                   placeholder={Translate.string('Search unscheduled contributions')}
                   value={draftSearchQuery}
@@ -268,7 +254,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 )}
               </div>
 
-              {/* // TODO: change session creation modal to contribution creation modal */}
               <div styleName="add-session-container">
                 <CreateContributionButton
                   eventId={eventId}
