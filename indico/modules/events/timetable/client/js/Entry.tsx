@@ -51,7 +51,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({id});
+  const {listeners: _listeners, setNodeRef, transform, isDragging, ref} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -64,6 +64,9 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
   function onClick(evt: React.MouseEvent<HTMLElement>) {
     evt.stopPropagation();
+    if (evt.target instanceof Node && !ref.current.contains(evt.target)) {
+      return;
+    }
     if (isClick.current) {
       dispatch(actions.selectEntry(id));
     }
@@ -71,6 +74,9 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
   function onDoubleClick(evt: React.MouseEvent<HTMLElement>) {
     evt.stopPropagation();
+    if (evt.target instanceof Node && !ref.current.contains(evt.target)) {
+      return;
+    }
     if (rest.type !== EntryType.SessionBlock || isPosterBlock) {
       return;
     }
