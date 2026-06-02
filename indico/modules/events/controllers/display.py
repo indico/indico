@@ -33,7 +33,7 @@ from indico.web.rh import RH, RHProtected, allow_signed_url
 
 def _check_url(target_url):
     if urlsplit(target_url).hostname != urlsplit(config.BASE_URL).hostname:
-        raise ValidationError('URL for QR Code does not belong to this server')
+        raise ValidationError('URL for QR code does not belong to this server')
 
 
 @allow_signed_url

@@ -41,7 +41,7 @@ function QrDisplay({eventUrl}) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const buildDownloadUrl = boxSize =>
-    `${qrCodeImageURL()}?url=${encodeURIComponent(eventUrl)}&box_size=${boxSize}`;
+    qrCodeImageURL({url: eventUrl, box_size: boxSize});
 
   const {data: qrData} = useIndicoAxios(
     {url: qrCodeMetadataURL(), params: {url: eventUrl}},
@@ -93,7 +93,7 @@ QrDisplay.propTypes = {
   eventUrl: PropTypes.string.isRequired,
 };
 
-function ShareURL({eventShortUrl, eventExternalUrl}) {
+function ShareURL({eventShortUrl, eventQrUrl}) {
   const [isCopied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -125,14 +125,14 @@ function ShareURL({eventShortUrl, eventExternalUrl}) {
         />
         <Button icon="qrcode" onClick={() => setShowQR(previous => !previous)} />
       </div>
-      {showQR && <QrDisplay eventUrl={eventExternalUrl} />}
+      {showQR && <QrDisplay eventUrl={eventQrUrl} />}
     </div>
   );
 }
 
 ShareURL.propTypes = {
   eventShortUrl: PropTypes.string.isRequired,
-  eventExternalUrl: PropTypes.string.isRequired,
+  eventQrUrl: PropTypes.string.isRequired,
 };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
@@ -386,7 +386,7 @@ function ShareWidget({
   eventName,
   eventStartDt,
   eventShortUrl,
-  eventExternalUrl,
+  eventQrUrl,
   shareIcon,
   googleCalParams,
   outlookCalParams,
@@ -418,7 +418,7 @@ function ShareWidget({
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <ShareURL eventShortUrl={eventShortUrl} eventExternalUrl={eventExternalUrl} />
+          <ShareURL eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
           <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
@@ -454,7 +454,7 @@ ShareWidget.propTypes = {
   eventName: PropTypes.string.isRequired,
   eventStartDt: PropTypes.string.isRequired,
   eventShortUrl: PropTypes.string.isRequired,
-  eventExternalUrl: PropTypes.string.isRequired,
+  eventQrUrl: PropTypes.string.isRequired,
   shareIcon: PropTypes.string.isRequired,
   googleCalParams: PropTypes.string.isRequired,
   outlookCalParams: PropTypes.string.isRequired,
@@ -469,7 +469,7 @@ customElements.define(
           eventName={this.getAttribute('event-name')}
           eventStartDt={this.getAttribute('event-start-dt')}
           eventShortUrl={this.getAttribute('event-short-url')}
-          eventExternalUrl={this.getAttribute('event-external-url')}
+          eventQrUrl={this.getAttribute('event-qr-url')}
           shareIcon={this.getAttribute('share-icon')}
           googleCalParams={this.getAttribute('google-cal-params')}
           outlookCalParams={this.getAttribute('outlook-cal-params')}
