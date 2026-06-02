@@ -47,7 +47,6 @@ function UnscheduledContributionList({
           id={contrib.id}
           title={contrib.title}
           duration={contrib.duration}
-          colors={contrib.colors}
           sessionId={contrib.sessionId}
         />
       ))}
@@ -205,7 +204,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   open={filterOpen}
                   onOpen={() => setFilterOpen(true)}
                   onClose={() => setFilterOpen(false)}
-                  placement="bottom-end"
                   overflow
                   trigger={
                     <Button
