@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contributionProtectionURL from 'indico-url:contributions.manage_contrib_protection';
+import sessionProtectionURL from 'indico-url:sessions.session_protection';
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
@@ -311,6 +313,28 @@ function EntryPopupContent({
               trigger={<Button basic icon="plus" onClick={onCreateChild} />}
             />
           </>
+        )}
+        {type !== EntryType.Break && (
+          <ActionPopup
+            content={
+              type === EntryType.Contribution
+                ? Translate.string('Manage contribution protection')
+                : Translate.string('Manage session protection')
+            }
+            trigger={
+              <Button
+                basic
+                icon="shield"
+                onClick={onClose}
+                data-href={
+                  type === EntryType.Contribution
+                    ? contributionProtectionURL({event_id: eventId, contrib_id: objId})
+                    : sessionProtectionURL({event_id: eventId, session_id: sessionId})
+                }
+                data-ajax-dialog
+              />
+            }
+          />
         )}
         <ActionPopup
           content={Translate.string('Edit')}
