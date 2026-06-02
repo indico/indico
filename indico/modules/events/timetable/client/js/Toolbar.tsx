@@ -78,7 +78,7 @@ function SessionBlockToolbar() {
   );
 }
 
-export default function Toolbar(dt: Moment, {onNavigate}: {onNavigate: (dt: Moment) => void}) {
+export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}) {
   const dispatch = useDispatch();
   const {openModal} = useModal();
 
@@ -180,21 +180,6 @@ export default function Toolbar(dt: Moment, {onNavigate}: {onNavigate: (dt: Mome
   return (
     <div styleName="toolbar" ref={ref}>
       <Menu compact secondary styleName="actions-bar">
-        <Menu.Item
-          onClick={() => dispatch(actions.toggleShowUnscheduled())}
-          title={
-            showUnscheduled
-              ? // TODO: (Ajob) Rename to 'show draft entries' or something like that
-                //              once we have changed this sidemenu's features.
-                Translate.string('Hide unscheduled contributions')
-              : Translate.string('Show unscheduled contributions')
-          }
-          styleName="action"
-        >
-          <Icon.Group>
-            <Icon name="grid layout" />
-          </Icon.Group>
-        </Menu.Item>
         <Menu.Item className="right" styleName="action">
           <PublicationStateSwitch
             eventId={eventId}

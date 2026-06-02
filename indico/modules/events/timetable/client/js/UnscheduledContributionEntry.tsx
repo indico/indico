@@ -189,33 +189,35 @@ export function UnscheduledContributionEntry({
         timeRange={timeRange}
         type={EntryType.Contribution}
       />
-      <div
-        styleName="entry-actions"
-        style={{'--session-color': colors.color} as React.CSSProperties}
-      >
-        <EditContributionButton
-          eventId={eventId}
-          contribId={contrib.objId}
-          eventTitle={contrib.title}
-          trigger={
-            <Button
-              basic
-              type="button"
-              title={Translate.string('Edit contribution')}
-              icon="edit"
-              size="small"
-            />
-          }
-        />
-        <Button
-          basic
-          type="button"
-          title={Translate.string('Delete selected session')}
-          icon="trash"
-          size="small"
-          onClick={() => dispatch(actions.deleteUnscheduledContrib(contrib, eventId))}
-        />
-      </div>
+      {!isDragging && (
+        <div
+          styleName="entry-actions"
+          style={{'--session-color': colors.color} as React.CSSProperties}
+        >
+          <EditContributionButton
+            eventId={eventId}
+            contribId={contrib.objId}
+            eventTitle={contrib.title}
+            trigger={
+              <Button
+                basic
+                type="button"
+                title={Translate.string('Edit contribution')}
+                icon="edit"
+                size="small"
+              />
+            }
+          />
+          <Button
+            basic
+            type="button"
+            title={Translate.string('Delete selected session')}
+            icon="trash"
+            size="small"
+            onClick={() => dispatch(actions.deleteUnscheduledContrib(contrib, eventId))}
+          />
+        </div>
+      )}
     </div>
   );
 }
