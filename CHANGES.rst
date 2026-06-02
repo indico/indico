@@ -24,7 +24,7 @@ Improvements
 - Allow users to mark contributions as favorites (:issue:`3524`, :pr:`7256`)
 - Allow choosing whether to clone registration tags (:pr:`7506`)
 - Add placeholders for contribution link and board number for emailing contributions
-  (:pr:`7525`, thanks :user:`duartegalvao`)
+  (:issue:`3602`, :pr:`7525`, thanks :user:`duartegalvao`)
 - Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
 - Allow managers to override accommodation date range validation when editing
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)

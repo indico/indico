@@ -172,7 +172,7 @@ class SubmitterTitlePlaceholder(Placeholder):
 class ContributionURLPlaceholder(Placeholder):
     advanced = True
     name = 'contribution_url'
-    description = _('Contribution URL')
+    description = _('The URL of the contribution')
 
     @classmethod
     def render(cls, abstract):
