@@ -88,7 +88,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const eventStart = useSelector(selectors.getEventStartDt);
   const eventEnd = useSelector(selectors.getEventEndDt);
   const numDays = useSelector(selectors.getEventNumDays);
-  const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentEntries = useSelector(selectors.getCurrentEntries);

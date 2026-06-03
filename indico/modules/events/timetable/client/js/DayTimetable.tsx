@@ -583,7 +583,6 @@ export function DayTimetable({
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
-      {/* <UnscheduledContributions dt={dt} /> */}
       <div styleName="side-panel-container">
         <TimetableSidePanel />
         <UnscheduledContributions dt={dt} />
