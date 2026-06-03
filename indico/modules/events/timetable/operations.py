@@ -104,14 +104,18 @@ def update_timetable_entry(entry, data):
 
 
 def delete_timetable_entry(entry, log=True):
-    entry.is_deleted = True
-    if entry.timetable_entry is not None:
-        delete_timetable_entry(entry.timetable_entry, log=False)
+    entry.object = None
+    entry.parent = None
+
     db.session.flush()
-    signals.event.contribution_deleted.send(entry)
-    logger.info('Contribution %s deleted by %s', entry, session.user)
-    entry.log(EventLogRealm.management, LogKind.negative, 'Contributions',
-                f'Contribution {entry.verbose_title} has been deleted', session.user)
+
+    if log:
+        logger.info('Timetable entry %s deleted by %s', entry, session.user)
+        entry.event.log(
+            EventLogRealm.management,
+            LogKind.negative,
+            'Timetable',
+            f'Contribution {entry.verbose_title} has been deleted', session.user)
 
 
 def unschedule_timetable_entry(entry, log=True):
