@@ -980,7 +980,7 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                 prev_state = reg.state
                 if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
                     reg.state = RegistrationState.unpaid
-                elif reg.state != RegistrationState.unpaid:
+                elif reg.state not in {RegistrationState.unpaid, RegistrationState.pending}:
                     num_skipped += 1
                     continue
                 new_price = {
@@ -994,7 +994,7 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                                              format_currency(new_price, self.regform.currency, locale='en_GB'))
                     reg.base_price = new_price
                     reg.currency = self.regform.currency
-                if not reg.price:
+                if not reg.price and reg.state == RegistrationState.unpaid:
                     reg.state = RegistrationState.complete
                 if prev_state != reg.state:
                     changes['state'] = (prev_state, reg.state)
