@@ -79,7 +79,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             if section.is_deleted:
                 continue
             fields_ids = {field.show_if_id for field in section.children
-                            if field.show_if_id is not None and not field.is_deleted}
+                          if field.show_if_id is not None and not field.is_deleted}
             if critical_fields_ids & fields_ids:
                 raise ValidationError('Cannot make section manager-only due to conditional field relations')
 
