@@ -26,7 +26,7 @@ from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
-from indico.web.args import use_rh_kwargs
+from indico.web.args import use_kwargs, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -288,9 +288,9 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
     @use_rh_kwargs({
         'question_to_clone': ModelField(SurveyQuestion, with_parent='survey', data_key='clone')
     }, rh_context=('survey',), location='query')
-    @use_rh_kwargs({
+    @use_kwargs({
         'field_type': fields.String(validate=validate.OneOf(get_field_types().keys()), data_key='type')
-    }, rh_context=('survey',), location='view_args')
+    }, location='view_args')
     def _process(self, field_type, question_to_clone=None):
         field_cls = get_field_types()[field_type]
         form = field_cls.create_config_form()
