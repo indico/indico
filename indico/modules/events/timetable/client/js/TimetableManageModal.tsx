@@ -83,8 +83,6 @@ interface TimetableManageModalProps {
   entry: any;
   onClose?: () => void;
   onSubmit?: () => void;
-  // onSubmit?: (createdEntry?: any) => void;
-  // unscheduled?: boolean;
 }
 
 const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
@@ -92,7 +90,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   entry,
   onClose = () => null,
   onSubmit = () => null,
-  // unscheduled = false,
 }) => {
   const toast = useToast();
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
@@ -246,16 +243,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     try {
-      // if (unscheduled) {
-      //   delete data.start_dt;
-
-      //   const createdEntry = await dispatch(actions.createEntry(EntryType.Contribution, data));
-
-      //   onSubmit(createdEntry);
-      //   onClose();
-      //   return;
-      // }
-
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
         const oldDayKey = getDateKey(entry.startDt);

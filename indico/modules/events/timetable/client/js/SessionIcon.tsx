@@ -18,7 +18,6 @@ export function SessionIcon({colors, ...rest}: {colors: Colors}) {
   return (
     <Icon.Group {...rest}>
       <Icon name="circle" style={{color}} />
-      {/* <Icon name="circle" styleName="session-sub-icon" size="mini" style={{color: subColor}} /> */}
     </Icon.Group>
   );
 }
