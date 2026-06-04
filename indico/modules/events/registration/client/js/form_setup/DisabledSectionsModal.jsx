@@ -14,13 +14,14 @@ import {RequestConfirmDelete} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 
 import * as actions from './actions';
-import {getDisabledSections} from './selectors';
+import {getDisabledSections, sectionHasConditionalFields} from './selectors';
 
 import '../../styles/regform.module.scss';
 
 function DisabledSection({id, title}) {
   const dispatch = useDispatch();
   const [confirmDeleteActive, setConfirmDeleteActive] = useState(false);
+  const hasConditionalFields = useSelector(state => sectionHasConditionalFields(state, id));
 
   const handleEnableClick = () => {
     dispatch(actions.enableSection(id));
@@ -65,7 +66,6 @@ function DisabledSection({id, title}) {
         requestFunc={() => dispatch(actions.removeSection(id))}
         onClose={() => setConfirmDeleteActive(false)}
         open={confirmDeleteActive}
-        size="mini"
         persistent
       >
         <Translate>
@@ -73,6 +73,12 @@ function DisabledSection({id, title}) {
           <Param name="field" value={title} wrapper={<strong />} />
           "?
         </Translate>
+        {hasConditionalFields && (
+          <Translate as="p">
+            This section contains fields used as conditions for other fields. Deleting it will
+            permanently remove those conditional relationships. This action cannot be undone.
+          </Translate>
+        )}
       </RequestConfirmDelete>
     </Segment>
   );

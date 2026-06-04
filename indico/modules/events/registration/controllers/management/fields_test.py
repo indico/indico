@@ -10,6 +10,7 @@ from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
+                                                                              RHRegistrationFormModifyField,
                                                                               RHRegistrationFormToggleFieldState,
                                                                               _fill_form_field_with_data)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
@@ -188,6 +189,150 @@ class TestGeneralFieldDataSchema:
         schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
         schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
 
+    # show_if_field tests
+
+    def test_show_if_field_not_allowed_for_manager_only_section_field(self, db, dummy_regform):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section',
+                                                  is_manager_only=False)
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        db.session.flush()
+        manager_section = RegistrationFormSection(registration_form=dummy_regform, title='Manager section',
+                                                  is_manager_only=True)
+        new_field = RegistrationFormField(parent=manager_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'Manager field',
+                         'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {'show_if_field_id': ['Manager-only fields cannot be conditionally shown']}
+
+    def test_show_if_field_self_reference(self, db, dummy_regform):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(field, {'input_type': 'checkbox', 'title': 'Field'})
+        db.session.flush()
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'checkbox', 'title': 'Field',
+                         'show_if_field_id': field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {
+            'show_if_field_id': ['The field cannot conditionally depend on itself to be shown']
+        }
+
+    def test_show_if_field_from_other_regform(self, db, dummy_regform, dummy_event, create_regform):
+        other_regform = create_regform(dummy_event, title='Other Form')
+        other_section = RegistrationFormSection(registration_form=other_regform, title='Other section',
+                                                is_manager_only=False)
+        other_condition_field = RegistrationFormField(parent=other_section, registration_form=other_regform)
+        _fill_form_field_with_data(other_condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        db.session.flush()
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        new_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'New field',
+                         'show_if_field_id': other_condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {
+            'show_if_field_id': ['The field to show does not belong to the same registration form.']
+        }
+
+    def test_show_if_field_unsupported_input_type(self, db, dummy_regform):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'text', 'title': 'Condition field'})
+        db.session.flush()
+        new_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'New field',
+                         'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {'show_if_field_id': ['This field cannot be used as a condition.']}
+
+    def test_show_if_field_cycle_detection(self, db, dummy_regform):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        field_a = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(field_a, {'input_type': 'checkbox', 'title': 'Field A'})
+        db.session.flush()
+        field_b = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(field_b, {'input_type': 'checkbox', 'title': 'Field B'})
+        field_b.show_if_id = field_a.id
+        field_b.show_if_values = ['yes']
+        db.session.flush()
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': field_a})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'checkbox', 'title': 'Field A',
+                         'show_if_field_id': field_b.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {
+            'show_if_field_id': ['Field conditions may not have cycles (a -> b -> c -> a)']
+        }
+
+    def test_show_if_field_condition_in_manager_only_section(self, db, dummy_regform):
+        manager_section = RegistrationFormSection(registration_form=dummy_regform, title='Manager section',
+                                                  is_manager_only=True)
+        condition_field = RegistrationFormField(parent=manager_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Manager condition'})
+        db.session.flush()
+        new_section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'New field',
+                         'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {
+            'show_if_field_id': ['Field conditions may not depend on fields in manager-only sections']
+        }
+
+    def test_show_if_field_does_not_allow_disabled_field(self, db, dummy_regform):
+        new_section = RegistrationFormSection(registration_form=dummy_regform, title='New section',
+                                              is_manager_only=False)
+        condition_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        condition_field.is_enabled = False
+        db.session.flush()
+        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'New field',
+                         'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {'show_if_field_id': ['Disabled fields cannot be used as a condition.']}
+
+    def test_show_if_field_allows_existing_disabled_field(self, db, dummy_regform):
+        condition_section = RegistrationFormSection(registration_form=dummy_regform, title='Condition section',
+                                                    is_manager_only=False)
+        condition_field = RegistrationFormField(parent=condition_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        new_section = RegistrationFormSection(registration_form=dummy_regform, title='New section',
+                                                    is_manager_only=False)
+        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(new_field, {'input_type': 'text', 'title': 'New field'})
+        db.session.flush()
+        new_field.show_if_id = condition_field.id
+        new_field.show_if_values = ['yes']
+        db.session.flush()
+        condition_field.is_enabled = False
+        db.session.flush()
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        assert schema.load({'input_type': 'text', 'title': 'New field',
+                            'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+
+    def test_show_if_field_does_not_allow_fields_in_disabled_section(self, db, dummy_regform):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Condition section',
+                                          is_manager_only=False)
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        section.is_enabled = False
+        db.session.flush()
+        new_section = RegistrationFormSection(registration_form=dummy_regform, title='New section',
+                                                is_manager_only=False)
+        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'text', 'title': 'New field',
+                         'show_if_field_id': condition_field.id, 'show_if_field_values': ['yes']})
+        assert exc_info.value.messages == {
+            'show_if_field_id': ['Fields in disabled sections cannot be used as a condition.']
+        }
+
 
 class TestRegistrationFormToggleFieldState:
     # title tests
@@ -314,3 +459,40 @@ class TestRegistrationFormToggleFieldState:
         with pytest.raises(BadRequest, match='The field "Field Title" with the same internal name on form "Other Form" '
                                              'uses a different input type which is not allowed'):
             rh._check_internal_name_type_consistency_in_event()
+
+
+class TestRegistrationFormModifyField:
+    def test_delete_condition_field_clears_show_if_field_and_values(self, db, dummy_regform, app_context):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        db.session.flush()
+        new_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(new_field, {'input_type': 'text', 'title': 'New field'})
+        new_field.show_if_id = condition_field.id
+        new_field.show_if_values = ['yes']
+        db.session.flush()
+        with app_context.test_request_context():
+            rh = RHRegistrationFormModifyField()
+            rh.field = condition_field
+            rh.regform = dummy_regform
+            rh._process_DELETE()
+        assert new_field.show_if_id is None
+        assert new_field.show_if_values is None
+
+    def test_delete_field_clears_condition_for_links(self, db, dummy_regform, app_context):
+        section = RegistrationFormSection(registration_form=dummy_regform, title='Section', is_manager_only=False)
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(condition_field, {'input_type': 'checkbox', 'title': 'Condition field'})
+        db.session.flush()
+        new_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        _fill_form_field_with_data(new_field, {'input_type': 'text', 'title': 'New field'})
+        new_field.show_if_id = condition_field.id
+        new_field.show_if_values = ['yes']
+        db.session.flush()
+        with app_context.test_request_context():
+            rh = RHRegistrationFormModifyField()
+            rh.field = new_field
+            rh.regform = dummy_regform
+            rh._process_DELETE()
+        assert condition_field.condition_for == []

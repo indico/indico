@@ -70,12 +70,16 @@ ItemLocked.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
-function ItemConditional({reason}) {
-  return <Popup trigger={<Icon name="code branch" styleName="conditional" />}>{reason}</Popup>;
+function ItemConditional({reason, icon = 'code branch', color = 'blue'}) {
+  return (
+    <Popup trigger={<Icon name={icon} styleName="conditional" color={color} />}>{reason}</Popup>
+  );
 }
 
 ItemConditional.propTypes = {
   reason: PropTypes.string.isRequired,
+  icon: PropTypes.string,
+  color: PropTypes.string,
 };
 
 function renderAsFieldset(fieldOptions, meta) {
@@ -100,6 +104,7 @@ export default function FormItem({
   setupMode,
   setupActions,
   showIfFieldId,
+  isShowIfFieldDisabled,
   htmlName,
   defaultValue,
   ...rest
@@ -137,6 +142,7 @@ export default function FormItem({
     setupMode,
     setupActions,
     showIfFieldId,
+    isShowIfFieldDisabled,
     ...rest,
     meta,
   };
@@ -246,9 +252,19 @@ export default function FormItem({
       <div styleName="actions">
         {setupActions}
         {lockedReason && <ItemLocked reason={lockedReason} />}
-        {!!showIfFieldId && setupMode && (
-          <ItemConditional reason={Translate.string('This field is conditionally shown')} />
-        )}
+        {!!showIfFieldId &&
+          setupMode &&
+          (isShowIfFieldDisabled ? (
+            <ItemConditional
+              reason={Translate.string(
+                'The conditional field set to display this field is currently disabled and not in effect'
+              )}
+              icon="warning sign"
+              color="orange"
+            />
+          ) : (
+            <ItemConditional reason={Translate.string('This field is conditionally shown')} />
+          ))}
         {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
         {!lockedReason && !showPurged && paidItemLocked && (
           <PaidItemLocked management={isManagement} />
@@ -288,6 +304,8 @@ FormItem.propTypes = {
   setupActions: PropTypes.node,
   /** The ID of the field to use as condition for display */
   showIfFieldId: PropTypes.number,
+  /** Whether the field set as condition for display is currently disabled */
+  isShowIfFieldDisabled: PropTypes.bool,
   /** The default value for a given field **/
   defaultValue: PropTypes.any,
   // ... and various other field-specific keys (billing, limited-places, other config)
@@ -304,5 +322,6 @@ FormItem.defaultProps = {
   setupMode: false,
   setupActions: null,
   showIfFieldId: null,
+  isShowIfFieldDisabled: false,
   defaultValue: null,
 };

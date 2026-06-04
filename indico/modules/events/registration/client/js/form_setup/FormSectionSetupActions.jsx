@@ -7,23 +7,31 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
+import {RequestConfirm} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import ItemSettingsModal from './ItemSettingsModal';
 import ItemTypeDropdown from './ItemTypeDropdown';
 import SectionSettingsModal from './SectionSettingsModal';
+import {sectionHasConditionalFields} from './selectors';
 
 export default function FormSectionSetupActions({id, isPersonalData}) {
   const [settingsModalActive, setSettingsModalActive] = useState(false);
   const [fieldModalActive, setFieldModalActive] = useState(false);
   const [newItemType, setNewItemType] = useState(null);
+  const [confirmDisableActive, setConfirmDisableActive] = useState(false);
   const dispatch = useDispatch();
+  const hasConditionalFields = useSelector(state => sectionHasConditionalFields(state, id));
 
   const handleDisableClick = () => {
-    dispatch(actions.disableSection(id));
+    if (hasConditionalFields) {
+      setConfirmDisableActive(true);
+    } else {
+      dispatch(actions.disableSection(id));
+    }
   };
 
   const handleConfigureClick = () => {
@@ -61,6 +69,23 @@ export default function FormSectionSetupActions({id, isPersonalData}) {
           onClose={() => setFieldModalActive(false)}
         />
       )}
+      <RequestConfirm
+        header={Translate.string('Are you sure you want to disable this section?')}
+        confirmText={Translate.string('Disable section')}
+        onClose={() => setConfirmDisableActive(false)}
+        requestFunc={() => {
+          setConfirmDisableActive(false);
+          dispatch(actions.disableSection(id));
+        }}
+        open={confirmDisableActive}
+        persistent
+      >
+        <Translate>
+          This section contains fields that are used as conditions for other fields. Those
+          conditions will be inactive while this section is disabled, but may be restored when the
+          section is re-enabled.
+        </Translate>
+      </RequestConfirm>
     </>
   );
 }

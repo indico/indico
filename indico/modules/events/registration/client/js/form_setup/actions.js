@@ -101,6 +101,12 @@ function _createItem(data) {
   return {type: CREATE_ITEM, data};
 }
 
+function updateViewDataForConditionFields(dispatch, data) {
+  for (const viewData of data) {
+    dispatch(_updateItem(viewData.id, viewData));
+  }
+}
+
 export function saveSectionPosition(sectionId, position, oldPosition) {
   return async (dispatch, getStore) => {
     const store = getStore();
@@ -125,6 +131,7 @@ export function enableSection(sectionId) {
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, true));
       dispatch(updatePositions(resp.data.positions));
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
     }
   };
 }
@@ -138,6 +145,7 @@ export function disableSection(sectionId) {
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, false));
       dispatch(updatePositions(resp.data.positions));
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
     }
   };
 }
@@ -148,6 +156,7 @@ export function removeSection(sectionId) {
     const url = modifySectionURL(getURLParams(store)(sectionId));
     const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
     if (!resp.error) {
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
       dispatch(_removeSection(sectionId));
     }
     return !!resp.error;
@@ -208,6 +217,7 @@ export function enableItem(itemId) {
     if (!resp.error) {
       dispatch(_updateItem(itemId, resp.data.view_data));
       dispatch(updatePositions(resp.data.positions));
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
     }
   };
 }
@@ -223,7 +233,9 @@ export function disableItem(itemId) {
     if (!resp.error) {
       dispatch(_updateItem(itemId, resp.data.view_data));
       dispatch(updatePositions(resp.data.positions));
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
     }
+    return !!resp.error;
   };
 }
 
@@ -235,6 +247,7 @@ export function removeItem(itemId) {
     const url = urlFunc(getURLParams(store)(sectionId, itemId));
     const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
     if (!resp.error) {
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
       dispatch(_removeItem(itemId));
     }
     return !!resp.error;
@@ -251,6 +264,7 @@ export function updateItem(itemId, data) {
     const resp = await submitFormAction(() => indicoAxios.patch(url, payload))(dispatch);
     if (!resp.error) {
       dispatch(_updateItem(itemId, resp.data.view_data));
+      updateViewDataForConditionFields(dispatch, resp.data.updated_items_view_data || []);
     }
     return camelizeKeys(resp);
   };
