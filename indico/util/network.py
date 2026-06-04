@@ -21,6 +21,8 @@ def _is_private_ip(ip):
 
 def is_private_url(url):
     """Check if the provided URL points to a private IP address."""
+    if '\\' in url:
+        return True
     hostname = urlsplit(url).hostname
     if not hostname:
         # invalid url, just consider it private to avoid failing noisly...
