@@ -31,6 +31,8 @@ Improvements
 - Automatically paste obvious email addresses into the email field when pasting in
   the user search dialog (:pr:`7538`)
 - Allow changing/removing the registration fee of pending registrations (:pr:`7572`)
+- Allow assigning multiple contributions to a session in bulk from the contribution
+  management list (:issue:`7571`, :pr:`7574`)
 
 Bugfixes
 ^^^^^^^^
