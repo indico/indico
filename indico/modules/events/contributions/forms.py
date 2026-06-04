@@ -21,6 +21,7 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
@@ -202,6 +203,23 @@ class ContributionDurationForm(IndicoForm):
                 error_msg = _('With this duration, the contribution would exceed the current day.')
             if self.contrib.start_dt + field.data > latest_dt:
                 raise ValidationError(error_msg)
+
+
+class ContributionsBulkAssignSessionForm(IndicoForm):
+    contribution_id = HiddenFieldList()
+    submitted = HiddenField()
+    session = QuerySelectField(_('Session'), get_label='title', allow_blank=True,
+                               blank_text=_('No session'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super().__init__(*args, **kwargs)
+        self.session.query = (Session.query
+                              .with_parent(self.event)
+                              .order_by(db.func.lower(Session.title)))
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class ContributionDefaultDurationForm(IndicoForm):

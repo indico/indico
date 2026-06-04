@@ -25,6 +25,8 @@ _bp.add_url_rule('/manage/contributions/create', 'manage_create_contrib', manage
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/delete', 'manage_delete_contribs', management.RHDeleteContributions,
                  methods=('POST',))
+_bp.add_url_rule('/manage/contributions/assign-session', 'manage_contribs_assign_session',
+                 management.RHContributionsBulkAssignSession, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/person-list', 'person_list', management.RHContributionPersonList,
                  methods=('POST',))
 _bp.add_url_rule('/manage/contributions/material-package', 'material_package',

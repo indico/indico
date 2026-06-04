@@ -28,8 +28,9 @@ from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
 from indico.modules.events.contributions.forms import (AllowSubmitterEditsForm, ContributionDefaultDurationForm,
                                                        ContributionDurationForm, ContributionExportTeXForm,
-                                                       ContributionProtectionForm, ContributionStartDateForm,
-                                                       ContributionTypeForm, SubContributionForm)
+                                                       ContributionProtectionForm, ContributionsBulkAssignSessionForm,
+                                                       ContributionStartDateForm, ContributionTypeForm,
+                                                       SubContributionForm)
 from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
@@ -275,6 +276,45 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
                        '{count} contributions have been deleted.', deleted_count)
               .format(count=deleted_count), 'success')
         return jsonify_data(**self.list_generator.render_list())
+
+
+class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
+    """Assign multiple contributions to a session at once."""
+
+    _contrib_query_options = (joinedload('timetable_entry'),)
+
+    def _check_access(self):
+        RHManageContributionsActionsBase._check_access(self)
+
+        if not self.event.can_manage(session.user):
+            raise Forbidden
+
+    def _process(self):
+        form = ContributionsBulkAssignSessionForm(event=self.event,
+                                                  contribution_id=[c.id for c in self.contribs])
+        if form.validate_on_submit():
+            new_session = form.session.data
+            # Scheduled contributions may be unscheduled by this action
+            # To prevent this non-obvious side-effect, we filter them out.
+            to_assign = [c for c in self.contribs if c.timetable_entry is None]
+            skipped_count = len(self.contribs) - len(to_assign)
+            for contrib in to_assign:
+                update_contribution(contrib, {'session': new_session})
+            assigned_count = len(to_assign)
+            if assigned_count and new_session is not None:
+                flash(ngettext('The contribution has been assigned to the session "{session}".',
+                               '{count} contributions have been assigned to the session "{session}".', assigned_count)
+                      .format(count=assigned_count, session=new_session.title), 'success')
+            elif assigned_count:
+                flash(ngettext('The contribution has been removed from its session.',
+                               '{count} contributions have been removed from their session.', assigned_count)
+                      .format(count=assigned_count), 'success')
+            if skipped_count:
+                flash(ngettext('1 contribution was skipped because it is currently scheduled.',
+                               '{count} contributions were skipped because they are currently scheduled.',
+                               skipped_count).format(count=skipped_count), 'warning')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form, submit=_('Assign'), disabled_until_change=False)
 
 
 class RHContributionACL(RHManageContributionBase):
