@@ -211,8 +211,8 @@ class ContributionsBulkAssignSessionForm(IndicoForm):
     session = QuerySelectField(_('Session'), get_label='title', allow_blank=True,
                                blank_text=_('No session'))
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
         super().__init__(*args, **kwargs)
         self.session.query = (Session.query
                               .with_parent(self.event)
