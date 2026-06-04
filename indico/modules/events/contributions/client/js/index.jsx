@@ -285,6 +285,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function setupInlinePickerToggle() {
+    const $contributionList = $('#contribution-list');
+
+    function update() {
+      const selectedCount = $contributionList.find('input[name=contribution_id]:checked').length;
+      $contributionList
+        .find('.session-item-picker, .track-item-picker')
+        .prop('disabled', selectedCount > 1);
+    }
+
+    $contributionList.on('change', 'input[name=contribution_id]', update);
+    update();
+  }
+
   function setupStartDateQBubbles() {
     $('.js-contrib-start-date').each(function() {
       const $this = $(this);
@@ -337,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTableSorter('#contribution-list .tablesorter');
     setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
     setupTrackPicker(options.createTrackURL);
+    setupInlinePickerToggle();
     setupStartDateQBubbles();
     setupDurationQBubbles();
     enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
