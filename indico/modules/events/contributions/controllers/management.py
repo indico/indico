@@ -310,7 +310,7 @@ class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
                                '{count} contributions have been removed from their session.', assigned_count)
                       .format(count=assigned_count), 'success')
             if skipped_count:
-                flash(ngettext('1 contribution was skipped because it is currently scheduled.',
+                flash(ngettext('The contribution was skipped because it is currently scheduled.',
                                '{count} contributions were skipped because they are currently scheduled.',
                                skipped_count).format(count=skipped_count), 'warning')
             return jsonify_data(**self.list_generator.render_list())
