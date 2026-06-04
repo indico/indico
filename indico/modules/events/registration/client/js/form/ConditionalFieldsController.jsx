@@ -6,16 +6,18 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import {useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useFormState} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
+
+import {getPluginObjects} from 'indico/utils/plugins';
 
 import {setHiddenItemIds} from '../form_submission/actions';
 
 import {getFieldRegistry} from './fields/registry';
 import {getHiddenItemIds, getHiddenItemsInitialized, getItems} from './selectors';
 
-export default function ConditionalFieldsController() {
+export function DefaultConditionalFieldsController() {
   const {values} = useFormState({subscription: {values: true}});
   const dispatch = useDispatch();
   const fields = useSelector(getItems);
@@ -43,4 +45,17 @@ export default function ConditionalFieldsController() {
     }
   }, [dispatch, hiddenItemsInitialized, currentlyHiddenItemIds, hiddenItemIds]);
   return null;
+}
+
+export default function ConditionalFieldsController() {
+  const pluginControllers = getPluginObjects('regform-conditional-fields-controller');
+  if (pluginControllers.length > 1) {
+    throw new Error('Multiple plugin-defined regform conditional fields controllers');
+  }
+  const PluginConditionalFieldsController = pluginControllers[0];
+  return PluginConditionalFieldsController ? (
+    <PluginConditionalFieldsController />
+  ) : (
+    <DefaultConditionalFieldsController />
+  );
 }

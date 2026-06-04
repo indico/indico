@@ -142,6 +142,9 @@ class GeneralFieldDataSchema(mm.Schema):
                                         'uses a different input type which is not allowed.')
                                       .format(inconsistent_field.title, inconsistent_field.registration_form.title))
 
+    def _check_manager_only(self, field):
+        return field.parent.is_manager_only
+
     @validates('show_if_id')
     @no_autoflush
     def _check_show_if_id(self, field_id, **kwargs):
@@ -149,7 +152,7 @@ class GeneralFieldDataSchema(mm.Schema):
         if field_id is None:
             return
         field = self.context['field']
-        if field.parent.is_manager_only:
+        if self._check_manager_only(field):
             raise ValidationError('Manager-only fields cannot be conditionally shown')
         used_field_ids = set()
         if field.id is not None:
@@ -173,7 +176,7 @@ class GeneralFieldDataSchema(mm.Schema):
             else:
                 used_field_ids.add(next_field_id)
             next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
-            if next_field.parent.is_manager_only:
+            if self._check_manager_only(next_field):
                 raise ValidationError('Field conditions may not depend on fields in manager-only sections')
             if not next_field.is_enabled:
                 raise ValidationError('Field conditions may not depend on disabled fields')
