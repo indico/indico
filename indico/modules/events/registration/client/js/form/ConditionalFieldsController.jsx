@@ -48,8 +48,11 @@ export function DefaultConditionalFieldsController() {
 }
 
 export default function ConditionalFieldsController() {
-  const [PluginConditionalFieldsController] =
-    getPluginObjects('regform-conditional-fields-controller')[0] ?? [];
+  const pluginControllers = getPluginObjects('regform-conditional-fields-controller');
+  if (pluginControllers.length > 1) {
+    throw new Error('Multiple plugin-defined regform conditional fields controllers');
+  }
+  const PluginConditionalFieldsController = pluginControllers[0];
   return PluginConditionalFieldsController ? (
     <PluginConditionalFieldsController />
   ) : (
