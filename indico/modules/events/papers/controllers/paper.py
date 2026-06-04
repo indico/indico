@@ -24,10 +24,12 @@ from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import judge_paper, update_reviewing_roles
 from indico.modules.events.papers.schemas import CallForPapersSchema, PaperDumpSchema
 from indico.modules.events.papers.settings import PaperReviewingRole
+from indico.modules.events.papers.util import generate_spreadsheet_from_paper_assignments
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext, pgettext
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -161,6 +163,38 @@ class RHExportPapersJSON(RHPapersActionBase):
         response = jsonify(version=1, papers=papers_dump, **cfp_dump)
         response.headers['Content-Disposition'] = 'attachment; filename="papers.json"'
         return response
+
+
+class RHExportPapersCSV(RHPapersActionBase):
+    """Export paper assignment list to CSV."""
+
+    ALLOW_LOCKED = True
+    _allow_get_all = True
+
+    def _check_access(self):
+        RHPapersActionBase._check_access(self)
+        if not self.management:
+            raise Forbidden
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_paper_assignments(self.contributions, self.event)
+        return send_csv('papers.csv', headers, rows)
+
+
+class RHExportPapersExcel(RHPapersActionBase):
+    """Export paper assignment list to XLSX."""
+
+    ALLOW_LOCKED = True
+    _allow_get_all = True
+
+    def _check_access(self):
+        RHPapersActionBase._check_access(self)
+        if not self.management:
+            raise Forbidden
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_paper_assignments(self.contributions, self.event)
+        return send_xlsx('papers.xlsx', headers, rows, tz=self.event.tzinfo)
 
 
 class RHJudgePapers(RHPapersActionBase):

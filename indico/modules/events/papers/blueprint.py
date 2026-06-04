@@ -113,6 +113,10 @@ for prefix, is_management in (('/manage/papers/assignment-list', True), ('/paper
     if is_management:
         _bp.add_url_rule(prefix + '/export-json', 'export_json', paper.RHExportPapersJSON, methods=('GET', 'POST'),
                          defaults=defaults)
+        _bp.add_url_rule(prefix + '/export.csv', 'export_csv', paper.RHExportPapersCSV, methods=('GET', 'POST'),
+                         defaults=defaults)
+        _bp.add_url_rule(prefix + '/export.xlsx', 'export_excel', paper.RHExportPapersExcel, methods=('GET', 'POST'),
+                         defaults=defaults)
 
 
 @_bp.url_defaults

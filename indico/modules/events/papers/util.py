@@ -76,6 +76,58 @@ def has_contributions_with_user_paper_submission_rights(event, user):
     return _query_contributions_with_user_paper_submission_rights(event, user).has_rows()
 
 
+def generate_spreadsheet_from_paper_assignments(contributions, event):
+    """Generate spreadsheet data for paper assignment exports."""
+    id_header = 'ID'
+    title_header = 'Title'
+    state_header = 'State'
+    track_header = 'Track'
+    session_header = 'Session'
+    type_header = 'Type'
+    revision_header = 'Revision'
+    judges_header = 'Judges'
+    content_reviewers_header = 'Content reviewers'
+    layout_reviewers_header = 'Layout reviewers'
+
+    headers = [
+        id_header,
+        title_header,
+        state_header,
+        track_header,
+        session_header,
+        type_header,
+        revision_header,
+        judges_header,
+    ]
+    if event.cfp.content_reviewing_enabled:
+        headers.append(content_reviewers_header)
+    if event.cfp.layout_reviewing_enabled:
+        headers.append(layout_reviewers_header)
+
+    def _user_names(users):
+        return [user.display_full_name for user in sorted(users, key=lambda user: user.display_full_name.lower())]
+
+    rows = []
+    for contrib in contributions:
+        paper = contrib.paper
+        row = {
+            id_header: contrib.friendly_id,
+            title_header: contrib.title,
+            state_header: paper.last_revision.state.title if paper else 'Not submitted',
+            track_header: contrib.track.title_with_group if contrib.track else 'No track',
+            session_header: contrib.session.title if contrib.session else 'No session',
+            type_header: contrib.type.name if contrib.type else '',
+            revision_header: paper.revision_count if paper else '',
+            judges_header: _user_names(contrib.paper_judges),
+        }
+        if event.cfp.content_reviewing_enabled:
+            row[content_reviewers_header] = _user_names(contrib.paper_content_reviewers)
+        if event.cfp.layout_reviewing_enabled:
+            row[layout_reviewers_header] = _user_names(contrib.paper_layout_reviewers)
+        rows.append(row)
+    return headers, rows
+
+
 def get_user_submittable_contributions(event, user):
     criteria = [Contribution._paper_last_revision == None,  # noqa: E711
                 Contribution._paper_last_revision.has(PaperRevision.state == PaperRevisionState.to_be_corrected)]
