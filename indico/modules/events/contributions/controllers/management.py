@@ -287,12 +287,12 @@ class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
     def _process(self):
         form = ContributionsBulkAssignSessionForm(event=self.event,
                                                   contribution_id=[c.id for c in self.contribs])
+        # Scheduled contributions may be unscheduled by this action.
+        # To prevent this non-obvious side-effect, we filter them out.
+        to_assign = [c for c in self.contribs if c.timetable_entry is None]
+        skipped_count = len(self.contribs) - len(to_assign)
         if form.validate_on_submit():
             new_session = form.session.data
-            # Scheduled contributions may be unscheduled by this action
-            # To prevent this non-obvious side-effect, we filter them out.
-            to_assign = [c for c in self.contribs if c.timetable_entry is None]
-            skipped_count = len(self.contribs) - len(to_assign)
             for contrib in to_assign:
                 update_contribution(contrib, {'session': new_session})
             assigned_count = len(to_assign)
@@ -309,7 +309,12 @@ class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
                                '{count} contributions were skipped because they are currently scheduled.',
                                skipped_count).format(count=skipped_count), 'warning')
             return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form, submit=_('Assign'), disabled_until_change=False)
+        message = None
+        if skipped_count:
+            message = ngettext('One selected contribution is currently scheduled and will be skipped.',
+                               '{count} selected contributions are currently scheduled and will be skipped.',
+                               skipped_count).format(count=skipped_count)
+        return jsonify_form(form, submit=_('Assign'), disabled_until_change=False, message=message)
 
 
 class RHContributionACL(RHManageContributionBase):
