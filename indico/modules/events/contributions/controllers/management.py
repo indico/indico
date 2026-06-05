@@ -281,13 +281,8 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
 class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
     """Assign multiple contributions to a session at once."""
 
+    PERMISSION = None
     _contrib_query_options = (joinedload('timetable_entry'),)
-
-    def _check_access(self):
-        RHManageContributionsActionsBase._check_access(self)
-
-        if not self.event.can_manage(session.user):
-            raise Forbidden
 
     def _process(self):
         form = ContributionsBulkAssignSessionForm(event=self.event,
