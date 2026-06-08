@@ -80,6 +80,19 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   const {data, loading, lastData} = useIndicoAxios(url);
 
+  const perPageOptions: PerPageOptions[] = useMemo(() => {
+    const maxNumberOfParticipants = (data?.tables ?? []).reduce(
+      (max, table) => Math.max(max, table.num_participants),
+      0
+    );
+    console.log('Max number of participants (excluding anonymous):', maxNumberOfParticipants);
+    if (maxNumberOfParticipants > 0) {
+      const options = [25, 50, 100].filter(opt => opt < maxNumberOfParticipants);
+      return [...options, 'all'];
+    }
+    return ['all'];
+  }, [data]);
+
   let viewToggle: ReactNode, infoContent: ReactNode;
 
   if (preview === PreviewEnum.GUEST) {
@@ -137,6 +150,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
           table={data.tables[0]}
           search={search}
           setSearch={setSearch}
+          perPageOptions={perPageOptions}
           perPage={perPage}
           setPerPage={setPerPage}
           currentPage={currentPage}
@@ -162,6 +176,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
                   merged={data.merged}
                   search={search}
                   setSearch={setSearch}
+                  perPageOptions={perPageOptions}
                   perPage={perPage}
                   setPerPage={setPerPage}
                   currentPage={currentPage}
