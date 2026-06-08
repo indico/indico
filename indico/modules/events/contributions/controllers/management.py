@@ -297,15 +297,15 @@ class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
                 update_contribution(contrib, {'session': new_session})
             assigned_count = len(to_assign)
             if assigned_count and new_session is not None:
-                flash(ngettext('The contribution has been assigned to the session "{session}".',
+                flash(ngettext('One contribution has been assigned to the session "{session}".',
                                '{count} contributions have been assigned to the session "{session}".', assigned_count)
                       .format(count=assigned_count, session=new_session.title), 'success')
             elif assigned_count:
-                flash(ngettext('The contribution has been removed from its session.',
+                flash(ngettext('One contribution has been removed from its session.',
                                '{count} contributions have been removed from their session.', assigned_count)
                       .format(count=assigned_count), 'success')
             if skipped_count:
-                flash(ngettext('The contribution was skipped because it is currently scheduled.',
+                flash(ngettext('One contribution was skipped because it is currently scheduled.',
                                '{count} contributions were skipped because they are currently scheduled.',
                                skipped_count).format(count=skipped_count), 'warning')
             return jsonify_data(**self.list_generator.render_list())
