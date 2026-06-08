@@ -157,6 +157,8 @@ export default function ParticipantTable({
             selection
             compact
             floating
+            selectOnBlur={false}
+            selectOnNavigation={false}
             styleName="participant-list-dropdown"
             options={perPageOptions.map(n => ({
               key: n,
