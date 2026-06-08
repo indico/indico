@@ -21,6 +21,7 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
@@ -202,6 +203,44 @@ class ContributionDurationForm(IndicoForm):
                 error_msg = _('With this duration, the contribution would exceed the current day.')
             if self.contrib.start_dt + field.data > latest_dt:
                 raise ValidationError(error_msg)
+
+
+class _BulkAssignSessionField(QuerySelectField):
+    """Session selector whose default leaves the current session untouched."""
+
+    _keep_value = '__keep'
+    _keep = object()
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('default', self._keep)
+        super().__init__(*args, **kwargs)
+
+    def iter_choices(self):
+        yield (self._keep_value, _('Keep current session'), self.data is self._keep, {})
+        yield from super().iter_choices()
+
+    def process_formdata(self, valuelist):
+        if valuelist and valuelist[0] == self._keep_value:
+            self.data = self._keep
+        else:
+            super().process_formdata(valuelist)
+
+
+class ContributionsBulkAssignSessionForm(IndicoForm):
+    contribution_id = HiddenFieldList()
+    submitted = HiddenField()
+    session = _BulkAssignSessionField(_('Session'), get_label='title', allow_blank=True,
+                                      blank_text=_('No session'))
+
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
+        super().__init__(*args, **kwargs)
+        self.session.query = (Session.query
+                              .with_parent(self.event)
+                              .order_by(db.func.lower(Session.title)))
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class ContributionDefaultDurationForm(IndicoForm):
