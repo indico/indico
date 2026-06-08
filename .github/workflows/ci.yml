@@ -11,11 +11,13 @@ on:
       - master
       - '*.x'
       - a11y
+      - next-gen-ui
   pull_request:
     branches:
       - master
       - '*.x'
       - a11y
+      - next-gen-ui
 
 permissions:
   contents: read
