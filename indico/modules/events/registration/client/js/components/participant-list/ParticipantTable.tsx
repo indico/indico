@@ -152,7 +152,7 @@ export default function ParticipantTable({
       )}
       <section styleName="participant-list-top">
         <div>
-          Rows per page:
+          <Translate>Rows per page:</Translate>
           <Dropdown
             selection
             compact

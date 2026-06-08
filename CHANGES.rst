@@ -36,6 +36,8 @@ Improvements
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
 - Change accordion view to tabs view and add pagination and search in public participant list (:pr:`7472`)
 - Change accordion view to tabs view and add pagination and search in public participant list (:issue:`6424`, :pr:`7472`)
+- Change accordion view to tabs view and add pagination and search in public participant 
+  list (:issue:`6424`, :pr:`7472`)
 
 Bugfixes
 ^^^^^^^^

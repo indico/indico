@@ -293,9 +293,7 @@ class ParticipantListMixin:
 
     def _process(self):
         is_participant = self.is_participant(session.user)
-
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
-
         num_participants = sum(table['num_participants'] for table in tables)
 
         return self.view_class.render_template(
