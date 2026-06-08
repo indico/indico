@@ -17,7 +17,6 @@ import {
   Pagination,
   Dropdown,
   Input,
-  Popup,
 } from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -34,6 +33,7 @@ interface ParticipantTableProps {
   merged?: boolean;
   search: string;
   setSearch: (val: string) => void;
+  perPageOptions: PerPageOptions[];
   perPage: PerPageOptions;
   setPerPage: (val: PerPageOptions) => void;
   currentPage: number;
@@ -45,6 +45,7 @@ export default function ParticipantTable({
   merged = true,
   search,
   setSearch,
+  perPageOptions,
   perPage,
   setPerPage,
   currentPage,
@@ -128,7 +129,6 @@ export default function ParticipantTable({
   }, [table.rows, search, sortColumn, sortDirection]);
 
   const totalPages = perPage === 'all' ? 1 : Math.ceil(processedRows.length / perPage);
-  const perPageOptions = [25, 50, 100, 'all'];
 
   const paginatedRows = useMemo(() => {
     if (perPage === 'all') {
@@ -171,14 +171,6 @@ export default function ParticipantTable({
           />
         </div>
         <div>
-          <Popup
-            content={
-              <Translate>
-                You can search for an exact match by wrapping the query in quotes (e.g. "John Doe")
-              </Translate>
-            }
-            trigger={<Icon name="question circle" styleName="search-hint" />}
-          />
           <Input
             value={search}
             onChange={(e, {value}) => {
