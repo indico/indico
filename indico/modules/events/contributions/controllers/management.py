@@ -314,7 +314,7 @@ class RHContributionsBulkAssignSession(RHManageContributionsActionsBase):
             message = ngettext('One selected contribution is currently scheduled and will be skipped.',
                                '{count} selected contributions are currently scheduled and will be skipped.',
                                skipped_count).format(count=skipped_count)
-        return jsonify_form(form, submit=_('Assign'), disabled_until_change=False, message=message)
+        return jsonify_form(form, submit=_('Assign'), message=message)
 
 
 class RHContributionACL(RHManageContributionBase):

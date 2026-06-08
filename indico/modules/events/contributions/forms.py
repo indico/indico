@@ -205,11 +205,32 @@ class ContributionDurationForm(IndicoForm):
                 raise ValidationError(error_msg)
 
 
+class _BulkAssignSessionField(QuerySelectField):
+    """Session selector whose default leaves the current session untouched."""
+
+    _keep_value = '__keep'
+    _keep = object()
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('default', self._keep)
+        super().__init__(*args, **kwargs)
+
+    def iter_choices(self):
+        yield (self._keep_value, _('Keep current session'), self.data is self._keep, {})
+        yield from super().iter_choices()
+
+    def process_formdata(self, valuelist):
+        if valuelist and valuelist[0] == self._keep_value:
+            self.data = self._keep
+        else:
+            super().process_formdata(valuelist)
+
+
 class ContributionsBulkAssignSessionForm(IndicoForm):
     contribution_id = HiddenFieldList()
     submitted = HiddenField()
-    session = QuerySelectField(_('Session'), get_label='title', allow_blank=True,
-                               blank_text=_('No session'))
+    session = _BulkAssignSessionField(_('Session'), get_label='title', allow_blank=True,
+                                      blank_text=_('No session'))
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
