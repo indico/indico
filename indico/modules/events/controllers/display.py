@@ -6,10 +6,18 @@
 # LICENSE file for more details.
 
 from io import BytesIO
+from pathlib import Path
+from urllib.parse import urlsplit
 
-from flask import jsonify, redirect, request, session
+import qrcode
+from flask import current_app, jsonify, redirect, request, session
+from marshmallow import ValidationError, validate
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.colormasks import SolidFillColorMask
+from qrcode.image.styles.moduledrawers.pil import SquareModuleDrawer
 from webargs import fields
 
+from indico.core.config import config
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_ical
 from indico.modules.events.layout.views import WPPage
@@ -20,7 +28,12 @@ from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
-from indico.web.rh import RHProtected, allow_signed_url
+from indico.web.rh import RH, RHProtected, allow_signed_url
+
+
+def _check_url(target_url):
+    if urlsplit(target_url).hostname != urlsplit(config.BASE_URL).hostname:
+        raise ValidationError('URL for QR code does not belong to this server')
 
 
 @allow_signed_url
@@ -106,3 +119,88 @@ class RHAutoLinkerRules(RHProtected):
 
     def _process(self):
         return jsonify(autolinker_settings.get_all())
+
+
+class QRCodeMixin:
+    QR_BORDER_SIZE = 4
+    QR_TARGET_SIZES = {
+        'small': 270,
+        'medium': 675,
+        'large': 1024,
+        'extra-large': 1920,
+    }
+
+    def _build_qr(self, url, box_size):
+        qr = qrcode.QRCode(
+            version=None,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=box_size,
+            border=self.QR_BORDER_SIZE,
+        )
+        qr.add_data(url)
+        qr.make(fit=True)
+        return qr
+
+    def _calculate_possible_sizes(self, qr):
+        total_squares = qr.modules_count + self.QR_BORDER_SIZE * 2
+        sizes = {}
+
+        for name, target_pixels in self.QR_TARGET_SIZES.items():
+            box_size = max(1, target_pixels // total_squares)
+            actual_pixels = total_squares * box_size
+
+            sizes[name] = {
+                'target_pixels': target_pixels,
+                'actual_pixels': actual_pixels,
+                'box_size': box_size,
+            }
+        return sizes
+
+
+class RHQRCodeMetadata(QRCodeMixin, RH):
+    """Return metadata for the requested QR code."""
+
+    @use_kwargs({
+        'url': fields.String(required=True, validate=_check_url),
+        'size_name': fields.String(load_default='medium', validate=validate.OneOf(QRCodeMixin.QR_TARGET_SIZES)),
+    }, location='query')
+    def _process(self, url, size_name):
+        qr = self._build_qr(url, box_size=10)
+        sizes = self._calculate_possible_sizes(qr)
+        size_data = sizes.get(size_name)
+        box_size = size_data['box_size']
+        return jsonify({
+            'image_source_url': url_for(
+                'events.url_qr_code_image', url=url, box_size=box_size, _external=True
+            ),
+            'download_sizes': sizes,
+        })
+
+
+class RHQRCodeImage(QRCodeMixin, RH):
+    """Return the QR code for an Indico URL."""
+
+    @use_kwargs({
+        'url': fields.String(required=True, validate=_check_url),
+        'box_size': fields.Int(load_default=10, validate=validate.Range(min=1, max=100)),
+    }, location='query')
+    def _process(self, url, box_size):
+        qr = self._build_qr(url, box_size)
+
+        qr_img = qr.make_image(
+            image_factory=StyledPilImage,
+            module_drawer=SquareModuleDrawer(),
+            embeded_image_ratio=0.25,
+            color_mask=SolidFillColorMask(
+                back_color=(255, 255, 255),
+                front_color=(0, 0, 0),
+            ),
+            embedded_image_path=(
+                Path(current_app.root_path) / 'web' / 'static' / 'images' / 'logo_indico_small_white_bg.png'
+            ),
+        )
+
+        output = BytesIO()
+        qr_img.save(output, format='PNG')
+        output.seek(0)
+        return send_file('event-qrcode.png', output, 'image/png')
