@@ -68,6 +68,8 @@ Accessibility
 - Screen reader users can now navigate the dashboard sections as second-level
   headings instead of a flat run of same-level headings (:pr:`7581`, thanks
   :user:`foxbunny`)
+- Screen readers now correctly recognise modal dialogs as modal, keeping
+  navigation within the open dialog (:pr:`7570`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
