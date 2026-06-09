@@ -64,7 +64,7 @@
   margin-bottom: 44px;
 }
 
-.dashboard-box h3 {
+.dashboard-box h2 {
   background: #f7f7f7;
   border-bottom: 1px solid #ddd;
   border-top-left-radius: 0.3em;
@@ -75,7 +75,7 @@
   padding: 10px;
 }
 
-.dashboard-box.suggestions h3 {
+.dashboard-box.suggestions h2 {
   background: #dcebf5;
 }
 
@@ -213,7 +213,10 @@
     max-width: 300px;
     margin-right: 5px;
 
-    h3 {
+    h2 {
+      // Pin the size the name had as an <h3>, so promoting the heading level
+      // does not change its appearance (the default <h2> size is larger).
+      font-size: 1.2em;
       margin-top: 0;
       margin-bottom: 10px;
     }
