@@ -161,7 +161,8 @@ $title-row-line-height: 1.2rem;
 }
 
 @container (width < 250px) {
-  .children-wrapper {
+  .children-wrapper,
+  .poster-count {
     display: none;
   }
 }
