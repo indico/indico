@@ -196,8 +196,11 @@ class RHAddSurveySection(RHManageSurveyBase):
     }, location='query', rh_context=('survey',))
     def _process(self, section_to_clone=None):
         form = SectionForm()
+        disabled_until_change = True
         if section_to_clone:
             form = SectionForm(obj=FormDefaults(section_to_clone))
+            if not section_to_clone.display_as_section:
+                disabled_until_change = False
         if form.validate_on_submit():
             section = add_survey_section(self.survey, form.data)
             if section_to_clone:
@@ -208,7 +211,8 @@ class RHAddSurveySection(RHManageSurveyBase):
                 message = _('Standalone section added')
             flash(message, 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('forms/form_common_fields_first.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form,
+                                disabled_until_change=disabled_until_change)
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
