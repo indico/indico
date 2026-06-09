@@ -123,7 +123,6 @@ class RHAutoLinkerRules(RHProtected):
 
 class QRCodeMixin:
     border = 4
-    error_correction = qrcode.constants.ERROR_CORRECT_H
     qr_target_sizes = {
         'small': 270,
         'medium': 675,
@@ -134,7 +133,7 @@ class QRCodeMixin:
     def _build_qr(self, url, box_size):
         qr = qrcode.QRCode(
             version=None,
-            error_correction=self.error_correction,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=box_size,
             border=self.border,
         )
@@ -159,7 +158,7 @@ class QRCodeMixin:
 
 
 class RHQRCodeMetadata(QRCodeMixin, RH):
-    """Return QR Code for URL, size (small, medium, large, extra large)and its metadata."""
+    """Return metadata for the requested QR code."""
 
     @use_kwargs({
         'url': fields.String(required=True, validate=_check_url),
@@ -174,15 +173,12 @@ class RHQRCodeMetadata(QRCodeMixin, RH):
             'image_source_url': url_for(
                 'events.url_qr_code_image', url=url, box_size=box_size, _external=True
             ),
-            'qr_displayed_url': url,
-            'extension': 'png',
             'download_sizes': sizes,
-            'dimensions': {'width': size_data['actual_pixels'], 'height': size_data['actual_pixels']},
         })
 
 
 class RHQRCodeImage(QRCodeMixin, RH):
-    """Return QRCode image for URL, box_size."""
+    """Return the QR code for an Indico URL."""
 
     @use_kwargs({
         'url': fields.String(required=True, validate=_check_url),
@@ -199,7 +195,7 @@ class RHQRCodeImage(QRCodeMixin, RH):
                 back_color=(255, 255, 255),
                 front_color=(0, 0, 0),
             ),
-            embeded_image_path=(
+            embedded_image_path=(
                 Path(current_app.root_path) / 'web' / 'static' / 'images' / 'logo_indico_small_white_bg.png'
             ),
         )
