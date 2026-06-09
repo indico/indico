@@ -96,6 +96,14 @@
   border-left: 5px solid transparent;
   container-type: size;
   border-radius: 4px;
+
+  .poster-count {
+    margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 10px;
+    line-height: 1.2rem;
+  }
 }
 
 .mv-buttons-wrapper {
@@ -162,7 +170,8 @@
 }
 
 @container (height <= 50px) {
-  .title-wrapper {
+  .title-wrapper,
+  .poster-count {
     padding-block: 0;
     align-self: center;
   }
