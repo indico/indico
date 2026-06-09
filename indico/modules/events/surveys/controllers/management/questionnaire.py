@@ -297,7 +297,8 @@ class RHAddSurveyQuestion(RHManageSurveySectionBase):
 
         if question_to_clone:
             form = question_to_clone.field.create_config_form(
-                    obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
+                obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data())
+            )
 
         if form.validate_on_submit():
             question = add_survey_question(self.section, field_cls, form.data)
