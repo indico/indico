@@ -36,7 +36,7 @@ import {
   Session,
   ReduxState,
 } from './types';
-import {getEntryURLByObjId} from './utils';
+import {flattenEntries, getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -291,7 +291,7 @@ export function changeEntryLayout(
   sessionBlockId?: number
 ) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
-    const {staticData} = getState();
+    const {staticData, entries: stateEntries} = getState();
     const eventId = staticData.eventId;
 
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
@@ -300,6 +300,20 @@ export function changeEntryLayout(
       start_dt: entry.startDt.format(),
       session_block_id: sessionBlockId,
     };
+
+    const previousEntries = Object.values(
+      stateEntries.changes[stateEntries.currentChangeIdx].entries
+    ).flat();
+    const flattenedEntries = flattenEntries(previousEntries);
+    const entryBeforeChanges = flattenedEntries.find(e => e.id === entry.id);
+    if (
+      entryBeforeChanges &&
+      entryBeforeChanges.startDt.isSame(entry.startDt) &&
+      entryBeforeChanges.sessionId === entry.sessionId
+    ) {
+      // No changes were actually made, don't update state or backend
+      return;
+    }
 
     return dispatch(
       synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
@@ -332,6 +346,11 @@ export function resizeEntry(entry: Entry, duration: number, date: string) {
     const eventId = staticData.eventId;
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
     const entryData = {duration: duration * 60};
+
+    if (entry.duration === duration) {
+      // No changes were actually made, don't update state or backend
+      return;
+    }
 
     const action = synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
       type: RESIZE_ENTRY,
