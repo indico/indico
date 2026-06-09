@@ -122,8 +122,8 @@ class RHAutoLinkerRules(RHProtected):
 
 
 class QRCodeMixin:
-    border = 4
-    qr_target_sizes = {
+    QR_BORDER_SIZE = 4
+    QR_TARGET_SIZES = {
         'small': 270,
         'medium': 675,
         'large': 1024,
@@ -135,17 +135,17 @@ class QRCodeMixin:
             version=None,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=box_size,
-            border=self.border,
+            border=self.QR_BORDER_SIZE,
         )
         qr.add_data(url)
         qr.make(fit=True)
         return qr
 
     def _calculate_possible_sizes(self, qr):
-        total_squares = qr.modules_count + self.border * 2
+        total_squares = qr.modules_count + self.QR_BORDER_SIZE * 2
         sizes = {}
 
-        for name, target_pixels in self.qr_target_sizes.items():
+        for name, target_pixels in self.QR_TARGET_SIZES.items():
             box_size = max(1, target_pixels // total_squares)
             actual_pixels = total_squares * box_size
 
@@ -162,7 +162,7 @@ class RHQRCodeMetadata(QRCodeMixin, RH):
 
     @use_kwargs({
         'url': fields.String(required=True, validate=_check_url),
-        'size_name': fields.String(load_default='medium', validate=validate.OneOf(QRCodeMixin.qr_target_sizes)),
+        'size_name': fields.String(load_default='medium', validate=validate.OneOf(QRCodeMixin.QR_TARGET_SIZES)),
     }, location='query')
     def _process(self, url, size_name):
         qr = self._build_qr(url, box_size=10)
