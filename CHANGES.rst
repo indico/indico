@@ -24,7 +24,7 @@ Improvements
 - Allow users to mark contributions as favorites (:issue:`3524`, :pr:`7256`)
 - Allow choosing whether to clone registration tags (:pr:`7506`)
 - Add placeholders for contribution link and board number for emailing contributions
-  (:issue:`3602`, :pr:`7525`, thanks :user:`duartegalvao`)
+  (:pr:`7525`, thanks :user:`duartegalvao`)
 - Add a weekday option to the contribution schedule email placeholder (:pr:`7526`)
 - Allow managers to override accommodation date range validation when editing
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
@@ -32,6 +32,7 @@ Improvements
   the user search dialog (:pr:`7538`)
 - Allow changing/removing the registration fee of pending registrations (:pr:`7572`)
 - Add QR code generator to event share widget (:issue:`6796`, :pr:`7504`)
+- Add contribution link placeholder for emailing abstract roles (:issue:`3602`, :pr:`7569`)
 
 Bugfixes
 ^^^^^^^^
