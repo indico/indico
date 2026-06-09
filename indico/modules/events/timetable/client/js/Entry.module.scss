@@ -7,6 +7,9 @@
 
 @use 'base/palette' as *;
 
+$title-row-padding: 10px;
+$title-row-line-height: 1.2rem;
+
 .entry {
   color: white;
   border-radius: 4px;
@@ -45,13 +48,13 @@
 
 .title-wrapper {
   overflow: hidden;
-  line-height: 1.2rem;
+  line-height: $title-row-line-height;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  padding: 10px;
+  padding: $title-row-padding;
   max-height: 100%;
 
   .title-overflow-wrapper {
@@ -101,8 +104,8 @@
     margin-left: auto;
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 10px;
-    line-height: 1.2rem;
+    padding: $title-row-padding;
+    line-height: $title-row-line-height;
   }
 }
 
@@ -179,6 +182,6 @@
 
 @container (height <= 34px) {
   .title-wrapper {
-    max-height: 1.2rem;
+    max-height: $title-row-line-height;
   }
 }
