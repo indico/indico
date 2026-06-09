@@ -63,6 +63,9 @@ Accessibility
   :user:`foxbunny`)
 - Screen reader users can now navigate to the footer link list as a named
   navigation landmark (:pr:`7559`, thanks :user:`foxbunny`)
+- Screen reader users can now navigate the dashboard sections as second-level
+  headings instead of a flat run of same-level headings (:pr:`7581`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

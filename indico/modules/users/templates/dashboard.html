@@ -40,7 +40,7 @@
                         <img src="{{ user.avatar_url }}" alt="" class="ui large circular label">
                     </div>
                     <div class="your-details-wrapper">
-                        <h3>{{ user.full_name }}</h3>
+                        <h2>{{ user.full_name }}</h2>
                         <div class="your-labels">
                             {% if config.DEBUG %}
                                 <div class="ui small label">
@@ -92,7 +92,7 @@
                 </div>
                 {% if unlisted_events %}
                     <div class="dashboard-box">
-                        <h3>{% trans %}Your unlisted events{% endtrans %}</h3>
+                        <h2>{% trans %}Your unlisted events{% endtrans %}</h2>
                         <ul>
                             {% for event in unlisted_events %}
                                 <li class="flexrow">
@@ -115,9 +115,9 @@
                     </div>
                 {% endif %}
                 <div class="dashboard-box">
-                    <h3>
+                    <h2>
                         {% trans %}Your events at hand{% endtrans %}
-                    </h3>
+                    </h2>
                     <ul>
                         {% for event, roles in linked_events %}
                             <li id="event-{{ event.id }}" class="flexrow">
@@ -154,7 +154,7 @@
                 </div>
                 {% if suggested_categories %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
-                        <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
+                        <h2>{% trans %}You might be interested in the following categories...{% endtrans %}</h2>
                         <ul>
                             {% for category in suggested_categories %}
                                 {{ suggested_category(category.categ, category.path) }}
@@ -165,7 +165,7 @@
             </div>
             <div class="dashboard-col">
                 <div id="yourCategories" class="dashboard-box">
-                    <h3>{% trans %}Your categories{% endtrans %}</h3>
+                    <h2>{% trans %}Your categories{% endtrans %}</h2>
                     <ul>
                         {% if not categories %}
                             <li class="no-event">
@@ -181,7 +181,7 @@
                     </ul>
                 </div>
                 <div class="dashboard-box">
-                    <h3>{% trans %}Happening in your categories{% endtrans %}</h3>
+                    <h2>{% trans %}Happening in your categories{% endtrans %}</h2>
                     <ul>
                         {% if not categories %}
                             <li class="no-event">
