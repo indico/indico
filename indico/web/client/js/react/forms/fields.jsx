@@ -434,6 +434,7 @@ function DateTimePickerComponent({
   onFocus,
   minStartDt,
   maxEndDt,
+  required,
 }) {
   const [dateValue, timeValue] = value.split('T');
   const dt = moment(value);
@@ -454,6 +455,7 @@ function DateTimePickerComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           disabled={disabled}
+          required={required}
           min={minStartDt.format('YYYY-MM-DD')}
           max={maxEndDt.format('YYYY-MM-DD')}
         />
@@ -481,11 +483,13 @@ DateTimePickerComponent.propTypes = {
   onFocus: PropTypes.func.isRequired,
   minStartDt: PropTypes.object,
   maxEndDt: PropTypes.object,
+  required: PropTypes.bool,
 };
 
 DateTimePickerComponent.defaultProps = {
   minStartDt: null,
   maxEndDt: null,
+  required: false,
 };
 
 /**
@@ -850,13 +854,17 @@ FinalDuration.defaultProps = {
   defaultValue: 1200, // 20 minutes
 };
 
-export function FinalDateTimePicker({name, label, defaultValue, ...rest}) {
+export function FinalDateTimePicker({name, label, defaultValue, validate, required, ...rest}) {
+  // Validate the whole datetime via `validators.datetime` rather than the built-in
+  // `required`, which can't reject half-empty values.
   return (
     <FinalField
       name={name}
       component={DateTimePickerComponent}
       label={label}
       defaultValue={defaultValue}
+      required={required ? 'no-validator' : false}
+      validate={validate}
       {...rest}
     />
   );
@@ -866,11 +874,15 @@ FinalDateTimePicker.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   defaultValue: PropTypes.string,
+  validate: PropTypes.func,
+  required: PropTypes.bool,
 };
 
 FinalDateTimePicker.defaultProps = {
   label: null,
   defaultValue: moment().startOf('day').minutes(20).toISOString(),
+  validate: validators.datetime(),
+  required: false,
 };
 
 /**
