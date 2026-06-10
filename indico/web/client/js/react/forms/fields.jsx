@@ -854,17 +854,29 @@ FinalDuration.defaultProps = {
   defaultValue: 1200, // 20 minutes
 };
 
-export function FinalDateTimePicker({name, label, defaultValue, validate, required, ...rest}) {
-  // Validate the whole datetime via `validators.datetime` rather than the built-in
-  // `required`, which can't reject half-empty values.
+export function FinalDateTimePicker({
+  name,
+  label,
+  defaultValue,
+  validate,
+  required,
+  minStartDt,
+  maxEndDt,
+  ...rest
+}) {
+  const dtValidator = validators.datetime(minStartDt, maxEndDt);
+  const combinedValidate = validate ? validators.chain(dtValidator, validate) : dtValidator;
+  const requiredProp = required ? 'no-validator' : false;
   return (
     <FinalField
       name={name}
       component={DateTimePickerComponent}
       label={label}
       defaultValue={defaultValue}
-      required={required ? 'no-validator' : false}
-      validate={validate}
+      required={requiredProp}
+      validate={combinedValidate}
+      minStartDt={minStartDt}
+      maxEndDt={maxEndDt}
       {...rest}
     />
   );
@@ -876,13 +888,17 @@ FinalDateTimePicker.propTypes = {
   defaultValue: PropTypes.string,
   validate: PropTypes.func,
   required: PropTypes.bool,
+  minStartDt: PropTypes.object,
+  maxEndDt: PropTypes.object,
 };
 
 FinalDateTimePicker.defaultProps = {
   label: null,
   defaultValue: moment().startOf('day').minutes(20).toISOString(),
-  validate: validators.datetime(),
+  validate: null,
   required: false,
+  minStartDt: null,
+  maxEndDt: null,
 };
 
 /**
