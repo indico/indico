@@ -124,13 +124,22 @@ function dates() {
   };
 }
 
-function datetime() {
-  // the value of a datetime field is a combined `<date>T<time>` string, so a plain
-  // `required` check passes even when the date is cleared (e.g. `T10:20:00`). parse the
-  // whole thing instead so a missing date or time is correctly rejected.
+/**
+ * Validates that a datetime field contains a valid ISO 8601 value, optionally within bounds.
+ * @param {moment.Moment} minStartDt - The earliest allowed date and time.
+ * @param {moment.Moment} maxEndDt - The latest allowed date and time.
+ */
+function datetime(minStartDt = null, maxEndDt = null) {
   return value => {
-    if (!moment(value, moment.ISO_8601, true).isValid()) {
+    const dt = moment(value, moment.ISO_8601, true);
+    if (!dt.isValid()) {
       return Translate.string('Please enter a valid date and time.');
+    }
+    if (minStartDt && dt.isBefore(minStartDt)) {
+      return Translate.string('Date and time must be after start date');
+    }
+    if (maxEndDt && dt.isAfter(maxEndDt)) {
+      return Translate.string('Date and time must be before end date');
     }
   };
 }
