@@ -136,10 +136,14 @@ function datetime(minStartDt = null, maxEndDt = null) {
       return Translate.string('Please enter a valid date and time.');
     }
     if (minStartDt && dt.isBefore(minStartDt)) {
-      return Translate.string('Date and time must be after start date');
+      return Translate.string('The entered date and time cannot be earlier than {min}.', {
+        min: minStartDt.format('L LT'),
+      });
     }
     if (maxEndDt && dt.isAfter(maxEndDt)) {
-      return Translate.string('Date and time must be before end date');
+      return Translate.string('The entered date and time cannot be later than {max}.', {
+        max: maxEndDt.format('L LT'),
+      });
     }
   };
 }
