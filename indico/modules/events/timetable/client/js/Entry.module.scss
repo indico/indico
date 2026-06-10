@@ -7,6 +7,9 @@
 
 @use 'base/palette' as *;
 
+$title-row-padding: 10px;
+$title-row-line-height: 1.2rem;
+
 .entry {
   color: white;
   border-radius: 4px;
@@ -45,13 +48,13 @@
 
 .title-wrapper {
   overflow: hidden;
-  line-height: 1.2rem;
+  line-height: $title-row-line-height;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  padding: 10px;
+  padding: $title-row-padding;
   max-height: 100%;
 
   .title-overflow-wrapper {
@@ -96,6 +99,14 @@
   border-left: 5px solid transparent;
   container-type: size;
   border-radius: 4px;
+
+  .poster-count {
+    margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: $title-row-padding;
+    line-height: $title-row-line-height;
+  }
 }
 
 .mv-buttons-wrapper {
@@ -150,7 +161,8 @@
 }
 
 @container (width < 250px) {
-  .children-wrapper {
+  .children-wrapper,
+  .poster-count {
     display: none;
   }
 }
@@ -162,7 +174,8 @@
 }
 
 @container (height <= 50px) {
-  .title-wrapper {
+  .title-wrapper,
+  .poster-count {
     padding-block: 0;
     align-self: center;
   }
@@ -170,6 +183,6 @@
 
 @container (height <= 34px) {
   .title-wrapper {
-    max-height: 1.2rem;
+    max-height: $title-row-line-height;
   }
 }
