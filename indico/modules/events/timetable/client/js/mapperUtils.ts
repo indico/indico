@@ -91,7 +91,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
   {
     from: 'start_dt',
     to: 'startDt',
-    fromTransform: v => moment(v),
+    fromTransform: v => moment.tz(v.dt, v.tzinfo),
     toTransform: v => v.toISOString(),
   },
   {
