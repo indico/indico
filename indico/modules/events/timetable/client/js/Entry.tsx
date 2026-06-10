@@ -10,6 +10,8 @@ import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
+import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+
 import * as actions from './actions';
 import {useDraggable, useDroppable} from './dnd';
 import {EntryMoveButtons} from './EntryMoveButtons';
@@ -298,6 +300,7 @@ export default function Entry({
           type={type}
           {...(isPosterBlock ? {icon: 'flag outline'} : {})}
         />
+        {isPosterBlock && <PosterCount count={children.length} />}
         {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
             ref={setDroppableNodeRef}
@@ -388,5 +391,20 @@ export function EntryTitle({
       </div>
       <span styleName="time">{timeRange}</span>
     </div>
+  );
+}
+
+function PosterCount({count}: {count: number}) {
+  return (
+    <span styleName="poster-count">
+      <PluralTranslate count={count}>
+        <Singular>
+          <Param name="count" value={count} /> poster
+        </Singular>
+        <Plural>
+          <Param name="count" value={count} /> posters
+        </Plural>
+      </PluralTranslate>
+    </span>
   );
 }
