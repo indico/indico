@@ -1,0 +1,16 @@
+@mixin typography($size, $weight: regular) {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-#{$size});
+  line-height: var(--line-height-#{$size});
+  font-weight: var(--font-weight-#{$weight});
+
+  @if $size == display-2xl or $size == display-xl or $size == display-lg or $size == display-md {
+    letter-spacing: var(--letter-spacing-#{$size});
+  }
+}
+
+@mixin container($size: xl) {
+  width: 100%;
+  max-width: var(--container-#{$size});
+  margin-inline: auto;
+}
