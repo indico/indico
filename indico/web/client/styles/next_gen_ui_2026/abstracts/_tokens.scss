@@ -1,0 +1,55 @@
+:root {
+  // Spacing system
+  // Base: 16px
+
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem; // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem; // 24px
+  --space-8: 2rem; // 32px
+  --space-10: 2.5rem; // 40px
+  --space-12: 3rem; // 48px
+  --space-16: 4rem; // 64px
+  --space-20: 5rem; // 80px
+  --space-24: 6rem; // 96px
+  --space-32: 8rem; // 128px
+  --space-40: 10rem; // 160px
+  --space-48: 12rem; // 192px
+  --space-56: 14rem; // 224px
+  --space-64: 16rem; // 256px
+
+  // Container widths
+  // Based on 16px root font size
+
+  --container-sm: 40rem; // 640px
+  --container-md: 48rem; // 768px
+  --container-lg: 64rem; // 1024px
+  --container-xl: 80rem; // 1280px
+
+  // Radius
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-pill: 999px;
+
+  // Shadows
+  --shadow-xs: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(10, 13, 18, 0.1);
+  --shadow-md: 0 4px 8px -2px rgba(10, 13, 18, 0.1);
+  --shadow-lg: 0 12px 16px -4px rgba(10, 13, 18, 0.08);
+  --shadow-xl: 0 20px 24px -4px rgba(10, 13, 18, 0.08);
+  --shadow-2xl: 0 24px 48px -12px rgba(10, 13, 18, 0.18);
+  --shadow-3xl: 0 32px 64px -12px rgba(10, 13, 18, 0.14);
+
+  // Blurs
+    --blur-sm: blur(8px);
+    --blur-md: blur(16px);
+    --blur-lg: blur(24px);
+    --blur-xl: blur(40px);
+
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-base: 220ms ease;
+}
