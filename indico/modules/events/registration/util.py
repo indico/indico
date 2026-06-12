@@ -224,13 +224,19 @@ def get_initial_form_values(regform, *, management=False, **kwargs):
 
 
 @make_interceptable
-def get_user_data(regform, user, invitation=None):
+def get_user_data(regform: RegistrationForm, user, invitation=None):
     if user is None:
         user_data = {}
     else:
+        affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
+        # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
+        modern_affiliation_field = affiliation_field.input_type == 'affiliation'
+        skip = {'title', 'picture'}
+        if modern_affiliation_field:
+            skip.add('affiliation')
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
-                     if t.name not in {'title', 'affiliation', 'picture'} and getattr(user, t.name, None)}
-        if user.affiliation:
+                     if t.name not in skip and getattr(user, t.name, None)}
+        if modern_affiliation_field and user.affiliation:
             user_data['affiliation'] = {'id': user.affiliation_id, 'text': user.affiliation or ''}
         if (
             (country_field := get_country_field(regform)) and
