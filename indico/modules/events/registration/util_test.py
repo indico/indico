@@ -23,7 +23,8 @@ from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
+from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
+                                                             RegistrationFormSection)
 from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_regforms_registrations, get_registered_event_persons,
@@ -31,6 +32,7 @@ from indico.modules.events.registration.util import (create_registration, genera
                                                      import_invitations_from_user_records,
                                                      import_registrations_from_csv, import_user_records_from_csv,
                                                      modify_registration, process_registration_picture)
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
@@ -695,15 +697,40 @@ def test_modify_registration_update_consent(dummy_reg):
     assert dummy_reg.consent_to_publish == RegistrationVisibility.all
 
 
-@pytest.mark.usefixtures('request_context')
-def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
+@pytest.mark.usefixtures('request_context', 'dummy_event')
+@pytest.mark.parametrize('legacy_affiliation_field', (False, True))
+@pytest.mark.parametrize('user_affiliation_predefined', (False, True))
+def test_get_user_data(db, monkeypatch, dummy_user, dummy_regform, legacy_affiliation_field,
+                       user_affiliation_predefined):
+    if legacy_affiliation_field:
+        affiliation_field = dummy_regform.get_personal_data_field(PersonalDataType.affiliation)
+        affiliation_field.input_type = 'text'
+    if user_affiliation_predefined:
+        dummy_user.affiliation_link = Affiliation(name='CERN')
+        dummy_user.affiliation = dummy_user.affiliation_link.name
+        db.session.flush()
+        expected_user_affiliation = (
+            dummy_user.affiliation_link.name
+            if legacy_affiliation_field
+            else {'id': dummy_user.affiliation_link.id, 'text': dummy_user.affiliation_link.name}
+        )
+    else:
+        dummy_user.affiliation = 'CERN'
+        expected_user_affiliation = (
+            dummy_user.affiliation if legacy_affiliation_field else {'id': None, 'text': dummy_user.affiliation}
+        )
+
     monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
     session.set_session_user(dummy_user)
 
     assert get_user_data(dummy_regform, None) == {}
 
-    expected = {'email': '1337@example.test', 'first_name': 'Guinea',
-                'last_name': 'Pig'}
+    expected = {
+        'email': '1337@example.test',
+        'first_name': 'Guinea',
+        'last_name': 'Pig',
+        'affiliation': expected_user_affiliation,
+    }
 
     user_data = get_user_data(dummy_regform, dummy_user)
     assert user_data == expected
@@ -724,15 +751,16 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     dummy_regform.invitations.append(invitation)
 
     dummy_user.title = None
+    expected_invitation_affiliation = 'ACME Inc.' if legacy_affiliation_field else {'id': None, 'text': 'ACME Inc.'}
     user_data = get_user_data(dummy_regform, dummy_user, invitation)
     assert user_data == {'email': 'awang@example.test', 'first_name': 'Amy', 'last_name': 'Wang',
                          'phone': '+1 22 50 14', 'address': 'Geneva',
-                         'affiliation': {'id': None, 'text': 'ACME Inc.'}}
+                         'affiliation': expected_invitation_affiliation}
 
     # Check that data is taken from the invitation when user is missing
     user_data = get_user_data(dummy_regform, None, invitation)
     assert user_data == {'email': 'awang@example.test', 'first_name': 'Amy', 'last_name': 'Wang',
-                         'affiliation': {'id': None, 'text': 'ACME Inc.'}}
+                         'affiliation': expected_invitation_affiliation}
 
     # Check that data from disabled/deleted fields is not used
     title_field = next(item for item in dummy_regform.active_fields
@@ -751,7 +779,7 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     assert 'title' not in user_data
     assert 'phone' not in user_data
     assert user_data == {'email': '1337@example.test', 'first_name': 'Guinea',
-                         'last_name': 'Pig', 'address': 'Geneva'}
+                         'last_name': 'Pig', 'address': 'Geneva', 'affiliation': expected_user_affiliation}
 
     for item in dummy_regform.active_fields:
         item.is_enabled = False

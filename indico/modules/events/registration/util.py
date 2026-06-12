@@ -225,12 +225,12 @@ def get_initial_form_values(regform, *, management=False, **kwargs):
 
 @make_interceptable
 def get_user_data(regform: RegistrationForm, user, invitation=None):
+    affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
+    # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
+    modern_affiliation_field = affiliation_field.input_type == 'affiliation'
     if user is None:
         user_data = {}
     else:
-        affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
-        # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
-        modern_affiliation_field = affiliation_field.input_type == 'affiliation'
         skip = {'title', 'picture'}
         if modern_affiliation_field:
             skip.add('affiliation')
@@ -248,7 +248,9 @@ def get_user_data(regform: RegistrationForm, user, invitation=None):
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:
-            user_data['affiliation'] = {'id': None, 'text': invitation.affiliation}
+            user_data['affiliation'] = (
+                {'id': None, 'text': invitation.affiliation} if modern_affiliation_field else invitation.affiliation
+            )
     title = getattr(user, 'title', None)
     if title_uuid := get_title_uuid(regform, title):
         user_data['title'] = title_uuid
