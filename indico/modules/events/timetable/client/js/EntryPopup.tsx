@@ -16,7 +16,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import './Entry.module.scss';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -34,6 +34,7 @@ import {
   PersonLinkRole,
   isChildEntry,
   SessionBlockId,
+  AttachmentUpdatedEventDetail,
 } from './types';
 import {getIconByEntryType, getEntryColors} from './utils';
 
@@ -58,7 +59,7 @@ function EntryPopupContent({
   onClose: () => void;
 }) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
-  const {objId, type, title, attachments, duration, startDt, sessionId} = entry;
+  const {objId, type, title, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
@@ -72,6 +73,16 @@ function EntryPopupContent({
   const colors = getEntryColors(entry, session);
   const {openModal} = useModal();
 
+  const entryLocatorKey = entry.type === EntryType.SessionBlock ? 'session_id' : 'contrib_id';
+  const entryLocatorValue = entry.type === EntryType.SessionBlock ? sessionId : objId;
+  const entryLocator = {
+    event_id: eventId,
+    [entryLocatorKey]: entryLocatorValue,
+  };
+  const entryDetails: AttachmentUpdatedEventDetail = {
+    type,
+    id: objId,
+  };
   const _getOrderedLocationArray = () => {
     const {address, venueName, roomName} = entry.locationData;
     return Object.values([address, venueName, roomName]).filter(Boolean);
@@ -262,28 +273,28 @@ function EntryPopupContent({
             </List>
           </List.Item>
         )}
-        {attachments?.length > 0 && (
+        {entry.type !== EntryType.Break && (
           <List.Item title={Translate.string('Attachments')}>
             <Icon name="copy outline" />
             <List styleName="inline">
-              {attachments.map(a => {
-                const iconName = {
-                  attachment: 'file',
-                  folder: 'folder',
-                }[a.type];
-
-                return (
-                  <List.Item key={a.id}>
-                    <Label
-                      style={{fontWeight: 'normal'}}
-                      basic
-                      key={a.id}
-                      icon={iconName}
-                      content={a.title}
-                    />
-                  </List.Item>
-                );
-              })}
+              <Button
+                as="a"
+                basic
+                size="mini"
+                icon="edit"
+                content={PluralTranslate.string(
+                  '{attachmentCount} material',
+                  '{attachmentCount} materials',
+                  entry.attachmentCount,
+                  {
+                    attachmentCount: entry.attachmentCount,
+                  }
+                )}
+                data-attachment-editor
+                data-details={JSON.stringify(entryDetails)}
+                data-locator={JSON.stringify(entryLocator)}
+                onClick={onClose}
+              />
             </List>
           </List.Item>
         )}

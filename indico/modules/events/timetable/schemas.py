@@ -24,8 +24,11 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'location_parent',
-                  'child_location_parent', 'session_id', 'session_title')
+                  'child_location_parent', 'session_id', 'session_title', 'attachment_count')
         rh_context = ('event',)
+
+    def _get_attachment_count(self, session_block):
+        return len(session_block.session.attached_items.get('files', []))
 
     start_dt = EventTimezoneDateTimeField()
     location_data = fields.Nested(LocationDataSchema)
@@ -34,6 +37,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     conveners = fields.List(fields.Nested(_SessionBlockPersonLinkSchema(unknown=EXCLUDE)), attribute='person_links')
     duration = fields.TimeDelta(required=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
+    attachment_count = fields.Method('_get_attachment_count', dump_only=True)
 
 
 def _get_break_session_id(entry):
@@ -65,8 +69,11 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data', 'location_parent',
                   'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block',
-                  'session_block_id', 'session_id', 'parent_id')
+                  'session_block_id', 'session_id', 'parent_id', 'attachment_count')
         rh_context = ('event', {'object': 'contrib'})
+
+    def _get_attachment_count(self, contribution):
+        return len(contribution.attached_items.get('files', []))
 
     start_dt = EventTimezoneDateTimeField()
     _description = fields.String(attribute='description')
@@ -82,3 +89,4 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     parent_id = fields.Integer(allow_none=True, load_only=True)
     session_block_id = fields.Integer(allow_none=True)
+    attachment_count = fields.Method('_get_attachment_count', dump_only=True)

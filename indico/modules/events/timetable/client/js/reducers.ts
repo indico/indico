@@ -92,6 +92,68 @@ export default {
           ],
         };
       }
+      case actions.SET_ENTRY_ATTACHMENTS: {
+        const {id, attachmentCount} = action;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const flatEntries = Object.values(newEntries)
+          .flat()
+          .map(e => [e, ...(e.type === EntryType.SessionBlock ? e.children : [])])
+          .flat();
+        const entry = flatEntries.find(e => e.id === id);
+        if (!entry || entry.type === EntryType.Break) {
+          return state;
+        }
+
+        const dateKey = getDateKey(entry.startDt);
+        const dayEntries = newEntries[dateKey];
+        if (isChildEntry(entry)) {
+          const parentEntry = dayEntries.find(dayEntry => dayEntry.id === entry.sessionBlockId);
+          if (parentEntry === undefined || parentEntry.type !== EntryType.SessionBlock) {
+            return state;
+          }
+          newEntries[dateKey] = [
+            ...dayEntries.filter(dayEntry => dayEntry.id !== parentEntry.id),
+            {
+              ...parentEntry,
+              children: [
+                ...parentEntry.children.filter(childEntry => childEntry.id !== id),
+                {
+                  ...entry,
+                  attachmentCount,
+                },
+              ],
+            },
+          ];
+        } else if (entry.type === EntryType.Contribution) {
+          newEntries[dateKey] = [
+            ...dayEntries.filter(dayEntry => dayEntry.id !== id),
+            {...entry, attachmentCount},
+          ];
+        } else {
+          // attachments are linked to sessions, not session blocks, so we must update every
+          // session block that matches this sessionId
+          for (const key of Object.keys(newEntries)) {
+            newEntries[key] = newEntries[key].map(dayEntry =>
+              dayEntry.type === EntryType.SessionBlock && dayEntry.sessionId === entry.sessionId
+                ? {...dayEntry, attachmentCount}
+                : dayEntry
+            );
+          }
+        }
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'update',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
       case actions.UPDATE_ENTRY: {
         const {
           entry,
