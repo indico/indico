@@ -130,17 +130,20 @@
                                     </a>
                                     {{ event.get_label_markup('mini') }}
                                 </span>
-                                {% set role_titles = {
-                                    'management': _('You have management rights') if roles.management else _('You do not have management rights'),
-                                    'reviewing': _('You are a reviewer') if roles.reviewing else _('You are not a reviewer'),
-                                    'attendance': _('You are an attendee') if roles.attendance else _('You are not an attendee'),
-                                    'favorited': _('You have favorited this event') if roles.favorited else _('You have not favorited this event')
-                                } %}
+                                {% set role_legend = [
+                                    ('management', 'icon-medal', _('You have management rights'), _('You do not have management rights')),
+                                    ('reviewing', 'icon-user-reading', _('You are a reviewer'), _('You are not a reviewer')),
+                                    ('attendance', 'icon-ticket', _('You are an attendee'), _('You are not an attendee')),
+                                    ('favorited', 'icon-star', _('You have favorited this event'), _('You have not favorited this event'))
+                                ] %}
                                 <span class="item-legend">
-                                    <span title="{{ role_titles.management }}" class="icon-medal {{ 'active' if roles.management }}"></span>
-                                    <span title="{{ role_titles.reviewing }}" class="icon-user-reading {{ 'active' if roles.reviewing }}"></span>
-                                    <span title="{{ role_titles.attendance }}" class="icon-ticket {{ 'active' if roles.attendance }}"></span>
-                                    <span title="{{ role_titles.favorited }}" class="icon-star {{ 'active' if roles.favorited }}"></span>
+                                    {% for key, icon, active_label, inactive_label in role_legend %}
+                                        <ind-with-tooltip>
+                                            <span class="{{ icon }} {{ 'active' if roles[key] }}">
+                                                <span data-tip-content>{{ active_label if roles[key] else inactive_label }}</span>
+                                            </span>
+                                        </ind-with-tooltip>
+                                    {% endfor %}
                                 </span>
                             </li>
                         {% else %}
