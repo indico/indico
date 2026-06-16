@@ -166,31 +166,16 @@ export function DayTimetable({
     if (fromSession?.title && toSession?.title) {
       message = (
         <Translate>
-          <Param name="title" wrapper={<strong />}>
-            {title}
-          </Param>{' '}
-          was moved from session{' '}
-          <Param name="fromSession" wrapper={<strong />}>
-            {fromSession.title}
-          </Param>{' '}
-          to session{' '}
-          <Param name="toSession" wrapper={<strong />}>
-            {toSession.title}
-          </Param>
-          .
+          <Param name="title" value={title} wrapper={<strong />} /> was moved from session{' '}
+          <Param name="fromSession" value={fromSession.title} wrapper={<strong />} /> to session{' '}
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />.
         </Translate>
       );
     } else if (toSession?.title) {
       message = (
         <Translate>
-          <Param name="title" wrapper={<strong />}>
-            {title}
-          </Param>{' '}
-          is now part of session{' '}
-          <Param name="toSession" wrapper={<strong />}>
-            {toSession.title}
-          </Param>
-          .
+          <Param name="title" value={title} wrapper={<strong />} /> is now part of session{' '}
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />.
         </Translate>
       );
     } else {

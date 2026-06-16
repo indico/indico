@@ -265,18 +265,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
             type: 'info',
             message: (
               <Translate>
-                <Param name="title" wrapper={<strong />}>
-                  {entryTitle}
-                </Param>{' '}
-                was moved from{' '}
-                <Param name="oldDay" wrapper={<strong />}>
-                  {oldDayLabel}
-                </Param>{' '}
-                to{' '}
-                <Param name="newDay" wrapper={<strong />}>
-                  {newDayLabel}
-                </Param>
-                .
+                <Param name="title" value={entryTitle} wrapper={<strong />} /> was moved from{' '}
+                <Param name="oldDay" value={oldDayLabel} wrapper={<strong />} /> to{' '}
+                <Param name="newDay" value={newDayLabel} wrapper={<strong />} />.
               </Translate>
             ),
           });
