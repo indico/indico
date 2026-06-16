@@ -19,8 +19,8 @@ export default {
   entries: (
     state: Entries = {
       draftEntry: null,
-      changes: [],
-      currentChangeIdx: 0,
+      entries: {},
+      unscheduled: [],
       selectedId: null,
       draggedIds: new Set(),
     },
@@ -31,27 +31,19 @@ export default {
         return {...state, draftEntry: action.data};
       case actions.SET_TIMETABLE_DATA: {
         const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
-        return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
+        return {...state, entries: layoutDays(dayEntries), unscheduled};
       }
       case actions.CHANGE_ENTRY_LAYOUT: {
         const date = action.date;
         const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+          Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             day === date ? action.entries : dayEntries,
           ])
         );
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'move',
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-            },
-          ],
+          entries: newEntries,
         };
       }
       case actions.CREATE_ENTRY: {
@@ -59,7 +51,7 @@ export default {
           entry,
           entry: {startDt},
         } = action;
-        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const newEntries = {...state.entries};
 
         const dayKey = moment(startDt).format('YYYYMMDD');
         const dayEntries = newEntries[dayKey];
@@ -81,15 +73,7 @@ export default {
 
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'create',
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-            },
-          ],
+          entries: newEntries,
         };
       }
       case actions.UPDATE_ENTRY: {
@@ -99,7 +83,7 @@ export default {
           entry: {startDt},
           currentDay,
         } = action;
-        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const newEntries = {...state.entries};
         const currentDayKey = currentDay;
         const dayEntries = [...newEntries[currentDayKey]];
         const newDayKey = getDateKey(startDt);
@@ -132,15 +116,7 @@ export default {
 
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'update',
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-            },
-          ],
+          entries: newEntries,
         };
       }
       case actions.RESIZE_ENTRY: {
@@ -149,14 +125,12 @@ export default {
 
         if (isChildEntry(entry)) {
           const sessionBlockId = entry.sessionBlockId;
-          const parent = state.changes[state.currentChangeIdx].entries[date].find(
-            e => e.id === sessionBlockId
-          );
+          const parent = state.entries[date].find(e => e.id === sessionBlockId);
           if (!parent) {
             return state;
           }
           newDayEntries = layout(
-            state.changes[state.currentChangeIdx].entries[date].map(e => {
+            state.entries[date].map(e => {
               if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
                 return {
                   ...e,
@@ -180,28 +154,18 @@ export default {
           );
         } else {
           newDayEntries = layout(
-            state.changes[state.currentChangeIdx].entries[date].map(e =>
-              e.id === entry.id ? {...e, duration} : e
-            )
+            state.entries[date].map(e => (e.id === entry.id ? {...e, duration} : e))
           );
         }
         const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+          Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             day === date ? newDayEntries : dayEntries,
           ])
         );
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'resize',
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-            },
-          ],
+          entries: newEntries,
         };
       }
       case actions.SELECT_ENTRY:
@@ -215,60 +179,43 @@ export default {
           const sessionBlockId = entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
-              Object.entries(state.changes[state.currentChangeIdx].entries).map(
-                ([day, dayEntries]) => [
-                  day,
-                  dayEntries.map(e => {
-                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
-                      return {
-                        ...e,
-                        children: e.children.filter(child => child.id !== id),
-                      };
-                    }
-                    return e;
-                  }),
-                ]
-              )
+              Object.entries(state.entries).map(([day, dayEntries]) => [
+                day,
+                dayEntries.map(e => {
+                  if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
+                    return {
+                      ...e,
+                      children: e.children.filter(child => child.id !== id),
+                    };
+                  }
+                  return e;
+                }),
+              ])
             )
           );
           return {
             ...state,
-            currentChangeIdx: state.currentChangeIdx + 1,
-            changes: [
-              ...state.changes.slice(0, state.currentChangeIdx + 1),
-              {
-                entries: newEntries,
-                change: 'delete',
-                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-              },
-            ],
+            entries: newEntries,
           };
         } else {
           const newEntries = layoutDays(
             Object.fromEntries(
-              Object.entries(state.changes[state.currentChangeIdx].entries).map(
-                ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
-              )
+              Object.entries(state.entries).map(([day, dayEntries]) => [
+                day,
+                dayEntries.filter(e => e.id !== id),
+              ])
             )
           );
           return {
             ...state,
-            currentChangeIdx: state.currentChangeIdx + 1,
-            changes: [
-              ...state.changes.slice(0, state.currentChangeIdx + 1),
-              {
-                entries: newEntries,
-                change: 'delete',
-                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-              },
-            ],
+            entries: newEntries,
           };
         }
       }
       case actions.DELETE_BLOCK: {
         const {id} = action.entry;
         let block = null;
-        for (const dayEntries of Object.values(state.changes[state.currentChangeIdx].entries)) {
+        for (const dayEntries of Object.values(state.entries)) {
           block = dayEntries.find(e => e.id === id);
           if (block) {
             break;
@@ -284,44 +231,31 @@ export default {
           .map(({startDt, ...rest}) => rest);
         const newEntries = layoutDays(
           Object.fromEntries(
-            Object.entries(state.changes[state.currentChangeIdx].entries).map(
-              ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
-            )
+            Object.entries(state.entries).map(([day, dayEntries]) => [
+              day,
+              dayEntries.filter(e => e.id !== id),
+            ])
           )
         );
 
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'delete',
-              unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, ...contribs],
-            },
-          ],
+          entries: newEntries,
+          unscheduled: {...state.unscheduled, ...contribs},
         };
       }
       case actions.SCHEDULE_ENTRY: {
         const date = action.date;
         const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+          Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             day === date ? action.entries : dayEntries,
           ])
         );
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'resize',
-              unscheduled: action.unscheduled,
-            },
-          ],
+          entries: newEntries,
+          unscheduled: action.unscheduled,
         };
       }
       case actions.UNSCHEDULE_ENTRY: {
@@ -331,53 +265,38 @@ export default {
           const sessionBlockId = entry.sessionBlockId;
           const newEntries = layoutDays(
             Object.fromEntries(
-              Object.entries(state.changes[state.currentChangeIdx].entries).map(
-                ([day, dayEntries]) => [
-                  day,
-                  dayEntries.map(e => {
-                    if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
-                      return {
-                        ...e,
-                        children: e.children.filter(child => child.id !== id),
-                      };
-                    }
-                    return e;
-                  }),
-                ]
-              )
+              Object.entries(state.entries).map(([day, dayEntries]) => [
+                day,
+                dayEntries.map(e => {
+                  if (e.type === EntryType.SessionBlock && e.id === sessionBlockId) {
+                    return {
+                      ...e,
+                      children: e.children.filter(child => child.id !== id),
+                    };
+                  }
+                  return e;
+                }),
+              ])
             )
           );
           return {
             ...state,
-            currentChangeIdx: state.currentChangeIdx + 1,
-            changes: [
-              ...state.changes.slice(0, state.currentChangeIdx + 1),
-              {
-                entries: newEntries,
-                change: 'unschedule',
-                unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, action.entry],
-              },
-            ],
+            entries: newEntries,
+            unscheduled: [...state.unscheduled, action.entry],
           };
         } else {
           const newEntries = layoutDays(
             Object.fromEntries(
-              Object.entries(state.changes[state.currentChangeIdx].entries).map(
-                ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
-              )
+              Object.entries(state.entries).map(([day, dayEntries]) => [
+                day,
+                dayEntries.filter(e => e.id !== id),
+              ])
             )
           );
           return {
             ...state,
-            currentChangeIdx: state.currentChangeIdx + 1,
-            changes: [
-              ...state.changes.slice(0, state.currentChangeIdx + 1),
-              {
-                entries: newEntries,
-                change: 'unschedule',
-                unscheduled: [...state.changes[state.currentChangeIdx].unscheduled, action.entry],
-              },
-            ],
+            entries: newEntries,
+            unscheduled: [...state.unscheduled, action.entry],
           };
         }
       }
@@ -386,7 +305,7 @@ export default {
         // unschedule all contributions linked to it
         const contribsToUnschedule = [];
         const newEntries = Object.fromEntries(
-          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+          Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             dayEntries.filter(e => {
               if (e.type === EntryType.SessionBlock && e.sessionId === action.sessionId) {
@@ -401,33 +320,13 @@ export default {
             }),
           ])
         );
-        const newUnscheduled = [
-          ...state.changes[state.currentChangeIdx].unscheduled,
-          ...contribsToUnschedule,
-        ];
+        const newUnscheduled = [...state.unscheduled, ...contribsToUnschedule];
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'delete-session',
-              unscheduled: newUnscheduled,
-            },
-          ],
+          entries: newEntries,
+          unscheduled: newUnscheduled,
         };
       }
-      case actions.UNDO_CHANGE:
-        return {
-          ...state,
-          currentChangeIdx: Math.max(0, state.currentChangeIdx - 1),
-        };
-      case actions.REDO_CHANGE:
-        return {
-          ...state,
-          currentChangeIdx: Math.min(state.changes.length - 1, state.currentChangeIdx + 1),
-        };
       default:
         return state;
     }
