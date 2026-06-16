@@ -22,13 +22,10 @@ import {
 
 export const getStaticData = (state: ReduxState) => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
-export const getDayEntries = (state: ReduxState) =>
-  state.entries.changes[state.entries.currentChangeIdx].entries;
+export const getDayEntries = (state: ReduxState) => state.entries.entries;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
 export const getDisplay = (state: ReduxState) => state.display;
-export const getLatestChange = (state: ReduxState) =>
-  state.entries.changes[state.entries.currentChangeIdx];
 
 // Get the selected entry ID
 // You should not use this selector directly, use makeIsSelectedSelector instead
@@ -190,7 +187,7 @@ export const getCurrentDayEntriesWithoutOverlap = createSelector(
 );
 
 export const getUnscheduled = createSelector(
-  getLatestChange,
+  getEntries,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
@@ -198,14 +195,6 @@ export const getUnscheduled = createSelector(
 export const getDraftEntry = createSelector(
   getEntries,
   entries => entries.draftEntry
-);
-export const canUndo = createSelector(
-  getEntries,
-  entries => entries.currentChangeIdx > 0
-);
-export const canRedo = createSelector(
-  getEntries,
-  entries => entries.currentChangeIdx < entries.changes.length - 1
 );
 
 export const showUnscheduled = createSelector(
