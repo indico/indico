@@ -10,7 +10,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 
 import './DayTimetable.module.scss';
 import './Entry.module.scss';
@@ -53,6 +53,7 @@ import {
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
+  getEntryUniqueId,
 } from './utils';
 
 interface DayTimetableProps {
@@ -149,29 +150,49 @@ export function DayTimetable({
   const sessions: Record<number, Session> = useSelector(selectors.getSessions);
 
   function showToastIfContribSessionChanged(
-    contribTitle: string | undefined,
-    oldSessionId: number | null | undefined,
-    newSessionId: number | null | undefined
+    contribTitle?: string,
+    fromSessionId?: number | null,
+    toSessionId?: number | null
   ) {
-    const oldId = oldSessionId ?? null;
-    const newId = newSessionId ?? null;
-    if (oldId === newId) {
+    if ((fromSessionId ?? null) === (toSessionId ?? null)) {
       return;
     }
-    const oldSessionTitle = oldId !== null ? sessions[oldId]?.title : null;
-    const newSessionTitle = newId !== null ? sessions[newId]?.title : null;
+
+    const fromSession = fromSessionId ? sessions[fromSessionId] : null;
+    const toSession = toSessionId ? sessions[toSessionId] : null;
+
     const title = contribTitle || Translate.string('the contribution');
     let message: React.ReactNode;
-    if (oldSessionTitle && newSessionTitle) {
-      message = Translate.string(
-        '"{title}" was moved from session "{oldSession}" to session "{newSession}".',
-        {title, oldSession: oldSessionTitle, newSession: newSessionTitle}
+    if (fromSession?.title && toSession?.title) {
+      message = (
+        <Translate>
+          <Param name="title" wrapper={<strong />}>
+            {title}
+          </Param>{' '}
+          was moved from session{' '}
+          <Param name="fromSession" wrapper={<strong />}>
+            {fromSession.title}
+          </Param>{' '}
+          to session{' '}
+          <Param name="toSession" wrapper={<strong />}>
+            {toSession.title}
+          </Param>
+          .
+        </Translate>
       );
-    } else if (newSessionTitle) {
-      message = Translate.string('"{title}" is now part of session "{newSession}".', {
-        title,
-        newSession: newSessionTitle,
-      });
+    } else if (toSession?.title) {
+      message = (
+        <Translate>
+          <Param name="title" wrapper={<strong />}>
+            {title}
+          </Param>{' '}
+          is now part of session{' '}
+          <Param name="toSession" wrapper={<strong />}>
+            {toSession.title}
+          </Param>
+          .
+        </Translate>
+      );
     } else {
       return;
     }
@@ -275,7 +296,9 @@ export function DayTimetable({
         ) || [];
       // TODO(tomas): use something better than 'unscheduled-' prefix
       const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-      const fromContrib = unscheduled.find(c => c.id === `c${contribId}`);
+      const fromContrib = unscheduled.find(
+        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+      );
       showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
       dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
     }
@@ -310,7 +333,9 @@ export function DayTimetable({
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
     const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-    const fromContrib = unscheduled.find(c => c.id === `c${contribId}`);
+    const fromContrib = unscheduled.find(
+      c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+    );
     const targetBlock = currentDayEntries.find(
       e => e.type === EntryType.SessionBlock && e.objId === blockId
     ) as BlockEntry | undefined;
