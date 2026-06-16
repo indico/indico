@@ -81,11 +81,6 @@ function GlobalEvents() {
         if (selectedEntry) {
           dispatch(actions.deselectEntry());
         }
-        // TODO: (Ajob) Evaluate need for undo/redo
-        // } else if (e.ctrlKey && e.key === 'z') {
-        //   dispatch(actions.undoChange());
-        // } else if (e.ctrlKey && e.key === 'y') {
-        //   dispatch(actions.redoChange());
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedEntry) {
           switch (selectedEntry.type) {
