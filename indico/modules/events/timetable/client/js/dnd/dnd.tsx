@@ -421,7 +421,12 @@ export function useDroppable({id}: {id: string}) {
   const unregisterDroppable = useContextSelector(DnDContext, ctx => ctx.unregisterDroppable);
   const hasDraggableOver = useContextSelector(DnDContext, ctx => {
     for (const [draggableId, draggable] of Object.entries(ctx.draggableData)) {
-      if (draggableId === id || !draggable.transform) {
+      // FIXME: !(draggableId.startsWith('c') || draggableId.startsWith('b')) is a huge hack
+      if (
+        draggableId === id ||
+        !(draggableId.startsWith('c') || draggableId.startsWith('b')) ||
+        !draggable.transform
+      ) {
         continue;
       }
       const overlapping = getOverlappingDroppables(ctx.droppables, draggable.mouse);
