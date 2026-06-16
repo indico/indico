@@ -8,8 +8,9 @@
 import React, {useEffect} from 'react';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
-import './Toast.module.scss';
 import {Translate} from 'indico/react/i18n';
+
+import './Toast.module.scss';
 
 export type ToastType = 'info' | 'success' | 'warning' | 'error';
 
@@ -40,7 +41,7 @@ export function Toast({id, type, message, duration, leaving, onClose}: ToastProp
 
   return (
     <div
-      styleName={leaving ? 'toast toast-leaving' : 'toast'}
+      styleName={`toast ${leaving ? 'toast-leaving' : ''}`}
       data-type={type}
       role="status"
       aria-live="polite"
