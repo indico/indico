@@ -10,7 +10,7 @@ import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
-import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {PluralTranslate, Singular, Plural, Param, Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {useDraggable, useDroppable} from './dnd';
@@ -165,7 +165,9 @@ function DroppableArea({id, title}: {id: string; title: string}) {
         ref={setDroppableNodeRef}
       >
         <div>
-          <p>Move into "{title}"</p>
+          <Translate as="p">
+            Move into "<Param name="title" value={title} />"
+          </Translate>
         </div>
       </div>
     </div>

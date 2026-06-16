@@ -62,7 +62,7 @@ $title-row-line-height: 1.2rem;
     right: 20px;
     z-index: 10;
     pointer-events: none;
-    border: 5px dashed gray;
+    border: 2px dashed gray;
     border-radius: 4px;
     background-color: rgba(255, 255, 255, 0.6);
     display: flex;
@@ -71,6 +71,7 @@ $title-row-line-height: 1.2rem;
     overflow: hidden;
 
     p {
+      user-select: none;
       text-align: center;
       font-size: 1.25em;
       font-weight: bold;
