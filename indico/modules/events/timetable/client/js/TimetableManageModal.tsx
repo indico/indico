@@ -16,7 +16,7 @@ import {ContributionFormFields} from 'indico/modules/events/contributions/Contri
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 import {handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -263,11 +263,22 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           const entryTitle = updatedEntry.title || entry.title || fallbackTitle;
           toast.addToast({
             type: 'info',
-            message: Translate.string('"{title}" was moved from {oldDay} to {newDay}.', {
-              title: entryTitle,
-              oldDay: oldDayLabel,
-              newDay: newDayLabel,
-            }),
+            message: (
+              <Translate>
+                <Param name="title" wrapper={<strong />}>
+                  {entryTitle}
+                </Param>{' '}
+                was moved from{' '}
+                <Param name="oldDay" wrapper={<strong />}>
+                  {oldDayLabel}
+                </Param>{' '}
+                to{' '}
+                <Param name="newDay" wrapper={<strong />}>
+                  {newDayLabel}
+                </Param>
+                .
+              </Translate>
+            ),
           });
         }
       } else {
