@@ -54,8 +54,6 @@ export const DELETE_BREAK = 'Delete break';
 export const DELETE_BLOCK = 'Delete block';
 export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
-export const UNDO_CHANGE = 'Undo change';
-export const REDO_CHANGE = 'Redo change';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
@@ -133,14 +131,6 @@ interface DeleteBlockAction {
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
 }
 
-interface UndoChangeAction {
-  type: typeof UNDO_CHANGE;
-}
-
-interface RedoChangeAction {
-  type: typeof REDO_CHANGE;
-}
-
 interface SetSessionDataAction {
   type: typeof SET_SESSION_DATA;
   data: any;
@@ -197,8 +187,6 @@ export type Action =
   | DeleteBreakAction
   | DeleteBlockAction
   | SetDraftEntryAction
-  | UndoChangeAction
-  | RedoChangeAction
   | SetSessionDataAction
   | EditSessionAction
   | CreateSessionAction
@@ -301,9 +289,7 @@ export function changeEntryLayout(
       session_block_id: sessionBlockId,
     };
 
-    const previousEntries = Object.values(
-      stateEntries.changes[stateEntries.currentChangeIdx].entries
-    ).flat();
+    const previousEntries = Object.values(stateEntries.entries).flat();
     const flattenedEntries = flattenEntries(previousEntries);
     const entryBeforeChanges = flattenedEntries.find(e => e.id === entry.id);
     if (
@@ -417,14 +403,6 @@ export function unscheduleEntry(entry: ContribEntry, eventId: number) {
     type: UNSCHEDULE_ENTRY,
     entry,
   });
-}
-
-export function undoChange(): UndoChangeAction {
-  return {type: UNDO_CHANGE};
-}
-
-export function redoChange(): RedoChangeAction {
-  return {type: REDO_CHANGE};
 }
 
 export function toggleShowUnscheduled() {

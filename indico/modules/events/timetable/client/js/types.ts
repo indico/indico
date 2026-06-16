@@ -164,16 +164,10 @@ export interface LocationParentObj {
   inheriting: boolean;
 }
 
-interface Change {
-  change: any;
-  entries: DayEntries;
-  unscheduled: any[];
-}
-
 export interface Entries {
   draftEntry: any | null;
-  changes: Change[];
-  currentChangeIdx: number;
+  entries: DayEntries;
+  unscheduled: any[];
   selectedId: string | null;
   draggedIds: Set<number>;
 }
