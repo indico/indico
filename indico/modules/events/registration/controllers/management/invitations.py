@@ -17,8 +17,10 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.models.invitations import (InvitationState, MockRegistrationInvitation,
                                                                    RegistrationInvitation)
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
                                                         NewInvitationSchema, RegistrationInvitationSchema)
 from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
@@ -151,11 +153,18 @@ class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
             default_body = tpl.get_html_body()
             default_subject = tpl.get_subject()
         placeholders = get_sorted_placeholders('registration-invitation-email', invitation=None)
+        affiliation_field = self.regform.get_personal_data_field(PersonalDataType.affiliation)
+        allow_affiliations = not (
+            affiliation_field and
+            affiliation_field.input_type == 'affiliation' and
+            affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
+        )
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),
             'default_subject': default_subject,
             'default_body': default_body,
             'moderation_enabled': self.regform.moderation_enabled,
+            'allow_affiliations': allow_affiliations,
             'placeholders': [p.serialize() for p in placeholders],
             'csv_upload_url': url_for('.api_invitations_import_upload', self.regform),
         })

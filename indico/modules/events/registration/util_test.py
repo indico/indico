@@ -20,6 +20,7 @@ from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.custom import RegistrationListColumn
+from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
@@ -786,6 +787,41 @@ def test_get_user_data(db, monkeypatch, dummy_user, dummy_regform, legacy_affili
 
     assert get_user_data(dummy_regform, dummy_user) == {}
     assert get_user_data(dummy_regform, dummy_user, invitation) == {}
+
+
+@pytest.mark.usefixtures('request_context', 'dummy_event')
+def test_get_user_data_predefined_only_affiliation(db, dummy_user, dummy_regform):
+    affiliation_field = dummy_regform.get_personal_data_field(PersonalDataType.affiliation)
+    affiliation_field.data = {'affiliation_mode': AffiliationMode.predefined}
+
+    dummy_user.affiliation = 'CERN'
+    assert get_user_data(dummy_regform, dummy_user) == {
+        'email': '1337@example.test',
+        'first_name': 'Guinea',
+        'last_name': 'Pig',
+    }
+
+    affiliation = Affiliation(name='CERN')
+    db.session.add(affiliation)
+    db.session.flush()
+    dummy_user.affiliation_link = affiliation
+    dummy_user.affiliation = affiliation.name
+    db.session.flush()
+    assert get_user_data(dummy_regform, dummy_user) == {
+        'email': '1337@example.test',
+        'first_name': 'Guinea',
+        'last_name': 'Pig',
+        'affiliation': {'id': affiliation.id, 'text': affiliation.name},
+    }
+
+    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.test', first_name='Amy',
+                                        last_name='Wang', affiliation='ACME Inc.')
+    dummy_regform.invitations.append(invitation)
+    assert get_user_data(dummy_regform, None, invitation) == {
+        'email': 'awang@example.test',
+        'first_name': 'Amy',
+        'last_name': 'Wang',
+    }
 
 
 def test_get_user_data_prefills_profile_picture(dummy_regform, dummy_user, db):

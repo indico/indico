@@ -9,7 +9,9 @@ import searchAffiliationsURL from 'indico-url:event_registration.search_registra
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
+import {Message} from 'semantic-ui-react';
 
 import {FinalAffiliationField} from 'indico/react/components';
 import {FinalDropdown} from 'indico/react/forms';
@@ -82,30 +84,54 @@ export const affiliationSettingsInitialData = {
   affiliationMode: AFFILIATION_MODES.both,
 };
 
-export function AffiliationSettings() {
+export function AffiliationSettings({fieldIsPersonalData}) {
   const {hasPredefinedAffiliations} = useSelector(getStaticData);
   if (!hasPredefinedAffiliations) {
     return null;
   }
   return (
-    <FinalDropdown
-      name="affiliationMode"
-      label={Translate.string('Allowed affiliations')}
-      options={[
-        {
-          value: AFFILIATION_MODES.both,
-          text: Translate.string('Predefined and custom affiliations'),
-        },
-        {
-          value: AFFILIATION_MODES.predefined,
-          text: Translate.string('Only predefined affiliations'),
-        },
-        {value: AFFILIATION_MODES.custom, text: Translate.string('Only custom affiliations')},
-      ]}
-      search={false}
-      selection
-      required
-      fluid
-    />
+    <>
+      <FinalDropdown
+        name="affiliationMode"
+        label={Translate.string('Allowed affiliations')}
+        options={[
+          {
+            value: AFFILIATION_MODES.both,
+            text: Translate.string('Predefined and custom affiliations'),
+          },
+          {
+            value: AFFILIATION_MODES.predefined,
+            text: Translate.string('Only predefined affiliations'),
+          },
+          {value: AFFILIATION_MODES.custom, text: Translate.string('Only custom affiliations')},
+        ]}
+        search={false}
+        selection
+        required
+        fluid
+      />
+      {fieldIsPersonalData && (
+        <Field name="affiliationMode" subscription={{value: true}}>
+          {({input: {value}}) =>
+            value === AFFILIATION_MODES.predefined && (
+              <Message warning visible>
+                <Translate>
+                  Affiliations specified in invitations are custom text and will not be pre-filled
+                  in the registration form when only predefined affiliations are allowed.
+                </Translate>
+              </Message>
+            )
+          }
+        </Field>
+      )}
+    </>
   );
 }
+
+AffiliationSettings.propTypes = {
+  fieldIsPersonalData: PropTypes.bool,
+};
+
+AffiliationSettings.defaultProps = {
+  fieldIsPersonalData: false,
+};
