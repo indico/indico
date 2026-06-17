@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system';
 @use 'rb:styles/responsive' as *;
 
 .banner.user-dashboard,
@@ -234,6 +235,22 @@
       .label {
         margin: 0 7px 7px 0;
       }
+    }
+
+    .contact-details {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: baseline;
+      margin: 0;
+
+      dt,
+      dd {
+        margin: 0;
+      }
+    }
+
+    .contact-details-label {
+      @extend %visually-hidden;
     }
   }
 

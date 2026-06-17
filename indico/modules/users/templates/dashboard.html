@@ -69,19 +69,27 @@
                                 </div>
                             {% endif %}
                         </div>
-                        {% if user.affiliation %}
-                            <div>
-                                <i class="icon-users"></i><span>{{ user.affiliation }}</span>
-                            </div>
-                        {% endif %}
-                        <div>
-                            <i class="icon-mail"></i><span>{{ user.email }}</span>
-                        </div>
-                        {% if user.phone %}
-                            <div>
-                                <i class="icon-phone"></i><span>{{ user.phone }}</span>
-                            </div>
-                        {% endif %}
+                        <dl class="contact-details">
+                            {% if user.affiliation %}
+                                <dt>
+                                    <i class="icon-users" aria-hidden="true"></i>
+                                    <span class="contact-details-label">{% trans %}Affiliation{% endtrans %}</span>
+                                </dt>
+                                <dd>{{ user.affiliation }}</dd>
+                            {% endif %}
+                            <dt>
+                                <i class="icon-mail" aria-hidden="true"></i>
+                                <span class="contact-details-label">{% trans %}Email{% endtrans %}</span>
+                            </dt>
+                            <dd>{{ user.email }}</dd>
+                            {% if user.phone %}
+                                <dt>
+                                    <i class="icon-phone" aria-hidden="true"></i>
+                                    <span class="contact-details-label">{% trans %}Phone{% endtrans %}</span>
+                                </dt>
+                                <dd>{{ user.phone }}</dd>
+                            {% endif %}
+                        </dl>
                     </div>
                     <div class="actions">
                         <a class="ui icon button" href="{{ url_for('users.user_profile') }}">
