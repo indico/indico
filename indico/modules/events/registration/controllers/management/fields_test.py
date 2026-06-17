@@ -172,6 +172,17 @@ class TestGeneralFieldDataSchema:
         db.session.flush()
         assert schema.load({'input_type': 'text', 'title': 'text', 'internal_name': 'title'})
 
+    def test_internal_name_allows_legacy_affiliation_type_on_other_regform(self, db, create_regform, dummy_regform):
+        other_form = create_regform(dummy_regform.event, title='Other Form')
+        legacy_affiliation_field = other_form.get_personal_data_field(PersonalDataType.affiliation)
+        legacy_affiliation_field.input_type = 'text'
+        affiliation_field = dummy_regform.get_personal_data_field(PersonalDataType.affiliation)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': affiliation_field})
+        db.session.flush()
+
+        assert schema.load({'input_type': 'affiliation', 'title': affiliation_field.title,
+                            'internal_name': affiliation_field.internal_name})
+
     def test_internal_name_with_different_input_type_on_other_event(self, db, create_event, dummy_regform,
                                                                     create_regform):
         # create field in dummy event
