@@ -45,7 +45,7 @@ class RegistrationFormMixin:
         )
 
     @property
-    def has_predefined_affiliations(self):
+    def regform_uses_predefined_affiliations(self):
         return (any(field.input_type == 'affiliation' for field in self.regform.active_fields) and
                 Affiliation.query.filter_by(is_deleted=False).has_rows())
 
@@ -93,7 +93,7 @@ class RegistrationEditMixin:
         return self.view_class.render_template(self.template_file, self.event,
                                                regform=self.regform,
                                                form_data=form_data,
-                                               has_predefined_affiliations=self.has_predefined_affiliations,
+                                               has_predefined_affiliations=self.regform_uses_predefined_affiliations,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                registration=self.registration,

@@ -432,7 +432,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                form_data=get_flat_section_submission_data(self.regform),
                                                initial_values=initial_values,
                                                file_data=file_data,
-                                               has_predefined_affiliations=self.has_predefined_affiliations,
+                                               has_predefined_affiliations=self.regform_uses_predefined_affiliations,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                invitation=self.invitation,
