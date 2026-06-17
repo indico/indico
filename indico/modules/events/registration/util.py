@@ -1250,6 +1250,7 @@ def is_conditional_field_shown(field, data, *, is_db_data=False):
     return is_conditional_field_shown(field.show_if_field, data, is_db_data=is_db_data)
 
 
+@make_interceptable
 def get_hidden_conditional_fields(regform, data_by_id):
     return {f for f in regform.active_fields if not is_conditional_field_shown(f, data_by_id)}
 
