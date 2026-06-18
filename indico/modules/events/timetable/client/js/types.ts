@@ -191,6 +191,6 @@ export interface ReduxState {
   entries: Entries;
   sessions: Record<string, Session>;
   navigation: Navigation;
-  display: {showUnscheduled: boolean};
+  display: {showUnscheduled: boolean; showSessions: boolean};
   staticData: StaticData;
 }

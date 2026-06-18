@@ -53,6 +53,11 @@
       position: relative;
       display: flex;
       gap: 0.5rem;
+      justify-content: space-between;
+
+      :global(.ui.icon.input) {
+        flex-grow: 1;
+      }
 
       :global(.ui.search.selection.dropdown) {
         width: 100%;
@@ -203,10 +208,16 @@
   outline: dashed 1px grey;
 }
 
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .session-wrapper {
   position: relative;
   display: flex;
-  margin: 0.5rem 0;
+  // margin: 0.5rem 0;
   padding: 0;
   border-radius: 4px;
   border: 1px solid $raincloud-gray;

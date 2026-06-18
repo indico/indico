@@ -53,12 +53,14 @@ export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
 export const DELETE_BREAK = 'Delete break';
 export const DELETE_UNSCHEDULED_CONTRIB = 'Delete contrib';
+export const ADD_UNSCHEDULED_CONTRIB = 'Add unscheduled contrib';
 export const DELETE_BLOCK = 'Delete block';
 export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
+export const TOGGLE_SHOW_SESSIONS = 'Toggle show sessions';
 export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
@@ -139,6 +141,11 @@ interface DeleteUnscheduledContribAction {
   eventId: number;
 }
 
+interface AddUnscheduledContribAction {
+  type: typeof ADD_UNSCHEDULED_CONTRIB;
+  entry: UnscheduledContribEntry;
+}
+
 interface SetSessionDataAction {
   type: typeof SET_SESSION_DATA;
   data: any;
@@ -161,6 +168,10 @@ interface DeleteSessionAction {
 
 interface ToggleShowUnscheduledAction {
   type: typeof TOGGLE_SHOW_UNSCHEDULED;
+}
+
+interface ToggleShowSessionsAction {
+  type: typeof TOGGLE_SHOW_SESSIONS;
 }
 
 interface SetCurrentDateAction {
@@ -194,6 +205,7 @@ export type Action =
   | UpdateEntryAction
   | DeleteBreakAction
   | DeleteUnscheduledContribAction
+  | AddUnscheduledContribAction
   | DeleteBlockAction
   | SetDraftEntryAction
   | SetSessionDataAction
@@ -201,6 +213,7 @@ export type Action =
   | CreateSessionAction
   | DeleteSessionAction
   | ToggleShowUnscheduledAction
+  | ToggleShowSessionsAction
   | SetCurrentDateAction
   | ToggleExpandAction
   | ToggleDraftAction
@@ -382,6 +395,13 @@ export function deleteUnscheduledContrib(entry: UnscheduledContribEntry, eventId
   });
 }
 
+export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
+  return {
+    type: ADD_UNSCHEDULED_CONTRIB,
+    entry,
+  };
+}
+
 export function deleteBlock(entry: BlockEntry, eventId: number) {
   const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
   return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
@@ -425,6 +445,10 @@ export function unscheduleEntry(entry: ContribEntry, eventId: number) {
 
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
+}
+
+export function toggleShowSessions() {
+  return {type: TOGGLE_SHOW_SESSIONS};
 }
 
 function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {

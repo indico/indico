@@ -192,7 +192,12 @@ export function UnscheduledContributionEntry({
       {!isDragging && (
         <div
           styleName="entry-actions"
-          style={{'--session-color': colors.color} as React.CSSProperties}
+          style={
+            {
+              '--session-color': colors.color,
+              '--session-background': colors.backgroundColor,
+            } as React.CSSProperties
+          }
         >
           <EditContributionButton
             eventId={eventId}

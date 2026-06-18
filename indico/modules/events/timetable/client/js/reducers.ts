@@ -176,15 +176,14 @@ export default {
         const {entry} = action;
         return {
           ...state,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx),
-            {
-              ...state.changes[state.currentChangeIdx],
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled.filter(
-                e => e.id !== entry.id
-              ),
-            },
-          ],
+          unscheduled: state.unscheduled.filter(e => e.id !== entry.id),
+        };
+      }
+      case actions.ADD_UNSCHEDULED_CONTRIB: {
+        const {entry} = action;
+        return {
+          ...state,
+          unscheduled: [entry, ...state.unscheduled],
         };
       }
       case actions.DELETE_BREAK: {
@@ -383,10 +382,22 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action: Action) => {
+  display: (state = {showUnscheduled: false, showSessions: false}, action: Action) => {
     switch (action.type) {
       case actions.TOGGLE_SHOW_UNSCHEDULED:
-        return {...state, showUnscheduled: !state.showUnscheduled};
+        return {
+          ...state,
+          showUnscheduled: !state.showUnscheduled,
+          showSessions: false,
+        };
+
+      case actions.TOGGLE_SHOW_SESSIONS:
+        return {
+          ...state,
+          showSessions: !state.showSessions,
+          showUnscheduled: false,
+        };
+
       default:
         return state;
     }
