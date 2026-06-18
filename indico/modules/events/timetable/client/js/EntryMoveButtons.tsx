@@ -24,7 +24,6 @@ interface EntryMoveButtonsProps {
   duration: number;
   sessionBlockId?: string;
   colors?: Colors;
-  hidden?: boolean;
 }
 
 export function EntryMoveButtons({
@@ -33,7 +32,7 @@ export function EntryMoveButtons({
   duration,
   sessionBlockId,
   colors,
-}: Omit<EntryMoveButtonsProps, 'hidden'>) {
+}: EntryMoveButtonsProps) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
