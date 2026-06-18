@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import countriesURL from 'indico-url:users.api_countries';
+
 import type {FormApi} from 'final-form';
 import React, {useCallback} from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
@@ -101,7 +103,12 @@ export default function AffiliationFormDialog({
             </Form.Group>
             <Form.Group widths="equal">
               <FinalInput name="city" label={Translate.string('City')} />
-              <FinalCountryDropdown name="country_code" label={Translate.string('Country')} fluid />
+              <FinalCountryDropdown
+                name="country_code"
+                label={Translate.string('Country')}
+                fluid
+                countriesURL={countriesURL({})}
+              />
             </Form.Group>
           </>
         ),
