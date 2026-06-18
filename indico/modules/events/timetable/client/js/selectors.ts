@@ -202,6 +202,11 @@ export const showUnscheduled = createSelector(
   display => display.showUnscheduled
 );
 
+export const showSessions = createSelector(
+  getDisplay,
+  display => display.showSessions
+);
+
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
   getSessions,

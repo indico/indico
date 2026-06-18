@@ -98,6 +98,13 @@ $title-row-line-height: 1.2rem;
     width: 100%;
     justify-content: flex-end;
 
+    background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--session-background) 0%, transparent) 32%,
+    color-mix(in srgb, var(--session-background) 100%, transparent) 66%,
+    color-mix(in srgb, var(--session-background) 100%, transparent) 100%
+  );
+
     display: flex;
     opacity: 0;
     visibility: hidden;

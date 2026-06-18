@@ -264,6 +264,11 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                       size="small"
                     />
                   }
+                  onCreate={contrib => {
+                    dispatch(actions.addUnscheduledContrib(contrib));
+                    setSelectedFilter([]);
+                    setDraftSearchQuery('');
+                  }}
                 />
               </div>
 
@@ -303,7 +308,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </div>
 
               {filteredSessions.length > 0 ? (
-                <div styleName="">
+                <div styleName="session-list">
                   {filteredSessions.map(session => (
                     <div key={session.id} styleName="session-wrapper">
                       <div

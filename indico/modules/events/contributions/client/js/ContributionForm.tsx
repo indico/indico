@@ -335,11 +335,13 @@ export function ContributionEditForm({
 export function ContributionCreateForm({
   eventId,
   onClose,
+  onCreate,
   customFields = {},
   customInitialValues = {},
 }: {
   eventId: number;
   onClose: () => void;
+  onCreate?: (contrib: any) => void;
   customFields?: Record<string, any>;
   customInitialValues?: Record<string, any>;
 }) {
@@ -360,14 +362,21 @@ export function ContributionCreateForm({
 
   const handleSubmit = async (formData: any) => {
     try {
-      await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
+      const response = await indicoAxios.post(contributionCreateURL({event_id: eventId}), {
+        ...formData,
+        event_id: eventId,
+      });
+
+      if (response.data) {
+        onCreate?.(response.data);
+      } else {
+        location.reload();
+      }
     } catch (e) {
       return handleSubmitError(e);
     }
-    location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    await new Promise(() => {});
+
+    onClose();
   };
 
   const locationData = locationParent
@@ -470,11 +479,13 @@ export function CreateContributionButton({
   eventId,
   triggerSelector,
   trigger,
+  onCreate,
   ...rest
 }: {
   eventId: number;
   triggerSelector?: string;
   trigger?: React.ReactElement;
+  onCreate?: (contrib: any) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -509,6 +520,7 @@ export function CreateContributionButton({
         <ContributionCreateForm
           eventId={eventId}
           onClose={() => setOpen(false)}
+          onCreate={onCreate}
           customFields={{}}
           customInitialValues={{}}
         />

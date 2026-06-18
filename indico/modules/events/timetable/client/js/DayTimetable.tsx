@@ -42,6 +42,7 @@ import {
   EntryType,
   Session,
 } from './types';
+import TimetableSidePanel from './TimetableSidePanel';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
