@@ -325,14 +325,15 @@ export default function Entry({
           </div>
         )}
       </div>
-      <EntryMoveButtons
-        id={id}
-        sessionBlockId={sessionBlockId}
-        startDt={startDt}
-        duration={duration}
-        colors={btnColors}
-        hidden={!!draftEntry}
-      />
+      {!draftEntry && (
+        <EntryMoveButtons
+          id={id}
+          sessionBlockId={sessionBlockId}
+          startDt={startDt}
+          duration={duration}
+          colors={btnColors}
+        />
+      )}
       <ResizeHandle
         duration={duration}
         minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}

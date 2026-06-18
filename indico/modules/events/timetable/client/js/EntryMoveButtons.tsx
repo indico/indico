@@ -27,11 +27,7 @@ interface EntryMoveButtonsProps {
   hidden?: boolean;
 }
 
-export function EntryMoveButtons({hidden, ...props}: EntryMoveButtonsProps) {
-  return !hidden ? <VisibleEntryMoveButtons {...props} /> : null;
-}
-
-export function VisibleEntryMoveButtons({
+export function EntryMoveButtons({
   id,
   startDt,
   duration,
