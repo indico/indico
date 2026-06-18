@@ -10,7 +10,7 @@ import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
-import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {PluralTranslate, Singular, Plural, Param, Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {useDraggable, useDroppable} from './dnd';
@@ -156,6 +156,24 @@ interface _EntryProps {
 
 type EntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
+function DroppableArea({id, title}: {id: string; title: string}) {
+  const {setNodeRef: setDroppableNodeRef, hasDraggableOver} = useDroppable({id});
+  return (
+    <div styleName={`children-droppable-container ${hasDraggableOver ? 'hovered' : ''}`}>
+      <div
+        styleName={`children-droppable ${hasDraggableOver ? 'hovered' : ''}`}
+        ref={setDroppableNodeRef}
+      >
+        <div>
+          <Translate as="p">
+            Move into "<Param name="title" value={title} />"
+          </Translate>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // TODO: (Ajob) Fix these type errors
 export default function Entry({
   type,
@@ -192,7 +210,6 @@ export default function Entry({
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
 
@@ -303,7 +320,6 @@ export default function Entry({
         {isPosterBlock && <PosterCount count={children.length} />}
         {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
-            ref={setDroppableNodeRef}
             styleName="children-wrapper"
             style={{
               backgroundImage: `radial-gradient(${colors.color}11 1px, transparent 0)`,
@@ -324,6 +340,7 @@ export default function Entry({
           </div>
         )}
       </div>
+      {type === EntryType.SessionBlock && !isPosterBlock && <DroppableArea id={id} title={title} />}
       <EntryMoveButtons
         id={id}
         sessionBlockId={sessionBlockId}
