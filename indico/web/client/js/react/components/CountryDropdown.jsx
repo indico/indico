@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import countriesURL from 'indico-url:users.api_countries';
-
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
@@ -18,35 +16,38 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 const isoToFlag = code =>
   String.fromCodePoint(...code.split('').map(c => c.charCodeAt(0) + 0x1f1a5));
 
-let countriesPromise = null;
+const countriesCache = {};
 
-function useCountries() {
+function useCountries(url) {
   const [countries, setCountries] = useState(null);
   useEffect(() => {
-    if (!countriesPromise) {
-      countriesPromise = indicoAxios
-        .get(countriesURL({}))
+    if (!countriesCache[url]) {
+      countriesCache[url] = indicoAxios
+        .get(url)
         .then(({data}) => data)
         .catch(error => {
-          countriesPromise = null;
+          delete countriesCache[url];
           handleAxiosError(error);
         });
     }
-    countriesPromise.then(setCountries);
-  }, []);
+    countriesCache[url].then(setCountries);
+  }, [url]);
   return countries;
 }
 
-export function FinalCountryDropdown({name, ...rest}) {
-  return <FinalField name={name} component={CountryDropdown} {...rest} />;
+export function FinalCountryDropdown({name, countriesURL, ...rest}) {
+  return (
+    <FinalField name={name} component={CountryDropdown} countriesURL={countriesURL} {...rest} />
+  );
 }
 
 FinalCountryDropdown.propTypes = {
   name: PropTypes.string.isRequired,
+  countriesURL: PropTypes.string.isRequired,
 };
 
-export default function CountryDropdown({value, onChange, fluid}) {
-  const countries = useCountries();
+export default function CountryDropdown({value, onChange, fluid, countriesURL}) {
+  const countries = useCountries(countriesURL);
 
   return (
     <Dropdown
@@ -72,6 +73,7 @@ CountryDropdown.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   fluid: PropTypes.bool,
+  countriesURL: PropTypes.string.isRequired,
 };
 
 CountryDropdown.defaultProps = {
