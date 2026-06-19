@@ -1,0 +1,42 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@mixin typography($size, $weight: 'regular') {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-#{$size});
+  line-height: var(--line-height-#{$size});
+  font-weight: var(--font-weight-#{$weight});
+
+  @if $size == 'display-2xl' or $size == 'display-xl' or $size == 'display-lg' or $size == 'display-md' {
+    letter-spacing: var(--letter-spacing-#{$size});
+  }
+}
+
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin container($size: 'xl') {
+  width: 100%;
+  max-width: var(--container-#{$size});
+  margin-inline: auto;
+}
+
+@mixin centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

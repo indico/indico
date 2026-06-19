@@ -1,0 +1,37 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+.card-root {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+  max-width: var(--container-md);
+  padding: var(--space-3) var(--space-5); // 12px top/bottom, 20px left/right
+  box-sizing: border-box;
+
+  background: var(--color-surface-soft);
+  margin: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-fast);
+  border-radius: var(--radius-lg);
+
+  &:hover {
+    background: var(--color-surface-soft-hover);
+  }
+}
+
+.card-header {
+  @include text-ellipsis();
+}
+
+.card-meta {
+  @include typography('text-xs', 'regular'); // 12px
+  color: var(--color-text-muted);
+}
