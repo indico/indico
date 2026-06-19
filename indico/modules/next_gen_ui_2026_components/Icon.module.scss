@@ -1,0 +1,107 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+@mixin icon-size($size) {
+  width: var(--icon-size-#{$size});
+  height: var(--icon-size-#{$size});
+  border-radius: var(--radius-#{$size});
+
+  svg,
+  i {
+    width: 50%;
+    height: 50%;
+  }
+}
+
+@mixin icon-color($color) {
+  $palette: $color;
+
+  @if $color == 'primary' {
+    $palette: 'primary-blue';
+  }
+
+  --icon-100: var(--indico-#{$palette}-100);
+  --icon-500: var(--indico-#{$palette}-500);
+  --icon-600: var(--indico-#{$palette}-600);
+  --icon-800: var(--indico-#{$palette}-800);
+}
+
+.root {
+  @include centered();
+
+  &[data-size='xs'] {
+    @include icon-size('xs');
+  }
+
+  &[data-size='sm'] {
+    @include icon-size('sm');
+  }
+
+  &[data-size='md'] {
+    @include icon-size('md');
+  }
+
+  &[data-size='lg'] {
+    @include icon-size('lg');
+  }
+
+  &[data-size='xl'] {
+    @include icon-size('xl');
+  }
+
+  &[data-color='primary'] {
+    @include icon-color('primary');
+  }
+
+  &[data-color='gray'] {
+    @include icon-color('gray');
+  }
+
+  &[data-color='success'] {
+    @include icon-color('success');
+  }
+
+  &[data-color='warning'] {
+    @include icon-color('warning');
+  }
+
+  &[data-color='error'] {
+    @include icon-color('error');
+  }
+}
+
+.root[data-variant='plain'] {
+  color: var(--icon-500);
+  background: transparent;
+
+  svg,
+  i {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.root[data-rounded] {
+  border-radius: 50%;
+}
+
+.root[data-variant='light'] {
+  color: var(--icon-600);
+  background: var(--icon-100);
+}
+
+.root[data-variant='solid'] {
+  color: white;
+  background: var(--icon-500);
+}
+
+.root[data-variant='dark'] {
+  color: white;
+  background: var(--icon-800);
+}

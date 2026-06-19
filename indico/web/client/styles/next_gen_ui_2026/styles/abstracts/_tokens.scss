@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 :root {
   // Spacing system
   // Base: 16px
@@ -29,9 +36,11 @@
   --container-xl: 80rem; // 1280px
 
   // Radius
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --radius-xs: 0.25rem; // 4px
+  --radius-sm: 0.35rem; // 6px
+  --radius-md: 0.5rem; // 8px
+  --radius-lg: 0.65rem; // 10px
+  --radius-xl: 0.75rem; // 12px
   --radius-pill: 999px;
 
   // Shadows
@@ -52,4 +61,11 @@
   // Transitions
   --transition-fast: 150ms ease;
   --transition-base: 220ms ease;
+
+  // Icon sizes
+  --icon-size-xs: 1.5rem; // 24px
+  --icon-size-sm: 2rem; // 32px
+  --icon-size-md: 2.5rem; // 40px
+  --icon-size-lg: 3rem; // 48px
+  --icon-size-xl: 3.5rem; // 56px
 }
