@@ -7,7 +7,12 @@
 
 /* global handleAjaxError:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {$T} from 'indico/utils/i18n';
+
+import {CategoryCardList} from './../../../next_gen_ui_2026_components/Card/CategoryCardList';
 
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
@@ -129,4 +134,13 @@ import {$T} from 'indico/utils/i18n';
       });
     }
   };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('category-cards-root');
+    if (!root) {
+      return;
+    }
+    const categoryId = Number(root.dataset.categoryId);
+    ReactDOM.render(<CategoryCardList categoryId={categoryId} />, root);
+  });
 })(window);

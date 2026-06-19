@@ -9,6 +9,11 @@
   "dependencies": {
     "@babel/runtime": "^7.26.10",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-brands-svg-icons": "^7.2.0",
+    "@fortawesome/free-regular-svg-icons": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@monaco-editor/react": "^4.6.0",
     "@tinymce/tinymce-react": "^4.3.0",
     "ajv": "^8.11.0",

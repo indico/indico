@@ -1,0 +1,24 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:root {
+  --color-text: var(--indico-gray-500);
+  --color-text-muted: var(--indico-gray-400);
+  --color-text-heading: var(--indico-primary-blue-900);
+  --color-text-display-heading: white;
+
+  --color-text-link: var(--indico-primary-blue-600);
+  --color-text-link-hover: var(--indico-primary-blue-700);
+  --color-text-link-visited: var(--indico-primary-blue-900);
+
+  --color-on-primary: white;
+  --color-surface-soft: var(--indico-gray-50);
+  --color-surface-soft-hover: var(--indico-gray-100);
+
+  --color-primary: var(--indico-primary-blue-500);
+  --color-primary-hover: var(--indico-primary-blue-600);
+}

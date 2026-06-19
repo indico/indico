@@ -10,15 +10,15 @@ from flask import redirect, request
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryCalendarViewEvents,
-                                                           RHCategoryClosestEvent, RHCategoryIcon, RHCategoryInfo,
-                                                           RHCategoryLogo, RHCategoryManagedEventSearch,
-                                                           RHCategoryOverview, RHCategoryPreviousEvent,
-                                                           RHCategorySearch, RHCategoryStatistics,
-                                                           RHCategoryStatisticsJSON, RHCategoryUpcomingEvent,
-                                                           RHDisplayCategory, RHEventList, RHExportCategoryAtom,
-                                                           RHExportCategoryICAL, RHReachableCategoriesInfo,
-                                                           RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
-                                                           RHSubcatInfo)
+                                                           RHCategoryChildrenJSON, RHCategoryClosestEvent,
+                                                           RHCategoryIcon, RHCategoryInfo, RHCategoryLogo,
+                                                           RHCategoryManagedEventSearch, RHCategoryOverview,
+                                                           RHCategoryPreviousEvent, RHCategorySearch,
+                                                           RHCategoryStatistics, RHCategoryStatisticsJSON,
+                                                           RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
+                                                           RHExportCategoryAtom, RHExportCategoryICAL,
+                                                           RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
+                                                           RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHAPIEventMoveRequests, RHCategoryRoleMembersExportCSV,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
@@ -111,6 +111,7 @@ _bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), s
 
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
+_bp.add_url_rule('/api/children', 'get_category_children', RHCategoryChildrenJSON)
 _bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/events/search-for-series', 'event_search', RHCategoryManagedEventSearch)
 
