@@ -71,6 +71,11 @@ Accessibility
   :user:`foxbunny`)
 - Screen readers now correctly recognise modal dialogs as modal, keeping
   navigation within the open dialog (:pr:`7570`, thanks :user:`foxbunny`)
+- Screen reader users can now reliably hear their relationship to each event in
+  the dashboard's "Your events at hand" list (management, reviewing, attendance
+  and favourite status), which was previously exposed only through role-icon
+  tooltips that assistive technology did not announce dependably (:pr:`7589`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
