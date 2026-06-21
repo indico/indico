@@ -687,6 +687,7 @@ class Registration(db.Model):
         invitation = self.invitation
         moderation_required = (regform.moderation_enabled and not _skip_moderation and
                                (not invitation or not invitation.skip_moderation))
+        reset_on_modification = moderation_required and regform.reset_approval_on_modification
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and self.price and not self.is_paid
         if self.state is None:
@@ -697,10 +698,14 @@ class Registration(db.Model):
             else:
                 self.state = RegistrationState.complete
         elif self.state == RegistrationState.unpaid:
-            if not self.price:
+            if reset_on_modification:
+                self.state = RegistrationState.pending
+            elif not self.price:
                 self.state = RegistrationState.complete
         elif self.state == RegistrationState.complete:
-            if payment_required:
+            if reset_on_modification:
+                self.state = RegistrationState.pending
+            elif payment_required:
                 self.state = RegistrationState.unpaid
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
@@ -719,7 +724,8 @@ class Registration(db.Model):
         moderation_required = (regform.moderation_enabled and not _skip_moderation and
                                (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
-            payment_required = regform.event.has_feature('payment') and bool(self.price)
+            payment_required = (regform.event.has_feature('payment') and bool(self.price) and
+                                not self.is_paid)
         if self.state == RegistrationState.pending:
             if approved and payment_required:
                 self.state = RegistrationState.unpaid
