@@ -26,7 +26,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.receipts.util import sandboxed_url_fetcher
+from indico.modules.receipts.util import IndicoURLFetcher
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, get_day_start, iterdays
 from indico.util.i18n import _
@@ -457,8 +457,8 @@ class TimetableExportProgramConfig:
 
 
 def create_pdf(html, css, event) -> BytesIO:
-    css_url_fetcher = sandboxed_url_fetcher(event)
-    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
+    css_url_fetcher = IndicoURLFetcher(event)
+    html_url_fetcher = IndicoURLFetcher(event, allow_event_images=True)
     css = CSS(string=css, url_fetcher=css_url_fetcher)
     documents = [
         HTML(string=html, url_fetcher=html_url_fetcher).render(stylesheets=(css,))

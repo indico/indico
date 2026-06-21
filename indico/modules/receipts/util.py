@@ -26,8 +26,8 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.python import PythonLexer
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import or_
-from weasyprint import CSS, HTML, default_url_fetcher
-from weasyprint.urls import URLFetcherResponse
+from weasyprint import CSS, HTML
+from weasyprint.urls import URLFetcher, URLFetcherResponse
 from webargs.flaskparser import abort
 from werkzeug.exceptions import UnprocessableEntity
 
@@ -181,16 +181,22 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
         raise UnprocessableEntity(e)
 
 
-def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.Callable[[str], dict]:
+class IndicoURLFetcher(URLFetcher):
     """Fetch also "event-local" URLs.
 
     More info on fetchers: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#url-fetchers
     """
-    allow_external_urls = receipts_settings.get('allow_external_urls')
 
-    def _fetcher(url: str) -> dict:
+    def __init__(self, event: Event, *, allow_event_images: bool = False):
+        self.event = event
+        self.allow_event_images = allow_event_images
+        self.allow_external_urls = receipts_settings.get('allow_external_urls')
+        super().__init__(allowed_protocols={'http', 'https'}, allow_redirects=False)
+
+    def fetch(self, url, headers=None):
         url_data = urlparse(url)
-        if allow_event_images and url_data.scheme == 'event':
+        if self.allow_event_images and url_data.scheme == 'event':
+            event = self.event
             if url_data.netloc == 'logo':
                 if not event.has_logo:
                     raise ValueError('Event has no logo')
@@ -224,12 +230,10 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
                 logger.warning('Attempted to use local file URL %s in a document template', url)
             raise ValueError('Invalid URL scheme')
 
-        if not allow_external_urls and not url.startswith(config.BASE_URL):
+        if not self.allow_external_urls and not url.startswith(config.BASE_URL):
             raise ValueError('External URLs not allowed')
 
-        return default_url_fetcher(url)
-
-    return _fetcher
+        return super().fetch(url, headers)
 
 
 def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
@@ -240,8 +244,8 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     :param css: CSS stylesheet to include
     :return: a the rendered PDF blob
     """
-    css_url_fetcher = sandboxed_url_fetcher(event)
-    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
+    css_url_fetcher = IndicoURLFetcher(event)
+    html_url_fetcher = IndicoURLFetcher(event, allow_event_images=True)
     try:
         css = CSS(string=f'{css}{DEFAULT_CSS}', url_fetcher=css_url_fetcher)
     except IndexError:
