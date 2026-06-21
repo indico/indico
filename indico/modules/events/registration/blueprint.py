@@ -265,7 +265,7 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registr
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
                  privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
-
+_bp.add_url_rule('/api/registrations/participants/data', 'api_participant_list', display.RHParticipantListREST)
 
 # Check-in app API
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/', 'api_checkin_event', api_checkin.RHCheckinAPIEventDetails)

@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .cell-img {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -16,14 +18,14 @@
   width: 50px;
 }
 
-.participant-table-row {
+.participant-table-header {
   position: relative;
+  overflow-x: hidden;
 
   > p {
     width: 100%;
     line-height: 1em;
     display: inline-block;
-    overflow: hidden;
     text-overflow: ellipsis;
   }
 
@@ -39,8 +41,45 @@
   }
 }
 
-:global(.ui.sortable.table) .participant-table-row:not(.unsortable):not(:global(.sorted))::after {
+:global(.ui.sortable.table) .participant-table-header:not(.unsortable):not(:global(.sorted))::after {
   display: inline-block;
   content: '\f0dc';
   opacity: 0.4;
+}
+
+.merged-view-hidden-participants-count {
+  div {
+    color: $dark-gray;
+  }
+}
+
+.participant-list-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+
+  :global(i.icon).search-hint {
+    color: $gray;
+    margin-right: 10px;
+  }
+}
+
+.participant-list-dropdown {
+  margin-left: 10px;
+}
+
+.participant-list-pagination-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.participant-list-pagination {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+
+  > a {
+    border-bottom: 0.1px solid $separator-color;
+  }
 }
