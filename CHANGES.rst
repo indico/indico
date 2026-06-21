@@ -71,6 +71,9 @@ Accessibility
   :user:`foxbunny`)
 - Screen readers now correctly recognise modal dialogs as modal, keeping
   navigation within the open dialog (:pr:`7570`, thanks :user:`foxbunny`)
+- Screen reader users now hear the affiliation, email and phone on their profile
+  dashboard announced as labelled fields instead of bare values (:pr:`7593`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
