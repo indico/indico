@@ -24,6 +24,7 @@ export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
 export const HOUR_SIZE = minutesToPixels(60);
 export const DAY_SIZE = 24 * HOUR_SIZE;
 export const V_SPACE_BETWEEN_ENTRIES_PX = 1;
+export const DRAG_DURATION_THRESHOLD = 100;
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
