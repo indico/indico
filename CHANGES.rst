@@ -57,6 +57,8 @@ Bugfixes
   :user:`foxbunny`)
 - Fix database error when importing protection settings in an unlisted event
   (:issue:`7550`, :pr:`7551`)
+- Use consistent sorting and hide deleted+unused single-choice options in
+  registration list filters (:pr:`7439`, thanks :user:`duartegalvao`)
 
 Accessibility
 ^^^^^^^^^^^^^
