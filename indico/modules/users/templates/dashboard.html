@@ -96,10 +96,12 @@
                         <ul>
                             {% for event in unlisted_events %}
                                 <li class="flexrow">
-                                    <span class="event-date f-self-no-shrink"
-                                          title="{{ _format_event_times(event) }}">
-                                        {{ _format_event_time(event) }}
-                                    </span>
+                                    <time class="event-date f-self-no-shrink" datetime="{{ event.start_dt.isoformat() }}">
+                                        <ind-with-tooltip>
+                                            {{ _format_event_time(event) }}
+                                            <span data-tip-content>{{ _format_event_times(event) }}</span>
+                                        </ind-with-tooltip>
+                                    </time>
                                     <span class="event-title ellipsis f-self-stretch">
                                         <a href="{{ event.url }}">
                                             {{ event.get_verbose_title(show_series_pos=true) }}
@@ -121,9 +123,12 @@
                     <ul>
                         {% for event, roles in linked_events %}
                             <li id="event-{{ event.id }}" class="flexrow">
-                                <span class="event-date" title="{{ _format_event_times(event) }}">
-                                    {{ _format_event_time(event) }}
-                                </span>
+                                <time class="event-date" datetime="{{ event.start_dt.isoformat() }}">
+                                    <ind-with-tooltip>
+                                        {{ _format_event_time(event) }}
+                                        <span data-tip-content>{{ _format_event_times(event) }}</span>
+                                    </ind-with-tooltip>
+                                </time>
                                 <span class="event-title ellipsis f-self-stretch">
                                     <a href="{{ event.url }}">
                                         {{ event.get_verbose_title(show_series_pos=true) }}
@@ -198,10 +203,12 @@
                         {% else %}
                             {% for event in categories_events %}
                                 <li class="flexrow">
-                                    <span class="event-date f-self-no-shrink"
-                                          title="{{ _format_event_times(event) }}">
-                                        {{ _format_event_time(event) }}
-                                    </span>
+                                    <time class="event-date f-self-no-shrink" datetime="{{ event.start_dt.isoformat() }}">
+                                        <ind-with-tooltip>
+                                            {{ _format_event_time(event) }}
+                                            <span data-tip-content>{{ _format_event_times(event) }}</span>
+                                        </ind-with-tooltip>
+                                    </time>
                                     <div class="flexcol ellipsis">
                                         <span class="event-title ellipsis">
                                             <a href="{{ event.url }}">
