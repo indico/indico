@@ -35,9 +35,8 @@ class AccompanyingPersonSchema(mm.Schema):
         old_id = data.get('id', '')
         if old_id.startswith('new:'):
             data['id'] = str(uuid4())
-            signals.event.registration.generate_accompanying_person_id.send(
-                self, temporary_id=old_id, permanent_id=data['id']
-            )
+            signals.event.registration.generate_accompanying_person_id.send(self, temporary_id=old_id,
+                                                                            permanent_id=data['id'])
         return data
 
     @post_load
