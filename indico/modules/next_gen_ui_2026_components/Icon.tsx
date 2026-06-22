@@ -27,7 +27,7 @@ type IconSource =
 
 export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain';
-export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type IconSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface IconProps {
   icon: IconSource;
