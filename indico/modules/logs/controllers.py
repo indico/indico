@@ -237,8 +237,10 @@ class RHResendEmail(RHManageEventBase):
         if preface := form_data['preface']:
             text_separator = '\n\n-------------\n\n'
             if is_html_email:
-                assert '<body>' in body  # should always be true for HTML emails
-                body = body.replace('<body>', f'<body>{preface}<hr>', 1)
+                if '<body>' in body:
+                    body = body.replace('<body>', f'<body>{preface}<hr>', 1)
+                else:
+                    body = f'{preface}<hr>{body}'
                 text_preface = html_to_markdown(preface, inline_links=False).strip()
                 alternatives = [
                     (f'{text_preface}{text_separator}{alt_body}', mimetype)
