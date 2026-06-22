@@ -9,6 +9,10 @@
 @use 'base/reset';
 @use 'next_gen_ui_2026/styles/base' as *;
 
+// html {
+//   font-size: 16px;
+// }
+
 // body {
 //   min-height: 100vh;
 //   font-family: var(--font-family-base);
@@ -16,41 +20,41 @@
 //   background: var(--color-surface-soft);
 // }
 
-a {
-  color: inherit;
-}
+// a {
+//   color: inherit;
+// }
 
-p {
-  @include typography('text-sm', 'regular'); // 12px
-  color: var(--color-text);
-}
+// p {
+//   @include typography('text-sm', 'regular'); // 12px
+//   color: var(--color-text);
+// }
 
-h1 {
-  @include typography('display-md', 'bold'); // 36px
-  color: var(--color-text-display-heading);
-}
+// h1 {
+//   @include typography('display-md', 'bold'); // 36px
+//   color: var(--color-text-display-heading);
+// }
 
-h2 {
-  @include typography('display-sm', 'bold'); // 30px
-  color: var(--color-text-display-heading);
-}
+// h2 {
+//   @include typography('display-sm', 'bold'); // 30px
+//   color: var(--color-text-display-heading);
+// }
 
-h3 {
-  @include typography('text-xl', 'semibold'); // 20px
-  color: var(--color-text-heading);
-}
+// h3 {
+//   @include typography('text-xl', 'semibold'); // 20px
+//   color: var(--color-text-heading);
+// }
 
-h4 {
-  @include typography('text-lg', 'semibold'); // 18px
-  color: var(--color-text-heading);
-}
+// h4 {
+//   @include typography('text-lg', 'semibold'); // 18px
+//   color: var(--color-text-heading);
+// }
 
-h5 {
-  @include typography('text-md', 'semibold'); // 16px
-  color: var(--color-text-heading);
-}
+// h5 {
+//   @include typography('text-md', 'semibold'); // 16px
+//   color: var(--color-text-heading);
+// }
 
-h6 {
-  @include typography('text-sm', 'semibold'); // 14px
-  color: var(--color-text-heading);
-}
+// h6 {
+//   @include typography('text-sm', 'semibold'); // 14px
+//   color: var(--color-text-heading);
+// }

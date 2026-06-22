@@ -17,9 +17,20 @@ import './CategoryCardList.module.scss';
 
 interface CategoryCardListProps {
   categoryId: number;
+  columns?: 1 | 2 | 3;
 }
 
-export function CategoryCardList({categoryId}: CategoryCardListProps) {
+interface Category {
+  id: React.Key;
+  displayURL: string;
+  title: string;
+  deepCategoryCount: number;
+  deepEventCount: number;
+  isProtected: boolean;
+  isFavorite: boolean;
+}
+
+export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProps) {
   const url = getCategoryChildrenURL({
     category_id: String(categoryId),
   });
@@ -32,9 +43,11 @@ export function CategoryCardList({categoryId}: CategoryCardListProps) {
     return null;
   }
 
+  const gridClass = `${columns > 1 ? `grid-${columns}` : ''}`;
+
   return (
-    <div>
-      {data.categories.map(category => (
+    <div className={gridClass}>
+      {data.categories.map((category: Category) => (
         <Card key={category.id} href={category.displayURL}>
           <Card.Icon
             icon={{name: 'folder', prefix: 'fas'}}
@@ -62,7 +75,7 @@ export function CategoryCardList({categoryId}: CategoryCardListProps) {
             <Card.Icon
               icon={{name: 'chevron-right', prefix: 'fas'}}
               color="gray"
-              size="xs"
+              size="xxs"
               variant="plain"
               title="View Category"
               label="View Category"

@@ -13,6 +13,7 @@ import ReactDOM from 'react-dom';
 import {$T} from 'indico/utils/i18n';
 
 import {CategoryCardList} from './../../../next_gen_ui_2026_components/Card/CategoryCardList';
+import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
@@ -141,6 +142,11 @@ import {CategoryCardList} from './../../../next_gen_ui_2026_components/Card/Cate
       return;
     }
     const categoryId = Number(root.dataset.categoryId);
-    ReactDOM.render(<CategoryCardList categoryId={categoryId} />, root);
+    ReactDOM.render(
+      <IndicoUIProvider>
+        <CategoryCardList categoryId={categoryId} />
+      </IndicoUIProvider>,
+      root
+    );
   });
 })(window);

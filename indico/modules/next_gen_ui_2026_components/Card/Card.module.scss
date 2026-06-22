@@ -13,12 +13,10 @@
 
   min-width: 0;
   max-width: var(--container-md);
-  padding: var(--space-3) var(--space-5); // 12px top/bottom, 20px left/right
+  padding: var(--space-3) var(--space-3); // 12px top/bottom, 20px left/right
   box-sizing: border-box;
 
   background: var(--color-surface-soft);
-  margin: var(--space-4);
-  box-shadow: var(--shadow-sm);
   transition: background var(--transition-fast);
   border-radius: var(--radius-lg);
 
@@ -29,9 +27,23 @@
 
 .card-header {
   @include text-ellipsis();
+  @include typography('text-sm', 'semibold'); // 14px
+  color: var(--color-text-heading);
+  margin: 0;
+  max-width: 100%;
 }
 
 .card-meta {
   @include typography('text-xs', 'regular'); // 12px
   color: var(--color-text-muted);
+  margin: 0;
+  max-width: 100%;
+}
+
+.card-description {
+  @include text-ellipsis();
+  @include typography('text-sm', 'regular'); // 14px
+  color: var(--color-text);
+  margin: 0;
+  max-width: 100%;
 }
