@@ -10,8 +10,6 @@ Version 3.3.13
 Improvements
 ^^^^^^^^^^^^
 
-- Add support for **anonymous** accompanying with numeric count only in registration form
-  (:issue:`7383`)
 - Include keywords in contribution CSV/Excel exports (:pr:`7421`)
 - Add new permission that grants only participant management (create, edit and
   delete registrations) without access to the registration form configuration
@@ -38,6 +36,8 @@ Improvements
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
 - Add "Affiliation" field type to regforms (:pr:`7352`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Add support for anonymous accompanying persons (numeric count only) in registration form
+  (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr`)
 
 Bugfixes
 ^^^^^^^^
