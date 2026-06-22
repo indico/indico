@@ -11,6 +11,10 @@
   --viewport-desktop: 1280px;
 }
 
+[class^='grid-'] {
+  gap: var(--space-3);
+}
+
 // Grid layouts
 .grid-12 {
   display: grid;
