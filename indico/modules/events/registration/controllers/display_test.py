@@ -217,9 +217,9 @@ def test_display_register_anonymous_accompanying_persons(db, dummy_event, dummy_
     assert reg.data_by_field[field.id].data == 2
     assert reg.data_by_field[field.id].friendly_data == '2'
     assert reg.data_by_field[field.id].search_data == '2'
-    assert reg.data_by_field[field.id].get_friendly_data(for_humans=True) == '2 people'
-    assert field.field_impl.render_summary_data(reg.data_by_field[field.id]) == '2 people'
-    assert field.field_impl.render_email_data(reg.data_by_field[field.id]) == '2 people'
+    assert reg.data_by_field[field.id].get_friendly_data(for_humans=True) == '2 persons'
+    assert field.field_impl.render_summary_data(reg.data_by_field[field.id]) == '2 persons'
+    assert field.field_impl.render_email_data(reg.data_by_field[field.id]) == '2 persons'
     assert reg.accompanying_persons == []
     db.session.expire(reg)
     db.session.expire(dummy_regform)
