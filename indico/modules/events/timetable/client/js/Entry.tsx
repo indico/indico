@@ -195,6 +195,7 @@ export default function Entry({
   const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
+  const draftEntry = useSelector(selectors.getDraftEntry);
 
   let style: Record<string, string | number | undefined> = transform
     ? {
@@ -324,13 +325,15 @@ export default function Entry({
           </div>
         )}
       </div>
-      <EntryMoveButtons
-        id={id}
-        sessionBlockId={sessionBlockId}
-        startDt={startDt}
-        duration={duration}
-        colors={btnColors}
-      />
+      {!draftEntry && (
+        <EntryMoveButtons
+          id={id}
+          sessionBlockId={sessionBlockId}
+          startDt={startDt}
+          duration={duration}
+          colors={btnColors}
+        />
+      )}
       <ResizeHandle
         duration={duration}
         minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}
