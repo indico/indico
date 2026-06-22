@@ -45,7 +45,7 @@ ExistingInviteFields.propTypes = {
   eventId: PropTypes.number.isRequired,
 };
 
-function NewInviteFields() {
+function NewInviteFields({allowAffiliations}) {
   return (
     <>
       <Form.Group widths="equal">
@@ -59,12 +59,22 @@ function NewInviteFields() {
         required
         description={Translate.string('The invitation will be sent to this address.')}
       />
-      <FinalInput name="affiliation" label={Translate.string('Affiliation')} />
+      {allowAffiliations && (
+        <FinalInput name="affiliation" label={Translate.string('Affiliation')} />
+      )}
     </>
   );
 }
 
-function ImportInviteFields({eventId, regformId}) {
+NewInviteFields.propTypes = {
+  allowAffiliations: PropTypes.bool,
+};
+
+NewInviteFields.defaultProps = {
+  allowAffiliations: true,
+};
+
+function ImportInviteFields({eventId, regformId, allowAffiliations}) {
   return (
     <>
       <Message info icon>
@@ -85,7 +95,12 @@ function ImportInviteFields({eventId, regformId}) {
           </Translate>
         </Message.Content>
       </Message>
-      <ImportInvitationsField name="imported" eventId={eventId} regformId={regformId} />
+      <ImportInvitationsField
+        name="imported"
+        eventId={eventId}
+        regformId={regformId}
+        allowAffiliations={allowAffiliations}
+      />
       <FinalCheckbox
         name="skip_existing"
         label={Translate.string('Skip existing invitations')}
@@ -98,6 +113,11 @@ function ImportInviteFields({eventId, regformId}) {
 ImportInviteFields.propTypes = {
   eventId: PropTypes.number.isRequired,
   regformId: PropTypes.number.isRequired,
+  allowAffiliations: PropTypes.bool,
+};
+
+ImportInviteFields.defaultProps = {
+  allowAffiliations: true,
 };
 
 const modeConfig = {
@@ -112,7 +132,7 @@ const modeConfig = {
   new: {
     label: Translate.string('New user'),
     buttonLabel: Translate.string('New user'),
-    renderFields: () => <NewInviteFields />,
+    renderFields: props => <NewInviteFields {...props} />,
     extraFields: ['first_name', 'last_name', 'email', 'affiliation'],
     getPreviewPayload: values => {
       const firstName = values.first_name.trim();
@@ -300,7 +320,13 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         ))}
       </Button.Group>
       <Segment attached="bottom">
-        {ModeFields && <ModeFields eventId={eventId} regformId={regformId} />}
+        {ModeFields && (
+          <ModeFields
+            eventId={eventId}
+            regformId={regformId}
+            allowAffiliations={metadata.allowAffiliations ?? true}
+          />
+        )}
       </Segment>
       {metadata.moderationEnabled && (
         <FinalCheckbox

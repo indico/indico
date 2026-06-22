@@ -34,6 +34,13 @@ from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
 
+def _is_compatible_internal_name_type(internal_name, input_type, other_input_type):
+    return (
+        input_type == other_input_type or
+        (internal_name == 'affiliation' and {input_type, other_input_type} <= {'text', 'affiliation'})
+    )
+
+
 class GeneralFieldDataSchema(mm.Schema):
     class Meta:
         unknown = EXCLUDE
@@ -137,7 +144,12 @@ class GeneralFieldDataSchema(mm.Schema):
                              Event.id == field.registration_form.event_id))
             if field.id:
                 query = query.filter(RegistrationFormItem.id != field.id)
-            if inconsistent_field := query.first():
+            inconsistent_field = next(
+                (item for item in query
+                 if not _is_compatible_internal_name_type(internal_name, field.input_type, item.input_type)),
+                None
+            )
+            if inconsistent_field:
                 raise ValidationError(_('The field "{}" with the same internal name on form "{}" '
                                         'uses a different input type which is not allowed.')
                                       .format(inconsistent_field.title, inconsistent_field.registration_form.title))
@@ -317,7 +329,13 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                          RegistrationFormItem.is_enabled,
                          ~RegistrationFormItem.is_deleted,
                          Event.id == self.field.registration_form.event_id))
-        if inconsistent_field := query.first():
+        inconsistent_field = next(
+            (item for item in query
+             if not _is_compatible_internal_name_type(self.field.internal_name, self.field.input_type,
+                                                      item.input_type)),
+            None
+        )
+        if inconsistent_field:
             raise NoReportError.wrap_exc(
                 BadRequest(_('The field "{}" with the same internal name on form "{}" '
                              'uses a different input type which is not allowed.')

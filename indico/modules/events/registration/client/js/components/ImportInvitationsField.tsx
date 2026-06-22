@@ -56,6 +56,41 @@ function ImportedInvitesMessage({name}: {name: string}) {
   );
 }
 
+function ImportedInviteAffiliationWarning({
+  name,
+  allowAffiliations,
+}: {
+  name: string;
+  allowAffiliations: boolean;
+}) {
+  return (
+    <Field name={name} subscription={{value: true}}>
+      {({input: {value}}) => {
+        const count =
+          !allowAffiliations &&
+          value?.filter(({affiliation}: ImportedInvitation) => affiliation.trim()).length;
+        return (
+          count > 0 && (
+            <Message visible warning icon>
+              <Icon name="warning" />
+              <PluralTranslate count={count} as={Message.Content}>
+                <Singular>
+                  <Param name="count" value={count} /> imported invitation contains affiliation data
+                  that will not be pre-filled because this form only allows predefined affiliations.
+                </Singular>
+                <Plural>
+                  <Param name="count" value={count} /> imported invitations contain affiliation data
+                  that will not be pre-filled because this form only allows predefined affiliations.
+                </Plural>
+              </PluralTranslate>
+            </Message>
+          )
+        );
+      }}
+    </Field>
+  );
+}
+
 function getErrorMessages(error: unknown): string[] {
   const axiosError = error as AxiosError<UploadErrorResponse>;
   if (axiosError?.response?.status === 422) {
@@ -74,10 +109,12 @@ export default function ImportInvitationsField({
   name,
   eventId,
   regformId,
+  allowAffiliations,
 }: {
   name: string;
   eventId: number;
   regformId: number;
+  allowAffiliations: boolean;
 }) {
   const uploadURL = useMemo(
     () => inviteImportUploadURL({event_id: eventId, reg_form_id: regformId}),
@@ -116,6 +153,7 @@ export default function ImportInvitationsField({
         required
       />
       <ImportedInvitesMessage name={name} />
+      <ImportedInviteAffiliationWarning name={name} allowAffiliations={allowAffiliations} />
     </>
   );
 }

@@ -436,6 +436,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     form_data=form_data,
                                                     initial_values=initial_values,
                                                     file_data=file_data,
+                                                    has_predefined_affiliations=self.regform_uses_predefined_affiliations,
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,
