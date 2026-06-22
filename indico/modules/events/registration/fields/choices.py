@@ -144,8 +144,8 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         query = (RegistrationData.query
                  .join(RegistrationData.registration)
                  .filter(Registration.registration_form == self.form_item.registration_form,
-                          ~Registration.is_deleted,
-                          RegistrationData.field_data.has(field_id=self.form_item.id)))
+                         ~Registration.is_deleted,
+                         RegistrationData.field_data.has(field_id=self.form_item.id)))
         choice_key = RegistrationData.data.op('?')('choice')
         non_legacy_ids = (query.filter(~choice_key)
                           .with_entities(db.func.jsonb_object_keys(RegistrationData.data).label('choice_id')))
