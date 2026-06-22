@@ -10,6 +10,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
+import {Translate, Param} from 'indico/react/i18n';
+
 import './DayTimetable.module.scss';
 import './Entry.module.scss';
 
@@ -30,7 +32,16 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {ReduxState, TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
+import {useToast} from './ToastContext';
+import {
+  ReduxState,
+  TopLevelEntry,
+  BlockEntry,
+  Entry,
+  isChildEntry,
+  EntryType,
+  Session,
+} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
@@ -38,10 +49,12 @@ import {
   GRID_SIZE_MINUTES,
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
+  flattenEntries,
   getDateKey,
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
+  getEntryUniqueId,
 } from './utils';
 
 interface DayTimetableProps {
@@ -109,6 +122,7 @@ export function DayTimetable({
   entries,
   scrollPosition = 0,
 }: DayTimetableProps) {
+  const toast = useToast();
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
@@ -133,6 +147,47 @@ export function DayTimetable({
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
   const {openModal} = useModal();
+
+  const sessions: Record<number, Session> = useSelector(selectors.getSessions);
+
+  function showToastIfContribSessionChanged(
+    contribTitle?: string,
+    fromSessionId?: number,
+    toSessionId?: number
+  ) {
+    if (fromSessionId === toSessionId) {
+      return;
+    }
+
+    const fromSession = sessions[fromSessionId];
+    const toSession = sessions[toSessionId];
+
+    const title = contribTitle || Translate.string('the contribution');
+    let message: React.ReactNode;
+    if (fromSession?.title && toSession?.title) {
+      message = (
+        <Translate>
+          <Param name="title" value={title} wrapper={<strong />} /> was moved from session{' '}
+          <Param name="fromSession" value={fromSession.title} wrapper={<strong />} /> to session{' '}
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />
+        </Translate>
+      );
+    } else if (toSession?.title) {
+      message = (
+        <Translate>
+          <Param name="title" value={title} wrapper={<strong />} /> is now part of session{' '}
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />
+        </Translate>
+      );
+    } else {
+      return;
+    }
+    toast.addToast({type: 'info', message});
+  }
+
+  function findEntryById(id: string): Entry | undefined {
+    return flattenEntries(currentDayEntries).find(e => e.id === id);
+  }
 
   function handleOpenDraftModal() {
     openModal(DRAFT_ENTRY_MODAL, {
@@ -227,6 +282,10 @@ export function DayTimetable({
         ) || [];
       // TODO(tomas): use something better than 'unscheduled-' prefix
       const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      const fromContrib = unscheduled.find(
+        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+      );
+      showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
       dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
     }
   }
@@ -260,12 +319,24 @@ export function DayTimetable({
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
     const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+    const fromContrib = unscheduled.find(
+      c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+    );
+    const targetBlock = currentDayEntries.find(
+      e => e.type === EntryType.SessionBlock && e.objId === blockId
+    ) as BlockEntry | undefined;
+    showToastIfContribSessionChanged(
+      fromContrib?.title,
+      fromContrib?.sessionId,
+      targetBlock?.sessionId
+    );
     dispatch(
       actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
     );
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
+    const originalEntry = findEntryById(who);
     const sessionBlockId = expandedSessionBlock?.id;
     if (sessionBlockId) {
       const [newLayout, movedEntry] = layoutAfterDropOnBlock(
@@ -276,6 +347,13 @@ export function DayTimetable({
         mouse,
         over
       );
+      if (originalEntry?.type === EntryType.Contribution) {
+        showToastIfContribSessionChanged(
+          originalEntry.title,
+          originalEntry.sessionId,
+          expandedSessionBlock?.sessionId
+        );
+      }
       dispatch(
         actions.changeEntryLayout(
           movedEntry,
@@ -292,6 +370,9 @@ export function DayTimetable({
         delta,
         mouse
       );
+      if (originalEntry?.type === EntryType.Contribution) {
+        showToastIfContribSessionChanged(originalEntry.title, originalEntry.sessionId, null);
+      }
       dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), null));
     }
   }
@@ -303,10 +384,21 @@ export function DayTimetable({
     mouse: MousePosition,
     calendar: Over
   ) {
+    const originalEntry = findEntryById(who);
     const [newLayout, movedEntry, blockId] =
       layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar) || [];
     if (!newLayout) {
       return;
+    }
+    if (originalEntry?.type === EntryType.Contribution) {
+      const targetBlock = entries.find(
+        e => e.type === EntryType.SessionBlock && e.objId === blockId
+      ) as BlockEntry | undefined;
+      showToastIfContribSessionChanged(
+        originalEntry.title,
+        originalEntry.sessionId,
+        targetBlock?.sessionId
+      );
     }
     dispatch(actions.changeEntryLayout(movedEntry, newLayout, getDateKey(dt), blockId));
   }

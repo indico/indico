@@ -16,7 +16,7 @@ import {ContributionFormFields} from 'indico/modules/events/contributions/Contri
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 import {handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -25,8 +25,9 @@ import {BreakFormFields} from './BreakForm';
 import {mapDataToEntry, mapEntryToData, mapSessionToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
+import {useToast} from './ToastContext';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT} from './utils';
+import {DATE_KEY_FORMAT, getDateKey} from './utils';
 
 // Generic models
 
@@ -90,6 +91,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onClose = () => null,
   onSubmit = () => null,
 }) => {
+  const toast = useToast();
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
@@ -243,9 +245,33 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     try {
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
+        const oldDayKey = getDateKey(entry.startDt);
+        const newDayKey = getDateKey(updatedEntry.startDt);
         dispatch(
           actions.updateEntry(activeType, updatedEntry, currentDay, getChangedValues(data, form))
         );
+        if (
+          (activeType === EntryType.SessionBlock || activeType === EntryType.Contribution) &&
+          oldDayKey !== newDayKey
+        ) {
+          const oldDayLabel = moment(entry.startDt).format('ll');
+          const newDayLabel = moment(updatedEntry.startDt).format('ll');
+          const fallbackTitle =
+            activeType === EntryType.SessionBlock
+              ? session?.title || Translate.string('Session block')
+              : Translate.string('Contribution');
+          const entryTitle = updatedEntry.title || entry.title || fallbackTitle;
+          toast.addToast({
+            type: 'info',
+            message: (
+              <Translate>
+                <Param name="title" value={entryTitle} wrapper={<strong />} /> was moved from{' '}
+                <Param name="oldDay" value={oldDayLabel} wrapper={<strong />} /> to{' '}
+                <Param name="newDay" value={newDayLabel} wrapper={<strong />} />.
+              </Translate>
+            ),
+          });
+        }
       } else {
         dispatch(actions.createEntry(activeType, data));
       }
