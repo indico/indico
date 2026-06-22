@@ -116,13 +116,9 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
     @property
     def anonymous_lock_reason(self):
         if self.is_anonymous and self.has_active_registration_data:
-            return _(
-                'Cannot be switched back to named mode when anonymous accompanying persons are registered.'
-            )
+            return _('Cannot be switched back to named mode when anonymous accompanying persons are registered.')
         if self.has_active_registration_data:
-            return _(
-                'Cannot be enabled when accompanying persons are registered.'
-            )
+            return _('Cannot be enabled when accompanying persons are registered.')
         return None
 
     def _get_person_count(self, data):
