@@ -36,7 +36,7 @@ export interface IconProps {
   size?: IconSize;
   variant?: IconVariant;
   rounded?: boolean;
-  label?: string;
+  ariaLabel?: string;
   title?: string;
 }
 
@@ -47,10 +47,10 @@ export const Icon: React.FC<IconProps> = ({
   size = 'md',
   variant = 'plain',
   rounded = false,
-  label,
+  ariaLabel,
   title,
 }) => {
-  const decorative = !label;
+  const decorative = !ariaLabel;
 
   return (
     <span
@@ -62,7 +62,7 @@ export const Icon: React.FC<IconProps> = ({
       title={title} // TODO: remake this into new tooltip component
       aria-hidden={decorative}
       role={decorative ? undefined : 'img'}
-      aria-label={label}
+      aria-label={ariaLabel}
     >
       {'svg' in icon ? (
         icon.svg
