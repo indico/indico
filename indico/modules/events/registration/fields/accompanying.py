@@ -62,9 +62,7 @@ class AccompanyingPersonsFieldDataSchema(BillableFieldDataSchema):
         if not is_anonymous:
             if current_is_anonymous and has_active_registration_data:
                 raise ValidationError(
-                    _(
-                        'Cannot be switched back to named mode when anonymous accompanying persons are registered.'
-                    ),
+                    _('Cannot be switched back to named mode when anonymous accompanying persons are registered.'),
                     'is_anonymous',
                 )
             return
@@ -78,9 +76,7 @@ class AccompanyingPersonsFieldDataSchema(BillableFieldDataSchema):
             )
         if not current_is_anonymous and has_active_registration_data:
             raise ValidationError(
-                _(
-                    'Cannot be enabled when accompanying persons are registered.'
-                ),
+                _('Cannot be enabled when accompanying persons are registered.'),
                 'is_anonymous',
             )
 
