@@ -111,12 +111,14 @@ class GeneralFieldDataSchema(mm.Schema):
                 raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty '
                                         'for indefinite.'))
 
-    @validates('internal_name')
+    @validates_schema(skip_on_field_errors=True)
     @no_autoflush
-    def _check_internal_name(self, internal_name, **kwargs):
+    def _check_internal_name(self, data, **kwargs):
+        input_type = data['input_type']
+        internal_name = data.get('internal_name')
         field = self.context['field']
         if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.internal_name:
-            raise ValidationError(_('Changing internal name for personal data field is not allowed.'))
+            raise ValidationError(_('Changing internal name for personal data field is not allowed.'), 'internal_name')
         if internal_name is None:
             return
         if field.is_enabled is not False:  # None for new field
@@ -129,15 +131,17 @@ class GeneralFieldDataSchema(mm.Schema):
             if field.id:
                 query = query.filter(RegistrationFormItem.id != field.id)
             if same_field := query.first():
-                raise ValidationError(_('The field "{}" on this form has the same internal name.')
-                                      .format(same_field.title))
+                raise ValidationError(
+                    _('The field "{}" on this form has the same internal name.').format(same_field.title),
+                    'internal_name',
+                )
             # consistent type on forms of the same event
             query = (RegistrationFormItem.query
                      .join(RegistrationFormItem.registration_form)
                      .join(RegistrationForm.event)
                      .filter(RegistrationFormItem.internal_name == internal_name,
                              RegistrationFormItem.registration_form_id != field.registration_form.id,
-                             RegistrationFormItem.input_type != field.input_type,
+                             RegistrationFormItem.input_type != input_type,
                              RegistrationFormItem.is_enabled,
                              ~RegistrationFormItem.is_deleted,
                              ~RegistrationForm.is_deleted,
@@ -150,9 +154,12 @@ class GeneralFieldDataSchema(mm.Schema):
                 None
             )
             if inconsistent_field:
-                raise ValidationError(_('The field "{}" with the same internal name on form "{}" '
-                                        'uses a different input type which is not allowed.')
-                                      .format(inconsistent_field.title, inconsistent_field.registration_form.title))
+                raise ValidationError(
+                    _('The field "{field}" with the same internal name on form "{form}" uses a different input type '
+                      'which is not allowed.'
+                    ).format(field=inconsistent_field.title, form=inconsistent_field.registration_form.title),
+                    'internal_name',
+                )
 
     def _check_manager_only(self, field):
         return field.parent.is_manager_only

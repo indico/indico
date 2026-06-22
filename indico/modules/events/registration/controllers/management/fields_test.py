@@ -126,8 +126,9 @@ class TestGeneralFieldDataSchema:
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': position_field})
         with pytest.raises(ValidationError) as exc_info:
             assert schema.load({'input_type': 'text', 'title': position_field.title, 'internal_name': internal_name})
-        assert exc_info.value.messages == {'internal_name': 'Changing internal name for personal data field '
-                                                            'is not allowed.'}
+        assert exc_info.value.messages == {
+            'internal_name': 'Changing internal name for personal data field is not allowed.'
+        }
 
     def test_update_internal_name_of_disabled_field(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
@@ -149,28 +150,33 @@ class TestGeneralFieldDataSchema:
         assert schema.load({'input_type': 'text', 'title': position_field.title,
                             'internal_name': position_field.internal_name})
 
-    def test_internal_name_with_different_input_type_on_other_regform(self, db, create_regform, dummy_regform):
-        other_form = create_regform(dummy_regform.event, title='Other Form')
-        pd_section = dummy_regform.sections[0]
-        # Disable the title field on dummy_regform to be able to add another title field but with different type
-        title_field = next((field for field in pd_section.fields
-                            if field.personal_data_type == PersonalDataType.title), None)
-        title_field.is_enabled = False
-        db.session.flush()
-        new_section = RegistrationFormSection(registration_form=dummy_regform, title='New Section',
-                                              is_manager_only=False)
-        new_field = RegistrationFormField(parent=new_section, registration_form=dummy_regform, title='test',
-                                          input_type='text')
-        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': new_field})
+    def test_add_new_field_with_same_internal_name_on_other_regform(self, db, create_regform, dummy_regform):
+        RegistrationFormField(parent=dummy_regform.sections[0], registration_form=dummy_regform,
+                              title='Test field', input_type='text', internal_name='test-internal-name')
+        other_regform = create_regform(dummy_regform.event, title='Other regform')
+        # No other properties are set on the new field.
+        # The missing input_type is the most important here because that comes from the form data.
+        new_field = RegistrationFormField(parent=other_regform.sections[0], registration_form=other_regform)
+        schema = GeneralFieldDataSchema(context={'regform': other_regform, 'field': new_field})
+        assert schema.load({'title': 'Test field', 'input_type': 'text', 'internal_name': 'test-internal-name'})
+
+    def test_update_field_to_same_internal_name_but_different_input_type_on_other_regform(self, db, create_regform,
+                                                                                          dummy_regform):
+        RegistrationFormField(parent=dummy_regform.sections[0], registration_form=dummy_regform,
+                              title='Test title', input_type='number', internal_name='test-internal-name')
+        other_regform = create_regform(dummy_regform.event, title='Other regform')
+        section = RegistrationFormSection(registration_form=other_regform, title='Other Section', is_manager_only=False)
+        field = RegistrationFormField(parent=section, registration_form=other_regform, title='test', input_type='text')
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': field})
         with pytest.raises(ValidationError) as exc_info:
-            schema.load({'input_type': 'text', 'title': 'test', 'internal_name': 'title'})
+            schema.load({'input_type': 'text', 'title': 'test', 'internal_name': 'test-internal-name'})
         assert exc_info.value.messages == {
-            'internal_name': [f'The field "Title" with the same internal name on form '
-                              f'"{other_form.title}" uses a different input type which is not allowed.']
+            'internal_name': [f'The field "Test title" with the same internal name on form '
+                              f'"{dummy_regform.title}" uses a different input type which is not allowed.']
         }
-        other_form.is_deleted = True
+        dummy_regform.is_deleted = True
         db.session.flush()
-        assert schema.load({'input_type': 'text', 'title': 'text', 'internal_name': 'title'})
+        assert schema.load({'input_type': 'text', 'title': 'test', 'internal_name': 'test-internal-name'})
 
     def test_internal_name_allows_legacy_affiliation_type_on_other_regform(self, db, create_regform, dummy_regform):
         other_form = create_regform(dummy_regform.event, title='Other Form')
