@@ -27,5 +27,7 @@ def test_reject_enabling_accompanying_person_tickets_when_anonymous_mode_is_acti
             SimpleNamespace(data=True),
         )
 
-    assert str(exc_info.value) == ('Tickets for accompanying persons cannot be enabled because the registration '
-                                    'form contains anonymous accompanying person registrations.')
+    assert str(exc_info.value) == (
+        'Tickets for accompanying persons cannot be enabled because the registration '
+        'form contains anonymous accompanying person registrations.'
+    )
