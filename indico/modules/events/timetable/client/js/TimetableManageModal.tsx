@@ -27,7 +27,7 @@ import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {useToast} from './ToastContext';
 import {ReduxState, BlockEntry, EntryType, Session} from './types';
-import {DATE_KEY_FORMAT} from './utils';
+import {DATE_KEY_FORMAT, getDateKey} from './utils';
 
 // Generic models
 
@@ -245,8 +245,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     try {
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
-        const oldDayKey = moment(entry.startDt).format(DATE_KEY_FORMAT);
-        const newDayKey = moment(updatedEntry.startDt).format(DATE_KEY_FORMAT);
+        const oldDayKey = getDateKey(entry.startDt);
+        const newDayKey = getDateKey(updatedEntry.startDt);
         dispatch(
           actions.updateEntry(activeType, updatedEntry, currentDay, getChangedValues(data, form))
         );

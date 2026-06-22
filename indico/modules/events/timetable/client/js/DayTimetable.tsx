@@ -151,15 +151,15 @@ export function DayTimetable({
 
   function showToastIfContribSessionChanged(
     contribTitle?: string,
-    fromSessionId?: number | null,
-    toSessionId?: number | null
+    fromSessionId?: number,
+    toSessionId?: number
   ) {
-    if ((fromSessionId ?? null) === (toSessionId ?? null)) {
+    if (fromSessionId === toSessionId) {
       return;
     }
 
-    const fromSession = fromSessionId ? sessions[fromSessionId] : null;
-    const toSession = toSessionId ? sessions[toSessionId] : null;
+    const fromSession = sessions[fromSessionId];
+    const toSession = sessions[toSessionId];
 
     const title = contribTitle || Translate.string('the contribution');
     let message: React.ReactNode;
@@ -168,14 +168,14 @@ export function DayTimetable({
         <Translate>
           <Param name="title" value={title} wrapper={<strong />} /> was moved from session{' '}
           <Param name="fromSession" value={fromSession.title} wrapper={<strong />} /> to session{' '}
-          <Param name="toSession" value={toSession.title} wrapper={<strong />} />.
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />
         </Translate>
       );
     } else if (toSession?.title) {
       message = (
         <Translate>
           <Param name="title" value={title} wrapper={<strong />} /> is now part of session{' '}
-          <Param name="toSession" value={toSession.title} wrapper={<strong />} />.
+          <Param name="toSession" value={toSession.title} wrapper={<strong />} />
         </Translate>
       );
     } else {
