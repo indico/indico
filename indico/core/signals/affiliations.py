@@ -20,3 +20,9 @@ affiliation_updated = _signals.signal('affiliation-updated', '''
 Called from RHAffiliationAPI when processing updates. The sender is the
 Affiliation being updated and the update dict is passed via ``payload``.
 ''')
+
+get_affiliation_search_providers = _signals.signal('get-affiliation-search-providers', '''
+Expected to return exactly one `AffiliationSearchProvider` subclass. No more than one
+handler for this signal may return one as using multiple affiliation search providers
+at the same time is not possible.
+''')
