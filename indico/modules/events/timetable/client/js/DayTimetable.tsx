@@ -34,6 +34,7 @@ import {ReduxState, TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} f
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,
+  DRAG_DURATION_THRESHOLD,
   GRID_SIZE_MINUTES,
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
@@ -358,6 +359,8 @@ export function DayTimetable({
   }, []);
 
   useEffect(() => {
+    let newEntryTimer: number | null = null;
+
     function onMouseDown(event: MouseEvent) {
       const clientY = event.clientY + wrapperRef.current.scrollTop;
       const offsetY = clientY - wrapperRef.current.offsetTop;
@@ -394,16 +397,19 @@ export function DayTimetable({
         y -= pxSurplus;
       }
 
-      setDraggingStartPos(y);
-      dispatch(
-        actions.setDraftEntry({
-          startDt: moment.max(startDt, dt),
-          duration,
-          locationParent: eventLocationParent,
-          locationData: {...eventLocationParent.location_data, inheriting: true},
-          y,
-        })
-      );
+      // Instead of starting to drag right away, wait to make sure this isn't just a mouse click
+      newEntryTimer = window.setTimeout(() => {
+        dispatch(
+          actions.setDraftEntry({
+            startDt: moment.max(startDt, dt),
+            duration,
+            locationParent: eventLocationParent,
+            locationData: {...eventLocationParent.location_data, inheriting: true},
+            y,
+          })
+        );
+        setDraggingStartPos(y);
+      }, DRAG_DURATION_THRESHOLD);
     }
 
     function onMouseMove(event: MouseEvent) {
@@ -428,6 +434,11 @@ export function DayTimetable({
     function onMouseUp() {
       if (draftEntry) {
         handleOpenDraftModal();
+      }
+
+      if (newEntryTimer !== null) {
+        // Cancel timer for drag start
+        clearTimeout(newEntryTimer);
       }
 
       if (isDragging) {
