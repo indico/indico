@@ -17,6 +17,7 @@ import {setSessionData, setTimetableData} from './actions';
 import {ModalProvider} from './ModalContext';
 import reducers from './reducers';
 import Timetable from './Timetable';
+import {ToastProvider} from './ToastContext';
 import {getCurrentDateLocalStorage} from './utils';
 
 (function(global) {
@@ -52,9 +53,11 @@ import {getCurrentDateLocalStorage} from './utils';
       ReactDOM.render(
         <Provider store={store}>
           <UserSearchTokenContext.Provider value={searchToken}>
-            <ModalProvider>
-              <Timetable />
-            </ModalProvider>
+            <ToastProvider>
+              <ModalProvider>
+                <Timetable />
+              </ModalProvider>
+            </ToastProvider>
           </UserSearchTokenContext.Provider>
         </Provider>,
         root
