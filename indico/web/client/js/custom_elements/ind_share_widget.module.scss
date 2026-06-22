@@ -83,3 +83,38 @@
   margin-top: 10px;
   color: $dark-red;
 }
+
+.copy-to-clipboard-container {
+  width: 100%;
+
+  .input-copy-qr-container {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+
+    :global(.ui.input) {
+      flex: 1;
+    }
+
+    input {
+      text-overflow: ellipsis;
+    }
+  }
+
+  .download-dropdown-menu {
+    background-color: $dark-blue;
+    color: $light-blue;
+  }
+
+  .qr-wrapper {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+
+    .qr-code-img {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+}

@@ -167,6 +167,22 @@ class ContributionSchedulePlaceholder(ParametrizedPlaceholder):
             return f'{weekday}, {scheduled}'
 
 
+class AbstractContributionLinkPlaceholder(ParametrizedPlaceholder):
+    name = 'contribution_link'
+    param_friendly_name = 'link title'
+
+    @classmethod
+    def render(cls, param, abstract, **kwargs):
+        if not abstract.contribution:
+            return ''
+        return ContributionLinkPlaceholder.render(param, contribution=abstract.contribution, **kwargs)
+
+    @classmethod
+    def iter_param_info(cls, **kwargs):
+        yield None, _('Link to the contribution created from the abstract (empty if not accepted)')
+        yield 'custom-text', _('Custom link text instead of the full URL')
+
+
 class AbstractIDPlaceholder(Placeholder):
     name = 'abstract_id'
     description = _('The ID of the abstract')

@@ -19,6 +19,10 @@ import AccompanyingPersonsInput, {
   AccompanyingPersonsSettings,
   accompanyingPersonsSettingsInitialData,
 } from './AccompanyingPersonsInput';
+import AffiliationInput, {
+  AffiliationSettings,
+  affiliationSettingsInitialData,
+} from './AffiliationInput';
 import BooleanInput, {
   BooleanSettings,
   booleanShowIfOptions,
@@ -91,6 +95,8 @@ Available keys:
 - getDataForCondition: optional; a function that takes the current value of the field and
   returns a list that can be compared with the stored condition of another field. its logic
   must match the corresponding ``get_data_for_condition`` method in the backend field class
+- hideFromItemDropdown: optional; a function receiving staticData and returning whether the
+  field should be hidden in the "Add field" dropdown
 */
 
 const fieldRegistry = {
@@ -102,6 +108,7 @@ const fieldRegistry = {
     noLabel: true,
     icon: 'tag',
     customFormItem: true,
+    hideFromItemDropdown: () => true,
   },
   text: {
     title: Translate.string('Text field'),
@@ -165,6 +172,14 @@ const fieldRegistry = {
     inputComponent: CountryInput,
     settingsComponent: CountrySettings,
     icon: 'earth',
+  },
+  affiliation: {
+    title: Translate.string('Affiliation'),
+    inputComponent: AffiliationInput,
+    settingsComponent: AffiliationSettings,
+    settingsFormInitialData: affiliationSettingsInitialData,
+    icon: 'id-badge',
+    hideFromItemDropdown: ({hasPredefinedAffiliations}) => !hasPredefinedAffiliations,
   },
   file: {
     title: Translate.string('File'),

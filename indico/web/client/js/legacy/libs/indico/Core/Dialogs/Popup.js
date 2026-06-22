@@ -67,10 +67,10 @@ type(
           this._getDialogOptions()
         );
         this.canvas = $('<div/>').dialog(opts);
-        this.canvas.attr('aria-modal', 'true');
       }
       if (!this.dialogElement) {
         this.dialogElement = this.canvas.dialog('widget');
+        this.dialogElement.attr('aria-modal', 'true');
       }
       this.buttons = this.dialogElement.find('.ui-dialog-buttonset button');
     },
@@ -109,9 +109,8 @@ type(
         }
       }
 
-      var titleId = this.dialogElement.find('.ui-dialog-title').attr('id');
-      if (titleId) {
-        this.canvas.attr('aria-labelledby', titleId);
+      if (!this.title) {
+        this.dialogElement.removeAttr('aria-labelledby');
       }
 
       if (this.postDraw() === true) {

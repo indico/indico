@@ -38,7 +38,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.users.util import send_avatar, send_default_avatar
+from indico.modules.users.util import SearchAffiliationsMixin, send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString
@@ -432,6 +432,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                form_data=get_flat_section_submission_data(self.regform),
                                                initial_values=initial_values,
                                                file_data=file_data,
+                                               has_predefined_affiliations=self.regform_uses_predefined_affiliations,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                invitation=self.invitation,
@@ -470,6 +471,18 @@ class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHR
 
 class RHUploadRegistrationPicture(UploadRegistrationPictureMixin, RHUploadRegistrationFile):
     """Upload a picture from a registration form."""
+
+
+class RHSearchRegistrationAffiliation(SearchAffiliationsMixin, RHRegistrationFormFieldActionBase):
+    """Search for an affiliation from a registration form."""
+
+    @property
+    def context(self):
+        return {
+            'event': self.event,
+            'registration_form': self.regform,
+            'field': self.field,
+        }
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):

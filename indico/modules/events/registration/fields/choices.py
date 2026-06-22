@@ -22,11 +22,11 @@ from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
-from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.date_time import format_date
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import UUIDString, not_empty
-from indico.util.string import camelize_keys, snakify_keys
+from indico.util.string import camelize_keys, natural_sort_key, snakify_keys
 
 
 def get_field_merged_options(field, registration_data):
@@ -133,7 +133,26 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
     @property
     def filter_choices(self):
-        return self.form_item.data['captions']
+        captions = self.form_item.data['captions']
+        current_choice_ids = {c['id'] for c in self.form_item.versioned_data['choices']}
+        deleted_ids = set(captions) - current_choice_ids
+        hidden_ids = deleted_ids - self._get_used_choice_ids() if deleted_ids else set()
+        visible_choices = [(k, v) for k, v in captions.items() if k not in hidden_ids]
+        return dict(sorted(visible_choices, key=lambda item: natural_sort_key(item[1])))
+
+    def _get_used_choice_ids(self):
+        query = (RegistrationData.query
+                 .join(RegistrationData.registration)
+                 .filter(Registration.registration_form == self.form_item.registration_form,
+                         ~Registration.is_deleted,
+                         RegistrationData.field_data.has(field_id=self.form_item.id)))
+        choice_key = RegistrationData.data.op('?')('choice')
+        non_legacy_ids = (query.filter(~choice_key)
+                          .with_entities(db.func.jsonb_object_keys(RegistrationData.data).label('choice_id')))
+        legacy_ids = (query.filter(choice_key)
+                      .with_entities(RegistrationData.data['choice'].astext.label('choice_id')))
+        used_ids = non_legacy_ids.union_all(legacy_ids).distinct()
+        return {row.choice_id for row in used_ids}
 
     @property
     def view_data(self):

@@ -8,12 +8,12 @@
 import json
 
 from flask import flash, jsonify, request, session
+from marshmallow import fields, validate
 from sqlalchemy.orm import contains_eager, joinedload
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
-from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.fields import get_field_types
@@ -25,6 +25,8 @@ from indico.modules.events.surveys.operations import add_survey_question, add_su
 from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_kwargs, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -180,17 +182,37 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
 class RHAddSurveySection(RHManageSurveyBase):
     """Add a new section to a survey."""
 
-    def _process(self):
+    def _clone_section_children(self, source_section, target_section):
+        for old_item in source_section.children:
+            item_cls = type(old_item)
+            new_item = item_cls(survey=target_section.survey, parent=target_section)
+            attrs = get_attrs_to_clone(item_cls, skip={'id', 'parent_id'})
+            new_item.populate_from_attrs(old_item, attrs)
+            db.session.add(new_item)
+        db.session.flush()
+
+    @use_rh_kwargs({
+        'section_to_clone': ModelField(SurveySection, with_parent='survey', data_key='clone')
+    }, location='query', rh_context=('survey',))
+    def _process(self, section_to_clone=None):
         form = SectionForm()
+        disabled_until_change = True
+        if section_to_clone:
+            form = SectionForm(obj=FormDefaults(section_to_clone))
+            if not section_to_clone.display_as_section:
+                disabled_until_change = False
         if form.validate_on_submit():
             section = add_survey_section(self.survey, form.data)
+            if section_to_clone:
+                self._clone_section_children(section_to_clone, section)
             if section.title:
                 message = _('Section "{title}" added').format(title=section.title)
             else:
                 message = _('Standalone section added')
             flash(message, 'success')
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
-        return jsonify_template('forms/form_common_fields_first.html', form=form)
+        return jsonify_template('forms/form_common_fields_first.html', form=form,
+                                disabled_until_change=disabled_until_change)
 
 
 class RHEditSurveySection(RHManageSurveySectionBase):
@@ -267,24 +289,20 @@ class RHDeleteSurveyText(RHManageSurveyTextBase):
 class RHAddSurveyQuestion(RHManageSurveySectionBase):
     """Add a new question to a survey."""
 
-    def _process(self):
-        try:
-            field_cls = get_field_types()[request.view_args['type']]
-        except KeyError:
-            raise NotFound
-
+    @use_rh_kwargs({
+        'question_to_clone': ModelField(SurveyQuestion, with_parent='survey', data_key='clone')
+    }, rh_context=('survey',), location='query')
+    @use_kwargs({
+        'field_type': fields.String(validate=validate.OneOf(get_field_types().keys()), data_key='type')
+    }, location='view_args')
+    def _process(self, field_type, question_to_clone=None):
+        field_cls = get_field_types()[field_type]
         form = field_cls.create_config_form()
-        try:
-            clone_id = int(request.args['clone'])
-        except (KeyError, ValueError):
-            pass
-        else:
-            try:
-                question_to_clone = SurveyQuestion.query.with_parent(self.survey).filter_by(id=clone_id).one()
-                form = question_to_clone.field.create_config_form(
-                    obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data()))
-            except NoResultFound:
-                pass
+
+        if question_to_clone:
+            form = question_to_clone.field.create_config_form(
+                obj=FormDefaults(question_to_clone, **question_to_clone.field.copy_field_data())
+            )
 
         if form.validate_on_submit():
             question = add_survey_question(self.section, field_cls, form.data)

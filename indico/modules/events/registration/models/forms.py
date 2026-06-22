@@ -605,12 +605,25 @@ class RegistrationForm(db.Model):
     def render_base_price(self):
         return format_currency(self.base_price, self.currency)
 
+    def get_personal_data_field(self, personal_data_type, *, force=False):
+        """Return the personal data field with the given type."""
+        fields = self.active_fields if not force else [x for x in self.form_items if x.is_field]
+        return next(
+            (
+                field
+                for field in fields
+                if (
+                    isinstance(field, RegistrationFormPersonalDataField)
+                    and field.personal_data_type == personal_data_type
+                )
+            ),
+            None,
+        )
+
     def get_personal_data_field_id(self, personal_data_type):
         """Return the field id corresponding to the personal data field with the given name."""
-        for field in self.active_fields:
-            if (isinstance(field, RegistrationFormPersonalDataField) and
-                    field.personal_data_type == personal_data_type):
-                return field.id
+        if field := self.get_personal_data_field(personal_data_type):
+            return field.id
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the regform."""

@@ -32,6 +32,12 @@ Improvements
   registrations (:issue:`7415`, :pr:`7433`, thanks :user:`moliholy, unconventionaldotdev`)
 - Automatically paste obvious email addresses into the email field when pasting in
   the user search dialog (:pr:`7538`)
+- Allow changing/removing the registration fee of pending registrations (:pr:`7572`)
+- Add QR code generator to event share widget (:issue:`6796`, :pr:`7504`)
+- Add contribution link placeholder for emailing abstract roles (:issue:`3602`, :pr:`7569`)
+- Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
+- Add "Affiliation" field type to regforms (:pr:`7352`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -53,6 +59,8 @@ Bugfixes
   :user:`foxbunny`)
 - Fix database error when importing protection settings in an unlisted event
   (:issue:`7550`, :pr:`7551`)
+- Use consistent sorting and hide deleted+unused single-choice options in
+  registration list filters (:pr:`7439`, thanks :user:`duartegalvao`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -64,6 +72,14 @@ Accessibility
   :user:`foxbunny`)
 - Screen reader users can now navigate to the footer link list as a named
   navigation landmark (:pr:`7559`, thanks :user:`foxbunny`)
+- Screen reader users can now navigate the dashboard sections as second-level
+  headings instead of a flat run of same-level headings (:pr:`7581`, thanks
+  :user:`foxbunny`)
+- Screen readers now correctly recognise modal dialogs as modal, keeping
+  navigation within the open dialog (:pr:`7570`, thanks :user:`foxbunny`)
+- Screen reader users can now access the full date range and timezone for events
+  in the dashboard lists, which was previously shown only as a mouse-hover
+  tooltip (:pr:`7608`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

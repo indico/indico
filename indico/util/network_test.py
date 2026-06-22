@@ -14,6 +14,7 @@ from indico.util.network import (InsecureRequestError, is_private_url, make_vali
 
 @pytest.mark.parametrize(('url', 'expected'), (
     ('http://127.0.0.1', True),
+    ('http://127.0.0.1\\@1.1.1.1', True),
     ('https://[::1]', True),
     ('https://localhost', True),
     ('http://192.168.0.12', True),

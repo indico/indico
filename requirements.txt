@@ -24,7 +24,7 @@ bcrypt==5.0.0
     # via -r requirements.in
 billiard==4.2.4
     # via celery
-bleach==6.3.0
+bleach==6.4.0
     # via -r requirements.in
 blinker==1.9.0
     # via
@@ -72,7 +72,7 @@ click-repl==0.3.0
     # via celery
 colorclass==2.2.2
     # via -r requirements.in
-cryptography==46.0.7
+cryptography==49.0.0
     # via
     #   authlib
     #   google-auth
@@ -267,7 +267,7 @@ pygments==2.20.0
     #   ipython-pygments-lexers
 pynpm==0.3.0
     # via pywebpack
-pypdf==6.10.2
+pypdf==6.13.2
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
@@ -331,7 +331,7 @@ stack-data==0.6.3
     # via ipython
 terminaltables==3.1.10
     # via -r requirements.in
-tinycss2==1.4.0
+tinycss2==1.5.1
     # via
     #   bleach
     #   cssselect2
@@ -379,7 +379,7 @@ wallet-py3k==0.0.4
     # via -r requirements.in
 wcwidth==0.6.0
     # via prompt-toolkit
-weasyprint==65.1
+weasyprint==69.0
     # via -r requirements.in
 webargs==8.7.1
     # via -r requirements.in

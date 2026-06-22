@@ -18,6 +18,10 @@
                 </div>
                 <div class="i-box-buttons toolbar right hide-if-locked">
                     <div class="group">
+                        <button data-href="{{ url_for('.add_section', section, clone=section.id) }}"
+                                title="{% trans %}Clone section{% endtrans %}"
+                                class="i-button js-survey-item-dialog icon-copy"
+                                data-title="{% trans %}Clone section{% endtrans %}"></button>
                         <button data-href="{{ url_for('.edit_section', section) }}"
                                 title="{% trans %}Edit section{% endtrans %}"
                                 class="i-button js-survey-item-dialog icon-edit"

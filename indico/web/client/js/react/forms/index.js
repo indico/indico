@@ -7,6 +7,7 @@
 
 export {handleSubmissionError} from './errors';
 export {
+  ComboDropdown,
   FinalCheckbox,
   FinalComboDropdown,
   FinalDropdown,

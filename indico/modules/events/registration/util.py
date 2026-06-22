@@ -36,6 +36,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.constants import (PROFILE_PICTURE_SENTINEL, REGISTRATION_PICTURE_SIZE,
                                                           REGISTRATION_PICTURE_THUMBNAIL_SIZE)
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
+from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
@@ -224,12 +225,24 @@ def get_initial_form_values(regform, *, management=False, **kwargs):
 
 
 @make_interceptable
-def get_user_data(regform, user, invitation=None):
+def get_user_data(regform: RegistrationForm, user, invitation=None):
+    affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
+    # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
+    modern_affiliation_field = affiliation_field.input_type == 'affiliation'
+    predefined_only_affiliation = (
+        modern_affiliation_field and
+        affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
+    )
     if user is None:
         user_data = {}
     else:
+        skip = {'title', 'picture'}
+        if modern_affiliation_field:
+            skip.add('affiliation')
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
-                     if t.name not in {'title', 'picture'} and getattr(user, t.name, None)}
+                     if t.name not in skip and getattr(user, t.name, None)}
+        if modern_affiliation_field and user.affiliation and (not predefined_only_affiliation or user.affiliation_id):
+            user_data['affiliation'] = {'id': user.affiliation_id, 'text': user.affiliation or ''}
         if (
             (country_field := get_country_field(regform)) and
             country_field.data.get('use_affiliation_country') and
@@ -239,8 +252,10 @@ def get_user_data(regform, user, invitation=None):
             user_data['country'] = user.affiliation_link.country_code
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
-        if invitation.affiliation:
-            user_data['affiliation'] = invitation.affiliation
+        if invitation.affiliation and (not modern_affiliation_field or not predefined_only_affiliation):
+            user_data['affiliation'] = (
+                {'id': None, 'text': invitation.affiliation} if modern_affiliation_field else invitation.affiliation
+            )
     title = getattr(user, 'title', None)
     if title_uuid := get_title_uuid(regform, title):
         user_data['title'] = title_uuid
@@ -622,7 +637,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             field_names.append(unique_col('{} ({})'.format(item.title, 'Arrival'), item.id))
             field_names.append(unique_col('{} ({})'.format(item.title, 'Departure'), item.id))
     field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
-    field_names.extend(col.title for col in extra_columns)
+    field_names.extend(str(col.title) for col in extra_columns)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -657,7 +672,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
             registration_dict[title] = value
         for col in extra_columns:
             col_data = col.data.get(registration)
-            registration_dict[col.title] = col_data.text_value if col_data else ''
+            registration_dict[str(col.title)] = col_data.text_value if col_data else ''
         rows.append(registration_dict)
     return field_names, rows
 
@@ -713,7 +728,7 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
     }
     field_names.extend(unique_col(item.title, item.id) for item in regform_items)
     field_names.extend(title for name, (title, fn) in special_item_mapping.items() if name in static_items)
-    field_names.extend(col.title for col in extra_columns)
+    field_names.extend(str(col.title) for col in extra_columns)
     rows = []
     for registration in registrations:
         data = registration.data_by_field
@@ -739,7 +754,7 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
             row_data[title] = value
         for col in extra_columns:
             col_data = col.data.get(registration)
-            row_data[col.title] = col_data.text_value if col_data else empty_value
+            row_data[str(col.title)] = col_data.text_value if col_data else empty_value
         rows.append((registration, row_data))
     return field_names, rows
 
