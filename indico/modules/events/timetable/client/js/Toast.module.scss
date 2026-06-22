@@ -55,20 +55,21 @@ $color-error: #db2828;
 }
 
 .toast {
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
   position: relative;
   display: flex;
   align-items: flex-start;
   width: 100%;
   box-sizing: border-box;
   gap: 12px;
-  padding: 12px 14px 14px;
+  padding: 12px 14px 18px 12px;
   background: #fff;
   border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid white;
   pointer-events: auto;
 
   &.toast-leaving {
-    animation: toastCollapse 0.2s ease-in forwards;
+    animation: toastCollapse 0.1s ease-in forwards;
   }
 }
 
@@ -103,15 +104,21 @@ $color-error: #db2828;
   flex: 1;
   font-size: 1em;
   line-height: 1.4;
+  margin-right: 40px;
   color: #333;
   word-break: break-word;
 }
 
 .toast-close {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  right: 0;
+  width: 40px;
+  align-self: center;
   flex-shrink: 0;
   background: none;
   border: none;
-  padding: 0;
   margin: 0;
   cursor: pointer;
   color: #888;
@@ -123,6 +130,7 @@ $color-error: #db2828;
 
   :global(i.icon) {
     margin: 0;
+    transform: translateY(-2px);
   }
 }
 
@@ -153,10 +161,11 @@ $color-error: #db2828;
 
 .toast-progress {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  width: 100%;
+  bottom: 2px;
+  left: 4px;
+  right: 4px;
+  height: 4px;
+  border-radius: 2px;
   background: rgba(0, 0, 0, 0.25);
   transform-origin: left center;
   animation-name: toastProgress;
