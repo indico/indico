@@ -118,9 +118,7 @@ class GeneralFieldDataSchema(mm.Schema):
         internal_name = data.get('internal_name')
         field = self.context['field']
         if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.internal_name:
-            raise ValidationError(
-                {'internal_name': [_('Changing internal name for personal data field is not allowed.')]}
-            )
+            raise ValidationError(_('Changing internal name for personal data field is not allowed.'), 'internal_name')
         if internal_name is None:
             return
         if field.is_enabled is not False:  # None for new field
@@ -134,8 +132,8 @@ class GeneralFieldDataSchema(mm.Schema):
                 query = query.filter(RegistrationFormItem.id != field.id)
             if same_field := query.first():
                 raise ValidationError(
-                    {'internal_name': [(_('The field "{}" on this form has the same internal name.')
-                                        .format(same_field.title))]}
+                    _('The field "{}" on this form has the same internal name.').format(same_field.title),
+                    'internal_name',
                 )
             # consistent type on forms of the same event
             query = (RegistrationFormItem.query
@@ -157,9 +155,10 @@ class GeneralFieldDataSchema(mm.Schema):
             )
             if inconsistent_field:
                 raise ValidationError(
-                    {'internal_name': [(_('The field "{}" with the same internal name on form "{}" '
-                                          'uses a different input type which is not allowed.')
-                                        .format(inconsistent_field.title, inconsistent_field.registration_form.title))]}
+                    _('The field "{field}" with the same internal name on form "{form}" uses a different input type '
+                      'which is not allowed.'
+                    ).format(field=inconsistent_field.title, form=inconsistent_field.registration_form.title),
+                    'internal_name',
                 )
 
     def _check_manager_only(self, field):

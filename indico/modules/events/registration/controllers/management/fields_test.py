@@ -126,8 +126,9 @@ class TestGeneralFieldDataSchema:
         schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': position_field})
         with pytest.raises(ValidationError) as exc_info:
             assert schema.load({'input_type': 'text', 'title': position_field.title, 'internal_name': internal_name})
-        assert exc_info.value.messages == {'internal_name': ['Changing internal name for personal data field '
-                                                             'is not allowed.']}
+        assert exc_info.value.messages == {
+            'internal_name': 'Changing internal name for personal data field is not allowed.'
+        }
 
     def test_update_internal_name_of_disabled_field(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
