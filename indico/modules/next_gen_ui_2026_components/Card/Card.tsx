@@ -57,17 +57,27 @@ interface CardProps {
   styleName?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  ariaLabel?: string;
 }
 
-const CardRoot = ({children, href, onClick, styleName}: CardProps) => {
+const CardRoot = ({children, href, onClick, styleName, ariaLabel}: CardProps) => {
   if (href) {
     return (
-      <a href={href} onClick={onClick} styleName={`card-root ${styleName || ''}`}>
+      <a
+        href={href}
+        onClick={onClick}
+        styleName={`card-root ${styleName || ''}`}
+        aria-label={ariaLabel}
+      >
         {children}
       </a>
     );
   }
-  return <div styleName={`card-root ${styleName || ''}`}>{children}</div>;
+  return (
+    <div styleName={`card-root ${styleName || ''}`} aria-label={ariaLabel}>
+      {children}
+    </div>
+  );
 };
 
 type CardComponent = React.FunctionComponent<CardProps> & {

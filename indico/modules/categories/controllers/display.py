@@ -278,6 +278,7 @@ class RHCategoryChildrenJSON(RHDisplayCategoryBase):
         for c in self.category.children:
             data = serialize_category(c, with_path=True, with_favorite=True)
             data['display_url'] = url_for('.display', c)
+            data['description'] = c.description
             serialized_categories.append(data)
 
         return jsonify_data(
