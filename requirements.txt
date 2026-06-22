@@ -331,7 +331,7 @@ stack-data==0.6.3
     # via ipython
 terminaltables==3.1.10
     # via -r requirements.in
-tinycss2==1.4.0
+tinycss2==1.5.1
     # via
     #   bleach
     #   cssselect2
@@ -379,7 +379,7 @@ wallet-py3k==0.0.4
     # via -r requirements.in
 wcwidth==0.6.0
     # via prompt-toolkit
-weasyprint==65.1
+weasyprint==69.0
     # via -r requirements.in
 webargs==8.7.1
     # via -r requirements.in
