@@ -138,9 +138,9 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
     def _format_person_count(count, *, for_humans=False):
         if not for_humans:
             return str(count)
-        # Keep the stored value numeric while rendering a localized label
-        label = ngettext('1 person', '%(count)s people', count)
-        return label if count == 1 else label % {'count': count}
+        if not count:
+            return ''
+        return ngettext('{count} person', '{count} persons', count).format(count=count)
 
     @property
     def default_value(self):
