@@ -442,6 +442,19 @@ class Registration(db.Model):
     def can_be_modified(self):
         return self.registration_form.is_modification_allowed(self)
 
+    def can_manage(self, user, permission, allow_admin=True):
+        if not self.event.can_manage(user, permission=permission, allow_admin=allow_admin):
+            return False
+        # A plugin may grant a user event-wide registration management but scope it to a subset of
+        # registrations, expressed as a SQL criterion through the `filter_registration_list`
+        # signal. A user scoped that way may only manage the registrations matching their scope.
+        criteria = [c for c in values_from_signal(
+            signals.event.filter_registration_list.send(self.registration_form, user=user), as_list=True
+        ) if c is not None]
+        if not criteria:
+            return True
+        return Registration.query.filter(Registration.id == self.id, *criteria).has_rows()
+
     @property
     def can_be_withdrawn(self):
         from indico.modules.events.registration.models.forms import ModificationMode
