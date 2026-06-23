@@ -251,6 +251,11 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
+    def _check_management_permission(self):
+        # re-checked per registration so a plugin can bound management to a subset of registrations
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        return any(self.field_data.registration.can_manage(session.user, p) for p in permissions)
+
     def _process(self):
         return self.field_data.send()
 
@@ -290,6 +295,12 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
                               .order_by(*Registration.order_by_name)
                               .options(*self.registration_query_options)
                               .all())
+
+    @property
+    def manageable_registrations(self):
+        # the selected registrations the user may manage, honouring per-registration scoping
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        return [r for r in self.registrations if any(r.can_manage(session.user, p) for p in permissions)]
 
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
@@ -386,14 +397,15 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
     PERMISSION = ('registration', 'registration_edit')
 
     def _process(self):
-        for registration in self.registrations:
+        registrations = self.manageable_registrations
+        for registration in registrations:
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration, permanent=False)
             logger.info('Registration %s deleted by %s', registration, session.user)
             registration.log(EventLogRealm.management, LogKind.negative, 'Registration',
                              f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
-        num_reg_deleted = len(self.registrations)
+        num_reg_deleted = len(registrations)
         flash(ngettext('Registration was deleted.',
                        '{num} registrations were deleted.', num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()

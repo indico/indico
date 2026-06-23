@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import request, session
 from sqlalchemy.orm import joinedload, undefer
 
 from indico.core import signals
@@ -17,7 +17,7 @@ from indico.modules.events.registration.models.registrations import (Registratio
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
-from indico.util.signals import named_objects_from_signal
+from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import natural_sort_key
 from indico.web.flask.templating import get_template_module
 
@@ -165,9 +165,15 @@ class RegistrationListGenerator(ListGeneratorBase):
         return filters
 
     def _build_query(self):
+        # Plugins may scope the list to the registrations the current user may manage; each returns
+        # a SQL criterion AND-combined into the query. No receivers (or a full manager) means no
+        # extra criteria, so the list is unscoped.
+        extra_criteria = [c for c in values_from_signal(
+            signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
+        ) if c is not None]
         return (Registration.query
                 .with_parent(self.regform)
-                .filter(~Registration.is_deleted)
+                .filter(~Registration.is_deleted, *extra_criteria)
                 .options(joinedload('data').joinedload('field_data').joinedload('field'),
                          joinedload('tags'),
                          undefer('num_receipt_files'))
