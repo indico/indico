@@ -66,7 +66,7 @@ interface DraftEntry {
   keywords: string[];
   references: string[];
   location_data: LocationData;
-  start_dt: Date;
+  start_dt: string;
   person_links?: PersonLink[];
   description?: string;
   colors?: EntryColors;
@@ -95,6 +95,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId, sessionBlockId = expandedSessionBlock?.objId} = entry;
@@ -114,8 +115,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     minStartDt: useSelector(selectors.getEventStartDt),
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
-  // Don't include timezone offset in string
-  let initialStartDt = entry.startDt.format('YYYY-MM-DDTHH:mm:ss');
+  let initialStartDt = moment.tz(entry.startDt, eventTimezone).format();
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
@@ -124,7 +124,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     // Don't include timezone offset in string
     initialStartDt = moment
       .min(
-        moment(initialStartDt),
+        moment.parseZone(initialStartDt),
         moment(extraOptions.maxEndDt).subtract(entry.duration, 'minutes')
       )
       .format('YYYY-MM-DDTHH:mm:ss');

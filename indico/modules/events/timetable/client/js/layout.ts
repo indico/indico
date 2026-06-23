@@ -234,17 +234,18 @@ export function getParallelEntries(entry: TopLevelEntry, entries: TopLevelEntry[
 
 export function computeYoffset(entries: TopLevelEntry[], startHour: number): TopLevelEntry[] {
   return entries.map(entry => {
-    const offsetMinutes = moment(entry.startDt).diff(
-      moment(entry.startDt).startOf('day').add(startHour, 'hours'),
-      'minutes'
-    );
+    const offsetMinutes = moment
+      .parseZone(entry.startDt)
+      .diff(moment.parseZone(entry.startDt).startOf('day').add(startHour, 'hours'), 'minutes');
     if (entry.type !== 'block') {
       return {...entry, y: minutesToPixels(offsetMinutes)};
     }
     const children = entry.children.map(child => ({
       // TODO: no need to compute y offset for children here
       ...child,
-      y: minutesToPixels(moment(child.startDt).diff(entry.startDt, 'minutes')),
+      y: minutesToPixels(
+        moment.parseZone(child.startDt).diff(moment.parseZone(entry.startDt), 'minutes')
+      ),
     }));
     return {...entry, y: minutesToPixels(offsetMinutes), children};
   });
