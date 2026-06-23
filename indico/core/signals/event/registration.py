@@ -26,6 +26,15 @@ Called when the checkin state of a registration changes. The `sender` is the
 `Registration` object.
 ''')
 
+registration_pre_create = _signals.signal('registration-pre-create', '''
+Called before a new registration is created, before any database work is done. The `sender` is
+the `RegistrationForm` object. The `user` kwarg is the user performing the action (or ``None``).
+The `data` kwarg contains the submitted form data, keyed by each field's HTML field name. The
+`management` kwarg is set to `True` if the registration is being created from the event management
+area. A handler may raise to veto the creation; raising cleanly aborts before the registration is
+built.
+''')
+
 registration_created = _signals.signal('registration-created', '''
 Called when a new registration has been created. The `sender` is the `Registration` object.
 The `data` kwarg contains the form data used to populate the registration fields.
@@ -151,6 +160,16 @@ registration form.
 registrant_list_items = _signals.signal('registrant-list-item', '''
 Expected to return `CustomRegistrationListItem` subclasses. The `sender` is the
 `RegistrationForm` object for which to get the custom items.
+''')
+
+filter_registration_list = _signals.signal('filter-registration-list', '''
+Called to scope which registrations a user may manage. The `sender` is the `RegistrationForm`;
+the `user` kwarg identifies the user. Return a SQLAlchemy filter criterion selecting the
+registrations `user` may manage (an empty result set is acceptable), or ``None`` for "no
+opinion". This only scopes access on top of the regular ACL; it never grants it. Criteria from
+multiple handlers are AND-combined and applied to the management list, the managed-registration
+count and the per-registration `Registration.can_manage` check, so a plugin that grants a user
+event-wide registration management (e.g. via `acl.can_manage`) can bound it to a subset here.
 ''')
 
 google_wallet_ticket_class_data = _signals.signal('google-wallet-ticket-class-data', '''
