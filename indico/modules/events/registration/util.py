@@ -436,6 +436,7 @@ def create_personal_data_fields(regform):
 @no_autoflush
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
+    signals.event.registration_pre_create.send(regform, user=user, data=data, management=management)
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
                                 base_price=regform.base_price, currency=regform.currency,
                                 created_by_manager=management, created_by=user)
