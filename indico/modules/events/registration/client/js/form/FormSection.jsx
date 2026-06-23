@@ -10,7 +10,7 @@ import React from 'react';
 import {Form, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Markdown} from 'indico/react/util';
+import {RustyMarkdown} from 'indico/react/util';
 
 import FormItem from './FormItem';
 
@@ -47,7 +47,7 @@ export default function FormSection({
             {title}
           </h4>
           <div className="i-box-description">
-            <Markdown targetBlank>{description}</Markdown>
+            <RustyMarkdown source={description} />
           </div>
         </div>
         {setupActions && (
