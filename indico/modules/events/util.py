@@ -686,16 +686,19 @@ def get_event_from_url(url):
 class ZipGeneratorMixin:
     """Mixin for RHs that generate zip with files."""
 
+    _MAX_ARCHIVE_PATH_LENGTH = 200
+
     def _adjust_path_length(self, segments):
-        """Shorten the path length to < 260 chars.
+        """Shorten the archive path length to a Windows-safe limit.
 
         Windows' built-in ZIP tool doesn't like files whose
-        total path exceeds ~260 chars. Here we progressively
-        shorten the total until it matches that constraint.
+        extracted path exceeds ~260 chars. Since the extraction
+        target folder also contributes to that limit, we keep a
+        safety margin for the archive entry path itself.
         """
         result = []
         total_len = sum(len(seg) for seg in segments) + len(segments) - 1
-        excess = (total_len - 255) if total_len > 255 else 0
+        excess = (total_len - self._MAX_ARCHIVE_PATH_LENGTH) if total_len > self._MAX_ARCHIVE_PATH_LENGTH else 0
 
         for seg in reversed(segments):
             fname, ext = os.path.splitext(seg)
