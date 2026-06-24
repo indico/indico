@@ -12,7 +12,7 @@ from io import BytesIO
 from operator import attrgetter
 
 import pytz
-from flask import current_app
+from flask import current_app, session
 from PIL import Image
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
@@ -264,7 +264,7 @@ def generate_spreadsheet_from_occurrences(occurrences):
     headers = ['Room', 'Booking ID', 'Booked for', 'Reason', 'Occurrence start', 'Occurrence end']
     rows = [{'Room': occ.reservation.room.full_name,
              'Booking ID': occ.reservation.id,
-             'Booked for': occ.reservation.booked_for_name,
+             'Booked for': occ.reservation.booked_for_name if occ.reservation.can_see_details(session.user) else '',
              'Reason': occ.reservation.booking_reason,
              'Occurrence start': occ.start_dt,
              'Occurrence end': occ.end_dt}
