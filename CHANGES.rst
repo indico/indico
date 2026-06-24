@@ -59,6 +59,7 @@ Bugfixes
   (:issue:`7550`, :pr:`7551`)
 - Use consistent sorting and hide deleted+unused single-choice options in
   registration list filters (:pr:`7439`, thanks :user:`duartegalvao`)
+- Honor room booking details restrictions in spreadsheet export (:pr:`7612`)
 
 Accessibility
 ^^^^^^^^^^^^^
