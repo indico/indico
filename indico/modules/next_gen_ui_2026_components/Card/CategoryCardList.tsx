@@ -41,7 +41,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     );
   }
 
-  const gridClass = `${columns > 1 ? `grid-${columns}` : ''}`;
+  const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
 
   return (
     <div className={gridClass}>
