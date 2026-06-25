@@ -10,6 +10,7 @@ import getCategoryChildrenURL from 'indico-url:categories.get_category_children'
 import React from 'react';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
+import {Translate} from 'indico/react/i18n';
 
 // import ArrowIcon from '../../../web/static/images/circle-arrow-right-solid-full.svg';
 // import { ReactComponent as ArrowIcon } from '../../../web/static/images/circle-arrow-right-solid-full.svg';
@@ -32,12 +33,12 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     camelize: true,
   });
 
-   if (loading) {
+  if (loading) {
     return (
-    <div aria-busy="true">
-      Loading categories…
-    </div>
-  );
+      <div aria-busy="true">
+        <Translate>Loading...</Translate>
+      </div>
+    );
   }
 
   const gridClass = `${columns > 1 ? `grid-${columns}` : ''}`;
@@ -51,7 +52,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           href={category.displayURL}
           ariaLabel={category.description || category.title}
         >
-          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative/>
+          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
           {/* <Card.Icon
             icon= {ArrowIcon}
             color="primary"
