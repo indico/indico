@@ -16,6 +16,21 @@
   min-width: 0;
 }
 
-.spacer {
+.category-card-wrapper {
+  &:hover {
+    .arrow-icon {
+      transform: translateX(var(--space-1));
+    }
+  }
+}
+
+.arrow-icon {
+  display: inline-flex;
+  transition: transform var(--animation-duration-slow) cubic-bezier(0.4, 1, 0.5, 1), var(--transition-slow);
+}
+
+.dot-divider {
   margin: var(--space-1);
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-text-lg);
 }

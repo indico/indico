@@ -16,22 +16,15 @@ import './Icon.module.scss';
 
 library.add(fas, far, fab);
 
-type IconSource =
-  | {
-      name: IconName;
-      prefix?: IconPrefix;
-    }
-  | {
-      svg: React.ReactNode;
-    };
+type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
-export type IconVariant = 'light' | 'solid' | 'dark' | 'plain';
-export type IconSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface IconProps {
   icon: IconSource;
-  styleName?: string;
+  className?: string;
   color?: IconColor;
   size?: IconSize;
   variant?: IconVariant;
@@ -40,40 +33,93 @@ export interface IconProps {
   title?: string;
 }
 
-export const Icon: React.FC<IconProps> = ({
-  icon,
-  styleName,
-  color = 'primary',
-  size = 'md',
-  variant = 'plain',
-  rounded = false,
-  ariaLabel,
-  title,
-}) => {
-  const decorative = !ariaLabel;
+function isCustomIcon(
+  icon: IconSource
+): icon is React.ComponentType<React.SVGProps<SVGSVGElement>> {
+  return typeof icon !== 'string';
+}
+
+function parseIconString(icon: string): {
+  prefix: IconPrefix;
+  iconName: IconName;
+};
+
+function parseIconString(icon: string): {
+  prefix: IconPrefix;
+  iconName: IconName;
+} {
+  const [prefix, iconName] = icon.split(':');
+
+  return {
+    prefix: (prefix as IconPrefix) || 'fas',
+    iconName: iconName as IconName,
+  };
+}
+
+export const Icon = (props: IconProps) => {
+  const {
+    icon,
+    className,
+    color = 'primary',
+    size = 'md',
+    variant = 'plain',
+    rounded = false,
+    ariaLabel,
+    title,
+  } = props;
+
+  let content: React.ReactNode;
+
+  if (isCustomIcon(icon)) {
+    const SvgIcon = icon;
+
+    content = <SvgIcon focusable="false" aria-hidden="true" />;
+  } else {
+    const {prefix, iconName} = parseIconString(icon);
+
+    content = (
+      <FontAwesomeIcon
+        icon={{
+          prefix,
+          iconName,
+        }}
+        focusable="false"
+      />
+    );
+  }
+
+  // console.log(props);
+
+  console.log('className', className);
+  console.log('styleName', 'root');
+  // console.log("ariaLabel", ariaLabel);
 
   return (
     <span
-      styleName={`root ${styleName || ''}`}
+      styleName="root"
+      className={className}
       data-color={color}
       data-size={size}
       data-variant={variant}
       data-rounded={rounded ? '' : undefined}
-      title={title} // TODO: remake this into new tooltip component
-      aria-hidden={decorative}
-      role={decorative ? undefined : 'img'}
+      title={title}
+      aria-hidden={!ariaLabel}
       aria-label={ariaLabel}
     >
-      {'svg' in icon ? (
-        icon.svg
-      ) : (
-        <FontAwesomeIcon
-          icon={{
-            prefix: icon.prefix ?? 'fas',
-            iconName: icon.name,
-          }}
-        />
-      )}
+      {content}
     </span>
   );
+
+  // );
+  // {'svg' in icon ? (
+  //   icon.svg
+  // ) : (
+  //   <FontAwesomeIcon
+  //     icon={{
+  //       prefix: icon.prefix ?? 'fas',
+  //       iconName: icon.name,
+  //     }}
+  //     focusable="false"
+  //   />
+  // )}
 };

@@ -13,7 +13,7 @@
 
   min-width: 0;
   max-width: var(--container-md);
-  padding: var(--space-3) var(--space-3); // 12px top/bottom, 20px left/right
+  padding: var(--space-3);
   box-sizing: border-box;
 
   background: var(--color-surface-soft);
@@ -22,6 +22,7 @@
 
   &:hover {
     background: var(--color-surface-soft-hover);
+    color: none;
   }
 }
 

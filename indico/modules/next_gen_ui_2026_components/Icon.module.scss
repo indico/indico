@@ -36,10 +36,6 @@
 .root {
   @include centered();
 
-  &[data-size='xxs'] {
-    @include icon-size('xxs');
-  }
-
   &[data-size='xs'] {
     @include icon-size('xs');
   }
@@ -84,6 +80,10 @@
 .root[data-variant='plain'] {
   color: var(--icon-500);
   background: transparent;
+}
+
+.root[data-variant='compact'] {
+  @extend .root, [data-variant='plain'];
 
   svg,
   img,
