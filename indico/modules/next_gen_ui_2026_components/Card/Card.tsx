@@ -18,7 +18,9 @@ interface CardHeaderProps {
 }
 
 export const CardHeader = ({children, styleName}: CardHeaderProps) => (
-  <h6 styleName={`card-header ${styleName || ''}`}>{children}</h6>
+  <h6 styleName="card-header" className={styleName}>
+    {children}
+  </h6>
 );
 
 type CardHeaderElement = ReactElement<CardHeaderProps, typeof CardHeader>;
@@ -54,19 +56,20 @@ type CardChild = CardIconElement | CardHeaderElement | CardMetaElement | CardDes
 
 interface CardProps {
   children: CardChild | CardChild[];
-  styleName?: string;
+  className?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   ariaLabel?: string;
 }
 
-const CardRoot = ({children, href, onClick, styleName, ariaLabel}: CardProps) => {
+const CardRoot = ({children, href, onClick, className, ariaLabel}: CardProps) => {
   if (href) {
     return (
       <a
         href={href}
         onClick={onClick}
-        styleName={`card-root ${styleName || ''}`}
+        styleName="card-root"
+        className={className}
         aria-label={ariaLabel}
       >
         {children}
@@ -74,7 +77,7 @@ const CardRoot = ({children, href, onClick, styleName, ariaLabel}: CardProps) =>
     );
   }
   return (
-    <div styleName={`card-root ${styleName || ''}`} aria-label={ariaLabel}>
+    <div styleName="card-root" className={className} aria-label={ariaLabel}>
       {children}
     </div>
   );
