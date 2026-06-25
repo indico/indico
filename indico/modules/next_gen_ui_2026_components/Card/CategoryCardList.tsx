@@ -28,12 +28,16 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     category_id: String(categoryId),
   });
 
-  const {data, loading, error} = useIndicoAxios(url, {
+  const {data, loading} = useIndicoAxios(url, {
     camelize: true,
   });
 
-  if (loading || !data || error) {
-    return null;
+   if (loading) {
+    return (
+    <div aria-busy="true">
+      Loading categories…
+    </div>
+  );
   }
 
   const gridClass = `${columns > 1 ? `grid-${columns}` : ''}`;
@@ -47,7 +51,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           href={category.displayURL}
           ariaLabel={category.description || category.title}
         >
-          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" />
+          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative/>
           {/* <Card.Icon
             icon= {ArrowIcon}
             color="primary"

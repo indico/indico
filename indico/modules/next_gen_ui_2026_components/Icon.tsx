@@ -29,6 +29,7 @@ export interface IconProps {
   size?: IconSize;
   variant?: IconVariant;
   rounded?: boolean;
+  decorative?: boolean;
   ariaLabel?: string;
   title?: string;
 }
@@ -64,15 +65,16 @@ export const Icon = (props: IconProps) => {
     size = 'md',
     variant = 'plain',
     rounded = false,
+    decorative = true,
     ariaLabel,
     title,
   } = props;
 
+  const isDecorative = decorative || !ariaLabel;
   let content: React.ReactNode;
 
   if (isCustomIcon(icon)) {
     const SvgIcon = icon;
-
     content = <SvgIcon focusable="false" aria-hidden="true" />;
   } else {
     const {prefix, iconName} = parseIconString(icon);
@@ -88,8 +90,6 @@ export const Icon = (props: IconProps) => {
     );
   }
 
-  // console.log(props);
-
   console.log('className', className);
   console.log('styleName', 'root');
   // console.log("ariaLabel", ariaLabel);
@@ -103,8 +103,8 @@ export const Icon = (props: IconProps) => {
       data-variant={variant}
       data-rounded={rounded ? '' : undefined}
       title={title}
-      aria-hidden={!ariaLabel}
-      aria-label={ariaLabel}
+      aria-hidden={isDecorative}
+      aria-label={!isDecorative ? ariaLabel : undefined}
     >
       {content}
     </span>
