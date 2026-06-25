@@ -70,8 +70,13 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           <div styleName="card-main">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
-              {category.deepCategoryCount || 0} Categories <span styleName="dot-divider">•</span>
-              {category.deepEventCount || 0} Events
+              {category.deepCategoryCount > 0 ? (
+                <>
+                  {category.deepCategoryCount} Categories
+                  <span styleName="dot-divider">•</span>
+                </>
+              ) : null}
+              {category.deepEventCount > 0 ? `${category.deepEventCount} Events` : null}
             </Card.Meta>
           </div>
           {category.isProtected ? (
