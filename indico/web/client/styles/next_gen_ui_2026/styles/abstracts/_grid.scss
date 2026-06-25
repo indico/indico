@@ -12,31 +12,60 @@
 }
 
 [class^='grid-'] {
+  display: grid;
   gap: var(--space-3);
 }
 
 // Grid layouts
 .grid-12 {
-  display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .grid-6 {
-  display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .grid-5 {
-  display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .grid-3 {
-  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+}
+
+@mixin responsive-grid($max-columns, $viewport: var(--viewport-desktop), $gap: var(--space-3)) {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(
+      calc(
+        (#{$viewport} - (#{$max-columns - 1} * #{$gap}))
+        / #{$max-columns}
+      ),
+      1fr
+    )
+  );
+}
+
+.grid-2-responsive {
+  @include responsive-grid(2, var(--viewport-tablet));
+}
+
+.grid-3-responsive {
+  @include responsive-grid(3, var(--viewport-tablet));
+}
+
+.grid-5-responsive {
+  @include responsive-grid(5);
+}
+
+.grid-6-responsive {
+  @include responsive-grid(6);
+}
+
+.grid-12-responsive {
+  @include responsive-grid(12);
 }
