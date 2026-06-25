@@ -7,44 +7,46 @@
 
 @use 'next_gen_ui_2026/styles/base' as *;
 
-.card-root {
-  @include focus-ring();
-  @include centered();
+:global(.indico-ui) {
+  &.card-root {
+    @include focus-ring();
+    @include centered();
 
-  min-width: 0;
-  max-width: var(--container-md);
-  padding: var(--space-3);
-  box-sizing: border-box;
+    min-width: 0;
+    max-width: var(--container-md);
+    padding: var(--space-3);
+    box-sizing: border-box;
 
-  background: var(--color-surface-soft);
-  transition: background var(--transition-fast);
-  border-radius: var(--radius-lg);
+    background: var(--color-surface-soft);
+    transition: background var(--transition-fast);
+    border-radius: var(--radius-lg);
 
-  &:hover {
-    background: var(--color-surface-soft-hover);
-    color: none;
+    &:hover {
+      background: var(--color-surface-soft-hover);
+      color: none;
+    }
   }
-}
 
-.card-header {
-  @include text-ellipsis();
-  @include typography('text-sm', 'semibold'); // 14px
-  color: var(--color-text-heading);
-  margin: 0;
-  max-width: 100%;
-}
+  &.card-header {
+    @include text-ellipsis();
+    @include typography('text-sm', 'semibold'); // 14px
+    color: var(--color-text-heading);
+    margin: 0;
+    max-width: 100%;
+  }
 
-.card-meta {
-  @include typography('text-xs', 'regular'); // 12px
-  color: var(--color-text-muted);
-  margin: 0;
-  max-width: 100%;
-}
+  &.card-meta {
+    @include typography('text-xs', 'regular'); // 12px
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 100%;
+  }
 
-.card-description {
-  @include text-ellipsis();
-  @include typography('text-sm', 'regular'); // 14px
-  color: var(--color-text);
-  margin: 0;
-  max-width: 100%;
+  &.card-description {
+    @include text-ellipsis();
+    @include typography('text-sm', 'regular'); // 14px
+    color: var(--color-text);
+    margin: 0;
+    max-width: 100%;
+  }
 }

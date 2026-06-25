@@ -103,7 +103,7 @@ export const Icon = (props: IconProps) => {
   return (
     <span
       styleName="root"
-      className={className}
+      className={`indico-ui ${className || ''}`}
       data-color={color}
       data-size={size}
       data-variant={variant}

@@ -67,13 +67,15 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
             size="md"
             variant="plain"
           /> */}
-          <div styleName="card-main">
+          <div styleName="card-main" className="indico-ui">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
               {category.deepCategoryCount > 0 ? (
                 <>
                   {category.deepCategoryCount} Categories
-                  <span styleName="dot-divider">•</span>
+                  <span styleName=" dot-divider" className="indico-ui">
+                    •
+                  </span>
                 </>
               ) : null}
               {category.deepEventCount > 0 ? `${category.deepEventCount} Events` : null}
