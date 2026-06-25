@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use '../base/colors' as *;
+
 @mixin typography($size, $weight: 'regular') {
   font-family: var(--font-family-base);
   font-size: var(--font-size-#{$size});
@@ -36,7 +38,13 @@
 
 @mixin focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    &:focus-visible {
+      outline: 2px solid CanvasText;
+    }
   }
 }

@@ -8,8 +8,8 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 .card-root {
-  display: flex;
-  align-items: center;
+  @include focus-ring();
+  @include centered();
 
   min-width: 0;
   max-width: var(--container-md);
