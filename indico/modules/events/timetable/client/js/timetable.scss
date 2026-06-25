@@ -1,0 +1,99 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main.main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: unset;
+  overflow: hidden;
+
+  & > div:not(.main-breadcrumb) {
+    flex-grow: 1;
+    overflow: hidden;
+
+    & > .full-width-content-wrapper {
+      height: 100%;
+
+      & > div {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        & > div.layout-side-menu {
+          min-height: unset;
+
+          &:first-child {
+            background: transparent !important;
+          }
+
+          &:last-child {
+            height: 0;
+            flex-grow: 1;
+
+            & > div.content-column {
+              height: 100%;
+
+              & > div.management-page {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+
+                & > header {
+                  margin-bottom: 0;
+                }
+
+                & > div.page-content {
+                  flex-grow: 1;
+                  display: flex;
+                  flex-direction: column;
+                  overflow: hidden;
+                  // Not exactly -60px because side button also has 5px margin
+                  margin-top: -55px;
+
+                  & > #timetable-container {
+                    height: 100%;
+                    overflow-y: auto;
+                    flex-grow: 0;
+
+                    & > div {
+                      height: 100%;
+
+                      & > div:last-child {
+                        height: 100%;
+                        width: 100%;
+                        flex-grow: 1;
+                        overflow: hidden;
+
+                        & > div.wrapper {
+                          width: 100%;
+                          overflow-y: scroll;
+                          // extra space for the scrollbar
+                          padding-right: 10px;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+div.footer {
+  display: none;
+}

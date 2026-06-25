@@ -12,6 +12,7 @@ from marshmallow import ValidationError, fields, validates_schema
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalPermissionList, not_empty
 
@@ -68,3 +69,9 @@ class EventDetailsSchema(mm.SQLAlchemyAutoSchema):
 
 
 event_permissions_schema = EventPermissionsSchema()
+
+
+class ReferenceTypeSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ReferenceType
+        fields = ('id', 'name')

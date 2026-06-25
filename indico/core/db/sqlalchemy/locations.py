@@ -87,6 +87,26 @@ class LocationMixin:
             return None
         raise NotImplementedError
 
+    @property
+    def resolved_location_parent(self):
+        """The parent object from which the location is actually inherited.
+
+        This climbs up the parents until it finds a non-inherited location.
+        """
+        if not self.allow_location_inheritance:
+            return None
+        data_source = self.location_parent
+        while data_source and data_source.inherit_location:
+            data_source = data_source.location_parent
+        return data_source
+
+    @property
+    def child_location_parent(self):
+        """The location_parent a child object pointing to this one uses."""
+        if not self.allow_location_inheritance or not self.inherit_location:
+            return self
+        return self.resolved_location_parent
+
     @declared_attr
     def inherit_location(cls):
         if cls.allow_location_inheritance:
