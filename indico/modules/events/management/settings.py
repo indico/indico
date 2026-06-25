@@ -17,7 +17,7 @@ program_codes_settings = EventSettingsProxy('program_codes', {
 })
 
 
-privacy_settings = EventSettingsProxy('privacy', {
+event_privacy_settings = EventSettingsProxy('privacy', {
     'data_controller_name': '',
     'data_controller_email': '',
     'privacy_policy_urls': [],

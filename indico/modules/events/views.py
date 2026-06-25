@@ -19,8 +19,8 @@ from indico.modules.events import Event
 from indico.modules.events.layout import get_theme_global_settings, layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_js_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
-from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
+from indico.modules.events.operations import get_event_privacy
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.mathjax import MathjaxMixin
@@ -223,7 +223,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         attached_items = self.event.attached_items
         folders = [folder for folder in attached_items.get('folders', []) if folder.title != 'Internal Page Files']
         files = attached_items.get('files', [])
-        privacy_info = privacy_settings.get_all(self.event)
+        privacy_info, _inherited = get_event_privacy(self.event)
 
         lectures = []
         if self.event.series is not None and self.event.series.show_links:
