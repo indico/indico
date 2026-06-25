@@ -22,7 +22,7 @@ export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-export interface IconProps {
+interface BaseIconProps {
   icon: IconSource;
   className?: string;
   color?: IconColor;
@@ -33,6 +33,16 @@ export interface IconProps {
   ariaLabel?: string;
   title?: string;
 }
+
+export type IconProps =
+  | (BaseIconProps & {
+      variant: 'light' | 'solid' | 'dark';
+      rounded?: boolean;
+    })
+  | (BaseIconProps & {
+      variant: 'plain' | 'compact';
+      rounded?: never;
+    });
 
 function isCustomIcon(
   icon: IconSource
@@ -90,10 +100,6 @@ export const Icon = (props: IconProps) => {
     );
   }
 
-  console.log('className', className);
-  console.log('styleName', 'root');
-  // console.log("ariaLabel", ariaLabel);
-
   return (
     <span
       styleName="root"
@@ -109,17 +115,4 @@ export const Icon = (props: IconProps) => {
       {content}
     </span>
   );
-
-  // );
-  // {'svg' in icon ? (
-  //   icon.svg
-  // ) : (
-  //   <FontAwesomeIcon
-  //     icon={{
-  //       prefix: icon.prefix ?? 'fas',
-  //       iconName: icon.name,
-  //     }}
-  //     focusable="false"
-  //   />
-  // )}
 };
