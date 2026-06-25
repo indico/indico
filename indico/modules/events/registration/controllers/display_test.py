@@ -176,6 +176,58 @@ def test_display_edit_override_required_rh(dummy_regform, dummy_user, app_contex
         )
 
 
+def test_display_register_anonymous_accompanying_persons(db, dummy_event, dummy_regform, app_context, mocker):
+    dummy_regform.start_dt = now_utc(False)
+    dummy_regform.registration_limit = 4
+    dummy_regform.require_captcha = False
+    mocker.patch('indico.modules.events.registration.util.notify_registration_creation')
+
+    section = RegistrationFormSection(
+        registration_form=dummy_regform, title='dummy_section', is_manager_only=False
+    )
+    field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(
+        field,
+        {
+            'input_type': 'accompanying_persons',
+            'title': 'Anonymous accompanying persons',
+            'is_anonymous': True,
+            'persons_count_against_limit': True,
+            'max_persons': 0,
+        },
+    )
+    db.session.flush()
+
+    jsondata = {
+        'email': 'anonymous@example.test',
+        'first_name': 'Anonymous',
+        'last_name': 'Registrant',
+        field.html_field_name: 2,
+    }
+    url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/'
+    with app_context.test_request_context(url, json=jsondata):
+        request.view_args = {'event_id': dummy_regform.event_id, 'reg_form_id': dummy_regform.id}
+        rh = RHRegistrationForm()
+        rh._process_args()
+        rh._check_access()
+        rh._process_POST()
+
+    reg = dummy_regform.get_registration(email='anonymous@example.test')
+    assert reg is not None
+    assert reg.data_by_field[field.id].data == 2
+    assert reg.data_by_field[field.id].friendly_data == '2'
+    assert reg.data_by_field[field.id].search_data == '2'
+    assert reg.data_by_field[field.id].get_friendly_data(for_humans=True) == '2 persons'
+    assert field.field_impl.render_summary_data(reg.data_by_field[field.id]) == '2 persons'
+    assert field.field_impl.render_email_data(reg.data_by_field[field.id]) == '2 persons'
+    assert reg.accompanying_persons == []
+    db.session.expire(reg)
+    db.session.expire(dummy_regform)
+    assert reg.num_accompanying_persons == 2
+    assert reg.occupied_slots == 3
+    assert dummy_regform.active_registration_count == 3
+
+
 condition_field_params = pytest.mark.parametrize(
     ('input_type', 'input_data', 'false_values', 'true_value', 'condition'), (
     ('bool', {}, [False], True, True),

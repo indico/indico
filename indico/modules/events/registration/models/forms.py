@@ -486,6 +486,12 @@ class RegistrationForm(db.Model):
         return [x for x in self.sections if not x.is_visible and not x.is_deleted]
 
     @property
+    def has_anonymous_accompanying_persons_fields(self):
+        return any(item.input_type == 'accompanying_persons' and not item.is_deleted and
+                   (item.data or {}).get('is_anonymous')
+                   for item in self.form_items)
+
+    @property
     def limit_reached(self):
         return self.registration_limit and self.active_registration_count >= self.registration_limit
 
