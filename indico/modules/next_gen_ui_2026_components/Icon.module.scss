@@ -23,7 +23,7 @@
 @mixin icon-color($color) {
   $palette: $color;
 
-  @if $color == 'primary' {
+  @if $color =='primary' {
     $palette: 'primary-blue';
   }
 
@@ -33,81 +33,83 @@
   --icon-800: var(--indico-#{$palette}-800);
 }
 
-.root {
-  @include centered();
+:global(.indico-ui) {
+  &.root {
+    @include centered();
 
-  &[data-size='xs'] {
-    @include icon-size('xs');
+    &[data-size='xs'] {
+      @include icon-size('xs');
+    }
+
+    &[data-size='sm'] {
+      @include icon-size('sm');
+    }
+
+    &[data-size='md'] {
+      @include icon-size('md');
+    }
+
+    &[data-size='lg'] {
+      @include icon-size('lg');
+    }
+
+    &[data-size='xl'] {
+      @include icon-size('xl');
+    }
+
+    &[data-color='primary'] {
+      @include icon-color('primary');
+    }
+
+    &[data-color='gray'] {
+      @include icon-color('gray');
+    }
+
+    &[data-color='success'] {
+      @include icon-color('success');
+    }
+
+    &[data-color='warning'] {
+      @include icon-color('warning');
+    }
+
+    &[data-color='error'] {
+      @include icon-color('error');
+    }
   }
 
-  &[data-size='sm'] {
-    @include icon-size('sm');
+  &.root[data-variant='plain'] {
+    color: var(--icon-500);
+    background: transparent;
   }
 
-  &[data-size='md'] {
-    @include icon-size('md');
+  &.root[data-variant='compact'] {
+    @extend .root, [data-variant='plain'];
+
+    svg,
+    img,
+    i {
+      width: 100%;
+      height: 100%;
+    }
   }
 
-  &[data-size='lg'] {
-    @include icon-size('lg');
+  &.root[data-rounded] {
+    border-radius: 50%;
   }
 
-  &[data-size='xl'] {
-    @include icon-size('xl');
+  &.root[data-variant='light'] {
+    color: var(--icon-600);
+    background: var(--icon-100);
   }
 
-  &[data-color='primary'] {
-    @include icon-color('primary');
+  &.root[data-variant='solid'] {
+    color: white;
+    background: var(--icon-500);
   }
 
-  &[data-color='gray'] {
-    @include icon-color('gray');
+  &.root[data-variant='dark'] {
+    color: white;
+    background: var(--icon-800);
   }
-
-  &[data-color='success'] {
-    @include icon-color('success');
-  }
-
-  &[data-color='warning'] {
-    @include icon-color('warning');
-  }
-
-  &[data-color='error'] {
-    @include icon-color('error');
-  }
-}
-
-.root[data-variant='plain'] {
-  color: var(--icon-500);
-  background: transparent;
-}
-
-.root[data-variant='compact'] {
-  @extend .root, [data-variant='plain'];
-
-  svg,
-  img,
-  i {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.root[data-rounded] {
-  border-radius: 50%;
-}
-
-.root[data-variant='light'] {
-  color: var(--icon-600);
-  background: var(--icon-100);
-}
-
-.root[data-variant='solid'] {
-  color: white;
-  background: var(--icon-500);
-}
-
-.root[data-variant='dark'] {
-  color: white;
-  background: var(--icon-800);
 }

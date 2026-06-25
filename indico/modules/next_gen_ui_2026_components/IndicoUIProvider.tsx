@@ -11,9 +11,8 @@ import './IndicoUIProvider.scss';
 
 interface IndicoUIProviderProps {
   children: React.ReactNode;
-  className?: string;
 }
 
-export function IndicoUIProvider({children, className}: IndicoUIProviderProps) {
-  return <div className={`indico-ui ${className || ''}`}>{children}</div>;
+export function IndicoUIProvider({children}: IndicoUIProviderProps) {
+  return <div>{children}</div>;
 }

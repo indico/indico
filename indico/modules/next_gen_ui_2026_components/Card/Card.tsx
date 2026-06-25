@@ -14,11 +14,11 @@ import './Card.module.scss';
 // HEADER COMPONENT
 interface CardHeaderProps {
   children: React.ReactNode;
-  styleName?: string;
+  className?: string;
 }
 
-export const CardHeader = ({children, styleName}: CardHeaderProps) => (
-  <h6 styleName="card-header" className={styleName}>
+export const CardHeader = ({children, className}: CardHeaderProps) => (
+  <h6 styleName="card-header" className={`indico-ui ${className || ''}`}>
     {children}
   </h6>
 );
@@ -28,11 +28,13 @@ type CardHeaderElement = ReactElement<CardHeaderProps, typeof CardHeader>;
 // META DATA CATEGORY COMPONENT
 interface CardMetaProps {
   children: React.ReactNode;
-  styleName?: string;
+  className?: string;
 }
 
-export const CardMeta = ({children, styleName}: CardMetaProps) => (
-  <p styleName={`card-meta ${styleName || ''}`}>{children}</p>
+export const CardMeta = ({children, className}: CardMetaProps) => (
+  <p styleName='card-meta' className={`indico-ui ${className || ''}`}>
+    {children}
+  </p>
 );
 
 type CardMetaElement = ReactElement<CardMetaProps, typeof CardMeta>;
@@ -40,11 +42,13 @@ type CardMetaElement = ReactElement<CardMetaProps, typeof CardMeta>;
 // DESCRIPTION COMPONENT
 interface CardDescriptionProps {
   children: React.ReactNode;
-  styleName?: string;
+  className?: string;
 }
 
-export const CardDescription = ({children, styleName}: CardDescriptionProps) => (
-  <p styleName={`card-description ${styleName || ''}`}>{children}</p>
+export const CardDescription = ({children, className}: CardDescriptionProps) => (
+  <p styleName='card-description' className={`indico-ui ${className || ''}`}>
+    {children}
+  </p>
 );
 
 type CardDescriptionElement = ReactElement<CardDescriptionProps, typeof CardDescription>;
@@ -69,7 +73,7 @@ const CardRoot = ({children, href, onClick, className, ariaLabel}: CardProps) =>
         href={href}
         onClick={onClick}
         styleName="card-root"
-        className={className}
+        className={`indico-ui ${className ?? ''}`}
         aria-label={ariaLabel}
       >
         {children}
@@ -77,7 +81,7 @@ const CardRoot = ({children, href, onClick, className, ariaLabel}: CardProps) =>
     );
   }
   return (
-    <div styleName="card-root" className={className} aria-label={ariaLabel}>
+    <div styleName="card-root" className={`indico-ui ${className ?? ''}`} aria-label={ariaLabel}>
       {children}
     </div>
   );
