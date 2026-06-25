@@ -63,14 +63,14 @@
   --transition-base: 220ms ease;
   --transition-slow: 400ms ease;
 
+  --animation-duration-fast: 150ms;
+  --animation-duration-base: 220ms;
+  --animation-duration-slow: 400ms;
+
   // Icon sizes
   --icon-size-xs: 1.5rem; // 24px
   --icon-size-sm: 2rem; // 32px
   --icon-size-md: 2.5rem; // 40px
   --icon-size-lg: 3rem; // 48px
   --icon-size-xl: 3.5rem; // 56px
-
-  --animation-duration-fast: 150ms;
-  --animation-duration-base: 220ms;
-  --animation-duration-slow: 400ms;
 }
