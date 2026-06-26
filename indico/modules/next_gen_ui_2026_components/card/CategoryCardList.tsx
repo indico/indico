@@ -12,8 +12,8 @@ import React from 'react';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
-// import ArrowIcon from '../../../web/static/images/circle-arrow-right-solid-full.svg';
-// import { ReactComponent as ArrowIcon } from '../../../web/static/images/circle-arrow-right-solid-full.svg';
+// eslint-disable-next-line import/no-unresolved
+import ArrowIcon from '../icon/circle-arrow-right-solid-full.svg?react';
 
 import {Card} from './Card';
 
@@ -52,28 +52,25 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           href={category.displayURL}
           ariaLabel={category.description || category.title}
         >
-          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
-          {/* <Card.Icon
-            icon= {ArrowIcon}
-            color="primary"
-            size="md"
-            variant="plain"
-          /> */}
-          {/* <Card.Icon icon={{svg: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path fill="rgb(71, 147, 206)" d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM361 417C351.6 426.4 336.4 426.4 327.1 417C317.8 407.6 317.7 392.4 327.1 383.1L366.1 344.1L216 344.1C202.7 344.1 192 333.4 192 320.1C192 306.8 202.7 296.1 216 296.1L366.1 296.1L327.1 257.1C317.7 247.7 317.7 232.5 327.1 223.2C336.5 213.9 351.7 213.8 361 223.2L441 303.2C450.4 312.6 450.4 327.8 441 337.1L361 417.1z"/></svg>}}
-          
+          <Card.Icon 
+            icon="fas:folder" 
+            color="primary" 
+            size="md" 
+            variant="compact" 
+            decorative />
           <Card.Icon
-            icon={{svg: <img src={ArrowIcon} />}}
-            color="primary"
-            size="md"
-            variant="plain"
-          /> */}
+            icon= {ArrowIcon}
+            color="success"
+            size="sm"
+            variant="compact"
+          />
           <div styleName="card-main" className="indico-ui">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
               {category.deepCategoryCount > 0 ? (
                 <>
                   {category.deepCategoryCount} Categories
-                  <span styleName=" dot-divider" className="indico-ui">
+                  <span styleName="dot-divider" className="indico-ui">
                     •
                   </span>
                 </>
