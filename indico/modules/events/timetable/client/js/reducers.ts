@@ -317,28 +317,36 @@ export default {
       case actions.DELETE_SESSION: {
         // Remove all entries belonging to the session being deleted &
         // unschedule all contributions linked to it
+        const {sessionId} = action;
         const contribsToUnschedule = [];
+
+        const unscheduled = state.unscheduled.filter(contrib => contrib.sessionId !== sessionId);
+
         const newEntries = Object.fromEntries(
           Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             dayEntries.filter(e => {
-              if (e.type === EntryType.SessionBlock && e.sessionId === action.sessionId) {
+              if (e.type === EntryType.SessionBlock && e.sessionId === sessionId) {
                 for (const child of e.children) {
                   if (child.type === EntryType.Contribution) {
-                    contribsToUnschedule.push({...child, sessionId: null});
+                    contribsToUnschedule.push({
+                      ...child,
+                      sessionId: null,
+                      sessionBlockId: null,
+                    });
                   }
                 }
               }
 
-              return e.sessionId !== action.sessionId;
+              return e.sessionId !== sessionId;
             }),
           ])
         );
-        const newUnscheduled = [...state.unscheduled, ...contribsToUnschedule];
+
         return {
           ...state,
           entries: newEntries,
-          unscheduled: newUnscheduled,
+          unscheduled: [...unscheduled, ...contribsToUnschedule],
         };
       }
       default:
@@ -383,15 +391,15 @@ export default {
     }
   },
   display: (state = {activePanel: SidePanelView.None}, action: Action) => {
-  switch (action.type) {
-    case actions.SET_ACTIVE_PANEL:
-      return {
-        ...state,
-        activePanel: action.panel,
-      };
+    switch (action.type) {
+      case actions.SET_ACTIVE_PANEL:
+        return {
+          ...state,
+          activePanel: action.panel,
+        };
 
-    default:
-      return state;
-  }
-},
+      default:
+        return state;
+    }
+  },
 };

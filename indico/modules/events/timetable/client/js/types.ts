@@ -20,6 +20,12 @@ export enum PersonLinkRole {
   SUBMITTER = 'submitter',
 }
 
+export enum SidePanelView {
+  None = 'none',
+  Sessions = 'sessions',
+  Unscheduled = 'unscheduled',
+}
+
 export type HexColor = `#${string}`;
 
 export type EventType = 'lecture' | 'meeting' | 'conference';
@@ -192,10 +198,5 @@ export interface ReduxState {
   sessions: Record<string, Session>;
   navigation: Navigation;
   staticData: StaticData;
-}
-
-export enum SidePanelView {
-  None = 'none',
-  Sessions = 'sessions',
-  Unscheduled = 'unscheduled',
+  display: {activePanel: SidePanelView};
 }

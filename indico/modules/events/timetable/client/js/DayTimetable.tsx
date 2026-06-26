@@ -32,6 +32,7 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
+import TimetableSidePanel from './TimetableSidePanel';
 import {useToast} from './ToastContext';
 import {
   ReduxState,
@@ -42,7 +43,6 @@ import {
   EntryType,
   Session,
 } from './types';
-import TimetableSidePanel from './TimetableSidePanel';
 import UnscheduledContributions from './UnscheduledContributions';
 import {
   DAY_SIZE,

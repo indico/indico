@@ -25,7 +25,7 @@ const PopoverDropdownMenu = ({
   searchValue,
   onSearchChange,
   searchPlaceholder,
-}) => {  
+}) => {
   const triggerRef = useRef(null);
   return (
     <Manager>
@@ -74,19 +74,19 @@ const PopoverDropdownMenu = ({
             return (
               <div className="ui dropdown" styleName="dropdown-container" style={style} ref={ref}>
                 <Dropdown.Menu open>
-                {onSearchChange && (
-                  <div styleName="search-container">
-                    <Input
-                      fluid
-                      icon="search"
-                      value={searchValue}
-                      placeholder={searchPlaceholder}
-                      onClick={e => e.stopPropagation()}
-                      onChange={(_, {value}) => onSearchChange(value)}
-                    />
-                  </div>
-                )}
-                {children}
+                  {onSearchChange && (
+                    <div styleName="search-container">
+                      <Input
+                        fluid
+                        icon="search"
+                        value={searchValue}
+                        placeholder={searchPlaceholder}
+                        onClick={e => e.stopPropagation()}
+                        onChange={(_, {value}) => onSearchChange(value)}
+                      />
+                    </div>
+                  )}
+                  {children}
                 </Dropdown.Menu>
               </div>
             );

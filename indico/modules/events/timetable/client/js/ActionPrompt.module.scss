@@ -1,0 +1,64 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+$color-warning: #f2a33c;
+
+.action-prompt {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  padding: 2rem 1rem 1rem;
+  border-radius: 4px;
+  border: 1px solid $raincloud-gray;
+  background: $white;
+}
+
+.action-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.action-prompt-warning {
+  border-color: $color-warning;
+}
+
+.prompt-icon {
+  font-size: 1.25rem;
+  color: $color-warning;
+}
+
+.prompt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.prompt-message {
+  font-weight: bold;
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
