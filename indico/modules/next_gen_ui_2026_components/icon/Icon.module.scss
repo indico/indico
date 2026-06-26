@@ -36,9 +36,9 @@
 :global(.indico-ui) {
   &.root {
     @include centered();
-    
-    svg path{
-      fill: currentColor !important; //override the fill color of the svg path to currentColor
+
+    svg path {
+      fill: currentcolor !important; // override the fill color of the svg path to currentColor
     }
 
     &[data-size='xs'] {
