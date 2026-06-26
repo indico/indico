@@ -1124,6 +1124,12 @@ class RHUserSearch(RHProtected):
             return *exact_match_keys, *unaccent_exact_match_keys, entry['full_name'], entry['email']
 
         results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
+        for filtered in values_from_signal(
+            signals.users.filter_user_search_results.send(self, user=session.user, results=results),
+            as_list=True
+        ):
+            if filtered is not None:
+                results = filtered
         if favorites_first:
             favorites = {u.id for u in session.user.favorite_users}
             results.sort(key=lambda x: x['id'] not in favorites)
