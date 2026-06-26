@@ -75,6 +75,14 @@ ind-with-toggletip {
     pointer-events: none;
   }
 
+  // When shown, lift the whole tooltip above sibling overlay chrome — e.g. a
+  // Semantic popup's own arrow (z-index 2), which would otherwise paint over a
+  // tooltip shown inside the popup. A stacking context on the host raises the
+  // box and arrow together, keeping the box-above-arrow order intact.
+  &[shown] {
+    z-index: 3;
+  }
+
   // Content background
   //
   // We use a transparent border to provide the necessary offset
