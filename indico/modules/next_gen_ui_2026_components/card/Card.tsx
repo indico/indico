@@ -7,7 +7,7 @@
 
 import React, {ReactElement} from 'react';
 
-import {Icon, IconProps} from '../Icon';
+import {Icon, IconProps} from '../icon/Icon';
 
 import './Card.module.scss';
 
@@ -32,7 +32,7 @@ interface CardMetaProps {
 }
 
 export const CardMeta = ({children, className}: CardMetaProps) => (
-  <p styleName='card-meta' className={`indico-ui ${className || ''}`}>
+  <p styleName="card-meta" className={`indico-ui ${className || ''}`}>
     {children}
   </p>
 );
@@ -46,7 +46,7 @@ interface CardDescriptionProps {
 }
 
 export const CardDescription = ({children, className}: CardDescriptionProps) => (
-  <p styleName='card-description' className={`indico-ui ${className || ''}`}>
+  <p styleName="card-description" className={`indico-ui ${className || ''}`}>
     {children}
   </p>
 );

@@ -12,7 +12,8 @@ import ReactDOM from 'react-dom';
 
 import {$T} from 'indico/utils/i18n';
 
-import {CategoryCardList} from './../../../next_gen_ui_2026_components/Card/CategoryCardList';
+import {CategoryCardList} from '../../../next_gen_ui_2026_components/card/CategoryCardList';
+
 import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
