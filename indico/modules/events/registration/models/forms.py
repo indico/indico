@@ -558,12 +558,7 @@ class RegistrationForm(db.Model):
         return self.is_active and (not self.require_login or user)
 
     def get_managed_registration_count(self, user):
-        """Number of active registrations ``user`` may manage on this form.
-
-        For a full manager this is the total active count; for a user a plugin scopes to a subset it
-        counts only the registrations matching their scope, so the displayed number matches the list
-        they actually see.
-        """
+        """Number of active registrations ``user`` may manage on this form."""
         from indico.modules.events.registration.models.registrations import Registration
         criteria = [c for c in values_from_signal(
             signals.event.filter_registration_list.send(self, user=user), as_list=True

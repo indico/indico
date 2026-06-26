@@ -165,9 +165,6 @@ class RegistrationListGenerator(ListGeneratorBase):
         return filters
 
     def _build_query(self):
-        # Plugins may scope the list to the registrations the current user may manage; each returns
-        # a SQL criterion AND-combined into the query. No receivers (or a full manager) means no
-        # extra criteria, so the list is unscoped.
         extra_criteria = [c for c in values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
         ) if c is not None]

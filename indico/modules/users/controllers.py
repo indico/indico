@@ -1124,8 +1124,6 @@ class RHUserSearch(RHProtected):
             return *exact_match_keys, *unaccent_exact_match_keys, entry['full_name'], entry['email']
 
         results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
-        # Let plugins restrict the results. Each handler that returns a list replaces the current
-        # results, so later handlers only see what earlier ones left. With no receivers this is a no-op.
         for filtered in values_from_signal(
             signals.users.filter_user_search_results.send(self, user=session.user, results=results),
             as_list=True
