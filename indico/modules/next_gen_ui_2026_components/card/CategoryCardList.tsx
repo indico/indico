@@ -12,9 +12,6 @@ import React from 'react';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
-// eslint-disable-next-line import/no-unresolved
-import ArrowIcon from '../icon/circle-arrow-right-solid-full.svg?react';
-
 import {Card} from './Card';
 
 import './CategoryCardList.module.scss';
@@ -53,7 +50,6 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           ariaLabel={category.description || category.title}
         >
           <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
-          <Card.Icon icon={ArrowIcon} color="success" size="sm" variant="compact" />
           <div styleName="card-main" className="indico-ui">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
