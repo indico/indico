@@ -36,6 +36,7 @@ import {
   UnscheduledContribEntry,
   Session,
   ReduxState,
+  SidePanelView,
 } from './types';
 import {flattenEntries, getEntryURLByObjId} from './utils';
 
@@ -59,8 +60,7 @@ export const SCHEDULE_ENTRY = 'Schedule entry';
 export const UNSCHEDULE_ENTRY = 'Unschedule entry';
 export const TOGGLE_EXPAND = 'Toggle expand';
 export const TOGGLE_DRAFT = 'Toggle draft mode';
-export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
-export const TOGGLE_SHOW_SESSIONS = 'Toggle show sessions';
+export const SET_ACTIVE_PANEL = 'Set active tab in side panel';
 export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_ENTRY = 'Update entry';
@@ -166,12 +166,9 @@ interface DeleteSessionAction {
   sessionId: number;
 }
 
-interface ToggleShowUnscheduledAction {
-  type: typeof TOGGLE_SHOW_UNSCHEDULED;
-}
-
-interface ToggleShowSessionsAction {
-  type: typeof TOGGLE_SHOW_SESSIONS;
+interface SetActivePanelAction {
+  type: typeof SET_ACTIVE_PANEL;
+  panel: SidePanelView;
 }
 
 interface SetCurrentDateAction {
@@ -212,8 +209,9 @@ export type Action =
   | EditSessionAction
   | CreateSessionAction
   | DeleteSessionAction
-  | ToggleShowUnscheduledAction
-  | ToggleShowSessionsAction
+  // | ToggleShowUnscheduledAction
+  // | ToggleShowSessionsAction
+  | SetActivePanelAction
   | SetCurrentDateAction
   | ToggleExpandAction
   | ToggleDraftAction
@@ -443,12 +441,11 @@ export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   });
 }
 
-export function toggleShowUnscheduled() {
-  return {type: TOGGLE_SHOW_UNSCHEDULED};
-}
-
-export function toggleShowSessions() {
-  return {type: TOGGLE_SHOW_SESSIONS};
+export function setActivePanel(panel: SidePanelView) {
+  return {
+    type: SET_ACTIVE_PANEL,
+    panel,
+  };
 }
 
 function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {

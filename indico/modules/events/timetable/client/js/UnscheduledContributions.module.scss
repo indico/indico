@@ -14,9 +14,18 @@
 }
 
 .contributions-container {
+  :global(.ui.basic.button),
+  :global(.ui.basic.buttons .button) {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    margin: 0;
+  }
+}
+
+.contributions-container {
   position: sticky;
   top: 0;
-  padding: 1rem 0.5rem;
+  padding: 1rem 0 1rem 0.5rem;
   align-self: flex-start;
   display: flex;
   flex-direction: column;
@@ -25,18 +34,15 @@
   flex-shrink: 0;
   height: 100%;
   overflow-x: hidden;
-  border: 1px solid $raincloud-gray;
+  border-left: 1px solid $raincloud-gray;
 
-  :global(.ui.button) {
-      box-shadow: none !important;
-      -webkit-box-shadow: none !important;
-    }
 
   .content {
+    
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    overflow-x: visible;
+    overflow-x: hidden;
     overflow-y: scroll;
     height: 100%;
     padding: 1rem;
@@ -101,6 +107,10 @@
       }
 
       :global(.ui.button) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
         font-weight: normal;
         aspect-ratio: 1;
         max-height: 33px;
@@ -115,10 +125,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-
-      & > * {
-        margin: 0 !important;
-      }
     }
 
     .contribution {
@@ -155,6 +161,7 @@
 .pane-resize-handle {
   width: 12px;
   min-width: 12px;
+  margin-left: -10px;
   height: 100%;
   cursor: ew-resize;
   user-select: none;
@@ -162,20 +169,6 @@
 
   &:hover {
     border-right: 4px solid #007cac;
-  }
-}
-
-.filter-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  cursor: pointer;
-
-  :global(.ui.label) {
-   position: absolute;
-   top: -5px;
-   right: -5px;
   }
 }
 
@@ -187,8 +180,7 @@
     align-items: center;
   }
 
-  :global(.menu .item.active),
-  :global(.menu .item.selected) {
+  :global(.menu .item:is(.active, .selected)){
     background: #eef6fa !important;
     font-weight: bold;
   }
@@ -198,14 +190,38 @@
   width: 100%;
 }
 
-.add-session-container {
+:global(.ui.basic.button).add-session-container {
   display: flex;
   width: auto;
-  padding: 0.5rem;
+  min-height: 50px;
   border-radius: 4px;
   align-items: center;
   justify-content: center;
   outline: dashed 1px grey;
+  cursor: pointer;
+
+  &:hover {
+    :global(.ui.basic.button).add-session-container {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+}
+
+.add-session-container {
+  display: flex;
+  width: auto;
+  min-height: 50px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  outline: dashed 1px grey;
+  cursor: pointer;
+
+  &:hover {
+    :global(.ui.basic.button).add-session-container {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
 }
 
 .session-list {
@@ -217,7 +233,6 @@
 .session-wrapper {
   position: relative;
   display: flex;
-  // margin: 0.5rem 0;
   padding: 0;
   border-radius: 4px;
   border: 1px solid $raincloud-gray;
@@ -236,13 +251,10 @@
     transition:
       opacity 0.2s ease,
       transform 0.2s ease;
-
-    // TODO: (Marina) transform background into variable
     background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 32%,
       rgba(255, 255, 255, 1) 66%,
-      rgba(255, 255, 255, 1) 100%
     );
   }
 
@@ -261,7 +273,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem;
   width: 100%;
 
   &::before {
@@ -277,7 +289,6 @@
 }
 
 .session-title {
-
   display: -webkit-box;
   -webkit-box-orient: vertical;
   font-weight: bold;
@@ -309,4 +320,58 @@
   font-size: 12px;
   line-height: 16px;
   cursor: pointer;
+}
+
+.filter-trigger-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.filter-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 13px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: $red;
+  color: $white;
+  font-size: 9px;
+  line-height: 16px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-cross {
+  display: none;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.filter-badge:hover {
+  .filter-count {
+    display: none;
+  }
+
+  .filter-cross {
+    display: inline;
+
+    :global(.close.icon).filter-cross{
+      margin: 0;
+    }
+  }
+}
+
+.filter-count:empty::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $white;
+  display: block;
 }

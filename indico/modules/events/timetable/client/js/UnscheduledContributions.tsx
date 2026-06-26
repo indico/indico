@@ -9,7 +9,7 @@ import {partition} from 'lodash';
 import {Moment} from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Label, Input, Dropdown} from 'semantic-ui-react';
+import {Button, Label, Input, Dropdown, Icon} from 'semantic-ui-react';
 
 import {CreateContributionButton} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
@@ -19,9 +19,9 @@ import {Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
-import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
 import {UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
+import { SESSION_CREATE_MODAL, SESSION_EDIT_MODAL, useModal } from './ModalContext';
 
 enum GenericFilterType {
   NO_SESSION = 'no-session',
@@ -56,6 +56,7 @@ function UnscheduledContributionList({
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
+  const {openModal} = useModal();
   const minSidebarWidthPx = 320;
   const eventId = useSelector(selectors.getEventId);
 
@@ -63,10 +64,11 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const resizing = useRef(false);
   const initialPosition = useRef<number>(0);
 
-  const [selectedFilter, setSelectedFilter] = useState<FilterType[]>([]);
+  const [selectedFilter, setSelectedFilters] = useState<FilterType[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
   const [draftSearchQuery, setDraftSearchQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [filterSearchQuery, setFilterSearchQuery] = useState('');
 
   const contribs = useSelector(selectors.getUnscheduled).toSorted((c1, c2) => {
     // sort by sessionId then by title
@@ -132,14 +134,17 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     initialPosition.current = 0;
   }
 
-  function onMouseMove(e: MouseEvent) {
-    if (resizing.current) {
+    function onMouseMove(e: MouseEvent) {
+      if (!resizing.current || !wrapperRef.current) {
+        return;
+      }
+
       const diff = e.pageX - initialPosition.current;
       const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
-      initialPosition.current = wrapperRef.current.offsetLeft + width;
       wrapperRef.current.style.width = `${width}px`;
+      initialPosition.current = e.pageX;
     }
-  }
+  
 
   useEffect(() => {
     document.addEventListener('mouseup', onMouseUp);
@@ -165,7 +170,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       newFilter = +newKeys.filter(k => !prevSessions.current[k])?.pop();
     }
 
-    setSelectedFilter(newFilter ? [newFilter] : []);
+    setSelectedFilters(newFilter ? [newFilter] : []);
     prevSessions.current = sessions;
   }, [sessions]);
 
@@ -181,7 +186,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   if (!showUnscheduled && !showSessions) {
     return null;
   }
-
+  const filteredDropdownSessions = dropdownSessions.filter(session =>
+    session.title.toLowerCase().includes(filterSearchQuery.toLowerCase())
+  );
   return (
     <>
       <div
@@ -200,10 +207,14 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   value={draftSearchQuery}
                   onChange={(_, {value}) => setDraftSearchQuery(value)}
                 />
-                <PopoverDropdownMenu
-                  open={filterOpen}
+                <div styleName="filter-trigger-wrapper">
+                  <PopoverDropdownMenu
+                    open={filterOpen}
                   onOpen={() => setFilterOpen(true)}
-                  onClose={() => setFilterOpen(false)}
+                  onClose={() => {
+                    setFilterOpen(false);
+                    setFilterSearchQuery('');
+                  }}
                   overflow
                   trigger={
                     <Button
@@ -213,65 +224,73 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                       title={Translate.string('Filter sessions')}
                     />
                   }
-                >
-                  {dropdownSessions.map(option => {
-                    const isSelected = selectedFilter.includes(option.value as FilterType);
-
-                    return (
-                      <Dropdown.Item
-                        key={option.value}
-                        active={isSelected}
-                        selected={isSelected}
-                        onClick={e => {
-                          e.stopPropagation();
-
-                          setSelectedFilter(prev =>
-                            isSelected
-                              ? prev.filter(value => value !== option.value)
-                              : [...prev, option.value as FilterType]
-                          );
-                        }}
-                      >
-                        {option.text}
-                      </Dropdown.Item>
-                    );
-                  })}
-                </PopoverDropdownMenu>
-                {selectedFilter.length > 0 && (
-                  <button
-                    type="button"
-                    styleName="filter-clear"
-                    title={Translate.string('Clear filters')}
-                    onClick={e => {
-                      e.stopPropagation();
-                      setSelectedFilter([]);
-                    }}
+                  searchValue={filterSearchQuery}
+                  onSearchChange={setFilterSearchQuery}
+                  searchPlaceholder={Translate.string('Search sessions')}
                   >
-                    ×
-                  </button>
-                )}
-              </div>
+                    {filteredDropdownSessions.map(option => {
+                      const isSelected = selectedFilter.includes(option.value as FilterType);
 
-              <div styleName="add-session-container">
-                <CreateContributionButton
-                  eventId={eventId}
-                  trigger={
-                    <Button
-                      basic
+                      return (
+                        <Dropdown.Item
+                          key={option.value}
+                          active={isSelected}
+                          selected={isSelected}
+                          onClick={e => {
+                            e.stopPropagation();
+
+                            setSelectedFilters(prev =>
+                              isSelected
+                                ? prev.filter(value => value !== option.value)
+                                : [...prev, option.value as FilterType]
+                            );
+                          }}
+                        >
+                          {option.text}
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </PopoverDropdownMenu>
+
+                  {selectedFilter.length > 0 && (
+                    <button
                       type="button"
-                      title={Translate.string('Create new contribution')}
-                      icon="plus"
-                      size="small"
-                    />
-                  }
-                  onCreate={contrib => {
-                    dispatch(actions.addUnscheduledContrib(contrib));
-                    setSelectedFilter([]);
-                    setDraftSearchQuery('');
-                  }}
-                />
+                      styleName="filter-badge"
+                      title={Translate.string('Clear filters')}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelectedFilters([]);
+                      }}
+                    >
+                      <span styleName="filter-count">
+                        {selectedFilter.length > 9 ? '' : selectedFilter.length}
+                      </span>
+                     <span styleName="filter-cross">
+                        <Icon name="close" />
+                      </span>
+                    </button>
+                  )}
+                </div>
               </div>
 
+              <CreateContributionButton
+                eventId={eventId}
+                trigger={
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    styleName="add-session-container"
+                    title={Translate.string('Create new contribution')}
+                  >
+                    <Button basic type="button" icon="plus" size="small" />
+                  </div>
+                }
+                onCreate={contrib => {
+                  dispatch(actions.addUnscheduledContrib(contrib));
+                  setSelectedFilters([]);
+                  setDraftSearchQuery('');
+                }}
+              />
               {filteredContribs.length > 0 ? (
                 <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
               ) : (
@@ -287,7 +306,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
             <div styleName="content">
               <div styleName="actions">
                 <Input
-                  // fluid
                   icon="search"
                   placeholder={Translate.string('Search sessions')}
                   value={sessionSearchQuery}
@@ -295,17 +313,19 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 />
               </div>
 
-              <div styleName="add-session-container">
-                {/* TODO: Add nicer create session entry point here */}
                 <Button
+                  styleName="add-session-container"
                   basic
                   type="button"
                   title={Translate.string('Create new session')}
                   icon="plus"
                   size="small"
-                  onClick={() => setSelectedSessionId('draft')}
+                  onClick={() =>
+                    openModal(SESSION_CREATE_MODAL, {
+                      onClose: () => setSelectedSessionId(null),
+                    })
+                  }
                 />
-              </div>
 
               {filteredSessions.length > 0 ? (
                 <div styleName="session-list">
@@ -325,7 +345,12 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                             title={Translate.string('Edit session')}
                             icon="edit"
                             size="small"
-                            onClick={() => setSelectedSessionId(session.id)}
+                            onClick={() =>
+                              openModal(SESSION_EDIT_MODAL, {
+                                sessionId: session.id,
+                                onClose: () => setSelectedSessionId(session.id),
+                              })
+                            }
                           />
                           <Button
                             basic
@@ -351,20 +376,13 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       <div
         styleName="pane-resize-handle"
         onMouseDown={e => {
+          if (e.button !== 0) {
+              return;
+            }
           resizing.current = true;
           initialPosition.current = e.pageX;
         }}
       />
-
-      {selectedSessionId &&
-        (selectedSessionId === 'draft' ? (
-          <TimetableSessionCreateModal onClose={() => setSelectedSessionId(null)} />
-        ) : (
-          <TimetableSessionEditModal
-            onClose={() => setSelectedSessionId(null)}
-            sessionId={selectedSessionId}
-          />
-        ))}
     </>
   );
 }

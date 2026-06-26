@@ -16,7 +16,20 @@ $toolbar-bg-color: $raincloud-gray;
     width: 100%;
 }
 
-.tab-rail {
-    display: flex !important;
-    width: inherit !important;
+:global(.ui.vertical.menu).tab-rail {
+    display: flex;
+    width: inherit;
+    gap: 10px;
+    margin: 10px 0;
+
+     > :global(.item) {
+    margin: 0;
+    padding: 10px;
+    margin-right: 10px;
+
+    > :global(.icon) {
+       margin: 0;
+       font-size: 1.2rem;
+    }
+  }
 }
