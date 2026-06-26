@@ -23,7 +23,7 @@
 @mixin icon-color($color) {
   $palette: $color;
 
-  @if $color =='primary' {
+  @if $color == 'primary' {
     $palette: 'primary-blue';
   }
 
@@ -36,6 +36,10 @@
 :global(.indico-ui) {
   &.root {
     @include centered();
+    
+    svg path{
+      fill: currentColor !important; //override the fill color of the svg path to currentColor
+    }
 
     &[data-size='xs'] {
       @include icon-size('xs');

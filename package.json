@@ -117,6 +117,7 @@
     "@babel/preset-typescript": "^7.24.7",
     "@babel/register": "^7.17.7",
     "@biomejs/biome": "2.2.2",
+    "@svgr/webpack": "^8.1.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/jest": "^29.5.3",

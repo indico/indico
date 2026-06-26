@@ -53,11 +53,6 @@ function isCustomIcon(
 function parseIconString(icon: string): {
   prefix: IconPrefix;
   iconName: IconName;
-};
-
-function parseIconString(icon: string): {
-  prefix: IconPrefix;
-  iconName: IconName;
 } {
   const [prefix, iconName] = icon.split(':');
 
@@ -85,10 +80,9 @@ export const Icon = (props: IconProps) => {
 
   if (isCustomIcon(icon)) {
     const SvgIcon = icon;
-    content = <SvgIcon focusable="false" aria-hidden="true" />;
+    content = <SvgIcon className="indico-ui" focusable="false" aria-hidden="true" />;
   } else {
     const {prefix, iconName} = parseIconString(icon);
-
     content = (
       <FontAwesomeIcon
         icon={{
