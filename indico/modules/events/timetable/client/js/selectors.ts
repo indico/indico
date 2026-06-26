@@ -202,8 +202,7 @@ export const getActivePanel = (state: ReduxState) => state.display.activePanel;
 export const showUnscheduled = (state: ReduxState) =>
   getActivePanel(state) === SidePanelView.Unscheduled;
 
-export const showSessions = (state: ReduxState) =>
-  getActivePanel(state) === SidePanelView.Sessions;
+export const showSessions = (state: ReduxState) => getActivePanel(state) === SidePanelView.Sessions;
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,

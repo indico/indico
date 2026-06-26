@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React from 'react';
+import React, {useState} from 'react';
 import {createPortal} from 'react-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {Button} from 'semantic-ui-react';
@@ -14,6 +14,7 @@ import {Button} from 'semantic-ui-react';
 import {EditContributionButton} from 'indico/modules/events/contributions/ContributionForm';
 import {Translate} from 'indico/react/i18n';
 
+import TimetableActionPrompt from './ActionPrompt';
 import * as actions from './actions';
 import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
@@ -166,6 +167,7 @@ export function UnscheduledContributionEntry({
   contrib: UnscheduledContribEntry;
 }) {
   const dispatch = useDispatch<any>();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors({type: EntryType.Contribution}, session);
@@ -216,11 +218,28 @@ export function UnscheduledContributionEntry({
           <Button
             basic
             type="button"
-            title={Translate.string('Delete selected session')}
+            title={Translate.string('Delete contribution')}
             icon="trash"
             size="small"
-            onClick={() => dispatch(actions.deleteUnscheduledContrib(contrib, eventId))}
+            onClick={e => {
+              e.stopPropagation();
+              setConfirmDeleteOpen(true);
+            }}
           />
+          {confirmDeleteOpen && (
+            <TimetableActionPrompt
+              message={
+                <Translate>Deleting this contribution will permanently remove it.</Translate>
+              }
+              confirmLabel={Translate.string('Proceed')}
+              cancelLabel={Translate.string('Cancel')}
+              onClose={() => setConfirmDeleteOpen(false)}
+              onConfirm={() => {
+                dispatch(actions.deleteUnscheduledContrib(contrib, eventId));
+                setConfirmDeleteOpen(false);
+              }}
+            />
+          )}
         </div>
       )}
     </div>

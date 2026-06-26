@@ -14,7 +14,7 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import { SidePanelView } from './types';
+import {SidePanelView} from './types';
 
 export default function TimetableSidePanel() {
   const dispatch = useDispatch();
@@ -35,11 +35,15 @@ export default function TimetableSidePanel() {
             <Menu.Item
               name="sessions"
               active={showSessions}
-              onClick={() => dispatch(
-                actions.setActivePanel(
-                  activePanel === SidePanelView.Sessions ? SidePanelView.None : SidePanelView.Sessions
+              onClick={() =>
+                dispatch(
+                  actions.setActivePanel(
+                    activePanel === SidePanelView.Sessions
+                      ? SidePanelView.None
+                      : SidePanelView.Sessions
+                  )
                 )
-              )}
+              }
             >
               <Icon name="calendar outline" size="large" />
             </Menu.Item>
@@ -54,11 +58,15 @@ export default function TimetableSidePanel() {
             <Menu.Item
               name="unscheduled"
               active={showUnscheduled}
-              onClick={() => dispatch(
-                actions.setActivePanel(
-                  activePanel === SidePanelView.Unscheduled ? SidePanelView.None : SidePanelView.Unscheduled
+              onClick={() =>
+                dispatch(
+                  actions.setActivePanel(
+                    activePanel === SidePanelView.Unscheduled
+                      ? SidePanelView.None
+                      : SidePanelView.Unscheduled
+                  )
                 )
-              )}
+              }
             >
               <Icon name="edit outline" size="large" />
             </Menu.Item>
