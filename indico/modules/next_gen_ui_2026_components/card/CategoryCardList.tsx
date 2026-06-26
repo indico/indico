@@ -57,15 +57,23 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           <div styleName="card-main" className="indico-ui">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
-              {category.deepCategoryCount > 0 ? (
+              {category.deepCategoryCount === 0 && category.deepEventCount === 0 ? (
+                'Empty'
+              ) : (
                 <>
-                  {category.deepCategoryCount} Categories
-                  <span styleName="dot-divider" className="indico-ui">
-                    •
-                  </span>
+                  {category.deepCategoryCount > 0 && (
+                    <>
+                      {category.deepCategoryCount} Categories
+                      {category.deepEventCount > 0 && (
+                        <span styleName="dot-divider" className="indico-ui">
+                          •
+                        </span>
+                      )}
+                    </>
+                  )}
+                  {category.deepEventCount > 0 ? `${category.deepEventCount} Events` : null}
                 </>
-              ) : null}
-              {category.deepEventCount > 0 ? `${category.deepEventCount} Events` : null}
+              )}
             </Card.Meta>
           </div>
           {category.isProtected ? (
