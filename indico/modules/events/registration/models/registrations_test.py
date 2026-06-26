@@ -29,8 +29,6 @@ def test_can_manage_full_manager(db, dummy_regform, create_user):
 
 
 def test_can_manage_scoped_grant_is_bounded(db, dummy_regform, create_user):
-    # A user holding the event-wide registration_edit permission is bounded to the registrations
-    # matching a scope criterion: they manage the in-range one and are vetoed on the out-of-range one.
     manager = create_user(2)
     dummy_regform.event.update_principal(manager, permissions={'registration_edit'})
     db.session.flush()
