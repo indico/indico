@@ -9,12 +9,23 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useRef} from 'react';
 import {Manager, Popper} from 'react-popper';
-import {Dropdown, Portal} from 'semantic-ui-react';
+import {Dropdown, Portal, Input} from 'semantic-ui-react';
 
 import './PopoverDropdownMenu.module.scss';
 
 /** Dropdown "context" menu whose position is relative to the trigger. */
-const PopoverDropdownMenu = ({trigger, children, onOpen, onClose, open, placement, overflow}) => {
+const PopoverDropdownMenu = ({
+  trigger,
+  children,
+  onOpen,
+  onClose,
+  open,
+  placement,
+  overflow,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder,
+}) => {  
   const triggerRef = useRef(null);
   return (
     <Manager>
@@ -62,7 +73,21 @@ const PopoverDropdownMenu = ({trigger, children, onOpen, onClose, open, placemen
           {({ref, style}) => {
             return (
               <div className="ui dropdown" styleName="dropdown-container" style={style} ref={ref}>
-                <Dropdown.Menu open>{children}</Dropdown.Menu>
+                <Dropdown.Menu open>
+                {onSearchChange && (
+                  <div styleName="search-container">
+                    <Input
+                      fluid
+                      icon="search"
+                      value={searchValue}
+                      placeholder={searchPlaceholder}
+                      onClick={e => e.stopPropagation()}
+                      onChange={(_, {value}) => onSearchChange(value)}
+                    />
+                  </div>
+                )}
+                {children}
+                </Dropdown.Menu>
               </div>
             );
           }}
@@ -88,7 +113,14 @@ PopoverDropdownMenu.propTypes = {
     _.flatten(['auto', 'top', 'right', 'bottom', 'left'].map(e => [e, `${e}-start`, `${e}-end`]))
   ),
   /** `true` means that the menu may overflow the container */
+  /** Search value for the search input */
   overflow: PropTypes.bool,
+  /** Value of the search input */
+  searchValue: PropTypes.string,
+  /** Gets called when the search input changes */
+  onSearchChange: PropTypes.func,
+  /** Placeholder for the filter search input */
+  searchPlaceholder: PropTypes.string,
 };
 
 PopoverDropdownMenu.defaultProps = {
@@ -97,6 +129,9 @@ PopoverDropdownMenu.defaultProps = {
   open: false,
   placement: 'bottom-start',
   overflow: false,
+  searchValue: '',
+  onSearchChange: null,
+  searchPlaceholder: 'Filter sessions',
 };
 
 export default React.memo(PopoverDropdownMenu);

@@ -322,7 +322,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         />
       }
     >
-      {/* {!isEditing && !unscheduled && ( */}
       {!isEditing && (
         <>
           <Segment textAlign="center">

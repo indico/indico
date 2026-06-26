@@ -12,7 +12,7 @@ import * as actions from './actions';
 import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
+import {BlockEntry, Entries, EntryType, isChildEntry, SidePanelView} from './types';
 import {getDateKey, setCurrentDateLocalStorage, shiftEntries} from './utils';
 
 export default {
@@ -382,24 +382,16 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false, showSessions: false}, action: Action) => {
-    switch (action.type) {
-      case actions.TOGGLE_SHOW_UNSCHEDULED:
-        return {
-          ...state,
-          showUnscheduled: !state.showUnscheduled,
-          showSessions: false,
-        };
+  display: (state = {activePanel: SidePanelView.None}, action: Action) => {
+  switch (action.type) {
+    case actions.SET_ACTIVE_PANEL:
+      return {
+        ...state,
+        activePanel: action.panel,
+      };
 
-      case actions.TOGGLE_SHOW_SESSIONS:
-        return {
-          ...state,
-          showSessions: !state.showSessions,
-          showUnscheduled: false,
-        };
-
-      default:
-        return state;
-    }
-  },
+    default:
+      return state;
+  }
+},
 };

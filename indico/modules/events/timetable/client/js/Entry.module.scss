@@ -59,6 +59,7 @@ $title-row-line-height: 1.2rem;
     top: 0;
     right: 0;
     width: 100%;
+    height: 100%;
     justify-content: flex-end;
 
     background: linear-gradient(
@@ -71,7 +72,7 @@ $title-row-line-height: 1.2rem;
     display: flex;
     opacity: 0;
     visibility: hidden;
-    transform: translateX(10px);
+    transform: translateX(-10px);
 
     transition:
       opacity 0.2s ease,
@@ -95,7 +96,7 @@ $title-row-line-height: 1.2rem;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
-  padding: 14px 10px;
+  padding: $title-row-padding;
   max-height: 100%;
 
   .title-overflow-wrapper {

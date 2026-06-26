@@ -34,6 +34,7 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
+import { UNSCHEDULED_CONTRIB_CREATE_MODAL, UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal } from 'indico/modules/events/timetable/ModalContext';
 
 interface CustomField {
   id: number;
@@ -399,6 +400,7 @@ export function ContributionCreateForm({
         ...customInitialValues,
       };
 
+
   return (
     <ContributionForm
       eventId={eventId}
@@ -429,13 +431,24 @@ export function EditContributionButton({
   trigger?: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
+  const modalContext = useModal();
+
+  const openEditModal = React.useCallback(() => {
+    if (modalContext) {
+      modalContext.openModal(UNSCHEDULED_CONTRIB_EDIT_MODAL, {
+        eventId,
+        contribId,
+      });
+    } else {
+      setOpen(true);
+    }
+  }, [modalContext, eventId, contribId]);
 
   useEffect(() => {
     if (!triggerSelector) {
       return;
     }
 
-    const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
 
     if (!element) {
@@ -443,24 +456,29 @@ export function EditContributionButton({
       return;
     }
 
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
+    element.addEventListener('click', openEditModal);
+    return () => element.removeEventListener('click', openEditModal);
+  }, [triggerSelector, openEditModal]);
 
   return (
     <>
       {!triggerSelector &&
         (trigger ? (
           React.cloneElement(trigger, {
-            onClick: () => setOpen(true),
+            ...trigger.props,
+            onClick: e => {
+              e.stopPropagation();
+              trigger.props.onClick?.(e);
+              openEditModal();
+            },
           })
         ) : (
-          <Button onClick={() => setOpen(true)} {...rest}>
+          <Button onClick={openEditModal} {...rest}>
             <Translate>Edit contribution</Translate>
           </Button>
         ))}
 
-      {open && (
+      {!modalContext && open && (
         <ContributionEditForm
           eventId={eventId}
           contribId={contribId}
@@ -484,35 +502,62 @@ export function CreateContributionButton({
   onCreate?: (contrib: any) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const modalContext = useModal();
+
+  const openCreateModal = React.useCallback(() => {
+    if (modalContext) {
+      modalContext.openModal(UNSCHEDULED_CONTRIB_CREATE_MODAL, {
+        eventId,
+        onCreate,
+      });
+    } else {
+      setOpen(true);
+    }
+  }, [modalContext, eventId, onCreate]);
 
   useEffect(() => {
     if (!triggerSelector) {
       return;
     }
-    const handler = () => setOpen(true);
+
     const element = document.querySelector(triggerSelector);
+
     if (!element) {
       console.error(`No element matched ${triggerSelector}`);
       return;
     }
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
+
+    element.addEventListener('click', openCreateModal);
+    return () => element.removeEventListener('click', openCreateModal);
+  }, [triggerSelector, openCreateModal]);
 
   return (
     <>
       {!triggerSelector &&
         (trigger ? (
           React.cloneElement(trigger, {
-            onClick: () => setOpen(true),
+            ...trigger.props,
+            onClick: e => {
+              e.stopPropagation();
+              trigger.props.onClick?.(e);
+              openCreateModal();
+            },
+            onKeyDown: e => {
+              trigger.props.onKeyDown?.(e);
+
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openCreateModal();
+              }
+            },
           })
         ) : (
-          <Button onClick={() => setOpen(true)} {...rest}>
+          <Button onClick={openCreateModal} {...rest}>
             <Translate>Create contribution</Translate>
           </Button>
         ))}
 
-      {open && (
+      {!modalContext && open && (
         <ContributionCreateForm
           eventId={eventId}
           onClose={() => setOpen(false)}
