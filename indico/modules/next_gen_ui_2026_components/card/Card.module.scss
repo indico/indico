@@ -31,14 +31,12 @@
     @include text-ellipsis();
     @include typography('text-sm', 'semibold'); // 14px
     color: var(--color-text-heading);
-    margin: 0;
     max-width: 100%;
   }
 
   &.card-meta {
     @include typography('text-xs', 'regular'); // 12px
     color: var(--color-text-muted);
-    margin: 0;
     max-width: 100%;
   }
 
@@ -46,7 +44,6 @@
     @include text-ellipsis();
     @include typography('text-sm', 'regular'); // 14px
     color: var(--color-text);
-    margin: 0;
     max-width: 100%;
   }
 }

@@ -14,5 +14,5 @@ interface IndicoUIProviderProps {
 }
 
 export function IndicoUIProvider({children}: IndicoUIProviderProps) {
-  return <div>{children}</div>;
+  return <div className="indico-ui">{children}</div>;
 }
