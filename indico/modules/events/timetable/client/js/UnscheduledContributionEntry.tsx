@@ -6,16 +6,22 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React from 'react';
+import React, {useState} from 'react';
 import {createPortal} from 'react-dom';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {Button} from 'semantic-ui-react';
 
+import {EditContributionButton} from 'indico/modules/events/contributions/ContributionForm';
+import {Translate} from 'indico/react/i18n';
+
+import TimetableActionPrompt from './ActionPrompt';
+import * as actions from './actions';
 import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
-import {Colors, EntryType, ReduxState} from './types';
+import {EntryType, ReduxState, UnscheduledContribEntry} from './types';
 import {
   getEntryColors,
   minutesToPixels,
@@ -24,7 +30,6 @@ import {
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
 } from './utils';
-
 import './Entry.module.scss';
 
 export function DraggableUnscheduledContributionEntry({
@@ -32,15 +37,15 @@ export function DraggableUnscheduledContributionEntry({
   dt,
   title,
   duration,
-  colors,
   sessionId,
+  contrib,
 }: {
   id: string;
   dt: Moment;
   title: string;
   duration: number;
-  colors?: Colors;
   sessionId?: number;
+  contrib: UnscheduledContribEntry;
 }) {
   const droppableData = useDroppableData({id: 'calendar'});
 
@@ -84,9 +89,7 @@ export function DraggableUnscheduledContributionEntry({
     }
   }
 
-  let style: React.CSSProperties = {
-    ...colors,
-  };
+  let style: React.CSSProperties = {};
 
   if (transform) {
     style = {
@@ -111,6 +114,7 @@ export function DraggableUnscheduledContributionEntry({
           duration={duration}
           sessionId={sessionId}
           isDragging={isDragging}
+          contrib={contrib}
         />
       </div>,
       document.body
@@ -141,6 +145,7 @@ export function DraggableUnscheduledContributionEntry({
         duration={duration}
         sessionId={sessionId}
         isDragging={isDragging}
+        contrib={contrib}
       />
     </div>
   );
@@ -152,13 +157,18 @@ export function UnscheduledContributionEntry({
   duration,
   sessionId,
   isDragging,
+  contrib,
 }: {
   title: string;
   timeRange: string;
   duration: number;
   sessionId?: number;
   isDragging?: boolean;
+  contrib: UnscheduledContribEntry;
 }) {
+  const dispatch = useDispatch<any>();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors({type: EntryType.Contribution}, session);
   const style = {
@@ -171,6 +181,8 @@ export function UnscheduledContributionEntry({
     ),
   };
 
+  const eventId = useSelector(selectors.getEventId);
+
   return (
     <div role="button" styleName="entry" style={style}>
       <EntryTitle
@@ -179,6 +191,57 @@ export function UnscheduledContributionEntry({
         timeRange={timeRange}
         type={EntryType.Contribution}
       />
+      {!isDragging && (
+        <div
+          styleName="entry-actions"
+          style={
+            {
+              '--session-color': colors.color,
+              '--session-background': colors.backgroundColor,
+            } as React.CSSProperties
+          }
+        >
+          <EditContributionButton
+            eventId={eventId}
+            contribId={contrib.objId}
+            eventTitle={contrib.title}
+            trigger={
+              <Button
+                basic
+                type="button"
+                title={Translate.string('Edit contribution')}
+                icon="edit"
+                size="small"
+              />
+            }
+          />
+          <Button
+            basic
+            type="button"
+            title={Translate.string('Delete contribution')}
+            icon="trash"
+            size="small"
+            onClick={e => {
+              e.stopPropagation();
+              setConfirmDeleteOpen(true);
+            }}
+          />
+          {confirmDeleteOpen && (
+            <TimetableActionPrompt
+              message={
+                <Translate>Deleting this contribution will permanently remove it.</Translate>
+              }
+              confirmLabel={Translate.string('Proceed')}
+              cancelLabel={Translate.string('Cancel')}
+              onClose={() => setConfirmDeleteOpen(false)}
+              onConfirm={() => {
+                dispatch(actions.deleteUnscheduledContrib(contrib, eventId));
+                setConfirmDeleteOpen(false);
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

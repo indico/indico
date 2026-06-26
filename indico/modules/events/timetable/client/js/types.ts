@@ -191,6 +191,11 @@ export interface ReduxState {
   entries: Entries;
   sessions: Record<string, Session>;
   navigation: Navigation;
-  display: {showUnscheduled: boolean};
   staticData: StaticData;
+}
+
+export enum SidePanelView {
+  None = 'none',
+  Sessions = 'sessions',
+  Unscheduled = 'unscheduled',
 }

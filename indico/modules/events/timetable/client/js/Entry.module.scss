@@ -44,7 +44,49 @@ $title-row-line-height: 1.2rem;
       transition-delay: 0.1s; // Prevent flickering when moving the mouse quickly
     }
   }
+
+  &:hover {
+    .entry-actions {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
 }
+
+.entry-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+
+    background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--session-background) 0%, transparent) 32%,
+    color-mix(in srgb, var(--session-background) 100%, transparent) 66%,
+    color-mix(in srgb, var(--session-background) 100%, transparent) 100%
+  );
+
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    :global(.ui.basic.button) {
+      color: var(--session-color) !important;
+
+      &:hover {
+        background: transparent !important;
+        color: color-mix(in srgb, var(--session-color) 70%, transparent) !important;
+      }
+    }
+  }
 
 .title-wrapper {
   overflow: hidden;

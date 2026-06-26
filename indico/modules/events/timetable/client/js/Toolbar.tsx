@@ -88,7 +88,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const eventStart = useSelector(selectors.getEventStartDt);
   const eventEnd = useSelector(selectors.getEventEndDt);
   const numDays = useSelector(selectors.getEventNumDays);
-  const showUnscheduled = useSelector(selectors.showUnscheduled);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentEntries = useSelector(selectors.getCurrentEntries);
@@ -180,21 +179,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   return (
     <div styleName="toolbar" ref={ref}>
       <Menu compact secondary styleName="actions-bar">
-        <Menu.Item
-          onClick={() => dispatch(actions.toggleShowUnscheduled())}
-          title={
-            showUnscheduled
-              ? // TODO: (Ajob) Rename to 'show draft entries' or something like that
-                //              once we have changed this sidemenu's features.
-                Translate.string('Hide unscheduled contributions')
-              : Translate.string('Show unscheduled contributions')
-          }
-          styleName="action"
-        >
-          <Icon.Group>
-            <Icon name="grid layout" />
-          </Icon.Group>
-        </Menu.Item>
         <Menu.Item className="right" styleName="action">
           <PublicationStateSwitch
             eventId={eventId}
