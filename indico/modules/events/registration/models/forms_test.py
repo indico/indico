@@ -21,14 +21,12 @@ def _add_registration(db, regform, email):
 
 
 def test_get_managed_registration_count_unscoped(db, dummy_regform, dummy_user):
-    # With no scoping handler the full active count is returned.
     _add_registration(db, dummy_regform, 'a@example.test')
     _add_registration(db, dummy_regform, 'b@example.test')
     assert dummy_regform.get_managed_registration_count(dummy_user) == 2
 
 
 def test_get_managed_registration_count_scoped(db, dummy_regform, dummy_user):
-    # A handler returning a criterion scopes the count to the matching registrations.
     mine = _add_registration(db, dummy_regform, 'a@example.test')
     _add_registration(db, dummy_regform, 'b@example.test')
 

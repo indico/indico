@@ -252,7 +252,6 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
                            .one())
 
     def _check_management_permission(self):
-        # re-checked per registration so a plugin can bound management to a subset of registrations
         permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
         return any(self.field_data.registration.can_manage(session.user, p) for p in permissions)
 
@@ -298,7 +297,6 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
     @property
     def manageable_registrations(self):
-        # the selected registrations the user may manage, honouring per-registration scoping
         permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
         return [r for r in self.registrations if any(r.can_manage(session.user, p) for p in permissions)]
 
