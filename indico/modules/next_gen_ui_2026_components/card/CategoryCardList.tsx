@@ -52,18 +52,8 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           href={category.displayURL}
           ariaLabel={category.description || category.title}
         >
-          <Card.Icon 
-            icon="fas:folder" 
-            color="primary" 
-            size="md" 
-            variant="compact" 
-            decorative />
-          <Card.Icon
-            icon= {ArrowIcon}
-            color="success"
-            size="sm"
-            variant="compact"
-          />
+          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
+          <Card.Icon icon={ArrowIcon} color="success" size="sm" variant="compact" />
           <div styleName="card-main" className="indico-ui">
             <Card.Header>{category.title}</Card.Header>
             <Card.Meta>
