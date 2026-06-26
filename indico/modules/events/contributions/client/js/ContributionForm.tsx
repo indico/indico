@@ -22,6 +22,11 @@ import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
+  UNSCHEDULED_CONTRIB_CREATE_MODAL,
+  UNSCHEDULED_CONTRIB_EDIT_MODAL,
+  useModal,
+} from 'indico/modules/events/timetable/ModalContext';
+import {
   CollapsibleContainer,
   FinalLocationField,
   FinalReferences,
@@ -35,7 +40,6 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
-import { UNSCHEDULED_CONTRIB_CREATE_MODAL, UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal } from 'indico/modules/events/timetable/ModalContext';
 
 interface CustomField {
   id: number;
@@ -403,7 +407,6 @@ export function ContributionCreateForm({
         },
         ...customInitialValues,
       };
-
 
   return (
     <ContributionForm

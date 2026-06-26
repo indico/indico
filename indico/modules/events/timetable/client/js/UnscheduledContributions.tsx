@@ -16,12 +16,13 @@ import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
+import TimetableActionPrompt from './ActionPrompt';
 import * as actions from './actions';
+import {SESSION_CREATE_MODAL, SESSION_EDIT_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
-import { SESSION_CREATE_MODAL, SESSION_EDIT_MODAL, useModal } from './ModalContext';
 
 enum GenericFilterType {
   NO_SESSION = 'no-session',
@@ -65,10 +66,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const initialPosition = useRef<number>(0);
 
   const [selectedFilter, setSelectedFilters] = useState<FilterType[]>([]);
-  const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
   const [draftSearchQuery, setDraftSearchQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterSearchQuery, setFilterSearchQuery] = useState('');
+  const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
 
   const contribs = useSelector(selectors.getUnscheduled).toSorted((c1, c2) => {
     // sort by sessionId then by title
@@ -134,17 +135,25 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     initialPosition.current = 0;
   }
 
-    function onMouseMove(e: MouseEvent) {
-      if (!resizing.current || !wrapperRef.current) {
-        return;
-      }
-
-      const diff = e.pageX - initialPosition.current;
-      const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
-      wrapperRef.current.style.width = `${width}px`;
-      initialPosition.current = e.pageX;
+  function onMouseMove(e: MouseEvent) {
+    if (!resizing.current || !wrapperRef.current) {
+      return;
     }
-  
+
+    const diff = e.pageX - initialPosition.current;
+    const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
+    wrapperRef.current.style.width = `${width}px`;
+    initialPosition.current = e.pageX;
+  }
+
+  useEffect(() => {
+    if (showUnscheduled) {
+      setSelectedFilters([]);
+      setDraftSearchQuery('');
+      setFilterSearchQuery('');
+      setFilterOpen(false);
+    }
+  }, [showUnscheduled]);
 
   useEffect(() => {
     document.addEventListener('mouseup', onMouseUp);
@@ -210,23 +219,23 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 <div styleName="filter-trigger-wrapper">
                   <PopoverDropdownMenu
                     open={filterOpen}
-                  onOpen={() => setFilterOpen(true)}
-                  onClose={() => {
-                    setFilterOpen(false);
-                    setFilterSearchQuery('');
-                  }}
-                  overflow
-                  trigger={
-                    <Button
-                      basic
-                      type="button"
-                      icon="filter"
-                      title={Translate.string('Filter sessions')}
-                    />
-                  }
-                  searchValue={filterSearchQuery}
-                  onSearchChange={setFilterSearchQuery}
-                  searchPlaceholder={Translate.string('Search sessions')}
+                    onOpen={() => setFilterOpen(true)}
+                    onClose={() => {
+                      setFilterOpen(false);
+                      setFilterSearchQuery('');
+                    }}
+                    overflow
+                    trigger={
+                      <Button
+                        basic
+                        type="button"
+                        icon="filter"
+                        title={Translate.string('Filter sessions')}
+                      />
+                    }
+                    searchValue={filterSearchQuery}
+                    onSearchChange={setFilterSearchQuery}
+                    searchPlaceholder={Translate.string('Search sessions')}
                   >
                     {filteredDropdownSessions.map(option => {
                       const isSelected = selectedFilter.includes(option.value as FilterType);
@@ -265,7 +274,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                       <span styleName="filter-count">
                         {selectedFilter.length > 9 ? '' : selectedFilter.length}
                       </span>
-                     <span styleName="filter-cross">
+                      <span styleName="filter-cross">
                         <Icon name="close" />
                       </span>
                     </button>
@@ -313,19 +322,15 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 />
               </div>
 
-                <Button
-                  styleName="add-session-container"
-                  basic
-                  type="button"
-                  title={Translate.string('Create new session')}
-                  icon="plus"
-                  size="small"
-                  onClick={() =>
-                    openModal(SESSION_CREATE_MODAL, {
-                      onClose: () => setSelectedSessionId(null),
-                    })
-                  }
-                />
+              <Button
+                styleName="add-session-container"
+                basic
+                type="button"
+                title={Translate.string('Create new session')}
+                icon="plus"
+                size="small"
+                onClick={() => openModal(SESSION_CREATE_MODAL, {})}
+              />
 
               {filteredSessions.length > 0 ? (
                 <div styleName="session-list">
@@ -345,12 +350,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                             title={Translate.string('Edit session')}
                             icon="edit"
                             size="small"
-                            onClick={() =>
-                              openModal(SESSION_EDIT_MODAL, {
-                                sessionId: session.id,
-                                onClose: () => setSelectedSessionId(session.id),
-                              })
-                            }
+                            onClick={() => openModal(SESSION_EDIT_MODAL, {sessionId: session.id})}
                           />
                           <Button
                             basic
@@ -358,7 +358,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                             title={Translate.string('Delete selected session')}
                             icon="trash"
                             size="small"
-                            onClick={() => dispatch(actions.deleteSession(session.id))}
+                            onClick={() => setSessionToDelete(session.id)}
                           />
                         </div>
                       </div>
@@ -372,17 +372,32 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
           </>
         )}
       </div>
-
       <div
         styleName="pane-resize-handle"
         onMouseDown={e => {
           if (e.button !== 0) {
-              return;
-            }
+            return;
+          }
           resizing.current = true;
           initialPosition.current = e.pageX;
         }}
       />
+      {sessionToDelete && (
+        <TimetableActionPrompt
+          message={
+            <Translate>
+              Deleting this session will result in deleting entries associated to it.
+            </Translate>
+          }
+          confirmLabel={Translate.string('Proceed')}
+          cancelLabel={Translate.string('Cancel')}
+          onClose={() => setSessionToDelete(null)}
+          onConfirm={() => {
+            dispatch(actions.deleteSession(sessionToDelete));
+            setSessionToDelete(null);
+          }}
+        />
+      )}
     </>
   );
 }

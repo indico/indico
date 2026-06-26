@@ -7,11 +7,15 @@
 
 import React, {createContext, useContext, useState} from 'react';
 
+import {
+  ContributionCreateForm,
+  ContributionEditForm,
+} from 'indico/modules/events/contributions/ContributionForm';
+
 import TimetableManageModal from './TimetableManageModal';
 import {TimetablePosterBlockModal} from './TimetablePosterBlockModal';
+import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
 import {SessionBlockId} from './types';
-import { TimetableSessionCreateModal, TimetableSessionEditModal } from './TimetableSessionModal';
-import { ContributionCreateForm, ContributionEditForm } from 'indico/modules/events/contributions/ContributionForm';
 
 export const DRAFT_ENTRY_MODAL = 'Create/Edit draft entry';
 export const POSTER_BLOCK_CONTRIBUTIONS_MODAL = 'Show poster block contributions';
@@ -25,14 +29,22 @@ type ModalState =
   | {type: typeof POSTER_BLOCK_CONTRIBUTIONS_MODAL; payload: {id: SessionBlockId}}
   | {type: typeof SESSION_CREATE_MODAL; payload: {onClose?: () => void}}
   | {type: typeof SESSION_EDIT_MODAL; payload: {sessionId: number; onClose?: () => void}}
-  | {type: typeof UNSCHEDULED_CONTRIB_CREATE_MODAL; payload: {
-      eventId: number; 
-      onCreate?: (contrib: any) => void; onClose?: () => void
-    }}
-  | {type: typeof UNSCHEDULED_CONTRIB_EDIT_MODAL; payload: { 
-    eventId: number; 
-    contribId: number; 
-    onClose?: () => void }};
+  | {
+      type: typeof UNSCHEDULED_CONTRIB_CREATE_MODAL;
+      payload: {
+        eventId: number;
+        onCreate?: (contrib: any) => void;
+        onClose?: () => void;
+      };
+    }
+  | {
+      type: typeof UNSCHEDULED_CONTRIB_EDIT_MODAL;
+      payload: {
+        eventId: number;
+        contribId: number;
+        onClose?: () => void;
+      };
+    };
 
 type ModalType = ModalState['type'];
 
@@ -85,16 +97,16 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
     case UNSCHEDULED_CONTRIB_CREATE_MODAL:
       return (
         <ContributionCreateForm
-                  eventId={payload.eventId}
-                  onClose={() => {
-                    closeModal();
-                    payload?.onClose?.();
-                  }}
-                  onCreate={payload?.onCreate}
-                  customFields={{}}
-                  customInitialValues={{}}
-                />
-      )
+          eventId={payload.eventId}
+          onClose={() => {
+            closeModal();
+            payload?.onClose?.();
+          }}
+          onCreate={payload?.onCreate}
+          customFields={{}}
+          customInitialValues={{}}
+        />
+      );
     case UNSCHEDULED_CONTRIB_EDIT_MODAL:
       return (
         <ContributionEditForm
@@ -105,7 +117,7 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
             payload?.onClose?.();
           }}
         />
-      )
+      );
     default:
       return null;
   }
