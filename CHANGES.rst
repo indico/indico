@@ -11,11 +11,14 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Fix an XSS vulnerability when resolving conflicts between concurrent edits to minutes
+- Fix an XSS vulnerability in various places that allow entering custom links
 
 .. note::
 
-    The risk of this is quite low, because both the attacker and the victim would need
-    to collaborate on the same minutes (ie have privileges to edit them)
+    The risk of these vulnerabilities is relatively low, because for the minute editor both the
+    attacker and the victim would need to collaborate on the same minutes (ie have privileges
+    to edit them), and the others require at least submitter or management access in an event
+    and additionally an interaction (clicking the link) by the victim.
 
 Improvements
 ^^^^^^^^^^^^
