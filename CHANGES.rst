@@ -7,6 +7,16 @@ Version 3.3.13
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an XSS vulnerability when resolving conflicts between concurrent edits to minutes
+
+.. note::
+
+    The risk of this is quite low, because both the attacker and the victim would need
+    to collaborate on the same minutes (ie have privileges to edit them)
+
 Improvements
 ^^^^^^^^^^^^
 
