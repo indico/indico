@@ -160,9 +160,12 @@
   }
 
   .title {
+    margin-top: 0;
     margin-bottom: $banner-title-margin;
     font-family: 'Roboto Light', sans-serif;
     font-size: 2em;
+    font-weight: normal;
+    line-height: inherit;
     color: $banner-title-color;
 
     a:not(:hover) {

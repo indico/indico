@@ -14,9 +14,11 @@
             {% block banner %}
                 <div class="content-column">
                     <div class="banner {% block banner_class %}{% endblock %}">
-                        <div class="title">
-                            {% block banner_title %}{% endblock %}
-                        </div>
+                        {% if self.banner_title()|trim %}
+                            <h1 class="title">
+                                {% block banner_title %}{% endblock %}
+                            </h1>
+                        {% endif %}
                         <div class="action-menu">
                             {% block banner_actions %}{% endblock %}
                         </div>

@@ -125,6 +125,9 @@ Accessibility
   abstracts / call for papers submission period instead of hearing the
   decorative opening-day / deadline timeline graphic (:pr:`7487`, thanks
   :user:`foxbunny`)
+- Screen reader users can now navigate to the main page heading on the dashboard,
+  user profile, preferences and category pages, which previously showed the page
+  title as plain text with no heading (:pr:`7617`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
