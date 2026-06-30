@@ -15,7 +15,7 @@
   }
 
   & p {
-    @include typography('text-xs', 'regular'); // 12px
+    @include typography('text-sm', 'regular'); // 12px
     color: var(--color-text);
   }
 
