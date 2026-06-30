@@ -143,7 +143,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     const diff = e.pageX - initialPosition.current;
     const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
     wrapperRef.current.style.width = `${width}px`;
-    initialPosition.current = e.pageX;
+    initialPosition.current = wrapperRef.current.getBoundingClientRect().left + width;
   }
 
   useEffect(() => {
