@@ -207,7 +207,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       >
         {showUnscheduled && (
           <>
-            <h1 styleName="title">Unscheduled Contributions</h1>
+            <h1 styleName="title">
+              <Translate>Unscheduled Contributions</Translate>
+            </h1>
             <div styleName="content">
               <div styleName="actions">
                 <Input
@@ -311,7 +313,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
         {showSessions && (
           <>
-            <h1 styleName="title">Your Sessions</h1>
+            <h1 styleName="title">
+              <Translate>Sessions</Translate>
+            </h1>
             <div styleName="content">
               <div styleName="actions">
                 <Input
