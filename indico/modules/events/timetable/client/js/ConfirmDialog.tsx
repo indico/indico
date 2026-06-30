@@ -11,10 +11,11 @@ import {Button, Icon, SemanticICONS} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import './ActionPrompt.module.scss';
+import './ConfirmDialog.module.scss';
 
-export interface TimetableActionPromptProps {
+export interface TimetableConfirmDialogProps {
   message: React.ReactNode;
+  title: string;
   type?: 'warning' | 'danger' | 'info';
   icon?: SemanticICONS;
   confirmLabel?: string;
@@ -23,30 +24,34 @@ export interface TimetableActionPromptProps {
   onConfirm: () => void;
 }
 
-export default function TimetableActionPrompt({
+export default function TimetableConfirmDialog({
   message,
+  title,
   type = 'warning',
   icon = 'warning sign',
   confirmLabel = Translate.string('Proceed'),
   cancelLabel = Translate.string('Cancel'),
   onClose,
   onConfirm,
-}: TimetableActionPromptProps) {
+}: TimetableConfirmDialogProps) {
+  // TODO: Create a context for dialog
   return createPortal(
-    <div styleName="action-prompt-overlay">
-      <div styleName={`action-prompt action-prompt-${type}`}>
+    <div styleName="confirm-dialog-overlay" className="ui" onClick={onClose}>
+      <div styleName={`confirm-dialog confirm-dialog-${type}`} onClick={e => e.stopPropagation()}>
         <button type="button" styleName="close-button" onClick={onClose}>
-          <Icon name="close" />
+          <Icon name="close" size="large" />
         </button>
 
-        <div styleName="prompt-icon">
-          <Icon name={icon} />
-        </div>
+        <div styleName="dialog-content">
+          <div styleName="dialog-title">
+            <div styleName="dialog-icon">
+              <Icon name={icon} />
+            </div>
+            {title}
+          </div>
+          <p styleName="dialog-message">{message}</p>
 
-        <div styleName="prompt-content">
-          <div styleName="prompt-message">{message}</div>
-
-          <div styleName="prompt-actions">
+          <div styleName="dialog-actions">
             <Button basic size="small" onClick={onClose}>
               {cancelLabel}
             </Button>
