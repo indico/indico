@@ -388,7 +388,8 @@ class RHAPIContributionCreate(RHManageContributionsBase):
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
 
-        create_contribution(self.event, data)
+        contrib = create_contribution(self.event, data)
+        return ContributionSchema(context={'event': self.event}).jsonify(contrib)
 
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
