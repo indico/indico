@@ -456,8 +456,8 @@ function DateTimePickerComponent({
           onFocus={onFocus}
           disabled={disabled}
           required={required}
-          min={minStartDt.format('YYYY-MM-DD')}
-          max={maxEndDt.format('YYYY-MM-DD')}
+          min={minStartDt?.format('YYYY-MM-DD')}
+          max={maxEndDt?.format('YYYY-MM-DD')}
         />
       </Form.Field>
       <Form.Field>
