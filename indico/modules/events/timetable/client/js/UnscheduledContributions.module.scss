@@ -175,11 +175,6 @@
     display: flex;
     align-items: center;
   }
-
-  :global(.menu .item:is(.active, .selected)) {
-    background: #eef6fa !important;
-    font-weight: bold;
-  }
 }
 
 .session {

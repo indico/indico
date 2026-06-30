@@ -78,14 +78,13 @@ $title-row-line-height: 1.2rem;
       opacity 0.2s ease,
       transform 0.2s ease;
 
-    :global(.ui.basic.button) {
-      color: var(--session-color) !important;
-
-      &:hover {
-        background: transparent !important;
-        color: color-mix(in srgb, var(--session-color) 70%, transparent) !important;
-      }
+    > :global(.ui.basic.button) {
+      color: var(--session-color);
     }
+
+    > :global(button.ui.small.basic.button):hover {
+        background: transparent !important;
+      }
   }
 
 .title-wrapper {
