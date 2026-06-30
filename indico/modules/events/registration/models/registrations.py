@@ -328,6 +328,7 @@ class Registration(db.Model):
     def get_all_for_event(cls, event):
         """Retrieve all registrations in all registration forms of an event."""
         from indico.modules.events.registration.models.forms import RegistrationForm
+
         return (Registration.query
                 .filter(Registration.is_active,
                         ~RegistrationForm.is_deleted,
@@ -365,6 +366,7 @@ class Registration(db.Model):
                 return cls.registration_form.has(publish_registrations_participants=mode)
             else:
                 return cls.registration_form.has(publish_registrations_public=mode)
+
         consent_criterion = (
             cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
             if is_participant else
@@ -593,7 +595,8 @@ class Registration(db.Model):
                  .with_parent(self)
                  .join(RegistrationFormFieldData)
                  .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
-        return list(itertools.chain.from_iterable(d.data for d in query.all() if not d.field_data.field.is_deleted))
+        return list(itertools.chain.from_iterable((d.data or []) for d in query.all()
+                                                  if not d.field_data.field.is_deleted and isinstance(d.data, list)))
 
     @property
     def published_receipts(self):
@@ -968,6 +971,12 @@ def _mapper_configured():
     from indico.modules.events.registration.models.items import RegistrationFormItem
     from indico.modules.receipts.models.files import ReceiptFile
 
+    stored_value = RegistrationData.data.op('#>>')('{}')
+    accompanying_persons_count = db.case(
+        [(db.func.jsonb_typeof(RegistrationData.data) == 'array', db.func.jsonb_array_length(RegistrationData.data))],
+        else_=db.cast(stored_value, db.Integer),
+    )
+
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
         target.event_id = value.event_id
@@ -983,7 +992,7 @@ def _mapper_configured():
     def _set_transaction_id(target, value, *unused):
         value.registration = target
 
-    query = (select([db.func.coalesce(db.func.sum(db.func.jsonb_array_length(RegistrationData.data)), 0) + 1])
+    query = (select([db.func.coalesce(db.func.sum(accompanying_persons_count), 0) + 1])
              .where(db.and_(RegistrationData.registration_id == Registration.id,
                             RegistrationData.field_data_id == RegistrationFormFieldData.id,
                             RegistrationFormFieldData.field_id == RegistrationFormItem.id,
@@ -994,7 +1003,7 @@ def _mapper_configured():
              .scalar_subquery())
     Registration.occupied_slots = column_property(query, deferred=True)
 
-    query = (select([db.func.coalesce(db.func.sum(db.func.jsonb_array_length(RegistrationData.data)), 0)])
+    query = (select([db.func.coalesce(db.func.sum(accompanying_persons_count), 0)])
              .where(db.and_(RegistrationData.registration_id == Registration.id,
                             RegistrationData.field_data_id == RegistrationFormFieldData.id,
                             RegistrationFormFieldData.field_id == RegistrationFormItem.id,

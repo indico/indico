@@ -22,6 +22,7 @@ export default function setupRegformSetup(root) {
     eventEndDate,
     regformId,
     currency,
+    ticketsForAccompanyingPersons,
     dataRetentionRange,
     hasPredefinedAffiliations,
     formData,
@@ -35,6 +36,7 @@ export default function setupRegformSetup(root) {
       eventStartDate,
       eventEndDate,
       currency,
+      ticketsForAccompanyingPersons: JSON.parse(ticketsForAccompanyingPersons),
       dataRetentionRange: JSON.parse(dataRetentionRange),
     },
   };

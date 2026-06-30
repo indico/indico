@@ -49,6 +49,8 @@ Improvements
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
 - Add "Affiliation" field type to regforms (:pr:`7352`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Add support for anonymous accompanying persons (numeric count only) in registration form
+  (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
 
 Bugfixes
 ^^^^^^^^
