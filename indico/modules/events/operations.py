@@ -13,12 +13,13 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.categories.models.event_move_request import EventMoveRequest
+from indico.modules.categories.operations import get_category_privacy
 from indico.modules.categories.util import format_visibility
 from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.management.settings import privacy_settings
+from indico.modules.events.management.settings import event_privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
@@ -397,11 +398,28 @@ def update_event_privacy(event, data):
     assert set(data.keys()) <= log_fields.keys()
     changes = {}
     for key, value in data.items():
-        old_value = privacy_settings.get(event, key)
+        old_value = event_privacy_settings.get(event, key)
         if old_value != value:
             changes[key] = (old_value, value)
-    privacy_settings.set_multi(event, data)
+    if not any(data.values()):
+        event_privacy_settings.delete_all(event)
+    else:
+        event_privacy_settings.set_multi(event, data)
     logger.info('Privacy settings of event %r updated with %r by %r', event, data, session.user)
     if changes:
         event.log(EventLogRealm.management, LogKind.change, 'Event', 'Privacy settings updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def get_event_privacy(event):
+    """Get the privacy settings for an event.
+
+    param event: the event to get the privacy settings for
+    return: (privacy settings dict, is_inherited)
+    """
+    inherited = False
+    privacy_settings = event_privacy_settings.get_all(event, no_defaults=True)
+    if not privacy_settings.values() and event.category:
+        privacy_settings, _inherited = get_category_privacy(event.category)
+        inherited = bool(privacy_settings.values())
+    return privacy_settings, inherited

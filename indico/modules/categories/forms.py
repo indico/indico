@@ -23,6 +23,7 @@ from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import get_image_data, get_visibility_options
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
+from indico.modules.events.management.forms import EventPrivacyForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.wallets.google import GoogleCredentialValidationResult, GoogleWalletManager
 from indico.modules.networks import IPNetworkGroup
@@ -401,3 +402,17 @@ class CategoryRoleForm(IndicoForm):
             query = query.filter(CategoryRole.id != self.role.id)
         if query.has_rows():
             raise ValidationError(_('A role with this code already exists.'))
+
+
+class CategoryPrivacyForm(EventPrivacyForm):
+    _lock_privacy_data_fields = ('lock_privacy_data',)
+
+    lock_privacy_data = BooleanField(
+        'Lock privacy data',
+        widget=SwitchWidget(),
+        description=_('When enabled, privacy settings in this category will apply to all sub-categories and events. '
+                      'Sub-categories and events will not be able to set their own privacy settings.'))
+
+    def validate_lock_privacy_data(self, field):
+        if field.data and not any(val for key, val in self.data.items() if key != 'lock_privacy_data'):
+            raise ValidationError(_('Cannot lock privacy data when no privacy information is set.'))

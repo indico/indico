@@ -94,3 +94,12 @@ class CategorySettingsProxy(SettingsProxyBase):
         """
         CategorySetting.delete_all(self.module, category_id=category)
         self._flush_cache()
+
+
+category_privacy_settings = CategorySettingsProxy('privacy', {
+    'data_controller_name': '',
+    'data_controller_email': '',
+    'privacy_policy_urls': [],
+    'privacy_policy': '',
+    'lock_privacy_data': False,
+})

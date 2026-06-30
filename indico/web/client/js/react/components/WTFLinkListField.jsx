@@ -15,7 +15,7 @@ const linkShape = {
   url: PropTypes.string.isRequired,
 };
 
-export default function WTFLinkListField({fieldId}) {
+export default function WTFLinkListField({fieldId, linkProps}) {
   const storageField = useMemo(() => document.getElementById(fieldId), [fieldId]);
   const initialLinks = storageField.value ? JSON.parse(storageField.value) : [];
   const [links, setLinks] = useState(
@@ -46,6 +46,7 @@ export default function WTFLinkListField({fieldId}) {
           placeholder={Translate.string('URL')}
           onChange={evt => handleChange(0, 'url', evt.target.value)}
           value={links[0].url}
+          {...linkProps}
         />
       </div>
     );
@@ -64,6 +65,7 @@ export default function WTFLinkListField({fieldId}) {
               onDelete={makeOnDelete(idx)}
               title={link.title}
               url={link.url}
+              linkProps={linkProps}
             />
           ))}
         </tbody>
@@ -73,7 +75,11 @@ export default function WTFLinkListField({fieldId}) {
   return (
     <div className="multiple-items-widget">
       {linksTable}
-      <button type="button" className="js-add-row i-button icon-plus" onClick={addURL}>
+      <button
+        type="button"
+        className="js-add-row i-button icon-plus"
+        onClick={linkProps.disabled ? () => {} : addURL}
+      >
         <Translate>Add</Translate>
       </button>
     </div>
@@ -82,9 +88,14 @@ export default function WTFLinkListField({fieldId}) {
 
 WTFLinkListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
+  linkProps: PropTypes.object,
 };
 
-function Link({onChange, onDelete, title, url}) {
+WTFLinkListField.defaultProps = {
+  linkProps: {},
+};
+
+function Link({onChange, onDelete, title, url, linkProps}) {
   const clearRef = useRef(null);
   const makeOnChange = field => evt => onChange(field, evt.target.value);
   const handleDelete = () => {
@@ -102,6 +113,7 @@ function Link({onChange, onDelete, title, url}) {
           onChange={makeOnChange('title')}
           value={title}
           required
+          {...linkProps}
         />
       </td>
       <td>
@@ -112,6 +124,7 @@ function Link({onChange, onDelete, title, url}) {
           onChange={makeOnChange('url')}
           value={url}
           required
+          {...linkProps}
         />
       </td>
       <td className="js-action-col">
@@ -119,7 +132,7 @@ function Link({onChange, onDelete, title, url}) {
           ref={clearRef}
           className="icon-remove remove-row"
           title={Translate.string('Remove row')}
-          onClick={handleDelete}
+          onClick={linkProps.disabled ? () => {} : handleDelete}
         />
       </td>
     </tr>
@@ -130,4 +143,9 @@ Link.propTypes = {
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   ...linkShape,
+  linkProps: PropTypes.object,
+};
+
+Link.defaultProps = {
+  linkProps: {},
 };
