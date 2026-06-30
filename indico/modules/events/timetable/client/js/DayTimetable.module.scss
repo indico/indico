@@ -104,6 +104,7 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   top: 0;
   height: 100%;
   min-height: auto;
+  max-width: min-content;
   overflow: visible;
   z-index: 1;
   background: $white;
