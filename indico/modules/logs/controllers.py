@@ -68,6 +68,8 @@ class RHCategoryLogs(RHManageCategoryBase):
 class RHEventLogs(RHManageEventBase):
     """Show the modification/action log for the event."""
 
+    PERMISSION = 'registration'
+
     def _process(self):
         metadata_query = _get_metadata_query()
         realms = {realm.name: realm.title for realm in EventLogRealm}
@@ -172,6 +174,15 @@ class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
 class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
     model = EventLogEntry
     realm_enum = EventLogRealm
+
+    PERMISSION = 'registration'
+
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        if not request.args.get('meta.registration_id'):
+            # Logs not related to registration can be seen only by users with event management permission
+            if not self.event.can_manage(session.user):
+                raise Forbidden
 
     @property
     def object(self):
