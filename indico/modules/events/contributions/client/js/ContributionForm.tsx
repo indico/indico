@@ -22,7 +22,6 @@ import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
-  UNSCHEDULED_CONTRIB_CREATE_MODAL,
   UNSCHEDULED_CONTRIB_EDIT_MODAL,
   useModal,
 } from 'indico/modules/events/timetable/ModalContext';
@@ -499,76 +498,39 @@ export function EditContributionButton({
 export function CreateContributionButton({
   eventId,
   triggerSelector,
-  trigger,
-  onCreate,
   ...rest
 }: {
   eventId: number;
   triggerSelector?: string;
-  trigger?: React.ReactElement;
-  onCreate?: (contrib: any) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const modalContext = useModal();
-
-  const openCreateModal = React.useCallback(() => {
-    if (modalContext) {
-      modalContext.openModal(UNSCHEDULED_CONTRIB_CREATE_MODAL, {
-        eventId,
-        onCreate,
-      });
-    } else {
-      setOpen(true);
-    }
-  }, [modalContext, eventId, onCreate]);
 
   useEffect(() => {
     if (!triggerSelector) {
       return;
     }
-
+    const handler = () => setOpen(true);
     const element = document.querySelector(triggerSelector);
-
     if (!element) {
       console.error(`No element matched ${triggerSelector}`);
       return;
     }
 
-    element.addEventListener('click', openCreateModal);
-    return () => element.removeEventListener('click', openCreateModal);
-  }, [triggerSelector, openCreateModal]);
+    element.addEventListener('click', handler);
+    return () => element.removeEventListener('click', handler);
+  }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector &&
-        (trigger ? (
-          React.cloneElement(trigger, {
-            ...trigger.props,
-            onClick: e => {
-              e.stopPropagation();
-              trigger.props.onClick?.(e);
-              openCreateModal();
-            },
-            onKeyDown: e => {
-              trigger.props.onKeyDown?.(e);
-
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                openCreateModal();
-              }
-            },
-          })
-        ) : (
-          <Button onClick={openCreateModal} {...rest}>
-            <Translate>Create contribution</Translate>
-          </Button>
-        ))}
-
-      {!modalContext && open && (
+      {!triggerSelector && (
+        <Button onClick={() => setOpen(true)} {...rest}>
+          <Translate>Edit contribution</Translate>
+        </Button>
+      )}
+      {open && (
         <ContributionCreateForm
           eventId={eventId}
           onClose={() => setOpen(false)}
-          onCreate={onCreate}
           customFields={{}}
           customInitialValues={{}}
         />

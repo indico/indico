@@ -181,7 +181,7 @@
   width: 100%;
 }
 
-:global(.ui.basic.button).add-session-container {
+:global(.ui.basic.button).add-element {
   display: flex;
   width: auto;
   min-height: 50px;
@@ -192,13 +192,13 @@
   cursor: pointer;
 
   &:hover {
-    :global(.ui.basic.button).add-session-container {
+    :global(.ui.basic.button).add-element {
       color: rgba(0, 0, 0, 0.8);
     }
   }
 }
 
-.add-session-container {
+.add-element {
   display: flex;
   width: auto;
   min-height: 50px;
@@ -209,7 +209,7 @@
   cursor: pointer;
 
   &:hover {
-    :global(.ui.basic.button).add-session-container {
+    :global(.ui.basic.button).add-element {
       color: rgba(0, 0, 0, 0.8);
     }
   }

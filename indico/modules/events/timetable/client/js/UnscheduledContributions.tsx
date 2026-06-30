@@ -11,14 +11,18 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Label, Input, Dropdown, Icon} from 'semantic-ui-react';
 
-import {CreateContributionButton} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
 import TimetableActionPrompt from './ActionPrompt';
 import * as actions from './actions';
-import {SESSION_CREATE_MODAL, SESSION_EDIT_MODAL, useModal} from './ModalContext';
+import {
+  SESSION_CREATE_MODAL,
+  SESSION_EDIT_MODAL,
+  UNSCHEDULED_CONTRIB_CREATE_MODAL,
+  useModal,
+} from './ModalContext';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {UnscheduledContribEntry} from './types';
@@ -283,24 +287,26 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   )}
                 </div>
               </div>
-
-              <CreateContributionButton
-                eventId={eventId}
-                trigger={
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    styleName="add-session-container"
-                    title={Translate.string('Create new contribution')}
-                  >
-                    <Button basic type="button" icon="plus" size="small" />
-                  </div>
+              <Button
+                styleName="add-element"
+                basic
+                type="button"
+                title={Translate.string('Create new session')}
+                icon="plus"
+                size="small"
+                onClick={() =>
+                  openModal(UNSCHEDULED_CONTRIB_CREATE_MODAL, {
+                    eventId,
+                    onCreate: contrib => {
+                      // TODO: (Ajob) Instead of manual conversion we should
+                      //              adjust the actual endpoint and its usages
+                      contrib = {...contrib, duration: contrib.duration / 60};
+                      dispatch(actions.addUnscheduledContrib(contrib));
+                      setSelectedFilters([]);
+                      setDraftSearchQuery('');
+                    },
+                  })
                 }
-                onCreate={contrib => {
-                  dispatch(actions.addUnscheduledContrib(contrib));
-                  setSelectedFilters([]);
-                  setDraftSearchQuery('');
-                }}
               />
               {filteredContribs.length > 0 ? (
                 <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
@@ -327,7 +333,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </div>
 
               <Button
-                styleName="add-session-container"
+                styleName="add-element"
                 basic
                 type="button"
                 title={Translate.string('Create new session')}
