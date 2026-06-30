@@ -9,55 +9,81 @@
 
 $color-warning: #f2a33c;
 
-.action-prompt {
+.confirm-dialog {
   position: relative;
   display: flex;
   gap: 0.75rem;
-  padding: 2rem 1rem 1rem;
+  padding: 1.25rem 1.5rem;
   border-radius: 4px;
   border: 1px solid $raincloud-gray;
   background: $white;
 }
 
-.action-prompt-overlay {
+.confirm-dialog-overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.85);
 }
 
-.action-prompt-warning {
+.confirm-dialog-warning {
   border-color: $color-warning;
 }
 
-.prompt-icon {
+.dialog-icon {
   font-size: 1.25rem;
   color: $color-warning;
 }
 
-.prompt-content {
+.dialog-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.prompt-message {
+.dialog-title {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+  font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  background: #fff;
+  margin: 0;
+  padding: 0 1.5rem 1.25rem 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+  line-height: 1.28571429em;
   font-weight: bold;
+  font-size: 1.3rem;
 }
 
-.prompt-actions {
+.dialog-message {
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+.dialog-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  font-size: 1rem;
+  padding-top: 0.5rem;
+
+  :global(.ui.button),
+  :global(.ui.buttons .button) {
+    margin-right: 0;
+  }
 }
 
 .close-button {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
+  top: -2.5rem;
+  right: -2.5rem;
+  color: #fff;
   border: 0;
   background: transparent;
   cursor: pointer;

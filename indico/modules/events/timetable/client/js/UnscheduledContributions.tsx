@@ -15,7 +15,6 @@ import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
-import TimetableActionPrompt from './ActionPrompt';
 import * as actions from './actions';
 import {
   SESSION_CREATE_MODAL,
@@ -23,6 +22,7 @@ import {
   UNSCHEDULED_CONTRIB_CREATE_MODAL,
   useModal,
 } from './ModalContext';
+import TimetableConfirmDialog from './ConfirmDialog';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {UnscheduledContribEntry} from './types';
@@ -393,7 +393,8 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         }}
       />
       {sessionToDelete && (
-        <TimetableActionPrompt
+        <TimetableConfirmDialog
+          title="Delete contribution"
           message={
             <Translate>
               Deleting this session will result in deleting entries associated to it.
