@@ -275,7 +275,7 @@ function EntryPopupContent({
             </List>
           </List.Item>
         )}
-        {entry.type !== EntryType.Break && (
+        {(entry.type === EntryType.Contribution || entry.type === EntryType.SessionBlock) && (
           <List.Item title={Translate.string('Attachments')}>
             <Icon name="copy outline" />
             <List styleName="inline">
