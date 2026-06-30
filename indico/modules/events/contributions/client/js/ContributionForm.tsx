@@ -14,6 +14,7 @@ import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
 import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
+import {FormApi} from 'final-form';
 import _ from 'lodash';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
@@ -33,7 +34,7 @@ import {
 } from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalDateTimePicker, FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
-import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
+import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -56,7 +57,7 @@ interface ContributionFormProps {
   personLinkFieldParams?: Record<string, any>;
   locationParent?: Record<string, any>;
   customFields: CustomField[];
-  onSubmit: (formData: any) => void;
+  onSubmit: (formData: any, form?: any) => void;
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
   loading: boolean;
@@ -208,7 +209,7 @@ export function ContributionForm({
   loading,
   ...rest
 }: ContributionFormProps) {
-  const handleSubmit = (formData: any) => {
+  const handleSubmit = (formData: any, form: FormApi) => {
     const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
       id: parseInt(key.replace('field_', ''), 10),
       data,
@@ -238,10 +239,13 @@ export function ContributionForm({
       custom_fields: customFieldsData,
       person_links: personLinks,
     };
-    onSubmit({
-      ...formData,
-      references: formData.references.map(({id, ...refs}: any) => refs),
-    });
+    onSubmit(
+      {
+        ...formData,
+        references: formData.references.map(({id, ...refs}: any) => refs),
+      },
+      form
+    );
   };
 
   if (loading) {
@@ -291,9 +295,9 @@ export function ContributionEditForm({
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading: contribLoading} = useIndicoAxios(contribURL);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: any, form) => {
     try {
-      await indicoAxios.patch(contribURL, formData);
+      await indicoAxios.patch(contribURL, getChangedValues(formData, form));
     } catch (e) {
       return handleSubmitError(e);
     }
