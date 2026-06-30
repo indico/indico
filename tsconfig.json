@@ -30,5 +30,10 @@
     },
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["indico/**/client/**/*", "indico/web/client/js/types", "indico/global.d.ts", "indico/modules/next_gen_ui_2026_components/**/*"],
+  "include": [
+    "indico/**/client/**/*",
+    "indico/web/client/js/types",
+    "indico/global.d.ts",
+    "indico/modules/next_gen_ui_2026_components/**/*"
+  ]
 }

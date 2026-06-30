@@ -5,11 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-:root {
-  --viewport-mobile: 375px;
-  --viewport-tablet: 768px;
-  --viewport-desktop: 1280px;
-}
+@use './tokens' as *;
 
 [class^='grid-'] {
   display: grid;
@@ -37,25 +33,28 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-@mixin responsive-grid($max-columns, $viewport: var(--viewport-desktop), $gap: var(--space-3)) {
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(
-      calc(
-        (#{$viewport} - (#{$max-columns - 1} * #{$gap}))
-        / #{$max-columns}
-      ),
-      1fr
-    )
-  );
+@mixin responsive-grid($columns) {
+  grid-template-columns: 1fr;
+
+  @if $columns >= 2 {
+    @media (min-width: $viewport-tablet) {
+      grid-template-columns: repeat(min(2, $columns), 1fr);
+    }
+  }
+
+  @if $columns >= 3 {
+    @media (min-width: $viewport-desktop) {
+      grid-template-columns: repeat($columns, 1fr);
+    }
+  }
 }
 
 .grid-2-responsive {
-  @include responsive-grid(2, var(--viewport-tablet));
+  @include responsive-grid(2);
 }
 
 .grid-3-responsive {
-  @include responsive-grid(3, var(--viewport-tablet));
+  @include responsive-grid(3);
 }
 
 .grid-5-responsive {
