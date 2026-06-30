@@ -230,10 +230,12 @@
 
   .session-actions {
     position: absolute;
-    right: 10px;
-    width: 100%;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    top: 0.5rem;
     justify-content: flex-end;
-
+    pointer-events: none;
     display: flex;
     opacity: 0;
     visibility: hidden;
@@ -247,11 +249,14 @@
       rgba(255, 255, 255, 0) 32%,
       rgba(255, 255, 255, 1) 66%
     );
+
+    button {
+      pointer-events: all;
+    }
   }
 
   &:hover {
     .session-actions {
-      height: 100%;
       opacity: 1;
       visibility: visible;
       transform: translateX(0);
