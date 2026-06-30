@@ -44,15 +44,15 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     <div className={gridClass}>
       {data.categories.map(category => (
         <Card
-          styleName="category-card-wrapper"
+          styleName="category-card"
           key={category.id}
           href={category.displayURL}
           ariaLabel={category.description || category.title}
         >
           <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
-          <div styleName="card-main" className="indico-ui">
-            <Card.Header>{category.title}</Card.Header>
-            <Card.Meta>
+          <div styleName="category-card-main">
+            <Card.Header styleName="category-card-header">{category.title}</Card.Header>
+            <Card.Meta styleName="category-card-meta">
               {category.deepCategoryCount === 0 && category.deepEventCount === 0 ? (
                 'Empty'
               ) : (
@@ -61,9 +61,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
                     <>
                       {category.deepCategoryCount} Categories
                       {category.deepEventCount > 0 && (
-                        <span styleName="dot-divider" className="indico-ui">
-                          •
-                        </span>
+                        <span styleName="category-card-dot-divider">•</span>
                       )}
                     </>
                   )}
@@ -83,7 +81,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
           ) : (
             <Card.Icon
               icon="fas:chevron-right"
-              styleName="arrow-icon"
+              styleName="category-card-arrow-icon"
               color="gray"
               size="xs"
               variant="plain"

@@ -11,12 +11,10 @@
   &.card-root {
     @include focus-ring();
     @include centered();
-
     min-width: 0;
     max-width: var(--container-md);
     padding: var(--space-3);
     box-sizing: border-box;
-
     background: var(--color-surface-soft);
     transition: background var(--transition-fast);
     border-radius: var(--radius-lg);

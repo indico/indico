@@ -9,30 +9,47 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 :global(.indico-ui) {
-  &.card-main {
+  .category-card-main {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     flex: 1;
     margin-left: var(--space-3);
     min-width: 0;
   }
 
-  &.category-card-wrapper {
+  .category-card {
     &:hover {
-      .arrow-icon {
+      .category-card-arrow-icon {
         transform: translateX(var(--space-1));
       }
     }
   }
 
-  &.arrow-icon {
+  .category-card-arrow-icon {
     display: inline-flex;
-    transition: transform var(--animation-duration-slow) cubic-bezier(0.4, 1, 0.5, 1), var(--transition-slow);
+    margin-right: var(--space-1);
+    transition:
+      transform var(--animation-duration-slow) cubic-bezier(0.4, 1, 0.5, 1),
+      var(--transition-slow);
   }
 
-  &.dot-divider {
-    margin: var(--space-1);
+  .category-card-header {
+    line-height: var(--line-height-text-xxs);
+    margin-bottom: var(--space-1);
+  }
+
+  .category-card-meta {
+    line-height: var(--line-height-text-xxs);
+  }
+
+  .category-card-dot-divider {
+    margin-right: var(--space-2);
+    margin-left: var(--space-2);
     color: var(--color-text-disabled);
     font-size: var(--font-size-text-lg);
+    display: inline-block;
+    vertical-align: top;
   }
 }
