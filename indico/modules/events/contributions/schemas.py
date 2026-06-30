@@ -196,3 +196,4 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
+    _description = fields.String(attribute='description')
