@@ -8,7 +8,7 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import './TimetableSidePanel.module.scss';
-import {Icon, Menu, Popup} from 'semantic-ui-react';
+import {Icon, Menu} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -27,51 +27,36 @@ export default function TimetableSidePanel() {
     // once we have changed this sidemenu's features.
     <div styleName="side-panel">
       <Menu secondary vertical styleName="tab-rail">
-        <Popup
-          content={Translate.string('View sessions')}
-          position="right center"
-          size="mini"
-          trigger={
-            <Menu.Item
-              name="sessions"
-              active={showSessions}
-              onClick={() =>
-                dispatch(
-                  actions.setActivePanel(
-                    activePanel === SidePanelView.Sessions
-                      ? SidePanelView.None
-                      : SidePanelView.Sessions
-                  )
-                )
-              }
-            >
-              <Icon name="calendar outline" size="large" />
-            </Menu.Item>
+        <Menu.Item
+          name="sessions"
+          active={showSessions}
+          title={Translate.string('Sessions')}
+          onClick={() =>
+            dispatch(
+              actions.setActivePanel(
+                activePanel === SidePanelView.Sessions ? SidePanelView.None : SidePanelView.Sessions
+              )
+            )
           }
-        />
-
-        <Popup
-          content={Translate.string('View unscheduled contributions')}
-          position="right center"
-          size="mini"
-          trigger={
-            <Menu.Item
-              name="unscheduled"
-              active={showUnscheduled}
-              onClick={() =>
-                dispatch(
-                  actions.setActivePanel(
-                    activePanel === SidePanelView.Unscheduled
-                      ? SidePanelView.None
-                      : SidePanelView.Unscheduled
-                  )
-                )
-              }
-            >
-              <Icon name="edit outline" size="large" />
-            </Menu.Item>
+        >
+          <Icon name="calendar outline" size="large" />
+        </Menu.Item>
+        <Menu.Item
+          name="unscheduled"
+          active={showUnscheduled}
+          title={Translate.string('Unscheduled contributions')}
+          onClick={() =>
+            dispatch(
+              actions.setActivePanel(
+                activePanel === SidePanelView.Unscheduled
+                  ? SidePanelView.None
+                  : SidePanelView.Unscheduled
+              )
+            )
           }
-        />
+        >
+          <Icon name="edit outline" size="large" />
+        </Menu.Item>
       </Menu>
     </div>
   );
