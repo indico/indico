@@ -36,10 +36,11 @@
   justify-content: center;
 }
 
-@mixin focus-ring {
+@mixin focus-ring($ring-color: var(--color-focus-ring)) {
   &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
+    outline: 2px solid $ring-color;
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-on-primary);
   }
 
   @media (forced-colors: active) {

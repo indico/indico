@@ -63,10 +63,10 @@ interface CardProps {
   className?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  ariaLabel?: string;
+  role?: 'listitem' | 'presentation';
 }
 
-const CardRoot = ({children, href, onClick, className, ariaLabel}: CardProps) => {
+const CardRoot = ({children, href, onClick, className, role}: CardProps) => {
   if (href) {
     return (
       <a
@@ -74,14 +74,14 @@ const CardRoot = ({children, href, onClick, className, ariaLabel}: CardProps) =>
         onClick={onClick}
         styleName="card-root"
         className={`indico-ui ${className ?? ''}`}
-        aria-label={ariaLabel}
+        role={role || 'listitem'}
       >
         {children}
       </a>
     );
   }
   return (
-    <div styleName="card-root" className={`indico-ui ${className ?? ''}`} aria-label={ariaLabel}>
+    <div styleName="card-root" className={`indico-ui ${className ?? ''}`} role={role}>
       {children}
     </div>
   );

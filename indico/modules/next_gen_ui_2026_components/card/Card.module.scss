@@ -19,7 +19,8 @@
     transition: background var(--transition-fast);
     border-radius: var(--radius-lg);
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background: var(--color-surface-soft-hover);
       color: none;
     }
