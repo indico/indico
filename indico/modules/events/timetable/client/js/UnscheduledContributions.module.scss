@@ -327,17 +327,18 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 12px;
-  height: 13px;
+  width: 1rem;
+  height: 1rem;
   border: 0;
   border-radius: 50%;
   padding: 0;
   background: $red;
   color: $white;
-  font-size: 9px;
-  line-height: 16px;
+  font-size: 0.7rem;
+  line-height: 0.7rem;
+  font-weight: bold;
   cursor: pointer;
-
+  padding-bottom: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -345,8 +346,12 @@
 
 .filter-cross {
   display: none;
-  font-size: 10px;
-  line-height: 1;
+  font-size: 0.6rem;
+  line-height: 0.6rem;
+
+  i:global(.icon) {
+    margin: 0;
+  }
 }
 
 .filter-badge:hover {
@@ -356,17 +361,13 @@
 
   .filter-cross {
     display: inline;
-
-    :global(.close.icon).filter-cross {
-      margin: 0;
-    }
   }
 }
 
 .filter-count:empty::before {
   content: '';
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: $white;
   display: block;
