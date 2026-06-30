@@ -28,16 +28,18 @@ import {getCurrentDateLocalStorage} from './utils';
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
-      const startDt = moment(eventInfo.start_dt_local);
-      const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
+      const startDt = moment.tz(eventInfo.start_dt_local, eventInfo.timezone);
+      const storedDate = getCurrentDateLocalStorage(eventId);
+      const currentDate = storedDate ? moment.tz(storedDate, eventInfo.timezone) : startDt;
       const initialData = {
         staticData: {
           eventId,
           eventType: eventInfo.type,
-          startDt: moment(eventInfo.start_dt_local),
-          endDt: moment(eventInfo.end_dt_local),
+          startDt: moment.tz(eventInfo.start_dt_local, eventInfo.timezone),
+          endDt: moment.tz(eventInfo.end_dt_local, eventInfo.timezone),
           defaultContribDurationMinutes: eventInfo.default_contribution_duration / 60,
           eventLocationParent: eventInfo.location_parent,
+          timezone: eventInfo.timezone,
         },
         navigation: {
           isDraft: eventInfo.is_draft,

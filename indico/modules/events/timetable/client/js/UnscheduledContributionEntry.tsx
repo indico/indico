@@ -42,6 +42,7 @@ export function DraggableUnscheduledContributionEntry({
   colors?: Colors;
   sessionId?: number;
 }) {
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const droppableData = useDroppableData({id: 'calendar'});
 
   const draggableId = `unscheduled-${id}`;
@@ -80,7 +81,7 @@ export function DraggableUnscheduledContributionEntry({
       const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
       const startDt = moment(dt).startOf('day').add(start, 'minutes');
       const newEnd = moment(startDt).add(duration, 'minutes');
-      timeRange = formatTimeRange('en', startDt, newEnd); // TODO: use current locale
+      timeRange = formatTimeRange('en', startDt, newEnd, eventTimezone); // TODO: use current locale
     }
   }
 

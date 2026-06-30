@@ -145,6 +145,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
       minDt = moment(expandedSessionBlock.startDt);
       maxDt = moment(expandedSessionBlock.startDt).add(expandedSessionBlock.duration, 'minutes');
     } else {
+      // TODO (Michel): We should not use a hardcoded value for the start hour of an empty day that
+      // is not the first day of the event. Find a better solution for this.
       minDt = currentDayIdx === 0 ? moment(eventStart) : moment(currentDate).startOf('day').hour(8);
       maxDt = reachedLastDay
         ? moment(eventEnd).subtract(defaultContributionDuration, 'minutes')
@@ -154,7 +156,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
     }
 
     const currentEntryEndDts = currentEntries.map(e =>
-      moment(e.startDt).add(e.duration, 'minutes')
+      moment.parseZone(e.startDt).add(e.duration, 'minutes')
     );
     const newDt = moment.min(maxDt, moment.max(minDt, ...currentEntryEndDts));
     const draftEntry = {

@@ -73,6 +73,10 @@ export const getEventType = createSelector(
   getStaticData,
   staticData => staticData.eventType
 );
+export const getEventTimezone = createSelector(
+  getStaticData,
+  staticData => staticData.timezone
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt
@@ -137,8 +141,8 @@ export const getCurrentLimits = createSelector(
     const limits: [number, number] = [0, DAY_SIZE];
 
     if (sessionBlock) {
-      startDt = moment(sessionBlock.startDt);
-      endDt = moment(sessionBlock.startDt).add(sessionBlock.duration, 'minutes');
+      startDt = moment.parseZone(sessionBlock.startDt);
+      endDt = moment.parseZone(sessionBlock.startDt).add(sessionBlock.duration, 'minutes');
     }
 
     if (startDt.isSame(currentDate, 'day')) {

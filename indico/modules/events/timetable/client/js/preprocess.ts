@@ -16,12 +16,21 @@ export function preprocessSessionData(
 
 export function preprocessTimetableEntries(
   data: Record<string, unknown>,
-  eventInfo: {contributions?: Record<string, unknown>[]}
+  eventInfo: {contributions?: Record<string, unknown>[]; timezone: string}
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContribEntry[]} {
   const dayEntries = Object.fromEntries(
     Object.entries(data).map(([day, entries]) => [
       day,
-      Object.values(entries).map(entryData => mapDataToEntry(entryData)),
+      Object.values(entries).map(entryData => {
+        console.log('preprocessing entry', entryData);
+        return mapDataToEntry({
+          ...entryData,
+          start_dt: {
+            dt: entryData.start_dt,
+            tzinfo: eventInfo.timezone,
+          },
+        });
+      }),
     ])
   );
 
