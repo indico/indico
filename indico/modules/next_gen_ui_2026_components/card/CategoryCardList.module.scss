@@ -20,7 +20,8 @@
   }
 
   .category-card {
-    &:hover {
+    &:hover,
+    &:focus-visible {
       .category-card-arrow-icon {
         transform: translateX(var(--space-1));
       }

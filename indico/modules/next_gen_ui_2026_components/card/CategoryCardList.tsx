@@ -41,13 +41,13 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
   const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
 
   return (
-    <div className={gridClass}>
+    <div className={gridClass} role="list">
       {data.categories.map(category => (
         <Card
           styleName="category-card"
           key={category.id}
           href={category.displayURL}
-          ariaLabel={category.description || category.title}
+          role="listitem"
         >
           <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
           <div styleName="category-card-main">
@@ -61,7 +61,9 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
                     <>
                       {category.deepCategoryCount} Categories
                       {category.deepEventCount > 0 && (
-                        <span styleName="category-card-dot-divider">•</span>
+                        <span styleName="category-card-dot-divider" aria-hidden="true">
+                          •
+                        </span>
                       )}
                     </>
                   )}
