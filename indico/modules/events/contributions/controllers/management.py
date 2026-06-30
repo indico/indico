@@ -353,8 +353,11 @@ class RHAPIContribution(RHManageContributionBase):
     def _process_GET(self):
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
-    # @use_args(ContributionSchema)
-    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event, 'object': self.contrib})
+    @use_args_schema_context(
+        ContributionSchema,
+        lambda self: {'event': self.event, 'object': self.contrib},
+        partial=True,
+    )
     def _process_PATCH(self, data):
         # from indico.web.args import parser
         # data = parser.parse(ContributionSchema(context={'event': self.event, 'object': self.contrib}))
