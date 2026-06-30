@@ -10,7 +10,6 @@ import getCategoryChildrenURL from 'indico-url:categories.get_category_children'
 import React from 'react';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
-import {Translate} from 'indico/react/i18n';
 
 import {Card} from './Card';
 
@@ -26,29 +25,18 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     category_id: String(categoryId),
   });
 
-  const {data, loading} = useIndicoAxios(url, {
+  const {data} = useIndicoAxios(url, {
     camelize: true,
   });
 
-  if (loading) {
-    return (
-      <div aria-busy="true">
-        <Translate>Loading...</Translate>
-      </div>
-    );
-  }
+  const categories = data?.categories ?? [];
 
   const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
 
   return (
-    <div className={gridClass} role="list">
-      {data.categories.map(category => (
-        <Card
-          styleName="category-card"
-          key={category.id}
-          href={category.displayURL}
-          role="listitem"
-        >
+    <div className={gridClass} role="group">
+      {categories.map(category => (
+        <Card styleName="category-card" key={category.id} href={category.displayURL}>
           <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
           <div styleName="category-card-main">
             <Card.Header styleName="category-card-header">{category.title}</Card.Header>

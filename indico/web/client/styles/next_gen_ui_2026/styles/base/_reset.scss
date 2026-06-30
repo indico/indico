@@ -40,4 +40,8 @@
     display: block;
     max-width: 100%;
   }
+
+  @media (max-width: var(--viewport-tablet)) {
+    --content-max-readable-width: 100%;
+  }
 }
