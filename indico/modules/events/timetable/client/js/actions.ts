@@ -38,6 +38,7 @@ import {
   ReduxState,
   SidePanelView,
   ContribId,
+  EntryUniqueID,
 } from './types';
 import {flattenEntries, getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -136,9 +137,9 @@ interface UpdateEntryAction {
 
 interface SetEntryAttachments {
   type: typeof SET_ENTRY_ATTACHMENTS;
-  entryType: string;
+  entryType: EntryType;
   attachmentCount: number;
-  id: string;
+  id: EntryUniqueID;
 }
 
 interface DeleteBreakAction {
