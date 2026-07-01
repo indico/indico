@@ -20,6 +20,7 @@ $title-row-line-height: 1.2rem;
   padding: 0;
   outline: none;
   font-size: 0.9rem;
+  container-type: size;
 
   .children-wrapper {
     flex-grow: 1;
@@ -35,6 +36,42 @@ $title-row-line-height: 1.2rem;
     .time {
       display: none;
     }
+  }
+
+  .children-droppable-container {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    pointer-events: none;
+    transition: opacity ease-out 0.2s;
+  }
+
+  .children-droppable-container.hovered {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .children-droppable-outline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    border-radius: 4px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: 2px dashed gray;
+  }
+
+  .children-droppable {
+    width: 100%;
+    height: 100%;
   }
 
   &:hover:not(:has(.entry:hover)) {
