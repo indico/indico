@@ -419,6 +419,23 @@ export function useDroppable({id}: {id: string}) {
   const ref = useRef<HTMLElement | null>(null);
   const registerDroppable = useContextSelector(DnDContext, ctx => ctx.registerDroppable);
   const unregisterDroppable = useContextSelector(DnDContext, ctx => ctx.unregisterDroppable);
+  const hasDraggableOver = useContextSelector(DnDContext, ctx => {
+    for (const [draggableId, draggable] of Object.entries(ctx.draggableData)) {
+      // FIXME: !(draggableId.startsWith('c') || draggableId.startsWith('b')) is a huge hack
+      if (
+        draggableId === id ||
+        !(draggableId.startsWith('c') || draggableId.startsWith('b')) ||
+        !draggable.transform
+      ) {
+        continue;
+      }
+      const overlapping = getOverlappingDroppables(ctx.droppables, draggable.mouse);
+      if (overlapping.some(o => o.id === id)) {
+        return true;
+      }
+    }
+    return false;
+  });
 
   const setNodeRef = useCallback((node: HTMLElement | null) => {
     if (node) {
@@ -436,7 +453,7 @@ export function useDroppable({id}: {id: string}) {
     };
   }, [id, registerDroppable, unregisterDroppable]);
 
-  return {setNodeRef};
+  return useMemo(() => ({setNodeRef, hasDraggableOver}), [setNodeRef, hasDraggableOver]);
 }
 
 export function useDroppableData({id}: {id: string}) {
