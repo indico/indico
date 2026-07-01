@@ -98,7 +98,6 @@ export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateMod
 
   const handleSubmit = (formData: any) => {
     dispatch(actions.createSession(formData));
-
     onClose();
   };
 
