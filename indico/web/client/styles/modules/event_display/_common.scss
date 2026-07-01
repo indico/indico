@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 @use 'partials/buttons' as *;
 @use 'partials/boxes' as *;
 
@@ -67,6 +68,10 @@
   .main-action-bar {
     height: 50px;
     min-height: 50px;
+  }
+
+  .event-toolbar-heading {
+    @extend %visually-hidden;
   }
 
   .button-bar {
