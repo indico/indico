@@ -156,6 +156,18 @@ interface _EntryProps {
 
 type EntryProps = _EntryProps & ScheduledMixin & BaseEntry;
 
+function DroppableArea({id, horizontalPadding}: {id: string; horizontalPadding?: string}) {
+  const {setNodeRef: setDroppableNodeRef, hasDraggableOver} = useDroppable({id});
+
+  return (
+    <div styleName={`children-droppable-container ${hasDraggableOver ? 'hovered' : ''}`}>
+      <div styleName="children-droppable-outline" style={{padding: `0 ${horizontalPadding}`}}>
+        <div ref={setDroppableNodeRef} styleName="children-droppable" />
+      </div>
+    </div>
+  );
+}
+
 // TODO: (Ajob) Fix these type errors
 export default function Entry({
   type,
@@ -189,10 +201,11 @@ export default function Entry({
   );
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const {width, offset} = getWidthAndOffset(column, maxColumn);
+  const entryRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const {setNodeRef: setDroppableNodeRef} = useDroppable({id});
+  const [droppableArea, setDroppableArea] = useState<'full' | 'partial'>('full');
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
   const draftEntry = useSelector(selectors.getDraftEntry);
@@ -261,6 +274,29 @@ export default function Entry({
     };
   }, [isDragging, isResizing, blockRef]);
 
+  useEffect(() => {
+    if (type !== EntryType.SessionBlock || !entryRef.current) {
+      return;
+    }
+    function updateDroppableArea(entryWidth: number) {
+      if (entryWidth - 5 > 250) {
+        setDroppableArea('partial');
+      } else {
+        setDroppableArea('full');
+      }
+    }
+
+    const observer = new ResizeObserver(entries => {
+      const entryWidth = entries[0].contentRect.width;
+      updateDroppableArea(entryWidth);
+    });
+    observer.observe(entryRef.current);
+
+    updateDroppableArea(entryRef.current.clientWidth);
+
+    return observer.disconnect;
+  }, [id, type]);
+
   const setChildDurations = useMemo(() => {
     const obj = {};
     for (const e of _children) {
@@ -273,6 +309,7 @@ export default function Entry({
     <div
       role="button"
       styleName="entry"
+      ref={entryRef}
       style={style}
       onMouseUp={() => {
         if (isResizing || isDragging) {
@@ -304,7 +341,6 @@ export default function Entry({
         {isPosterBlock && <PosterCount count={children.length} />}
         {type === EntryType.SessionBlock && !isPosterBlock && (
           <div
-            ref={setDroppableNodeRef}
             styleName="children-wrapper"
             style={{
               backgroundImage: `radial-gradient(${colors.color}11 1px, transparent 0)`,
@@ -322,9 +358,15 @@ export default function Entry({
                 {...child}
               />
             ))}
+            {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'partial' && (
+              <DroppableArea id={id} />
+            )}
           </div>
         )}
       </div>
+      {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'full' && (
+        <DroppableArea id={id} horizontalPadding="15px" />
+      )}
       {!draftEntry && (
         <EntryMoveButtons
           id={id}
