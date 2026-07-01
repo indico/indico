@@ -252,6 +252,13 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: The ID of the user who created the registration
+    created_by_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
     #: The date/time until which the person can modify their registration
     modification_end_dt = db.Column(
         UTCDateTime,
@@ -276,11 +283,18 @@ class Registration(db.Model):
     user = db.relationship(
         'User',
         lazy=True,
+        foreign_keys=[user_id],
         backref=db.backref(
             'registrations',
             lazy='dynamic'
             # XXX: a delete-orphan cascade here would delete registrations when NULLing the user
         )
+    )
+    #: The user who created this registration
+    created_by = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=[created_by_id]
     )
     #: The latest payment transaction associated with this registration
     transaction = db.relationship(
