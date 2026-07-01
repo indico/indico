@@ -92,6 +92,10 @@ Accessibility
 - Screen reader users can now access the full date range and timezone for events
   in the dashboard lists, which was previously shown only as a mouse-hover
   tooltip (:pr:`7608`, thanks :user:`foxbunny`)
+- The calendar export button on the dashboard, and the copy and download buttons
+  in the export popup, now have accessible names and show a tooltip on keyboard
+  focus instead of relying on the ``title`` attribute (:pr:`7609`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
