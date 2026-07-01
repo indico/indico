@@ -32,6 +32,7 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
+import TimetableSidePanel from './TimetableSidePanel';
 import {useToast} from './ToastContext';
 import {
   ReduxState,
@@ -583,7 +584,10 @@ export function DayTimetable({
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
-      <UnscheduledContributions dt={dt} />
+      <div styleName="side-panel-container">
+        <TimetableSidePanel />
+        <UnscheduledContributions dt={dt} />
+      </div>
       {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
       <div ref={wrapperRef} className="wrapper timetable-popup-boundary">
         <div ref={innerWrapperRef} styleName="wrapper" style={{background: limitsGradient}}>

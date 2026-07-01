@@ -7,17 +7,24 @@
 
 import {partition} from 'lodash';
 import {Moment} from 'moment';
-import React, {Fragment, ReactNode, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, DropdownHeader, DropdownItemProps, Label, Select} from 'semantic-ui-react';
+import {Button, Label, Input, Dropdown, Icon} from 'semantic-ui-react';
 
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
+import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import {
+  SESSION_CREATE_MODAL,
+  SESSION_EDIT_MODAL,
+  UNSCHEDULED_CONTRIB_CREATE_MODAL,
+  useModal,
+} from './ModalContext';
+import TimetableConfirmDialog from './ConfirmDialog';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
-import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
 import {UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
@@ -25,11 +32,7 @@ enum GenericFilterType {
   NO_SESSION = 'no-session',
 }
 
-type FilterType = GenericFilterType & number;
-
-function FragmentWithoutWarning({key, children}: {key: string; children: ReactNode}) {
-  return <Fragment key={key}>{children}</Fragment>;
-}
+type FilterType = GenericFilterType | number;
 
 function UnscheduledContributionList({
   dt,
@@ -38,16 +41,17 @@ function UnscheduledContributionList({
   dt: Moment;
   contribs: UnscheduledContribEntry[];
 }) {
+  const uniqueContribs = [...new Map(contribs.map(contrib => [contrib.id, contrib])).values()];
   return (
     <div styleName="contributions-list">
-      {contribs.map(contrib => (
+      {uniqueContribs.map(contrib => (
         <DraggableUnscheduledContributionEntry
           key={contrib.id}
+          contrib={contrib}
           dt={dt}
           id={contrib.id}
           title={contrib.title}
           duration={contrib.duration}
-          colors={contrib.colors}
           sessionId={contrib.sessionId}
         />
       ))}
@@ -57,14 +61,19 @@ function UnscheduledContributionList({
 
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
+  const {openModal} = useModal();
   const minSidebarWidthPx = 320;
+  const eventId = useSelector(selectors.getEventId);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const resizing = useRef(false);
   const initialPosition = useRef<number>(0);
 
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>();
-  const [selectedSessionId, setSelectedSessionId] = useState<number | 'draft'>();
+  const [selectedFilter, setSelectedFilters] = useState<FilterType[]>([]);
+  const [draftSearchQuery, setDraftSearchQuery] = useState('');
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterSearchQuery, setFilterSearchQuery] = useState('');
+  const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
 
   const contribs = useSelector(selectors.getUnscheduled).toSorted((c1, c2) => {
     // sort by sessionId then by title
@@ -78,16 +87,24 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const sessions = useSelector(selectors.getSessions);
   const prevSessions = useRef(sessions);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
+  const showSessions = useSelector(selectors.showSessions);
 
   const contribsGrouped = Object.groupBy(contribs, ({sessionId}) => sessionId ?? 'no-session');
 
-  const currentContribs = selectedFilter ? (contribsGrouped[selectedFilter] ?? []) : contribs;
+  const currentContribs =
+    selectedFilter.length > 0
+      ? selectedFilter.flatMap(filter => contribsGrouped[filter] ?? [])
+      : contribs;
+  const filteredContribs = currentContribs.filter(contrib =>
+    contrib.title.toLowerCase().includes(draftSearchQuery.toLowerCase())
+  );
 
   const [sessionsWithContribs, sessionsWithoutContribs] = partition(
     Object.values(sessions)
       .map(session => ({
         value: session.id,
         title: session.title,
+        color: session.colors,
         count: (contribsGrouped[session.id] ?? []).length,
         text: (
           <div styleName="session">
@@ -102,16 +119,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
   const dropdownSessions = [
     {
-      as: FragmentWithoutWarning,
-      key: 'sep-filters',
-      disabled: true,
-      content: (
-        <DropdownHeader>
-          <Translate>Filters</Translate>
-        </DropdownHeader>
-      ),
-    },
-    {
       value: 'no-session',
       title: Translate.string('No assigned session'),
       text: (
@@ -123,50 +130,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
         </div>
       ),
     },
-    ...(sessionsWithContribs.length
-      ? [
-          {
-            as: FragmentWithoutWarning,
-            key: 'sep-with-contribs',
-            disabled: true,
-            content: (
-              <DropdownHeader>
-                <Translate>Sessions with contributions</Translate>
-              </DropdownHeader>
-            ),
-          },
-        ]
-      : []),
     ...sessionsWithContribs,
-    ...(sessionsWithoutContribs.length
-      ? [
-          {
-            as: FragmentWithoutWarning,
-            key: 'sep-without-contribs',
-            disabled: true,
-            content: (
-              <DropdownHeader>
-                <Translate>Empty sessions</Translate>
-              </DropdownHeader>
-            ),
-          },
-        ]
-      : []),
     ...sessionsWithoutContribs,
   ];
-
-  const sessionSearch = (options: DropdownItemProps[], value: string) =>
-    options
-      // Primary filter to match search term
-      .filter(
-        o => o.as === FragmentWithoutWarning || o.title.toLowerCase().includes(value.toLowerCase())
-      )
-      // Secondary filter to remove consecutive dividers
-      .filter(
-        (o, i, arr) =>
-          o.as !== FragmentWithoutWarning ||
-          (arr[i + 1] && arr[i + 1].as !== FragmentWithoutWarning)
-      );
 
   function onMouseUp() {
     resizing.current = false;
@@ -174,13 +140,24 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   }
 
   function onMouseMove(e: MouseEvent) {
-    if (resizing.current) {
-      const diff = e.pageX - initialPosition.current;
-      const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
-      initialPosition.current = wrapperRef.current.offsetLeft + width;
-      wrapperRef.current.style.width = `${width}px`;
+    if (!resizing.current || !wrapperRef.current) {
+      return;
     }
+
+    const diff = e.pageX - initialPosition.current;
+    const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
+    wrapperRef.current.style.width = `${width}px`;
+    initialPosition.current = wrapperRef.current.getBoundingClientRect().left + width;
   }
+
+  useEffect(() => {
+    if (showUnscheduled) {
+      setSelectedFilters([]);
+      setDraftSearchQuery('');
+      setFilterSearchQuery('');
+      setFilterOpen(false);
+    }
+  }, [showUnscheduled]);
 
   useEffect(() => {
     document.addEventListener('mouseup', onMouseUp);
@@ -206,98 +183,232 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       newFilter = +newKeys.filter(k => !prevSessions.current[k])?.pop();
     }
 
-    setSelectedFilter(newFilter);
+    setSelectedFilters(newFilter ? [newFilter] : []);
     prevSessions.current = sessions;
   }, [sessions]);
 
   // TODO: (Ajob) Once we move to an approach where we have all kinds of draft blocks
   //              I propose we have some kind of filter option to search by entry type,
   //              session, etc. If no filters are applied, everything is visible.
+  const [sessionSearchQuery, setSessionSearchQuery] = useState('');
+
+  const filteredSessions = Object.values(sessions).filter(session =>
+    session.title.toLowerCase().includes(sessionSearchQuery.toLowerCase())
+  );
+
+  if (!showUnscheduled && !showSessions) {
+    return null;
+  }
+  const filteredDropdownSessions = dropdownSessions.filter(session =>
+    session.title.toLowerCase().includes(filterSearchQuery.toLowerCase())
+  );
   return (
-    showUnscheduled && (
-      <>
-        <div
-          styleName="contributions-container"
-          style={{minWidth: `${minSidebarWidthPx}px`}}
-          ref={wrapperRef}
-        >
-          <div styleName="content">
-            <div styleName="actions">
-              <Select
-                button
-                placeholder={Translate.string('Filter sessions')}
-                value={selectedFilter}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-                search={sessionSearch}
-                noResultsMessage={Translate.string('No sessions found')}
-                clearable
-                onChange={(_, {value}: {_: unknown; value: FilterType}) => {
-                  // TODO: (Ajob) Fix bug where clicking enter on an option
-                  //              keeps dropdown open.
-                  setSelectedFilter(value);
-                }}
-                styleName="session-filter"
-                options={dropdownSessions}
-              />
-              {Number.isInteger(selectedFilter) && (
-                <Button
-                  basic
-                  type="button"
-                  title={Translate.string('Edit selected session')}
-                  icon="edit"
-                  size="small"
-                  onClick={() => setSelectedSessionId(selectedFilter)}
+    <>
+      <div
+        styleName="contributions-container"
+        style={{minWidth: `${minSidebarWidthPx}px`}}
+        ref={wrapperRef}
+      >
+        {showUnscheduled && (
+          <>
+            <h1 styleName="title">
+              <Translate>Unscheduled Contributions</Translate>
+            </h1>
+            <div styleName="content">
+              <div styleName="actions">
+                <Input
+                  icon="search"
+                  placeholder={Translate.string('Search unscheduled contributions')}
+                  value={draftSearchQuery}
+                  onChange={(_, {value}) => setDraftSearchQuery(value)}
                 />
-              )}
-              {Number.isInteger(selectedFilter) && (
-                <Button
-                  basic
-                  type="button"
-                  title={Translate.string('Delete selected session')}
-                  icon="trash"
-                  size="small"
-                  onClick={() => {
-                    dispatch(actions.deleteSession(selectedFilter));
-                  }}
-                />
-              )}
+                <div styleName="filter-trigger-wrapper">
+                  <PopoverDropdownMenu
+                    open={filterOpen}
+                    onOpen={() => setFilterOpen(true)}
+                    onClose={() => {
+                      setFilterOpen(false);
+                      setFilterSearchQuery('');
+                    }}
+                    overflow
+                    trigger={
+                      <Button
+                        basic
+                        type="button"
+                        icon="filter"
+                        title={Translate.string('Filter sessions')}
+                      />
+                    }
+                    searchValue={filterSearchQuery}
+                    onSearchChange={setFilterSearchQuery}
+                    searchPlaceholder={Translate.string('Search sessions')}
+                  >
+                    {filteredDropdownSessions.map(option => {
+                      const isSelected = selectedFilter.includes(option.value as FilterType);
+
+                      return (
+                        <Dropdown.Item
+                          key={option.value}
+                          active={isSelected}
+                          selected={isSelected}
+                          onClick={e => {
+                            e.stopPropagation();
+
+                            setSelectedFilters(prev =>
+                              isSelected
+                                ? prev.filter(value => value !== option.value)
+                                : [...prev, option.value as FilterType]
+                            );
+                          }}
+                        >
+                          {option.text}
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </PopoverDropdownMenu>
+
+                  {selectedFilter.length > 0 && (
+                    <button
+                      type="button"
+                      styleName="filter-badge"
+                      title={Translate.string('Clear filters')}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelectedFilters([]);
+                      }}
+                    >
+                      <span styleName="filter-count">
+                        {selectedFilter.length > 9 ? '' : selectedFilter.length}
+                      </span>
+                      <span styleName="filter-cross">
+                        <Icon name="close" />
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
               <Button
+                styleName="add-element"
                 basic
                 type="button"
                 title={Translate.string('Create new session')}
                 icon="plus"
                 size="small"
-                onClick={() => setSelectedSessionId('draft')}
+                onClick={() =>
+                  openModal(UNSCHEDULED_CONTRIB_CREATE_MODAL, {
+                    eventId,
+                    onCreate: contrib => {
+                      // TODO: (Ajob) Instead of manual conversion we should
+                      //              adjust the actual endpoint and its usages
+                      contrib = {...contrib, duration: contrib.duration / 60};
+                      dispatch(actions.addUnscheduledContrib(contrib));
+                      setSelectedFilters([]);
+                      setDraftSearchQuery('');
+                    },
+                  })
+                }
               />
+              {filteredContribs.length > 0 ? (
+                <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
+              ) : (
+                <Translate>This session has no contributions</Translate>
+              )}
             </div>
-            {currentContribs.length > 0 ? (
-              <UnscheduledContributionList dt={dt} contribs={currentContribs} />
-            ) : (
-              <Translate>This session has no contributions</Translate>
-            )}
-          </div>
-        </div>
-        <div
-          styleName="pane-resize-handle"
-          onMouseDown={e => {
-            if (e.button !== 0) {
-              return;
-            }
-            resizing.current = true;
-            initialPosition.current = e.pageX;
+          </>
+        )}
+
+        {showSessions && (
+          <>
+            <h1 styleName="title">
+              <Translate>Sessions</Translate>
+            </h1>
+            <div styleName="content">
+              <div styleName="actions">
+                <Input
+                  icon="search"
+                  placeholder={Translate.string('Search sessions')}
+                  value={sessionSearchQuery}
+                  onChange={(_, {value}) => setSessionSearchQuery(value)}
+                />
+              </div>
+
+              <Button
+                styleName="add-element"
+                basic
+                type="button"
+                title={Translate.string('Create new session')}
+                icon="plus"
+                size="small"
+                onClick={() => openModal(SESSION_CREATE_MODAL, {})}
+              />
+
+              {filteredSessions.length > 0 ? (
+                <div styleName="session-list">
+                  {filteredSessions.map(session => (
+                    <div key={session.id} styleName="session-wrapper">
+                      <div
+                        styleName="session-content"
+                        style={
+                          {'--session-color': session.colors.backgroundColor} as React.CSSProperties
+                        }
+                      >
+                        <div styleName="session-title">{session.title}</div>
+                        <div styleName="session-actions">
+                          <Button
+                            basic
+                            type="button"
+                            title={Translate.string('Edit session')}
+                            icon="edit"
+                            size="small"
+                            onClick={() => openModal(SESSION_EDIT_MODAL, {sessionId: session.id})}
+                          />
+                          <Button
+                            basic
+                            type="button"
+                            title={Translate.string('Delete selected session')}
+                            icon="trash"
+                            size="small"
+                            onClick={() => setSessionToDelete(session.id)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Translate>No sessions found</Translate>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+      <div
+        styleName="pane-resize-handle"
+        onMouseDown={e => {
+          if (e.button !== 0) {
+            return;
+          }
+          resizing.current = true;
+          initialPosition.current = e.pageX;
+        }}
+      />
+      {sessionToDelete && (
+        <TimetableConfirmDialog
+          title="Delete contribution"
+          message={
+            <Translate>
+              Deleting this session will result in deleting entries associated to it.
+            </Translate>
+          }
+          confirmLabel={Translate.string('Proceed')}
+          cancelLabel={Translate.string('Cancel')}
+          onClose={() => setSessionToDelete(null)}
+          onConfirm={() => {
+            dispatch(actions.deleteSession(sessionToDelete));
+            setSessionToDelete(null);
           }}
         />
-        {selectedSessionId &&
-          (selectedSessionId === 'draft' ? (
-            <TimetableSessionCreateModal onClose={() => setSelectedSessionId(null)} />
-          ) : (
-            <TimetableSessionEditModal
-              onClose={() => setSelectedSessionId(null)}
-              sessionId={selectedSessionId}
-            />
-          ))}
-      </>
-    )
+      )}
+    </>
   );
 }

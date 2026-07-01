@@ -12,9 +12,19 @@
 .dropdown-container {
   padding: 2px;
   z-index: 1000;
-  overflow: auto;
+  min-width: 14rem;
+
+  :global(.menu) {
+    max-height: calc(5 * 2.85rem);
+    overflow-y: auto;
+  }
 
   &:global(.ui.dropdown .menu) {
     position: relative;
   }
+}
+
+.search-container {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
