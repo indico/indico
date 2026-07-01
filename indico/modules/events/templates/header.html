@@ -190,7 +190,8 @@
 
 <header class="page-header page-header-dark event-page-header">
     <div class="main-action-bar flexrow f-j-space-between f-a-center">
-        <div class="button-bar flexrow f-j-start">
+        <nav class="button-bar flexrow f-j-start" aria-labelledby="event-toolbar-heading">
+            <h2 id="event-toolbar-heading" class="event-toolbar-heading">{% trans %}Event tools{% endtrans %}</h2>
             {% if event.type != 'conference' or show_nav_bar %}
                 {{ _render_nav_bar() }}
             {% endif %}
@@ -248,7 +249,7 @@
                     {%- trans %}Back to Conference View{% endtrans -%}
                 </a>
             {% endif %}
-        </div>
+        </nav>
 
         {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone, force_locale=force_locale,
                               force_locale_alts=force_locale_alts) }}
