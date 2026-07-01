@@ -1,0 +1,216 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:root {
+
+    // PRIMARY COLORS
+
+    // Indico Gray
+  --indico-gray-50: #f5f5f6;
+  --indico-gray-100: #e5e6e8;
+  --indico-gray-200: #ced0d3;
+  --indico-gray-300: #abafb5;
+  --indico-gray-400: #81868f;
+  --indico-gray-500: #717680;
+  --indico-gray-600: #575a63;
+  --indico-gray-700: #4b4d53;
+  --indico-gray-800: #424448;
+  --indico-gray-900: #3a3b3f;
+  --indico-gray-950: #242528;
+
+  // Indico Primary Blue
+  --indico-primary-blue-50: #e7f8ff;
+  --indico-primary-blue-100: #def3ff;
+  --indico-primary-blue-200: #b6e9ff;
+  --indico-primary-blue-300: #75daff;
+  --indico-primary-blue-400: #2ccbff;
+  --indico-primary-blue-500: #00a4e4;
+  --indico-primary-blue-600: #008ed4;
+  --indico-primary-blue-700: #0071ab;
+  --indico-primary-blue-800: #005f8d;
+  --indico-primary-blue-900: #064f74;
+  --indico-primary-blue-950: #04324d;
+
+  // Indico Error
+  --indico-error-50: #ffefef;
+  --indico-error-100: #ffcdcc;
+  --indico-error-200: #ffbfbf;
+  --indico-error-300: #ff9292;
+  --indico-error-400: #ff5454;
+  --indico-error-500: #ff1f1f;
+  --indico-error-600: #f00;
+  --indico-error-700: #db0000;
+  --indico-error-800: #af0000;
+  --indico-error-900: #940808;
+  --indico-error-950: #520000;
+
+  // Indico Warning
+  --indico-warning-50: #fefaec;
+  --indico-warning-100: #fbf2ca;
+  --indico-warning-200: #f7e390;
+  --indico-warning-300: #f3d056;
+  --indico-warning-400: #f0bc2f;
+  --indico-warning-500: #e99e18;
+  --indico-warning-600: #ce7811;
+  --indico-warning-700: #ab5612;
+  --indico-warning-800: #8b4415;
+  --indico-warning-900: #733714;
+  --indico-warning-950: #421c06;
+
+  // Indico Success
+  --indico-success-50: #f1faeb;
+  --indico-success-100: #dff4d3;
+  --indico-success-200: #c2eaac;
+  --indico-success-300: #99dc7a;
+  --indico-success-400: #6cc644;
+  --indico-success-500: #57af33;
+  --indico-success-600: #418b25;
+  --indico-success-700: #336b20;
+  --indico-success-800: #2c551f;
+  --indico-success-900: #28491e;
+  --indico-success-950: #11280b;
+
+  // SECONDARY COLORS
+
+  // Indico Accent
+  --indico-accent-50: #fff6ed;
+  --indico-accent-100: #ffebd5;
+  --indico-accent-200: #ffd2a9;
+  --indico-accent-300: #feb273;
+  --indico-accent-400: #fd863a;
+  --indico-accent-500: #fb6514;
+  --indico-accent-600: #ec4a0a;
+  --indico-accent-700: #c4350a;
+  --indico-accent-800: #9b2b11;
+  --indico-accent-900: #7d2f11;
+  --indico-accent-950: #441006;
+
+  // Indico Blue Light
+  --indico-blue-light-50: #f0f9ff;
+  --indico-blue-light-100: #e0f2fe;
+  --indico-blue-light-200: #b9e6fe;
+  --indico-blue-light-300: #7bd3fe;
+  --indico-blue-light-400: #35bdfb;
+  --indico-blue-light-500: #0ba5ec;
+  --indico-blue-light-600: #0084ca;
+  --indico-blue-light-700: #0169a3;
+  --indico-blue-light-800: #055987;
+  --indico-blue-light-900: #0b496f;
+  --indico-blue-light-950: #072f4a;
+
+  // Indico Indigo
+  --indico-indigo-50: #faf4ff;
+  --indico-indigo-100: #f3e6ff;
+  --indico-indigo-200: #ead2ff;
+  --indico-indigo-300: #d9aeff;
+  --indico-indigo-400: #c27bff;
+  --indico-indigo-500: #ab49ff;
+  --indico-indigo-600: #9825f8;
+  --indico-indigo-700: #8315db;
+  --indico-indigo-800: #6f17b2;
+  --indico-indigo-900: #5b148f;
+  --indico-indigo-950: #4b0082;
+
+  // Indico Rosé
+  --indico-rose-50: #fff1f3;
+  --indico-rose-100: #ffe4e8;
+  --indico-rose-200: #fecdd6;
+  --indico-rose-300: #fea3b4;
+  --indico-rose-400: #fd6f8e;
+  --indico-rose-500: #f63d68;
+  --indico-rose-600: #e31b54;
+  --indico-rose-700: #c01048;
+  --indico-rose-800: #a11043;
+  --indico-rose-900: #89123e;
+  --indico-rose-950: #4d041d;
+
+  // GRADIENTS
+
+  // Gray gradients
+  --indico-gradient-gray-600: #575a63;
+
+  --indico-gradient-gray-600-500-90: linear-gradient(
+    90deg,
+    #575a63 0%,
+    #717680 100%
+  );
+
+  --indico-gradient-gray-700-600-45: linear-gradient(
+    45deg,
+    #414651 0%,
+    #535862 100%
+  );
+
+  --indico-gradient-gray-800-600-45: linear-gradient(
+    45deg,
+    #252b37 0%,
+    #535862 100%
+  );
+
+  --indico-gradient-gray-800-600-90: linear-gradient(
+    90deg,
+    #252b37 0%,
+    #535862 100%
+  );
+
+  --indico-gradient-gray-800-700-26: linear-gradient(
+    26.5deg,
+    #252b37 0%,
+    #414651 100%
+  );
+
+  --indico-gradient-gray-900-600-45: linear-gradient(
+    45deg,
+    #101828 0%,
+    #535862 100%
+  );
+
+  // Brand gradients
+  --indico-gradient-brand-600: #7f56d9;
+
+  --indico-gradient-brand-600-500-90: linear-gradient(
+    90deg,
+    #7f56d9 0%,
+    #9e77ed 100%
+  );
+
+  --indico-gradient-brand-700-600-45: linear-gradient(
+    45deg,
+    #6941c6 0%,
+    #7f56d9 100%
+  );
+
+  --indico-gradient-brand-800-600-45: linear-gradient(
+    45deg,
+    #53389e 0%,
+    #7f56d9 100%
+  );
+
+  --indico-gradient-brand-800-600-90: linear-gradient(
+    90deg,
+    #53389e 0%,
+    #7f56d9 100%
+  );
+
+  --indico-gradient-brand-800-700-26: linear-gradient(
+    26.5deg,
+    #53389e 0%,
+    #6941c6 100%
+  );
+
+  --indico-gradient-brand-900-600-45: linear-gradient(
+    45deg,
+    #42307d 0%,
+    #7f56d9 100%
+  );
+
+  --indico-gradient-indigo-500-blue-500-45: linear-gradient(
+    45deg,
+    #ab49ff  0%,
+    #0ba5ec 100%
+  );
+}

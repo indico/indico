@@ -269,6 +269,24 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                                           upcoming_events=upcoming_events, **params)
 
 
+class RHCategoryChildrenJSON(RHDisplayCategoryBase):
+    """Return the children of a category in JSON format."""
+
+    def _process(self):
+        serialized_categories = []
+
+        for c in self.category.children:
+            data = serialize_category(c, with_path=True, with_favorite=True)
+            data['display_url'] = url_for('.display', c)
+            data['description'] = c.description
+            serialized_categories.append(data)
+
+        return jsonify_data(
+            categories=serialized_categories,
+            parent_id=self.category.id,
+        )
+
+
 class RHEventList(RHDisplayCategoryEventsBase):
     """Return the HTML for the event list before/after a specific month."""
 
