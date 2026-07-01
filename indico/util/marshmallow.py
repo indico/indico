@@ -10,6 +10,7 @@ import re
 from datetime import datetime, time, timedelta
 from uuid import UUID
 
+import pytz
 import yaml
 from dateutil import parser, relativedelta
 from marshmallow import Schema, ValidationError, fields
@@ -458,6 +459,34 @@ class HumanizedDate(fields.Field):
             return today + relativedelta.relativedelta(**{HUMANIZED_UNIT_MAP[unit]: number})
 
 
+class EventTimezoneDateTimeField(fields.DateTime):
+    """Marshmallow field for dealing with dates in the event's timezone.
+
+    The event should be passed in the schema's context as 'event'.
+    Since times in Indico typically have a granularity of minutes, any time
+    that contains seconds (or microseconds) will be rejected.
+    """
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        new_value = value.astimezone(self.context['event'].tzinfo).replace(tzinfo=None)
+        return super()._serialize(new_value, attr, obj, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if value is None:
+            return None
+        dt = super()._deserialize(value, attr, data, **kwargs)
+        if dt.second or dt.microsecond:
+            raise self.make_error('invalid', input=value, obj_type=self.OBJ_TYPE)
+        event_tz = self.context['event'].tzinfo
+        if dt.tzinfo is None:
+            localized = event_tz.localize(dt)
+        else:
+            localized = dt.astimezone(event_tz)
+        return localized.astimezone(pytz.utc)
+
+
 class FilesField(ModelList):
     """Marshmallow field for a list of previously-uploaded files."""
 
@@ -604,3 +633,19 @@ class YAML(I18nAwareField):
             return value if self.keep_text else data
         except yaml.YAMLError:
             raise self.make_error('invalid_yaml')
+
+
+class NonPartialNested(fields.Nested):
+    """Like Nested, but not propagating partial.
+
+    This field should be used in place of the standard `Nested` in most places where
+    one may set `partial` on the Schema, but doesn't want it to propagate into nested
+    schemas (ie requiring full values for nested data even if the outer schema is partial).
+
+    This is especially important when the nested schema uses `load_default`, because these
+    values are ignored in partial mode.
+    """
+
+    def deserialize(self, value, attr=None, data=None, **kwargs):
+        kwargs['partial'] = None
+        return super().deserialize(value, attr, data, **kwargs)
