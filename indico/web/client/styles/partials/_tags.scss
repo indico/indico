@@ -7,19 +7,52 @@
 
 @use 'base' as *;
 
+$tag-default-color: $black;
+$tag-semantic-color-map: (
+  highlight: $dark-blue,
+  success: darken($green, 14%),
+  error: $dark-red,
+  warning: darken($yellow, 18%),
+  visited: $purple,
+  strong: $black,
+  editing-rejected: $midnight-black,
+  editing-make-changes: darken($bright-yellow, 25%),
+  editing-request-changes: $dark-red,
+  editing-accepted-submitter: darken($olive, 18%),
+);
+
+@mixin tag-background($color) {
+  @include border-all($color);
+  background: $color;
+  color: $white;
+}
+
+@mixin tag-outline($color) {
+  @include border-all($color);
+  color: $color;
+}
+
 .i-tag {
-  @include semantic-background();
+  @include tag-background($tag-default-color);
   @include default-border-radius();
   padding: 0.3em 0.6em;
   font-weight: bold;
   box-sizing: initial;
 
+  @each $style, $color in $tag-semantic-color-map {
+    &.#{$style} {
+      @include tag-background($color);
+    }
+  }
+
   &.outline {
-    @include semantic-outline();
+    @include tag-outline($tag-default-color);
     background: transparent;
 
-    @include semantic-versions() {
-      background: transparent;
+    @each $style, $color in $tag-semantic-color-map {
+      &.#{$style} {
+        @include tag-outline($color);
+      }
     }
 
     &.dashed {

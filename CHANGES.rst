@@ -92,6 +92,7 @@ Accessibility
 - Screen reader users can now access the full date range and timezone for events
   in the dashboard lists, which was previously shown only as a mouse-hover
   tooltip (:pr:`7608`, thanks :user:`foxbunny`)
+- Status tag badges now meet WCAG AA color contrast requirements (:issue:`7621`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
