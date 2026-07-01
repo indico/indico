@@ -437,7 +437,8 @@ def create_personal_data_fields(regform):
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
-                                base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
+                                base_price=regform.base_price, currency=regform.currency,
+                                created_by_manager=management, created_by=user)
     if skip_moderation is None:
         skip_moderation = management
     all_data_by_id = {f.id: data.get(f.html_field_name) for f in regform.active_fields}
@@ -622,6 +623,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         'reg_date': ('Registration date', lambda x: x.submitted_dt),
         'mod_date': ('Modification date', lambda x: x.modified_dt),
         'state': ('Registration state', lambda x: x.state.title),
+        'created_by': ('Created by', lambda x: x.created_by.full_name if x.created_by else ''),
         'price': ('Price', lambda x: x.render_price()),
         'checked_in': ('Checked in', lambda x: x.checked_in),
         'checked_in_date': ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''),
@@ -700,6 +702,10 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
         'state': (
             _('Registration state'),
             lambda x: x.state.title,
+        ),
+        'created_by': (
+            _('Created by'),
+            lambda x: x.created_by.full_name if x.created_by else empty_value,
         ),
         'price': (
             _('Price'),

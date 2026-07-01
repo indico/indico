@@ -569,6 +569,23 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
 
 
 @pytest.mark.usefixtures('request_context')
+def test_create_registration_records_creator(monkeypatch, dummy_user, dummy_regform, create_user):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+    data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    creator = create_user(123)
+    session.set_session_user(creator)
+    reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
+    assert reg.created_by == creator
+    db.session.delete(reg)
+    db.session.flush()
+
+    session.set_session_user(None)
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+    assert reg.created_by is None
+
+
+@pytest.mark.usefixtures('request_context')
 def test_modify_registration(monkeypatch, dummy_user, dummy_regform):
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
