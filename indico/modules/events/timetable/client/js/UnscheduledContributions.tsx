@@ -285,6 +285,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </div>
             </div>
             <div styleName="content">
+              <div styleName="gradient" />
               <Button
                 styleName="add-element"
                 basic
@@ -311,6 +312,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               ) : (
                 <Translate>This session has no contributions</Translate>
               )}
+              <div styleName="gradient" />
             </div>
           </>
         )}
@@ -331,6 +333,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </div>
             </div>
             <div styleName="content">
+              <div styleName="gradient" />
               <Button
                 styleName="add-element"
                 basic
@@ -340,7 +343,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 size="small"
                 onClick={() => openModal(SESSION_CREATE_MODAL, {})}
               />
-
               {filteredSessions.length > 0 ? (
                 <div styleName="session-list">
                   {filteredSessions.map(session => (
@@ -377,6 +379,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               ) : (
                 <Translate>No sessions found</Translate>
               )}
+              <div styleName="gradient" />
             </div>
           </>
         )}
