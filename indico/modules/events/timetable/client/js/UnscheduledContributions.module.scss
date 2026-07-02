@@ -179,6 +179,22 @@ $content-pane-bg-color: $white;
   margin: 0;
   font-size: 1.125rem;
   font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  :global(.icon) {
+    opacity: 0.5;
+    transition: 0.1s;
+    font-size: 1rem;
+    width: auto;
+    height: auto;
+    margin: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 
 .pane-resize-handle {

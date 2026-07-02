@@ -9,7 +9,7 @@ import {partition} from 'lodash';
 import {Moment} from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Label, Input, Dropdown, Icon} from 'semantic-ui-react';
+import {Button, Label, Input, Dropdown, Icon, Popup} from 'semantic-ui-react';
 
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
@@ -232,7 +232,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                         basic
                         type="button"
                         icon="filter"
-                        title={Translate.string('Filter sessions')}
+                        title={Translate.string('Filter by session')}
                       />
                     }
                     searchValue={filterSearchQuery}
@@ -322,6 +322,14 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
             <div styleName="container-header">
               <h1 styleName="title">
                 <Translate>Sessions</Translate>
+
+                <Popup inverted position="bottom right" basic trigger={<Icon name="info circle" />}>
+                  <Translate>
+                    Sessions are used to group related contributions. Any contribution within a
+                    block of a session will inherit the session's properties, such as location and
+                    color. It serves as a way to categorize contributions.
+                  </Translate>
+                </Popup>
               </h1>
               <div styleName="actions">
                 <Input
