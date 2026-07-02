@@ -332,7 +332,6 @@
 .filter-cross {
   display: none;
   font-size: 0.6rem;
-  line-height: 0.6rem;
 
   i:global(.icon) {
     margin: 0;
@@ -345,7 +344,7 @@
   }
 
   .filter-cross {
-    display: inline;
+    display: flex;
   }
 }
 
