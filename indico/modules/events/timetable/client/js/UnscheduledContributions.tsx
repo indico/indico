@@ -17,6 +17,7 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import TimetableConfirmDialog from './ConfirmDialog';
+import {mapDataToEntry} from './mapperUtils';
 import {
   SESSION_CREATE_MODAL,
   SESSION_EDIT_MODAL,
@@ -25,7 +26,7 @@ import {
 } from './ModalContext';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
-import {UnscheduledContribEntry} from './types';
+import {EntryType, UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum GenericFilterType {
@@ -299,7 +300,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                     onCreate: contrib => {
                       // TODO: (Ajob) Instead of manual conversion we should
                       //              adjust the actual endpoint and its usages
-                      contrib = {...contrib, duration: contrib.duration / 60};
+                      contrib = mapDataToEntry({...contrib, type: EntryType.Contribution});
                       dispatch(actions.addUnscheduledContrib(contrib));
                       setSelectedFilters([]);
                       setDraftSearchQuery('');
