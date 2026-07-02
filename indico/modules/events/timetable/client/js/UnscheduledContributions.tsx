@@ -326,8 +326,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 <Popup inverted position="bottom right" basic trigger={<Icon name="info circle" />}>
                   <Translate>
                     Sessions are used to group related contributions. Any contribution within a
-                    block of a session will inherit the session's properties, such as location and
-                    color. It serves as a way to categorize contributions.
+                    session block on the timetable (which has a session assigned to it), will
+                    inherit the session's properties, such as location and color. It serves as a way
+                    to categorize contributions.
                   </Translate>
                 </Popup>
               </h1>
