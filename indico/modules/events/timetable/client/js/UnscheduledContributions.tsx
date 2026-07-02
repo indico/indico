@@ -16,13 +16,13 @@ import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import TimetableConfirmDialog from './ConfirmDialog';
 import {
   SESSION_CREATE_MODAL,
   SESSION_EDIT_MODAL,
   UNSCHEDULED_CONTRIB_CREATE_MODAL,
   useModal,
 } from './ModalContext';
-import TimetableConfirmDialog from './ConfirmDialog';
 import * as selectors from './selectors';
 import './UnscheduledContributions.module.scss';
 import {UnscheduledContribEntry} from './types';
@@ -47,9 +47,9 @@ function UnscheduledContributionList({
       {uniqueContribs.map(contrib => (
         <DraggableUnscheduledContributionEntry
           key={contrib.id}
-          contrib={contrib}
           dt={dt}
           id={contrib.id}
+          objId={contrib.objId}
           title={contrib.title}
           duration={contrib.duration}
           sessionId={contrib.sessionId}

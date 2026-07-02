@@ -275,10 +275,12 @@ export function ContributionForm({
 export function ContributionEditForm({
   eventId,
   contribId,
+  onSubmit,
   onClose,
 }: {
   eventId: number;
   contribId: number;
+  onSubmit?: (formData: any, form: any) => void;
   onClose: () => void;
 }) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
@@ -301,6 +303,7 @@ export function ContributionEditForm({
     } catch (e) {
       return handleSubmitError(e);
     }
+
     location.reload();
     // never finish submitting to avoid fields being re-enabled
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -317,7 +320,7 @@ export function ContributionEditForm({
       locationParent={locationParent}
       customFields={fields}
       header={Translate.string("Edit contribution '{title}'", {title: contrib?.title})}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit ?? handleSubmit}
       onClose={onClose}
       initialValues={
         loading
@@ -524,7 +527,7 @@ export function CreateContributionButton({
     <>
       {!triggerSelector && (
         <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
+          <Translate>Create contribution</Translate>
         </Button>
       )}
       {open && (

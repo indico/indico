@@ -37,8 +37,9 @@ import {
   Session,
   ReduxState,
   SidePanelView,
+  ContribId,
 } from './types';
-import {flattenEntries, getEntryURLByObjId} from './utils';
+import {flattenEntries, getEntryUniqueId, getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -63,6 +64,7 @@ export const TOGGLE_DRAFT = 'Toggle draft mode';
 export const SET_ACTIVE_PANEL = 'Set active tab in side panel';
 export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
+export const UPDATE_UNSCHEDULED_ENTRY = 'Update unscheduled entry';
 export const UPDATE_ENTRY = 'Update entry';
 
 interface SetTimetableDataAction {
@@ -118,6 +120,12 @@ interface CreateEntryAction {
   entry: Entry;
 }
 
+interface UpdateUnscheduledEntryAction {
+  type: typeof UPDATE_UNSCHEDULED_ENTRY;
+  entry: TopLevelEntry;
+  entryType: EntryType;
+}
+
 interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
   entry: TopLevelEntry;
@@ -137,7 +145,7 @@ interface DeleteBlockAction {
 
 interface DeleteUnscheduledContribAction {
   type: typeof DELETE_UNSCHEDULED_CONTRIB;
-  entry: UnscheduledContribEntry;
+  id: ContribId;
   eventId: number;
 }
 
@@ -215,6 +223,7 @@ export type Action =
   | SetCurrentDateAction
   | ToggleExpandAction
   | ToggleDraftAction
+  | UpdateUnscheduledEntryAction
   | SetExpandedSessionBlockIdAction;
 
 export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
@@ -384,11 +393,11 @@ export function deleteBreak(entry: BreakEntry, eventId: number) {
   });
 }
 
-export function deleteUnscheduledContrib(entry: UnscheduledContribEntry, eventId: number) {
-  const unscheduledContribURL = contributionURL({event_id: eventId, contrib_id: entry.objId});
+export function deleteUnscheduledContrib(id: number, eventId: number) {
+  const unscheduledContribURL = contributionURL({event_id: eventId, contrib_id: id});
   return synchronizedAjaxAction(() => indicoAxios.delete(unscheduledContribURL), {
     type: DELETE_UNSCHEDULED_CONTRIB,
-    entry,
+    id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
     eventId,
   });
 }
@@ -471,6 +480,13 @@ export function createEntry(entryType: EntryType, payload: any) {
     const resEntry = mapDataToEntry(data);
     return dispatch(_createEntry(resEntry.type, resEntry as Entry));
   };
+}
+
+export function updateUnscheduledEntry(
+  entryType: EntryType, // In preperation for potentially using other draft types
+  entry: Entry
+): UpdateUnscheduledEntryAction {
+  return {type: UPDATE_UNSCHEDULED_ENTRY, entryType, entry};
 }
 
 export function _updateEntry(

@@ -13,7 +13,7 @@ import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {BlockEntry, Entries, EntryType, isChildEntry, SidePanelView} from './types';
-import {getDateKey, setCurrentDateLocalStorage, shiftEntries} from './utils';
+import {getDateKey, getEntryUniqueId, setCurrentDateLocalStorage, shiftEntries} from './utils';
 
 export default {
   entries: (
@@ -74,6 +74,19 @@ export default {
         return {
           ...state,
           entries: newEntries,
+        };
+      }
+      case actions.UPDATE_UNSCHEDULED_ENTRY: {
+        const {entry, entryType} = action;
+
+        const uid = getEntryUniqueId(entryType, entry.objId);
+        const updatedUnscheduled = state.unscheduled.map(u => {
+          return u.id === uid ? entry : u;
+        });
+
+        return {
+          ...state,
+          unscheduled: updatedUnscheduled,
         };
       }
       case actions.UPDATE_ENTRY: {
@@ -173,10 +186,10 @@ export default {
       case actions.DESELECT_ENTRY:
         return {...state, selectedId: null};
       case actions.DELETE_UNSCHEDULED_CONTRIB: {
-        const {entry} = action;
+        const {id} = action;
         return {
           ...state,
-          unscheduled: state.unscheduled.filter(e => e.id !== entry.id),
+          unscheduled: state.unscheduled.filter(e => e.id !== id),
         };
       }
       case actions.ADD_UNSCHEDULED_CONTRIB: {

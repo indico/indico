@@ -370,6 +370,8 @@ class RHAPIContribution(RHManageContributionBase):
             # TODO: custom fields logs
             update_contribution(self.contrib, data)
 
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
         references = []

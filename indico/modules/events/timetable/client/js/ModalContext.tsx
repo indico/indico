@@ -43,6 +43,7 @@ type ModalState =
         eventId: number;
         contribId: number;
         onClose?: () => void;
+        onSubmit?: (formData: any, form: any) => void;
       };
     };
 
@@ -115,6 +116,10 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
           onClose={() => {
             closeModal();
             payload?.onClose?.();
+          }}
+          onSubmit={(formData, form) => {
+            closeModal();
+            payload?.onSubmit?.(formData, form);
           }}
         />
       );
