@@ -204,17 +204,13 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   );
   return (
     <>
-      <div
-        styleName="contributions-container"
-        style={{minWidth: `${minSidebarWidthPx}px`}}
-        ref={wrapperRef}
-      >
+      <div styleName="container" style={{minWidth: `${minSidebarWidthPx}px`}} ref={wrapperRef}>
         {showUnscheduled && (
           <>
-            <h1 styleName="title">
-              <Translate>Unscheduled Contributions</Translate>
-            </h1>
-            <div styleName="content">
+            <div styleName="container-header">
+              <h1 styleName="title">
+                <Translate>Unscheduled Contributions</Translate>
+              </h1>
               <div styleName="actions">
                 <Input
                   icon="search"
@@ -287,6 +283,8 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   )}
                 </div>
               </div>
+            </div>
+            <div styleName="content">
               <Button
                 styleName="add-element"
                 basic
@@ -319,10 +317,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
 
         {showSessions && (
           <>
-            <h1 styleName="title">
-              <Translate>Sessions</Translate>
-            </h1>
-            <div styleName="content">
+            <div styleName="container-header">
+              <h1 styleName="title">
+                <Translate>Sessions</Translate>
+              </h1>
               <div styleName="actions">
                 <Input
                   icon="search"
@@ -331,7 +329,8 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   onChange={(_, {value}) => setSessionSearchQuery(value)}
                 />
               </div>
-
+            </div>
+            <div styleName="content">
               <Button
                 styleName="add-element"
                 basic
