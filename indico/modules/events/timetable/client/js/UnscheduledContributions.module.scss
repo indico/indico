@@ -70,6 +70,10 @@ $content-pane-bg-color: $white;
       gap: 0.5rem;
       justify-content: space-between;
 
+      :global(.ui.icon.button) {
+        padding: 0;
+      }
+
       :global(.ui.input) {
         width: 100%;
       }
@@ -235,14 +239,15 @@ $content-pane-bg-color: $white;
   display: flex;
   padding: 0;
   border-radius: 4px;
+  min-height: 38px;
   border: 1px solid $raincloud-gray;
 
   .session-actions {
     position: absolute;
     right: 0.5rem;
-    bottom: 0.5rem;
+    bottom: 1px;
     left: 0.5rem;
-    top: 0.5rem;
+    top: 1px;
     justify-content: flex-end;
     pointer-events: none;
     display: flex;
@@ -278,7 +283,7 @@ $content-pane-bg-color: $white;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0.5rem;
+  padding: 1px;
   width: 100%;
 
   &::before {
@@ -296,7 +301,7 @@ $content-pane-bg-color: $white;
   font-weight: bold;
   overflow: hidden;
   word-break: break-word;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
 }
 
 .session-actions {
