@@ -291,7 +291,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                 styleName="add-element"
                 basic
                 type="button"
-                title={Translate.string('Create new session')}
+                title={Translate.string('Create new contribution')}
                 icon="plus"
                 size="small"
                 onClick={() =>

@@ -188,30 +188,15 @@
   border-radius: 4px;
   align-items: center;
   justify-content: center;
-  outline: dashed 1px grey;
+  border: 1px dashed grey;
   cursor: pointer;
 
-  &:hover {
-    :global(.ui.basic.button).add-element {
-      color: rgba(0, 0, 0, 0.8);
-    }
-  }
-}
-
-.add-element {
-  display: flex;
-  width: auto;
-  min-height: 50px;
-  border-radius: 4px;
-  align-items: center;
-  justify-content: center;
-  outline: dashed 1px grey;
-  cursor: pointer;
+  // Overrides Semantic UIs default background which also uses !important
+  background: rgba(0, 0, 0, 0.05) !important;
 
   &:hover {
-    :global(.ui.basic.button).add-element {
-      color: rgba(0, 0, 0, 0.8);
-    }
+    color: rgba(0, 0, 0, 0.8) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
   }
 }
 
