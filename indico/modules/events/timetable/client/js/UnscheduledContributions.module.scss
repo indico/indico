@@ -306,6 +306,7 @@ $content-pane-bg-color: $white;
     content: '';
     margin-right: 0.5rem;
     width: 0.45rem;
+    min-width: 0.45rem;
     height: 100%;
     border-radius: 4px;
     background: var(--session-color);
