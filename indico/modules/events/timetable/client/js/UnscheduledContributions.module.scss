@@ -288,7 +288,8 @@ $content-pane-bg-color: $white;
 
   &::before {
     content: '';
-    width: 5px;
+    margin-right: 0.5rem;
+    width: 0.45rem;
     height: 100%;
     border-radius: 4px;
     background: var(--session-color);
