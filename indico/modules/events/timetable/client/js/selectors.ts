@@ -5,11 +5,25 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
+import {layoutDays} from 'indico/modules/events/timetable/layout';
+
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, EntryType, EntryUniqueID, ReduxState, Session, SidePanelView} from './types';
+import {
+  BlockEntry,
+  EntryType,
+  EntryUniqueID,
+  ReduxState,
+  Session,
+  SidePanelView,
+  ChildEntry,
+  DayEntries,
+  Entry,
+  isChildEntry,
+} from './types';
 import {
   DAY_SIZE,
   getDiffInDays,
@@ -21,10 +35,56 @@ import {
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
-export const getEntries = (state: ReduxState) => state.entries;
-export const getDayEntries = (state: ReduxState) => state.entries.entries;
+const getEntries = (state: ReduxState) => state.entries;
+const getLayoutOverrides = (state: ReduxState) => state.entries.layoutOverrides;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
+
+const getNestedEntries = createSelector(
+  getEntries,
+  getLayoutOverrides,
+
+  ({entries}, layoutOverrides) => {
+    const topLevelEntries: Entry[] = [];
+    const entriesById = new Map();
+    const childEntries: ChildEntry[] = [];
+
+    Object.entries(entries)
+      .map(rec => _.cloneDeep(rec))
+      .forEach(([key, entry]) => {
+        entry = {...entry, ...(layoutOverrides[entry.id] || {})};
+        if (entry.type === EntryType.SessionBlock) {
+          entry.children = [];
+        }
+        entriesById.set(key, entry);
+        if (!isChildEntry(entry)) {
+          topLevelEntries.push(entry);
+        } else {
+          childEntries.push(entry);
+        }
+      });
+
+    childEntries.forEach(entry => {
+      const parent = entriesById.get(entry.sessionBlockId);
+      parent.children.push(entry);
+    });
+
+    return topLevelEntries;
+  }
+);
+export const getDayEntries = createSelector(
+  getNestedEntries,
+  entries => {
+    const dayEntries: DayEntries = {};
+    entries.forEach(entry => {
+      // TODO timezone?
+      const dayKey = moment(entry.startDt).format('YYYYMMDD');
+      dayEntries[dayKey] ??= [];
+      dayEntries[dayKey].push(entry);
+    });
+    return layoutDays(dayEntries);
+  }
+);
 
 // Get the selected entry ID
 // You should not use this selector directly, use makeIsSelectedSelector instead
@@ -188,7 +248,7 @@ export const getCurrentDayEntriesWithoutOverlap = createSelector(
 export const getUnscheduled = createSelector(
   getEntries,
   getSessions,
-  (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
+  ({unscheduled}, sessions) => appendSessionAttributes(unscheduled, sessions)
 );
 
 export const getDraftEntry = createSelector(

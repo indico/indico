@@ -268,7 +268,7 @@ export function DayTimetable({
         sbEndDt
       );
     } else {
-      const [newLayout, newUnscheduled, startDt] =
+      const [entry, layoutOverrides] =
         layoutAfterUnscheduledDrop(
           dt,
           unscheduled,
@@ -287,7 +287,7 @@ export function DayTimetable({
         c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
       );
       showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
-      dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
+      dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
     }
   }
 
@@ -301,7 +301,7 @@ export function DayTimetable({
     minStartDt: Moment = eventStartDt,
     maxEndDt: Moment = eventEndDt
   ) {
-    const [newLayout, newUnscheduled, startDt, blockId] =
+    const [entry, layoutOverrides] =
       layoutAfterUnscheduledDropOnBlock(
         dt,
         unscheduled,
@@ -315,7 +315,7 @@ export function DayTimetable({
         minStartDt,
         maxEndDt
       ) || [];
-    if (!newLayout) {
+    if (!entry) {
       return;
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
@@ -324,16 +324,14 @@ export function DayTimetable({
       c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
     );
     const targetBlock = currentDayEntries.find(
-      e => e.type === EntryType.SessionBlock && e.objId === blockId
+      e => e.type === EntryType.SessionBlock && e.id === entry.sessionBlockId
     ) as BlockEntry | undefined;
     showToastIfContribSessionChanged(
       fromContrib?.title,
       fromContrib?.sessionId,
       targetBlock?.sessionId
     );
-    dispatch(
-      actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
-    );
+    dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
