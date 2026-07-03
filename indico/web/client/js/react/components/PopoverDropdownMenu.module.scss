@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .trigger-container {
   display: inline-block;
 }
@@ -27,4 +29,9 @@
 .search-container {
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
+
+  :global(.link.icon) {
+        opacity: 0.5;
+        color: $black;
+      }
 }

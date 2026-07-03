@@ -221,7 +221,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                       'search'
                     )
                   }
-                  clearable
                   placeholder={Translate.string('Search unscheduled contributions')}
                   value={draftSearchQuery}
                   onChange={(_, {value}) => setDraftSearchQuery(value)}
@@ -346,7 +345,13 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </h1>
               <div styleName="actions">
                 <Input
-                  icon="search"
+                  icon={
+                    sessionSearchQuery ? (
+                      <Icon name="close" link onClick={() => setSessionSearchQuery('')} />
+                    ) : (
+                      'search'
+                    )
+                  }
                   placeholder={Translate.string('Search sessions')}
                   value={sessionSearchQuery}
                   onChange={(_, {value}) => setSessionSearchQuery(value)}

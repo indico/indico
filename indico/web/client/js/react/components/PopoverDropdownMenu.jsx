@@ -9,7 +9,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useRef} from 'react';
 import {Manager, Popper} from 'react-popper';
-import {Dropdown, Portal, Input} from 'semantic-ui-react';
+import {Dropdown, Portal, Input, Icon} from 'semantic-ui-react';
 
 import './PopoverDropdownMenu.module.scss';
 
@@ -78,7 +78,20 @@ const PopoverDropdownMenu = ({
                     <div styleName="search-container">
                       <Input
                         fluid
-                        icon="search"
+                        icon={
+                          searchValue ? (
+                            <Icon
+                              name="close"
+                              link
+                              onClick={e => {
+                                e.stopPropagation();
+                                onSearchChange('');
+                              }}
+                            />
+                          ) : (
+                            'search'
+                          )
+                        }
                         value={searchValue}
                         placeholder={searchPlaceholder}
                         onClick={e => e.stopPropagation()}
