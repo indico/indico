@@ -268,7 +268,6 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                     <button
                       type="button"
                       styleName="filter-badge"
-                      title={Translate.string('Clear filters')}
                       onClick={e => {
                         e.stopPropagation();
                         setSelectedFilters([]);
