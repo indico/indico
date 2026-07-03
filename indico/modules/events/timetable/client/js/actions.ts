@@ -38,8 +38,9 @@ import {
   ReduxState,
   SidePanelView,
   ContribId,
+  isChildEntry,
 } from './types';
-import {flattenEntries, getEntryUniqueId, getEntryURLByObjId} from './utils';
+import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
 export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
@@ -122,7 +123,8 @@ interface CreateEntryAction {
 
 interface UpdateUnscheduledEntryAction {
   type: typeof UPDATE_UNSCHEDULED_ENTRY;
-  entry: TopLevelEntry;
+  id: ContribId;
+  changes: Partial<ContribEntry>;
   entryType: EntryType;
 }
 
@@ -130,6 +132,7 @@ interface UpdateEntryAction {
   type: typeof UPDATE_ENTRY;
   entry: TopLevelEntry;
   entryType: string;
+  changes: Partial<Entry>;
   currentDay: string;
 }
 
@@ -140,7 +143,7 @@ interface DeleteBreakAction {
 
 interface DeleteBlockAction {
   type: typeof DELETE_BLOCK;
-  entry: BlockEntry | BreakEntry | ChildBreakEntry;
+  entry: BlockEntry;
 }
 
 interface DeleteUnscheduledContribAction {
@@ -306,7 +309,10 @@ export function changeEntryLayout(
   sessionBlockId?: number
 ) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
-    const {staticData, entries: stateEntries} = getState();
+    const {
+      staticData,
+      entries: {entries: stateEntries},
+    } = getState();
     const eventId = staticData.eventId;
 
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
@@ -316,11 +322,9 @@ export function changeEntryLayout(
       session_block_id: sessionBlockId,
     };
 
-    const previousEntries = Object.values(stateEntries.entries).flat();
-    const flattenedEntries = flattenEntries(previousEntries);
-    const entryBeforeChanges = flattenedEntries.find(e => e.id === entry.id);
+    const entryBeforeChanges = stateEntries[entry.id];
     if (
-      entryBeforeChanges &&
+      entryBeforeChanges && // XXX can this actually be undefined?
       entryBeforeChanges.startDt.isSame(entry.startDt) &&
       entryBeforeChanges.sessionId === entry.sessionId
     ) {
@@ -417,25 +421,24 @@ export function deleteBlock(entry: BlockEntry, eventId: number) {
 
 export function scheduleEntry(
   eventId: number,
-  contribId: number,
-  startDt: Moment,
-  entries: TopLevelEntry[],
-  unscheduled: UnscheduledContribEntry[],
-  blockId?: number
+  entry: ContribEntry | ChildContribEntry,
+  layoutOverrides
 ) {
   const scheduleURL = scheduleContribURL(
-    blockId ? {event_id: eventId, block_id: blockId} : {event_id: eventId}
+    isChildEntry(entry)
+      ? {event_id: eventId, block_id: entry.sessionBlockId?.slice(1)}
+      : {event_id: eventId}
   );
+  // TODO only pass contribId and none of the other stuff here?!
   return synchronizedAjaxAction(
     () =>
       indicoAxios.post(scheduleURL, {
-        contribs: [{contrib_id: contribId, start_dt: startDt.toISOString()}],
+        contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
       }),
     {
       type: SCHEDULE_ENTRY,
-      date: startDt.format('YYYYMMDD'),
-      entries,
-      unscheduled,
+      entry,
+      layoutOverrides,
     }
   );
 }
@@ -482,24 +485,26 @@ export function createEntry(entryType: EntryType, payload: any) {
 
 export function updateUnscheduledEntry(
   entryType: EntryType, // In preperation for potentially using other draft types
-  entry: Entry
+  id: ContribId,
+  changes: Partial<ContribEntry>
 ): UpdateUnscheduledEntryAction {
-  return {type: UPDATE_UNSCHEDULED_ENTRY, entryType, entry};
+  return {type: UPDATE_UNSCHEDULED_ENTRY, entryType, id, changes};
 }
 
 export function _updateEntry(
   entryType: EntryType,
   entry: Entry,
-  currentDay: string
+  currentDay: string,
+  changes: Partial<Entry>
 ): UpdateEntryAction {
-  return {type: UPDATE_ENTRY, entryType, entry, currentDay};
+  return {type: UPDATE_ENTRY, entryType, entry, currentDay, changes};
 }
 
 export function updateEntry(
   entryType: EntryType,
   entry: Entry,
   currentDay: string,
-  customPayload = null
+  customPayload: any
 ) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {
@@ -512,8 +517,8 @@ export function updateEntry(
     }[entryType];
 
     const action = synchronizedAjaxAction(
-      () => indicoAxios.patch(updateURL, customPayload ?? entry),
-      _updateEntry(entryType, entry, currentDay)
+      () => indicoAxios.patch(updateURL, customPayload),
+      _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
     );
     return dispatch(action);
   };

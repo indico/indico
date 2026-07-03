@@ -234,8 +234,14 @@ export function UnscheduledContributionEntry({
                     return handleSubmitError(err);
                   }
 
-                  const updatedContrib = {...contrib, ...mapDataToEntry(changedVals, true)};
-                  dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, updatedContrib));
+                  const changedEntryData = mapDataToEntry(changedVals, true);
+                  dispatch(
+                    actions.updateUnscheduledEntry(
+                      EntryType.Contribution,
+                      contrib.id,
+                      changedEntryData
+                    )
+                  );
                   e.stopPropagation();
                 },
               });

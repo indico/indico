@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import {mapDataToEntry, mapDataToSession} from './mapperUtils';
-import {DayEntries, Session, UnscheduledContribEntry} from './types';
+import {Session, Entry, UnscheduledContribEntry} from './types';
 
 export function preprocessSessionData(
   data: Record<string, Record<string, unknown>>
@@ -14,19 +14,14 @@ export function preprocessSessionData(
   return Object.fromEntries(Object.entries(data).map(([, s]) => [s.id, mapDataToSession(s)]));
 }
 
-export function preprocessTimetableEntries(
-  data: Record<string, unknown>,
-  eventInfo: {contributions?: Record<string, unknown>[]}
-): {dayEntries: DayEntries; unscheduled: UnscheduledContribEntry[]} {
-  const dayEntries = Object.fromEntries(
-    Object.entries(data).map(([day, entries]) => [
-      day,
-      Object.values(entries).map(entryData => mapDataToEntry(entryData)),
-    ])
+export function preprocessTimetableEntries(data: Record<string, unknown>): Entry[] {
+  return Object.fromEntries(
+    Object.entries(data).map(([id, entryData]) => [id, mapDataToEntry(entryData)])
   );
+}
 
-  return {
-    dayEntries,
-    unscheduled: eventInfo.contributions.map(c => mapDataToEntry(c) as UnscheduledContribEntry),
-  };
+export function preprocessUnscheduledContributions(
+  contributions: unknown
+): UnscheduledContribEntry[] {
+  return contributions.map(c => mapDataToEntry(c) as UnscheduledContribEntry);
 }
