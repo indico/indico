@@ -354,8 +354,8 @@ $content-pane-bg-color: $white;
 
 .filter-badge {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -0.3rem;
+  right: -0.3rem;
   width: 1rem;
   height: 1rem;
   border: 0;
@@ -367,10 +367,13 @@ $content-pane-bg-color: $white;
   line-height: 0.7rem;
   font-weight: bold;
   cursor: pointer;
-  padding-bottom: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  > span:first-child {
+    line-height: 0.6rem;
+  }
 }
 
 .filter-cross {
