@@ -10,18 +10,15 @@
 .timetable {
   display: flex;
   flex-direction: column;
+  background-color: $white;
 
   &.expanded {
     position: fixed;
-    top: 10px;
-    bottom: 10px;
-    right: 10px;
-    left: 10px;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
     overflow: hidden;
-    padding: 10px 10px 0 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 80px rgba($black, 0.8);
-    background-color: $white;
   }
 
   & > .content {
