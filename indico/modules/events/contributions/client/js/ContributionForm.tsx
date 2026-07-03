@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Icon, Loader} from 'semantic-ui-react';
 
 import {
   UNSCHEDULED_CONTRIB_EDIT_MODAL,
@@ -74,6 +74,8 @@ interface ContributionFormFieldsProps {
   [key: string]: any; // Allow additional props
 }
 
+const referenceIsIncomplete = ref => !ref.type || !ref.value;
+
 export function ContributionFormFields({
   eventId,
   locationParent = {inheriting: false},
@@ -82,6 +84,7 @@ export function ContributionFormFields({
   customFields = [],
   extraOptions = {},
 }: ContributionFormFieldsProps) {
+  const [hasIncompleteReferences, setHasIncompleteReferences] = useState(false);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -186,7 +189,36 @@ export function ContributionFormFields({
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
         <FinalReferences
           name="references"
-          label={Translate.string('External IDs')}
+          label={
+            <>
+              <Translate>External IDs</Translate>
+              {hasIncompleteReferences && (
+                <span style={{display: 'block', color: '#ba8e23', marginTop: '0.5em'}}>
+                  <Icon name="warning sign" />
+                  <Translate>
+                    Some external IDs are incomplete, and therefore will not be saved on submission.
+                  </Translate>
+                </span>
+              )}
+            </>
+          }
+          onChange={refs => {
+            refs.map(ref => {
+              if (typeof ref.id === 'string') {
+                delete ref.id;
+              }
+              return ref;
+            });
+            const incompleteRefs = refs.some(
+              ref => ref.type + ref.value !== '' && referenceIsIncomplete(ref)
+            );
+
+            if (incompleteRefs !== hasIncompleteReferences) {
+              setHasIncompleteReferences(incompleteRefs);
+            }
+
+            return refs;
+          }}
           description={Translate.string('Manage external resources for this contribution')}
         />
         <Form.Group widths="equal">
@@ -238,6 +270,7 @@ export function ContributionForm({
       ...formData,
       custom_fields: customFieldsData,
       person_links: personLinks,
+      references: formData.references.filter(ref => !referenceIsIncomplete(ref)),
     };
     onSubmit(
       {
