@@ -217,8 +217,6 @@ export type Action =
   | EditSessionAction
   | CreateSessionAction
   | DeleteSessionAction
-  // | ToggleShowUnscheduledAction
-  // | ToggleShowSessionsAction
   | SetActivePanelAction
   | SetCurrentDateAction
   | ToggleExpandAction

@@ -70,12 +70,21 @@ $content-pane-bg-color: $white;
       gap: 0.5rem;
       justify-content: space-between;
 
+      :global(input:focus) ~ :global(i.icon) {
+        color: $light-black;
+      }
+
       :global(.ui.icon.button) {
         padding: 0;
       }
 
       :global(.ui.input) {
         width: 100%;
+      }
+
+      :global(.link.icon) {
+        opacity: 0.5;
+        color: $black;
       }
 
       :global(.ui.search.selection.dropdown) {
@@ -402,4 +411,29 @@ $content-pane-bg-color: $white;
   border-radius: 50%;
   background: $white;
   display: block;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  padding: 3rem 1rem;
+  text-align: center;
+
+  color: $gray;
+
+  :global(.icon) {
+    font-size: 2.5rem;
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  > div.empty-state-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $gray;
+  }
 }

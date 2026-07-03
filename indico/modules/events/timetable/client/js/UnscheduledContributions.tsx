@@ -193,9 +193,9 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   //              session, etc. If no filters are applied, everything is visible.
   const [sessionSearchQuery, setSessionSearchQuery] = useState('');
 
-  const filteredSessions = Object.values(sessions).filter(session =>
-    session.title.toLowerCase().includes(sessionSearchQuery.toLowerCase())
-  );
+  const filteredSessions = Object.values(sessions)
+    .filter(session => session.title.toLowerCase().includes(sessionSearchQuery.toLowerCase()))
+    .toSorted((a, b) => a.title.localeCompare(b.title));
 
   if (!showUnscheduled && !showSessions) {
     return null;
@@ -214,7 +214,14 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               </h1>
               <div styleName="actions">
                 <Input
-                  icon="search"
+                  icon={
+                    draftSearchQuery ? (
+                      <Icon name="close" link onClick={() => setDraftSearchQuery('')} />
+                    ) : (
+                      'search'
+                    )
+                  }
+                  clearable
                   placeholder={Translate.string('Search unscheduled contributions')}
                   value={draftSearchQuery}
                   onChange={(_, {value}) => setDraftSearchQuery(value)}
@@ -310,7 +317,12 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
               {filteredContribs.length > 0 ? (
                 <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
               ) : (
-                <Translate>This session has no contributions</Translate>
+                <div styleName="empty-state">
+                  <Icon name="calendar times outline" />
+                  <div styleName="empty-state-text">
+                    <Translate>No contributions found</Translate>
+                  </div>
+                </div>
               )}
               <div styleName="gradient" />
             </div>
@@ -386,7 +398,12 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
                   ))}
                 </div>
               ) : (
-                <Translate>No sessions found</Translate>
+                <div styleName="empty-state">
+                  <Icon name="calendar times outline" />
+                  <div styleName="empty-state-text">
+                    <Translate>No sessions found</Translate>
+                  </div>
+                </div>
               )}
               <div styleName="gradient" />
             </div>
@@ -405,10 +422,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       />
       {sessionToDelete && (
         <TimetableConfirmDialog
-          title="Delete contribution"
+          title="Delete session"
           message={
             <Translate>
-              Deleting this session will result in deleting entries associated to it.
+              Deleting this session will result in unscheduling contibutions associated to it.
             </Translate>
           }
           confirmLabel={Translate.string('Proceed')}

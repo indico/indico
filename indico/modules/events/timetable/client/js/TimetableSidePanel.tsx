@@ -39,7 +39,7 @@ export default function TimetableSidePanel() {
             )
           }
         >
-          <Icon name="calendar outline" size="large" />
+          <Icon name="folder outline" size="large" />
         </Menu.Item>
         <Menu.Item
           name="unscheduled"
@@ -55,7 +55,7 @@ export default function TimetableSidePanel() {
             )
           }
         >
-          <Icon name="edit outline" size="large" />
+          <Icon name="file outline" size="large" />
         </Menu.Item>
       </Menu>
     </div>
