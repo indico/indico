@@ -32,7 +32,7 @@ export default function ResizeHandle({
   setGlobalDuration: (d: number) => void;
   setIsResizing: (b: boolean) => void;
 }) {
-  function resizeHandler(e: SyntheticMouseEvent) {
+  function resizeHandler(e: SyntheticMouseEvent<HTMLDivElement>) {
     if (e.button !== 0) {
       return;
     }
