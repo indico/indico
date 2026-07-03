@@ -7,11 +7,13 @@
 
 import React, {MouseEvent as SyntheticMouseEvent} from 'react';
 
-import {MIN_DURATION, minutesToPixels, pixelsToMinutes} from './utils';
+import {getScrollParent} from './dnd/modifiers';
+import {DAY_SIZE, MIN_DURATION, minutesToPixels, pixelsToMinutes} from './utils';
 
 import './DayTimetable.module.scss';
 
 const gridSize = minutesToPixels(5);
+const resizingCursorClass = 'timetable-entry-resizing';
 
 export default function ResizeHandle({
   duration,
@@ -36,7 +38,11 @@ export default function ResizeHandle({
     }
 
     e.stopPropagation();
-    resizeStartRef.current = e.clientY;
+    const scrollParent = getScrollParent(e.currentTarget);
+    let currentClientY = e.clientY;
+    clampScrollTop();
+    resizeStartRef.current = e.clientY + scrollParent.scrollTop;
+    document.body.classList.add(resizingCursorClass);
     setIsResizing(true);
     const handlers = new Map<keyof DocumentEventMap, (event: unknown) => void>();
 
@@ -54,12 +60,27 @@ export default function ResizeHandle({
       }
     }
 
-    function mouseMoveHandler(moveEvent: MouseEvent) {
+    function cleanUp() {
+      removeEventListeners();
+      scrollParent.removeEventListener('scroll', scrollHandler);
+      document.body.classList.remove(resizingCursorClass);
+    }
+
+    function clampScrollTop() {
+      const maxScrollTop = Math.max(0, DAY_SIZE - scrollParent.clientHeight);
+
+      if (scrollParent.scrollTop > maxScrollTop) {
+        scrollParent.scrollTop = maxScrollTop;
+      }
+    }
+
+    function calculateNewDuration(clientY: number) {
       if (resizeStartRef.current === null) {
-        return;
+        return null;
       }
 
-      let dy = moveEvent.clientY - resizeStartRef.current;
+      clampScrollTop();
+      let dy = clientY + scrollParent.scrollTop - resizeStartRef.current;
       dy = Math.ceil(dy / gridSize) * gridSize;
       let newDuration = duration + pixelsToMinutes(dy);
 
@@ -68,23 +89,36 @@ export default function ResizeHandle({
         newDuration = Math.min(newDuration, maxDuration);
       }
 
-      if (newDuration > minDuration) {
-        setLocalDuration(newDuration);
-      } else {
-        setLocalDuration(minDuration);
-      }
+      return newDuration;
     }
 
-    const mouseUpHandler = (mouseUpEvent: MouseEvent) => {
-      removeEventListeners();
+    function updateLocalDuration(clientY: number) {
+      const newDuration = calculateNewDuration(clientY);
 
-      if (resizeStartRef.current === null) {
+      if (newDuration === null) {
         return;
       }
 
-      let dy = mouseUpEvent.clientY - resizeStartRef.current;
-      dy = Math.ceil(dy / gridSize) * gridSize;
-      let newDuration = duration + pixelsToMinutes(dy);
+      setLocalDuration(Math.max(newDuration, minDuration));
+    }
+
+    function mouseMoveHandler(moveEvent: MouseEvent) {
+      currentClientY = moveEvent.clientY;
+      updateLocalDuration(currentClientY);
+    }
+
+    function scrollHandler() {
+      updateLocalDuration(currentClientY);
+    }
+
+    const mouseUpHandler = (mouseUpEvent: MouseEvent) => {
+      cleanUp();
+
+      let newDuration = calculateNewDuration(mouseUpEvent.clientY);
+      if (newDuration === null) {
+        setIsResizing(false);
+        return;
+      }
 
       if (minDuration !== undefined) {
         newDuration = Math.max(newDuration, minDuration);
@@ -102,7 +136,7 @@ export default function ResizeHandle({
         return;
       }
 
-      removeEventListeners();
+      cleanUp();
 
       if (resizeStartRef.current === null) {
         return;
@@ -114,6 +148,7 @@ export default function ResizeHandle({
     addEventListener('mousemove', mouseMoveHandler);
     addEventListener('mouseup', mouseUpHandler);
     addEventListener('keydown', keyDownHandler);
+    scrollParent.addEventListener('scroll', scrollHandler);
   }
 
   return (

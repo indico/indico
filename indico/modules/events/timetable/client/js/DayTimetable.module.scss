@@ -111,3 +111,8 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   pointer-events: auto;
   border-right: 2px solid $raincloud-gray;
 }
+
+:global(body.timetable-entry-resizing),
+:global(body.timetable-entry-resizing *) {
+  cursor: ns-resize;
+}
