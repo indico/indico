@@ -35,6 +35,29 @@
     });
   }
 
+  function syncRequiresSelectedRowAccessibility() {
+    $('.js-requires-selected-row').each(function() {
+      const $this = $(this);
+      const disabled = $this.hasClass('disabled');
+
+      $this.attr('aria-disabled', disabled ? 'true' : 'false');
+      if (disabled) {
+        if ($this.attr('tabindex') !== '-1') {
+          $this.data('previous-tabindex', $this.attr('tabindex'));
+        }
+        $this.attr('tabindex', '-1');
+      } else {
+        const previousTabindex = $this.data('previous-tabindex');
+        if (previousTabindex === undefined) {
+          $this.removeAttr('tabindex');
+        } else {
+          $this.attr('tabindex', previousTabindex);
+        }
+        $this.removeData('previous-tabindex');
+      }
+    });
+  }
+
   global.handleRowSelection = function(trigger) {
     let lastClickedIndex;
     const $obj = $('table.i-table input.select-row');
@@ -57,10 +80,13 @@
         'disabled',
         !$('.list input:checkbox:checked').length
       );
+      syncRequiresSelectedRowAccessibility();
     });
 
     if (trigger) {
       $obj.trigger('change');
+    } else {
+      syncRequiresSelectedRowAccessibility();
     }
   };
 

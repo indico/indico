@@ -43,6 +43,34 @@ import {$T} from 'indico/utils/i18n';
     }
   };
 
+  function appendToken(value, token) {
+    return [...new Set(`${value || ''} ${token}`.trim().split(/\s+/))].join(' ');
+  }
+
+  function getFieldErrorId(field, input) {
+    const fieldId = input.attr('id') || field.closest('.form-group').attr('id') || field.index();
+    return `${fieldId}-error`;
+  }
+
+  function describeFormError(field, input) {
+    const errorId = getFieldErrorId(field, input);
+    let error = field.children(`#${$.escapeSelector(errorId)}`);
+
+    if (!error.length) {
+      error = $('<div>', {
+        id: errorId,
+        class: 'form-field-error-message',
+        role: 'alert',
+      }).appendTo(field);
+    }
+
+    error.html(field.data('error'));
+    input.attr({
+      'aria-invalid': 'true',
+      'aria-describedby': appendToken(input.attr('aria-describedby'), errorId),
+    });
+  }
+
   // Select the field of an i-form which has an error and display the tooltip.
   global.showFormErrors = function showFormErrors(context) {
     context = context || $('body');
@@ -59,10 +87,18 @@ import {$T} from 'indico/utils/i18n';
         }
 
         if (!input.length) {
+          // Try the first native or custom focusable field.
+          input = $this
+            .children('input, select, textarea, button, [tabindex], [contenteditable]')
+            .eq(0);
+        }
+
+        if (!input.length) {
           // Try the first element that's not a hidden input
           input = $this.children(':not(:input:hidden)').eq(0);
         }
         input.stickyTooltip('danger', () => $this.data('error'));
+        describeFormError($this, input);
       });
   };
 })(window);

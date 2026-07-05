@@ -24,6 +24,7 @@
       const ul = elem.next('ul');
 
       elem.removeClass('open');
+      elem.attr('aria-expanded', 'false');
       elem.removeData('no-qtip');
 
       this._effect('off', ul, effect);
@@ -47,6 +48,7 @@
       const positionReference = this.options.relative_to || elem;
 
       elem.addClass('open');
+      elem.attr('aria-expanded', 'true');
       elem.data('no-qtip', true).trigger('indico:closeAutoTooltip');
 
       this._effect('on', sibl);
@@ -74,6 +76,21 @@
 
       elem.find(this.options.selector).each(function() {
         const $this = $(this);
+        const menu = $this.next('ul.i-dropdown');
+
+        if (menu.length) {
+          if (!menu.attr('id')) {
+            menu.attr('id', `dropdown-menu-${Math.random().toString(36).slice(2)}`);
+          }
+          $this.attr({
+            'aria-haspopup': 'menu',
+            'aria-expanded': 'false',
+            'aria-controls': menu.attr('id'),
+          });
+          menu.attr('role', 'menu');
+          menu.children('li').children('a').attr('role', 'menuitem');
+        }
+
         if (
           !$this.attr('href') ||
           $this.attr('href') === '#' ||
