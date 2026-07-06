@@ -357,7 +357,7 @@ export default {
         return {
           ...state,
           entries: newEntries,
-          unscheduled: [state.unscheduled, ...contribsToUnschedule],
+          unscheduled: [...state.unscheduled, ...contribsToUnschedule],
         };
       }
       default:
