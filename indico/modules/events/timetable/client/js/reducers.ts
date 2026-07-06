@@ -354,10 +354,21 @@ export default {
           ])
         );
 
+        const newUnscheduled = state.unscheduled
+          .map(u =>
+            u.sessionId === sessionId
+              ? {
+                  ...u,
+                  sessionId: null,
+                }
+              : u
+          )
+          .concat(contribsToUnschedule);
+
         return {
           ...state,
           entries: newEntries,
-          unscheduled: [...state.unscheduled, ...contribsToUnschedule],
+          unscheduled: newUnscheduled,
         };
       }
       default:
