@@ -64,6 +64,7 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
   const {openModal} = useModal();
   const minSidebarWidthPx = 200;
+  const maxSidebarWidthPx = 700;
   const initialSidebarWidthPx = 320;
   const eventId = useSelector(selectors.getEventId);
 
@@ -147,7 +148,10 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
     }
 
     const diff = e.pageX - initialPosition.current;
-    const width = Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx);
+    const width = Math.min(
+      Math.max(wrapperRef.current.offsetWidth + diff, minSidebarWidthPx),
+      maxSidebarWidthPx
+    );
     wrapperRef.current.style.width = `${width}px`;
     initialPosition.current = wrapperRef.current.getBoundingClientRect().left + width;
   }
