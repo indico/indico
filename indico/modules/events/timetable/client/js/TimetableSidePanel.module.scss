@@ -7,29 +7,446 @@
 
 @use 'base/palette' as *;
 
-// Separate variables to allow customization.
-$primary-color: $dark-blue;
-$bg-color: $white;
-$toolbar-bg-color: $raincloud-gray;
+$content-pane-bg-color: $white;
 
-.side-panel {
-  flex-shrink: 1;
+.contributions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-:global(.ui.vertical.menu).tab-rail {
-    display: flex;
-    width: inherit;
-    gap: 10px;
-    height: calc(100% - 20px);
-    margin: 10px;
+.content {
+  position: relative;
 
-     > :global(.item) {
-    margin: 0;
-    padding: 10px;
+  .gradient {
+    pointer-events: none;
+    width: 100%;
+    height: 1rem;
+    left: 0;
+    flex-shrink: 0;
+    position: sticky;
+    z-index: 1;
 
-    > :global(.icon) {
-       margin: 0;
-       font-size: 1.2rem;
+    &:first-child {
+      background: linear-gradient(180deg, $content-pane-bg-color 50%, transparent);
+      top: 0;
     }
+
+    &:last-child {
+      background: linear-gradient(0deg, $content-pane-bg-color 50%, transparent);
+      bottom: 0;
+    }
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  border-left: 1px solid $raincloud-gray;
+
+  :global(.ui.basic.button),
+  :global(.ui.basic.buttons .button) {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    margin: 0;
+  }
+
+  .container-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 1rem 0 1rem;
+
+    .actions {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+      gap: 0.5rem;
+      justify-content: space-between;
+
+      :global(input:focus) ~ :global(i.icon) {
+        color: $light-black;
+      }
+
+      :global(.ui.input) {
+        width: 100%;
+
+        > input {
+          width: 100%;
+        }
+      }
+
+      :global(.link.icon) {
+        opacity: 0.5;
+        color: $black;
+      }
+
+      :global(.ui.search.selection.dropdown) {
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        flex-shrink: 1;
+        flex-grow: 0;
+        font-size: 1rem;
+
+        > input:global(.search) {
+          left: 0;
+        }
+
+        > :global(.menu > .header.text) {
+          text-wrap: wrap;
+        }
+
+        :global(.divider.text) {
+          line-height: unset;
+          width: 100%;
+          flex: 1;
+          min-width: 0;
+        }
+
+        > button {
+          flex-shrink: 0;
+          flex-grow: 1;
+        }
+
+        input {
+          width: 100%;
+        }
+      }
+
+      :global(.active),
+      :global(.active.item) {
+        font-weight: normal;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      :global(.ui.button) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        font-weight: normal;
+        aspect-ratio: 1;
+        max-height: 33px;
+
+        &:active {
+          background-color: transparent;
+        }
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+    overflow-y: scroll;
+    height: 100%;
+
+    & > h4 {
+      display: flex;
+
+      & > i:global(.icon) {
+        margin-left: auto;
+      }
+    }
+
+    .contribution {
+      cursor: pointer;
+      user-select: none;
+
+      :global(.square.outline.icon) {
+        cursor: pointer;
+      }
+    }
+
+    .session {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 0;
+
+      > span {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  :global(.icon) {
+    opacity: 0.5;
+    transition: 0.1s;
+    font-size: 1rem;
+    width: auto;
+    height: auto;
+    margin: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.pane-resize-handle {
+  width: 12px;
+  min-width: 12px;
+  margin-left: -10px;
+  height: 100%;
+  cursor: ew-resize;
+  user-select: none;
+  border-right: 2px solid $raincloud-gray;
+
+  &:hover {
+    border-right: 4px solid #007cac;
+  }
+}
+
+.session-filter {
+  position: relative;
+
+  :global(.menu > .item) {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.session {
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  > :global(i.icons) {
+    padding: 1px;
+    border-radius: 100%;
+      border: 2px solid lightgray;
+
+    > :global(.icon.circle) {
+      margin: 0;
+      color: transparent;
+    }
+  }
+}
+
+:global(.ui.basic.button).add-element {
+  display: flex;
+  width: auto;
+  min-height: 50px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed grey;
+  margin-bottom: 1rem;
+  cursor: pointer;
+
+  // Overrides Semantic UIs default background which also uses !important
+  background: rgba(0, 0, 0, 0.05) !important;
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.8) !important;
+    background: rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-wrapper {
+  position: relative;
+  display: flex;
+  padding: 0;
+  border-radius: 4px;
+  min-height: 38px;
+  border: 1px solid $raincloud-gray;
+
+  .session-actions {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 1px;
+    left: 0.5rem;
+    top: 1px;
+    justify-content: flex-end;
+    pointer-events: none;
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(0.5rem);
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 32%,
+      rgba(255, 255, 255, 1) 66%
+    );
+
+    button {
+      pointer-events: all;
+    }
+  }
+
+  &:hover {
+    .session-actions {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+  }
+}
+
+.session-content {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1px;
+  width: 100%;
+
+  &::before {
+    content: '';
+    margin-right: 0.5rem;
+    width: 0.45rem;
+    min-width: 0.45rem;
+    height: 100%;
+    border-radius: 4px;
+    background: var(--session-color);
+  }
+}
+
+.session-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  font-weight: bold;
+  overflow: hidden;
+  word-break: break-word;
+  padding: 0.5rem;
+}
+
+.session-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.session-color {
+  height: 100%;
+  width: 5px;
+  border-radius: 4px;
+}
+
+.filter-clear {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
+}
+
+.filter-trigger-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.filter-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1rem;
+  height: 1rem;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: $red;
+  color: $white;
+  font-size: 0.7rem;
+  line-height: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  > span:first-child {
+    line-height: 0.6rem;
+  }
+}
+
+.filter-cross {
+  display: none;
+  font-size: 0.6rem;
+
+  i:global(.icon) {
+    margin: 0;
+  }
+}
+
+.filter-badge:hover {
+  .filter-count {
+    display: none;
+  }
+
+  .filter-cross {
+    display: flex;
+  }
+}
+
+.filter-count:empty::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: $white;
+  display: block;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  padding: 3rem 1rem;
+  text-align: center;
+
+  color: $gray;
+
+  :global(.icon) {
+    font-size: 2.5rem;
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  > div.empty-state-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $gray;
   }
 }
