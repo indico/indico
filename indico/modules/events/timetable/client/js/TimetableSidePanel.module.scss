@@ -20,12 +20,12 @@ $toolbar-bg-color: $raincloud-gray;
     display: flex;
     width: inherit;
     gap: 10px;
-    margin: 10px 0;
+    height: calc(100% - 20px);
+    margin: 10px;
 
      > :global(.item) {
     margin: 0;
     padding: 10px;
-    margin-right: 10px;
 
     > :global(.icon) {
        margin: 0;
