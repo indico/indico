@@ -268,7 +268,7 @@ export default {
         return {
           ...state,
           entries: newEntries,
-          unscheduled: {...state.unscheduled, ...contribs},
+          unscheduled: [...state.unscheduled, ...contribs],
         };
       }
       case actions.SCHEDULE_ENTRY: {
