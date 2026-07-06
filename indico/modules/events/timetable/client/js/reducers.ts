@@ -12,8 +12,8 @@ import * as actions from './actions';
 import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
-import {BlockEntry, Entries, EntryType, isChildEntry} from './types';
-import {getDateKey, setCurrentDateLocalStorage, shiftEntries} from './utils';
+import {BlockEntry, Entries, EntryType, isChildEntry, SidePanelView} from './types';
+import {getDateKey, getEntryUniqueId, setCurrentDateLocalStorage, shiftEntries} from './utils';
 
 export default {
   entries: (
@@ -74,6 +74,19 @@ export default {
         return {
           ...state,
           entries: newEntries,
+        };
+      }
+      case actions.UPDATE_UNSCHEDULED_ENTRY: {
+        const {entry, entryType} = action;
+
+        const uid = getEntryUniqueId(entryType, entry.objId);
+        const updatedUnscheduled = state.unscheduled.map(u => {
+          return u.id === uid ? entry : u;
+        });
+
+        return {
+          ...state,
+          unscheduled: updatedUnscheduled,
         };
       }
       case actions.UPDATE_ENTRY: {
@@ -172,6 +185,20 @@ export default {
         return {...state, selectedId: action.id};
       case actions.DESELECT_ENTRY:
         return {...state, selectedId: null};
+      case actions.DELETE_UNSCHEDULED_CONTRIB: {
+        const {id} = action;
+        return {
+          ...state,
+          unscheduled: state.unscheduled.filter(e => e.id !== id),
+        };
+      }
+      case actions.ADD_UNSCHEDULED_CONTRIB: {
+        const {entry} = action;
+        return {
+          ...state,
+          unscheduled: [entry, ...state.unscheduled],
+        };
+      }
       case actions.DELETE_BREAK: {
         const {entry} = action;
         const {id} = entry;
@@ -241,7 +268,7 @@ export default {
         return {
           ...state,
           entries: newEntries,
-          unscheduled: {...state.unscheduled, ...contribs},
+          unscheduled: [...state.unscheduled, ...contribs],
         };
       }
       case actions.SCHEDULE_ENTRY: {
@@ -303,24 +330,41 @@ export default {
       case actions.DELETE_SESSION: {
         // Remove all entries belonging to the session being deleted &
         // unschedule all contributions linked to it
+        const {sessionId} = action;
         const contribsToUnschedule = [];
+
         const newEntries = Object.fromEntries(
           Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
             dayEntries.filter(e => {
-              if (e.type === EntryType.SessionBlock && e.sessionId === action.sessionId) {
+              if (e.type === EntryType.SessionBlock && e.sessionId === sessionId) {
                 for (const child of e.children) {
                   if (child.type === EntryType.Contribution) {
-                    contribsToUnschedule.push({...child, sessionId: null});
+                    contribsToUnschedule.push({
+                      ...child,
+                      sessionId: null,
+                      sessionBlockId: null,
+                    });
                   }
                 }
               }
 
-              return e.sessionId !== action.sessionId;
+              return e.sessionId !== sessionId;
             }),
           ])
         );
-        const newUnscheduled = [...state.unscheduled, ...contribsToUnschedule];
+
+        const newUnscheduled = state.unscheduled
+          .map(u =>
+            u.sessionId === sessionId
+              ? {
+                  ...u,
+                  sessionId: null,
+                }
+              : u
+          )
+          .concat(contribsToUnschedule);
+
         return {
           ...state,
           entries: newEntries,
@@ -368,10 +412,14 @@ export default {
         return state;
     }
   },
-  display: (state = {showUnscheduled: false}, action: Action) => {
+  display: (state = {activePanel: SidePanelView.None}, action: Action) => {
     switch (action.type) {
-      case actions.TOGGLE_SHOW_UNSCHEDULED:
-        return {...state, showUnscheduled: !state.showUnscheduled};
+      case actions.SET_ACTIVE_PANEL:
+        return {
+          ...state,
+          activePanel: action.panel,
+        };
+
       default:
         return state;
     }

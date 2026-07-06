@@ -5,17 +5,27 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contributionURL from 'indico-url:contributions.api_manage_contrib';
+
 import moment, {Moment} from 'moment';
 import React from 'react';
 import {createPortal} from 'react-dom';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {Button} from 'semantic-ui-react';
 
+import {getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
+import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
+
+import * as actions from './actions';
 import {useDraggable, useDroppableData} from './dnd';
 import {pointerInside} from './dnd/utils';
 import {EntryTitle} from './Entry';
 import {formatTimeRange} from './i18n';
+import {mapDataToEntry} from './mapperUtils';
+import {UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {Colors, EntryType, ReduxState} from './types';
+import {ContribId, EntryType, ReduxState} from './types';
 import {
   getEntryColors,
   minutesToPixels,
@@ -24,22 +34,21 @@ import {
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
 } from './utils';
-
 import './Entry.module.scss';
 
 export function DraggableUnscheduledContributionEntry({
   id,
+  objId,
   dt,
   title,
   duration,
-  colors,
   sessionId,
 }: {
-  id: string;
+  id: ContribId;
+  objId: number;
   dt: Moment;
   title: string;
   duration: number;
-  colors?: Colors;
   sessionId?: number;
 }) {
   const droppableData = useDroppableData({id: 'calendar'});
@@ -84,9 +93,7 @@ export function DraggableUnscheduledContributionEntry({
     }
   }
 
-  let style: React.CSSProperties = {
-    ...colors,
-  };
+  let style: React.CSSProperties = {};
 
   if (transform) {
     style = {
@@ -111,6 +118,8 @@ export function DraggableUnscheduledContributionEntry({
           duration={duration}
           sessionId={sessionId}
           isDragging={isDragging}
+          objId={objId}
+          id={id}
         />
       </div>,
       document.body
@@ -141,24 +150,34 @@ export function DraggableUnscheduledContributionEntry({
         duration={duration}
         sessionId={sessionId}
         isDragging={isDragging}
+        objId={objId}
+        id={id}
       />
     </div>
   );
 }
 
 export function UnscheduledContributionEntry({
+  id,
+  objId,
   title,
   timeRange,
   duration,
   sessionId,
   isDragging,
 }: {
+  id: ContribId;
+  objId: number;
   title: string;
   timeRange: string;
   duration: number;
   sessionId?: number;
   isDragging?: boolean;
 }) {
+  const {openModal} = useModal();
+  const dispatch = useDispatch<any>();
+  const contrib = useSelector(selectors.getUnscheduled).find(c => c.id === id);
+
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors({type: EntryType.Contribution}, session);
   const style = {
@@ -171,6 +190,8 @@ export function UnscheduledContributionEntry({
     ),
   };
 
+  const eventId = useSelector(selectors.getEventId);
+
   return (
     <div role="button" styleName="entry" style={style}>
       <EntryTitle
@@ -179,6 +200,60 @@ export function UnscheduledContributionEntry({
         timeRange={timeRange}
         type={EntryType.Contribution}
       />
+      {!isDragging && (
+        <div
+          styleName="entry-actions"
+          style={
+            {
+              '--session-color': colors.color,
+              '--session-background': colors.backgroundColor,
+            } as React.CSSProperties
+          }
+        >
+          <Button
+            basic
+            type="button"
+            title={Translate.string('Edit contribution')}
+            icon="edit"
+            size="small"
+            onClick={e => {
+              openModal(UNSCHEDULED_CONTRIB_EDIT_MODAL, {
+                eventId,
+                contribId: objId,
+                onSubmit: async (formData, form) => {
+                  // TODO: (Ajob) Instead, maybe create a separate timetable contrib form
+                  //              that disregards scheduling info like startdt. Or modify
+                  //              the existing timetable manage form to allow for this use case.
+                  const changedVals = getChangedValues(formData, form);
+                  try {
+                    await indicoAxios.patch(
+                      contributionURL({event_id: eventId, contrib_id: objId}),
+                      changedVals
+                    );
+                  } catch (err) {
+                    return handleSubmitError(err);
+                  }
+
+                  const updatedContrib = {...contrib, ...mapDataToEntry(changedVals, true)};
+                  dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, updatedContrib));
+                  e.stopPropagation();
+                },
+              });
+            }}
+          />
+          <Button
+            basic
+            type="button"
+            title={Translate.string('Delete contribution')}
+            icon="trash"
+            size="small"
+            onClick={e => {
+              e.stopPropagation();
+              dispatch(actions.deleteUnscheduledContrib(objId, eventId));
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
