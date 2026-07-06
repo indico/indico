@@ -10,6 +10,7 @@
 @use './Entry.module';
 
 $teal-shadow: rgba($dark-teal, 0.5);
+$toolbar-bg-color: $raincloud-gray;
 
 // Add vertical scroll to Indico sidebar, but only on the timetable management page
 body:has(:global(#timetable-container)) :global(.menu-column) {
@@ -95,4 +96,18 @@ body:has(:global(#timetable-container)) :global(.menu-column) {
   &.block {
     z-index: 9;
   }
+}
+
+.side-panel-container {
+  display: flex;
+  position: sticky;
+  top: 0;
+  height: 100%;
+  min-height: auto;
+  max-width: min-content;
+  overflow: visible;
+  z-index: 1;
+  background: $white;
+  pointer-events: auto;
+  border-right: 2px solid $raincloud-gray;
 }
