@@ -205,9 +205,17 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
   if (!showUnscheduled && !showSessions) {
     return null;
   }
-  const filteredDropdownSessions = dropdownSessions.filter(session =>
-    session.title.toLowerCase().includes(filterSearchQuery.toLowerCase())
-  );
+  const filteredDropdownSessions = [
+    ...dropdownSessions.filter(session => session.value === GenericFilterType.NO_SESSION),
+    ...dropdownSessions
+      .filter(
+        session =>
+          session.value !== GenericFilterType.NO_SESSION &&
+          session.title.toLowerCase().includes(filterSearchQuery.toLowerCase())
+      )
+      .toSorted((a, b) => a.title.localeCompare(b.title)),
+  ];
+
   return (
     <>
       <div
