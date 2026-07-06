@@ -333,8 +333,6 @@ export default {
         const {sessionId} = action;
         const contribsToUnschedule = [];
 
-        const unscheduled = state.unscheduled.filter(contrib => contrib.sessionId !== sessionId);
-
         const newEntries = Object.fromEntries(
           Object.entries(state.entries).map(([day, dayEntries]) => [
             day,
@@ -359,7 +357,7 @@ export default {
         return {
           ...state,
           entries: newEntries,
-          unscheduled: [...unscheduled, ...contribsToUnschedule],
+          unscheduled: [state.unscheduled, ...contribsToUnschedule],
         };
       }
       default:
