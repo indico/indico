@@ -1,0 +1,89 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+$color-warning: #f2a33c;
+
+.confirm-dialog {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 4px;
+  border: 1px solid $raincloud-gray;
+  background: $white;
+}
+
+.confirm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.confirm-dialog-warning {
+  border-color: $color-warning;
+}
+
+.dialog-icon {
+  font-size: 1.25rem;
+  color: $color-warning;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dialog-title {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+  background: $white;
+  margin: 0;
+  padding: 0 1.5rem 1.25rem 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+  line-height: 1.28571429em;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.dialog-message {
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  font-size: 1rem;
+  padding-top: 0.5rem;
+
+  :global(.ui.button),
+  :global(.ui.buttons .button) {
+    margin-right: 0;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: -2.5rem;
+  right: -2.5rem;
+  color: $white;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}

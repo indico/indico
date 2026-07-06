@@ -9,7 +9,7 @@ import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, EntryType, EntryUniqueID, ReduxState, Session} from './types';
+import {BlockEntry, EntryType, EntryUniqueID, ReduxState, Session, SidePanelView} from './types';
 import {
   DAY_SIZE,
   getDiffInDays,
@@ -25,7 +25,6 @@ export const getEntries = (state: ReduxState) => state.entries;
 export const getDayEntries = (state: ReduxState) => state.entries.entries;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
-export const getDisplay = (state: ReduxState) => state.display;
 
 // Get the selected entry ID
 // You should not use this selector directly, use makeIsSelectedSelector instead
@@ -197,10 +196,12 @@ export const getDraftEntry = createSelector(
   entries => entries.draftEntry
 );
 
-export const showUnscheduled = createSelector(
-  getDisplay,
-  display => display.showUnscheduled
-);
+export const getActivePanel = (state: ReduxState) => state.display.activePanel;
+
+export const showUnscheduled = (state: ReduxState) =>
+  getActivePanel(state) === SidePanelView.Unscheduled;
+
+export const showSessions = (state: ReduxState) => getActivePanel(state) === SidePanelView.Sessions;
 
 export const getDefaultContribDurationMinutes = createSelector(
   getStaticData,
