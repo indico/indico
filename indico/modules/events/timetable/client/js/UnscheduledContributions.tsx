@@ -9,7 +9,7 @@ import {partition} from 'lodash';
 import {Moment} from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Label, Input, Dropdown, Icon, Popup} from 'semantic-ui-react';
+import {Button, Input, Dropdown, Icon, Popup} from 'semantic-ui-react';
 
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
@@ -124,7 +124,7 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
       title: Translate.string('No assigned session'),
       text: (
         <div styleName="session">
-          <Label empty circular color="grey" />
+          <SessionIcon />
           <span>
             <Translate>No assigned session</Translate>
           </span>
