@@ -21,6 +21,22 @@
     overflow-y: auto;
   }
 
+  :global(.menu > .item > div) {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  :global(.menu > .item span) {
+    display: block;
+    min-width: 0;
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 16px;
+  }
+
   &:global(.ui.dropdown .menu) {
     position: relative;
   }
