@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .trigger-container {
   display: inline-block;
 }
@@ -12,9 +14,40 @@
 .dropdown-container {
   padding: 2px;
   z-index: 1000;
-  overflow: auto;
+  min-width: 14rem;
+
+  :global(.menu) {
+    max-height: calc(5 * 2.85rem);
+    overflow-y: auto;
+  }
+
+  :global(.menu > .item > div) {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  :global(.menu > .item span) {
+    display: block;
+    min-width: 0;
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 16px;
+  }
 
   &:global(.ui.dropdown .menu) {
     position: relative;
   }
+}
+
+.search-container {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(0 0 0 / 10%);
+
+  :global(.link.icon) {
+        opacity: 0.5;
+        color: $black;
+      }
 }
