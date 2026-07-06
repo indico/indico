@@ -98,40 +98,35 @@ $title-row-line-height: 1.2rem;
     width: 100%;
     height: 100%;
     justify-content: flex-end;
-
-    :global(.ui.basic.button),
-      :global(.ui.basic.buttons .button) {
-        // overrriding SemanticUI important color property
-        color: var(--session-color) !important;
-
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-
     background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--session-background) 0%, transparent) 32%,
-    color-mix(in srgb, var(--session-background) 100%, transparent) 66%,
-    color-mix(in srgb, var(--session-background) 100%, transparent) 100%
-  );
-
+      90deg,
+      color-mix(in srgb, var(--session-background) 0%, transparent) 32%,
+      color-mix(in srgb, var(--session-background) 100%, transparent) 66%,
+      color-mix(in srgb, var(--session-background) 100%, transparent) 100%
+    );
     display: flex;
     opacity: 0;
     visibility: hidden;
     transform: translateX(-10px);
-
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 
     > :global(.ui.basic.button) {
       color: var(--session-color);
     }
 
     > :global(button.ui.small.basic.button):hover {
-        background: transparent !important;
+      background: transparent !important;
+    }
+
+    :global(.ui.basic.button),
+    :global(.ui.basic.buttons .button) {
+      // overrriding SemanticUI important color property
+      color: var(--session-color) !important;
+
+      &:hover {
+        opacity: 0.8;
       }
+    }
   }
 
 .title-wrapper {
