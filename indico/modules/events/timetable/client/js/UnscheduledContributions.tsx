@@ -63,7 +63,8 @@ function UnscheduledContributionList({
 export default function UnscheduledContributions({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
   const {openModal} = useModal();
-  const minSidebarWidthPx = 320;
+  const minSidebarWidthPx = 200;
+  const initialSidebarWidthPx = 320;
   const eventId = useSelector(selectors.getEventId);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -205,7 +206,11 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
   );
   return (
     <>
-      <div styleName="container" style={{minWidth: `${minSidebarWidthPx}px`}} ref={wrapperRef}>
+      <div
+        styleName="container"
+        style={{minWidth: `${minSidebarWidthPx}px`, width: `${initialSidebarWidthPx}px`}}
+        ref={wrapperRef}
+      >
         {showUnscheduled && (
           <>
             <div styleName="container-header">

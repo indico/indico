@@ -13,7 +13,7 @@ $bg-color: $white;
 $toolbar-bg-color: $raincloud-gray;
 
 .side-panel {
-    width: 100%;
+  flex-shrink: 1;
 }
 
 :global(.ui.vertical.menu).tab-rail {
