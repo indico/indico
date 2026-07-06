@@ -39,7 +39,7 @@ export default function TimetableSidePanel() {
             )
           }
         >
-          <Icon name="folder outline" size="large" />
+          <Icon name="bookmark outline" size="large" />
         </Menu.Item>
         <Menu.Item
           name="unscheduled"
