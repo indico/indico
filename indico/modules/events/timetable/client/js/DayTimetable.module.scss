@@ -12,38 +12,55 @@
 $teal-shadow: rgba($dark-teal, 0.5);
 $toolbar-bg-color: $raincloud-gray;
 
-// Add vertical scroll to Indico sidebar, but only on the timetable management page
-body:has(:global(#timetable-container)) :global(.layout-side-menu) {
-  &:first-child {
-    > :global(.menu-column) {
-      display: flex;
-      position: relative;
+body:has(:global(#timetable-container)) :global(footer.footer) {
+  display: none;
+}
 
-      :global(.timetable-sidepanel-management-toggle) {
-        position: absolute;
-        top: 0;
-        right: -26px;
-        width: 26px;
-        height: 31px;
-        border-radius: 0 100vh 100vh 0;
-        font-size: 0.5rem;
-        bottom: 0;
-      }
+body:has(:global(#timetable-container)) :global(main.main) {
+  :global(.layout-side-menu) {
+    margin-right: 0;
+  }
 
-      > :global(.timetable-display-view-wrapper) {
-        position: relative;
-        width: 100%;
+  &:global(.side-panel-closed) {
+    :global(.timetable-sidepanel-management-toggle) {
+      margin-left: 0;
+    }
 
-        > :global(.group) {
-          margin-left: 0;
-        }
+    :global(.layout-side-menu) {
+      margin-left: 0;
+
+      > :global(.menu-column) {
+        width: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
       }
     }
+  }
+}
+
+// Add vertical scroll to Indico sidebar, but only on the timetable management page
+body:has(:global(#timetable-container)) :global(.layout-side-menu) {
+  :global(.page-content) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  :global(.timetable-sidepanel-management-toggle) {
+    height: 100%;
+    width: 1.4rem;
+    padding: 0;
+    border: none;
+    font-size: 0.5rem;
+    margin: 0 0 0 5px;
   }
 
   &:nth-child(2) {
     > :global(.menu-column) {
       overflow-y: scroll;
+      position: relative;
+      margin-right: 2px;
     }
   }
 }
