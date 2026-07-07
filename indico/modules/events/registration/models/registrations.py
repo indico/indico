@@ -294,7 +294,11 @@ class Registration(db.Model):
     created_by = db.relationship(
         'User',
         lazy=True,
-        foreign_keys=[created_by_id]
+        foreign_keys=[created_by_id],
+        backref=db.backref(
+            'created_registrations',
+            lazy='dynamic'
+        )
     )
     #: The latest payment transaction associated with this registration
     transaction = db.relationship(
