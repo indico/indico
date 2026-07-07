@@ -467,6 +467,7 @@ class User(PersonMixin, db.Model):
     # - category_roles (CategoryRole.members)
     # - content_reviewer_for_contributions (Contribution.paper_content_reviewers)
     # - created_events (Event.creator)
+    # - created_registrations (Registration.created_by)
     # - data_export_request (DataExportRequest.user)
     # - editing_comments (EditingRevisionComment.user)
     # - editing_revisions (EditingRevision.user)
