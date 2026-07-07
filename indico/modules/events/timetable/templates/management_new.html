@@ -5,14 +5,6 @@
 {%- block banner -%}{%- endblock -%}
 {%- block title -%}{%- endblock -%}
 
-{% block display_view_button %}
-    <div class="group timetable-display-view-wrapper">
-        <button class="timetable-sidepanel-management-toggle icon-prev i-button" onclick="toggleSidePanel()" title="{{ _('Toggle side panel') }}">
-        </button>
-        {{ super() }}
-    </div>
-{% endblock %}
-
 {% block side_menu %}
     {{ super() }}
 {% endblock %}
@@ -32,36 +24,12 @@
         setupTimetable();
     </script>
     <script>
-        let sidePanelIsOpen = true;
+        const main = document.querySelector('main.main');
         const sidePanelToggleButton = document.querySelector('.timetable-sidepanel-management-toggle');
-        const itemsToHide = document.querySelectorAll('.layout-side-menu:last-child > .menu-column, .timetable-display-view-wrapper > .group');
-        console.log(itemsToHide)
-
         function toggleSidePanel() {
-            const hiddenInlineStyles = {
-                width: '0',
-                overflow: 'hidden',
-                margin: '0',
-                padding: '0'
-            }
-            itemsToHide.forEach(column => {
-                if (sidePanelIsOpen) {
-                    Object.assign(column.style, hiddenInlineStyles);
-                } else {
-                    column.removeAttribute('style');
-                }
-            });
-
             sidePanelToggleButton.classList.toggle('icon-prev');
             sidePanelToggleButton.classList.toggle('icon-next');
-
-            if (sidePanelIsOpen) {
-                sidePanelToggleButton.style.left = '-30px';
-            } else {
-                sidePanelToggleButton.style.removeProperty('left');
-            }
-
-            sidePanelIsOpen = !sidePanelIsOpen;
+            main.classList.toggle('side-panel-closed');
         }
     </script>
 {% endblock %}
