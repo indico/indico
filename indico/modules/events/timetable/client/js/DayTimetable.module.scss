@@ -13,8 +13,39 @@ $teal-shadow: rgba($dark-teal, 0.5);
 $toolbar-bg-color: $raincloud-gray;
 
 // Add vertical scroll to Indico sidebar, but only on the timetable management page
-body:has(:global(#timetable-container)) :global(.menu-column) {
-  overflow-y: scroll;
+body:has(:global(#timetable-container)) :global(.layout-side-menu) {
+  &:first-child {
+    > :global(.menu-column) {
+      display: flex;
+      position: relative;
+
+      :global(.timetable-sidepanel-management-toggle) {
+        position: absolute;
+        top: 0;
+        right: -26px;
+        width: 26px;
+        height: 31px;
+        border-radius: 0 100vh 100vh 0;
+        font-size: 0.5rem;
+        bottom: 0;
+      }
+
+      > :global(.timetable-display-view-wrapper) {
+        position: relative;
+        width: 100%;
+
+        > :global(.group) {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  &:nth-child(2) {
+    > :global(.menu-column) {
+      overflow-y: scroll;
+    }
+  }
 }
 
 .wrapper {
