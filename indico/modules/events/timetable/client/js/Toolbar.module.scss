@@ -19,17 +19,18 @@ $toolbar-bg-color: $raincloud-gray;
   z-index: 100;
   border-bottom: 2px solid rgba($raincloud-gray, 0.8);
 
+  > .actions-bar {
+    box-shadow: 0 10px 10px -10px rgba($raincloud-gray, 0.8);
+    padding: 0;
+  }
+
+  .actions-bar,
   :global(.ui.menu) {
     height: 46px;
     display: flex;
     align-items: center;
     margin: 0;
     border: 0;
-
-    &.actions-bar {
-      box-shadow: 0 10px 10px -10px rgba($raincloud-gray, 0.8);
-      padding: 0;
-    }
 
     &.timetable-bar {
       height: 4.2rem;
@@ -191,6 +192,7 @@ $toolbar-bg-color: $raincloud-gray;
     .action {
       padding-left: 0.7em;
       padding-right: 0.7em;
+      background: none;
 
       :global(.divider.text) {
         display: none;

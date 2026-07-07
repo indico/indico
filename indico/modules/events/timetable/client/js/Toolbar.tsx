@@ -178,21 +178,22 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
 
   return (
     <div styleName="toolbar" ref={ref}>
-      <Menu compact secondary styleName="actions-bar">
-        <Menu.Item className="right" styleName="action">
+      <div styleName="actions-bar">
+        <div className="right" styleName="action">
           <PublicationStateSwitch
             eventId={eventId}
             onSuccess={() => dispatch(actions.toggleDraft())}
             basic
+            size="tiny"
           />
-        </Menu.Item>
-        <Menu.Item
+        </div>
+        <Button
           onClick={addNewEntry}
           title={Translate.string('Add new entry')}
           icon="plus"
           styleName="action"
         />
-        <Menu.Item
+        <Button
           onClick={() => dispatch(actions.toggleExpand())}
           title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
           icon={isExpanded ? 'compress' : 'expand'}
@@ -201,7 +202,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
         {/* TODO: (Ajob) The logic behind this component is broken.
                          Evaluate necessity then remove or fix */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
-      </Menu>
+      </div>
       {expandedSessionBlock && <SessionBlockToolbar />}
       {!expandedSessionBlock && numDays > 1 && (
         <Menu tabular styleName="timetable-bar">
