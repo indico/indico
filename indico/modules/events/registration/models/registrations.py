@@ -359,6 +359,7 @@ class Registration(db.Model):
         for r in source.registrations.all():
             if r.registration_form not in target_regforms_used:
                 r.user = target
+        source.created_registrations.update({cls.created_by_id: target.id})
 
     @hybrid_method
     def is_publishable(self, is_participant):

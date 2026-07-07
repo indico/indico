@@ -26,7 +26,8 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormSection)
-from indico.modules.events.registration.models.registrations import RegistrationVisibility
+from indico.modules.events.registration.models.registrations import (Registration, RegistrationState,
+                                                                     RegistrationVisibility)
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_regforms_registrations, get_registered_event_persons,
                                                      get_ticket_qr_code_data, get_user_data,
@@ -583,6 +584,21 @@ def test_create_registration_records_creator(monkeypatch, dummy_user, dummy_regf
     session.set_session_user(None)
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
     assert reg.created_by is None
+
+
+def test_merge_users_reassigns_created_by(db, dummy_event, dummy_regform, create_user):
+    source = create_user(101)
+    target = create_user(102)
+    participant = create_user(103)
+    reg = Registration(registration_form=dummy_regform, first_name='Guinea', last_name='Pig',
+                       state=RegistrationState.complete, currency='USD', email=participant.email,
+                       user=participant, created_by=source)
+    dummy_event.registrations.append(reg)
+    db.session.flush()
+
+    Registration.merge_users(target, source)
+    db.session.expire(reg)
+    assert reg.created_by == target
 
 
 @pytest.mark.usefixtures('request_context')
