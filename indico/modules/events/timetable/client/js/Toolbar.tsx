@@ -236,9 +236,10 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
                     styleName="day"
                     active={isActive}
                   >
-                    <span styleName="day-month">{d.format('MMM')}</span>
-                    <span styleName="day-number">{d.format('D')}</span>
-                    <span styleName="day-name">{d.format('ddd')}</span>
+                    <div styleName="day-badge">
+                      <div styleName="day-number">{d.format('DD / MM')}</div>
+                      <div styleName="day-name">{d.format('ddd')}</div>
+                    </div>
                   </Menu.Item>
                 );
               })}

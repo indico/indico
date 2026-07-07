@@ -32,7 +32,7 @@ $toolbar-bg-color: $raincloud-gray;
     }
 
     &.timetable-bar {
-      height: 100px;
+      height: 4.2rem;
       overflow-y: hidden;
 
       &.block {
@@ -90,8 +90,6 @@ $toolbar-bg-color: $raincloud-gray;
           display: flex;
           overflow-x: auto;
           box-sizing: content-box;
-          // gap: 40px;
-
           // This padding in combination with fixed height
           // and overflow-y hidden above,it hides the scrollbar
           padding: 18px 0;
@@ -106,15 +104,22 @@ $toolbar-bg-color: $raincloud-gray;
             font-weight: normal;
             margin-bottom: 0;
             background: none;
+            padding: 0;
 
+            // Instead of gap we use this as the gradients also trigger a gap
             &:not(:last-of-type) {
-              margin-right: 20px;
+              margin-right: 15px;
             }
 
             &:global(.active) {
-              .day-number {
+              .day-badge {
                 color: $bg-color;
                 background-color: $primary-color;
+                opacity: 1;
+
+                > .day-name {
+                  opacity: 0.8;
+                }
               }
 
               > .day-month {
@@ -124,37 +129,38 @@ $toolbar-bg-color: $raincloud-gray;
 
             &:global(:not(.active)) {
               &:hover {
-                > .day-number {
+                > .day-badge {
                   background-color: rgba($black, 0.1);
                   transition: 0.1s;
                 }
               }
             }
 
-            > .day-month {
-              color: $bg-color;
+            > .day-badge {
+              opacity: 0.7;
               font-weight: bold;
-              font-size: 0.8em;
-              background-color: rgba($primary-color, 0.5);
-              border-radius: 3px;
-              padding: 2px 8px;
-              margin-bottom: 5px;
-              visibility: hidden;
-            }
-
-            > .day-name {
-              color: #555;
-            }
-
-            > .day-number {
-              font-size: 1.2em;
-              font-weight: bold;
-              width: 40px;
-              height: 40px;
+              // Needs to be px value for better calculations
+              width: 45px;
+              border-radius: 4px;
+              margin: 0.5rem 0;
+              padding: 0.5rem 0;
               display: flex;
+              flex-direction: column;
               justify-content: center;
               align-items: center;
-              border-radius: 100%;
+              gap: 0.3rem;
+
+              > .day-number {
+                font-size: 0.85rem;
+                word-spacing: -0.1rem;
+                margin-top: -0.2rem;
+              }
+
+              > .day-name {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                opacity: 0.6;
+              }
             }
           }
 
@@ -162,7 +168,7 @@ $toolbar-bg-color: $raincloud-gray;
             pointer-events: none;
             width: 15px;
             margin-top: 10px;
-            height: 88px;
+            height: 60px;
             bottom: 0;
             flex-shrink: 0;
             position: sticky;
