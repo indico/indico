@@ -59,12 +59,12 @@ main.main {
                   flex-direction: column;
                   overflow: hidden;
                   // Not exactly -60px because side button also has 5px margin
-                  margin-top: -55px;
+                  margin-top: -80px;
 
                   & > #timetable-container {
                     height: 100%;
                     overflow-y: auto;
-                    flex-grow: 0;
+                    flex-grow: 1;
 
                     & > div {
                       height: 100%;
