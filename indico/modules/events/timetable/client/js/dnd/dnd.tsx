@@ -10,7 +10,7 @@ import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react';
 import {createContext, useContextSelector} from 'use-context-selector';
 
 import {getScrollParent, getTotalScroll} from './modifiers';
-import {useScrollIntent} from './scroll';
+import {ScrollBounds, useScrollIntent} from './scroll';
 import {
   MousePosition,
   Modifier,
@@ -191,10 +191,12 @@ export function DnDProvider({
   children,
   onDrop,
   modifier = ({transform}) => transform,
+  scrollBounds,
 }: {
   children: React.ReactNode;
   onDrop: OnDrop;
   modifier?: Modifier;
+  scrollBounds?: ScrollBounds;
 }) {
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
@@ -211,6 +213,7 @@ export function DnDProvider({
   useScrollIntent({
     state,
     draggables,
+    bounds: scrollBounds,
     enabled:
       // TODO: does not really work atm
       state.current.activeDraggable === null ||
