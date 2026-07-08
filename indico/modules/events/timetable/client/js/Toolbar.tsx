@@ -188,11 +188,15 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
           />
         </div>
         <Button
+          basic
           onClick={addNewEntry}
           title={Translate.string('Add new entry')}
-          icon="plus"
           styleName="action"
-        />
+          size="tiny"
+        >
+          <Icon name="plus" />
+          <Translate>Add entry</Translate>
+        </Button>
         <Button
           onClick={() => dispatch(actions.toggleExpand())}
           title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
