@@ -130,6 +130,10 @@ body:has(#timetable-container) {
         border: none;
         font-size: 0.5rem;
         margin-left: 5px;
+
+        &::before {
+          margin-right: 0;
+        }
       }
     }
 

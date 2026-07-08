@@ -25,16 +25,12 @@
         setupTimetable();
     </script>
     <script>
-        (function() {
-            'use strict';
+        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', () => {
             const sidePanelToggleButton = document.querySelector('.timetable-sidepanel-management-toggle');
-            sidePanelToggleButton.addEventListener('click', toggleSidePanel);
-            function toggleSidePanel() {
-                const main = document.querySelector('main.main');
-                sidePanelToggleButton.classList.toggle('icon-prev');
-                sidePanelToggleButton.classList.toggle('icon-next');
-                main.classList.toggle('side-panel-closed');
-            }
-        })();
+            const main = document.querySelector('main.main');
+            sidePanelToggleButton.classList.toggle('icon-prev');
+            sidePanelToggleButton.classList.toggle('icon-next');
+            main.classList.toggle('side-panel-closed');
+        });
     </script>
 {% endblock %}
