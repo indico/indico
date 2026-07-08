@@ -25,8 +25,8 @@
         setupTimetable();
     </script>
     <script>
-        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', () => {
-            const sidePanelToggleButton = document.querySelector('.timetable-sidepanel-management-toggle');
+        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', (evt) => {
+            const {target: sidePanelToggleButton} = evt;
             const main = document.querySelector('main.main');
             sidePanelToggleButton.classList.toggle('icon-prev');
             sidePanelToggleButton.classList.toggle('icon-next');
