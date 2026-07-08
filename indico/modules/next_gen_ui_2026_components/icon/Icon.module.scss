@@ -84,6 +84,10 @@
 
   &.root[data-variant='plain'] {
     color: var(--icon-500);
+
+    &.root[data-color='white'] {
+      color: white;
+    }
     background: transparent;
   }
 
@@ -108,12 +112,12 @@
   }
 
   &.root[data-variant='solid'] {
-    color: white;
+    color: var(--color-accent-buttons);
     background: var(--icon-500);
   }
 
   &.root[data-variant='dark'] {
-    color: white;
+    color: var(--color-accent-buttons);
     background: var(--icon-800);
   }
 }
