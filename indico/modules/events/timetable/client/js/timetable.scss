@@ -97,3 +97,58 @@ main.main {
 div.footer {
   display: none;
 }
+
+// New timetable
+body:has(#timetable-container) {
+  footer.footer {
+    display: none;
+  }
+
+  main.main {
+    .layout-side-menu {
+      margin-right: 0;
+
+      &:nth-child(2) {
+        > .menu-column {
+          // Add vertical scroll to Indico sidebar, but only on the timetable management page
+          overflow-y: auto;
+          position: relative;
+          margin-right: 2px;
+        }
+      }
+
+      .page-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .timetable-sidepanel-management-toggle {
+        height: 100%;
+        min-width: 1.4rem;
+        padding: 0;
+        border: none;
+        font-size: 0.5rem;
+        margin-left: 5px;
+
+        &::before {
+          margin-right: 0;
+        }
+      }
+    }
+
+    &.side-panel-closed {
+      .layout-side-menu,
+      .timetable-sidepanel-management-toggle {
+        margin-left: 0;
+      }
+
+      .menu-column {
+        width: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
