@@ -16,9 +16,9 @@ import './Icon.module.scss';
 
 library.add(fas, far, fab);
 
-type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
+export type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
-export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
+export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -38,10 +38,12 @@ export type IconProps =
   | (BaseIconProps & {
       variant: 'light' | 'solid' | 'dark';
       rounded?: boolean;
+      color?: 'primary' | 'gray' | 'success' | 'warning' | 'error';
     })
   | (BaseIconProps & {
       variant: 'plain' | 'compact';
       rounded?: never;
+      color?: 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
     });
 
 function isCustomIcon(
