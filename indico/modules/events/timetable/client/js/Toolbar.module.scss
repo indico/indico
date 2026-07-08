@@ -13,27 +13,32 @@ $bg-color: $white;
 $toolbar-bg-color: $raincloud-gray;
 
 .toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   position: sticky;
   top: 0;
   background-color: $bg-color;
   z-index: 100;
   border-bottom: 2px solid rgba($raincloud-gray, 0.8);
+  padding: 15px 10px 0 10px;
 
   > .actions-bar {
-    box-shadow: 0 10px 10px -10px rgba($raincloud-gray, 0.8);
-    padding: 0;
+    margin: 0 5px;
+    > .action {
+      &.right {
+        margin-left: auto;
+      }
+    }
   }
 
   .actions-bar,
-  :global(.ui.menu) {
-    height: 46px;
+  .timetable-bar {
     display: flex;
     align-items: center;
-    margin: 0;
-    border: 0;
 
     &.timetable-bar {
-      height: 4.2rem;
+      height: 3.8rem;
       overflow-y: hidden;
 
       &.block {
@@ -96,6 +101,7 @@ $toolbar-bg-color: $raincloud-gray;
           padding: 18px 0;
 
           .day {
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -112,14 +118,12 @@ $toolbar-bg-color: $raincloud-gray;
               margin-right: 15px;
             }
 
-            &:global(.active) {
+            &.active {
               .day-badge {
-                color: $bg-color;
-                background-color: $primary-color;
-                opacity: 1;
-
-                > .day-name {
-                  opacity: 0.8;
+                > .day-number {
+                  color: $bg-color;
+                  background-color: $primary-color;
+                  opacity: 1;
                 }
               }
 
@@ -128,23 +132,29 @@ $toolbar-bg-color: $raincloud-gray;
               }
             }
 
-            &:global(:not(.active)) {
+            &:not(.active) {
+              > .day-badge {
+                > .day-number {
+                  opacity: 0.7;
+                }
+              }
+
               &:hover {
                 > .day-badge {
-                  background-color: rgba($black, 0.1);
-                  transition: 0.1s;
+                  > .day-number {
+                    background-color: rgba($black, 0.1);
+                  }
                 }
               }
             }
 
             > .day-badge {
-              opacity: 0.7;
               font-weight: bold;
               // Needs to be px value for better calculations
-              width: 45px;
-              border-radius: 4px;
+              width: 60px;
               margin: 0.5rem 0;
               padding: 0.5rem 0;
+              border-radius: 4px;
               display: flex;
               flex-direction: column;
               justify-content: center;
@@ -152,9 +162,13 @@ $toolbar-bg-color: $raincloud-gray;
               gap: 0.3rem;
 
               > .day-number {
-                font-size: 0.85rem;
-                word-spacing: -0.1rem;
+                transition: 0.1s;
+                display: flex;
+                justify-content: center;
+                font-size: 0.9rem;
+                padding: 0.2rem 0.2rem;
                 margin-top: -0.2rem;
+                border-radius: 3px;
               }
 
               > .day-name {
@@ -167,21 +181,21 @@ $toolbar-bg-color: $raincloud-gray;
 
           .gradient {
             pointer-events: none;
-            width: 15px;
+            width: 30px;
             margin-top: 10px;
-            height: 60px;
+            top: 0;
             bottom: 0;
             flex-shrink: 0;
             position: sticky;
             z-index: 1;
 
             &:first-child {
-              background: linear-gradient(90deg, $bg-color, transparent);
+              background: linear-gradient(90deg, $bg-color 30%, transparent);
               left: 0;
             }
 
             &:last-child {
-              background: linear-gradient(-90deg, $bg-color, transparent);
+              background: linear-gradient(-90deg, $bg-color 30%, transparent);
               right: 0;
             }
           }
@@ -189,10 +203,9 @@ $toolbar-bg-color: $raincloud-gray;
       }
     }
 
-    .action {
-      padding-left: 0.7em;
-      padding-right: 0.7em;
+    .nav-button {
       background: none;
+      color: black;
 
       :global(.divider.text) {
         display: none;
