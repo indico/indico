@@ -25,10 +25,9 @@ $toolbar-bg-color: $raincloud-gray;
 
   > .actions-bar {
     margin: 0 5px;
-    > .action {
-      &.right {
-        margin-left: auto;
-      }
+
+    > .right {
+      margin-left: auto;
     }
   }
 
@@ -44,41 +43,24 @@ $toolbar-bg-color: $raincloud-gray;
       &.block {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
-        gap: 5px;
-        padding-top: 12px;
+        gap: 0.2rem;
 
         > :is(.header, .session) {
           margin: 0;
         }
 
         > .header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          letter-spacing: 1px;
+          letter-spacing: 0.05rem;
+          font-size: 1rem;
         }
 
         > .session {
-          font-weight: normal;
-          padding: 2px 6px;
+          font-size: 0.7rem;
+          letter-spacing: 0.05rem;
+          padding: 4px 8px;
           border-radius: 100vh;
-        }
-
-        .close-btn {
-          box-shadow: none;
-          margin: 0;
-          padding: 2px;
-
-          kbd {
-            font-size: 0.75em;
-            padding: 1px 5px;
-            margin-left: 6px;
-            border: 1px solid #aaa;
-            border-radius: 3px;
-            background-color: #f9f9f9;
-          }
         }
       }
 

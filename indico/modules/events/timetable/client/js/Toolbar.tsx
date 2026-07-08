@@ -8,7 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Header, Icon, Label, Menu} from 'semantic-ui-react';
+import {Button, Header, Icon, Label} from 'semantic-ui-react';
 
 import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
@@ -50,31 +50,13 @@ function SessionBlockToolbar() {
     return null;
   }
 
-  const sessionColors = {
-    backgroundColor: `${colors.backgroundColor}55`,
-    color: colors.color,
-  };
-
   return (
-    <Menu tabular styleName="timetable-bar block">
-      <Label size="small" styleName="session" style={{...sessionColors}}>
+    <div styleName="timetable-bar block">
+      <Label size="small" styleName="session" style={{...colors}}>
         {session.title}
       </Label>
-      <Header as="h3" styleName="header">
-        <span>{title}</span>
-      </Header>
-      <Button
-        basic
-        size="mini"
-        onClick={closeExpandedBlock}
-        styleName="close-btn"
-        title={Translate.string('Close session block view')}
-      >
-        <Icon name="close" />
-        <Translate>Close session block view or press</Translate>
-        <kbd>Esc</kbd>
-      </Button>
-    </Menu>
+      {title && <Header styleName="header">{title}</Header>}
+    </div>
   );
 }
 
@@ -185,23 +167,28 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
           basic
           size="tiny"
         />
-        <Button
-          basic
-          onClick={addNewEntry}
-          title={Translate.string('Add new entry')}
-          size="tiny"
-        >
+        <Button basic onClick={addNewEntry} title={Translate.string('Add new entry')} size="tiny">
           <Icon name="plus" />
           <Translate>Add entry</Translate>
         </Button>
-        <Button
-          styleName="action right"
-          onClick={() => dispatch(actions.toggleExpand())}
-          title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
-          icon={isExpanded ? 'compress' : 'expand'}
-          circular
-          size="tiny"
-        />
+        <div styleName="right">
+          {expandedSessionBlock && (
+            <Button
+              onClick={() => dispatch(actions.setExpandedSessionBlock(null))}
+              title={Translate.string('Exit session block view')}
+              icon="arrow left"
+              circular
+              size="tiny"
+            />
+          )}
+          <Button
+            onClick={() => dispatch(actions.toggleExpand())}
+            title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
+            icon={isExpanded ? 'compress' : 'expand'}
+            circular
+            size="tiny"
+          />
+        </div>
         {/* TODO: (Ajob) The logic behind this component is broken.
                          Evaluate necessity then remove or fix */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
