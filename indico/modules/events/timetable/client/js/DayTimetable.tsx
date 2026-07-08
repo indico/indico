@@ -58,6 +58,8 @@ import {
   getEntryUniqueId,
 } from './utils';
 
+const AUTO_SCROLL_LIMIT_GAP_MINUTES = 90;
+
 interface DayTimetableProps {
   dt: Moment;
   eventId: number;
@@ -571,6 +573,14 @@ export function DayTimetable({
     return createRestrictToCalendar(calendarRef, limitsDelta);
   }, [limitTop, limitBottom]);
 
+  const scrollBounds = useMemo(() => {
+    const gap = minutesToPixels(AUTO_SCROLL_LIMIT_GAP_MINUTES);
+    return {
+      top: Math.max(0, limitTop - gap),
+      bottom: Math.min(DAY_SIZE, limitBottom + gap),
+    };
+  }, [limitTop, limitBottom]);
+
   const limitsGradientColor = 'rgba(0, 0, 0, 0.05)';
   const limitsGradientArg = [
     `${limitsGradientColor} 0`,
@@ -583,7 +593,7 @@ export function DayTimetable({
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
   return (
-    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
+    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar} scrollBounds={scrollBounds}>
       <div styleName="side-panel-container">
         <TimetableTabRail />
         <TimetableSidePanel dt={dt} />
