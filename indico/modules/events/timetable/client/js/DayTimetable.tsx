@@ -145,6 +145,7 @@ export function DayTimetable({
   const selectedEntry = useSelector(selectors.getSelectedEntry);
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
+  const [hoverGuideY, setHoverGuideY] = useState<number | null>(null);
   const isDragging = draggingStartPos !== null;
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
@@ -152,6 +153,40 @@ export function DayTimetable({
   const {openModal} = useModal();
 
   const sessions: Record<number, Session> = useSelector(selectors.getSessions);
+
+  function getPositionCalendarY(yAxis: number) {
+    const rect = calendarRef?.current?.getBoundingClientRect();
+
+    return minutesToPixels(
+      Math.round(pixelsToMinutes(yAxis - rect?.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
+    );
+  }
+
+  function handleCalendarMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    if (wrapperRef.current !== null) {
+      const clientY = event.clientY + wrapperRef.current.scrollTop;
+      const offsetY = clientY - wrapperRef.current.offsetTop;
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
+
+      if (isDragging || selectedEntry || isWithinLimitsWithOffset) {
+        if (hoverGuideY !== null) {
+          setHoverGuideY(null);
+        }
+        return;
+      }
+
+      const y = getPositionCalendarY(event.clientY);
+      setHoverGuideY(y);
+    }
+  }
+
+  function getCalendarTimeFromY(y: number) {
+    return moment(dt)
+      .startOf('day')
+      .add(minHour, 'hours')
+      .add(pixelsToMinutes(y), 'minutes')
+      .format('LT');
+  }
 
   function showToastIfContribSessionChanged(
     contribTitle?: string,
@@ -599,12 +634,27 @@ export function DayTimetable({
         <TimetableSidePanel dt={dt} />
       </div>
       {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
-      <div ref={wrapperRef} className="wrapper timetable-popup-boundary">
-        <div ref={innerWrapperRef} styleName="wrapper" style={{background: limitsGradient}}>
+      <div
+        ref={wrapperRef}
+        className="wrapper timetable-popup-boundary"
+        onScroll={() => setHoverGuideY(null)}
+      >
+        <div
+          ref={innerWrapperRef}
+          styleName="wrapper"
+          style={{background: limitsGradient}}
+          onMouseMove={handleCalendarMouseMove}
+          onMouseLeave={() => setHoverGuideY(null)}
+        >
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <DnDCalendar>
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
+              {hoverGuideY !== null && (
+                <div styleName="hover-guide" style={{top: hoverGuideY}}>
+                  {getCalendarTimeFromY(hoverGuideY)}
+                </div>
+              )}
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               <div
                 styleName="draft"
