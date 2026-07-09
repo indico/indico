@@ -86,11 +86,11 @@ def _assign_registration_tags(registrations, add, remove):
         reg.tags -= remove
         if add:
             added = sorted(t.title for t in add)
-            reg.log(EventLogRealm.management, LogKind.positive, 'Tags',
+            reg.log(EventLogRealm.management, LogKind.positive, 'Registration',
                     f'Tags added to {reg.full_name}: {", ".join(added)}', session.user)
         if remove:
             removed = sorted(t.title for t in remove)
-            reg.log(EventLogRealm.management, LogKind.negative, 'Tags',
+            reg.log(EventLogRealm.management, LogKind.negative, 'Registration',
                     f'Tags removed from {reg.full_name}: {", ".join(removed)}', session.user)
 
 
