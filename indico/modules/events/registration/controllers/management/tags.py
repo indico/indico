@@ -8,12 +8,14 @@
 from flask import flash, redirect, request, session
 
 from indico.core.db import db
+from indico.modules.events import EventLogRealm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.controllers.management.reglists import RHRegistrationsActionBase
 from indico.modules.events.registration.forms import RegistrationTagForm, RegistrationTagsAssignForm
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.logs import LogKind
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 from indico.web.args import use_rh_kwargs
@@ -80,8 +82,18 @@ class RHRegistrationTagEdit(RHManageRegistrationTagBase):
 
 def _assign_registration_tags(registrations, add, remove):
     for reg in registrations:
+        added = add - remove - reg.tags
+        removed = reg.tags & remove
         reg.tags |= add
         reg.tags -= remove
+        if added:
+            added = sorted(t.title for t in added)
+            reg.log(EventLogRealm.management, LogKind.positive, 'Registration',
+                    f'Tags added to {reg.full_name}: {", ".join(added)}', session.user if session else None)
+        if removed:
+            removed = sorted(t.title for t in removed)
+            reg.log(EventLogRealm.management, LogKind.negative, 'Registration',
+                    f'Tags removed from {reg.full_name}: {", ".join(removed)}', session.user if session else None)
 
 
 class RHRegistrationTagsAssign(RHRegistrationsActionBase):
