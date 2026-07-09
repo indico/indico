@@ -60,7 +60,7 @@ class TimeDeltaField(Field):
 
     @property
     def best_unit(self):
-        """Return the largest unit that covers the current timedelta."""
+        """The largest unit that covers the current timedelta."""
         if self.data is None:
             return None
         seconds = int(self.data.total_seconds())

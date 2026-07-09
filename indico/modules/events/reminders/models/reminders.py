@@ -269,7 +269,7 @@ class EventReminder(RenderModeMixin, db.Model):
 
     @property
     def all_recipients(self):
-        """Return all recipients of the notifications.
+        """All recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
         participants/speakers of the event.

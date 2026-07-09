@@ -188,7 +188,7 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
 
     @property
     def generated_data(self):
-        """Return a dict containing all generated data."""
+        """A dict containing all generated data."""
         cls = type(self)
         return {field: getattr(self, field).data
                 for field in dir(cls)

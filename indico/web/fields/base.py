@@ -60,12 +60,12 @@ class BaseField:
 
     @property
     def validators(self):
-        """Return a list of validators for this field."""
+        """A list of validators for this field."""
         return None
 
     @property
     def wtf_field_kwargs(self):
-        """Return a dict of kwargs for this field's wtforms field."""
+        """A dict of kwargs for this field's wtforms field."""
         return {}
 
     def create_wtf_field(self):

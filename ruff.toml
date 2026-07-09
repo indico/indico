@@ -49,7 +49,6 @@ ignore = [
     'RUF027',  # also triggers on i18n functions -> too noisy for now
     'RUF052',  # we often use underscore-prefixed variables in tests and to cache regexps in function definitions
     'RUF067',  # we often have code in __init__.py
-    'RUF076',  # autouse=True fixtures are perfectly valid
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
     'D1',      # we have way too many missing docstrings :(

@@ -128,7 +128,7 @@ class PersonMixin:
 
     @property
     def full_name(self):
-        """Return the person's name in 'Firstname Lastname' notation."""
+        """The person's name in 'Firstname Lastname' notation."""
         return self.get_full_name(show_title=False, last_name_first=False, last_name_upper=False,
                                   abbrev_first_name=False)
 
@@ -138,7 +138,7 @@ class PersonMixin:
 
     @property
     def display_full_name(self):
-        """Return the full name using the user's preferred name format."""
+        """The full name using the user's preferred name format."""
         if has_request_context():
             return format_display_full_name(session.user, self)
         else:

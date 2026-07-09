@@ -688,7 +688,7 @@ class SearchAffiliationsMixin:
 
     @property
     def context(self):
-        """Return the context dict passed to affiliation filter signal receivers.
+        """The context dict passed to affiliation filter signal receivers.
 
         The dict should contain any objects relevant to the current search,
         keyed by descriptive names.

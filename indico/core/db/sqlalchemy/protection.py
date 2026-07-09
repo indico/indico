@@ -365,7 +365,7 @@ class ProtectionMixin:
 class ProtectionManagersMixin(ProtectionMixin):
     @property
     def all_manager_emails(self):
-        """Return the emails of all managers."""
+        """The emails of all managers."""
         # We ignore email principals here. They never signed up in indico anyway...
         return {p.principal.email
                 for p in self.acl_entries

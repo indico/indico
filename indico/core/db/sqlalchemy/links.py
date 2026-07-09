@@ -350,12 +350,9 @@ class LinkMixin:
 
     @property
     def link_event_log_data(self):
-        """
-        Return a dict containing information about the linked object
-        suitable for the event log.
+        """A dict containing information about the linked object suitable for the event log.
 
-        It does not return any information for an object linked to a
-        category or the event itself.
+        It does not return any information for an object linked to a category or the event itself.
         """
         data = {}
         if self.link_type == LinkType.session:

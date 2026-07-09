@@ -151,7 +151,7 @@ class IndicoLocale(Locale):
 
     @property
     def html_locale(self):
-        """Return locale in HTML-compatible way (e.g., en-US instead of en_US)."""
+        """The locale in an HTML-compatible way (e.g., en-US instead of en_US)."""
         return f'{self.language}-{self.territory}'
 
     @cached_property

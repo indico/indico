@@ -1185,7 +1185,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def ical_uid(self) -> str:
-        """Return the event UID used by iCalendar."""
+        """The event UID used by iCalendar."""
         return f'indico-event-{self.id}@{urlsplit(config.BASE_URL).hostname}'
 
 

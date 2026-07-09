@@ -468,17 +468,17 @@ class Registration(db.Model):
 
     @property
     def full_name(self):
-        """Return the user's name in 'Firstname Lastname' notation."""
+        """The user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
 
     @property
     def display_full_name(self):
-        """Return the full name using the user's preferred name format."""
+        """The full name using the user's preferred name format."""
         return format_display_full_name(session.user, self)
 
     @property
     def avatar_url(self):
-        """Return the url of the user's avatar."""
+        """The url of the user's avatar."""
         return url_for('event_registration.registration_avatar', self)
 
     @property
@@ -500,7 +500,7 @@ class Registration(db.Model):
 
     @property
     def is_paid(self):
-        """Return whether the registration has been paid for."""
+        """Whether the registration has been paid for."""
         paid_states = {TransactionStatus.successful, TransactionStatus.pending}
         return self.transaction is not None and self.transaction.status in paid_states
 

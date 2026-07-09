@@ -178,7 +178,7 @@ class DesignerTemplate(db.Model):
 
     @property
     def is_unlinkable(self):
-        """Return `True` if the template can be unlinked from a registration form."""
+        """Whether the template can be unlinked from a registration form."""
         from indico.modules.designer.util import has_regform_field_placeholders
         return not has_regform_field_placeholders(self.data)
 
