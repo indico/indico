@@ -231,7 +231,7 @@ function EntryPopupContent({
         )}
         <List.Item title={Translate.string('Date and time')}>
           <Icon name="clock outline" />
-          {formatTimeRange('en', startTime, endTime)}
+          {formatTimeRange(moment.locale().replace('_', '-'), startTime, endTime)}
         </List.Item>
         {parent?.title && (
           <List.Item title={Translate.string('Session block title')}>
