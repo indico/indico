@@ -238,7 +238,8 @@ export default function Entry({
   const newStart = moment(startDt).add(deltaMinutes, 'minutes');
   const newEnd = moment(startDt).add(deltaMinutes + duration, 'minutes');
 
-  const timeRange = formatTimeRange('en', newStart, newEnd); // TODO: use current locale
+  const locale = moment.locale().replace('_', '-');
+  const timeRange = formatTimeRange(locale, newStart, newEnd);
   // shift children startDt by deltaMinutes
   const children: ContribEntry[] = _children.map(child => ({
     ...child,
