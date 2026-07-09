@@ -163,19 +163,21 @@ export function DayTimetable({
   }
 
   function handleCalendarMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-    const clientY = event.clientY + wrapperRef.current.scrollTop;
-    const offsetY = clientY - wrapperRef.current.offsetTop;
-    const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
+    if (wrapperRef.current !== null) {
+      const clientY = event.clientY + wrapperRef.current.scrollTop;
+      const offsetY = clientY - wrapperRef.current.offsetTop;
+      const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
-    if (isDragging || selectedEntry || isWithinLimitsWithOffset) {
-      if (hoverGuideY !== null) {
-        setHoverGuideY(null);
+      if (isDragging || selectedEntry || isWithinLimitsWithOffset) {
+        if (hoverGuideY !== null) {
+          setHoverGuideY(null);
+        }
+        return;
       }
-      return;
-    }
 
-    const y = getPositionCalendarY(event.clientY);
-    setHoverGuideY(y);
+      const y = getPositionCalendarY(event.clientY);
+      setHoverGuideY(y);
+    }
   }
 
   function getCalendarTimeFromY(y: number) {
