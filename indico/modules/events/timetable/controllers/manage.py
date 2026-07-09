@@ -32,8 +32,8 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
                                                         create_timetable_entry, delete_timetable_entry,
-                                                        schedule_contribution, unschedule_timetable_entry,
-                                                        update_break_entry, update_timetable_entry)
+                                                        schedule_contribution, update_break_entry,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
 # TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
@@ -359,7 +359,7 @@ class RHTimetableContribution(RHManageContributionBase):
 
 class RHTimetableUnscheduleContribution(RHManageContributionBase):
     def _process_POST(self):
-        unschedule_timetable_entry(self.contrib.timetable_entry)
+        delete_timetable_entry(self.contrib.timetable_entry)
         return '', 204
 
 
