@@ -6,13 +6,11 @@
 # LICENSE file for more details.
 
 import pytest
-from flask import session
 
 from indico.modules.events import EventLogRealm
 from indico.modules.events.registration.controllers.management.tags import _assign_registration_tags
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.logs import LogKind
-from indico.modules.logs.models.entries import EventLogEntry
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -29,20 +27,16 @@ def create_tag(db, dummy_event):
     return _create_tag
 
 
-@pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_added(db, dummy_reg, dummy_user, create_tag):
-    session.set_session_user(dummy_user)
+def test_assign_tags_logs_added(dummy_reg, create_tag):
     tag_a = create_tag('Alpha')
     tag_b = create_tag('Beta')
 
     _assign_registration_tags([dummy_reg], add={tag_a, tag_b}, remove=set())
 
-    entries = EventLogEntry.query.filter_by(event=dummy_reg.event).all()
-    assert len(entries) == 1
-    entry = entries[0]
+    entry = dummy_reg.event.log_entries.one()
     assert entry.realm == EventLogRealm.management
     assert entry.kind == LogKind.positive
-    assert entry.module == 'Tags'
+    assert entry.module == 'Registration'
     assert dummy_reg.full_name in entry.summary
     assert 'Alpha' in entry.summary
     assert 'Beta' in entry.summary
@@ -50,28 +44,23 @@ def test_assign_tags_logs_added(db, dummy_reg, dummy_user, create_tag):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_removed(db, dummy_reg, dummy_user, create_tag):
-    session.set_session_user(dummy_user)
+def test_assign_tags_logs_removed(db, dummy_reg, create_tag):
     tag_a = create_tag('Alpha')
     dummy_reg.tags.add(tag_a)
     db.session.flush()
 
     _assign_registration_tags([dummy_reg], add=set(), remove={tag_a})
 
-    entries = EventLogEntry.query.filter_by(event=dummy_reg.event).all()
-    assert len(entries) == 1
-    entry = entries[0]
+    entry = dummy_reg.event.log_entries.one()
     assert entry.realm == EventLogRealm.management
     assert entry.kind == LogKind.negative
-    assert entry.module == 'Tags'
+    assert entry.module == 'Registration'
     assert dummy_reg.full_name in entry.summary
     assert 'Alpha' in entry.summary
     assert entry.meta['registration_id'] == dummy_reg.id
 
 
-@pytest.mark.usefixtures('request_context')
-def test_assign_tags_logs_both(db, dummy_reg, dummy_user, create_tag):
-    session.set_session_user(dummy_user)
+def test_assign_tags_logs_both(db, dummy_reg, create_tag):
     tag_a = create_tag('Alpha')
     tag_b = create_tag('Beta')
     dummy_reg.tags.add(tag_a)
@@ -79,16 +68,13 @@ def test_assign_tags_logs_both(db, dummy_reg, dummy_user, create_tag):
 
     _assign_registration_tags([dummy_reg], add={tag_b}, remove={tag_a})
 
-    entries = EventLogEntry.query.filter_by(event=dummy_reg.event).order_by(EventLogEntry.id).all()
+    entries = dummy_reg.event.log_entries.all()
     assert len(entries) == 2
     kinds = {e.kind for e in entries}
     assert kinds == {LogKind.positive, LogKind.negative}
 
 
 @pytest.mark.usefixtures('request_context')
-def test_assign_tags_no_log_when_nothing_changes(db, dummy_reg, dummy_user):
-    session.set_session_user(dummy_user)
-
+def test_assign_tags_no_log_when_nothing_changes(dummy_reg):
     _assign_registration_tags([dummy_reg], add=set(), remove=set())
-
-    assert EventLogEntry.query.filter_by(event=dummy_reg.event).count() == 0
+    assert not dummy_reg.event.log_entries.has_rows()

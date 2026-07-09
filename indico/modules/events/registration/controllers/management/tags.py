@@ -89,11 +89,11 @@ def _assign_registration_tags(registrations, add, remove):
         if added:
             added = sorted(t.title for t in added)
             reg.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                    f'Tags added to {reg.full_name}: {", ".join(added)}', session.user)
+                    f'Tags added to {reg.full_name}: {", ".join(added)}', session.user if session else None)
         if removed:
             removed = sorted(t.title for t in removed)
             reg.log(EventLogRealm.management, LogKind.negative, 'Registration',
-                    f'Tags removed from {reg.full_name}: {", ".join(removed)}', session.user)
+                    f'Tags removed from {reg.full_name}: {", ".join(removed)}', session.user if session else None)
 
 
 class RHRegistrationTagsAssign(RHRegistrationsActionBase):
