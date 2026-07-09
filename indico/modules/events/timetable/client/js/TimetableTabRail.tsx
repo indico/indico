@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import './TimetableTabRail.module.scss';
 import {Icon, Menu} from 'semantic-ui-react';
 
+import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -21,6 +22,7 @@ export default function TimetableTabRail() {
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const showSessions = useSelector(selectors.showSessions);
   const activePanel = useSelector(selectors.getActivePanel);
+  const eventId = useSelector(selectors.getEventId);
 
   return (
     // TODO: (Marina) Rename to 'show draft entries' or something like that
@@ -57,6 +59,15 @@ export default function TimetableTabRail() {
         >
           <Icon name="file outline" size="large" />
         </Menu.Item>
+        <PublicationStateSwitch
+          as={Menu.Item}
+          styleName="publication-switch"
+          eventId={eventId}
+          onSuccess={() => dispatch(actions.toggleDraft())}
+          basic
+          noText
+          size="tiny"
+        />
       </Menu>
     </div>
   );
