@@ -670,7 +670,7 @@ export function DayTimetable({
               >
                 {draftEntry
                   ? formatTimeRange(
-                      'en',
+                      moment.locale().replace('_', '-'),
                       draftEntry.startDt,
                       moment(draftEntry.startDt).add(draftEntry.duration, 'minutes')
                     )
