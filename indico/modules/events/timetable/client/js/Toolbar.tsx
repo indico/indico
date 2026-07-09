@@ -10,7 +10,6 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Header, Icon, Label} from 'semantic-ui-react';
 
-import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -161,12 +160,6 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   return (
     <div styleName="toolbar" ref={ref}>
       <div styleName="actions-bar">
-        <PublicationStateSwitch
-          eventId={eventId}
-          onSuccess={() => dispatch(actions.toggleDraft())}
-          basic
-          size="tiny"
-        />
         <Button basic onClick={addNewEntry} title={Translate.string('Add new entry')} size="tiny">
           <Icon name="plus" />
           <Translate>Add entry</Translate>
