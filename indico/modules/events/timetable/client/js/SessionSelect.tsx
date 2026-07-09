@@ -117,7 +117,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
       styleName="session-select"
       placeholder={
         sessions.length
-          ? Translate.string('Select a session')
+          ? Translate.string('Select a session or create one by typing its title')
           : Translate.string('Create a session by typing its title')
       }
       options={options}
@@ -131,6 +131,8 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
       onAddItem={() => _createDraftSessionOption()}
       search={(_, q) => _filterOptions(options, q)}
       onSearchChange={(_, {searchQuery: q}) => setQuery(q)}
+      selectOnBlur={false}
+      selectOnNavigation={false}
     />
   );
 }
