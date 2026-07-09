@@ -17,19 +17,29 @@ $toolbar-bg-color: $raincloud-gray;
 }
 
 :global(.ui.vertical.menu).tab-rail {
-    display: flex;
-    width: inherit;
-    gap: 10px;
-    height: calc(100% - 20px);
-    margin: 10px;
+  display: flex;
+  width: inherit;
+  gap: 10px;
+  height: calc(100% - 20px);
+  margin: 10px;
 
-     > :global(.item) {
+  > :global(.item) {
     margin: 0;
     padding: 10px;
 
     > :global(.icon) {
-       margin: 0;
-       font-size: 1.2rem;
+      margin: 0;
+      font-size: 1.2rem;
     }
+  }
+
+  &::after {
+    display: none;
+  }
+
+  .publication-switch {
+    margin-top: auto;
+    // SUI uses important so we need to override
+    box-shadow: none !important;
   }
 }
