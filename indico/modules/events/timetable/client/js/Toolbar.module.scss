@@ -88,6 +88,12 @@ $toolbar-bg-color: $raincloud-gray;
           display: flex;
           overflow-x: auto;
           box-sizing: content-box;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+
           // This padding in combination with fixed height
           // and overflow-y hidden above,it hides the scrollbar
           padding: 18px 0;
