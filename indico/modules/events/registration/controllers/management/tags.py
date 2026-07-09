@@ -82,14 +82,16 @@ class RHRegistrationTagEdit(RHManageRegistrationTagBase):
 
 def _assign_registration_tags(registrations, add, remove):
     for reg in registrations:
+        added = add - reg.tags
+        removed = (reg.tags | add) & remove
         reg.tags |= add
         reg.tags -= remove
-        if add:
-            added = sorted(t.title for t in add)
+        if added:
+            added = sorted(t.title for t in added)
             reg.log(EventLogRealm.management, LogKind.positive, 'Registration',
                     f'Tags added to {reg.full_name}: {", ".join(added)}', session.user)
-        if remove:
-            removed = sorted(t.title for t in remove)
+        if removed:
+            removed = sorted(t.title for t in removed)
             reg.log(EventLogRealm.management, LogKind.negative, 'Registration',
                     f'Tags removed from {reg.full_name}: {", ".join(removed)}', session.user)
 
