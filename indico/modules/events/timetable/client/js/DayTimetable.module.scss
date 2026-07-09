@@ -113,6 +113,7 @@ $toolbar-bg-color: $raincloud-gray;
 }
 
 .hover-guide {
+  font-weight: bold;
   position: absolute;
   display: flex;
   align-items: center;
@@ -120,9 +121,12 @@ $toolbar-bg-color: $raincloud-gray;
   color: #fff;
   pointer-events: none;
   z-index: 1;
-  background: #7dcfb6;
-  padding: 2px 10px;
-  font-size: 11px;
-  border-radius: 7px;
+  background: $teal;
+  padding: 4px 6px;
+  min-width: 60px;
+  font-size: 0.9rem;
+  line-height: 0.9rem;
+  border-radius: 7px 0 0 7px;
+  transition: 0.05s;
   transform: translate(-100%, -50%);
 }
