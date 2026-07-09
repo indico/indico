@@ -111,3 +111,22 @@ $toolbar-bg-color: $raincloud-gray;
 :global(body.timetable-entry-resizing *) {
   cursor: ns-resize;
 }
+
+.hover-guide {
+  font-weight: bold;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  pointer-events: none;
+  z-index: 1;
+  background: $teal;
+  padding: 4px 6px;
+  min-width: 60px;
+  font-size: 0.9rem;
+  line-height: 0.9rem;
+  border-radius: 7px 0 0 7px;
+  transition: 0.05s;
+  transform: translate(-100%, -50%);
+}
