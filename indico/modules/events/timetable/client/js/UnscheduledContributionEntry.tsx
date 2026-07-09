@@ -89,7 +89,7 @@ export function DraggableUnscheduledContributionEntry({
       const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
       const startDt = moment(dt).startOf('day').add(start, 'minutes');
       const newEnd = moment(startDt).add(duration, 'minutes');
-      timeRange = formatTimeRange('en', startDt, newEnd); // TODO: use current locale
+      timeRange = formatTimeRange(moment.locale().replace('_', '-'), startDt, newEnd);
     }
   }
 
