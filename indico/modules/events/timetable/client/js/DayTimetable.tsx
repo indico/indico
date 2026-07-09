@@ -11,9 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
 import {Translate, Param} from 'indico/react/i18n';
-
-import './DayTimetable.module.scss';
-import './Entry.module.scss';
+import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
@@ -57,6 +55,9 @@ import {
   pixelsToMinutes,
   getEntryUniqueId,
 } from './utils';
+
+import './DayTimetable.module.scss';
+import './Entry.module.scss';
 
 const AUTO_SCROLL_LIMIT_GAP_MINUTES = 90;
 
@@ -702,7 +703,7 @@ export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
 
 export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
   const oneHour = minutesToPixels(60);
-  const format = /h/.test(moment.localeData().longDateFormat('LT')) ? 'h A' : 'HH:mm';
+  const format = localeUses24HourTime(moment.locale().replace('_', '-')) ? 'HH:mm' : 'h A';
 
   return (
     <div styleName="time-gutter">
