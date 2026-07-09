@@ -30,6 +30,11 @@ main.main {
         display: flex;
         flex-direction: column;
 
+        #event-side-menu {
+          padding-bottom: 2em;
+          padding-right: 0.5em; // avoid the scrollbar overlapping the right border of the menu
+        }
+
         & > div.layout-side-menu {
           min-height: unset;
 
@@ -114,6 +119,7 @@ body:has(#timetable-container) {
           overflow-y: auto;
           position: relative;
           margin-right: 2px;
+          scrollbar-width: thin;
         }
       }
 
