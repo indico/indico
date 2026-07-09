@@ -19,12 +19,14 @@ import PublicationModal from './PublicationModal';
 interface PublicationStateSwitch {
   eventId: number;
   onSuccess?: () => void;
+  noText?: boolean;
   [key: string]: any;
 }
 
 export default function PublicationStateSwitch({
   eventId,
   onSuccess = () => undefined,
+  noText = false,
   ...rest
 }: PublicationStateSwitch) {
   const url = publicationURL({event_id: eventId});
@@ -62,7 +64,13 @@ export default function PublicationStateSwitch({
       {...rest}
     >
       <Icon name={published ? 'lock open' : 'lock'} />
-      {published ? <Translate>Published</Translate> : <Translate>Unpublished</Translate>}
+      {!noText ? (
+        published ? (
+          <Translate>Published</Translate>
+        ) : (
+          <Translate>Unpublished</Translate>
+        )
+      ) : null}
     </Button>
   );
 

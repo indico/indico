@@ -8,9 +8,8 @@
 import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Header, Icon, Label, Menu} from 'semantic-ui-react';
+import {Button, Header, Icon, Label} from 'semantic-ui-react';
 
-import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -50,31 +49,13 @@ function SessionBlockToolbar() {
     return null;
   }
 
-  const sessionColors = {
-    backgroundColor: `${colors.backgroundColor}55`,
-    color: colors.color,
-  };
-
   return (
-    <Menu tabular styleName="timetable-bar block">
-      <Label size="small" styleName="session" style={{...sessionColors}}>
+    <div styleName="timetable-bar block">
+      <Label size="small" styleName="session" style={{...colors}}>
         {session.title}
       </Label>
-      <Header as="h3" styleName="header">
-        <span>{title}</span>
-      </Header>
-      <Button
-        basic
-        size="mini"
-        onClick={closeExpandedBlock}
-        styleName="close-btn"
-        title={Translate.string('Close session block view')}
-      >
-        <Icon name="close" />
-        <Translate>Close session block view or press</Translate>
-        <kbd>Esc</kbd>
-      </Button>
-    </Menu>
+      {title && <Header styleName="header">{title}</Header>}
+    </div>
   );
 }
 
@@ -98,8 +79,8 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
   const currentDayIdxRef = useRef<number>(currentDayIdx);
   const reachedLastDay = currentDayIdx >= numDays - 1;
 
-  const gradientWidth = 10;
-  const dayWidth = 60;
+  const gradientWidth = 30;
+  const dayWidth = 75;
 
   const getDateFromIdx = (idx: number): Moment => eventStart.clone().add(idx, 'days');
 
@@ -178,50 +159,53 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
 
   return (
     <div styleName="toolbar" ref={ref}>
-      <Menu compact secondary styleName="actions-bar">
-        <Menu.Item className="right" styleName="action">
-          <PublicationStateSwitch
-            eventId={eventId}
-            onSuccess={() => dispatch(actions.toggleDraft())}
-            basic
+      <div styleName="actions-bar">
+        <Button basic onClick={addNewEntry} title={Translate.string('Add new entry')} size="tiny">
+          <Icon name="plus" />
+          <Translate>Add entry</Translate>
+        </Button>
+        <div styleName="right">
+          {expandedSessionBlock && (
+            <Button
+              onClick={() => dispatch(actions.setExpandedSessionBlock(null))}
+              title={Translate.string('Exit session block view')}
+              icon="arrow left"
+              circular
+              size="tiny"
+            />
+          )}
+          <Button
+            onClick={() => dispatch(actions.toggleExpand())}
+            title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
+            icon={isExpanded ? 'compress' : 'expand'}
+            circular
+            size="tiny"
           />
-        </Menu.Item>
-        <Menu.Item
-          onClick={addNewEntry}
-          title={Translate.string('Add new entry')}
-          icon="plus"
-          styleName="action"
-        />
-        <Menu.Item
-          onClick={() => dispatch(actions.toggleExpand())}
-          title={isExpanded ? Translate.string('Exit Fullscreen') : Translate.string('Expand')}
-          icon={isExpanded ? 'compress' : 'expand'}
-          styleName="action"
-        />
+        </div>
         {/* TODO: (Ajob) The logic behind this component is broken.
                          Evaluate necessity then remove or fix */}
         {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
-      </Menu>
+      </div>
       {expandedSessionBlock && <SessionBlockToolbar />}
       {!expandedSessionBlock && numDays > 1 && (
-        <Menu tabular styleName="timetable-bar">
+        <div styleName="timetable-bar">
           {numDays > 2 && (
-            <Menu.Item
+            <Button
               onClick={() => scrollByPage(-1)}
               disabled={currentDayIdx === 0}
               title={Translate.string('Previous page')}
               icon="angle double left"
-              styleName="action"
+              styleName="nav-button"
             />
           )}
-          <Menu.Item
+          <Button
             onClick={() => scrollByDay(-1)}
             disabled={currentDayIdx === 0}
             title={Translate.string('Previous day')}
             icon="angle left"
-            styleName="action"
+            styleName="nav-button"
           />
-          <Menu.Item fitted styleName="days-wrapper">
+          <div styleName="days-wrapper">
             <div ref={daysBarRef} styleName="days">
               <div styleName="gradient" />
               {[...Array(numDays).keys()].map(n => {
@@ -229,40 +213,44 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
                 const isActive = n === currentDayIdx;
 
                 return (
-                  <Menu.Item
-                    fitted="horizontally"
+                  <Button
                     key={n}
                     onClick={() => navigateToDayNumber(n)}
-                    styleName="day"
-                    active={isActive}
+                    styleName={`day ${isActive ? 'active' : ''}`}
                   >
-                    <span styleName="day-month">{d.format('MMM')}</span>
-                    <span styleName="day-number">{d.format('D')}</span>
-                    <span styleName="day-name">{d.format('ddd')}</span>
-                  </Menu.Item>
+                    <div styleName="day-badge">
+                      <div styleName="day-number">
+                        {new Intl.DateTimeFormat(moment.locale(), {
+                          month: 'short',
+                          day: 'numeric',
+                        }).format(d.toDate())}
+                      </div>
+                      <div styleName="day-name">{d.format('ddd')}</div>
+                    </div>
+                  </Button>
                 );
               })}
               <div styleName="gradient" />
             </div>
-          </Menu.Item>
-          <Menu.Item
+          </div>
+          <Button
             onClick={() => scrollByDay(1)}
             disabled={reachedLastDay}
             title={Translate.string('Next day')}
             icon="angle right"
             position="right"
-            styleName="action"
+            styleName="nav-button"
           />
           {numDays > 2 && (
-            <Menu.Item
+            <Button
               onClick={() => scrollByPage(1)}
               disabled={reachedLastDay}
               title={Translate.string('Next page')}
               icon="angle double right"
-              styleName="action"
+              styleName="nav-button"
             />
           )}
-        </Menu>
+        </div>
       )}
     </div>
   );
