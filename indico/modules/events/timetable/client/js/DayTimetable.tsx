@@ -652,13 +652,14 @@ export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
 
 export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
   const oneHour = minutesToPixels(60);
+  const format = /h/.test(moment.localeData().longDateFormat('LT')) ? 'h A' : 'HH:mm';
 
   return (
     <div styleName="time-gutter">
-      {Array.from({length: maxHour - minHour + 1}, (__, i) => {
-        const time = (minHour + i) % 12 || 12;
-        const suffix = i + minHour >= 12 ? 'PM' : 'AM';
-        return <TimeSlot key={i} height={oneHour} time={`${time} ${suffix}`} />;
+      {Array.from({length: maxHour - minHour + 1}, (_, i) => {
+        const time = moment({hour: minHour + i}).format(format);
+
+        return <TimeSlot key={i} height={oneHour} time={time} />;
       })}
     </div>
   );
