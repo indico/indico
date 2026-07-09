@@ -43,7 +43,6 @@ def test_assign_tags_logs_added(dummy_reg, create_tag):
     assert entry.meta['registration_id'] == dummy_reg.id
 
 
-@pytest.mark.usefixtures('request_context')
 def test_assign_tags_logs_removed(db, dummy_reg, create_tag):
     tag_a = create_tag('Alpha')
     dummy_reg.tags.add(tag_a)
@@ -74,7 +73,17 @@ def test_assign_tags_logs_both(db, dummy_reg, create_tag):
     assert kinds == {LogKind.positive, LogKind.negative}
 
 
-@pytest.mark.usefixtures('request_context')
-def test_assign_tags_no_log_when_nothing_changes(dummy_reg):
+def test_assign_tags_no_log_when_nothing_changes(dummy_reg, create_tag):
+    tag_a = create_tag('Alpha')
+    tag_b = create_tag('Beta')
+    # empty changeset
     _assign_registration_tags([dummy_reg], add=set(), remove=set())
+    assert not dummy_reg.event.log_entries.has_rows()
+    # redundant changes
+    dummy_reg.tags = {tag_a}
+    _assign_registration_tags([dummy_reg], add={tag_a}, remove=set())
+    _assign_registration_tags([dummy_reg], add=set(), remove={tag_b})
+    assert not dummy_reg.event.log_entries.has_rows()
+    # nonsense change
+    _assign_registration_tags([dummy_reg], add={tag_b}, remove={tag_b})
     assert not dummy_reg.event.log_entries.has_rows()

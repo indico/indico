@@ -82,8 +82,8 @@ class RHRegistrationTagEdit(RHManageRegistrationTagBase):
 
 def _assign_registration_tags(registrations, add, remove):
     for reg in registrations:
-        added = add - reg.tags
-        removed = (reg.tags | add) & remove
+        added = add - remove - reg.tags
+        removed = reg.tags & remove
         reg.tags |= add
         reg.tags -= remove
         if added:
