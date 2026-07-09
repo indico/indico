@@ -267,7 +267,7 @@ pygments==2.20.0
     #   ipython-pygments-lexers
 pynpm==0.3.0
     # via pywebpack
-pypdf==6.13.2
+pypdf==6.14.2
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
