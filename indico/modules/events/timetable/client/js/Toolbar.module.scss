@@ -13,66 +13,64 @@ $bg-color: $white;
 $toolbar-bg-color: $raincloud-gray;
 
 .toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   position: sticky;
   top: 0;
   background-color: $bg-color;
   z-index: 100;
   border-bottom: 2px solid rgba($raincloud-gray, 0.8);
+  padding: 15px 10px 0 10px;
+   // Makes sure there is spacing when there is no timetable bar (e.g. single day)
+  min-height: 64px;
 
-  :global(.ui.menu) {
-    height: 46px;
+  > .actions-bar {
+    margin: 0 5px;
+
+    > .right {
+      margin-left: auto;
+    }
+  }
+
+  .actions-bar,
+  .timetable-bar {
     display: flex;
     align-items: center;
-    margin: 0;
-    border: 0;
-
-    &.actions-bar {
-      box-shadow: 0 10px 10px -10px rgba($raincloud-gray, 0.8);
-      padding: 0;
-    }
 
     &.timetable-bar {
-      height: 100px;
+      height: 3.8rem;
       overflow-y: hidden;
 
       &.block {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
-        gap: 5px;
-        padding-top: 12px;
+        gap: 0.2rem;
+        padding: 0 10px;
 
         > :is(.header, .session) {
           margin: 0;
+          max-width: min(800px, 100%);
         }
 
         > .header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          letter-spacing: 1px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          letter-spacing: 0.05rem;
+          font-size: 1rem;
+          white-space: nowrap;
         }
 
         > .session {
-          font-weight: normal;
-          padding: 2px 6px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.7rem;
+          letter-spacing: 0.05rem;
+          padding: 4px 8px;
           border-radius: 100vh;
-        }
-
-        .close-btn {
-          box-shadow: none;
-          margin: 0;
-          padding: 2px;
-
-          kbd {
-            font-size: 0.75em;
-            padding: 1px 5px;
-            margin-left: 6px;
-            border: 1px solid #aaa;
-            border-radius: 3px;
-            background-color: #f9f9f9;
-          }
         }
       }
 
@@ -90,13 +88,18 @@ $toolbar-bg-color: $raincloud-gray;
           display: flex;
           overflow-x: auto;
           box-sizing: content-box;
-          // gap: 40px;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
 
           // This padding in combination with fixed height
           // and overflow-y hidden above,it hides the scrollbar
           padding: 18px 0;
 
           .day {
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -106,15 +109,20 @@ $toolbar-bg-color: $raincloud-gray;
             font-weight: normal;
             margin-bottom: 0;
             background: none;
+            padding: 0;
 
+            // Instead of gap we use this as the gradients also trigger a gap
             &:not(:last-of-type) {
-              margin-right: 20px;
+              margin-right: 15px;
             }
 
-            &:global(.active) {
-              .day-number {
-                color: $bg-color;
-                background-color: $primary-color;
+            &.active {
+              .day-badge {
+                > .day-number {
+                  color: $bg-color;
+                  background-color: $primary-color;
+                  opacity: 1;
+                }
               }
 
               > .day-month {
@@ -122,59 +130,70 @@ $toolbar-bg-color: $raincloud-gray;
               }
             }
 
-            &:global(:not(.active)) {
-              &:hover {
+            &:not(.active) {
+              > .day-badge {
                 > .day-number {
-                  background-color: rgba($black, 0.1);
-                  transition: 0.1s;
+                  opacity: 0.7;
+                }
+              }
+
+              &:hover {
+                > .day-badge {
+                  > .day-number {
+                    background-color: rgba($black, 0.1);
+                  }
                 }
               }
             }
 
-            > .day-month {
-              color: $bg-color;
+            > .day-badge {
               font-weight: bold;
-              font-size: 0.8em;
-              background-color: rgba($primary-color, 0.5);
-              border-radius: 3px;
-              padding: 2px 8px;
-              margin-bottom: 5px;
-              visibility: hidden;
-            }
-
-            > .day-name {
-              color: #555;
-            }
-
-            > .day-number {
-              font-size: 1.2em;
-              font-weight: bold;
-              width: 40px;
-              height: 40px;
+              // Needs to be px value for better calculations
+              width: 60px;
+              margin: 0.5rem 0;
+              padding: 0.5rem 0;
+              border-radius: 4px;
               display: flex;
+              flex-direction: column;
               justify-content: center;
               align-items: center;
-              border-radius: 100%;
+              gap: 0.3rem;
+
+              > .day-number {
+                transition: 0.1s;
+                display: flex;
+                justify-content: center;
+                font-size: 0.9rem;
+                padding: 0.2rem 0.2rem;
+                margin-top: -0.2rem;
+                border-radius: 3px;
+              }
+
+              > .day-name {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                opacity: 0.6;
+              }
             }
           }
 
           .gradient {
             pointer-events: none;
-            width: 15px;
+            width: 30px;
             margin-top: 10px;
-            height: 88px;
+            top: 0;
             bottom: 0;
             flex-shrink: 0;
             position: sticky;
             z-index: 1;
 
             &:first-child {
-              background: linear-gradient(90deg, $bg-color, transparent);
+              background: linear-gradient(90deg, $bg-color 30%, transparent);
               left: 0;
             }
 
             &:last-child {
-              background: linear-gradient(-90deg, $bg-color, transparent);
+              background: linear-gradient(-90deg, $bg-color 30%, transparent);
               right: 0;
             }
           }
@@ -182,9 +201,9 @@ $toolbar-bg-color: $raincloud-gray;
       }
     }
 
-    .action {
-      padding-left: 0.7em;
-      padding-right: 0.7em;
+    .nav-button {
+      background: none;
+      color: black;
 
       :global(.divider.text) {
         display: none;
