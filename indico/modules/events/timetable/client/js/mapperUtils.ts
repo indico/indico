@@ -94,15 +94,15 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: v => moment(v),
     toTransform: v => v.toISOString(),
   },
-  {
-    from: 'children',
-    to: 'children',
-    // TODO: (Ajob) Find a clean way to fix this use-before-define error...
-    // eslint-disable-next-line no-use-before-define
-    fromTransform: (children: Record<string, unknown>[]) => children.map(c => mapDataToEntry(c)),
-    // eslint-disable-next-line no-use-before-define
-    toTransform: (children: Entry[]) => children.map(c => mapEntryToData(c)),
-  },
+  // {
+  //   from: 'children',
+  //   to: 'children',
+  //   // TODO: (Ajob) Find a clean way to fix this use-before-define error...
+  //   // eslint-disable-next-line no-use-before-define
+  //   fromTransform: (children: Record<string, unknown>[]) => children.map(c => mapDataToEntry(c)),
+  //   // eslint-disable-next-line no-use-before-define
+  //   toTransform: (children: Entry[]) => children.map(c => mapEntryToData(c)),
+  // },
 ];
 
 const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
@@ -220,8 +220,9 @@ const {mapObjToData: mapEntryToData} = createMapper<Record<string, unknown>, Ent
 function mapDataToEntry(data: Record<string, unknown>, partial: true): Partial<Entry>;
 function mapDataToEntry(data: Record<string, unknown>, partial?: false): Entry;
 function mapDataToEntry(data: Record<string, unknown>, partial = false): Entry | Partial<Entry> {
+  // TODO get rid of entryDefaults?
   const entryDefaults: Partial<Record<EntryType, Partial<Entry>>> = {
-    [EntryType.SessionBlock]: {children: []},
+    [EntryType.SessionBlock]: {},
   };
   const defaults = entryDefaults[data.type as EntryType] ?? {};
   const {mapDataToObj} = createMapper<Record<string, unknown>, Entry>(entryMapperConfig, defaults);

@@ -145,6 +145,11 @@ export interface ChildBaseEntry {
   sessionBlockId?: string;
 }
 
+interface LayoutOverride {
+  column: number | null;
+  maxColumn: number | null;
+}
+
 export type ChildContribEntry = ContribEntry & ChildBaseEntry;
 export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
@@ -152,6 +157,7 @@ export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
+export type LayoutOverrides = Record<string, LayoutOverride>;
 
 export function isChildEntry(entry: Entry): entry is ChildEntry {
   // TODO: (Ajob) This is bypassing the 'Entry' type check because 'sessionBlockId'
@@ -172,7 +178,8 @@ export interface LocationParentObj {
 
 export interface Entries {
   draftEntry: any | null;
-  entries: DayEntries;
+  entries: Record<string, Entry>;
+  layoutOverrides: LayoutOverrides;
   unscheduled: any[];
   selectedId: string | null;
   draggedIds: Set<number>;
