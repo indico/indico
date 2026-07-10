@@ -51,7 +51,7 @@ def send_email(email, obj=None, module=None, user=None, log_metadata=None, log_s
 
     :param email: The email object returned by :func:`make_email`
     :param obj: If specified, the email will be saved in that object's log. The
-                object must have a `log()` method and an `id` attribute.
+                object must have a ``log`` method and an ``id`` attribute.
     :param module: The module name to show in the email log
     :param user: The user to show in the email log
     :param log_metadata: A metadata dictionary to be saved in the event's log
