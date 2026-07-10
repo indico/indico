@@ -1,7 +1,7 @@
 """Add emails realm to AppLogRealm
 
 Revision ID: 461958bf2774
-Revises: af9d03d7073c
+Revises: e1e229910f7e
 Create Date: 2026-02-18 13:46:48.862976
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '461958bf2774'
-down_revision = 'af9d03d7073c'
+down_revision = 'e1e229910f7e'
 branch_labels = None
 depends_on = None
 
