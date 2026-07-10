@@ -75,12 +75,16 @@ For example, Chinese (China) is ``zh_CN.GB2312``.
 5. Check the translations
 -------------------------
 
-Run ``indico i18n check-format-strings`` to make sure that all placeholders in the
-translated strings match.
+Run these two commands to check for matching placeholders and HTML tags:
 
-If this command finds any issues, we recommend fixing the translations in Transifex and
+.. code-block:: shell
+
+    indico i18n check-format-strings
+    indico i18n check-html-tags
+
+If these commands find any issues, we recommend fixing the translations in Transifex and
 reinstalling the updated translations before proceeding to the next step. Otherwise,
-this could to lead to errors when Indico tries to use the translated string.
+this could lead to errors when Indico tries to use the translated string.
 
 6. Compile translations and run Indico
 --------------------------------------
