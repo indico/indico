@@ -59,7 +59,7 @@ simplejson
 speaklater
 sqlalchemy<2  # major upgrade
 terminaltables
-translitcodec
+Unidecode
 ua-parser
 wallet-py3k
 weasyprint
