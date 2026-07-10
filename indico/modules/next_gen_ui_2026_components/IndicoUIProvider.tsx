@@ -8,6 +8,7 @@
 import React from 'react';
 
 import './IndicoUIProvider.scss';
+import {Demonstration} from './Demonstration';
 
 interface IndicoUIProviderProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export function IndicoUIProvider({children}: IndicoUIProviderProps) {
   return (
     <div className="indico-ui" role="none">
       {children}
+      <Demonstration />
     </div>
   );
 }
