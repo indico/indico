@@ -1,0 +1,142 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+@mixin button-size($size) {
+  height: var(--button-height-#{$size});
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-#{$size});
+}
+
+@mixin button-color($color) {
+  $palette: $color;
+
+  @if $color == 'primary' {
+    $palette: 'primary-blue';
+  }
+  --button-100: var(--indico-#{$palette}-100);
+  --button-500: var(--indico-#{$palette}-500);
+  --button-600: var(--indico-#{$palette}-600);
+  --button-800: var(--indico-#{$palette}-800);
+}
+
+:global(.indico-ui) {
+  &.root {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: var(--space-2);
+
+    font-family: inherit;
+    font-weight: 500;
+
+    border: none;
+    cursor: pointer;
+
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      border 0.15s ease;
+
+    &[data-size='xs'] {
+      @include button-size('xs');
+    }
+
+    &[data-size='sm'] {
+      @include button-size('sm');
+    }
+
+    &[data-size='md'] {
+      @include button-size('md');
+    }
+
+    &[data-size='lg'] {
+      @include button-size('lg');
+    }
+
+    &[data-size='xl'] {
+      @include button-size('xl');
+    }
+
+    &[data-color='primary'] {
+      @include button-color('primary');
+    }
+
+    &[data-color='gray'] {
+      @include button-color('gray');
+    }
+
+    &[data-color='success'] {
+      @include button-color('success');
+    }
+
+    &[data-color='warning'] {
+      @include button-color('warning');
+    }
+
+    &[data-color='error'] {
+      @include button-color('error');
+    }
+  }
+
+  &.root[data-variant='solid'] {
+    color: var(--color-accent-buttons);
+    background: var(--button-500);
+
+    &.root[data-opacity='opaque'] {
+      background-color: color-mix(in srgb, var(--button-500) 50%);
+    }
+
+    &.root[data-outlined] {
+      border: 10px solid var(--color-accent-buttons);
+    }
+
+    &:hover {
+      background: var(--button-600);
+    }
+
+    &:active {
+      background: var(--button-800);
+    }
+  }
+
+  &.root[data-variant='light'] {
+    color: var(--button-600);
+    background: var(--button-100);
+
+    &:hover {
+      background: var(--button-500);
+      color: white;
+    }
+
+    &:active {
+      background: var(--button-800);
+      color: white;
+    }
+  }
+
+  &.root[data-variant='white'] {
+    color: var(--button-600);
+    background: white;
+
+    &:hover {
+      background: var(--button-500);
+      color: white;
+    }
+
+    &:active {
+      background: var(--button-800);
+      color: white;
+    }
+  }
+
+  &.root[data-opacity='transparent'] {
+    background-color: transparent;
+  }
+}
