@@ -1,0 +1,36 @@
+{% extends 'events/management/full_width_base.html' %}
+{% from 'events/timetable/_timetable.html' import render_timetable %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+
+{%- block banner -%}{%- endblock -%}
+{%- block title -%}{%- endblock -%}
+
+{% block side_menu %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+    <button
+        class="timetable-sidepanel-management-toggle icon-prev i-button"
+        title="{% trans %}Toggle menu{% endtrans %}"
+        data-qtip-position="right">
+    </button>
+    <div id="timetable-container"
+         data-timetable-data="{{ timetable_data | tojson | forceescape }}"
+         data-event-info="{{ event_info | tojson | forceescape }}"
+         data-custom-links="{{ custom_links | tojson | forceescape }}"
+         data-search-token="{{ make_user_search_token() }}">
+    </div>
+    <script>
+        setupTimetable();
+    </script>
+    <script>
+        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', (evt) => {
+            const {target: sidePanelToggleButton} = evt;
+            const main = document.querySelector('main.main');
+            sidePanelToggleButton.classList.toggle('icon-prev');
+            sidePanelToggleButton.classList.toggle('icon-next');
+            main.classList.toggle('side-panel-closed');
+        });
+    </script>
+{% endblock %}

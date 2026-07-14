@@ -1,0 +1,35 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.timetable {
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+
+  &.expanded {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    overflow: hidden;
+  }
+
+  & > .content {
+    display: flex;
+  }
+}
+
+:global(div:not(.main-breadcrumb) > .full-width-content-wrapper > div > div.layout-side-menu:last-child) {
+  > :global(div.content-column > div.management-page > div.page-content > #timetable-container) {
+    > div.timetable.expanded {
+      height: auto;
+    }
+  }
+}
