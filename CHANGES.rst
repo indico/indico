@@ -75,6 +75,8 @@ Bugfixes
 - Use consistent sorting and hide deleted+unused single-choice options in
   registration list filters (:pr:`7439`, thanks :user:`duartegalvao`)
 - Honor room booking details restrictions in spreadsheet export (:pr:`7612`)
+- Show favorite events in the dashboard based on their end date instead of their
+  start date (:pr:`7653`, thanks :user:`SegiNyn`)
 
 Accessibility
 ^^^^^^^^^^^^^
