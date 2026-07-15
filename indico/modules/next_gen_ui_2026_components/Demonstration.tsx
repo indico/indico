@@ -28,6 +28,7 @@ const buttonAttributes = [
 ] as const;
 
 const buttonAttributesNoOpaque = ['', 'animated', 'compact', 'outlined', 'disabled'] as const;
+const textWeights = ['regular', 'medium', 'semibold', 'bold'] as const;
 
 export function Demonstration() {
   const [isIconExpanded, setIsIconExpanded] = useState(false);
@@ -118,7 +119,40 @@ export function Demonstration() {
               />
             </h2>
           </summary>
-          <h3>Solid</h3>
+          <h3> Button text Weights</h3>
+          <div className="grid-5">
+            {textWeights.map(textWeight =>
+              sizes.map(size => (
+                <div
+                  key={`${'solid'}-${'primary'}-${size}-${textWeight}-square`}
+                  styleName="demo-item align-center"
+                >
+                  <Button color="primary" variant="solid" size={size} textWeight={textWeight}>
+                    Button
+                  </Button>
+                  <div styleName="demo-label">
+                    solid • primary • {size} • {textWeight}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <h3> Rounded </h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-rounded`}
+                styleName="demo-item align-center"
+              >
+                <Button color="primary" variant="solid" size={size} rounded>
+                  Button
+                </Button>
+                <div styleName="demo-label">solid • primary • {size} • rounded</div>
+              </div>
+            ))}
+          </div>
+
+          <h3>Variant: Solid</h3>
           <section>
             <div className="grid-5">
               {colors.map(color =>
@@ -147,7 +181,7 @@ export function Demonstration() {
               )}
             </div>
           </section>
-          <h3>Light</h3>
+          <h3>Variant: Light</h3>
           <section>
             <div className="grid-5">
               {colors.map(color =>
@@ -176,7 +210,7 @@ export function Demonstration() {
               )}
             </div>
           </section>
-          <h3>White</h3>
+          <h3>Variant: White</h3>
           <section>
             <div className="grid-5">
               {colors.map(color =>
@@ -205,7 +239,7 @@ export function Demonstration() {
               )}
             </div>
           </section>
-          <h3>Transparent</h3>
+          <h3>Variant: Transparent</h3>
           <section>
             <div className="grid-5">
               {colorsWithWhite.map(color =>

@@ -27,6 +27,7 @@ interface BaseButtonProps {
   outlined?: boolean;
   compact?: boolean;
   animated?: boolean;
+  rounded?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
   onClick?: () => void;
@@ -60,6 +61,7 @@ export default function Button(props: ButtonProps) {
     outlined = false,
     compact = false,
     animated = false,
+    rounded = false,
     icon,
     iconPosition = 'left',
     onClick,
@@ -81,6 +83,7 @@ export default function Button(props: ButtonProps) {
       data-outlined={outlined ? '' : undefined}
       data-compact={compact ? '' : undefined}
       data-animated={animated ? '' : undefined}
+      data-rounded={rounded ? '' : undefined}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
@@ -105,6 +108,7 @@ export default function Button(props: ButtonProps) {
       data-outlined={outlined ? '' : undefined}
       data-compact={compact ? '' : undefined}
       data-animated={animated ? '' : undefined}
+      data-rounded={rounded ? '' : undefined}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
