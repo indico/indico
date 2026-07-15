@@ -9,8 +9,13 @@
 
 @mixin button-size($size) {
   height: var(--button-height-#{$size});
-  padding: var(--space-2) var(--space-4);
+  padding: var(--button-padding-#{$size});
   border-radius: var(--radius-#{$size});
+
+  &[data-compact] {
+    height: var(--button-height-#{$size}-compact);
+    padding: var(--button-padding-#{$size}-compact);
+  }
 }
 
 @mixin button-color($color) {
@@ -19,50 +24,38 @@
   @if $color == 'primary' {
     $palette: 'primary-blue';
   }
+
+  --button-50: var(--indico-#{$palette}-50);
   --button-100: var(--indico-#{$palette}-100);
+  --button-200: var(--indico-#{$palette}-200);
+  --button-300: var(--indico-#{$palette}-300);
+  --button-400: var(--indico-#{$palette}-400);
   --button-500: var(--indico-#{$palette}-500);
   --button-600: var(--indico-#{$palette}-600);
+  --button-700: var(--indico-#{$palette}-700);
   --button-800: var(--indico-#{$palette}-800);
 }
 
+@mixin button-typography($size) {
+  @include typography($size);
+
+  font-weight: var(--button-font-weight);
+}
+
+@mixin button-text-weight($weight) {
+  --button-font-weight: var(--font-weight-#{$weight});
+}
+
 :global(.indico-ui) {
-  &.root {
+  &.button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    gap: var(--space-2);
-
-    font-family: inherit;
-    font-weight: 500;
-
     border: none;
-    cursor: pointer;
-
     transition:
-      background 0.15s ease,
-      color 0.15s ease,
-      border 0.15s ease;
-
-    &[data-size='xs'] {
-      @include button-size('xs');
-    }
-
-    &[data-size='sm'] {
-      @include button-size('sm');
-    }
-
-    &[data-size='md'] {
-      @include button-size('md');
-    }
-
-    &[data-size='lg'] {
-      @include button-size('lg');
-    }
-
-    &[data-size='xl'] {
-      @include button-size('xl');
-    }
+      background var(--transition-fast),
+      color var(--transition-fast),
+      border var(--transition-fast);
 
     &[data-color='primary'] {
       @include button-color('primary');
@@ -83,60 +76,252 @@
     &[data-color='error'] {
       @include button-color('error');
     }
+
+    &[data-text-weight='regular'] {
+      @include button-text-weight('regular');
+    }
+
+    &[data-text-weight='medium'] {
+      @include button-text-weight('medium');
+    }
+
+    &[data-text-weight='semibold'] {
+      @include button-text-weight('semibold');
+    }
+
+    &[data-text-weight='bold'] {
+      @include button-text-weight('bold');
+    }
+
+    &[data-size='xs'] {
+      @include button-size('xs');
+      @include button-typography('text-xs');
+    }
+
+    &[data-size='sm'] {
+      @include button-size('sm');
+      @include button-typography('text-sm');
+    }
+
+    &[data-size='md'] {
+      @include button-size('md');
+      @include button-typography('text-md');
+    }
+
+    &[data-size='lg'] {
+      @include button-size('lg');
+      @include button-typography('text-lg');
+    }
+
+    &[data-size='xl'] {
+      @include button-size('xl');
+      @include button-typography('text-xl');
+    }
+
+    &[data-animated] {
+      &:not([data-disabled]) {
+        &:active {
+          animation: var(--slight-shift-up) var(--animation-duration-slow) ease-in;
+        }
+      }
+    }
   }
 
-  &.root[data-variant='solid'] {
+  &.button[data-variant='solid'] {
     color: var(--color-accent-buttons);
-    background: var(--button-500);
+    background-color: var(--button-500);
 
-    &.root[data-opacity='opaque'] {
-      background-color: color-mix(in srgb, var(--button-500) 50%);
+    &:hover {
+      background-color: var(--button-600);
     }
 
-    &.root[data-outlined] {
-      border: 10px solid var(--color-accent-buttons);
+    &:active {
+      background-color: var(--button-700);
     }
+
+    &[data-disabled] {
+      background-color: var(--button-300);
+      color: var(--button-50);
+
+      &:hover {
+        background-color: var(--button-300);
+        color: var(--button-50);
+      }
+    }
+
+    &[data-opaque] {
+      background-color: color-mix(in srgb, var(--button-500) 20%);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--button-500) 30%);
+      }
+
+      &:active {
+        background-color: color-mix(in srgb, var(--button-500) 40%);
+      }
+
+      &[data-disabled] {
+        background-color: color-mix(in srgb, var(--button-500) 10%);
+        color: var(--button-50);
+      }
+    }
+
+    &[data-outlined] {
+      border: 2px solid var(--color-accent-buttons);
+    }
+  }
+
+  &.button[data-variant='light'] {
+    color: var(--button-700);
+    background-color: var(--button-100);
+
+    &:hover {
+      background: var(--button-200);
+    }
+
+    &:active {
+      background: var(--button-300);
+    }
+
+    &[data-disabled] {
+      background-color: var(--button-50);
+      color: var(--button-300);
+
+      &:hover {
+        background-color: var(--button-50);
+        color: var(--button-300);
+      }
+    }
+
+    &[data-opaque] {
+      background-color: color-mix(in srgb, var(--button-100) 20%);
+      color: var(--button-600);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--button-100) 30%);
+      }
+
+      &:active {
+        background-color: color-mix(in srgb, var(--button-100) 40%);
+      }
+
+      &[data-disabled] {
+        background-color: color-mix(in srgb, var(--button-100) 10%);
+        color: var(--button-300);
+      }
+    }
+
+    &[data-outlined] {
+      border: 2px solid var(--button-700);
+    }
+  }
+
+  &.button[data-variant='white'] {
+    color: var(--button-600);
+    background-color: var(--color-accent-buttons);
 
     &:hover {
       background: var(--button-600);
+      color: var(--color-accent-buttons);
     }
 
     &:active {
-      background: var(--button-800);
+      background: var(--button-700);
+      color: var(--color-accent-buttons);
+    }
+
+    &[data-disabled] {
+      background-color: var(--color-disabled-buttons);
+      color: var(--button-300);
+
+      &:hover {
+        background-color: var(--color-disabled-buttons);
+        color: var(--button-300);
+      }
+    }
+
+    &[data-opaque] {
+      background-color: color-mix(in srgb, var(--color-accent-buttons) 20%);
+      color: var(--color-accent-buttons);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--color-accent-buttons) 30%);
+      }
+
+      &:active {
+        background-color: var(--color-accent-buttons);
+        color: var(--button-600);
+      }
+
+      &[data-disabled] {
+        background-color: color-mix(in srgb, var(--color-accent-buttons) 10%);
+        color: var(--color-disabled-buttons);
+      }
+    }
+
+    &[data-outlined] {
+      border: 2px solid var(--button-600);
+
+      &:active {
+        border-color: var(--button-700);
+      }
     }
   }
 
-  &.root[data-variant='light'] {
-    color: var(--button-600);
-    background: var(--button-100);
-
-    &:hover {
-      background: var(--button-500);
-      color: white;
-    }
-
-    &:active {
-      background: var(--button-800);
-      color: white;
-    }
-  }
-
-  &.root[data-variant='white'] {
-    color: var(--button-600);
-    background: white;
-
-    &:hover {
-      background: var(--button-500);
-      color: white;
-    }
-
-    &:active {
-      background: var(--button-800);
-      color: white;
-    }
-  }
-
-  &.root[data-opacity='transparent'] {
+  &.button[data-variant='transparent'] {
     background-color: transparent;
+    color: var(--button-600);
+
+    &:hover {
+      color: var(--button-700);
+    }
+
+    &:active {
+      color: var(--button-800);
+    }
+
+    &[data-disabled] {
+      color: var(--button-400);
+
+      &:hover {
+        color: var(--button-400);
+      }
+    }
+
+    &[data-outlined] {
+      border: 2px solid var(--button-600);
+
+      &:hover {
+        border-color: var(--button-700);
+      }
+
+      &:active {
+        border-color: var(--button-800);
+      }
+    }
+
+    &[data-color='white'] {
+      &[data-outlined] {
+        border: 2px solid var(--color-accent-buttons);
+
+        &:hover {
+          border-color: var(--indico-gray-200);
+        }
+      }
+
+      color: var(--color-accent-buttons);
+
+      &:hover {
+        color: var(--indico-gray-200);
+      }
+
+      &[data-disabled] {
+        color: var(--color-disabled-buttons);
+
+        &:hover {
+          color: var(--color-disabled-buttons);
+        }
+      }
+    }
   }
 }

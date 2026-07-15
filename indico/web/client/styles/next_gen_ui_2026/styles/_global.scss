@@ -10,6 +10,8 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 .indico-ui {
+  @include typography('text-sm', 'regular'); // 14 px
+
   & a {
     color: inherit;
   }

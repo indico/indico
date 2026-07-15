@@ -11,22 +11,22 @@ import {Icon, IconSource} from '../icon/Icon';
 import './Button.module.scss';
 
 export type ButtonColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
-export type Variant = 'solid' | 'light' | 'white';
+export type ButtonVariant = 'solid' | 'light' | 'white' | 'transparent';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type ButtonOpacity = 'opaque' | 'transparent';
+export type ButtonTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 export type IconPosition = 'left' | 'right';
 
-// export type ButtonVariant = 'outlined' | 'transparent' | 'opaque' | 'compact';
-
 interface BaseButtonProps {
-  color: ButtonColor;
-  variant?: Variant;
-  size?: ButtonSize;
-  opacity?: ButtonOpacity;
   className?: string;
+  color: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  textWeight?: ButtonTextWeight;
+  opaque?: boolean;
   disabled?: boolean;
   outlined?: boolean;
   compact?: boolean;
+  animated?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
   onClick?: () => void;
@@ -34,26 +34,32 @@ interface BaseButtonProps {
   children: React.ReactNode;
 }
 
-export type ButtonProps =
-  | (BaseButtonProps & {
-      variant: 'solid' | 'light' | 'white';
-      opacity?: 'opaque';
-    })
-  | (BaseButtonProps & {
-      variant?: never;
-      opacity?: 'transparent';
-    });
+export type ButtonProps = BaseButtonProps &
+  (
+    | {
+        variant: 'transparent';
+        color?: ButtonColor;
+        opaque?: never;
+      }
+    | {
+        variant: 'solid' | 'light' | 'white';
+        color: Exclude<ButtonColor, 'white'>;
+        opaque?: boolean;
+      }
+  );
 
 export default function Button(props: ButtonProps) {
   const {
+    className,
     color = 'primary',
     variant = 'solid',
     size = 'md',
-    opacity,
-    className,
+    textWeight = 'regular',
     disabled = false,
+    opaque = false,
     outlined = false,
     compact = false,
+    animated = false,
     icon,
     iconPosition = 'left',
     onClick,
@@ -64,15 +70,17 @@ export default function Button(props: ButtonProps) {
   return href ? (
     <a
       href={href}
-      styleName="root"
+      styleName="button"
       className={`indico-ui ${className || ''}`}
       data-color={color}
       data-variant={variant}
       data-size={size}
-      data-opacity={opacity}
+      data-text-weight={textWeight}
       data-disabled={disabled ? '' : undefined}
+      data-opaque={opaque ? '' : undefined}
       data-outlined={outlined ? '' : undefined}
       data-compact={compact ? '' : undefined}
+      data-animated={animated ? '' : undefined}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
@@ -86,15 +94,17 @@ export default function Button(props: ButtonProps) {
   ) : (
     <button
       type="button"
-      styleName="root"
+      styleName="button"
       className={`indico-ui ${className || ''}`}
       data-color={color}
       data-variant={variant}
       data-size={size}
-      data-opacity={opacity}
+      data-text-weight={textWeight}
       data-disabled={disabled ? '' : undefined}
+      data-opaque={opaque ? '' : undefined}
       data-outlined={outlined ? '' : undefined}
       data-compact={compact ? '' : undefined}
+      data-animated={animated ? '' : undefined}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
@@ -107,4 +117,3 @@ export default function Button(props: ButtonProps) {
     </button>
   );
 }
-// TO DO: white on white allow only if with opaque or transparent bg

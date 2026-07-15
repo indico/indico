@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 // Viewports (for saas media queries)
-  $viewport-mobile: 375px;
-  $viewport-tablet: 768px;
-  $viewport-desktop: 1280px;
+$viewport-mobile: 375px;
+$viewport-tablet: 768px;
+$viewport-desktop: 1280px;
 
 :root {
   // Spacing system
@@ -58,10 +58,10 @@
   --shadow-3xl: 0 32px 64px -12px rgba(10, 13, 18, 0.14);
 
   // Blurs
-    --blur-sm: blur(8px);
-    --blur-md: blur(16px);
-    --blur-lg: blur(24px);
-    --blur-xl: blur(40px);
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --blur-lg: blur(24px);
+  --blur-xl: blur(40px);
 
   // Transitions
   --transition-fast: 150ms ease;
@@ -80,9 +80,26 @@
   --icon-size-xl: 4rem; // 56px
 
   // Button sizes
-  --button-height-xs: 1.714rem; // 24px
-  --button-height-sm: 2.286rem; // 32px
-  --button-height-md: 2.857rem; // 40px
-  --button-height-lg: 3.429rem; // 48px
-  --button-height-xl: 4rem; // 56px
+  --button-height-xs: 2.143rem; // 30px
+  --button-height-xs-compact: 1.857rem; // 26px
+  --button-height-sm: 2.571rem; // 36px
+  --button-height-sm-compact: 2.286rem; // 32px
+  --button-height-md: 3.143rem; // 44px
+  --button-height-md-compact: 2.857rem; // 40px
+  --button-height-lg: 3.714rem; // 52px
+  --button-height-lg-compact: 3.429rem; // 48px
+  --button-height-xl: 4.286rem; // 60px
+  --button-height-xl-compact: 4rem; // 56px
+
+  // Button padding
+  --button-padding-xs: 0.5rem 1rem; // 7px 14px
+  --button-padding-xs-compact: 0.357rem 0.714rem; // 5px 10px
+  --button-padding-sm: 0.643rem 1.286rem; // 9px 18px
+  --button-padding-sm-compact: 0.5rem 1rem; // 7px 14px
+  --button-padding-md: 0.857rem 1.714rem; // 12px 24px
+  --button-padding-md-compact: 0.714rem 1.429rem; // 10px 20px
+  --button-padding-lg: 1rem 1.286rem; // 14px 28px
+  --button-padding-lg-compact: 0.857rem 1.143rem; // 12px 24px
+  --button-padding-xl: 1.143rem 1.429rem; // 16px 32px
+  --button-padding-xl-compact: 1rem 1.286rem; // 14px 28px
 }
