@@ -125,6 +125,10 @@
         }
       }
     }
+
+    &[data-rounded] {
+      border-radius: var(--radius-pill);
+    }
   }
 
   &.button[data-variant='solid'] {
@@ -140,11 +144,11 @@
     }
 
     &[data-disabled] {
-      background-color: var(--button-300);
+      background-color: var(--button-200);
       color: var(--button-50);
 
       &:hover {
-        background-color: var(--button-300);
+        background-color: var(--button-200);
         color: var(--button-50);
       }
     }
@@ -161,7 +165,7 @@
       }
 
       &[data-disabled] {
-        background-color: color-mix(in srgb, var(--button-500) 10%);
+        background-color: color-mix(in srgb, var(--button-200) 10%);
         color: var(--button-50);
       }
     }
@@ -176,20 +180,20 @@
     background-color: var(--button-100);
 
     &:hover {
-      background: var(--button-200);
+      background-color: var(--button-200);
     }
 
     &:active {
-      background: var(--button-300);
+      background-color: var(--button-300);
     }
 
     &[data-disabled] {
       background-color: var(--button-50);
-      color: var(--button-300);
+      color: var(--color-disabled-buttons-text);
 
       &:hover {
+        color: var(--color-disabled-buttons-text);
         background-color: var(--button-50);
-        color: var(--button-300);
       }
     }
 
@@ -207,7 +211,7 @@
 
       &[data-disabled] {
         background-color: color-mix(in srgb, var(--button-100) 10%);
-        color: var(--button-300);
+        color: var(--color-disabled-buttons-text);
       }
     }
 
@@ -232,11 +236,11 @@
 
     &[data-disabled] {
       background-color: var(--color-disabled-buttons);
-      color: var(--button-300);
+      color: var(--color-disabled-buttons-text);
 
       &:hover {
         background-color: var(--color-disabled-buttons);
-        color: var(--button-300);
+        color: var(--color-disabled-buttons-text);
       }
     }
 
@@ -255,7 +259,7 @@
 
       &[data-disabled] {
         background-color: color-mix(in srgb, var(--color-accent-buttons) 10%);
-        color: var(--color-disabled-buttons);
+        color: var(--color-disabled-buttons-text);
       }
     }
 
@@ -278,14 +282,6 @@
 
     &:active {
       color: var(--button-800);
-    }
-
-    &[data-disabled] {
-      color: var(--button-400);
-
-      &:hover {
-        color: var(--button-400);
-      }
     }
 
     &[data-outlined] {
@@ -314,14 +310,14 @@
       &:hover {
         color: var(--indico-gray-200);
       }
+    }
 
-      &[data-disabled] {
-        color: var(--color-disabled-buttons);
+    &[data-disabled] {
+        color: var(--color-disabled-buttons-text);
 
         &:hover {
-          color: var(--color-disabled-buttons);
+          color: var(--color-disabled-buttons-text);
         }
       }
-    }
   }
 }
