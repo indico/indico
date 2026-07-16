@@ -84,14 +84,26 @@ export default function Button(props: ButtonProps) {
       data-compact={compact ? '' : undefined}
       data-animated={animated ? '' : undefined}
       data-rounded={rounded ? '' : undefined}
+      data-icon={icon ? '' : undefined}
+      data-icon-position={iconPosition}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
-        <Icon icon={icon} color={color} size={size} variant="compact" decorative />
+        <Icon
+          icon={icon}
+          variant="compact"
+          decorative
+          styleName="button-icon"
+        />
       )}
       {children}
       {iconPosition === 'right' && icon && (
-        <Icon icon={icon} color={color} size={size} variant="compact" decorative />
+        <Icon
+          icon={icon}
+          variant="compact"
+          decorative
+          styleName="button-icon"
+        />
       )}
     </a>
   ) : (
@@ -109,14 +121,26 @@ export default function Button(props: ButtonProps) {
       data-compact={compact ? '' : undefined}
       data-animated={animated ? '' : undefined}
       data-rounded={rounded ? '' : undefined}
+      data-icon={icon ? '' : undefined}
+      data-icon-position={iconPosition}
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
-        <Icon icon={icon} color={color} size={size} variant="compact" decorative />
+        <Icon
+          icon={icon}
+          variant="compact"
+          decorative
+          styleName="button-icon"
+        />
       )}
       {children}
       {iconPosition === 'right' && icon && (
-        <Icon icon={icon} color={color} size={size} variant="compact" decorative />
+        <Icon
+          icon={icon}
+          variant="compact"
+          decorative
+          styleName="button-icon"
+        />
       )}
     </button>
   );
