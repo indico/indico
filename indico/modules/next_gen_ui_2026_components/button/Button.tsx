@@ -4,7 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-import React from 'react';
+import React, {forwardRef} from 'react';
 
 import {Icon, IconSource} from '../icon/Icon';
 
@@ -16,9 +16,8 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type ButtonTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 export type IconPosition = 'left' | 'right' | 'icon-only';
 
-interface BaseButtonProps {
+interface CustomButtonProps {
   className?: string;
-  color: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   textWeight?: ButtonTextWeight;
@@ -28,28 +27,48 @@ interface BaseButtonProps {
   compact?: boolean;
   animated?: boolean;
   rounded?: boolean;
+  fullWidth?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
-  onClick?: () => void;
+  // type?: 'button' | 'submit' | 'reset';
+  onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   href?: string;
   children?: React.ReactNode;
+  'aria-label'?: string;
+  'aria-describedby'?: string;
+  id?: string;
+  title?: string;
+  tabIndex?: number;
 }
 
-export type ButtonProps = BaseButtonProps &
+// type NativeButtonProps =
+//   React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+// type NativeAnchorProps =
+//   React.AnchorHTMLAttributes<HTMLAnchorElement>;
+
+export type ButtonProps = CustomButtonProps &
+  //  (
+  //   | (NativeButtonProps & {
+  //       href?: never;
+  //     })
+  //   | NativeAnchorProps
+  // )
+  // &
   (
     | {
-        variant: 'transparent';
+        variant?: 'transparent';
         color?: ButtonColor;
         opaque?: never;
       }
     | {
-        variant: 'solid' | 'light' | 'white';
-        color: Exclude<ButtonColor, 'white'>;
+        variant?: 'solid' | 'light' | 'white';
+        color?: Exclude<ButtonColor, 'white'>;
         opaque?: boolean;
       }
   );
 
-export default function Button(props: ButtonProps) {
+const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((props, ref) => {
   const {
     className,
     color = 'primary',
@@ -62,66 +81,89 @@ export default function Button(props: ButtonProps) {
     compact = false,
     animated = false,
     rounded = false,
+    fullWidth = false,
     icon,
     iconPosition = 'left',
     onClick,
     href,
     children,
+    ...rest
   } = props;
 
-  return href ? (
-    <a
-      href={href}
-      styleName="button"
-      className={`indico-ui ${className || ''}`}
-      data-color={color}
-      data-variant={variant}
-      data-size={size}
-      data-text-weight={textWeight}
-      data-disabled={disabled ? '' : undefined}
-      data-opaque={opaque ? '' : undefined}
-      data-outlined={outlined ? '' : undefined}
-      data-compact={compact ? '' : undefined}
-      data-animated={animated ? '' : undefined}
-      data-rounded={rounded ? '' : undefined}
-      data-icon={icon ? '' : undefined}
-      data-icon-position={iconPosition}
-      onClick={onClick}
-    >
-      {(iconPosition === 'left' || iconPosition === 'icon-only') && icon && (
-        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
-      )}
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
+
+  const dataProps = {
+    'data-color': color,
+    'data-variant': variant,
+    'data-size': size,
+    'data-text-weight': textWeight,
+    'data-disabled': disabled ? '' : undefined,
+    'data-opaque': opaque ? '' : undefined,
+    'data-outlined': outlined ? '' : undefined,
+    'data-compact': compact ? '' : undefined,
+    'data-animated': animated ? '' : undefined,
+    'data-rounded': rounded ? '' : undefined,
+    'data-full-width': fullWidth ? '' : undefined,
+    'data-icon': icon ? '' : undefined,
+    'data-icon-position': iconPosition,
+  };
+
+  const iconElement = icon && (
+    <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
+  );
+
+  // if content has no children but has an icon, aria-label is required for accessibility
+  const content = (
+    <>
+      {icon && iconPosition !== 'right' && iconElement}
       {children}
-      {iconPosition === 'right' && icon && (
-        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
-      )}
-    </a>
-  ) : (
+      {icon && iconPosition === 'right' && iconElement}
+    </>
+  );
+
+  const sharedClassName = `indico-ui ${className || ''}`;
+
+  if (href !== undefined) {
+    return (
+      <a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        styleName="button"
+        className={sharedClassName}
+        href={disabled ? undefined : href}
+        aria-disabled={disabled || undefined}
+        onClick={handleClick}
+        {...dataProps}
+        {...rest}
+        tabIndex={disabled ? -1 : rest.tabIndex}
+        role={disabled ? 'link' : undefined}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
     <button
+      ref={ref as React.Ref<HTMLButtonElement>}
       type="button"
       styleName="button"
-      className={`indico-ui ${className || ''}`}
-      data-color={color}
-      data-variant={variant}
-      data-size={size}
-      data-text-weight={textWeight}
-      data-disabled={disabled ? '' : undefined}
-      data-opaque={opaque ? '' : undefined}
-      data-outlined={outlined ? '' : undefined}
-      data-compact={compact ? '' : undefined}
-      data-animated={animated ? '' : undefined}
-      data-rounded={rounded ? '' : undefined}
-      data-icon={icon ? '' : undefined}
-      data-icon-position={iconPosition}
-      onClick={onClick}
+      className={sharedClassName}
+      disabled={disabled}
+      onClick={handleClick}
+      {...dataProps}
+      {...rest}
     >
-      {(iconPosition === 'left' || iconPosition === 'icon-only') && icon && (
-        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
-      )}
-      {children}
-      {iconPosition === 'right' && icon && (
-        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
-      )}
+      {content}
     </button>
   );
-}
+});
+
+Button.displayName = 'Button';
+
+export default Button;

@@ -7,6 +7,8 @@
 
 @use 'next_gen_ui_2026/styles/base' as *;
 
+// TODO: Clean up order of attributes and create clearer structure
+
 @mixin button-size-spacing($size, $space) {
   height: var(--button-height-#{$size});
   padding: var(--button-padding-y-#{$size}) var(--button-padding-x-#{$size});
@@ -58,6 +60,7 @@
 
 :global(.indico-ui) {
   &.button {
+    @include focus-ring();
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -141,6 +144,11 @@
 
     &[data-rounded] {
       border-radius: var(--radius-pill);
+    }
+
+    &[data-full-width] {
+      width: 100%;
+      display: flex;
     }
 
     .button-icon {
