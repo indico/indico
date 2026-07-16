@@ -14,7 +14,7 @@ export type ButtonColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' |
 export type ButtonVariant = 'solid' | 'light' | 'white' | 'transparent';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type ButtonTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
-export type IconPosition = 'left' | 'right';
+export type IconPosition = 'left' | 'right' | 'icon-only';
 
 interface BaseButtonProps {
   className?: string;
@@ -32,7 +32,7 @@ interface BaseButtonProps {
   iconPosition?: IconPosition;
   onClick?: () => void;
   href?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export type ButtonProps = BaseButtonProps &
@@ -88,7 +88,7 @@ export default function Button(props: ButtonProps) {
       data-icon-position={iconPosition}
       onClick={onClick}
     >
-      {iconPosition === 'left' && icon && (
+      {(iconPosition === 'left' || iconPosition === 'icon-only') && icon && (
         <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
       {children}
@@ -115,7 +115,7 @@ export default function Button(props: ButtonProps) {
       data-icon-position={iconPosition}
       onClick={onClick}
     >
-      {iconPosition === 'left' && icon && (
+      {(iconPosition === 'left' || iconPosition === 'icon-only') && icon && (
         <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
       {children}
