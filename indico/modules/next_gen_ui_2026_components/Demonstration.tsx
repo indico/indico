@@ -117,7 +117,7 @@ export function Demonstration() {
           </section>
         </details>
         {/* BUTTON */}
-        <details open={isButtonExpanded}>
+        <details>
           <summary onClick={() => setIsButtonExpanded(!isButtonExpanded)}>
             <h2>
               Buttons
@@ -161,7 +161,43 @@ export function Demonstration() {
               </div>
             ))}
           </div>
-
+          <h3> Icon only </h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-icon-only`}
+                styleName="demo-item align-center"
+              >
+                <Button
+                  color="primary"
+                  variant="solid"
+                  size={size}
+                  icon="fas:calendar"
+                  iconPosition="icon-only"
+                />
+                <div styleName="demo-label">solid • primary • {size} • icon only</div>
+              </div>
+            ))}
+          </div>
+          <h3> Icon only rounded</h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-icon-only-rounded`}
+                styleName="demo-item align-center"
+              >
+                <Button
+                  color="primary"
+                  variant="solid"
+                  size={size}
+                  icon="fas:calendar"
+                  iconPosition="icon-only"
+                  rounded
+                />
+                <div styleName="demo-label">solid • primary • {size} • icon only rounded</div>
+              </div>
+            ))}
+          </div>
           <h3>Variant: Solid</h3>
           <section>
             <div className="grid-5">
