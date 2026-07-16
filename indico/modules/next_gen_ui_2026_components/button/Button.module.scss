@@ -7,14 +7,24 @@
 
 @use 'next_gen_ui_2026/styles/base' as *;
 
-@mixin button-size($size) {
+@mixin button-size-spacing($size, $space) {
   height: var(--button-height-#{$size});
-  padding: var(--button-padding-#{$size});
+  padding: var(--button-padding-y-#{$size}) var(--button-padding-x-#{$size});
   border-radius: var(--radius-#{$size});
+
+  &[data-icon] {
+    --icon-height: calc(var(--button-height-#{$size}) - ((var(--button-padding-y-#{$size})) * 2));
+    --icon-margin: var(--space-#{$space});
+  }
 
   &[data-compact] {
     height: var(--button-height-#{$size}-compact);
-    padding: var(--button-padding-#{$size}-compact);
+    padding: var(--button-padding-y-#{$size}-compact) var(--button-padding-x-#{$size}-compact);
+
+    &[data-icon] {
+      --icon-height: calc(var(--button-height-#{$size}-compact) - ((var(--button-padding-y-#{$size}-compact)) * 2));
+      --icon-margin: var(--space-#{$space});
+    }
   }
 }
 
@@ -94,32 +104,35 @@
     }
 
     &[data-size='xs'] {
-      @include button-size('xs');
+      @include button-size-spacing('xs', '1');
       @include button-typography('text-xs');
     }
 
     &[data-size='sm'] {
-      @include button-size('sm');
+      @include button-size-spacing('sm', '2');
       @include button-typography('text-sm');
     }
 
     &[data-size='md'] {
-      @include button-size('md');
+      @include button-size-spacing('md', '3');
       @include button-typography('text-md');
     }
 
     &[data-size='lg'] {
-      @include button-size('lg');
+      @include button-size-spacing('lg', '4');
       @include button-typography('text-lg');
     }
 
     &[data-size='xl'] {
-      @include button-size('xl');
+      @include button-size-spacing('xl', '5');
       @include button-typography('text-xl');
     }
 
     &[data-animated] {
       &:not([data-disabled]) {
+        will-change: transform;
+        backface-visibility: hidden;
+
         &:active {
           animation: var(--slight-shift-up) var(--animation-duration-slow) ease-in;
         }
@@ -129,11 +142,28 @@
     &[data-rounded] {
       border-radius: var(--radius-pill);
     }
+
+    .button-icon {
+      height: var(--icon-height);
+      width: var(--icon-height);
+    }
+
+    &[data-icon-position='left'] .button-icon {
+      margin-right: var(--icon-margin);
+    }
+
+    &[data-icon-position='right'] .button-icon {
+      margin-left: var(--icon-margin);
+    }
   }
 
   &.button[data-variant='solid'] {
     color: var(--color-accent-buttons);
     background-color: var(--button-500);
+
+    .button-icon {
+      color: var(--color-accent-buttons);
+    }
 
     &:hover {
       background-color: var(--button-600);
@@ -147,9 +177,17 @@
       background-color: var(--button-200);
       color: var(--button-50);
 
+      .button-icon {
+        color: var(--button-50);
+      }
+
       &:hover {
         background-color: var(--button-200);
         color: var(--button-50);
+
+        .button-icon {
+          color: var(--button-50);
+        }
       }
     }
 
@@ -166,7 +204,6 @@
 
       &[data-disabled] {
         background-color: color-mix(in srgb, var(--button-200) 10%);
-        color: var(--button-50);
       }
     }
 
@@ -179,6 +216,10 @@
     color: var(--button-700);
     background-color: var(--button-100);
 
+    .button-icon {
+      color: var(--button-700);
+    }
+
     &:hover {
       background-color: var(--button-200);
     }
@@ -188,12 +229,15 @@
     }
 
     &[data-disabled] {
-      background-color: var(--button-50);
+      background-color: var(--color-disabled-buttons);
       color: var(--color-disabled-buttons-text);
 
-      &:hover {
+      .button-icon {
         color: var(--color-disabled-buttons-text);
-        background-color: var(--button-50);
+      }
+
+      &:hover {
+        background-color: var(--color-disabled-buttons);
       }
     }
 
@@ -212,6 +256,10 @@
       &[data-disabled] {
         background-color: color-mix(in srgb, var(--button-100) 10%);
         color: var(--color-disabled-buttons-text);
+
+        .button-icon {
+          color: var(--color-disabled-buttons-text);
+        }
       }
     }
 
@@ -224,9 +272,17 @@
     color: var(--button-600);
     background-color: var(--color-accent-buttons);
 
+    .button-icon {
+      color: var(--button-600);
+    }
+
     &:hover {
       background: var(--button-600);
       color: var(--color-accent-buttons);
+
+      .button-icon {
+        color: var(--color-accent-buttons);
+      }
     }
 
     &:active {
@@ -238,15 +294,27 @@
       background-color: var(--color-disabled-buttons);
       color: var(--color-disabled-buttons-text);
 
+      .button-icon {
+        color: var(--color-disabled-buttons-text);
+      }
+
       &:hover {
         background-color: var(--color-disabled-buttons);
         color: var(--color-disabled-buttons-text);
+
+        .button-icon {
+          color: var(--color-disabled-buttons-text);
+        }
       }
     }
 
     &[data-opaque] {
       background-color: color-mix(in srgb, var(--color-accent-buttons) 20%);
       color: var(--color-accent-buttons);
+
+      .button-icon {
+        color: var(--color-accent-buttons);
+      }
 
       &:hover {
         background-color: color-mix(in srgb, var(--color-accent-buttons) 30%);
@@ -255,11 +323,19 @@
       &:active {
         background-color: var(--color-accent-buttons);
         color: var(--button-600);
+
+        .button-icon {
+          color: var(--button-600);
+        }
       }
 
       &[data-disabled] {
         background-color: color-mix(in srgb, var(--color-accent-buttons) 10%);
         color: var(--color-disabled-buttons-text);
+
+        .button-icon {
+          color: var(--color-disabled-buttons-text);
+        }
       }
     }
 
@@ -276,12 +352,24 @@
     background-color: transparent;
     color: var(--button-600);
 
+    .button-icon {
+      color: var(--button-600);
+    }
+
     &:hover {
       color: var(--button-700);
+
+      .button-icon {
+        color: var(--button-700);
+      }
     }
 
     &:active {
       color: var(--button-800);
+
+      .button-icon {
+        color: var(--button-800);
+      }
     }
 
     &[data-outlined] {
@@ -303,21 +391,49 @@
         &:hover {
           border-color: var(--indico-gray-200);
         }
+
+        &:active {
+          border-color: var(--indico-gray-300);
+        }
       }
 
       color: var(--color-accent-buttons);
 
+      .button-icon {
+        color: var(--color-accent-buttons);
+      }
+
       &:hover {
         color: var(--indico-gray-200);
-      }
-    }
 
-    &[data-disabled] {
+        .button-icon {
+          color: var(--indico-gray-200);
+        }
+      }
+
+      &:active {
+        color: var(--indico-gray-300);
+
+        .button-icon {
+          color: var(--indico-gray-300);
+        }
+      }
+
+      &[data-disabled] {
         color: var(--color-disabled-buttons-text);
+
+        .button-icon {
+          color: var(--color-disabled-buttons-text);
+        }
 
         &:hover {
           color: var(--color-disabled-buttons-text);
+
+          .button-icon {
+            color: var(--color-disabled-buttons-text);
+          }
         }
       }
+    }
   }
 }

@@ -98,8 +98,34 @@ $viewport-desktop: 1280px;
   --button-padding-sm-compact: 0.5rem 1rem; // 7px 14px
   --button-padding-md: 0.857rem 1.714rem; // 12px 24px
   --button-padding-md-compact: 0.714rem 1.429rem; // 10px 20px
-  --button-padding-lg: 1rem 1.286rem; // 14px 28px
-  --button-padding-lg-compact: 0.857rem 1.143rem; // 12px 24px
-  --button-padding-xl: 1.143rem 1.429rem; // 16px 32px
-  --button-padding-xl-compact: 1rem 1.286rem; // 14px 28px
+  --button-padding-lg: 1rem 1.286rem; // 14px 18px
+  --button-padding-lg-compact: 0.857rem 1.714rem; // 12px 24px
+  --button-padding-xl: 1.143rem 2.286rem; // 16px 32px
+  --button-padding-xl-compact: 1rem 2rem; // 14px 28px
+
+  // Button padding — vertical / horizontal split
+--button-padding-y-xs: 0.5rem; // 7px
+--button-padding-x-xs: 1rem; // 14px
+--button-padding-y-xs-compact: 0.357rem; // 5px
+--button-padding-x-xs-compact: 0.714rem; // 10px
+
+--button-padding-y-sm: 0.643rem; // 9px
+--button-padding-x-sm: 1.286rem; // 18px
+--button-padding-y-sm-compact: 0.5rem; // 7px
+--button-padding-x-sm-compact: 1rem; // 14px
+
+--button-padding-y-md: 0.857rem; // 12px
+--button-padding-x-md: 1.714rem; // 24px
+--button-padding-y-md-compact: 0.714rem; // 10px
+--button-padding-x-md-compact: 1.429rem; // 20px
+
+--button-padding-y-lg: 1rem; // 14px
+--button-padding-x-lg: 2rem; // 28px
+--button-padding-y-lg-compact: 0.857rem; // 12px
+--button-padding-x-lg-compact: 1.714rem; // 24px
+
+--button-padding-y-xl: 1.143rem; // 16px
+--button-padding-x-xl: 2.286rem; // 32px
+--button-padding-y-xl-compact: 1rem; // 14px
+--button-padding-x-xl-compact: 2rem; // 28px
 }
