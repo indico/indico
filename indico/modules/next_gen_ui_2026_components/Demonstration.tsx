@@ -21,13 +21,23 @@ const buttonAttributes = [
   '',
   'animated',
   'compact',
+  'compact icon=fas:calendar',
+  'icon=fas:calendar',
   'outlined',
   'disabled',
   'opaque',
   'disabled opaque',
 ] as const;
 
-const buttonAttributesNoOpaque = ['', 'animated', 'compact', 'outlined', 'disabled'] as const;
+const buttonAttributesNoOpaque = [
+  '',
+  'animated',
+  'compact',
+  'compact icon=fas:calendar',
+  'icon=fas:calendar',
+  'outlined',
+  'disabled',
+] as const;
 const textWeights = ['regular', 'medium', 'semibold', 'bold'] as const;
 
 export function Demonstration() {
@@ -167,7 +177,12 @@ export function Demonstration() {
                         variant="solid"
                         size={size}
                         {...(attribute
-                          ? Object.fromEntries(attribute.split(' ').map(attr => [attr, true]))
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
                           : {})}
                       >
                         Button
@@ -196,7 +211,12 @@ export function Demonstration() {
                         variant="light"
                         size={size}
                         {...(attribute
-                          ? Object.fromEntries(attribute.split(' ').map(attr => [attr, true]))
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
                           : {})}
                       >
                         Button
@@ -225,7 +245,12 @@ export function Demonstration() {
                         variant="white"
                         size={size}
                         {...(attribute
-                          ? Object.fromEntries(attribute.split(' ').map(attr => [attr, true]))
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
                           : {})}
                       >
                         Button
@@ -267,7 +292,12 @@ export function Demonstration() {
                           variant="transparent"
                           size={size}
                           {...(attribute
-                            ? Object.fromEntries(attribute.split(' ').map(attr => [attr, true]))
+                            ? Object.fromEntries(
+                                attribute.split(' ').map(attr => {
+                                  const [key, value] = attr.split('=');
+                                  return [key, value ?? true];
+                                })
+                              )
                             : {})}
                         >
                           Button
