@@ -89,21 +89,11 @@ export default function Button(props: ButtonProps) {
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
-        <Icon
-          icon={icon}
-          variant="compact"
-          decorative
-          styleName="button-icon"
-        />
+        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
       {children}
       {iconPosition === 'right' && icon && (
-        <Icon
-          icon={icon}
-          variant="compact"
-          decorative
-          styleName="button-icon"
-        />
+        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
     </a>
   ) : (
@@ -126,21 +116,11 @@ export default function Button(props: ButtonProps) {
       onClick={onClick}
     >
       {iconPosition === 'left' && icon && (
-        <Icon
-          icon={icon}
-          variant="compact"
-          decorative
-          styleName="button-icon"
-        />
+        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
       {children}
       {iconPosition === 'right' && icon && (
-        <Icon
-          icon={icon}
-          variant="compact"
-          decorative
-          styleName="button-icon"
-        />
+        <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
       )}
     </button>
   );
