@@ -155,6 +155,10 @@
     &[data-icon-position='right'] .button-icon {
       margin-left: var(--icon-margin);
     }
+
+    &[data-icon-position='icon-only'] .button-icon {
+      margin: 0;
+    }
   }
 
   &.button[data-variant='solid'] {
