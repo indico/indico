@@ -49,3 +49,17 @@
     }
   }
 }
+
+@mixin color($color) {
+  $palette: if($color == 'primary', 'primary-blue', $color);
+
+  --intenzity-50: var(--indico-#{$palette}-50);
+  --intenzity-100: var(--indico-#{$palette}-100);
+  --intenzity-200: var(--indico-#{$palette}-200);
+  --intenzity-300: var(--indico-#{$palette}-300);
+  --intenzity-400: var(--indico-#{$palette}-400);
+  --intenzity-500: var(--indico-#{$palette}-500);
+  --intenzity-600: var(--indico-#{$palette}-600);
+  --intenzity-700: var(--indico-#{$palette}-700);
+  --intenzity-800: var(--indico-#{$palette}-800);
+}

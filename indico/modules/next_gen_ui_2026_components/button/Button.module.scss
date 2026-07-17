@@ -7,7 +7,9 @@
 
 @use 'next_gen_ui_2026/styles/base' as *;
 
-// TODO: Clean up order of attributes and create clearer structure
+// ============================================================================
+// MIXINS
+// ============================================================================
 
 @mixin button-size-spacing($size, $space) {
   height: var(--button-height-#{$size});
@@ -30,33 +32,18 @@
   }
 }
 
-@mixin button-color($color) {
-  $palette: $color;
-
-  @if $color == 'primary' {
-    $palette: 'primary-blue';
-  }
-
-  --button-50: var(--indico-#{$palette}-50);
-  --button-100: var(--indico-#{$palette}-100);
-  --button-200: var(--indico-#{$palette}-200);
-  --button-300: var(--indico-#{$palette}-300);
-  --button-400: var(--indico-#{$palette}-400);
-  --button-500: var(--indico-#{$palette}-500);
-  --button-600: var(--indico-#{$palette}-600);
-  --button-700: var(--indico-#{$palette}-700);
-  --button-800: var(--indico-#{$palette}-800);
-}
-
 @mixin button-typography($size) {
   @include typography($size);
-
   font-weight: var(--button-font-weight);
 }
 
 @mixin button-text-weight($weight) {
   --button-font-weight: var(--font-weight-#{$weight});
 }
+
+// ============================================================================
+// CORE
+// ============================================================================
 
 :global(.indico-ui) {
   &.button {
@@ -65,47 +52,42 @@
     align-items: center;
     justify-content: center;
     border: none;
-    transition:
-      background var(--transition-fast),
-      color var(--transition-fast),
-      border var(--transition-fast);
+    transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast);
 
-    &[data-color='primary'] {
-      @include button-color('primary');
+    // --- States ---
+    background-color: var(--btn-bg, transparent);
+    color: var(--btn-text);
+
+    &:hover:not([data-disabled]) {
+      background-color: var(--btn-bg-hover, var(--btn-bg));
+      color: var(--btn-text-hover, var(--btn-text));
     }
 
-    &[data-color='gray'] {
-      @include button-color('gray');
+    &:active:not([data-disabled]) {
+      background-color: var(--btn-bg-active, var(--btn-bg-hover));
+      color: var(--btn-text-active, var(--btn-text));
     }
 
-    &[data-color='success'] {
-      @include button-color('success');
+    &[data-disabled] {
+      cursor: not-allowed;
+      pointer-events: none;
+      background-color: var(--btn-bg-disabled, transparent);
+      color: var(--btn-text-disabled);
     }
 
-    &[data-color='warning'] {
-      @include button-color('warning');
+    &[data-outlined] {
+      border: 2px solid var(--btn-border, currentColor);
+
+      &:hover:not([data-disabled]) {
+        border-color: var(--btn-border-hover, var(--btn-border, currentColor));
+      }
+
+      &:active:not([data-disabled]) {
+        border-color: var(--btn-border-active, var(--btn-border, currentColor));
+      }
     }
 
-    &[data-color='error'] {
-      @include button-color('error');
-    }
-
-    &[data-text-weight='regular'] {
-      @include button-text-weight('regular');
-    }
-
-    &[data-text-weight='medium'] {
-      @include button-text-weight('medium');
-    }
-
-    &[data-text-weight='semibold'] {
-      @include button-text-weight('semibold');
-    }
-
-    &[data-text-weight='bold'] {
-      @include button-text-weight('bold');
-    }
-
+    // --------- Layout ---------
     &[data-size='xs'] {
       @include button-size-spacing('xs', '1');
       @include button-typography('text-xs');
@@ -131,15 +113,40 @@
       @include button-typography('text-xl');
     }
 
-    &[data-animated] {
-      &:not([data-disabled]) {
-        will-change: transform;
-        backface-visibility: hidden;
+    &[data-text-weight='regular'] {
+      @include button-text-weight('regular');
+    }
 
-        &:active {
-          animation: var(--slight-shift-up) var(--animation-duration-slow) ease-in;
-        }
-      }
+    &[data-text-weight='medium'] {
+      @include button-text-weight('medium');
+    }
+
+    &[data-text-weight='semibold'] {
+      @include button-text-weight('semibold');
+    }
+
+    &[data-text-weight='bold'] {
+      @include button-text-weight('bold');
+    }
+
+    &[data-color='primary'] {
+      @include color('primary');
+    }
+
+    &[data-color='gray'] {
+      @include color('gray');
+    }
+
+    &[data-color='success'] {
+      @include color('success');
+    }
+
+    &[data-color='warning'] {
+      @include color('warning');
+    }
+
+    &[data-color='error'] {
+      @include color('error');
     }
 
     &[data-rounded] {
@@ -147,13 +154,24 @@
     }
 
     &[data-full-width] {
-      width: 100%;
       display: flex;
+      width: 100%;
     }
 
+    &[data-animated]:not([data-disabled]) {
+      will-change: transform;
+      backface-visibility: hidden;
+
+      &:active {
+        animation: var(--slight-shift-up) var(--animation-duration-slow) ease-in;
+      }
+    }
+
+    // --------- Icons ---------
     .button-icon {
-      height: var(--icon-height);
       width: var(--icon-height);
+      height: var(--icon-height);
+      color: inherit;
     }
 
     &[data-icon-position='left'] .button-icon {
@@ -169,283 +187,89 @@
     }
   }
 
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+  // --------- Solid ----------
   &.button[data-variant='solid'] {
-    color: var(--color-accent-buttons);
-    background-color: var(--button-500);
-
-    .button-icon {
-      color: var(--color-accent-buttons);
-    }
-
-    &:hover {
-      background-color: var(--button-600);
-    }
-
-    &:active {
-      background-color: var(--button-700);
-    }
-
-    &[data-disabled] {
-      background-color: var(--button-200);
-      color: var(--button-50);
-
-      .button-icon {
-        color: var(--button-50);
-      }
-
-      &:hover {
-        background-color: var(--button-200);
-        color: var(--button-50);
-
-        .button-icon {
-          color: var(--button-50);
-        }
-      }
-    }
+    --btn-bg: var(--intenzity-500);
+    --btn-text: var(--color-accent-buttons);
+    --btn-bg-hover: var(--intenzity-600);
+    --btn-bg-active: var(--intenzity-700);
+    --btn-bg-disabled: var(--intenzity-200);
+    --btn-text-disabled: var(--intenzity-50);
 
     &[data-opaque] {
-      background-color: color-mix(in srgb, var(--button-500) 20%);
-
-      &:hover {
-        background-color: color-mix(in srgb, var(--button-500) 30%);
-      }
-
-      &:active {
-        background-color: color-mix(in srgb, var(--button-500) 40%);
-      }
-
-      &[data-disabled] {
-        background-color: color-mix(in srgb, var(--button-200) 10%);
-      }
-    }
-
-    &[data-outlined] {
-      border: 2px solid var(--color-accent-buttons);
+      --btn-bg: color-mix(in srgb, var(--intenzity-500) 20%);
+      --btn-bg-hover: color-mix(in srgb, var(--intenzity-500) 30%);
+      --btn-bg-active: color-mix(in srgb, var(--intenzity-500) 40%);
+      --btn-bg-disabled: color-mix(in srgb, var(--intenzity-200) 10%);
     }
   }
 
+  // ---------- Light ---------
   &.button[data-variant='light'] {
-    color: var(--button-700);
-    background-color: var(--button-100);
-
-    .button-icon {
-      color: var(--button-700);
-    }
-
-    &:hover {
-      background-color: var(--button-200);
-    }
-
-    &:active {
-      background-color: var(--button-300);
-    }
-
-    &[data-disabled] {
-      background-color: var(--color-disabled-buttons);
-      color: var(--color-disabled-buttons-text);
-
-      .button-icon {
-        color: var(--color-disabled-buttons-text);
-      }
-
-      &:hover {
-        background-color: var(--color-disabled-buttons);
-      }
-    }
+    --btn-bg: var(--intenzity-100);
+    --btn-text: var(--intenzity-700);
+    --btn-bg-hover: var(--intenzity-200);
+    --btn-bg-active: var(--intenzity-300);
+    --btn-bg-disabled: var(--color-disabled-buttons);
+    --btn-text-disabled: var(--color-disabled-buttons-text);
 
     &[data-opaque] {
-      background-color: color-mix(in srgb, var(--button-100) 20%);
-      color: var(--button-600);
-
-      &:hover {
-        background-color: color-mix(in srgb, var(--button-100) 30%);
-      }
-
-      &:active {
-        background-color: color-mix(in srgb, var(--button-100) 40%);
-      }
-
-      &[data-disabled] {
-        background-color: color-mix(in srgb, var(--button-100) 10%);
-        color: var(--color-disabled-buttons-text);
-
-        .button-icon {
-          color: var(--color-disabled-buttons-text);
-        }
-      }
-    }
-
-    &[data-outlined] {
-      border: 2px solid var(--button-700);
+      --btn-bg: color-mix(in srgb, var(--intenzity-100) 20%);
+      --btn-text: var(--intenzity-600);
+      --btn-bg-hover: color-mix(in srgb, var(--intenzity-100) 30%);
+      --btn-bg-active: color-mix(in srgb, var(--intenzity-100) 40%);
+      --btn-bg-disabled: color-mix(in srgb, var(--intenzity-100) 10%);
     }
   }
 
+  // --------- White ---------
   &.button[data-variant='white'] {
-    color: var(--button-600);
-    background-color: var(--color-accent-buttons);
-
-    .button-icon {
-      color: var(--button-600);
-    }
-
-    &:hover {
-      background: var(--button-600);
-      color: var(--color-accent-buttons);
-
-      .button-icon {
-        color: var(--color-accent-buttons);
-      }
-    }
-
-    &:active {
-      background: var(--button-700);
-      color: var(--color-accent-buttons);
-    }
-
-    &[data-disabled] {
-      background-color: var(--color-disabled-buttons);
-      color: var(--color-disabled-buttons-text);
-
-      .button-icon {
-        color: var(--color-disabled-buttons-text);
-      }
-
-      &:hover {
-        background-color: var(--color-disabled-buttons);
-        color: var(--color-disabled-buttons-text);
-
-        .button-icon {
-          color: var(--color-disabled-buttons-text);
-        }
-      }
-    }
+    --btn-bg: var(--color-accent-buttons);
+    --btn-text: var(--intenzity-600);
+    --btn-bg-hover: var(--intenzity-600);
+    --btn-text-hover: var(--color-accent-buttons);
+    --btn-bg-active: var(--intenzity-700);
+    --btn-text-active: var(--color-accent-buttons);
+    --btn-bg-disabled: var(--color-disabled-buttons);
+    --btn-text-disabled: var(--color-disabled-buttons-text);
 
     &[data-opaque] {
-      background-color: color-mix(in srgb, var(--color-accent-buttons) 20%);
-      color: var(--color-accent-buttons);
-
-      .button-icon {
-        color: var(--color-accent-buttons);
-      }
-
-      &:hover {
-        background-color: color-mix(in srgb, var(--color-accent-buttons) 30%);
-      }
-
-      &:active {
-        background-color: var(--color-accent-buttons);
-        color: var(--button-600);
-
-        .button-icon {
-          color: var(--button-600);
-        }
-      }
-
-      &[data-disabled] {
-        background-color: color-mix(in srgb, var(--color-accent-buttons) 10%);
-        color: var(--color-disabled-buttons-text);
-
-        .button-icon {
-          color: var(--color-disabled-buttons-text);
-        }
-      }
+      --btn-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
+      --btn-text: var(--color-accent-buttons);
+      --btn-bg-hover: color-mix(in srgb, var(--color-accent-buttons) 30%);
+      --btn-bg-active: var(--color-accent-buttons);
+      --btn-text-active: var(--intenzity-600);
+      --btn-bg-disabled: color-mix(in srgb, var(--color-accent-buttons) 10%);
     }
 
     &[data-outlined] {
-      border: 2px solid var(--button-600);
-
-      &:active {
-        border-color: var(--button-700);
-      }
+      --btn-border: var(--intenzity-600);
+      --btn-border-active: var(--intenzity-700);
     }
   }
 
+  // --------- Transparent ----------
   &.button[data-variant='transparent'] {
-    background-color: transparent;
-    color: var(--button-600);
-
-    .button-icon {
-      color: var(--button-600);
-    }
-
-    &:hover {
-      color: var(--button-700);
-
-      .button-icon {
-        color: var(--button-700);
-      }
-    }
-
-    &:active {
-      color: var(--button-800);
-
-      .button-icon {
-        color: var(--button-800);
-      }
-    }
-
-    &[data-outlined] {
-      border: 2px solid var(--button-600);
-
-      &:hover {
-        border-color: var(--button-700);
-      }
-
-      &:active {
-        border-color: var(--button-800);
-      }
-    }
+    --btn-bg: transparent;
+    --btn-text: var(--intenzity-600);
+    --btn-text-hover: var(--intenzity-700);
+    --btn-text-active: var(--intenzity-800);
+    --btn-border: var(--intenzity-600);
+    --btn-border-hover: var(--intenzity-700);
+    --btn-border-active: var(--intenzity-800);
 
     &[data-color='white'] {
-      &[data-outlined] {
-        border: 2px solid var(--color-accent-buttons);
-
-        &:hover {
-          border-color: var(--indico-gray-200);
-        }
-
-        &:active {
-          border-color: var(--indico-gray-300);
-        }
-      }
-
-      color: var(--color-accent-buttons);
-
-      .button-icon {
-        color: var(--color-accent-buttons);
-      }
-
-      &:hover {
-        color: var(--indico-gray-200);
-
-        .button-icon {
-          color: var(--indico-gray-200);
-        }
-      }
-
-      &:active {
-        color: var(--indico-gray-300);
-
-        .button-icon {
-          color: var(--indico-gray-300);
-        }
-      }
-
-      &[data-disabled] {
-        color: var(--color-disabled-buttons-text);
-
-        .button-icon {
-          color: var(--color-disabled-buttons-text);
-        }
-
-        &:hover {
-          color: var(--color-disabled-buttons-text);
-
-          .button-icon {
-            color: var(--color-disabled-buttons-text);
-          }
-        }
-      }
+      --btn-text: var(--color-accent-buttons);
+      --btn-text-hover: var(--indico-gray-200);
+      --btn-text-active: var(--indico-gray-300);
+      --btn-border: var(--color-accent-buttons);
+      --btn-border-hover: var(--indico-gray-200);
+      --btn-border-active: var(--indico-gray-300);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
     }
   }
 }
