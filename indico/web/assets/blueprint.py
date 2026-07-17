@@ -63,7 +63,9 @@ def js_vars_global():
         data = generate_global_file()
         cache_file.write_text(data)
 
-    return send_file('global.js', cache_file, mimetype='application/javascript', conditional=True)
+    resp = send_file('global.js', cache_file, mimetype='application/javascript', conditional=True)
+    resp.cache_control.private = True
+    return resp
 
 
 @assets_blueprint.route('/js-vars/user.js')
@@ -72,7 +74,9 @@ def js_vars_user():
 
     Useful for favorites, settings etc.
     """
-    return Response(generate_user_file(), mimetype='application/javascript')
+    resp = Response(generate_user_file(), mimetype='application/javascript')
+    resp.cache_control.private = True
+    return resp
 
 
 @assets_blueprint.route('/i18n/<locale_name>.js')
