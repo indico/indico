@@ -10,6 +10,7 @@ import React, {useState} from 'react';
 import './Demonstration.module.scss';
 import Button from './button/Button';
 import {Icon} from './icon/Icon';
+import Tag from './tag/Tag';
 
 const colors = ['primary', 'gray', 'success', 'warning', 'error'] as const;
 const colorsWithWhite = ['primary', 'gray', 'success', 'warning', 'error', 'white'] as const;
@@ -37,6 +38,15 @@ const buttonAttributesNoOpaque = [
   'icon=fas:calendar',
   'outlined',
   'disabled',
+] as const;
+
+const tagAttributes = [
+  '',
+  'outlined',
+  'rounded',
+  'icon=fas:calendar',
+  'icon=fas:calendar iconPosition=right',
+  'opaque',
 ] as const;
 const textWeights = ['regular', 'medium', 'semibold', 'bold'] as const;
 
@@ -306,18 +316,6 @@ export function Demonstration() {
               {colorsWithWhite.map(color =>
                 buttonAttributesNoOpaque.map(attribute =>
                   sizes.map(size => {
-                    const hasOpaque = attribute.split(' ').includes('opaque');
-                    if (hasOpaque) {
-                      return (
-                        <div
-                          key={`${'white'}-${color}-${size}-${attribute}-square`}
-                          styleName="demo-label"
-                        >
-                          <div style={{padding: '10px'}}>NOT ALLOWED</div>
-                          transparent • {color} • {size} • {attribute}
-                        </div>
-                      );
-                    }
                     return (
                       <div
                         key={`${'transparent'}-${color}-${size}-${attribute}-square`}
@@ -364,6 +362,144 @@ export function Demonstration() {
               />
             </h2>
           </summary>
+          <h3>Variant: Solid</h3>
+          <section>
+            <div className="grid-5">
+              {colors.map(color =>
+                tagAttributes.map(attribute =>
+                  sizes.map(size => (
+                    <div
+                      key={`${'solid'}-${color}-${size}-${attribute}-square`}
+                      styleName="demo-item align-center"
+                    >
+                      <Tag
+                        color={color}
+                        variant="solid"
+                        size={size}
+                        {...(attribute
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
+                          : {})}
+                      >
+                        29 Aug - 3 Sep
+                      </Tag>
+                      <div styleName="demo-label">
+                        solid • {color} • {size} • {attribute}
+                      </div>
+                    </div>
+                  ))
+                )
+              )}
+            </div>
+          </section>
+          <h3>Variant: Light</h3>
+          <section>
+            <div className="grid-5">
+              {colors.map(color =>
+                tagAttributes.map(attribute =>
+                  sizes.map(size => (
+                    <div
+                      key={`${'light'}-${color}-${size}-${attribute}-square`}
+                      styleName="demo-item align-center"
+                    >
+                      <Tag
+                        color={color}
+                        variant="light"
+                        size={size}
+                        {...(attribute
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
+                          : {})}
+                      >
+                        29 Aug - 3 Sep
+                      </Tag>
+                      <div styleName="demo-label">
+                        light • {color} • {size} • {attribute}
+                      </div>
+                    </div>
+                  ))
+                )
+              )}
+            </div>
+          </section>
+          <h3>Variant: White</h3>
+          <section>
+            <div className="grid-5">
+              {colors.map(color =>
+                tagAttributes.map(attribute =>
+                  sizes.map(size => (
+                    <div
+                      key={`${'white'}-${color}-${size}-${attribute}-square`}
+                      styleName="demo-item align-center"
+                    >
+                      <Tag
+                        color={color}
+                        variant="white"
+                        size={size}
+                        {...(attribute
+                          ? Object.fromEntries(
+                              attribute.split(' ').map(attr => {
+                                const [key, value] = attr.split('=');
+                                return [key, value ?? true];
+                              })
+                            )
+                          : {})}
+                      >
+                        29 Aug - 3 Sep
+                      </Tag>
+                      <div styleName="demo-label">
+                        white • {color} • {size} • {attribute}
+                      </div>
+                    </div>
+                  ))
+                )
+              )}
+            </div>
+          </section>
+          <h3>Variant: Transparent</h3>
+          <section>
+            <div className="grid-5">
+              {colors.map(color =>
+                tagAttributes.map(attribute =>
+                  sizes.map(size => {
+                    return (
+                      <div
+                        key={`${'transparent'}-${color}-${size}-${attribute}-square`}
+                        styleName="demo-item align-center"
+                      >
+                        <Tag
+                          color={color}
+                          variant="transparent"
+                          size={size}
+                          {...(attribute
+                            ? Object.fromEntries(
+                                attribute.split(' ').map(attr => {
+                                  const [key, value] = attr.split('=');
+                                  return [key, value ?? true];
+                                })
+                              )
+                            : {})}
+                        >
+                          29 Aug - 3 Sep
+                        </Tag>
+                        <div styleName="demo-label">
+                          transparent • {color} • {size} • {attribute}
+                        </div>
+                      </div>
+                    );
+                  })
+                )
+              )}
+            </div>
+          </section>
         </details>
       </div>
     </div>

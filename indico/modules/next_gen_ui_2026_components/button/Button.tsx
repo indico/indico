@@ -4,11 +4,14 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
 import React, {forwardRef} from 'react';
 
 import {Icon, IconSource} from '../icon/Icon';
-
 import './Button.module.scss';
+import {guardDisabledClick, NativeProps} from '../utils';
+
+// TODO: Add support for loading state (spinner)
 
 export type ButtonColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
 export type ButtonVariant = 'solid' | 'light' | 'white' | 'transparent';
@@ -23,6 +26,7 @@ interface CustomButtonProps {
   textWeight?: ButtonTextWeight;
   opaque?: boolean;
   disabled?: boolean;
+  loading?: boolean;
   outlined?: boolean;
   compact?: boolean;
   animated?: boolean;
@@ -30,31 +34,21 @@ interface CustomButtonProps {
   fullWidth?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
-  // type?: 'button' | 'submit' | 'reset';
-  onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
-  href?: string;
-  children?: React.ReactNode;
-  'aria-label'?: string;
-  'aria-describedby'?: string;
-  id?: string;
-  title?: string;
-  tabIndex?: number;
+  // onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
 }
 
 // type NativeButtonProps =
-//   React.ButtonHTMLAttributes<HTMLButtonElement>;
-
+//   React.ButtonHTMLAttributes<HTMLButtonElement>
+// ;
 // type NativeAnchorProps =
-//   React.AnchorHTMLAttributes<HTMLAnchorElement>;
+//   React.AnchorHTMLAttributes<HTMLAnchorElement>
+// ;
+
+type NativeButtonProps = NativeProps<'button'>;
+type NativeAnchorProps = NativeProps<'a'>;
 
 export type ButtonProps = CustomButtonProps &
-  //  (
-  //   | (NativeButtonProps & {
-  //       href?: never;
-  //     })
-  //   | NativeAnchorProps
-  // )
-  // &
+  (({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps)) &
   (
     | {
         variant?: 'transparent';
@@ -66,6 +60,12 @@ export type ButtonProps = CustomButtonProps &
         color?: Exclude<ButtonColor, 'white'>;
         opaque?: boolean;
       }
+    | {
+        icon?: IconSource;
+        iconPosition?: 'icon-only';
+        children?: never;
+        'aria-label'?: string;
+      }
   );
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((props, ref) => {
@@ -74,8 +74,9 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     color = 'primary',
     variant = 'solid',
     size = 'md',
-    textWeight = 'regular',
+    textWeight = 'semibold',
     disabled = false,
+    loading = false,
     opaque = false,
     outlined = false,
     compact = false,
@@ -84,19 +85,24 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     fullWidth = false,
     icon,
     iconPosition = 'left',
-    onClick,
-    href,
-    children,
-    ...rest
+    // onClick,
+    // children,
+    ...nativeProps
   } = props;
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
-    if (disabled) {
-      event.preventDefault();
-      return;
-    }
-    onClick?.(event);
-  };
+  const handleClick = guardDisabledClick<HTMLButtonElement | HTMLAnchorElement>(
+    disabled,
+    nativeProps.onClick,
+    loading
+  );
+
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+  //   if (disabled || loading) {
+  //     event.preventDefault();
+  //     return;
+  //   }
+  //   onClick?.(event);
+  // };
 
   const dataProps = {
     'data-color': color,
@@ -104,6 +110,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
     'data-size': size,
     'data-text-weight': textWeight,
     'data-disabled': disabled ? '' : undefined,
+    'data-loading': loading ? '' : undefined,
     'data-opaque': opaque ? '' : undefined,
     'data-outlined': outlined ? '' : undefined,
     'data-compact': compact ? '' : undefined,
@@ -122,32 +129,34 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
   const content = (
     <>
       {icon && iconPosition !== 'right' && iconElement}
-      {children}
+      {nativeProps.children}
       {icon && iconPosition === 'right' && iconElement}
     </>
   );
 
   const sharedClassName = `indico-ui ${className || ''}`;
 
-  if (href !== undefined) {
+  if (nativeProps.href !== undefined) {
+    const rest = nativeProps as NativeAnchorProps;
     return (
       <a
         ref={ref as React.Ref<HTMLAnchorElement>}
         styleName="button"
         className={sharedClassName}
-        href={disabled ? undefined : href}
-        aria-disabled={disabled || undefined}
+        href={disabled ? undefined : nativeProps.href}
+        aria-disabled={disabled || loading || undefined}
+        tabIndex={disabled || loading ? -1 : rest.tabIndex}
+        aria-busy={loading || undefined}
         onClick={handleClick}
         {...dataProps}
         {...rest}
-        tabIndex={disabled ? -1 : rest.tabIndex}
-        role={disabled ? 'link' : undefined}
       >
         {content}
       </a>
     );
   }
 
+  const rest = nativeProps as NativeButtonProps;
   return (
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
@@ -156,6 +165,9 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((p
       className={sharedClassName}
       disabled={disabled}
       onClick={handleClick}
+      aria-disabled={disabled || loading || undefined}
+      tabIndex={disabled || loading ? -1 : rest.tabIndex}
+      aria-busy={loading || undefined}
       {...dataProps}
       {...rest}
     >
