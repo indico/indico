@@ -5,8 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from email.mime.image import MIMEImage
+
 from babel.dates import get_timezone
 from flask import flash, jsonify, request, session
+from markupsafe import Markup
 from marshmallow import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -21,7 +24,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.logs.forms import ResendEmailPrefaceForm
 from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
                                                 EventLogEntry, EventLogRealm, UserLogEntry, UserLogRealm)
-from indico.modules.logs.util import serialize_log_entry
+from indico.modules.logs.util import replace_cid_links, serialize_log_entry
 from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
@@ -230,7 +233,13 @@ class RHResendEmail(RHManageEventBase):
                        log_metadata=self.entry.meta, log_summary=f'Resent email: {original_subject}')
             flash(_('The email has been re-sent.'), 'success')
             return jsonify_data()
-        return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry)
+
+        html_preview_body = None
+        if self.entry.data['content_type'] == 'text/html':
+            html_preview_body = replace_cid_links(self.entry)
+
+        return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry,
+                                html_preview_body=Markup(html_preview_body))
 
     def _build_email(self, form_data, is_html_email):
         email_data = self.entry.data
@@ -258,7 +267,13 @@ class RHResendEmail(RHManageEventBase):
             storage = get_storage(att['storage_backend'])
             with storage.open(att['storage_file_id']) as fd:
                 content = fd.read()
-            attachments.append((att['filename'], content, att['content_type']))
+            if (cid := att.get('content_id')) and att['content_type'].startswith('image/'):
+                subtype = att['content_type'].split('/')[1]
+                mime_att = MIMEImage(content, subtype)
+                mime_att.add_header('Content-ID', f'<{cid}>')
+                attachments.append(mime_att)
+            else:
+                attachments.append((att['filename'], content, att['content_type']))
 
         return make_email(
             to_list=email_data['to'],

@@ -7,7 +7,7 @@
 
 from flask import render_template
 
-from indico.modules.logs.util import render_changes
+from indico.modules.logs.util import render_changes, replace_cid_links
 
 
 class EventLogRendererBase:
@@ -63,22 +63,7 @@ class EmailRenderer(EventLogRendererBase):
     @classmethod
     def get_data(cls, entry):
         data = dict(entry.data)
-        stored_attachments = data.get('stored_attachments') or []
-        if data['content_type'] != 'text/html' or not stored_attachments:
+        if data['content_type'] != 'text/html' or not data.get('stored_attachments'):
             return data
-
-        replacements = {
-            content_id: entry.get_email_attachment_url(idx)
-            for idx, att in enumerate(stored_attachments)
-            if (content_id := att.get('content_id'))
-        }
-        if not replacements:
-            return data
-
-        body = data['body']
-        for content_id, url in replacements.items():
-            # this is a bit ugly, but cids are generally dynamic enough to avoid replacing
-            # unrelated content, and in any case it would not do any harm, but just look ugly
-            body = body.replace(f'cid:{content_id}', url)
-        data['body'] = body
+        data['body'] = replace_cid_links(entry)
         return data

@@ -23,7 +23,7 @@
 {% call form_row_static(_('Original message')) %}
     {% if entry.data.content_type == 'text/html' %}
         <div class="html email-body-preview">
-            {{ entry.data.body | safe }}
+            {{ html_preview_body }}
         </div>
     {% else %}
         <pre class="mono">{{ entry.data.body }}</pre>
