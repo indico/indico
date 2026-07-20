@@ -20,6 +20,11 @@ Security fixes
     to edit them), and the others require at least submitter or management access in an event
     and additionally an interaction (clicking the link) by the victim.
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Korean
+
 Improvements
 ^^^^^^^^^^^^
 
