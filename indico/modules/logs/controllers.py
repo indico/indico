@@ -289,16 +289,16 @@ class EmailLogAttachmentMixin:
         query = self.object.log_entries if self.object else self.model.query
         entry = query.filter_by(id=log_entry_id, type='email').first_or_404()
 
-        stored_attachments = entry.data.get('stored_attachments') or []
+        stored_attachments = entry.data.get('stored_attachments', [])
         try:
             attachment = stored_attachments[attachment_id]
         except IndexError:
             raise NotFound
         storage = get_storage(attachment['storage_backend'])
-        content_type = attachment.get('content_type') or ''
+        content_type = attachment['content_type']
         if not content_type.startswith('image/'):
             raise NotFound
-        filename = attachment.get('filename') or 'attachment'
+        filename = attachment['filename']
         return storage.send_file(attachment['storage_file_id'], content_type, filename, inline=True)
 
 
