@@ -22,7 +22,7 @@ def notify_paper_revision_submission(revision):
                 template = get_template_module('events/papers/emails/revision_submission_to_judge.html', event=event,
                                                revision=revision, receiver=judge)
                 email = make_email(to_list=judge.email, template=template, html=True)
-            send_email(email, event=event, module='Papers', user=session.user)
+            send_email(email, obj=event, module='Papers', user=session.user)
     reviewers = set()
     if PaperReviewingRole.layout_reviewer in roles_to_notify:
         if revision.paper.cfp.layout_reviewing_enabled:
@@ -35,7 +35,7 @@ def notify_paper_revision_submission(revision):
             template = get_template_module('events/papers/emails/revision_submission_to_reviewer.html', event=event,
                                            revision=revision, receiver=reviewer)
             email = make_email(to_list=reviewer.email, template=template, html=True)
-        send_email(email, event=event, module='Papers', user=session.user)
+        send_email(email, obj=event, module='Papers', user=session.user)
 
 
 def notify_paper_review_submission(review):
@@ -48,7 +48,7 @@ def notify_paper_review_submission(review):
                                            review=review, contribution=review.revision.paper.contribution,
                                            receiver=judge)
             email = make_email(to_list=judge.email, template=template, html=True)
-        send_email(email, event=event, module='Papers', user=session.user)
+        send_email(email, obj=event, module='Papers', user=session.user)
 
 
 def notify_paper_judgment(paper, reset=False):
@@ -69,14 +69,14 @@ def notify_paper_judgment(paper, reset=False):
             template = get_template_module(template_file, event=event, paper=paper, contribution=paper.contribution,
                                            receiver=receiver)
             email = make_email(to_list=receiver.email, template=template, html=True)
-        send_email(email, event=event, module='Papers', user=session.user)
+        send_email(email, obj=event, module='Papers', user=session.user)
 
 
 def _notify_changes_in_reviewing_team(user, template, event, role):
     with user.force_user_locale():
         template = get_template_module(template, event=event, receiver=user, role=role)
         email = make_email(to_list=user.email, template=template, html=True)
-    send_email(email, event=event, module='Papers', user=session.user)
+    send_email(email, obj=event, module='Papers', user=session.user)
 
 
 def notify_added_to_reviewing_team(user, role, event):
@@ -94,7 +94,7 @@ def notify_paper_assignment(user, role, contributions, event, assign):
         template = get_template_module('events/papers/emails/paper_assignment.html', event=event,
                                        contribs=contributions, receiver=user, assign=assign, role=role)
         email = make_email(to_list=user.email, template=template, html=True)
-    send_email(email, event=event, module='Papers', user=session.user)
+    send_email(email, obj=event, module='Papers', user=session.user)
 
 
 def notify_comment(person, paper, comment, submitter):
@@ -104,4 +104,4 @@ def notify_comment(person, paper, comment, submitter):
         template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
                                        contribution=paper.contribution, comment=comment, submitter=submitter)
         email = make_email(to_list=person.email, template=template, html=True)
-    send_email(email, event=event, module='Papers', user=session.user)
+    send_email(email, obj=event, module='Papers', user=session.user)

@@ -59,9 +59,10 @@ class UserLogRealm(RichIntEnum):
 
 
 class AppLogRealm(RichIntEnum):
-    __titles__ = (None, _('System'), _('Admin'))
+    __titles__ = (None, _('System'), _('Admin'), _('Emails'))
     system = 1
     admin = 2
+    emails = 3
 
 
 class LogKind(IndicoIntEnum):
@@ -171,6 +172,10 @@ class LogEntryBase(db.Model):
         renderer = self.renderer
         return renderer.render_entry(self) if renderer else None
 
+    def get_email_attachment_url(self, attachment_id):
+        """Return the URL for a stored email attachment."""
+        raise NotImplementedError
+
     @property
     def object_details(self):
         details_mapping = {
@@ -237,6 +242,9 @@ class EventLogEntry(LogEntryBase):
     def locator(self):
         return dict(self.event.locator, log_entry_id=self.id)
 
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.event_email_attachment', self, attachment_id=attachment_id)
+
 
 class CategoryLogEntry(LogEntryBase):
     """Log entries for categories."""
@@ -267,6 +275,13 @@ class CategoryLogEntry(LogEntryBase):
             lazy='dynamic'
         )
     )
+
+    @locator_property
+    def locator(self):
+        return dict(self.category.locator, log_entry_id=self.id)
+
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.category_email_attachment', self, attachment_id=attachment_id)
 
 
 class UserLogEntry(LogEntryBase):
@@ -301,6 +316,13 @@ class UserLogEntry(LogEntryBase):
         foreign_keys=[target_user_id]
     )
 
+    @locator_property
+    def locator(self):
+        return dict(self.user.locator, log_entry_id=self.id)
+
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.user_email_attachment', self, attachment_id=attachment_id)
+
 
 class AppLogEntry(LogEntryBase):
     """Log entries for the application."""
@@ -320,6 +342,13 @@ class AppLogEntry(LogEntryBase):
                             data=(data or {}), meta=(meta or {}))
         db.session.add(entry)
         return entry
+
+    @locator_property
+    def locator(self):
+        return {'log_entry_id': self.id}
+
+    def get_email_attachment_url(self, attachment_id):
+        return url_for('logs.app_email_attachment', self, attachment_id=attachment_id)
 
     def __repr__(self):
         return format_repr(self, 'id', 'logged_dt', 'realm', 'module', _text=self.summary)

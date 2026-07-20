@@ -187,3 +187,21 @@ def serialize_log_entry(entry, tzinfo):
         },
         'detailsLink': entry.object_details
     }
+
+
+def replace_cid_links(entry):
+    stored_attachments = entry.data.get('stored_attachments', [])
+    replacements = {
+        content_id: entry.get_email_attachment_url(idx)
+        for idx, att in enumerate(stored_attachments)
+        if (content_id := att.get('content_id'))
+    }
+    if not replacements:
+        return entry.data['body']
+
+    body = entry.data['body']
+    for content_id, url in replacements.items():
+        # this is a bit ugly, but cids are generally dynamic enough to avoid replacing
+        # unrelated content, and in any case it would not do any harm, but just look ugly
+        body = body.replace(f'cid:{content_id}', url)
+    return body

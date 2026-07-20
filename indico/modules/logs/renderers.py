@@ -7,7 +7,7 @@
 
 from flask import render_template
 
-from indico.modules.logs.util import render_changes
+from indico.modules.logs.util import render_changes, replace_cid_links
 
 
 class EventLogRendererBase:
@@ -59,3 +59,11 @@ class SimpleRenderer(EventLogRendererBase):
 class EmailRenderer(EventLogRendererBase):
     name = 'email'
     template_name = 'logs/entry_email.html'
+
+    @classmethod
+    def get_data(cls, entry):
+        data = dict(entry.data)
+        if data['content_type'] != 'text/html' or not data.get('stored_attachments'):
+            return data
+        data['body'] = replace_cid_links(entry)
+        return data

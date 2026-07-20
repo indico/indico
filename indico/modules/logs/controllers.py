@@ -5,9 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from email.mime.image import MIMEImage
+
 from babel.dates import get_timezone
 from flask import flash, jsonify, request, session
-from werkzeug.exceptions import BadRequest, Forbidden
+from markupsafe import Markup
+from marshmallow import fields
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.config import config
 from indico.core.db import db
@@ -20,11 +24,12 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.logs.forms import ResendEmailPrefaceForm
 from indico.modules.logs.models.entries import (AppLogEntry, AppLogRealm, CategoryLogEntry, CategoryLogRealm,
                                                 EventLogEntry, EventLogRealm, UserLogEntry, UserLogRealm)
-from indico.modules.logs.util import serialize_log_entry
+from indico.modules.logs.util import replace_cid_links, serialize_log_entry
 from indico.modules.logs.views import WPAppLogs, WPCategoryLogs, WPEventLogs, WPUserLogs
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.util.string import html_to_markdown
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -224,11 +229,17 @@ class RHResendEmail(RHManageEventBase):
         form = ResendEmailPrefaceForm(subject=original_subject, is_html_email=is_html_email)
         if form.validate_on_submit():
             email = self._build_email(form.data, is_html_email)
-            send_email(email, event=self.event, module=self.entry.module, user=self.entry.user,
+            send_email(email, obj=self.event, module=self.entry.module, user=self.entry.user,
                        log_metadata=self.entry.meta, log_summary=f'Resent email: {original_subject}')
             flash(_('The email has been re-sent.'), 'success')
             return jsonify_data()
-        return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry)
+
+        html_preview_body = None
+        if self.entry.data['content_type'] == 'text/html':
+            html_preview_body = replace_cid_links(self.entry)
+
+        return jsonify_template('logs/resend_email_dialog.html', form=form, entry=self.entry,
+                                html_preview_body=Markup(html_preview_body))
 
     def _build_email(self, form_data, is_html_email):
         email_data = self.entry.data
@@ -256,7 +267,13 @@ class RHResendEmail(RHManageEventBase):
             storage = get_storage(att['storage_backend'])
             with storage.open(att['storage_file_id']) as fd:
                 content = fd.read()
-            attachments.append((att['filename'], content, att['content_type']))
+            if (cid := att.get('content_id')) and att['content_type'].startswith('image/'):
+                subtype = att['content_type'].split('/')[1]
+                mime_att = MIMEImage(content, subtype)
+                mime_att.add_header('Content-ID', f'<{cid}>')
+                attachments.append(mime_att)
+            else:
+                attachments.append((att['filename'], content, att['content_type']))
 
         return make_email(
             to_list=email_data['to'],
@@ -270,3 +287,68 @@ class RHResendEmail(RHManageEventBase):
             alternatives=alternatives,
             attachments=attachments,
         )
+
+
+class EmailLogAttachmentMixin:
+    model = None
+
+    @property
+    def object(self):
+        raise NotImplementedError
+
+    @use_kwargs({
+        'log_entry_id': fields.Int(required=True),
+        'attachment_id': fields.Int(required=True)
+    }, location='view_args')
+    def _process(self, log_entry_id, attachment_id):
+        query = self.object.log_entries if self.object else self.model.query
+        entry = query.filter_by(id=log_entry_id, type='email').first_or_404()
+
+        stored_attachments = entry.data.get('stored_attachments', [])
+        try:
+            attachment = stored_attachments[attachment_id]
+        except IndexError:
+            raise NotFound
+        storage = get_storage(attachment['storage_backend'])
+        content_type = attachment['content_type']
+        if not content_type.startswith('image/'):
+            raise NotFound
+        filename = attachment['filename']
+        return storage.send_file(attachment['storage_file_id'], content_type, filename, inline=True)
+
+
+class RHAppEmailAttachment(EmailLogAttachmentMixin, RHAdminBase):
+    model = AppLogEntry
+
+    @property
+    def object(self):
+        return None
+
+
+class RHCategoryEmailAttachment(EmailLogAttachmentMixin, RHManageCategoryBase):
+    model = CategoryLogEntry
+
+    @property
+    def object(self):
+        return self.category
+
+
+class RHEventEmailAttachment(EmailLogAttachmentMixin, RHManageEventBase):
+    model = EventLogEntry
+
+    @property
+    def object(self):
+        return self.event
+
+
+class RHUserEmailAttachment(EmailLogAttachmentMixin, RHUserBase):
+    model = UserLogEntry
+
+    def _check_access(self):
+        RHUserBase._check_access(self)
+        if not session.user.is_admin:
+            raise Forbidden
+
+    @property
+    def object(self):
+        return self.user
