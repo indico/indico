@@ -228,7 +228,7 @@ def get_initial_form_values(regform, *, management=False, **kwargs):
 def get_user_data(regform: RegistrationForm, user, invitation=None):
     affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
     # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
-    modern_affiliation_field = affiliation_field.input_type == 'affiliation'
+    modern_affiliation_field = bool(affiliation_field and affiliation_field.input_type == 'affiliation')
     predefined_only_affiliation = (
         modern_affiliation_field and
         affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
