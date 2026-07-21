@@ -102,7 +102,7 @@ export default {
       }
       case actions.SET_ENTRY_ATTACHMENTS: {
         const {id, attachments} = action;
-        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+        const newEntries = {...state.entries};
         const flatEntries = Object.values(newEntries)
           .flat()
           .map(e => [e, ...(e.type === EntryType.SessionBlock ? e.children : [])])
@@ -151,15 +151,7 @@ export default {
 
         return {
           ...state,
-          currentChangeIdx: state.currentChangeIdx + 1,
-          changes: [
-            ...state.changes.slice(0, state.currentChangeIdx + 1),
-            {
-              entries: newEntries,
-              change: 'update',
-              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
-            },
-          ],
+          entries: newEntries,
         };
       }
       case actions.UPDATE_ENTRY: {
