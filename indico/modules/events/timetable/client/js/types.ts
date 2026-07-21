@@ -72,6 +72,13 @@ export interface LocationParent {
   title: string;
 }
 
+export interface Attachment {
+  id: number;
+  title: string;
+  type: 'attachment';
+  downloadUrl: string;
+}
+
 export interface Session {
   id: number; // XXX probably we need an id-less variant during creation, but that should be a separate type
   title: string;
@@ -109,7 +116,7 @@ export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> 
 export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: ContribId;
   type: EntryType.Contribution;
-  attachmentCount: number;
+  attachments: Attachment[];
   sessionId?: number;
   boardNumber?: string;
   keywords?: string[];
@@ -129,7 +136,7 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
   children: ChildEntry[];
   personLinks: PersonLink[];
   childLocationParent: LocationParent;
-  attachmentCount: number;
+  attachments: Attachment[];
   colors?: Colors;
   code?: string;
 }

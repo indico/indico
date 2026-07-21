@@ -39,6 +39,7 @@ import {
   SidePanelView,
   ContribId,
   EntryUniqueID,
+  Attachment,
 } from './types';
 import {flattenEntries, getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -138,7 +139,7 @@ interface UpdateEntryAction {
 interface SetEntryAttachments {
   type: typeof SET_ENTRY_ATTACHMENTS;
   entryType: EntryType;
-  attachmentCount: number;
+  attachments: Attachment[];
   id: EntryUniqueID;
 }
 
@@ -531,10 +532,10 @@ export function updateEntry(
 
 export function setEntryAttachments(
   entryType: EntryType,
-  id: string,
-  attachmentCount: number
+  id: EntryUniqueID,
+  attachments: Attachment[]
 ): SetEntryAttachments {
-  return {type: SET_ENTRY_ATTACHMENTS, entryType, id, attachmentCount};
+  return {type: SET_ENTRY_ATTACHMENTS, entryType, id, attachments};
 }
 
 export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {

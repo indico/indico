@@ -504,8 +504,8 @@ export function DayTimetable({
           : contributionURL({event_id: eventId, contrib_id: id});
       try {
         const entry = await indicoAxios.get(url);
-        const attachmentCount = entry.data.attachment_count;
-        dispatch(actions.setEntryAttachments(type, getEntryUniqueId(type, id), attachmentCount));
+        const attachments = entry.data.attachments;
+        dispatch(actions.setEntryAttachments(type, getEntryUniqueId(type, id), attachments));
       } catch (e) {
         handleAxiosError(e);
       }

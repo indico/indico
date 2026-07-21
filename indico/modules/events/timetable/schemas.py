@@ -16,6 +16,7 @@ from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSche
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.timetable.serializer import TimetableSerializer
 from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested
 
@@ -24,11 +25,8 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
         fields = ('id', 'title', 'start_dt', 'duration', 'code', 'person_links', 'location_data', 'location_parent',
-                  'child_location_parent', 'session_id', 'session_title', 'attachment_count')
+                  'child_location_parent', 'session_id', 'session_title', 'attachments')
         rh_context = ('event', {'object': 'session_block'})
-
-    def _get_attachment_count(self, session_block):
-        return len(session_block.session.attached_items.get('files', []))
 
     start_dt = EventTimezoneDateTimeField()
     location_data = fields.Nested(LocationDataSchema)
@@ -37,7 +35,7 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     person_links = NonPartialNested(_SessionBlockPersonLinkSchema(many=True, unknown=EXCLUDE))
     duration = fields.TimeDelta(required=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
-    attachment_count = fields.Method('_get_attachment_count', dump_only=True)
+    attachments = fields.Function(lambda obj: TimetableSerializer.get_attachment_data(obj.session))
 
 
 def _get_break_session_id(entry):
@@ -69,10 +67,10 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data', 'location_parent',
                   'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block',
-                  'session_block_id', 'session_id', 'parent_id', 'attachment_count')
+                  'session_block_id', 'session_id', 'parent_id', 'attachments')
         rh_context = ('event', {'object': 'contrib'})
 
-    def _get_attachment_count(self, contribution):
+    def _get_attachments(self, contribution):
         return len(contribution.attached_items.get('files', []))
 
     start_dt = EventTimezoneDateTimeField()
@@ -89,4 +87,4 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     parent_id = fields.Integer(allow_none=True, load_only=True)
     session_block_id = fields.Integer(allow_none=True)
-    attachment_count = fields.Method('_get_attachment_count', dump_only=True)
+    attachments = fields.Function(TimetableSerializer.get_attachment_data)

@@ -9,7 +9,6 @@ import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import './EntryPopup.module.scss';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
@@ -17,7 +16,6 @@ import {ThunkDispatch} from 'redux-thunk';
 import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import './Entry.module.scss';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
@@ -37,6 +35,9 @@ import {
   AttachmentUpdatedEventDetail,
 } from './types';
 import {getIconByEntryType, getEntryColors} from './utils';
+
+import './EntryPopup.module.scss';
+import './Entry.module.scss';
 
 function ActionPopup({content, trigger, ...rest}: PopupProps) {
   return (
@@ -273,31 +274,46 @@ function EntryPopupContent({
             </List>
           </List.Item>
         )}
-        {(entry.type === EntryType.Contribution || entry.type === EntryType.SessionBlock) && (
-          <List.Item title={Translate.string('Attachments')}>
-            <Icon name="copy outline" />
-            <List styleName="inline">
-              <Button
-                as="a"
-                basic
-                size="mini"
-                icon="edit"
-                content={PluralTranslate.string(
-                  '{attachmentCount} material',
-                  '{attachmentCount} materials',
-                  entry.attachmentCount,
-                  {
-                    attachmentCount: entry.attachmentCount,
-                  }
+        {(entry.type === EntryType.Contribution || entry.type === EntryType.SessionBlock) &&
+          entry.attachments.length > 0 && (
+            <List.Item>
+              <Icon name="copy outline" title={Translate.string('Materials')} />
+              <List styleName="inline">
+                {entry.attachments.slice(0, 2).map(attachment => (
+                  <List.Item key={attachment.id}>
+                    <Label
+                      styleName="attachment-label"
+                      icon="file"
+                      content={attachment.title}
+                      title={attachment.title}
+                      basic
+                    />
+                  </List.Item>
+                ))}
+                {entry.attachments.length > 2 && (
+                  <List.Item>
+                    <ActionPopup
+                      content={PluralTranslate.string(
+                        'There is {extra} more material',
+                        'There are {extra} more materials',
+                        entry.attachments.length - 2,
+                        {extra: entry.attachments.length - 2}
+                      )}
+                      trigger={
+                        <Label
+                          styleName="attachment-label extra-attachments"
+                          content={Translate.string('...and {extra} more', {
+                            extra: entry.attachments.length - 2,
+                          })}
+                          basic
+                        />
+                      }
+                    />
+                  </List.Item>
                 )}
-                data-attachment-editor
-                data-details={JSON.stringify(entryDetails)}
-                data-locator={JSON.stringify(entryLocator)}
-                onClick={onClose}
-              />
-            </List>
-          </List.Item>
-        )}
+              </List>
+            </List.Item>
+          )}
       </Card.Content>
       <Card.Content styleName="actions" textAlign="right">
         {isPosterBlock && (
@@ -308,6 +324,21 @@ function EntryPopupContent({
                 <Icon name={getIconByEntryType(EntryType.Contribution)} />
                 {(entry as BlockEntry)?.children?.length}
               </Button>
+            }
+          />
+        )}
+        {(entry.type === EntryType.Contribution || entry.type === EntryType.SessionBlock) && (
+          <ActionPopup
+            content={<Translate>Manage materials</Translate>}
+            trigger={
+              <Button
+                basic
+                icon="copy outline"
+                data-attachment-editor
+                data-details={JSON.stringify(entryDetails)}
+                data-locator={JSON.stringify(entryLocator)}
+                onClick={onClose}
+              />
             }
           />
         )}
