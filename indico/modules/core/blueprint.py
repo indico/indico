@@ -8,7 +8,7 @@
 from flask import request
 
 from indico.modules.core.controllers import (RHAPIGenerateCaptcha, RHChangeLanguage, RHChangeTimezone, RHConfig,
-                                             RHContact, RHPrincipals, RHRenderMarkdown, RHReportErrorAPI,
+                                             RHContact, RHCountries, RHPrincipals, RHRenderMarkdown, RHReportErrorAPI,
                                              RHResetSignatureTokens, RHSessionExpiry, RHSessionRefresh, RHSettings,
                                              RHSignURL, RHVersionCheck)
 from indico.web.flask.util import redirect_view
@@ -34,6 +34,7 @@ with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))
 _bp.add_url_rule('/api/config', 'config', RHConfig)
 _bp.add_url_rule('/api/render-markdown', 'markdown', RHRenderMarkdown, methods=('POST',))
+_bp.add_url_rule('!/api/countries', 'api_countries', RHCountries)
 
 # Misc pages
 _bp.add_url_rule('/contact', 'contact', RHContact)
