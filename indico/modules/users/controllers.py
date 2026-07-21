@@ -396,15 +396,11 @@ class RHAffiliationAPI(RHAdminBase):
         return '', 204
 
 
-class CountriesListMixin:
-    """Mixin providing a country list endpoint."""
+class RHCountries(RHAdminBase):
+    """Return the available countries for affiliation forms."""
 
     def _process(self):
         return jsonify(list(get_countries().items()))
-
-
-class RHCountries(CountriesListMixin, RHAdminBase):
-    """Return the available countries."""
 
 
 class RHProfilePicturePage(RHUserBase):
