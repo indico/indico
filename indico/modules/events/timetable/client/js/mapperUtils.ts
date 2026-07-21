@@ -40,8 +40,8 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     toTransform: (v: string) => +v.slice(1),
   },
   {
-    from: 'attachment_count',
-    to: 'attachmentCount',
+    from: 'attachments',
+    to: 'attachments',
   },
   {from: 'title', to: 'title'},
   {from: 'description', to: 'description'},

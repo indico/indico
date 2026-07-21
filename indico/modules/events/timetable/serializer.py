@@ -128,7 +128,7 @@ class TimetableSerializer:
                      'session_id': block.session_id,
                      'session_title': block.session.title,
                      'title': block.title,
-                     'attachment_count': self._get_attachment_data(block.session),
+                     'attachments': self.get_attachment_data(block.session),
                      'code': block.session.code,
                      'person_links': [self._get_person_data(x) for x in block.person_links],
                      'description': block.session.description,
@@ -149,7 +149,7 @@ class TimetableSerializer:
         data.update({'id': contribution.id,
                      'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
                      'start_dt': self._get_start_dt(entry),
-                     'attachment_count': self._get_attachment_data(contribution),
+                     'attachments': self.get_attachment_data(contribution),
                      'description': contribution.description,
                      'duration': contribution.duration_display.seconds,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
@@ -184,8 +184,25 @@ class TimetableSerializer:
                      **get_color_data(break_)})
         return data
 
-    def _get_attachment_data(self, obj):
-        return len(obj.attached_items.get('files', []))
+    @staticmethod
+    def get_attachment_data(obj):
+        def serialize_attachment(attachment):
+            return {'id': attachment.id,
+                    'type': 'attachment',
+                    'title': attachment.title,
+                    'download_url': attachment.download_url}
+
+        def serialize_folder(folder):
+            return {'id': folder.id,
+                    'type': 'folder',
+                    'title': folder.title,
+                    'attachments': list(map(serialize_attachment, folder.attachments))}
+
+        items = obj.attached_items
+        files = list(map(serialize_attachment, items.get('files', [])))
+        folders = list(map(serialize_folder, items.get('folders', [])))
+
+        return files + folders
 
     def _get_start_dt(self, entry):
         tzinfo = entry.event.tzinfo
@@ -209,7 +226,7 @@ def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
     return {'id': contribution.id,
             'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
             'contribution_id': contribution.id,
-            'attachment_count': 0,
+            'attachments': [],
             'description': contribution.description,
             'duration': contribution.duration_display.seconds,
             'pdf': url_for('contributions.export_pdf', contribution),

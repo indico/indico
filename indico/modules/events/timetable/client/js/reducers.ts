@@ -101,7 +101,7 @@ export default {
         };
       }
       case actions.SET_ENTRY_ATTACHMENTS: {
-        const {id, attachmentCount} = action;
+        const {id, attachments} = action;
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
         const flatEntries = Object.values(newEntries)
           .flat()
@@ -127,7 +127,7 @@ export default {
                 ...parentEntry.children.filter(childEntry => childEntry.id !== id),
                 {
                   ...entry,
-                  attachmentCount,
+                  attachments,
                 },
               ],
             },
@@ -135,7 +135,7 @@ export default {
         } else if (entry.type === EntryType.Contribution) {
           newEntries[dateKey] = [
             ...dayEntries.filter(dayEntry => dayEntry.id !== id),
-            {...entry, attachmentCount},
+            {...entry, attachments},
           ];
         } else {
           // attachments are linked to sessions, not session blocks, so we must update every
@@ -143,7 +143,7 @@ export default {
           for (const key of Object.keys(newEntries)) {
             newEntries[key] = newEntries[key].map(dayEntry =>
               dayEntry.type === EntryType.SessionBlock && dayEntry.sessionId === entry.sessionId
-                ? {...dayEntry, attachmentCount}
+                ? {...dayEntry, attachments}
                 : dayEntry
             );
           }
