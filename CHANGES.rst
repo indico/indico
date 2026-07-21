@@ -86,6 +86,8 @@ Bugfixes
 - Honor room booking details restrictions in spreadsheet export (:pr:`7612`)
 - Show favorite events in the dashboard based on their end date instead of their
   start date (:pr:`7653`, thanks :user:`SegiNyn`)
+- Reduce max filename length in ZIP downloads to avoid issues on Windows (:pr:`7479`,
+  :user:`moliholy`)
 
 Accessibility
 ^^^^^^^^^^^^^
