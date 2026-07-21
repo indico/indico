@@ -197,9 +197,13 @@ class CloneTemplateMixin(TargetFromURLMixin):
     def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
+        elif isinstance(self.target, Event):
+            check_event_locked(self, self.target)
 
     def _process_args(self):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
+        if self.target.is_deleted:
+            raise NotFound
 
     def clone_template(self, target=None):
         title = f'{self.template.title} (copy)'
