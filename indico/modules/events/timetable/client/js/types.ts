@@ -71,11 +71,12 @@ export interface LocationParent {
   type: string;
   title: string;
 }
+
 export interface Attachment {
-  type: 'attachment' | 'folder';
-  downloadURL: string;
   id: number;
   title: string;
+  type: 'attachment';
+  downloadUrl: string;
 }
 
 export interface Session {
@@ -96,7 +97,6 @@ export interface BaseEntry {
   colors?: Colors;
   locationData?: LocationData;
   locationParent?: LocationParent;
-  attachments?: Attachment[];
 }
 
 export interface ScheduledMixin {
@@ -116,7 +116,7 @@ export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> 
 export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: ContribId;
   type: EntryType.Contribution;
-  attachments?: Attachment[];
+  attachments: Attachment[];
   sessionId?: number;
   boardNumber?: string;
   keywords?: string[];
@@ -136,7 +136,7 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
   children: ChildEntry[];
   personLinks: PersonLink[];
   childLocationParent: LocationParent;
-  attachments?: Attachment[];
+  attachments: Attachment[];
   colors?: Colors;
   code?: string;
 }
@@ -199,4 +199,9 @@ export interface ReduxState {
   navigation: Navigation;
   staticData: StaticData;
   display: {activePanel: SidePanelView};
+}
+
+export interface AttachmentUpdatedEventDetail {
+  type: EntryType;
+  id: number;
 }
