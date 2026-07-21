@@ -62,7 +62,6 @@ from indico.modules.users.util import (GravatarError, SearchAffiliationsMixin, g
                                        search_affiliations, search_users, send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPAffiliationsDashboard, WPUser, WPUserDashboard, WPUserDataExport,
                                         WPUserFavorites, WPUserPersonalData, WPUserProfilePic, WPUsersAdmin)
-from indico.util.countries import get_countries
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -394,13 +393,6 @@ class RHAffiliationAPI(RHAdminBase):
                              f'Affiliation "{self.affiliation.name}" deleted', session.user)
         search_affiliations.bump_version()
         return '', 204
-
-
-class RHCountries(RHAdminBase):
-    """Return the available countries for affiliation forms."""
-
-    def _process(self):
-        return jsonify(list(get_countries().items()))
 
 
 class RHProfilePicturePage(RHUserBase):
