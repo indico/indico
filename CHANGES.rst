@@ -58,6 +58,8 @@ Improvements
   thanks :user:`moliholy, unconventionaldotdev`)
 - Display embedded images in email log entries (:pr:`7338`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
+- Record who created a registration on behalf of someone else (:pr:`7629`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
