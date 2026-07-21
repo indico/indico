@@ -13,6 +13,7 @@ import ReactDOM from 'react-dom';
 import {$T} from 'indico/utils/i18n';
 
 import {CategoryCardList} from '../../../next_gen_ui_2026_components/card/CategoryCardList';
+import {EventList} from '../../../next_gen_ui_2026_components/card/list/EventList';
 
 import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
@@ -146,6 +147,7 @@ import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIP
     ReactDOM.render(
       <IndicoUIProvider>
         <CategoryCardList categoryId={categoryId} />
+        <EventList categoryId={categoryId} />
       </IndicoUIProvider>,
       root
     );

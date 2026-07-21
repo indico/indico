@@ -27,8 +27,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
 from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
-                                                        group_by_month, make_format_event_date_func,
-                                                        make_happening_now_func, make_is_recent_func)
+                                                        group_by_month, group_by_year, group_by_year_month,
+                                                        make_format_event_date_func, make_happening_now_func,
+                                                        make_is_recent_func, serialize_events_by_year)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
@@ -269,6 +270,41 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                                           upcoming_events=upcoming_events, **params)
 
 
+class RHCategoryViewDataJSON(RHDisplayCategoryEventsBase):
+    """Return data needed to display a category."""
+
+    def _process(self):
+        params = get_category_view_params(
+            self.category,
+            self.now,
+            is_flat=self.is_flat
+        )
+        events_by_year = group_by_year(
+                        params['events_by_month'],
+                        self.now,
+                    )
+
+        return jsonify_data(
+            flash=False,
+            event_count=params['event_count'],
+            events_by_year=serialize_events_by_year(events_by_year,
+                                                    self.category,
+                                                    self.now),
+            future_event_count=params['future_event_count'],
+            show_future_events=params['show_future_events'],
+            future_threshold=params['future_threshold'],
+            is_flat=params['is_flat'],
+            past_event_count=params['past_event_count'],
+            show_past_events=params['show_past_events'],
+            past_threshold=params['past_threshold'],
+            has_hidden_events=params['has_hidden_events'],
+            json_ld=params['json_ld'],
+            atom_feed_url=params['atom_feed_url'],
+            atom_feed_title=params['atom_feed_title'],
+            pending_event_moves=params['pending_event_moves'],
+        )
+
+
 class RHCategoryChildrenJSON(RHDisplayCategoryBase):
     """Return the children of a category in JSON format."""
 
@@ -330,6 +366,59 @@ class RHEventList(RHDisplayCategoryEventsBase):
                                     is_recent=make_is_recent_func(self.now),
                                     happening_now=make_happening_now_func(self.now))
         return jsonify_data(flash=False, html=html)
+
+
+class RHEventListJSON(RHEventList):
+    """Return the JSON for the event list before/after a specific month. (JSON version of RHEventList)."""
+
+    def _parse_year_month(self, string):
+        try:
+            dt = datetime.strptime(string, '%Y-%m')
+        except (TypeError, ValueError):
+            return None
+        return self.category.display_tzinfo.localize(dt)
+
+    def _process_args(self):
+        RHDisplayCategoryEventsBase._process_args(self)
+        before = self._parse_year_month(request.args.get('before'))
+        after = self._parse_year_month(request.args.get('after'))
+        if before is None and after is None:
+            raise BadRequest('"before" or "after" parameter must be specified')
+        hidden_event_ids = ({e.id for e in self.category.get_hidden_events(user=session.user)}
+                            if not self.is_flat else set())
+        event_query_filter = get_event_query_filter(self.category, is_flat=self.is_flat,
+                                                    hidden_event_ids=hidden_event_ids)
+
+        extra_event_ids = values_from_signal(signals.category.extra_events.send(self.category, is_flat=self.is_flat,
+                                                                                before=before, after=after))
+        extra_events_queries = [Event.query.filter(Event.id.in_(extra_event_ids))] if extra_event_ids else []
+
+        event_query = (Event.query
+                       .options(*self._event_query_options)
+                       .filter(event_query_filter)
+                       .union(*extra_events_queries)
+                       .order_by(Event.start_dt.desc(), Event.id.desc()))
+        if before:
+            event_query = event_query.filter(Event.start_dt < before)
+        if after:
+            event_query = event_query.filter(Event.start_dt >= after)
+        self.events = event_query.all()
+
+        self.events_by_year = group_by_year_month(
+                        self.events,
+                        self.now,
+                        self.category.tzinfo
+                    )
+
+    def _process(self):
+        return jsonify_data(
+            flash=False,
+            events_by_year=serialize_events_by_year(
+                self.events_by_year,
+                self.category,
+                self.now
+            )
+        )
 
 
 class RHShowEventsInCategoryBase(RHDisplayCategoryBase):

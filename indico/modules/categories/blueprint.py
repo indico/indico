@@ -15,7 +15,8 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHCategoryManagedEventSearch, RHCategoryOverview,
                                                            RHCategoryPreviousEvent, RHCategorySearch,
                                                            RHCategoryStatistics, RHCategoryStatisticsJSON,
-                                                           RHCategoryUpcomingEvent, RHDisplayCategory, RHEventList,
+                                                           RHCategoryUpcomingEvent, RHCategoryViewDataJSON,
+                                                           RHDisplayCategory, RHEventList, RHEventListJSON,
                                                            RHExportCategoryAtom, RHExportCategoryICAL,
                                                            RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
                                                            RHShowPastEventsInCategory, RHSubcatInfo)
@@ -112,6 +113,8 @@ _bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), s
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 _bp.add_url_rule('/api/children', 'get_category_children', RHCategoryChildrenJSON)
+_bp.add_url_rule('/api/event-list', 'api_event_list', RHEventListJSON)
+_bp.add_url_rule('/api/view-data', 'api_view_data', RHCategoryViewDataJSON)
 _bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/events/search-for-series', 'event_search', RHCategoryManagedEventSearch)
 
