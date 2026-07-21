@@ -26,7 +26,8 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormSection)
-from indico.modules.events.registration.models.registrations import RegistrationVisibility
+from indico.modules.events.registration.models.registrations import (Registration, RegistrationState,
+                                                                     RegistrationVisibility)
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_regforms_registrations, get_registered_event_persons,
                                                      get_ticket_qr_code_data, get_user_data,
@@ -566,6 +567,38 @@ def test_create_registration(monkeypatch, dummy_user, dummy_regform):
     assert reg.data_by_field[multi_choice_field.id].data == {}
     # Assert that the manager field gets properly set with management=True
     assert reg.data_by_field[checkbox_field.id].data
+
+
+@pytest.mark.usefixtures('request_context')
+def test_create_registration_records_creator(monkeypatch, dummy_user, dummy_regform, create_user):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+    data = {'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+
+    creator = create_user(123)
+    session.set_session_user(creator)
+    reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
+    assert reg.created_by == creator
+    db.session.delete(reg)
+    db.session.flush()
+
+    session.set_session_user(None)
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+    assert reg.created_by is None
+
+
+def test_merge_users_reassigns_created_by(db, dummy_event, dummy_regform, create_user):
+    source = create_user(101)
+    target = create_user(102)
+    participant = create_user(103)
+    reg = Registration(registration_form=dummy_regform, first_name='Guinea', last_name='Pig',
+                       state=RegistrationState.complete, currency='USD', email=participant.email,
+                       user=participant, created_by=source)
+    dummy_event.registrations.append(reg)
+    db.session.flush()
+
+    Registration.merge_users(target, source)
+    db.session.expire(reg)
+    assert reg.created_by == target
 
 
 @pytest.mark.usefixtures('request_context')
