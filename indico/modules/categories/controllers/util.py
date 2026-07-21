@@ -38,8 +38,103 @@ def group_by_month(events, now, tzinfo):
     return list(map(_format_tuple, months))
 
 
-def make_format_event_date_func(category):
+def group_by_year(events_by_month, now):
+    def _format_year(x):
+        year, months = x
+        return {
+            'year': year,
+            'is_current': year == now.year,
+            'months': list(months),
+        }
+
+    def _key(month):
+        __, year = month['name'].rsplit(' ', 1)
+        return int(year)
+
+    years = groupby(events_by_month, key=_key)
+    return list(map(_format_year, years))
+
+
+def group_by_year_month(events, now, tzinfo):
+
+    def _format_year(year, months):
+        return {
+            'year': year,
+            'is_current': year == now.year,
+            'months': list(months),
+        }
+
+    def _format_month(month, events):
+        return {
+            'name': format_skeleton(date(month[0], month[1], 1), 'MMMMyyyy'),
+            'is_current': month[0] == now.year and month[1] == now.month,
+            'events': list(events),
+        }
+
+    def _year_key(event):
+        start_dt = event.start_dt.astimezone(tzinfo)
+        return start_dt.year
+
+    def _month_key(event):
+        start_dt = event.start_dt.astimezone(tzinfo)
+        return start_dt.year, start_dt.month
+
+    result = []
+
+    for year, year_events in groupby(events, key=_year_key):
+        months = (_format_month(month, month_events) for month, month_events in groupby(year_events, key=_month_key))
+
+        result.append(_format_year(year, months))
+    return result
+
+
+def serialize_event(event, format_event_date, is_recent, happening_now):
+    return {
+        'id': event.id,
+        'title': event.title,
+        'url': event.url,
+        'date': format_event_date(event),
+        'isRecent': is_recent(event.created_dt),
+        'isHappeningNow': happening_now(event),
+        'visibility': event.visibility,
+        'isProtected': event.is_self_protected,
+        'type': event.type,
+    }
+
+
+def serialize_events_by_year(events_by_year, category, now):
+    format_event_date = make_format_event_date_func(category, with_time=True)
+    is_recent = make_is_recent_func(now)
+    happening_now = make_happening_now_func(now)
+
+    return [
+        {
+            'year': year['year'],
+            'isCurrent': year['is_current'],
+            'months': [
+                {
+                    'name': month['name'],
+                    'isCurrent': month['is_current'],
+                    'events': [
+                        serialize_event(
+                            event,
+                            format_event_date,
+                            is_recent,
+                            happening_now,
+                        )
+                        for event in month['events']
+                    ],
+                }
+                for month in year['months']
+            ],
+        }
+        for year in events_by_year
+    ]
+
+
+def make_format_event_date_func(category, with_time=False):
     day_month = 'ddMMM'
+    time = 'HHmm'
 
     def fn(event):
         tzinfo = category.display_tzinfo
@@ -52,6 +147,9 @@ def make_format_event_date_func(category):
             end = format_skeleton(end_dt, day_month, timezone=tzinfo)
             return f'{start} - {end}'
         else:
+            if with_time:
+                return format_skeleton(start_dt, day_month, timezone=tzinfo)+ ' - ' + format_skeleton(start_dt, time,
+                                                                                                      timezone=tzinfo)
             return format_skeleton(start_dt, day_month, timezone=tzinfo)
 
     return fn
