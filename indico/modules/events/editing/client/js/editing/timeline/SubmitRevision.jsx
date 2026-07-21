@@ -15,12 +15,12 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Form} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
+import {getFilesFromRevision} from 'indico/react/components/files/FileManager/util';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {createRevision} from './actions';
-import {FinalFileManager} from './FileManager';
-import {getFilesFromRevision} from './FileManager/util';
 import * as selectors from './selectors';
 
 export default function SubmitRevision() {

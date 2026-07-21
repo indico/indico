@@ -15,12 +15,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Icon, Loader, Step} from 'semantic-ui-react';
 
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
+import {EditableType} from 'indico/modules/events/editing/models';
+import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import {
   fileTypePropTypes,
   uploadablePropTypes,
-} from 'indico/modules/events/editing/editing/timeline/FileManager/util';
-import {EditableType} from 'indico/modules/events/editing/models';
-import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
+} from 'indico/react/components/files/FileManager/util';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param} from 'indico/react/i18n';
 

@@ -17,7 +17,7 @@ import {useDispatch} from 'react-redux';
 import {AnyAction} from 'redux';
 import {Form} from 'semantic-ui-react';
 
-import {FinalFileManager} from 'indico/modules/events/editing/editing/timeline/FileManager';
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';

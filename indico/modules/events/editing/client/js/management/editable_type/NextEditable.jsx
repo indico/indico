@@ -16,12 +16,12 @@ import {useHistory} from 'react-router-dom';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer, Icon} from 'semantic-ui-react';
 
 import {ListFilter} from 'indico/react/components';
+import {fileTypePropTypes} from 'indico/react/components/files/FileManager/util';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
-import {fileTypePropTypes} from '../../editing/timeline/FileManager/util';
 import {EditableType, GetNextEditableTitles} from '../../models';
 
 import './NextEditable.module.scss';
