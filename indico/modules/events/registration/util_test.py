@@ -24,6 +24,7 @@ from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormSection)
@@ -1197,3 +1198,21 @@ def test_update_state_approves_paid_pending_back_to_complete(dummy_reg, dummy_ev
     dummy_reg.state = RegistrationState.pending
     dummy_reg.update_state(approved=True)
     assert dummy_reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+@pytest.mark.parametrize(('modification_mode', 'modifiable'), (
+    (ModificationMode.allowed_always, True),
+    (ModificationMode.allowed_until_payment, True),
+    (ModificationMode.allowed_until_approved, False),
+    (ModificationMode.not_allowed, False),
+))
+def test_reset_approval_requires_modifiable_complete_registration(dummy_reg, dummy_regform, modification_mode,
+                                                                  modifiable):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
+    dummy_regform.modification_mode = modification_mode
+    dummy_reg.state = RegistrationState.complete
+    assert dummy_reg.can_be_modified == modifiable
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.pending
