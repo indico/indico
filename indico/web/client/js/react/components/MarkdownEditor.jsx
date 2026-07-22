@@ -13,8 +13,7 @@ import MdEditor from 'react-markdown-editor-lite';
 import {Loader} from 'semantic-ui-react';
 
 import {formatters, FinalField} from 'indico/react/forms';
-import {useIndicoAxios} from 'indico/react/hooks';
-import {AutoLinkerPlugin, Markdown} from 'indico/react/util';
+import {useIndicoAxios, useRustyMarkdown} from 'indico/react/hooks';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './MarkdownEditor.module.scss';
@@ -43,6 +42,8 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     camelize: true,
   });
 
+  const md = useRustyMarkdown();
+
   const onImageUpload = async file => {
     const bodyFormData = new FormData();
     bodyFormData.append('upload', file);
@@ -62,17 +63,13 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     }
   };
 
-  return isLoadingRules ? (
+  return isLoadingRules || !md ? (
     <Loader />
   ) : (
     <div styleName="markdown-editor" onDragOver={handleDragOver}>
       <MdEditor
         htmlClass="editor-output"
-        renderHTML={text => (
-          <Markdown targetBlank remarkPlugins={[[AutoLinkerPlugin, {rules: data.rules}]]}>
-            {text.replace(/\n/gi, '  \n')}
-          </Markdown>
-        )}
+        renderHTML={text => md(text, {autolinkRules: data.rules, nl2br: true})}
         canView={{menu: true, md: true, html: false, fullScreen: false, hideMenu: false}}
         plugins={plugins.filter(p => imageUploadURL || p !== 'image')}
         style={{height}}
