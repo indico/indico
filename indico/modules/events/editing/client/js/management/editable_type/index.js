@@ -6,6 +6,6 @@
 // LICENSE file for more details.
 
 export {default as EditableTypeDashboard} from './EditableTypeDashboard';
-export {default as FileTypeManagement} from './file_types';
+export {default as FileTypeManagement} from './FileTypeManagement';
 export {default as ReviewConditionsManagement} from './review_conditions';
 export {default as EditableList} from './EditableList';
