@@ -21,6 +21,7 @@ def _log_registration_form_update(regform, changes, extra_log_fields):
         'introduction': 'Introduction',
         'contact_info': {'title': 'Contact info', 'type': 'string'},
         'moderation_enabled': 'Moderated',
+        'reset_approval_on_modification': 'Reset approval on modification',
         'private': 'Private',
         'require_login': 'Only logged-in users',
         'require_user': 'Registrant must have account',
