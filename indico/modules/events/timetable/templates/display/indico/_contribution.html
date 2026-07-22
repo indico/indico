@@ -20,7 +20,7 @@
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ contrib.slug }}" data-anchor-strip-arg="note">
-                    {{- contrib.title -}}
+                    {%- if contrib.board_number -%}{{ contrib.board_number }}: {% endif -%}{{- contrib.title -}}
                 </span>
                 {% if contrib.duration and not theme_settings.hide_duration -%}
                     <span class="icon-time timetable-duration">
