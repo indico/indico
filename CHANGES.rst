@@ -107,6 +107,9 @@ Accessibility
 - Screen reader users can now access the full date range and timezone for events
   in the dashboard lists, which was previously shown only as a mouse-hover
   tooltip (:pr:`7608`, thanks :user:`foxbunny`)
+- Screen reader users can now navigate to the main page heading on the dashboard,
+  user profile, preferences and category pages, which previously showed the page
+  title as plain text with no heading (:pr:`7617`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
