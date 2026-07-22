@@ -41,6 +41,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.logs import LogKind
 from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
@@ -266,6 +267,15 @@ class RHPersonsList(RHPersonsBase):
                                                custom_roles=custom_roles, person_schema=EventPersonSchema(),
                                                has_predefined_affiliations=has_predefined_affiliations,
                                                allow_custom_affiliations=allow_custom_affiliations)
+
+
+class RHAPIEmailEventPersonsUpload(UploadFileMixin, RHManageEventBase):
+    """Upload an attachment for an email to EventPersons."""
+
+    PERMISSION = 'contributions'
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'email-attachments'
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):
