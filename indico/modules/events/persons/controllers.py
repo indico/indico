@@ -344,7 +344,7 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
-        'attachments': FilesField(load_default=list),
+        'attachments': FilesField(load_default=lambda: []),
     })
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, attachments):
         if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
