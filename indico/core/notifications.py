@@ -248,7 +248,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, *, sender_address=None
     if config.MAX_EMAIL_ATTACHMENT_SIZE is not None and attachments:
         total = sum(_attachment_size(a) for a in attachments)
         if total > config.MAX_EMAIL_ATTACHMENT_SIZE * 1024 * 1024:
-            raise ValueError(_('Total attachment size exceeds the %s MB limit') % config.MAX_EMAIL_ATTACHMENT_SIZE)
+            raise ValueError(_('Total attachment size too large (max. {} MB)').format(config.MAX_EMAIL_ATTACHMENT_SIZE))
     return {
         'to': set(to_list),
         'cc': set(cc_list),
