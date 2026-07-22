@@ -20,6 +20,10 @@
   $image-spacing: 1.5em;
   display: flow-root;
 
+  // Use the same text color and size as for the event description page
+  color: var(--text-secondary-color);
+  font-size: 1.2em;
+
   img {
     max-width: 100%;
   }
