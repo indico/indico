@@ -11,13 +11,13 @@ import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {Form, Button, Message, Input, Popup, Icon} from 'semantic-ui-react';
 
-import {FinalFileManager} from 'indico/modules/events/editing/editing/timeline/FileManager';
 import {
   FinalEmailList,
   FinalTinyMCETextEditor,
   PlaceholderInfo,
   TinyMCETextEditor,
 } from 'indico/react/components';
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
 import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';

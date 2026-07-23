@@ -13,9 +13,9 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Message} from 'semantic-ui-react';
 
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
-import {FinalFileManager} from '../FileManager';
 import * as selectors from '../selectors';
 
 export default function UpdateFilesBox({

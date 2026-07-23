@@ -10,11 +10,15 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Button, Icon, Message, Popup} from 'semantic-ui-react';
 
+import {
+  fileTypePropTypes,
+  filePropTypes,
+  mapFileTypes,
+} from 'indico/react/components/files/FileManager/util';
 import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 
-import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
 import * as selectors from '../selectors';
 
 import './FileDisplay.module.scss';
