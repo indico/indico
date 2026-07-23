@@ -173,6 +173,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether modifying a registration resets its approval status (requires moderation)
+    reset_approval_on_modification = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether the registration form is only for selected users
     private = db.Column(
         db.Boolean,

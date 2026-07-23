@@ -17,12 +17,14 @@ from speaklater import make_lazy_string
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.custom import RegistrationListColumn
 from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.fields.simple import PROFILE_PICTURE_SENTINEL
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormSection)
@@ -40,7 +42,8 @@ from indico.testing.util import assert_json_snapshot
 from indico.util.spreadsheets import CSVFieldDelimiter
 
 
-pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
+pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
+                  'indico.modules.events.payment.testing.fixtures')
 
 
 INVITATION_COLUMNS = ['first_name', 'last_name', 'affiliation', 'email']
@@ -1130,3 +1133,86 @@ def test_generate_spreadsheet_no_extra_columns_backward_compat(dummy_reg):
     headers, rows = generate_spreadsheet_from_registrations([dummy_reg], [], set())
     assert 'ID' in headers
     assert len(rows) == 1
+
+
+@pytest.mark.usefixtures('request_context')
+def test_modify_registration_resets_to_pending_with_moderation(monkeypatch, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+    boolean_field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    })
+    db.session.flush()
+
+    # Create a registration as manager (bypasses moderation)
+    data = {
+        boolean_field.html_field_name: True,
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name
+    }
+    reg = create_registration(dummy_regform, data, management=True, notify_user=False)
+    assert reg.state == RegistrationState.complete
+
+    # Enable moderation and approval reset on modification
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
+    db.session.flush()
+
+    # Registrant modifies their registration -> state should become pending
+    modify_registration(reg, {boolean_field.html_field_name: False}, management=False, notify_user=False)
+    assert reg.state == RegistrationState.pending
+
+    # Approve the registration again
+    reg.update_state(approved=True)
+    assert reg.state == RegistrationState.complete
+
+    # Manager modifies the registration -> state should stay complete
+    modify_registration(reg, {boolean_field.html_field_name: True}, management=True, notify_user=False)
+    assert reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+def test_sync_state_resets_unpaid_to_pending_with_moderation(dummy_reg, dummy_regform):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
+    dummy_reg.state = RegistrationState.unpaid
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.pending
+
+
+@pytest.mark.usefixtures('request_context')
+def test_sync_state_does_not_reset_when_toggle_disabled(dummy_reg, dummy_regform):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = False
+    dummy_reg.state = RegistrationState.complete
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+def test_update_state_approves_paid_pending_back_to_complete(dummy_reg, dummy_event, dummy_transaction):
+    set_feature_enabled(dummy_event, 'payment', True)
+    dummy_reg.transaction = dummy_transaction
+    dummy_reg.base_price = 100
+    dummy_reg.state = RegistrationState.pending
+    dummy_reg.update_state(approved=True)
+    assert dummy_reg.state == RegistrationState.complete
+
+
+@pytest.mark.usefixtures('request_context')
+@pytest.mark.parametrize(('modification_mode', 'modifiable'), (
+    (ModificationMode.allowed_always, True),
+    (ModificationMode.allowed_until_payment, True),
+    (ModificationMode.allowed_until_approved, False),
+    (ModificationMode.not_allowed, False),
+))
+def test_reset_approval_requires_modifiable_complete_registration(dummy_reg, dummy_regform, modification_mode,
+                                                                  modifiable):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.reset_approval_on_modification = True
+    dummy_regform.modification_mode = modification_mode
+    dummy_reg.state = RegistrationState.complete
+    assert dummy_reg.can_be_modified == modifiable
+    dummy_reg.sync_state(_skip_moderation=False)
+    assert dummy_reg.state == RegistrationState.pending
