@@ -60,6 +60,7 @@ Improvements
   :user:`duartegalvao, unconventionaldotdev`)
 - Record who created a registration on behalf of someone else (:pr:`7629`, thanks
   :user:`moliholy, unconventionaldotdev`)
+- Support attaching files when emailing event persons (:pr:`7369`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^
