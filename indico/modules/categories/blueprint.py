@@ -31,6 +31,7 @@ from indico.modules.categories.controllers.management import (RHAddCategoryRole,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHRemoveCategoryRoleMember, RHSortSubcategories,
                                                               RHSplitCategory)
+from indico.modules.categories.controllers.privacy import RHCategoryPrivacy
 from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -53,6 +54,8 @@ _bp.add_url_rule('/manage/move', 'move', RHMoveCategory, methods=('POST',))
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
 _bp.add_url_rule('/manage/moderation', 'manage_moderation', RHManageCategoryModeration)
+_bp.add_url_rule('/manage/privacy', 'manage_privacy_dashboard', RHCategoryPrivacy, methods=('GET', 'POST'))
+
 
 # Role management
 _bp.add_url_rule('/manage/roles', 'manage_roles', RHCategoryRoles, methods=('POST', 'GET'))

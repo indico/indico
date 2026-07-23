@@ -10,27 +10,68 @@ from flask import flash, redirect
 from indico.core.db import db
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventPrivacyForm
-from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.management.views import WPEventPrivacy
-from indico.modules.events.operations import update_event_privacy
+from indico.modules.events.operations import get_event_privacy, update_event_privacy
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
 
-class RHEventPrivacy(RHManageEventBase):
-    """Show event privacy dashboard."""
+class RHPrivacyMixin:
+    """Mixix for event/category privacy dashboard."""
+
+    ERROR_FLASH_MESSAGE = _('The privacy settings is locked in a parent category and cannot be modified here.')
+    SUCCESS_FLASH_MESSAGE = _('Privacy settings have been updated')
+
+    def _get_privacy_data(self):
+        raise NotImplementedError
+
+    def _update_privacy(self, *args):
+        raise NotImplementedError
+
+    def _get_form(self):
+        raise NotImplementedError
+
+    def _render_template(self, **kwargs):
+        raise NotImplementedError
+
+    def _redirect_url(self):
+        raise NotImplementedError
 
     def _process(self):
-        form = EventPrivacyForm(obj=FormDefaults(**privacy_settings.get_all(self.event)), event=self.event)
+        privacy_data, inherited = self._get_privacy_data()
+        lock_privacy_settings = privacy_data.get('lock_privacy_data', False) if inherited else False
+        form = self._get_form(**privacy_data)
         if form.validate_on_submit():
-            update_event_privacy(self.event, form.data)
-            flash(_('Privacy settings have been updated'), 'success')
-            return redirect(url_for('.privacy_dashboard', self.event))
+            if lock_privacy_settings:
+                flash(self.ERROR_FLASH_MESSAGE, 'error')
+                return redirect(self._redirect_url())
+            self._update_privacy(form.data)
+            flash(self.SUCCESS_FLASH_MESSAGE, 'success')
+            return redirect(self._redirect_url())
+        return self._render_template(form=form, inherited=inherited, lock_privacy_settings=lock_privacy_settings)
+
+
+class RHEventPrivacy(RHPrivacyMixin, RHManageEventBase):
+    """Show event privacy dashboard."""
+
+    def _get_privacy_data(self):
+        return get_event_privacy(self.event)
+
+    def _update_privacy(self, data):
+        update_event_privacy(self.event, data)
+
+    def _get_form(self, **kwargs):
+        return EventPrivacyForm(obj=FormDefaults(**kwargs), event=self.event)
+
+    def _redirect_url(self):
+        return url_for('.privacy_dashboard', self.event)
+
+    def _render_template(self, **kwargs):
         regforms = (RegistrationForm.query
                     .with_parent(self.event)
                     .order_by(db.func.lower(RegistrationForm.title))
                     .all())
-        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy_dashboard', form=form,
-                                              regforms=regforms)
+        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy_dashboard',
+                                              regforms=regforms, **kwargs)
