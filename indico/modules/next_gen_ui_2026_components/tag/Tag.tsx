@@ -24,8 +24,8 @@ export type TagColorForLabelBasedOnSemanticUI =
   | 'violet'
   | 'purple'
   | 'pink'
+  | 'grey'
   | 'brown'
-  | 'gray'
   | 'black';
 export type TagColorMerged = TagColor | TagColorForLabelBasedOnSemanticUI;
 export type TagVariant = 'solid' | 'light' | 'white' | 'transparent';

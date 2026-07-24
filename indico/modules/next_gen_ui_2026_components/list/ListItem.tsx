@@ -34,16 +34,49 @@ export const ListItemDetails = ({children, className}: ListItemDetailsProps) => 
   </div>
 );
 
+// Semantic UI uses "grey" instead of "gray"
+export type LabelColorBasedOnSemanticUI =
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'olive'
+  | 'green'
+  | 'teal'
+  | 'blue'
+  | 'violet'
+  | 'purple'
+  | 'pink'
+  | 'brown'
+  | 'grey'
+  | 'black';
+
+interface LabelIndicatorProps {
+  color: LabelColorBasedOnSemanticUI;
+  label: string;
+  className?: string;
+}
+
+export function LabelIndicator({color, label, className}: LabelIndicatorProps) {
+  return (
+    <div styleName="label-indicator" className={`indico-ui ${className || ''}`}>
+      <span styleName="dot" data-color={color} />
+      <p styleName="label-indicator-text">{label}</p>
+    </div>
+  );
+}
+
 type ListItemHeaderElement = ReactElement<ListItemHeaderProps, typeof ListItemHeader>;
 type ListItemDetailsElement = ReactElement<ListItemDetailsProps, typeof ListItemDetails>;
 type ListItemTagElement = ReactElement<TagProps, typeof Tag>;
 type ListItemIconElement = ReactElement<IconProps, typeof Icon>;
+type ListItemLabelIndicatorElement = ReactElement<LabelIndicatorProps, typeof LabelIndicator>;
 
 type ListItemChild =
   | ListItemIconElement
   | ListItemHeaderElement
   | ListItemDetailsElement
   | ListItemTagElement
+  | ListItemLabelIndicatorElement
   | React.ReactNode;
 
 interface ListItemProps {
@@ -78,6 +111,7 @@ type ListItemComponent = React.FunctionComponent<ListItemProps> & {
   Header: typeof ListItemHeader;
   Details: typeof ListItemDetails;
   Tag: typeof Tag;
+  LabelIndicator: typeof LabelIndicator;
 };
 
 export const ListItem = Object.assign(ListItemRoot, {
@@ -85,4 +119,5 @@ export const ListItem = Object.assign(ListItemRoot, {
   Header: ListItemHeader,
   Details: ListItemDetails,
   Tag,
+  LabelIndicator,
 }) as ListItemComponent;
