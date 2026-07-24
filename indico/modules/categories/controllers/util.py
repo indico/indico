@@ -89,9 +89,16 @@ def group_by_year_month(events, now, tzinfo):
 
 
 def serialize_event(event, format_event_date, is_recent, happening_now):
+    is_lecture = (event.type == 'lecture')
+    if event.series and event.series.show_sequence_in_title:
+        series_label = f'({event.series_pos}/{event.series_count})'
+    else:
+        series_label = None
     return {
         'id': event.id,
         'title': event.title,
+        'verbosedTitle': event.get_verbose_title(show_speakers=is_lecture, show_series_pos=False),
+        'seriesLabel': series_label,
         'url': event.url,
         'date': format_event_date(event),
         'isRecent': is_recent(event.created_dt),
@@ -99,6 +106,9 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
         'visibility': event.visibility,
         'isProtected': event.is_self_protected,
         'type': event.type,
+        'label': event.label.title if event.label else None,
+        'labelColor': event.label.color if event.label else None,
+        'isFavorite': event in session.user.favorite_events,
     }
 
 

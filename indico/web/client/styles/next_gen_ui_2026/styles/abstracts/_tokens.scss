@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 // Viewports (for saas media queries)
-$viewport-mobile: 375px;
+$viewport-mobile: 480px;
 $viewport-tablet: 768px;
 $viewport-desktop: 1280px;
 
@@ -41,6 +41,7 @@ $viewport-desktop: 1280px;
   --container-xl: 91.429rem; // 1280px
 
   // Radius
+  --radius-xxs: 0.143rem; // 2px
   --radius-xs: 0.286rem; // 4px
   --radius-sm: 0.429rem; // 6px
   --radius-md: 0.571rem; // 8px
@@ -73,6 +74,7 @@ $viewport-desktop: 1280px;
   --animation-duration-slow: 400ms;
 
   // Icon sizes
+  --icon-size-xxs: 1.143rem; // 16px
   --icon-size-xs: 1.714rem; // 24px
   --icon-size-sm: 2.286rem; // 32px
   --icon-size-md: 2.857rem; // 40px
