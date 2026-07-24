@@ -41,15 +41,38 @@
             flex-shrink: 0;
         }
 
-        .event-list-item-favorite-icon {
-            flex-shrink: 0;
-            align-items: flex-start;
-            justify-content: flex-start;
-            order: 0;
-        }
+        .event-list-item-header-label-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
 
-        .event-list-item-series-label {
-            margin-left: var(--space-1);
+            min-width: 0;
+
+            .event-list-item-label-tag {
+                background-color: transparent;
+                max-width: fit-content;
+                height: var(--space-4);
+                margin-top: var(--space-1);
+            }
+
+            .event-list-item-header-section {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                gap: var(--space-1);
+
+                min-width: 0;
+
+                .event-list-item-favorite-icon {
+                    flex-shrink: 0;
+                }
+
+                .event-list-item-series-label {
+                    margin-left: var(--space-1);
+                    flex-shrink: 0;
+                }
+            }
         }
 
         @media (max-width: $viewport-mobile) {
@@ -59,21 +82,7 @@
             min-width: 0;
             flex: 1 1 auto;
 
-            .event-list-item-date-time-tag {
-                order: 0;
-            }
-
-            .event-list-item-favorite-icon {
-                order: 1;
-            }
-
-            .event-list-item-header {
-                order: 2;
-                width: 100%;
-            }
-
-            .event-list-item-series-label {
-                order: 3;
+            .event-list-item-header-label-section {
                 width: 100%;
             }
         }
@@ -89,9 +98,5 @@
         margin-left: var(--space-2);
 
         align-self: flex-end;
-    }
-
-    .event-list-item-label-tag {
-        border-radius: auto;
     }
 }

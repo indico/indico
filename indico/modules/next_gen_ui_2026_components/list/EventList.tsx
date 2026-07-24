@@ -19,6 +19,7 @@ import {ListItem} from './ListItem';
 
 import './EventList.module.scss';
 
+
 interface EventListProps {
   categoryId: number;
 }
@@ -49,14 +50,12 @@ export function EventList({categoryId}: EventListProps) {
 
   return (
     <div>
-      <h3>Event list:</h3>
-
       {events.map(year => (
         <div key={year.year}>
           {/* <h4>{year.year}</h4> */}
           {year.months.map(month => (
             <TimelineItem key={month.name}>
-              <TimelineItem.Title dotColor="primary">{month.name}</TimelineItem.Title>
+              <TimelineItem.Title dotColor="primary">{month.name.split(' ')[0]}</TimelineItem.Title>
               <TimelineItem.Content>
                 {month.events.map(event => (
                   <ListItem
@@ -75,38 +74,40 @@ export function EventList({categoryId}: EventListProps) {
                       >
                         {event.date}
                       </ListItem.Tag>
-                      <ListItem.Header styleName="event-list-item-header">
-                        {event.verbosedTitle}
-                      </ListItem.Header>
-                      {event.isFavorite && (
-                        <ListItem.Icon
-                          title={Translate.string('You have favorited this event.')}
-                          icon="fas:star"
-                          color="warning"
-                          variant="compact"
-                          size="xxs"
-                          styleName="event-list-item-favorite-icon"
-                        />
-                      )}
-                      {event.seriesLabel && (
-                        <ListItem.Details styleName="event-list-item-series-label">
-                          {event.seriesLabel}
-                        </ListItem.Details>
-                      )}
+                      <div styleName="event-list-item-header-label-section">
+                        <div styleName="event-list-item-header-section">
+                          <ListItem.Header>{event.verbosedTitle}</ListItem.Header>
+                          {event.isFavorite && (
+                            <ListItem.Icon
+                              title={Translate.string('You have favorited this event.')}
+                              icon="fas:star"
+                              color="warning"
+                              variant="compact"
+                              size="xxs"
+                              styleName="event-list-item-favorite-icon"
+                            />
+                          )}
+                          {event.seriesLabel && (
+                            <ListItem.Details styleName="event-list-item-series-label">
+                              {event.seriesLabel}
+                            </ListItem.Details>
+                          )}
+                        </div>
+                        {event.label && (
+                          <ListItem.Tag
+                            color={event.labelColor}
+                            variant="transparent"
+                            outlined
+                            size="xs"
+                            styleName="event-list-item-label-tag"
+                          >
+                            {event.label}
+                          </ListItem.Tag>
+                          // <ListItem.LabelIndicator color={event.labelColor} label={event.label} />
+                        )}
+                      </div>
                     </div>
                     <div styleName="event-list-item-tag-section">
-                      {event.label && (
-                        <ListItem.Tag
-                          title={Translate.string('Event label')}
-                          color={event.labelColor}
-                          variant="transparent"
-                          outlined
-                          size="xs"
-                          styleName="event-list-item-label-tag"
-                        >
-                          {event.label}
-                        </ListItem.Tag>
-                      )}
                       {event.isRecent && (
                         <ListItem.Tag
                           title={Translate.string('New')}
