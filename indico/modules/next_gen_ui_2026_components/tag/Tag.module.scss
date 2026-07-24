@@ -35,7 +35,7 @@
     color: var(--tag-text);
 
     &[data-outlined] {
-      border: 2px solid var(--tag-border, currentColor);
+      border: 1px solid var(--tag-border, currentColor);
 
       &:hover:not([data-disabled]) {
         border-color: var(--tag-border-hover, var(--tag-border, currentColor));
@@ -94,6 +94,10 @@
 
     &[data-color='primary'] {
       @include color('primary');
+    }
+
+    &[data-color='grey'] {
+      @include color('gray');
     }
 
     &[data-color='gray'] {
@@ -165,6 +169,11 @@
     &[data-color='brown'] {
      --intenzity-500: var(--color-tag-brown);
      --intenzity-600: var(--color-tag-brown);
+    }
+
+    &[data-color='grey'] { // Semantic UI uses "grey" instead of "gray"
+     --intenzity-500: var(--color-tag-gray);
+     --intenzity-600: var(--color-tag-gray);
     }
 
     &[data-color='black'] {
