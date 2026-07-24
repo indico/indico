@@ -13,6 +13,21 @@ import {NativeProps} from '../utils';
 import './Tag.module.scss';
 
 export type TagColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
+export type TagColorForLabelBasedOnSemanticUI =
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'olive'
+  | 'green'
+  | 'teal'
+  | 'blue'
+  | 'violet'
+  | 'purple'
+  | 'pink'
+  | 'brown'
+  | 'gray'
+  | 'black';
+export type TagColorMerged = TagColor | TagColorForLabelBasedOnSemanticUI;
 export type TagVariant = 'solid' | 'light' | 'white' | 'transparent';
 export type TagSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type TagTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
@@ -20,7 +35,6 @@ export type IconPosition = 'left' | 'right';
 
 export interface CustomTagProps {
   className?: string;
-  color?: TagColor;
   variant?: TagVariant;
   size?: TagSize;
   textWeight?: TagTextWeight;
@@ -29,12 +43,26 @@ export interface CustomTagProps {
   opaque?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
+  onIconClick?: React.MouseEventHandler<HTMLSpanElement>;
   children?: React.ReactNode;
 }
 
 type NativeSpanProps = NativeProps<'span'>;
 
-export type TagProps = CustomTagProps & NativeSpanProps;
+export type TagProps = CustomTagProps &
+  NativeSpanProps &
+  (
+    | {
+        variant?: 'transparent' | 'white';
+        color?: TagColorMerged;
+        opaque?: never;
+      }
+    | {
+        variant?: 'solid' | 'light';
+        color?: TagColor;
+        opaque?: boolean;
+      }
+  );
 
 const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
   const {
@@ -67,7 +95,14 @@ const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
   };
 
   const iconElement = icon && (
-    <Icon icon={icon} variant="compact" decorative styleName="tag-icon" />
+    <Icon
+      icon={icon}
+      data-clickable={!!props.onIconClick}
+      onClick={props.onIconClick}
+      variant="compact"
+      decorative
+      styleName="tag-icon"
+    />
   );
 
   const content = (

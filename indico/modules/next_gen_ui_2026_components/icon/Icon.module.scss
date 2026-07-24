@@ -41,6 +41,10 @@
       fill: currentcolor !important; // override the fill color of the svg path to currentColor
     }
 
+    &[data-size='xxs'] {
+      @include icon-size('xxs');
+    }
+
     &[data-size='xs'] {
       @include icon-size('xs');
     }

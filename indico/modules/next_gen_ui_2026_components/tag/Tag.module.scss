@@ -27,6 +27,9 @@
     justify-content: center;
     border: none;
 
+    overflow: hidden;
+    white-space: nowrap;
+
     // --- States ---
     background-color: var(--tag-bg, transparent);
     color: var(--tag-text);
@@ -69,6 +72,10 @@
       @include button-typography('text-xl');
     }
 
+    &[data-rounded] {
+      border-radius: var(--radius-pill);
+    }
+
     &[data-text-weight='regular'] {
       @include button-text-weight('regular');
     }
@@ -105,8 +112,64 @@
       @include color('error');
     }
 
-    &[data-rounded] {
-      border-radius: var(--radius-pill);
+    &[data-color='red'] {
+     --intenzity-500: var(--color-tag-red);
+     --intenzity-600: var(--color-tag-red);
+    }
+
+    &[data-color='orange'] {
+     --intenzity-500: var(--color-tag-orange);
+     --intenzity-600: var(--color-tag-orange);
+    }
+
+    &[data-color='yellow'] {
+     --intenzity-500: var(--color-tag-yellow);
+     --intenzity-600: var(--color-tag-yellow);
+    }
+
+    &[data-color='olive'] {
+     --intenzity-500: var(--color-tag-olive);
+     --intenzity-600: var(--color-tag-olive);
+    }
+
+    &[data-color='green'] {
+     --intenzity-500: var(--color-tag-green);
+     --intenzity-600: var(--color-tag-green);
+    }
+
+    &[data-color='teal'] {
+     --intenzity-500: var(--color-tag-teal);
+     --intenzity-600: var(--color-tag-teal);
+    }
+
+    &[data-color='blue'] {
+     --intenzity-500: var(--color-tag-blue);
+     --intenzity-600: var(--color-tag-blue);
+    }
+
+    &[data-color='violet'] {
+     --intenzity-500: var(--color-tag-violet);
+     --intenzity-600: var(--color-tag-violet);
+    }
+
+    &[data-color='purple'] {
+     --intenzity-500: var(--color-tag-purple);
+     --intenzity-600: var(--color-tag-purple);
+    }
+
+    &[data-color='pink'] {
+     --intenzity-500: var(--color-tag-pink);
+     --intenzity-600: var(--color-tag-pink);
+    }
+
+    &[data-color='brown'] {
+     --intenzity-500: var(--color-tag-brown);
+     --intenzity-600: var(--color-tag-brown);
+    }
+
+    &[data-color='black'] {
+     --intenzity-500: var(--color-tag-black);
+     --intenzity-600: var(--color-tag-black);
     }
 
 // --------- Icons ---------

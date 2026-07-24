@@ -7,8 +7,8 @@
 
 import React, {ReactElement} from 'react';
 
-import {Icon, IconProps} from '../../icon/Icon';
-import Tag, {TagProps} from '../../tag/Tag';
+import {Icon, IconProps} from '../icon/Icon';
+import Tag, {TagProps} from '../tag/Tag';
 
 import './ListItem.module.scss';
 
@@ -23,14 +23,26 @@ export const ListItemHeader = ({children, className}: ListItemHeaderProps) => (
   </h6>
 );
 
-type ListItemHeaderElement = ReactElement<ListItemHeaderProps, typeof ListItemHeader>;
+interface ListItemDetailsProps {
+  children: React.ReactNode;
+  className?: string;
+}
 
+export const ListItemDetails = ({children, className}: ListItemDetailsProps) => (
+  <div styleName="list-item-details" className={`indico-ui ${className || ''}`}>
+    {children}
+  </div>
+);
+
+type ListItemHeaderElement = ReactElement<ListItemHeaderProps, typeof ListItemHeader>;
+type ListItemDetailsElement = ReactElement<ListItemDetailsProps, typeof ListItemDetails>;
 type ListItemTagElement = ReactElement<TagProps, typeof Tag>;
 type ListItemIconElement = ReactElement<IconProps, typeof Icon>;
 
 type ListItemChild =
   | ListItemIconElement
   | ListItemHeaderElement
+  | ListItemDetailsElement
   | ListItemTagElement
   | React.ReactNode;
 
@@ -64,11 +76,13 @@ const ListItemRoot = ({children, href, onClick, className}: ListItemProps) => {
 type ListItemComponent = React.FunctionComponent<ListItemProps> & {
   Icon: typeof Icon;
   Header: typeof ListItemHeader;
+  Details: typeof ListItemDetails;
   Tag: typeof Tag;
 };
 
 export const ListItem = Object.assign(ListItemRoot, {
   Icon,
   Header: ListItemHeader,
+  Details: ListItemDetails,
   Tag,
 }) as ListItemComponent;
