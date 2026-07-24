@@ -1165,6 +1165,51 @@ System
 
     Default: ``set()``
 
+
+Plugin Configuration
+^^^^^^^^^^^^^^^^^^^^
+
+In addition to the regular database-backed plugin settings configured via the
+admin UI, plugins may declare file-backed config keys that live in
+``indico.conf`` alongside core settings. This is useful for values that should
+not be editable at runtime (e.g. credentials managed by infrastructure tooling).
+
+A plugin declares its file-backed config keys via the ``plugin_config_defaults``
+class attribute on its :class:`IndicoPlugin` subclass. Keys are written
+**unprefixed** in the plugin and exposed in ``indico.conf`` with the
+``PLUGIN_<NAME>_`` prefix, where ``<NAME>`` is the plugin's entry-point name
+uppercased. For example, plugin ``zoom`` declaring ``API_KEY`` becomes
+``PLUGIN_ZOOM_API_KEY``::
+
+    class ZoomPlugin(IndicoPlugin):
+        plugin_config_defaults = {
+            'API_KEY': None,
+            'API_SECRET': None,
+            'TIMEOUT': 30,
+        }
+
+In ``indico.conf``::
+
+    PLUGINS = {'zoom'}
+    PLUGIN_ZOOM_API_KEY = 'xxxxxxxx'
+    PLUGIN_ZOOM_API_SECRET = 'yyyyyyyy'
+
+Plugin code reads these via the ``plugin_config`` proxy on the plugin
+instance, which strips the prefix::
+
+    self.plugin_config.API_KEY  # reads PLUGIN_ZOOM_API_KEY
+
+These keys participate in the same machinery as core settings: defaults are
+applied when omitted, unknown ``PLUGIN_*`` keys produce an "Ignoring unknown
+config key" warning, and ``INDICO_CONF_OVERRIDE`` can override them. The
+``PLUGIN_*`` namespace is reserved for plugins; core config keys never use it.
+
+If a plugin declares a key that collides with a core config key, the plugin
+default is ignored and a warning is emitted; the core default stays
+authoritative. If two plugins declare the same prefixed key, loading raises a
+``RuntimeError``.
+
+
 .. data:: CATEGORY_CLEANUP
 
     This setting specifies categories where events are automatically

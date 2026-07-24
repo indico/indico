@@ -117,6 +117,11 @@ Internal Changes
 - Relax the videoconference name length limit to 255 characters, delegating
   service-specific limits to each plugin (:pr:`7560`, thanks
   :user:`moliholy, unconventionaldotdev`)
+- Allow plugins to declare file-backed config keys via the
+  ``plugin_config_defaults`` class attribute. Keys are exposed in ``indico.conf``
+  under the reserved ``PLUGIN_<NAME>_`` namespace, with parity for defaults,
+  sanitization and ``INDICO_CONF_OVERRIDE``
+  (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.12
