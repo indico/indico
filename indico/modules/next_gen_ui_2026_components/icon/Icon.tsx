@@ -20,7 +20,7 @@ export type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGEleme
 
 export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
-export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type IconSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface BaseIconProps {
   icon: IconSource;
@@ -32,6 +32,7 @@ interface BaseIconProps {
   decorative?: boolean;
   ariaLabel?: string;
   title?: string;
+  onClick?: React.MouseEventHandler<HTMLSpanElement>;
 }
 
 export type IconProps =
@@ -75,6 +76,7 @@ export const Icon = (props: IconProps) => {
     decorative = true,
     ariaLabel,
     title,
+    onClick,
   } = props;
 
   const isDecorative = decorative || !ariaLabel;
@@ -107,6 +109,7 @@ export const Icon = (props: IconProps) => {
       title={title}
       aria-hidden={isDecorative}
       aria-label={!isDecorative ? ariaLabel : undefined}
+      onClick={onClick}
     >
       {content}
     </span>
