@@ -16,6 +16,9 @@
     <div class="event-log"
          data-fetch-logs-url="{{ logs_api_url }}"
          data-realms="{{ realms|tojson|forceescape }}"
-         data-metadata-query="{{ metadata_query|tojson|forceescape }}">
+         data-metadata-query="{{ metadata_query|tojson|forceescape }}"
+         data-initial-keyword="{{ initial_keyword|default('') }}"
+         data-initial-filters="{{ initial_filters|default([])|tojson|forceescape }}"
+         data-user="{{ user|default('')|string }}">
     </div>
 {% endblock %}

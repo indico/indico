@@ -135,7 +135,7 @@ export function fetchLogEntries() {
     dispatch(fetchStarted());
     const {
       logs: {filters, keyword, currentPage, metadataQuery},
-      staticData: {fetchLogsUrl},
+      staticData: {fetchLogsUrl, user},
     } = getStore();
 
     const params = {
@@ -145,6 +145,9 @@ export function fetchLogEntries() {
     };
     if (keyword) {
       params.q = keyword;
+    }
+    if (user) {
+      params.user = user;
     }
 
     Object.entries(filters).forEach(([item, active]) => {
