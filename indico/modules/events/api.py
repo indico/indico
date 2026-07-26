@@ -755,6 +755,8 @@ class SessionFetcher(SessionContribFetcher, SerializerBase):
         """Return an aggregated list of session blocks given the sessions."""
         session_blocks = []
         for session_ in sessions:
+            if not session_.can_access(self.user):
+                continue
             can_manage = self.user is not None and session_.can_manage(self.user)
             session_access_list = None
             serialized_session = self._serialize_session(session_)
