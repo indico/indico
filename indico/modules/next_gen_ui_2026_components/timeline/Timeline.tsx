@@ -6,19 +6,20 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import './Timeline.module.scss';
 
-export type TimelineItemDotColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
+import './Timeline.module.scss';
+import {Dot} from '../dot/Dot';
+import {IndicoPaletteColor} from '../tokens';
 
 interface TimelineTitleProps {
-  dotColor?: TimelineItemDotColor;
+  dotColor?: IndicoPaletteColor;
   children: React.ReactNode;
   className?: string;
 }
 
 export const TimelineTitle = ({children, className, dotColor = 'primary'}: TimelineTitleProps) => (
   <h5 className={className ?? ''}>
-    <span styleName="dot" data-color={dotColor} />
+    <Dot styleName="dot" color={dotColor} size="sm" />
     {children}
   </h5>
 );

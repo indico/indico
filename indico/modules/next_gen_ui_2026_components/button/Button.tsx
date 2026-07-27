@@ -47,26 +47,21 @@ interface CustomButtonProps {
 type NativeButtonProps = NativeProps<'button'>;
 type NativeAnchorProps = NativeProps<'a'>;
 
-export type ButtonProps = CustomButtonProps &
-  (({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps)) &
-  (
-    | {
-        variant?: 'transparent';
-        color?: ButtonColor;
-        opaque?: never;
-      }
-    | {
-        variant?: 'solid' | 'light' | 'white';
-        color?: Exclude<ButtonColor, 'white'>;
-        opaque?: boolean;
-      }
-    | {
-        icon?: IconSource;
-        iconPosition?: 'icon-only';
-        children?: never;
-        'aria-label'?: string;
-      }
-  );
+type hrefUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
+
+type VariantColorUnion =
+  | {variant?: 'transparent'; color?: ButtonColor; opaque?: never}
+  | {
+      variant?: 'solid' | 'light' | 'white';
+      color?: Exclude<ButtonColor, 'white'>;
+      opaque?: boolean;
+    };
+
+type IconOnlyUnion =
+  | {icon?: IconSource; iconPosition?: 'left' | 'right'; children?: React.ReactNode}
+  | {icon: IconSource; iconPosition: 'icon-only'; children?: never; 'aria-label': string};
+
+export type ButtonProps = CustomButtonProps & hrefUnion & VariantColorUnion & IconOnlyUnion;
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>((props, ref) => {
   const {

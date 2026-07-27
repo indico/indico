@@ -7,10 +7,11 @@
 
 import React, {ReactElement} from 'react';
 
+import {Dot} from '../dot/Dot';
 import {Icon, IconProps} from '../icon/Icon';
 import Tag, {TagProps} from '../tag/Tag';
-
 import './ListItem.module.scss';
+import {LegacyColor} from '../tokens';
 
 interface ListItemHeaderProps {
   children: React.ReactNode;
@@ -34,24 +35,8 @@ export const ListItemDetails = ({children, className}: ListItemDetailsProps) => 
   </div>
 );
 
-// Semantic UI uses "grey" instead of "gray"
-export type LabelColorBasedOnSemanticUI =
-  | 'red'
-  | 'orange'
-  | 'yellow'
-  | 'olive'
-  | 'green'
-  | 'teal'
-  | 'blue'
-  | 'violet'
-  | 'purple'
-  | 'pink'
-  | 'brown'
-  | 'grey'
-  | 'black';
-
 interface LabelIndicatorProps {
-  color: LabelColorBasedOnSemanticUI;
+  color: LegacyColor;
   label: string;
   className?: string;
 }
@@ -59,7 +44,7 @@ interface LabelIndicatorProps {
 export function LabelIndicator({color, label, className}: LabelIndicatorProps) {
   return (
     <div styleName="label-indicator" className={`indico-ui ${className || ''}`}>
-      <span styleName="dot" data-color={color} />
+      <Dot styleName="dot" color={color} size="xxs" />
       <p styleName="label-indicator-text">{label}</p>
     </div>
   );
