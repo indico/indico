@@ -114,7 +114,10 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     @no_autoflush
     def _check_internal_name(self, data, **kwargs):
-        input_type = data['input_type']
+        if isinstance(self, TextDataSchema):
+            input_type = 'label'
+        else:
+            input_type = data['input_type']
         internal_name = data.get('internal_name')
         field = self.context['field']
         if field.type == RegistrationFormItemType.field_pd and internal_name != field.personal_data_type.internal_name:
