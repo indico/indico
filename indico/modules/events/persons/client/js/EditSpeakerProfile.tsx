@@ -7,70 +7,109 @@
 
 import uploadSpeakerPhoto from 'indico-url:persons.upload_speaker_photo';
 
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-final-form';
 import {Dropdown, Icon, Popup, SemanticICONS} from 'semantic-ui-react';
+import * as SUI from 'semantic-ui-react/dist/es/lib/SUI';
 
 import {FinalSingleFileManager} from 'indico/react/components';
-import {FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
-import './EditSpeakerProfile.module.scss';
 import {Speaker} from './types';
+
+import './EditSpeakerProfile.module.scss';
+
+export const DEFAULT_SOCIAL_ICONS: Record<string, SemanticICONS> = {
+  Facebook: 'facebook',
+  LinkedIn: 'linkedin',
+  GitHub: 'github',
+  Webpage: 'world',
+};
+
+export const DEFAULT_SOCIAL_TITLES = ['Facebook', 'LinkedIn', 'GitHub', 'Webpage'];
 
 export interface EditSpeakerFormData {
   description?: string;
-  github?: string;
-  facebook?: string;
-  linkedin?: string;
-  webpage?: string;
+  socials?: Record<
+    string,
+    {
+      url: string;
+      icon?: string;
+    }
+  >;
   photo?: string;
 }
 
 interface EditSpeakerProfileProps {
-  speaker?: Speaker;
+  speaker: Speaker;
   eventId: number;
-  onClose?: () => void;
-  onSubmit?: (formData: EditSpeakerFormData) => void;
+  onClose: () => void;
+  onSubmit: (formData: EditSpeakerFormData) => void;
 }
 
-type ExtraField = 'github' | 'facebook' | 'linkedin' | 'webpage';
-
-const FIELD_TITLES: Record<ExtraField, string> = {
-  facebook: 'Facebook',
-  linkedin: 'LinkedIn',
-  github: 'GitHub',
-  webpage: 'Webpage',
-};
-
-const FIELD_ICONS: Record<ExtraField, SemanticICONS> = {
-  facebook: 'facebook',
-  linkedin: 'linkedin',
-  github: 'github',
-  webpage: 'world',
-};
-
-function getExistingExtraFields(speaker: Speaker) {
-  const fields: ExtraField[] = [];
-  if (speaker.speaker_facebook !== null && speaker.speaker_facebook !== '') {
-    fields.push('facebook');
-  }
-  if (speaker.speaker_linkedin !== null && speaker.speaker_linkedin !== '') {
-    fields.push('linkedin');
-  }
-  if (speaker.speaker_github !== null && speaker.speaker_github !== '') {
-    fields.push('github');
-  }
-  if (speaker.speaker_webpage !== null && speaker.speaker_webpage !== '') {
-    fields.push('webpage');
-  }
-  return fields;
+interface AddSocialFormData {
+  title: string;
+  icon?: string;
 }
+
+function makeTitle(s: string) {
+  return s
+    .split(' ')
+    .map(word =>
+      word.length === 0 ? word : word.charAt(0).toLocaleUpperCase() + word.substring(1)
+    )
+    .join(' ');
+}
+
+const ICON_OPTIONS = SUI.ICONS_AND_ALIASES.map((iconName: string) => ({
+  key: iconName,
+  value: iconName,
+  icon: iconName,
+  text: makeTitle(iconName),
+}));
 
 function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: number}) {
-  const [extraFields, setExtraFields] = useState<ExtraField[]>(getExistingExtraFields(speaker));
+  const [speakerSocials, setSpeakerSocials] = useState(speaker.speaker_socials ?? {});
+  const [customSocialModalOpened, setCustomSocialModalOpened] = useState(false);
+
   const form = useForm();
+
+  const openCustomSocialModal = useCallback(() => setCustomSocialModalOpened(true), []);
+  const closeCustomSocialModal = useCallback(() => setCustomSocialModalOpened(false), []);
+
+  const addSpeakerSocial = useCallback((name: string, icon?: string) => {
+    setSpeakerSocials(old => ({...old, [name]: {url: '', icon}}));
+  }, []);
+
+  const addSocial = useCallback(
+    (formData: AddSocialFormData) => {
+      addSpeakerSocial(formData.title, formData.icon);
+      closeCustomSocialModal();
+    },
+    [closeCustomSocialModal, addSpeakerSocial]
+  );
+
+  useEffect(() => {
+    // Keep `icon` property in sync
+    const unsubscribe = form.subscribe(
+      formState => {
+        const socials: {url: string; icon?: string}[] | undefined = formState.values.socials;
+        if (socials === undefined) {
+          return;
+        }
+        for (const [name, value] of Object.entries(socials)) {
+          if (value.icon === undefined && speakerSocials[name].icon !== undefined) {
+            form.change(`socials.${name}.icon`, speakerSocials[name].icon);
+          }
+        }
+      },
+      {values: true}
+    );
+
+    return () => unsubscribe();
+  }, [form, speakerSocials]);
 
   return (
     <>
@@ -82,22 +121,23 @@ function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: 
       />
       <FinalTextArea
         name="description"
+        nullIfEmpty={false}
         label={Translate.string('Description')}
         initialValue={speaker.speaker_description}
       />
-      {extraFields.map(name => (
+      {Object.entries(speakerSocials).map(([name, properties]) => (
         <div styleName="row" key={name}>
           <FinalInput
-            name={name}
+            name={`socials.${name}.url`}
             label={
               <p>
-                {FIELD_TITLES[name]} <Icon name={FIELD_ICONS[name]} />
+                {name} {properties.icon && <Icon name={properties.icon as SemanticICONS} />}
               </p>
             }
-            initialValue={speaker[`speaker_${name}`]}
+            initialValue={speaker.speaker_socials?.[name]?.url ?? ''}
           />
           <Popup
-            content={Translate.string('Remove link')}
+            content={Translate.string('Remove social')}
             position="right center"
             trigger={
               <Icon
@@ -105,41 +145,61 @@ function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: 
                 link
                 color="black"
                 onClick={() => {
-                  setExtraFields(old => old.filter(field => field !== name));
-                  speaker[`speaker_${name}`] = null;
-                  form.change(name, undefined);
+                  form.change(`socials.${name}`, undefined);
+                  setSpeakerSocials(old =>
+                    Object.fromEntries(Object.entries(old).filter(entry => entry[0] !== name))
+                  );
                 }}
               />
             }
           />
         </div>
       ))}
-      {extraFields.length < Object.keys(FIELD_TITLES).length && (
-        <div styleName="centered-field">
-          <Dropdown
-            text={Translate.string('Add link')}
-            icon="add"
-            floating
+      <div styleName="centered-field">
+        <Dropdown
+          text={Translate.string('Add socials')}
+          icon="add"
+          floating
+          labeled
+          button
+          className="icon"
+        >
+          <Dropdown.Menu>
+            {DEFAULT_SOCIAL_TITLES.filter(entry => !speaker.speaker_socials?.[entry[0]]).map(
+              name => (
+                <Dropdown.Item
+                  key={name}
+                  icon={DEFAULT_SOCIAL_ICONS[name]}
+                  text={name}
+                  onClick={() => addSpeakerSocial(name, DEFAULT_SOCIAL_ICONS[name])}
+                />
+              )
+            )}
+            <Dropdown.Item text={Translate.string('Custom...')} onClick={openCustomSocialModal} />
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      {customSocialModalOpened && (
+        <FinalModalForm
+          id="add-social-form"
+          onClose={closeCustomSocialModal}
+          onSubmit={addSocial}
+          header={Translate.string('Add Social')}
+          size="tiny"
+        >
+          <FinalInput name="title" required fluid label={Translate.string('Title')} />
+          <FinalDropdown
+            name="icon"
+            required
+            label={Translate.string('Icon')}
+            placeholder={Translate.string('Select Icon')}
             labeled
-            button
-            className="icon"
-          >
-            <Dropdown.Menu>
-              <Dropdown.Header content={Translate.string('Select the link type')} />
-              <Dropdown.Divider />
-              {Object.entries(FIELD_TITLES)
-                .filter(entry => !extraFields.includes(entry[0] as ExtraField))
-                .map(([name, title]: [ExtraField, string]) => (
-                  <Dropdown.Item
-                    key={name}
-                    icon={FIELD_ICONS[name]}
-                    text={title}
-                    onClick={() => setExtraFields(old => [...old, name])}
-                  />
-                ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+            fluid
+            search
+            selection
+            options={ICON_OPTIONS}
+          />
+        </FinalModalForm>
       )}
     </>
   );

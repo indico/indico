@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import itertools
+import json
 import os
 from collections import defaultdict
 
@@ -329,29 +330,24 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
     @use_kwargs({
         'photo': FileField(validate=file_extension('png', 'jpg', 'jpeg')),
         'description': fields.String(validate=validate.Length(max=1000)),
-        'facebook': fields.String(validate=validate.Length(max=500)),
-        'github': fields.String(validate=validate.Length(max=500)),
-        'linkedin': fields.String(validate=validate.Length(max=500)),
-        'webpage': fields.String(validate=validate.Length(max=500)),
+        'socials': fields.String(validate=validate.Length(max=1000)),
     })
-    def _process_POST(self, description=None, facebook=None, github=None, linkedin=None, webpage=None, photo=None):
-        self.person.speaker_facebook = facebook
-        self.person.speaker_github = github
-        self.person.speaker_linkedin = linkedin
-        self.person.speaker_webpage = webpage
+    def _process_POST(self, description=None, socials=None, photo=None):
         if description is not None:
             self.person.speaker_description = description
         if photo is not None:
             self.person.speaker_photo = photo
             photo.claim()
+        if socials is not None:
+            try:
+                self.person.speaker_socials = json.loads(socials)
+            except json.JSONDecodeError:
+                return jsonify(error='asdasds')
         return SpeakerProfileSchema().dump(self.person)
 
     def _process_DELETE(self):
         self.person.speaker_description = None
-        self.person.speaker_facebook = None
-        self.person.speaker_linkedin = None
-        self.person.speaker_github = None
-        self.person.speaker_webpage = None
+        self.person.speaker_socials = None
         if self.person.speaker_photo is not None:
             self.person.speaker_photo.claimed = False
             self.person.speaker_photo_file_id = None
