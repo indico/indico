@@ -128,8 +128,7 @@ class SpeakerProfileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
         fields = ('id', 'email', 'name', 'first_name', 'last_name', 'speaker_photo_url', 'speaker_description',
-                  'speaker_linkedin', 'speaker_github', 'speaker_facebook', 'speaker_webpage', 'avatar_url',
-                  'affiliation')
+                  'speaker_socials', 'avatar_url', 'affiliation', 'has_speaker_profile')
 
     avatar_url = fields.String(attribute='user.avatar_url')
     speaker_photo_url = fields.String(attribute='speaker_photo.signed_download_url', default=None)

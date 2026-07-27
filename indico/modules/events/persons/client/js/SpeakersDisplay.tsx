@@ -9,7 +9,7 @@ import speakersURL from 'indico-url:persons.api_speakers_list';
 
 import React, {useEffect, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Icon, Divider} from 'semantic-ui-react';
+import {Icon, Divider, SemanticICONS} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 
@@ -25,31 +25,16 @@ function SpeakerProfile({speaker}: {speaker: Speaker}) {
           {speaker.name} {speaker.affiliation ? ` | ${speaker.affiliation}` : ''}
         </h4>
         <div styleName="socials">
-          {speaker.speaker_facebook && (
-            <a href={speaker.speaker_facebook} rel="noreferrer">
-              <Icon name="facebook" size="large" />
+          {Object.entries(speaker.speaker_socials ?? {}).map(([socialName, socialInfo]) => (
+            <a href={socialInfo.url} rel="noreferrer" key={socialName}>
+              <Icon name={socialInfo.icon as SemanticICONS} size="large" title={socialName} />
             </a>
-          )}
-          {speaker.speaker_github && (
-            <a href={speaker.speaker_github} rel="noreferrer">
-              <Icon name="github" size="large" />
-            </a>
-          )}
-          {speaker.speaker_linkedin && (
-            <a href={speaker.speaker_linkedin} rel="noreferrer">
-              <Icon name="linkedin" size="large" />
-            </a>
-          )}
-          {speaker.speaker_webpage && (
-            <a href={speaker.speaker_webpage} rel="noreferrer">
-              <Icon name="world" size="large" />
-            </a>
-          )}
+          ))}
         </div>
       </div>
       <img src={speaker.speaker_photo_url ?? speaker.avatar_url} styleName="speaker-photo" />
       <div>
-        {speaker.speaker_description.split('\n').map((line, index) => (
+        {(speaker.speaker_description ?? '').split('\n').map((line, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <p key={index}>{line}</p>
         ))}
@@ -98,7 +83,7 @@ customElements.define(
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(
-        <SpeakersDisplay eventId={JSON.parse(this.getAttribute('event-id'))} />,
+        <SpeakersDisplay eventId={JSON.parse(this.getAttribute('event-id') ?? '')} />,
         this
       );
     }

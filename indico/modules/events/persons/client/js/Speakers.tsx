@@ -35,18 +35,7 @@ export function Speakers({eventId}: {eventId: number}) {
     })
   );
   const speakersWithProfile = useMemo(
-    () =>
-      speakers
-        ? speakers.filter(
-            speaker =>
-              (speaker.speaker_description !== null && speaker.speaker_description !== '') ||
-              (speaker.speaker_facebook !== null && speaker.speaker_facebook !== '') ||
-              (speaker.speaker_github !== null && speaker.speaker_github !== '') ||
-              (speaker.speaker_linkedin !== null && speaker.speaker_linkedin !== '') ||
-              (speaker.speaker_webpage !== null && speaker.speaker_webpage !== '') ||
-              speaker.speaker_photo_url !== null
-          )
-        : [],
+    () => (speakers ? speakers.filter(speaker => speaker.has_speaker_profile) : []),
     [speakers]
   );
   const speakerIDsWithProfile = useMemo(
@@ -71,25 +60,16 @@ export function Speakers({eventId}: {eventId: number}) {
 
   const handleEditSpeaker = useCallback(
     async (formData: EditSpeakerFormData) => {
+      if (selectedSpeaker === undefined) {
+        return;
+      }
       const bodyFormData = new FormData();
-      console.log(formData);
+      bodyFormData.append('socials', JSON.stringify(formData.socials ?? {}));
       if (formData.photo !== undefined) {
         bodyFormData.append('photo', formData.photo);
       }
       if (formData.description !== undefined) {
         bodyFormData.append('description', formData.description);
-      }
-      if (formData.github !== undefined) {
-        bodyFormData.append('github', formData.github);
-      }
-      if (formData.facebook !== undefined) {
-        bodyFormData.append('facebook', formData.facebook);
-      }
-      if (formData.linkedin !== undefined) {
-        bodyFormData.append('linkedin', formData.linkedin);
-      }
-      if (formData.webpage !== undefined) {
-        bodyFormData.append('webpage', formData.webpage);
       }
       const config = {
         headers: {'content-type': 'multipart/form-data'},
@@ -146,7 +126,7 @@ export function Speakers({eventId}: {eventId: number}) {
           <Search
             placeholder={Translate.string('Search speakers')}
             value={searchTerm}
-            onSearchChange={(_, {value}) => setSearchTerm(value)}
+            onSearchChange={(_, {value}) => setSearchTerm(value ?? '')}
             open={false}
             fluid
           />
@@ -219,7 +199,7 @@ export function Speakers({eventId}: {eventId: number}) {
           </p>
         )
       ) : null}
-      {openedModal === 'EDIT_SPEAKER' && (
+      {openedModal === 'EDIT_SPEAKER' && selectedSpeaker !== undefined && (
         <EditSpeakerProfile
           onClose={() => {
             setOpenedModal(null);
@@ -250,7 +230,7 @@ customElements.define(
   'ind-speakers',
   class extends HTMLElement {
     connectedCallback() {
-      ReactDOM.render(<Speakers eventId={JSON.parse(this.getAttribute('event-id'))} />, this);
+      ReactDOM.render(<Speakers eventId={JSON.parse(this.getAttribute('event-id') ?? '')} />, this);
     }
   }
 );

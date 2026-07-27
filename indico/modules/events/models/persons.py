@@ -7,6 +7,7 @@
 
 from operator import attrgetter
 
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -176,20 +177,8 @@ class EventPerson(PersonMixin, db.Model):
         db.Text,
         nullable=True,
     )
-    speaker_linkedin = db.Column(
-        db.Text,
-        nullable=True,
-    )
-    speaker_facebook = db.Column(
-        db.Text,
-        nullable=True,
-    )
-    speaker_github = db.Column(
-        db.Text,
-        nullable=True,
-    )
-    speaker_webpage = db.Column(
-        db.Text,
+    speaker_socials = db.Column(
+        JSONB,
         nullable=True,
     )
 
@@ -265,6 +254,14 @@ class EventPerson(PersonMixin, db.Model):
         contain any signatures or similar data that could change.
         """
         return self.identifier
+
+    @hybrid_property
+    def has_speaker_profile(self):
+        return (
+            self.speaker_photo_file_id is not None
+            or self.speaker_description is not None
+            or self.speaker_socials is not None
+        )
 
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):

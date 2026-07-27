@@ -11,12 +11,16 @@ export interface Speaker {
   name: string;
   first_name: string;
   last_name: string;
-  speaker_description: string | null;
   speaker_photo_url: string | null;
-  speaker_facebook: string | null;
-  speaker_github: string | null;
-  speaker_linkedin: string | null;
-  speaker_webpage: string | null;
+  speaker_description: string | null;
+  has_speaker_profile: boolean;
+  speaker_socials: Record<
+    string,
+    {
+      url: string;
+      icon?: string;
+    }
+  >;
   avatar_url: string;
   affiliation: string;
 }
