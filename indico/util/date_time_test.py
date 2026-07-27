@@ -88,7 +88,10 @@ def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expect
     ('MMM', 'M', 'M'),  # Cannot expand numeric fields to alphabetic ones
     ('ss', 's', 's'),  # Hours, minutes and seconds should never be expanded
     ('MMdd', 'Md', 'MMdd'),  # Expand numeric fields
-    ('MMMMdddd', 'MMMddd', 'MMMMdddd')  # Expand alphabetic fields
+    ('MMMMdddd', 'MMMddd', 'MMMMdddd'),  # Expand alphabetic fields
+    ('ddMMM', "d 'de' MMM", "dd 'de 'MMM"),  # Cannot expand string literals
+    ('ddMMM', 'M月d日', 'M月dd日'),
+    ('EEEEdMMMM', "E, d 'de' MMM", "E, d 'de 'MMMM"),
 ))
 def test__adjust_skeleton_skeleton(skeleton, format, expected):
     assert _adjust_skeleton(format, skeleton) == expected
