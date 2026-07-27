@@ -37,12 +37,12 @@ interface BaseIconProps {
 
 export type IconProps =
   | (BaseIconProps & {
-      variant: 'light' | 'solid' | 'dark';
+      variant?: 'light' | 'solid' | 'dark';
       rounded?: boolean;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error';
     })
   | (BaseIconProps & {
-      variant: 'plain' | 'compact';
+      variant?: 'plain' | 'compact';
       rounded?: never;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
     });

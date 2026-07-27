@@ -30,32 +30,6 @@
     }
 
     .dot {
-        &[data-color='primary'] {
-            @include color('primary');
-        }
-
-        &[data-color='gray'] {
-            @include color('gray');
-        }
-
-        &[data-color='success'] {
-            @include color('success');
-        }
-
-        &[data-color='warning'] {
-            @include color('warning');
-        }
-
-        &[data-color='error'] {
-            @include color('error');
-        }
-
-        height: var(--space-3);
-        width: var(--space-3);
-        background-color: var(--intenzity-500);
-        border-radius: 50%;
-        display: inline-block;
-        align-self: center;
         margin-right: var(--space-2);
     }
 }

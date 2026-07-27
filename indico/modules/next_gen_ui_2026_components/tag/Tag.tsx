@@ -87,7 +87,6 @@ const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
     'data-size': size,
     'data-text-weight': textWeight,
     'data-outlined': outlined ? '' : undefined,
-    'data-compact': compact ? '' : undefined,
     'data-rounded': rounded ? '' : undefined,
     'data-opaque': opaque ? '' : undefined,
     'data-icon': icon ? '' : undefined,

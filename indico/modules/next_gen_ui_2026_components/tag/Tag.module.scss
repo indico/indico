@@ -96,10 +96,6 @@
       @include color('primary');
     }
 
-    &[data-color='grey'] {
-      @include color('gray');
-    }
-
     &[data-color='gray'] {
       @include color('gray');
     }
@@ -166,14 +162,15 @@
      --intenzity-600: var(--color-tag-pink);
     }
 
+    &[data-color='grey'] {
+     // Semantic UI uses "grey" instead of "gray"
+     --intenzity-500: var(--color-tag-gray);
+     --intenzity-600: var(--color-tag-gray);
+    }
+
     &[data-color='brown'] {
      --intenzity-500: var(--color-tag-brown);
      --intenzity-600: var(--color-tag-brown);
-    }
-
-    &[data-color='grey'] { // Semantic UI uses "grey" instead of "gray"
-     --intenzity-500: var(--color-tag-gray);
-     --intenzity-600: var(--color-tag-gray);
     }
 
     &[data-color='black'] {
