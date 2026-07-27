@@ -1,0 +1,119 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+@mixin dot-size($size) {
+    height: var(--space-#{$size});
+    width: var(--space-#{$size});
+}
+
+:global(.indico-ui) {
+    .dot {
+        &[data-color='primary'] {
+            @include color('primary');
+        }
+
+        &[data-color='gray'] {
+            @include color('gray');
+        }
+
+        &[data-color='success'] {
+            @include color('success');
+        }
+
+        &[data-color='warning'] {
+            @include color('warning');
+        }
+
+        &[data-color='error'] {
+            @include color('error');
+        }
+
+        &[data-color='red'] {
+            --intenzity-500: var(--color-tag-red);
+        }
+
+        &[data-color='orange'] {
+            --intenzity-500: var(--color-tag-orange);
+        }
+
+        &[data-color='yellow'] {
+            --intenzity-500: var(--color-tag-yellow);
+        }
+
+        &[data-color='olive'] {
+            --intenzity-500: var(--color-tag-olive);
+        }
+
+        &[data-color='green'] {
+            --intenzity-500: var(--color-tag-green);
+        }
+
+        &[data-color='teal'] {
+            --intenzity-500: var(--color-tag-teal);
+        }
+
+        &[data-color='blue'] {
+            --intenzity-500: var(--color-tag-blue);
+        }
+
+        &[data-color='violet'] {
+            --intenzity-500: var(--color-tag-violet);
+        }
+
+        &[data-color='purple'] {
+            --intenzity-500: var(--color-tag-purple);
+        }
+
+        &[data-color='pink'] {
+            --intenzity-500: var(--color-tag-pink);
+        }
+
+        &[data-color='brown'] {
+            --intenzity-500: var(--color-tag-brown);
+        }
+
+        &[data-color='grey'] {
+            // Semantic UI uses "grey" instead of "gray"
+            --intenzity-500: var(--color-tag-gray);
+        }
+
+        &[data-color='black'] {
+            --intenzity-500: var(--color-tag-black);
+        }
+
+        &[data-size='xxs'] {
+            @include dot-size('1');
+        }
+
+        &[data-size='xs'] {
+            @include dot-size('2');
+        }
+
+        &[data-size='sm'] {
+            @include dot-size('3');
+        }
+
+        &[data-size='md'] {
+            @include dot-size('4');
+        }
+
+        &[data-size='lg'] {
+            @include dot-size('5');
+        }
+
+        &[data-size='xl'] {
+            @include dot-size('6');
+        }
+
+        background-color: var(--intenzity-500);
+        border-radius: 50%;
+        display: inline-block;
+        align-self: center;
+    }
+}

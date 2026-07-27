@@ -19,7 +19,6 @@ import {ListItem} from './ListItem';
 
 import './EventList.module.scss';
 
-
 interface EventListProps {
   categoryId: number;
 }

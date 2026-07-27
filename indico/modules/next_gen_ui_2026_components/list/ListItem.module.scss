@@ -92,65 +92,6 @@
         }
 
         .dot {
-            &[data-color='red'] {
-                --intenzity-500: var(--color-tag-red);
-            }
-
-            &[data-color='orange'] {
-                --intenzity-500: var(--color-tag-orange);
-            }
-
-            &[data-color='yellow'] {
-                --intenzity-500: var(--color-tag-yellow);
-            }
-
-            &[data-color='olive'] {
-                --intenzity-500: var(--color-tag-olive);
-            }
-
-            &[data-color='green'] {
-                --intenzity-500: var(--color-tag-green);
-            }
-
-            &[data-color='teal'] {
-                --intenzity-500: var(--color-tag-teal);
-            }
-
-            &[data-color='blue'] {
-                --intenzity-500: var(--color-tag-blue);
-            }
-
-            &[data-color='violet'] {
-                --intenzity-500: var(--color-tag-violet);
-            }
-
-            &[data-color='purple'] {
-                --intenzity-500: var(--color-tag-purple);
-            }
-
-            &[data-color='pink'] {
-                --intenzity-500: var(--color-tag-pink);
-            }
-
-            &[data-color='brown'] {
-                --intenzity-500: var(--color-tag-brown);
-            }
-
-            &[data-color='grey'] {
-                // Semantic UI uses "grey" instead of "gray"
-                --intenzity-500: var(--color-tag-gray);
-            }
-
-            &[data-color='black'] {
-                --intenzity-500: var(--color-tag-black);
-            }
-
-            height: var(--space-1);
-            width: var(--space-1);
-            background-color: var(--intenzity-500);
-            border-radius: 50%;
-            display: inline-block;
-            align-self: center;
             margin-right: var(--space-1);
         }
     }
