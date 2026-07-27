@@ -89,6 +89,8 @@ Bugfixes
   start date (:pr:`7653`, thanks :user:`SegiNyn`)
 - Reduce max filename length in ZIP downloads to avoid issues on Windows (:pr:`7479`,
   :user:`moliholy`)
+- Correctly format dates containing literal strings, such as "30 de junho" (:issue:`7590`,
+  :pr:`7668`)
 
 Accessibility
 ^^^^^^^^^^^^^
