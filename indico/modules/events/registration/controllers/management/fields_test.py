@@ -11,9 +11,11 @@ from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
                                                                               RHRegistrationFormToggleFieldState,
+                                                                              TextDataSchema,
                                                                               _fill_form_field_with_data)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormSection
+from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormSection,
+                                                             RegistrationFormText)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -204,6 +206,33 @@ class TestGeneralFieldDataSchema:
                                             title='test', input_type='checkbox')
         schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
         schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
+
+    def test_new_label_field_with_empty_internal_name(self, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        schema = TextDataSchema(context={'regform': dummy_regform, 'field': new_label_field})
+        assert schema.load({'input_type': 'label', 'title': 'New label field'})
+
+    def test_new_label_field_with_unique_internal_name(self, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        schema = TextDataSchema(context={'regform': dummy_regform, 'field': new_label_field})
+        assert schema.load({'input_type': 'label', 'title': 'New label field', 'internal_name': 'unique-internal-name'})
+
+    def test_multiple_label_fields_with_same_internal_name(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        label_field_1 = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(label_field_1, {'input_type': 'label', 'title': 'Label field 1',
+                                                   'internal_name': 'test-internal-name'},
+                                   is_static_text=True)
+        db.session.flush()
+        label_field_2 = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        schema = TextDataSchema(context={'regform': dummy_regform, 'field': label_field_2})
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load({'input_type': 'label', 'title': 'Label field 2', 'internal_name': 'test-internal-name'})
+        assert exc_info.value.messages == {
+            'internal_name': ['The field "Label field 1" on this form has the same internal name.']
+        }
 
 
 class TestRegistrationFormToggleFieldState:
