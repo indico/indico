@@ -207,6 +207,9 @@ class TestGeneralFieldDataSchema:
         schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
         schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
 
+
+class TestTextDataSchema:
+
     def test_new_label_field_with_empty_internal_name(self, dummy_regform):
         pd_section = dummy_regform.sections[0]
         new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
