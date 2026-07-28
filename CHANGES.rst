@@ -61,6 +61,8 @@ Improvements
 - Record who created a registration on behalf of someone else (:pr:`7629`, thanks
   :user:`moliholy, unconventionaldotdev`)
 - Support attaching files when emailing event persons (:pr:`7369`, thanks :user:`jbtwist`)
+- Let registration managers view logs for specific registrations (:pr:`7600`, thanks
+  :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^

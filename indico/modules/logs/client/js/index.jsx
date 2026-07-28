@@ -24,6 +24,7 @@ window.addEventListener('load', () => {
       fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
       realms: JSON.parse(rootElement.dataset.realms),
       pageSize: 15,
+      canRemoveFilter: rootElement.dataset.requireFilter === undefined,
     },
   };
   const store = createReduxStore(
