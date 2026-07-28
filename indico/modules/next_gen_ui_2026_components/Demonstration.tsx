@@ -8,9 +8,9 @@
 import React, {useState} from 'react';
 
 import './Demonstration.module.scss';
-import Button from './button/Button';
+import {Button} from './button/Button';
 import {Icon} from './icon/Icon';
-import Tag from './tag/Tag';
+import {Tag} from './tag/Tag';
 
 const colors = ['primary', 'gray', 'success', 'warning', 'error'] as const;
 const colorsWithWhite = ['primary', 'gray', 'success', 'warning', 'error', 'white'] as const;
@@ -184,6 +184,7 @@ export function Demonstration() {
                   size={size}
                   icon="fas:calendar"
                   iconPosition="icon-only"
+                  aria-label="Calendar"
                 />
                 <div styleName="demo-label">solid • primary • {size} • icon only</div>
               </div>
@@ -203,6 +204,7 @@ export function Demonstration() {
                   icon="fas:calendar"
                   iconPosition="icon-only"
                   rounded
+                  aria-label="Calendar"
                 />
                 <div styleName="demo-label">solid • primary • {size} • icon only rounded</div>
               </div>

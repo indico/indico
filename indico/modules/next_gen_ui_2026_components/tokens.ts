@@ -1,4 +1,4 @@
-/** Core palette: Button, Tag, Icon, Timeline dot */
+/** Core palette: Button, Tag, Icon, Timeline Dot */
 export type IndicoPaletteColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
 
 /** Core palette plus 'white', for components that support a light-on-dark look */

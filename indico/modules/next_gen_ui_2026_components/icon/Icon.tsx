@@ -10,17 +10,17 @@ import {fab} from '@fortawesome/free-brands-svg-icons';
 import {far} from '@fortawesome/free-regular-svg-icons';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, {forwardRef} from 'react';
 
 import './Icon.module.scss';
+import {ExtendedIndicoPaletteColor, Size} from '../tokens';
 
 library.add(fas, far, fab);
 
 export type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
-
-export type IconColor = 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
+export type IconColor = ExtendedIndicoPaletteColor;
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
-export type IconSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type IconSize = Size;
 
 interface BaseIconProps {
   icon: IconSource;
@@ -65,7 +65,7 @@ function parseIconString(icon: string): {
   };
 }
 
-export const Icon = (props: IconProps) => {
+export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
   const {
     icon,
     className,
@@ -100,6 +100,7 @@ export const Icon = (props: IconProps) => {
 
   return (
     <span
+      ref={ref}
       styleName="root"
       className={`indico-ui ${className || ''}`}
       data-color={color}
@@ -114,4 +115,6 @@ export const Icon = (props: IconProps) => {
       {content}
     </span>
   );
-};
+});
+
+Icon.displayName = 'Icon';
