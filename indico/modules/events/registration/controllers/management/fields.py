@@ -114,6 +114,8 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     @no_autoflush
     def _check_internal_name(self, data, **kwargs):
+        if isinstance(self, TextDataSchema):
+            return
         input_type = data['input_type']
         internal_name = data.get('internal_name')
         field = self.context['field']
@@ -256,7 +258,7 @@ class GeneralFieldDataSchema(mm.Schema):
 
 class TextDataSchema(GeneralFieldDataSchema):
     class Meta(GeneralFieldDataSchema.Meta):
-        exclude = ('is_required', 'retention_period', 'input_type')
+        exclude = ('is_required', 'retention_period', 'input_type', 'internal_name')
 
 
 def _fill_form_field_with_data(field, field_data, *, is_static_text=False):

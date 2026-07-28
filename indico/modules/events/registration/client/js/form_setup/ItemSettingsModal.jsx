@@ -215,54 +215,56 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
               </FormSpy>
             </Fieldset>
           )}
-          <Fieldset
-            legend={
-              <div
-                style={{cursor: 'pointer', userSelect: 'none'}}
-                onClick={() => setAdvancedSettingsOpen(open => !open)}
-              >
-                <Translate>Advanced settings</Translate>
-                <div className="group right">
-                  <span className={advancedSettingsOpen ? 'icon-expand' : 'icon-next'} />
+          {!meta.noInternalName && (
+            <Fieldset
+              legend={
+                <div
+                  style={{cursor: 'pointer', userSelect: 'none'}}
+                  onClick={() => setAdvancedSettingsOpen(open => !open)}
+                >
+                  <Translate>Advanced settings</Translate>
+                  <div className="group right">
+                    <span className={advancedSettingsOpen ? 'icon-expand' : 'icon-next'} />
+                  </div>
                 </div>
-              </div>
-            }
-            compact
-          >
-            <FinalInput
-              fieldProps={advancedSettingsOpen ? {} : {style: {display: 'none'}}}
-              name="internalName"
-              type="text"
-              label={Translate.string('Internal name')}
-              readOnly={itemData.fieldIsPersonalData}
-              nullIfEmpty
-              hideValidationError="never"
-              validate={val => {
-                if (val && !/^[a-z0-9-]+$/.test(val)) {
-                  return Translate.string(
-                    'Only lowercase alphanumeric characters and dashes are allowed.'
-                  );
-                }
-              }}
-              description={
-                <>
-                  <Translate>
-                    Used for identifying the same field across registration forms regardless of the
-                    title. This can also be used across events if you make sure to use the same
-                    internal name.
-                  </Translate>
-                  {itemData.fieldIsPersonalData && (
-                    <>
-                      {' '}
-                      <Translate>
-                        The internal name for a personal data field cannot be changed.
-                      </Translate>
-                    </>
-                  )}
-                </>
               }
-            />
-          </Fieldset>
+              compact
+            >
+              <FinalInput
+                fieldProps={advancedSettingsOpen ? {} : {style: {display: 'none'}}}
+                name="internalName"
+                type="text"
+                label={Translate.string('Internal name')}
+                readOnly={itemData.fieldIsPersonalData}
+                nullIfEmpty
+                hideValidationError="never"
+                validate={val => {
+                  if (val && !/^[a-z0-9-]+$/.test(val)) {
+                    return Translate.string(
+                      'Only lowercase alphanumeric characters and dashes are allowed.'
+                    );
+                  }
+                }}
+                description={
+                  <>
+                    <Translate>
+                      Used for identifying the same field across registration forms regardless of
+                      the title. This can also be used across events if you make sure to use the
+                      same internal name.
+                    </Translate>
+                    {itemData.fieldIsPersonalData && (
+                      <>
+                        {' '}
+                        <Translate>
+                          The internal name for a personal data field cannot be changed.
+                        </Translate>
+                      </>
+                    )}
+                  </>
+                }
+              />
+            </Fieldset>
+          )}
           {isUnsupportedField && (
             <Message visible warning>
               Unknown input type: {inputType}.<br />

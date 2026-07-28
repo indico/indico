@@ -11,9 +11,11 @@ from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
                                                                               RHRegistrationFormToggleFieldState,
+                                                                              TextDataSchema,
                                                                               _fill_form_field_with_data)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormSection
+from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormSection,
+                                                             RegistrationFormText)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -204,6 +206,23 @@ class TestGeneralFieldDataSchema:
                                             title='test', input_type='checkbox')
         schema = GeneralFieldDataSchema(context={'regform': other_form, 'field': other_field})
         schema.load({'input_type': 'checkbox', 'title': 'test', 'internal_name': 'test'})
+
+
+class TestTextDataSchema:
+    def test_new_label_field_with_empty_internal_name(self, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        schema = TextDataSchema(context={'regform': dummy_regform, 'field': new_label_field})
+        assert schema.load({'input_type': 'label', 'title': 'New label field'})
+
+    def test_new_label_field_with_internal_name_not_saved(self, db, dummy_regform):
+        pd_section = dummy_regform.sections[0]
+        new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
+        _fill_form_field_with_data(new_label_field, {'input_type': 'label', 'title': 'New label field',
+                                                     'internal_name': 'unique-internal-name'},
+                                   is_static_text=True)
+        db.session.flush()
+        assert new_label_field.internal_name is None
 
 
 class TestRegistrationFormToggleFieldState:
