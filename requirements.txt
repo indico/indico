@@ -248,7 +248,7 @@ pure-eval==0.2.3
     # via
     #   sentry-sdk
     #   stack-data
-pyasn1==0.6.3
+pyasn1==0.6.4
     # via
     #   pyasn1-modules
     #   rsa
