@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {ReactElement} from 'react';
+import React, {forwardRef, ReactElement} from 'react';
 
 import {Icon, IconProps} from '../icon/Icon';
 
@@ -65,25 +65,34 @@ interface CardProps {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-const CardRoot = ({children, href, onClick, className}: CardProps) => {
-  if (href) {
+const CardRoot = forwardRef<HTMLAnchorElement | HTMLDivElement, CardProps>(
+  ({children, href, onClick, className}, ref) => {
+    if (href) {
+      return (
+        <a
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={href}
+          onClick={onClick}
+          styleName="card-root"
+          className={`indico-ui ${className ?? ''}`}
+        >
+          {children}
+        </a>
+      );
+    }
     return (
-      <a
-        href={href}
-        onClick={onClick}
+      <div
         styleName="card-root"
         className={`indico-ui ${className ?? ''}`}
+        ref={ref as React.Ref<HTMLDivElement>}
       >
         {children}
-      </a>
+      </div>
     );
   }
-  return (
-    <div styleName="card-root" className={`indico-ui ${className ?? ''}`}>
-      {children}
-    </div>
-  );
-};
+);
+
+CardRoot.displayName = 'Card';
 
 type CardComponent = React.FunctionComponent<CardProps> & {
   Icon: typeof Icon;

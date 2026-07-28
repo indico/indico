@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {forwardRef} from 'react';
 
 import {IndicoPaletteColor, LegacyColor} from '../tokens';
 
@@ -13,19 +13,22 @@ import './Dot.module.scss';
 
 export type DotColor = IndicoPaletteColor | LegacyColor;
 
-export const Dot = ({
-  color = 'primary',
-  size = 'md',
-  className,
-}: {
+interface DotProps {
   color?: DotColor;
   size?: string;
   className?: string;
-}) => (
-  <span
-    styleName="dot"
-    className={`indico-ui ${className || ''}`}
-    data-color={color}
-    data-size={size}
-  />
+}
+
+export const Dot = forwardRef<HTMLSpanElement, DotProps>(
+  ({color = 'primary', size = 'md', className}, ref) => (
+    <span
+      ref={ref}
+      styleName="dot"
+      className={`indico-ui ${className || ''}`}
+      data-color={color}
+      data-size={size}
+    />
+  )
 );
+
+Dot.displayName = 'Dot';
