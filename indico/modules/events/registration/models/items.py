@@ -536,7 +536,6 @@ class RegistrationFormText(RegistrationFormItem):
             section_id=self.parent_id,
             is_enabled=self.is_enabled,
             input_type='label',
-            internal_name=self.internal_name,
             title=self.title,
             is_purged=self.is_purged,
             show_if_field_id=self.show_if_id,
