@@ -258,7 +258,7 @@ class GeneralFieldDataSchema(mm.Schema):
 
 class TextDataSchema(GeneralFieldDataSchema):
     class Meta(GeneralFieldDataSchema.Meta):
-        exclude = ('is_required', 'retention_period', 'input_type')
+        exclude = ('is_required', 'retention_period', 'input_type', 'internal_name')
 
 
 def _fill_form_field_with_data(field, field_data, *, is_static_text=False):

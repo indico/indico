@@ -215,11 +215,13 @@ class TestTextDataSchema:
         schema = TextDataSchema(context={'regform': dummy_regform, 'field': new_label_field})
         assert schema.load({'input_type': 'label', 'title': 'New label field'})
 
-    def test_new_label_field_with_internal_name_not_saved(self, dummy_regform):
+    def test_new_label_field_with_internal_name_not_saved(self, db, dummy_regform):
         pd_section = dummy_regform.sections[0]
         new_label_field = RegistrationFormText(parent=pd_section, registration_form=dummy_regform)
-        schema = TextDataSchema(context={'regform': dummy_regform, 'field': new_label_field})
-        assert schema.load({'input_type': 'label', 'title': 'New label field', 'internal_name': 'unique-internal-name'})
+        _fill_form_field_with_data(new_label_field, {'input_type': 'label', 'title': 'New label field',
+                                                     'internal_name': 'unique-internal-name'},
+                                   is_static_text=True)
+        db.session.flush()
         assert new_label_field.internal_name is None
 
 
