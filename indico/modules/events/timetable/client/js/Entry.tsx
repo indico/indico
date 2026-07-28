@@ -295,7 +295,7 @@ export default function Entry({
 
     updateDroppableArea(entryRef.current.clientWidth);
 
-    return observer.disconnect;
+    return () => observer.disconnect();
   }, [id, type]);
 
   const setChildDurations = useMemo(() => {
