@@ -26,7 +26,6 @@ $toolbar-spacing: 10px;
 
   .i-button {
     border-radius: 0;
-    border-right-width: 0;
     margin: 0;
 
     // i-button flavors don't change border color on hover
@@ -39,7 +38,6 @@ $toolbar-spacing: 10px;
 
   ind-menu > .i-button {
     border-radius: 0 !important;
-    border-right-width: 0 !important;
     margin: 0;
   }
 
