@@ -623,7 +623,7 @@ export function DayTimetable({
     };
   }, [limitTop, limitBottom]);
 
-  const limitsGradientColor = 'rgba(0, 0, 0, 0.15)';
+  const limitsGradientColor = 'rgba(0, 0, 0, 0.075)';
   const limitsGradientArg = [
     `${limitsGradientColor} 0`,
     `${limitsGradientColor} ${limits[0]}px`,
