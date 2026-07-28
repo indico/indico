@@ -8,30 +8,15 @@
 import React, {forwardRef} from 'react';
 
 import {Icon, IconSource} from '../icon/Icon';
+import {IconPosition, IndicoPaletteColor, LegacyColor, Size, TextWeight, Variant} from '../tokens';
 import {NativeProps} from '../utils';
 
 import './Tag.module.scss';
 
-export type TagColor = 'primary' | 'gray' | 'success' | 'warning' | 'error';
-export type TagColorForLabelBasedOnSemanticUI =
-  | 'red'
-  | 'orange'
-  | 'yellow'
-  | 'olive'
-  | 'green'
-  | 'teal'
-  | 'blue'
-  | 'violet'
-  | 'purple'
-  | 'pink'
-  | 'grey'
-  | 'brown'
-  | 'black';
-export type TagColorMerged = TagColor | TagColorForLabelBasedOnSemanticUI;
-export type TagVariant = 'solid' | 'light' | 'white' | 'transparent';
-export type TagSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type TagTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
-export type IconPosition = 'left' | 'right';
+export type TagColorMerged = IndicoPaletteColor | LegacyColor;
+export type TagVariant = Variant;
+export type TagSize = Size;
+export type TagTextWeight = TextWeight;
 
 export interface CustomTagProps {
   className?: string;
@@ -59,12 +44,12 @@ export type TagProps = CustomTagProps &
       }
     | {
         variant?: 'solid' | 'light';
-        color?: TagColor;
+        color?: IndicoPaletteColor;
         opaque?: boolean;
       }
   );
 
-const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
+export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
   const {
     className,
     color = 'primary',
@@ -127,4 +112,3 @@ const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
 });
 
 Tag.displayName = 'Tag';
-export default Tag;

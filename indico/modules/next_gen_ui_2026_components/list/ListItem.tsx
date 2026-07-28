@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {ReactElement} from 'react';
+import React, {forwardRef, ReactElement} from 'react';
 
 import {Dot} from '../dot/Dot';
 import {Icon, IconProps} from '../icon/Icon';
-import Tag, {TagProps} from '../tag/Tag';
+import {Tag, TagProps} from '../tag/Tag';
 import './ListItem.module.scss';
 import {LegacyColor} from '../tokens';
 
@@ -61,8 +61,7 @@ type ListItemChild =
   | ListItemHeaderElement
   | ListItemDetailsElement
   | ListItemTagElement
-  | ListItemLabelIndicatorElement
-  | React.ReactNode;
+  | ListItemLabelIndicatorElement;
 
 interface ListItemProps {
   children: ListItemChild | ListItemChild[];
@@ -71,25 +70,34 @@ interface ListItemProps {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-const ListItemRoot = ({children, href, onClick, className}: ListItemProps) => {
-  if (href) {
+const ListItemRoot = forwardRef<HTMLAnchorElement | HTMLDivElement, ListItemProps>(
+  ({children, href, onClick, className}, ref) => {
+    if (href) {
+      return (
+        <a
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={href}
+          onClick={onClick}
+          styleName="list-item-root"
+          className={`indico-ui ${className ?? ''}`}
+        >
+          {children}
+        </a>
+      );
+    }
     return (
-      <a
-        href={href}
-        onClick={onClick}
+      <div
+        ref={ref as React.Ref<HTMLDivElement>}
         styleName="list-item-root"
         className={`indico-ui ${className ?? ''}`}
       >
         {children}
-      </a>
+      </div>
     );
   }
-  return (
-    <div styleName="list-item-root" className={`indico-ui ${className ?? ''}`}>
-      {children}
-    </div>
-  );
-};
+);
+
+ListItemRoot.displayName = 'ListItem';
 
 type ListItemComponent = React.FunctionComponent<ListItemProps> & {
   Icon: typeof Icon;

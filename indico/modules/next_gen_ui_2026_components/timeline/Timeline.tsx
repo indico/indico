@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {forwardRef} from 'react';
 
 import './Timeline.module.scss';
 import {Dot} from '../dot/Dot';
@@ -41,11 +41,20 @@ interface TimelineItemProps {
   children: React.ReactNode;
 }
 
-const TimelineItemRoot = ({className, children}: TimelineItemProps) => (
-  <div styleName="timeline-item" className={`indico-ui ${className || ''}`} role="group">
-    {children}
-  </div>
+const TimelineItemRoot = forwardRef<HTMLDivElement, TimelineItemProps>(
+  ({className, children}, ref) => (
+    <div
+      ref={ref}
+      styleName="timeline-item"
+      className={`indico-ui ${className || ''}`}
+      role="group"
+    >
+      {children}
+    </div>
+  )
 );
+
+TimelineItemRoot.displayName = 'TimelineItem';
 
 type TimelineItemComponent = React.FunctionComponent<TimelineItemProps> & {
   Title: typeof TimelineTitle;
