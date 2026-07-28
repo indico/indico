@@ -14,7 +14,15 @@ import {useEffect, useRef} from 'react';
 import {SemanticICONS} from 'semantic-ui-react';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID} from './types';
+import {
+  BlockEntry,
+  Colors,
+  ContribEntry,
+  Entry,
+  EntryType,
+  EntryUniqueID,
+  UnscheduledContribEntry,
+} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -233,3 +241,11 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
 export const flattenEntries = (entries: Entry[]): Entry[] => {
   return entries.map(e => [e, ...((e as BlockEntry)?.children ?? [])]).flat();
 };
+
+export function toUnscheduledContribEntry(
+  entry: ContribEntry & {sessionBlockId?: string}
+): UnscheduledContribEntry {
+  const {startDt, y, column, maxColumn, sessionBlockId, ...unscheduledEntry} = entry;
+
+  return unscheduledEntry;
+}

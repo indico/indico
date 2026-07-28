@@ -13,7 +13,13 @@ import {Action} from './actions';
 import {layout, layoutDays} from './layout';
 import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {BlockEntry, Entries, EntryType, isChildEntry, SidePanelView} from './types';
-import {getDateKey, getEntryUniqueId, setCurrentDateLocalStorage, shiftEntries} from './utils';
+import {
+  getDateKey,
+  getEntryUniqueId,
+  setCurrentDateLocalStorage,
+  shiftEntries,
+  toUnscheduledContribEntry,
+} from './utils';
 
 export default {
   entries: (
@@ -306,10 +312,12 @@ export default {
               ])
             )
           );
+
+          const unscheduledEntry = toUnscheduledContribEntry(action.entry);
           return {
             ...state,
             entries: newEntries,
-            unscheduled: [...state.unscheduled, action.entry],
+            unscheduled: [...state.unscheduled, unscheduledEntry],
           };
         } else {
           const newEntries = layoutDays(
