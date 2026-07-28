@@ -78,8 +78,10 @@ class RHEventLogs(RHManageEventBase):
     def _process(self):
         metadata_query = _get_metadata_query()
         realms = {realm.name: realm.title for realm in EventLogRealm}
+        require_filter = not self.event.can_manage(session.user)
         return WPEventLogs.render_template('logs.html', self.event, realms=realms, metadata_query=metadata_query,
-                                           logs_api_url=url_for('.api_event_logs', self.event))
+                                           logs_api_url=url_for('.api_event_logs', self.event),
+                                           require_filter=require_filter)
 
 
 class RHUserLogsBase(RHUserBase):

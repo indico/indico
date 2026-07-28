@@ -66,10 +66,11 @@ LogsRefreshMessage.propTypes = {};
 export default function EventLog() {
   const metadataQuery = useSelector(state => state.logs.metadataQuery);
   const hasNewEntries = useSelector(state => state.logs.hasNewEntries);
+  const canRemoveFilter = useSelector(state => state.staticData.canRemoveFilter);
   return (
     <>
       {hasNewEntries && <LogsRefreshMessage />}
-      {Object.keys(metadataQuery).length !== 0 && <MetadataQueryMessage />}
+      {canRemoveFilter && Object.keys(metadataQuery).length !== 0 && <MetadataQueryMessage />}
       <Toolbar />
       <LogEntryList />
     </>
