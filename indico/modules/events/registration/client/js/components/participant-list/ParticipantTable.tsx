@@ -21,7 +21,7 @@ import {
 
 import {Translate} from 'indico/react/i18n';
 
-import {ParticipantCountHidden} from './ParticipantSharedTranslations';
+import {ParticipantCountHidden} from './ParticipantCountHidden';
 import {TableColumnObj, TableObj, TableRowObj} from './types';
 import './ParticipantTable.module.scss';
 

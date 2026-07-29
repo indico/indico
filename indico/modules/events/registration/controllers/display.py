@@ -9,6 +9,7 @@ from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
@@ -22,6 +23,7 @@ from indico.modules.events.registration.constants import PROFILE_PICTURE_SENTINE
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
+from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
                                                                    RegistrationFormItem)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -291,6 +293,9 @@ class ParticipantListMixin:
 
         return tables, merged, regforms
 
+    def _get_participant_list_metadata(self, is_participant):
+        pass
+
     def _process(self):
         is_participant = self.is_participant(session.user)
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
@@ -327,14 +332,44 @@ class RHParticipantListREST(ParticipantListMixin, RHRegistrationFormDisplayBase)
         })
 
 
-class RHParticipantList(ParticipantListMixin, RHRegistrationFormDisplayBase):
+class RHParticipantListPreviewREST(ParticipantListMixin, RHManageRegFormsBase):
+    """REST API for the preview of the participant list."""
+
+    @use_kwargs(
+        {'guest': fields.Bool(load_default=False)}, location='query'
+    )
+    def _process_args(self, guest):
+        RHManageRegFormsBase._process_args(self)
+        print('preview', self.preview)
+        print('guest', guest)
+        self.preview = 'guest' if guest else 'participant'
+        print('preview', self.preview)
+
+    def is_participant(self, user):
+        return self.preview == 'participant'
+
+    def _process(self):
+        is_participant = self.is_participant(session.user)
+        print('is_participant', is_participant)
+        tables, merged, regforms = self._get_participant_list_tables(is_participant)
+
+        num_participants = sum(table['num_participants'] for table in tables)
+
+        return jsonify({
+            'published': bool(regforms),
+            'merged': merged,
+            'num_participants': num_participants,
+            'tables': tables
+        })
+
+
+class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList
-    preview = False
 
-    def is_participant(self, user):
-        return self.event.is_user_registered(user)
+    def _process(self):
+        return self.view_class.render_template('display/participant_list.html', self.event, preview=False)
 
 
 class InvitationMixin:

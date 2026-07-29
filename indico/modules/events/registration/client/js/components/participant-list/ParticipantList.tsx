@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import participantListDataURL from 'indico-url:event_registration.api_participant_list';
+import participantListDataPreviewURL from 'indico-url:event_registration.api_participant_list_preview';
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
 import React, {ReactNode, useMemo, useState} from 'react';
@@ -22,9 +23,9 @@ import {
 } from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
-import {Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import {ParticipantCountHidden} from './ParticipantSharedTranslations';
+import {ParticipantCountHidden} from './ParticipantCountHidden';
 import ParticipantTable, {PerPageOptions} from './ParticipantTable';
 import {PreviewEnum, TableObj} from './types';
 
@@ -69,14 +70,15 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
   const [perPage, setPerPage] = useState<PerPageOptions>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const url = useMemo(
-    () =>
-      participantListDataURL({
+  const url = useMemo(() => {
+    if (preview) {
+      return participantListDataPreviewURL({
         event_id: eventId,
-        ...(preview ? {preview} : {}),
-      }),
-    [eventId, preview]
-  );
+        guest: preview === PreviewEnum.GUEST ? '1' : '0',
+      });
+    }
+    return participantListDataURL({event_id: eventId});
+  }, [eventId, preview]);
 
   const {data, loading, lastData} = useIndicoAxios(url);
 
@@ -85,7 +87,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
       (max, table) => Math.max(max, table.num_participants),
       0
     );
-    console.log('Max number of participants (excluding anonymous):', maxNumberOfParticipants);
+
     if (maxNumberOfParticipants > 0) {
       const options = [25, 50, 100].filter(opt => opt < maxNumberOfParticipants);
       return [...options, 'all'];
@@ -95,12 +97,14 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   let viewToggle: ReactNode, infoContent: ReactNode;
 
-  if (preview === PreviewEnum.GUEST) {
+  console.log('preview', preview);
+
+  if (preview === 'guest') {
     viewToggle = (
       <Button
         basic
         color="blue"
-        href={participantListPreviewURL({event_id: eventId})}
+        href={participantListPreviewURL({event_id: eventId, guest: 0})}
         styleName="view-toggle"
       >
         <Icon name="user" />
@@ -133,17 +137,31 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   if (infoContent) {
     return (
-      <Message info size="large">
-        <MessageContent>
-          <Icon name="info circle" />
-          {infoContent}
-        </MessageContent>
-      </Message>
+      <>
+        {viewToggle}
+        <Message info size="large">
+          <MessageContent>
+            <Icon name="info circle" />
+            {infoContent}
+          </MessageContent>
+        </Message>
+      </>
     );
   }
 
   return (
     <section>
+      <p styleName="participant-total-count">
+        <PluralTranslate count={data.num_participants}>
+          <Singular>
+            <Param name="count" value={data.num_participants} /> participant.
+          </Singular>
+          <Plural>
+            <Param name="count" value={data.num_participants} /> participants.
+          </Plural>
+        </PluralTranslate>
+      </p>
+
       {viewToggle}
       {data.merged ? (
         <ParticipantTable
