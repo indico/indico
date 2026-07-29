@@ -172,6 +172,15 @@ count and the per-registration `Registration.can_manage` check, so a plugin that
 event-wide registration management (e.g. via `acl.can_manage`) can bound it to a subset here.
 ''')
 
+is_registration_download_blocked = _signals.signal('is-registration-download-blocked', '''
+Called to decide whether a manager may download or export registration data in bulk for a form,
+such as the participant list exports (CSV, Excel, PDF), badges, or similar downloads. The `sender`
+is the `RegistrationForm`; the `user` kwarg identifies the user. Return ``True`` to block the
+download. This only restricts access on top of the regular ACL; it never grants it. Intended for
+plugins that grant scoped registration management (e.g. via `acl.can_manage`) yet must withhold
+bulk data downloads from those scoped managers.
+''')
+
 google_wallet_ticket_class_data = _signals.signal('google-wallet-ticket-class-data', '''
 Called when data for a Google Wallet ticket class has been generated. The `sender` is the
 `Event` object, the `data` kwarg contains the data that will be passed to the Google

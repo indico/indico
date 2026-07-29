@@ -581,6 +581,17 @@ class RegistrationForm(db.Model):
                 .filter(Registration.registration_form_id == self.id, Registration.is_active, *criteria)
                 .scalar())
 
+    def is_download_blocked(self, user):
+        """Whether a plugin bars ``user`` from bulk-downloading this form's registration data.
+
+        A plugin that grants scoped registration management (e.g. via `acl.can_manage`) can withhold
+        the participant-list exports, badges and similar bulk downloads from those scoped managers
+        through the `is_registration_download_blocked` signal.
+        """
+        return any(values_from_signal(
+            signals.event.is_registration_download_blocked.send(self, user=user), as_list=True
+        ))
+
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):
         """Retrieve registrations for this registration form by user or uuid."""
