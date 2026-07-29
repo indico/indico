@@ -35,3 +35,13 @@ def test_get_managed_registration_count_scoped(db, dummy_regform, dummy_user):
 
     with signals.event.filter_registration_list.connected_to(_scope):
         assert dummy_regform.get_managed_registration_count(dummy_user) == 1
+
+
+def test_is_download_blocked(db, dummy_regform, dummy_user):
+    assert dummy_regform.is_download_blocked(dummy_user) is False
+
+    def _block(sender, user, **kwargs):
+        return True
+
+    with signals.event.is_registration_download_blocked.connected_to(_block):
+        assert dummy_regform.is_download_blocked(dummy_user) is True
