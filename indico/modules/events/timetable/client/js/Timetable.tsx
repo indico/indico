@@ -32,16 +32,31 @@ export default function Timetable() {
   const maxHour = 23;
 
   const _getScrollMoment = () => {
-    const scrollMoment = !currentEntries.length
-      ? moment.max(currentDate.hours(minScrollHour), eventStartDt)
-      : moment.min(currentEntries.map(e => e.startDt));
+    let scrollMoment;
+    let shouldScrollBeforeTarget = true;
 
-    return moment(scrollMoment);
+    if (currentEntries.length) {
+      scrollMoment = moment.min(currentEntries.map(e => e.startDt));
+    } else if (currentDate.isSame(eventStartDt, 'day')) {
+      scrollMoment = eventStartDt;
+    } else {
+      scrollMoment = moment(currentDate).hours(minScrollHour).startOf('hour');
+      shouldScrollBeforeTarget = false;
+    }
+
+    return {
+      scrollMoment: moment(scrollMoment),
+      shouldScrollBeforeTarget,
+    };
   };
 
   const _getScrollOffset = () => {
-    const scrollMoment = _getScrollMoment();
-    const scrollMinutes = scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes');
+    const {scrollMoment, shouldScrollBeforeTarget} = _getScrollMoment();
+    const scrollMinutes = Math.max(
+      0,
+      scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes') -
+        (shouldScrollBeforeTarget ? 60 : 0)
+    );
     return minutesToPixels(scrollMinutes);
   };
 

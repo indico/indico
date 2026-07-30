@@ -592,13 +592,19 @@ export function DayTimetable({
   }, [draftEntry, dt, dispatch, isDragging, minHour, limits, selectedEntry]);
 
   useEffect(() => {
-    if (wrapperRef.current) {
-      // We use a ref instead of scrollPosition directly to prevent jumping
-      // to the calculated position every single time DayTimetable renders,
-      // which mainly happens when changing days.
-      wrapperRef.current.scrollTop = scrollPositionRef.current;
+    // We use a ref instead of scrollPosition directly to prevent jumping
+    // to the calculated position every single time DayTimetable renders,
+    // which mainly happens when changing days.
+    const wrapper = wrapperRef.current;
+    if (!wrapper) {
+      return;
     }
-  }, [wrapperRef]);
+    const frame = requestAnimationFrame(() => {
+      wrapper.scrollTop = scrollPositionRef.current;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const restrictToCalendar = useMemo(() => {
     const limitsDelta: [number, number] = [
@@ -617,7 +623,7 @@ export function DayTimetable({
     };
   }, [limitTop, limitBottom]);
 
-  const limitsGradientColor = 'rgba(0, 0, 0, 0.05)';
+  const limitsGradientColor = 'rgba(0, 0, 0, 0.075)';
   const limitsGradientArg = [
     `${limitsGradientColor} 0`,
     `${limitsGradientColor} ${limits[0]}px`,
