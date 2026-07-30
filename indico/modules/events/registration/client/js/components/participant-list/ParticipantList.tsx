@@ -102,7 +102,11 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
       <Button
         basic
         color="blue"
-        onClick={() => setPreviewMode(PreviewEnum.PARTICIPANT)}
+        disabled={loading}
+        loading={loading}
+        onClick={() => {
+          setPreviewMode(PreviewEnum.PARTICIPANT);
+        }}
         styleName="view-toggle"
       >
         <Icon name="user" />
@@ -114,6 +118,8 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
       <Button
         basic
         color="blue"
+        disabled={loading}
+        loading={loading}
         onClick={() => setPreviewMode(PreviewEnum.GUEST)}
         styleName="view-toggle"
       >
