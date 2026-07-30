@@ -97,8 +97,6 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   let viewToggle: ReactNode, infoContent: ReactNode;
 
-  console.log('preview', preview);
-
   if (preview === 'guest') {
     viewToggle = (
       <Button

@@ -340,17 +340,13 @@ class RHParticipantListPreviewREST(ParticipantListMixin, RHManageRegFormsBase):
     )
     def _process_args(self, guest):
         RHManageRegFormsBase._process_args(self)
-        print('preview', self.preview)
-        print('guest', guest)
         self.preview = 'guest' if guest else 'participant'
-        print('preview', self.preview)
 
     def is_participant(self, user):
         return self.preview == 'participant'
 
     def _process(self):
         is_participant = self.is_participant(session.user)
-        print('is_participant', is_participant)
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
 
         num_participants = sum(table['num_participants'] for table in tables)
