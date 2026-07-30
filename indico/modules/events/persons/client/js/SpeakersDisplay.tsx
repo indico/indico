@@ -32,12 +32,14 @@ function SpeakerProfile({speaker}: {speaker: Speaker}) {
           ))}
         </div>
       </div>
-      <img src={speaker.speaker_photo_url ?? speaker.avatar_url} styleName="speaker-photo" />
-      <div>
-        {(speaker.speaker_description ?? '').split('\n').map((line, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <p key={index}>{line}</p>
-        ))}
+      <div styleName="speaker-content-body">
+        <img src={speaker.speaker_photo_url ?? speaker.avatar_url} styleName="speaker-photo" />
+        <div>
+          {(speaker.speaker_description ?? '').split('\n').map((line, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <p key={index}>{line}</p>
+          ))}
+        </div>
       </div>
     </div>
   );

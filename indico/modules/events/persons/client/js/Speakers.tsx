@@ -63,22 +63,14 @@ export function Speakers({eventId}: {eventId: number}) {
       if (selectedSpeaker === undefined) {
         return;
       }
-      const bodyFormData = new FormData();
-      bodyFormData.append('socials', JSON.stringify(formData.socials ?? {}));
-      if (formData.photo !== undefined) {
-        bodyFormData.append('photo', formData.photo);
-      }
-      if (formData.description !== undefined) {
-        bodyFormData.append('description', formData.description);
-      }
-      const config = {
-        headers: {'content-type': 'multipart/form-data'},
-      };
       try {
         const response = await indicoAxios.post(
           updateSpeakerProfileURL({event_id: eventId, person_id: selectedSpeaker.id}),
-          bodyFormData,
-          config
+          {
+            description: formData.description,
+            socials: formData.socials ?? {},
+            photo: formData.photo,
+          }
         );
         setOpenedModal(null);
         setSpeakers(oldSpeakers => [
@@ -132,16 +124,16 @@ export function Speakers({eventId}: {eventId: number}) {
           />
         </div>
       </div>
-      <Table sortable selectable singleLine fixed>
+      <Table sortable selectable>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell disabled width={1} />
-            <Table.HeaderCell styleName="borderless" width={4}>
+            <Table.HeaderCell disabled />
+            <Table.HeaderCell width={2} styleName="borderless">
               {Translate.string('Name')}
             </Table.HeaderCell>
-            <Table.HeaderCell width={4}>{Translate.string('Email')}</Table.HeaderCell>
-            <Table.HeaderCell width={12}>{Translate.string('Description')}</Table.HeaderCell>
-            <Table.HeaderCell disabled styleName="borderless" width={2} />
+            <Table.HeaderCell>{Translate.string('Email')}</Table.HeaderCell>
+            <Table.HeaderCell>{Translate.string('Description')}</Table.HeaderCell>
+            <Table.HeaderCell width={1} disabled styleName="borderless" />
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -155,33 +147,35 @@ export function Speakers({eventId}: {eventId: number}) {
                   <Table.Cell>{speaker.email}</Table.Cell>
                   <Table.Cell>{speaker.speaker_description}</Table.Cell>
                   <Table.Cell>
-                    <Popup
-                      content={Translate.string('Edit speaker profile')}
-                      position="top center"
-                      trigger={
-                        <Icon
-                          name="edit"
-                          link
-                          color="black"
-                          onClick={() => {
-                            setSelectedSpeaker(speaker);
-                            setOpenedModal('EDIT_SPEAKER');
-                          }}
-                        />
-                      }
-                    />
-                    <Popup
-                      content={Translate.string('Delete speaker profile')}
-                      position="top center"
-                      trigger={
-                        <Icon
-                          name="trash"
-                          link
-                          color="black"
-                          onClick={() => handleDeleteSpeaker(speaker.id)}
-                        />
-                      }
-                    />
+                    <div styleName="speaker-actions-container">
+                      <Popup
+                        content={Translate.string('Edit speaker profile')}
+                        position="top center"
+                        trigger={
+                          <Icon
+                            name="edit"
+                            link
+                            color="black"
+                            onClick={() => {
+                              setSelectedSpeaker(speaker);
+                              setOpenedModal('EDIT_SPEAKER');
+                            }}
+                          />
+                        }
+                      />
+                      <Popup
+                        content={Translate.string('Delete speaker profile')}
+                        position="top center"
+                        trigger={
+                          <Icon
+                            name="trash"
+                            link
+                            color="black"
+                            onClick={() => handleDeleteSpeaker(speaker.id)}
+                          />
+                        }
+                      />
+                    </div>
                   </Table.Cell>
                 </Table.Row>
               ))

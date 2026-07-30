@@ -131,4 +131,4 @@ class SpeakerProfileSchema(mm.SQLAlchemyAutoSchema):
                   'speaker_socials', 'avatar_url', 'affiliation', 'has_speaker_profile')
 
     avatar_url = fields.String(attribute='user.avatar_url')
-    speaker_photo_url = fields.String(attribute='speaker_photo.signed_download_url', default=None)
+    speaker_photo_url = fields.String(attribute='speaker_photo.signed_download_url')

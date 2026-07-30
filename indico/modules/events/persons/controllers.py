@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 import itertools
-import json
 import os
 from collections import defaultdict
 
@@ -233,7 +232,8 @@ class RHSpeakerBase(RHProtectedEventBase):
     def _process_args(self):
         RHProtectedEventBase._process_args(self)
         self.person = (EventPerson.query
-                       .filter(EventPerson.id == request.view_args['person_id'], EventPerson.event_id == self.event.id)
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
                        .first())
 
 
@@ -241,7 +241,8 @@ class RHManageSpeakerProfileBase(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.person = (EventPerson.query
-                       .filter(EventPerson.id == request.view_args['person_id'], EventPerson.event_id == self.event.id)
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
                        .first())
 
 
@@ -330,7 +331,13 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
     @use_kwargs({
         'photo': FileField(validate=file_extension('png', 'jpg', 'jpeg')),
         'description': fields.String(validate=validate.Length(max=1000)),
-        'socials': fields.String(validate=validate.Length(max=1000)),
+        'socials': fields.Dict(
+            keys=fields.String(validate=validate.Length(max=100)),
+            values=fields.Nested({
+                'url': fields.String(required=True, validate=validate.Length(max=500)),
+                'icon': fields.String(required=True, validate=validate.Length(max=100)),
+            })
+        ),
     })
     def _process_POST(self, description=None, socials=None, photo=None):
         if description is not None:
@@ -339,10 +346,7 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
             self.person.speaker_photo = photo
             photo.claim()
         if socials is not None:
-            try:
-                self.person.speaker_socials = json.loads(socials)
-            except json.JSONDecodeError:
-                return jsonify(error='asdasds')
+            self.person.speaker_socials = socials
         return SpeakerProfileSchema().dump(self.person)
 
     def _process_DELETE(self):
