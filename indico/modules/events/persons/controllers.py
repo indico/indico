@@ -6,12 +6,12 @@
 # LICENSE file for more details.
 
 import itertools
-import json
-import os
 from collections import defaultdict
+from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
+from PIL import Image, ImageOps
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
 from webargs import validate
@@ -36,6 +36,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons import logger, persons_settings
+from indico.modules.events.persons.constants import MAX_SPEAKER_PHOTO_SIZE
 from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema, SpeakerProfileSchema
@@ -233,7 +234,8 @@ class RHSpeakerBase(RHProtectedEventBase):
     def _process_args(self):
         RHProtectedEventBase._process_args(self)
         self.person = (EventPerson.query
-                       .filter(EventPerson.id == request.view_args['person_id'], EventPerson.event_id == self.event.id)
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
                        .first())
 
 
@@ -241,7 +243,8 @@ class RHManageSpeakerProfileBase(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.person = (EventPerson.query
-                       .filter(EventPerson.id == request.view_args['person_id'], EventPerson.event_id == self.event.id)
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
                        .first())
 
 
@@ -308,6 +311,13 @@ class RHDisplaySpeakerProfiles(RHProtectedEventBase):
         return WPDisplaySpeakers.render_template('display/speakers.html', self.event)
 
 
+class RHSpeakerPhoto(RHProtectedEventBase):
+    def _process(self):
+        person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
+        if person.speaker_photo is not None:
+            return person.speaker_photo.send()
+
+
 class RHAPISpeakersList(RHProtectedEventBase):
     def _process(self):
         matches = self.event.persons.filter(
@@ -315,35 +325,68 @@ class RHAPISpeakersList(RHProtectedEventBase):
                 ContributionPersonLink.is_speaker,
                 ContributionPersonLink.contribution.has(Contribution.is_deleted.is_(False))
         ))).all()
-        return SpeakerProfileSchema().dump(matches, many=True)
+        return SpeakerProfileSchema(many=True).jsonify(matches)
 
 
 class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
     def get_file_context(self):
         return 'event', self.event.id, 'speaker', self.person.id
 
-    def validate_file(self, file):
-        return os.path.splitext(file.filename)[1].lower() in {'.png', '.jpg', '.jpeg'}
+    @staticmethod
+    def process_speaker_photo(stream):
+        try:
+            picture = Image.open(stream)
+        except (OSError, Image.DecompressionBombError):
+            return False
+
+        picture = ImageOps.exif_transpose(picture)
+        if picture.mode != 'RGB':
+            picture = picture.convert('RGB')
+        size_x, size_y = picture.size
+        if max(size_x, size_y) > MAX_SPEAKER_PHOTO_SIZE:
+            ratio = MAX_SPEAKER_PHOTO_SIZE / max(size_x, size_y)
+            picture = picture.resize((max(1, int(ratio * size_x)), max(1, int(ratio * size_y))),
+                                     Image.Resampling.BICUBIC)
+        image_bytes = BytesIO()
+        picture.save(image_bytes, 'JPEG')
+        image_bytes.seek(0)
+        return image_bytes
+
+    def _save_file(self, file, stream):
+        if not (resized_image_stream := self.process_speaker_photo(stream)):
+            abort(422, messages={'file': [_('Could not process image, it may be corrupted or too big')]})
+        return super()._save_file(file, resized_image_stream)
+
+    def get_file_metadata(self):
+        return {'speaker_picture_checked': True}
 
 
 class RHAPISpeaker(RHManageSpeakerProfileBase):
-    @use_kwargs({
-        'photo': FileField(validate=file_extension('png', 'jpg', 'jpeg')),
-        'description': fields.String(validate=validate.Length(max=1000)),
-        'socials': fields.String(validate=validate.Length(max=1000)),
+    @use_args({
+        'photo': FileField(allow_none=True, validate=file_extension('png', 'jpg', 'jpeg'),
+                           require_file_metadata='speaker_picture_checked'),
+        'description': fields.String(validate=validate.Length(max=1000), required=False),
+        'socials': fields.Dict(
+            keys=fields.String(validate=validate.Length(max=100)),
+            values=fields.Nested({
+                'url': fields.String(required=True, validate=validate.Length(max=500)),
+                'icon': fields.String(required=True, validate=validate.Length(max=100)),
+            })
+        ),
     })
-    def _process_POST(self, description=None, socials=None, photo=None):
-        if description is not None:
-            self.person.speaker_description = description
-        if photo is not None:
-            self.person.speaker_photo = photo
-            photo.claim()
-        if socials is not None:
-            try:
-                self.person.speaker_socials = json.loads(socials)
-            except json.JSONDecodeError:
-                return jsonify(error='asdasds')
-        return SpeakerProfileSchema().dump(self.person)
+    def _process_POST(self, args):
+        if 'description' in args:
+            self.person.speaker_description = args['description']
+        if 'photo' in args:
+            if args['photo'] is not None:
+                self.person.speaker_photo = args['photo']
+                args['photo'].claim()
+            elif self.person.speaker_photo is not None:
+                self.person.speaker_photo.claimed = False
+                self.person.speaker_photo_file_id = None
+        if 'socials' in args:
+            self.person.speaker_socials = args['socials']
+        return SpeakerProfileSchema().jsonify(self.person)
 
     def _process_DELETE(self):
         self.person.speaker_description = None
@@ -610,7 +653,7 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
     def _process(self, exact, **criteria):
         matches, total = self._search_event_persons(exact=exact, **criteria)
         return jsonify(
-            users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields).dump(matches, many=True),
+            users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields, many=True).dump(matches),
             total=total
         )
 

@@ -12,7 +12,7 @@ import {useForm} from 'react-final-form';
 import {Dropdown, Icon, Popup, SemanticICONS} from 'semantic-ui-react';
 import * as SUI from 'semantic-ui-react/dist/es/lib/SUI';
 
-import {FinalSingleFileManager} from 'indico/react/components';
+import {FinalPictureManager} from 'indico/react/components';
 import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
@@ -73,6 +73,7 @@ const ICON_OPTIONS = SUI.ICONS_AND_ALIASES.map((iconName: string) => ({
 function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: number}) {
   const [speakerSocials, setSpeakerSocials] = useState(speaker.speaker_socials ?? {});
   const [customSocialModalOpened, setCustomSocialModalOpened] = useState(false);
+  const [displayInitialPicture, setDisplayInitialPicture] = useState(true);
 
   const form = useForm();
 
@@ -113,11 +114,21 @@ function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: 
 
   return (
     <>
-      <FinalSingleFileManager
+      <FinalPictureManager
         name="photo"
         label={Translate.string('Profile Picture')}
         uploadURL={uploadSpeakerPhoto({event_id: eventId, person_id: speaker.id})}
-        mustChange
+        previewURL={speaker.speaker_photo_url}
+        initialPictureDetails={
+          displayInitialPicture ? {uuid: '', filename: '', size: 0} : undefined
+        }
+        onChange={(v: string | null) => {
+          if (v === null) {
+            // clearing picture should make it so the initial picture is not displayed
+            setDisplayInitialPicture(false);
+          }
+        }}
+        required={false}
       />
       <FinalTextArea
         name="description"
@@ -212,6 +223,7 @@ export function EditSpeakerProfile({onClose, onSubmit, speaker, eventId}: EditSp
       onClose={onClose}
       onSubmit={onSubmit}
       disabledUntilChange={false}
+      size="large"
       header={
         speaker
           ? Translate.string('Edit Speaker Profile')

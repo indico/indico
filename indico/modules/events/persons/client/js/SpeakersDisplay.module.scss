@@ -23,11 +23,14 @@
   }
 }
 
+.speaker-content-body {
+  display: flow-root;
+}
+
 .speaker-photo {
   float: left;
   aspect-ratio: 1;
   margin-right: 1em;
-  margin-bottom: 1em;
   height: 8em;
   border: 1px solid black;
 }
