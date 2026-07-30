@@ -11,8 +11,8 @@ from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMet
                                                        RHEmailEventPersonsPreview, RHEventPersonSearch,
                                                        RHGrantModificationRights, RHGrantSubmissionRights,
                                                        RHManagePersonLists, RHPersonsList, RHRevokeSubmissionRights,
-                                                       RHSpeakerPhotoUpload, RHSpeakerProfiles, RHSyncEventPerson,
-                                                       RHUpdateEventPerson)
+                                                       RHSpeakerPhoto, RHSpeakerPhotoUpload, RHSpeakerProfiles,
+                                                       RHSyncEventPerson, RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -21,6 +21,7 @@ _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_
 
 # Display
 _bp.add_url_rule('!/event/<int:event_id>/speakers/', 'display_speaker_profiles', RHDisplaySpeakerProfiles)
+_bp.add_url_rule('!/event/<int:event_id>/speakers/<int:person_id>/photo', 'speaker_photo', RHSpeakerPhoto)
 
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
 _bp.add_url_rule('/api/persons/email/upload', 'api_email_event_persons_upload', RHAPIEmailEventPersonsUpload,

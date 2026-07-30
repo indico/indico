@@ -14,6 +14,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.marshmallow import ModelField, NoneValueEnumField
+from indico.web.flask.util import url_for
 
 
 class PersonLinkSchema(mm.Schema):
@@ -127,8 +128,11 @@ class EventPersonUpdateSchema(EventPersonSchema):
 class SpeakerProfileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
-        fields = ('id', 'email', 'name', 'first_name', 'last_name', 'speaker_photo_url', 'speaker_description',
-                  'speaker_socials', 'avatar_url', 'affiliation', 'has_speaker_profile')
+        fields = ('id', 'email', 'name', 'first_name', 'last_name', 'speaker_description',
+                  'speaker_photo_url', 'speaker_socials', 'affiliation', 'has_speaker_profile')
 
-    avatar_url = fields.String(attribute='user.avatar_url')
-    speaker_photo_url = fields.String(attribute='speaker_photo.signed_download_url', default=None)
+    def _get_speaker_photo_url(self, person):
+        return (url_for('persons.speaker_photo', person.event, person) if person.speaker_photo_file_id is not None
+                else person.user.avatar_url)
+
+    speaker_photo_url = fields.Method('_get_speaker_photo_url')

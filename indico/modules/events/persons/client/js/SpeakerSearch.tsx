@@ -10,8 +10,9 @@ import {Button, Modal, Search, Table} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import './Speakers.module.scss';
 import {Speaker} from './types';
+
+import './Speakers.module.scss';
 
 interface SpeakerSearchProps {
   speakers: Speaker[];
@@ -51,7 +52,7 @@ export function SpeakerSearch({onClose, onSubmit, speakers}: SpeakerSearchProps)
             <Search
               placeholder={Translate.string('Search')}
               value={searchTerm}
-              onSearchChange={(_, {value}) => setSearchTerm(value)}
+              onSearchChange={(_, {value}) => setSearchTerm(value ?? '')}
               open={false}
               fluid
             />
@@ -105,7 +106,7 @@ export function SpeakerSearch({onClose, onSubmit, speakers}: SpeakerSearchProps)
       </Modal.Content>
       <Modal.Actions>
         <Button
-          onClick={() => onSubmit(selectedSpeaker)}
+          onClick={() => (selectedSpeaker && onSubmit ? onSubmit(selectedSpeaker) : null)}
           primary
           disabled={selectedSpeaker === null}
         >

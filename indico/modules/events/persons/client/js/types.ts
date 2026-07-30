@@ -11,7 +11,7 @@ export interface Speaker {
   name: string;
   first_name: string;
   last_name: string;
-  speaker_photo_url: string | null;
+  speaker_photo_url: string;
   speaker_description: string | null;
   has_speaker_profile: boolean;
   speaker_socials: Record<
@@ -21,6 +21,5 @@ export interface Speaker {
       icon?: string;
     }
   >;
-  avatar_url: string;
   affiliation: string;
 }
