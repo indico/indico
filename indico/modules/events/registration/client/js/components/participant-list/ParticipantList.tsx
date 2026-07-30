@@ -149,18 +149,17 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   return (
     <section>
-      <p styleName="participant-total-count">
+      {viewToggle}
+      <h3 styleName="participant-total-count">
         <PluralTranslate count={data.num_participants}>
           <Singular>
-            <Param name="count" value={data.num_participants} /> participant.
+            <Param name="count" value={data.num_participants} /> participant
           </Singular>
           <Plural>
-            <Param name="count" value={data.num_participants} /> participants.
+            <Param name="count" value={data.num_participants} /> participants
           </Plural>
         </PluralTranslate>
-      </p>
-
-      {viewToggle}
+      </h3>
       {data.merged ? (
         <ParticipantTable
           table={data.tables[0]}
