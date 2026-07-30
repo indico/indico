@@ -40,6 +40,22 @@ interface ParticipantCounterProps {
 }
 
 function ParticipantCounter({table}: ParticipantCounterProps) {
+  const content = (
+    <div styleName="participants-count-wrapper">
+      {table.num_anonymous_participants > 0 && (
+        <>
+          <span styleName="hidden">{table.num_anonymous_participants}</span>
+          <Icon name="user secret" styleName="hidden" />
+        </>
+      )}
+      {table.num_participants}
+      <Icon name="user" />
+    </div>
+  );
+  if (table.num_anonymous_participants === 0) {
+    return content;
+  }
+
   return (
     <Popup
       position="left center"
@@ -49,17 +65,7 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
           countHidden={table.num_anonymous_participants}
         />
       }
-      trigger={
-        <div styleName="participants-count-wrapper">
-          {table.num_anonymous_participants > 0 && (
-            <>
-              <span styleName="hidden">{table.num_anonymous_participants}</span>/{' '}
-            </>
-          )}
-          {table.num_participants}
-          <Icon name="user" />
-        </div>
-      }
+      trigger={content}
     />
   );
 }
@@ -184,9 +190,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
           panes={data.tables.map((table: TableObj) => ({
             menuItem: (
               <MenuItem styleName="tab-title" key={table.title}>
-                <span styleName="title-text" title={table.title}>
-                  {table.title}
-                </span>
+                <span styleName="title-text">{table.title}</span>
                 <ParticipantCounter table={table} />
               </MenuItem>
             ),

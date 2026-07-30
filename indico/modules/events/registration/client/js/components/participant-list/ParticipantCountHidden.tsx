@@ -35,7 +35,7 @@ export function ParticipantCountHidden({
       </PluralTranslate>{' '}
       {displayTotal && (
         <Translate>
-          Total amount of participants is <Param name="total" value={count} />.
+          Total: <Param name="total" value={count} />
         </Translate>
       )}
     </div>
