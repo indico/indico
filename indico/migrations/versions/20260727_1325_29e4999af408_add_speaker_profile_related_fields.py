@@ -1,7 +1,7 @@
 """Add speaker profile-related fields
 
 Revision ID: 29e4999af408
-Revises: 461958bf2774
+Revises: c412156094d6
 Create Date: 2026-07-27 13:25:38.098983
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '29e4999af408'
-down_revision = '461958bf2774'
+down_revision = 'c412156094d6'
 branch_labels = None
 depends_on = None
 
