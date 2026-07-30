@@ -291,9 +291,6 @@ class ParticipantListMixin:
 
         return tables, merged, regforms
 
-    def _get_participant_list_metadata(self, is_participant):
-        pass
-
     def _process(self):
         is_participant = self.is_participant(session.user)
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
@@ -310,12 +307,7 @@ class ParticipantListMixin:
         )
 
 
-class RHParticipantListREST(ParticipantListMixin, RHRegistrationFormDisplayBase):
-    """REST API for the participant list."""
-
-    def is_participant(self, user):
-        return self.event.is_user_registered(user)
-
+class ParticipantListRESTMixin(ParticipantListMixin):
     def _process(self):
         is_participant = self.is_participant(session.user)
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
@@ -328,6 +320,13 @@ class RHParticipantListREST(ParticipantListMixin, RHRegistrationFormDisplayBase)
             'num_participants': num_participants,
             'tables': tables
         })
+
+
+class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
+    """REST API for the participant list."""
+
+    def is_participant(self, user):
+        return self.event.is_user_registered(user)
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):

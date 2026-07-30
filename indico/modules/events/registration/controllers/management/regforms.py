@@ -22,7 +22,7 @@ from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
-from indico.modules.events.registration.controllers.display import ParticipantListMixin
+from indico.modules.events.registration.controllers.display import ParticipantListRESTMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
                                                       ParticipantsDisplayFormColumnsForm, RegistrationFormCloneForm,
@@ -78,31 +78,16 @@ class RHParticipantListPreview(RHManageRegFormsBase):
         return self.view_class.render_template('display/participant_list.html', self.event, preview=self.preview)
 
 
-class RHParticipantListPreviewREST(ParticipantListMixin, RHManageRegFormsBase):
+class RHParticipantListPreviewREST(ParticipantListRESTMixin, RHManageRegFormsBase):
     """REST API for the preview of the participant list."""
 
-    @use_kwargs(
-        {'guest': fields.Bool(load_default=False)}, location='query'
-    )
+    @use_kwargs({'guest': fields.Bool(load_default=False)}, location='query')
     def _process_args(self, guest):
         RHManageRegFormsBase._process_args(self)
         self.preview = 'guest' if guest else 'participant'
 
     def is_participant(self, user):
         return self.preview == 'participant'
-
-    def _process(self):
-        is_participant = self.is_participant(session.user)
-        tables, merged, regforms = self._get_participant_list_tables(is_participant)
-
-        num_participants = sum(table['num_participants'] for table in tables)
-
-        return jsonify({
-            'published': bool(regforms),
-            'merged': merged,
-            'num_participants': num_participants,
-            'tables': tables
-        })
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):

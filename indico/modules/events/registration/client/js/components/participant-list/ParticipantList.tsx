@@ -89,13 +89,13 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
   const {data, loading, lastData} = useIndicoAxios(url);
 
   const perPageOptions: PerPageOptions[] = useMemo(() => {
-    const maxNumberOfParticipants = (data?.tables ?? []).reduce(
+    const maxNumParticipants = (data?.tables ?? []).reduce(
       (max, table) => Math.max(max, table.num_participants),
       0
     );
 
-    if (maxNumberOfParticipants > 0) {
-      const options = [25, 50, 100].filter(opt => opt < maxNumberOfParticipants);
+    if (maxNumParticipants > 0) {
+      const options = [25, 50, 100].filter(opt => opt < maxNumParticipants);
       return [...options, 'all'];
     }
     return ['all'];
