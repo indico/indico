@@ -7,7 +7,6 @@
 
 import participantListDataURL from 'indico-url:event_registration.api_participant_list';
 import participantListDataPreviewURL from 'indico-url:event_registration.api_participant_list_preview';
-import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
 import React, {ReactNode, useMemo, useState} from 'react';
 import {
@@ -69,16 +68,17 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState<PerPageOptions>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [previewMode, setPreviewMode] = useState<PreviewEnum | undefined>(preview);
 
   const url = useMemo(() => {
-    if (preview) {
+    if (previewMode) {
       return participantListDataPreviewURL({
         event_id: eventId,
-        guest: preview === PreviewEnum.GUEST ? '1' : '0',
+        guest: previewMode === PreviewEnum.GUEST ? '1' : '0',
       });
     }
     return participantListDataURL({event_id: eventId});
-  }, [eventId, preview]);
+  }, [eventId, previewMode]);
 
   const {data, loading, lastData} = useIndicoAxios(url);
 
@@ -97,24 +97,24 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
 
   let viewToggle: ReactNode, infoContent: ReactNode;
 
-  if (preview === 'guest') {
+  if (previewMode === PreviewEnum.GUEST) {
     viewToggle = (
       <Button
         basic
         color="blue"
-        href={participantListPreviewURL({event_id: eventId, guest: 0})}
+        onClick={() => setPreviewMode(PreviewEnum.PARTICIPANT)}
         styleName="view-toggle"
       >
         <Icon name="user" />
         <Translate>Show registered participant view instead</Translate>
       </Button>
     );
-  } else if (preview) {
+  } else if (previewMode) {
     viewToggle = (
       <Button
         basic
         color="blue"
-        href={participantListPreviewURL({event_id: eventId, guest: 1})}
+        onClick={() => setPreviewMode(PreviewEnum.GUEST)}
         styleName="view-toggle"
       >
         <Icon name="user secret" />

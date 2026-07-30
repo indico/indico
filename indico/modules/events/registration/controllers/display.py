@@ -9,7 +9,6 @@ from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
-from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
@@ -23,7 +22,6 @@ from indico.modules.events.registration.constants import PROFILE_PICTURE_SENTINE
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
-from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
                                                                    RegistrationFormItem)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -317,33 +315,6 @@ class RHParticipantListREST(ParticipantListMixin, RHRegistrationFormDisplayBase)
 
     def is_participant(self, user):
         return self.event.is_user_registered(user)
-
-    def _process(self):
-        is_participant = self.is_participant(session.user)
-        tables, merged, regforms = self._get_participant_list_tables(is_participant)
-
-        num_participants = sum(table['num_participants'] for table in tables)
-
-        return jsonify({
-            'published': bool(regforms),
-            'merged': merged,
-            'num_participants': num_participants,
-            'tables': tables
-        })
-
-
-class RHParticipantListPreviewREST(ParticipantListMixin, RHManageRegFormsBase):
-    """REST API for the preview of the participant list."""
-
-    @use_kwargs(
-        {'guest': fields.Bool(load_default=False)}, location='query'
-    )
-    def _process_args(self, guest):
-        RHManageRegFormsBase._process_args(self)
-        self.preview = 'guest' if guest else 'participant'
-
-    def is_participant(self, user):
-        return self.preview == 'participant'
 
     def _process(self):
         is_participant = self.is_participant(session.user)

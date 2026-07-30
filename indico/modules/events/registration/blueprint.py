@@ -29,6 +29,8 @@ _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers'
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/participant-list-preview', 'manage_participant_list_preview',
                  regforms.RHParticipantListPreview)
+_bp.add_url_rule('/api/registrations/participants/data/preview', 'api_participant_list_preview',
+                 regforms.RHParticipantListPreviewREST)
 _bp.add_url_rule('/manage/registration/description', 'manage_registration_multi_forms_announcement',
                  regforms.RHManageRegistrationMultiFormsAnnouncement, methods=('GET', 'POST'))
 
@@ -268,9 +270,6 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registr
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
                  privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
 _bp.add_url_rule('/api/registrations/participants/data', 'api_participant_list', display.RHParticipantListREST)
-_bp.add_url_rule(
-    '/api/registrations/participants/data/preview', 'api_participant_list_preview', display.RHParticipantListPreviewREST
-)
 
 
 # Check-in app API
