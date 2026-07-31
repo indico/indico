@@ -63,8 +63,8 @@ Improvements
 - Support attaching files when emailing event persons (:pr:`7369`, thanks :user:`jbtwist`)
 - Let registration managers view logs for specific registrations (:pr:`7600`, thanks
   :user:`vtran99`)
-- Change accordion view to tabs view and add pagination and search in public participant
-  list (:issue:`6424`, :pr:`7472`)
+- Add pagination to public participant list and use tabs instead of an accordion in case
+  of multiple registration forms (:issue:`6424`, :pr:`7472`)
 
 Bugfixes
 ^^^^^^^^
