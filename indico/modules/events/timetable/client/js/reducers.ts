@@ -302,7 +302,7 @@ export default {
         return state;
     }
   },
-  display: (state = {activePanel: SidePanelView.None}, action: Action) => {
+  display: (state = {activePanel: SidePanelView.Unscheduled}, action: Action) => {
     switch (action.type) {
       case actions.SET_ACTIVE_PANEL:
         return {
