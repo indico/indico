@@ -1,7 +1,5 @@
 {% extends 'events/management/base.html' %}
 
-{% from 'message_box.html' import message_box %}
-
 {% block back_button_url -%}
     {{ url_for('.manage_regform_list', event) }}
 {%- endblock %}

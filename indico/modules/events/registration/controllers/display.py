@@ -200,6 +200,7 @@ class ParticipantListRESTMixin:
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
+        num_participants = query.count()
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
                                                      for reg in query if reg.is_publishable(is_participant)),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']
@@ -207,8 +208,8 @@ class ParticipantListRESTMixin:
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count(),
-                'num_anonymous_participants': query.count() - len(registrations)}
+                'num_participants': num_participants,
+                'num_anonymous_participants': num_participants - len(registrations)}
 
     def _participant_list_table(self, regform, *, is_participant):
         def _process_registration(reg, column_ids, active_fields, picture_ids):
@@ -253,6 +254,7 @@ class ParticipantListRESTMixin:
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
+        num_participants = query.count()
         registrations = [_process_registration(reg, column_ids, active_fields, picture_ids) for reg in query
                          if reg.is_publishable(is_participant)]
 
@@ -261,8 +263,8 @@ class ParticipantListRESTMixin:
                 'rows': registrations,
                 'title': regform.title,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count(),
-                'num_anonymous_participants': query.count() - len(registrations)}
+                'num_participants': num_participants,
+                'num_anonymous_participants': num_participants - len(registrations)}
 
     def _get_participant_list_tables(self, is_participant):
         regforms = (RegistrationForm.query.with_parent(self.event)
