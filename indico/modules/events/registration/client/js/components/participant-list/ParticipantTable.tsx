@@ -58,15 +58,17 @@ export default function ParticipantTable({
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(null);
 
   function filterRows(rows: TableRowObj[], searchString: string): TableRowObj[] {
-    const query = searchString.trim().toLowerCase();
+    let query = searchString.trim().toLowerCase();
     if (!query) {
       return rows;
     }
     const exactSearchRegex = /^(['"]).*\1$/;
     if (exactSearchRegex.test(query)) {
-      const value = query.slice(1, -1).toLowerCase();
+      const value = query.slice(1, -1);
       return rows.filter(row => row.columns.some(col => col.text?.toLowerCase() === value));
     }
+    query = query.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+
     return rows.filter(row =>
       row.columns.some(col =>
         col.text
