@@ -152,7 +152,7 @@ import setupRegformSubmission from './form_submission';
           ReactDOM.render(
             <ParticipantList
               eventId={Number(this.getAttribute('event-id'))}
-              preview={this.getAttribute('preview')}
+              preview={this.hasAttribute('preview')}
             />,
             this
           );
