@@ -32,7 +32,7 @@ import './ParticipantList.module.scss';
 
 interface ParticipantListProps {
   eventId: number;
-  preview?: PreviewEnum;
+  preview?: boolean;
 }
 
 interface ParticipantCounterProps {
@@ -74,7 +74,9 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState<PerPageOptions>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [previewMode, setPreviewMode] = useState<PreviewEnum | undefined>(preview);
+  const [previewMode, setPreviewMode] = useState<PreviewEnum | undefined>(
+    preview ? PreviewEnum.PARTICIPANT : undefined
+  );
 
   const url = useMemo(() => {
     if (previewMode) {
@@ -116,7 +118,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
         styleName="view-toggle"
       >
         <Icon name="user" />
-        <Translate>Show registered participant view instead</Translate>
+        <Translate>Show registered participant view</Translate>
       </Button>
     );
   } else if (previewMode) {
@@ -130,7 +132,7 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
         styleName="view-toggle"
       >
         <Icon name="user secret" />
-        <Translate>Show unregistered guest view instead</Translate>
+        <Translate>Show unregistered guest view</Translate>
       </Button>
     );
   }

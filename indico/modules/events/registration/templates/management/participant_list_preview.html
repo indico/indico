@@ -10,21 +10,9 @@
     {% trans %}Participant List Preview{% endtrans %}
 {% endblock %}
 
-{% block description %}
-    {%- if preview == 'guest' -%}
-        {% trans -%}
-            This preview shows the participant list like an unregistered guest would see it.
-        {%- endtrans %}
-    {% else %}
-        {% trans -%}
-            This preview shows the participant list like a registered participant would see it.
-        {%- endtrans %}
-    {%- endif -%}
-{% endblock %}
-
 {% block content %}
     <ind-conference-participant-list
         event-id="{{ event.id }}"
-        preview="{{ preview }}"
+        preview="{{ True }}"
     ></ind-conference-participant-list>
 {% endblock %}

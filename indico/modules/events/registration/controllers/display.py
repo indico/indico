@@ -159,7 +159,6 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
 
 
 class ParticipantListRESTMixin:
-    view_class = None
     preview = None
 
     def is_participant(self, user):
@@ -297,11 +296,11 @@ class ParticipantListRESTMixin:
         num_participants = sum(table['num_participants'] for table in tables)
 
         return jsonify({
-                    'published': bool(regforms),
-                    'merged': merged,
-                    'num_participants': num_participants,
-                    'tables': tables
-                })
+            'published': bool(regforms),
+            'merged': merged,
+            'num_participants': num_participants,
+            'tables': tables,
+        })
 
 
 class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):

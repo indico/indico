@@ -67,14 +67,9 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
 class RHParticipantListPreview(RHManageRegFormsBase):
     """Preview the participant list like a registered participant would see it."""
 
-    @use_kwargs({'guest': fields.Bool(load_default=False)}, location='query')
-    def _process_args(self, guest):
-        RHManageRegFormsBase._process_args(self)
-        self.preview = 'guest' if guest else 'participant'
-
     def _process(self):
         return WPManageRegistration.render_template(
-            'display/participant_list_preview.html', self.event, preview=self.preview
+            'management/participant_list_preview.html', self.event,
         )
 
 
