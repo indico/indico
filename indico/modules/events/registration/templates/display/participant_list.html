@@ -1,40 +1,13 @@
-{% if preview %}
-    {% extends 'events/management/base.html' %}
-{% else %}
-    {% extends 'events/display/conference/base.html' %}
-{% endif %}
+{% extends 'events/display/conference/base.html' %}
 
 {% from 'message_box.html' import message_box %}
 
-{% block back_button_url -%}
-    {%- if preview -%}
-        {{ url_for('.manage_regform_list', event) }}
-    {%- endif -%}
-{%- endblock %}
-
 {% block title %}
-    {%- if not preview -%}
-        {{- page_title -}}
-    {%- else -%}
-        {% trans %}Participant List Preview{% endtrans %}
-    {%- endif -%}
-{% endblock %}
-
-{% block description %}
-    {%- if preview == 'guest' -%}
-        {% trans -%}
-            This preview shows the participant list like an unregistered guest would see it.
-        {%- endtrans %}
-    {% elif preview %}
-        {% trans -%}
-            This preview shows the participant list like a registered participant would see it.
-        {%- endtrans %}
-    {%- endif -%}
+    {{- page_title -}}
 {% endblock %}
 
 {% block content %}
     <ind-conference-participant-list
         event-id="{{ event.id }}"
-        {% if preview %}preview="{{ preview }}"{% endif %}
     ></ind-conference-participant-list>
 {% endblock %}

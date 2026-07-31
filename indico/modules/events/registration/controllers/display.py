@@ -158,7 +158,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                description=multi_forms_announcement)
 
 
-class ParticipantListMixin:
+class ParticipantListRESTMixin:
     view_class = None
     preview = None
 
@@ -296,30 +296,12 @@ class ParticipantListMixin:
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
         num_participants = sum(table['num_participants'] for table in tables)
 
-        return self.view_class.render_template(
-            'display/participant_list.html',
-            self.event,
-            preview=self.preview,
-            tables=tables,
-            merged=merged,
-            published=bool(regforms),
-            num_participants=num_participants
-        )
-
-
-class ParticipantListRESTMixin(ParticipantListMixin):
-    def _process(self):
-        is_participant = self.is_participant(session.user)
-        tables, merged, regforms = self._get_participant_list_tables(is_participant)
-
-        num_participants = sum(table['num_participants'] for table in tables)
-
         return jsonify({
-            'published': bool(regforms),
-            'merged': merged,
-            'num_participants': num_participants,
-            'tables': tables
-        })
+                    'published': bool(regforms),
+                    'merged': merged,
+                    'num_participants': num_participants,
+                    'tables': tables
+                })
 
 
 class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
@@ -332,10 +314,8 @@ class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayB
 class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
-    view_class = WPDisplayRegistrationParticipantList
-
     def _process(self):
-        return self.view_class.render_template('display/participant_list.html', self.event, preview=False)
+        return WPDisplayRegistrationParticipantList.render_template('display/participant_list.html', self.event)
 
 
 class InvitationMixin:
