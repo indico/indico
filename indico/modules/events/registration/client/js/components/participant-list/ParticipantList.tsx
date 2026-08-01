@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import participantListDataURL from 'indico-url:event_registration.api_participant_list';
-import participantListDataPreviewURL from 'indico-url:event_registration.api_participant_list_preview';
+import participantListDataPreviewURL from 'indico-url:event_registration.manage_participant_list_preview_api';
 
 import React, {ReactNode, useMemo, useState} from 'react';
 import {
