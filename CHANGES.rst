@@ -95,6 +95,8 @@ Bugfixes
   :user:`moliholy`)
 - Correctly format dates containing literal strings, such as "30 de junho" (:issue:`7590`,
   :pr:`7668`)
+- Avoid serving incomplete webpack manifests during concurrent requests (:issue:`7530`,
+  :pr:`7675`, thanks :user:`shuv-amp`)
 
 Accessibility
 ^^^^^^^^^^^^^
