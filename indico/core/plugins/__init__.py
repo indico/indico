@@ -109,6 +109,8 @@ class IndicoPlugin(Plugin):
         called anymore.
         """
         assert self.configurable or not self.settings_form, 'Non-configurable plugin cannot have a settings form'
+        from indico.core.config import config
+        config.register_plugin_config(self)
         self.alembic_versions_path = Path(self.root_path) / 'migrations'
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
