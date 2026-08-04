@@ -83,7 +83,7 @@ def build_wheel(target_dir: Path):
     info('building wheel')
     old_sdists = set(target_dir.glob('*.tar.gz'))
     try:
-        subprocess.check_output([sys.executable, '-m', 'uv', 'build', '-o', target_dir],
+        subprocess.check_output([sys.executable, '-m', 'uv', 'build', '--no-create-gitignore', '-o', target_dir],
                                 stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('build failed', verbose_msg=exc.output)
