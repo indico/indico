@@ -16,6 +16,14 @@
 {% endblock %}
 
 {% block content %}
+    {% if registration.modification_resets_approval %}
+        {% call message_box('warning') %}
+            {%- trans -%}
+                Modifying your registration will reset its approval status. It will need to be approved again
+                before it is confirmed.
+            {%- endtrans -%}
+        {% endcall %}
+    {% endif %}
     <div id="registration-form-submission-container"
          data-event-id="{{ event.id }}"
          data-regform-id="{{ regform.id }}"

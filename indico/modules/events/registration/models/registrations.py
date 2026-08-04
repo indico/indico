@@ -699,6 +699,15 @@ class Registration(db.Model):
     def render_price_adjustment(self):
         return self._render_price(self.price_adjustment)
 
+    @property
+    def modification_resets_approval(self):
+        regform = self.registration_form
+        invitation = self.invitation
+        moderation_required = (regform.moderation_enabled and
+                               (not invitation or not invitation.skip_moderation))
+        return (moderation_required and regform.reset_approval_on_modification and
+                self.state in (RegistrationState.unpaid, RegistrationState.complete))
+
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration."""
         initial_state = self.state
