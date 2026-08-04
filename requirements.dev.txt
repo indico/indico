@@ -22,8 +22,6 @@ blinker==1.9.0
     # via
     #   -c requirements.txt
     #   flask
-build==1.5.0
-    # via -r requirements.dev.in
 certifi==2026.7.22
     # via
     #   -c requirements.txt
@@ -103,7 +101,6 @@ mirakuru==3.0.2
 packaging==26.2
     # via
     #   -c requirements.txt
-    #   build
     #   hatch-requirements-txt
     #   hatchling
     #   pytest
@@ -136,8 +133,6 @@ pygments==2.20.0
     #   -r requirements.dev.in
     #   pytest
     #   sphinx
-pyproject-hooks==1.2.0
-    # via build
 pytest==9.1.1
     # via
     #   -r requirements.dev.in
