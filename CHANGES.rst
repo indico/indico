@@ -65,6 +65,8 @@ Improvements
   :user:`vtran99`)
 - Add pagination to public participant list and use tabs instead of an accordion in case
   of multiple registration forms (:issue:`6424`, :pr:`7472`)
+- Add new registration form setting to require approval again after a user modifies their
+  registration (:pr:`7434`, thanks :user:`moliholy`)
 
 Bugfixes
 ^^^^^^^^
