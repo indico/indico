@@ -703,10 +703,12 @@ class Registration(db.Model):
     def modification_resets_approval(self):
         regform = self.registration_form
         invitation = self.invitation
-        moderation_required = (regform.moderation_enabled and
-                               (not invitation or not invitation.skip_moderation))
-        return (moderation_required and regform.reset_approval_on_modification and
-                self.state in (RegistrationState.unpaid, RegistrationState.complete))
+        moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
+        return (
+            moderation_required
+            and regform.reset_approval_on_modification
+            and self.state in (RegistrationState.unpaid, RegistrationState.complete)
+        )
 
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration."""
