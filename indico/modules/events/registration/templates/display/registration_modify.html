@@ -19,8 +19,7 @@
     {% if registration.modification_resets_approval %}
         {% call message_box('warning') %}
             {%- trans -%}
-                Modifying your registration will reset its approval status. It will need to be approved again
-                before it is confirmed.
+                If you modify this registration, it needs to be approved again by the event organizer.
             {%- endtrans -%}
         {% endcall %}
     {% endif %}
