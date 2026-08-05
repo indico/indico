@@ -54,8 +54,6 @@ Improvements
 - Allow cloning survey sections (:issue:`7395`, :pr:`7536`)
 - Add "Affiliation" field type to regforms (:pr:`7352`, thanks
   :user:`duartegalvao, unconventionaldotdev`)
-- Add support for anonymous accompanying persons (numeric count only) in registration form
-  (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
 - Log registration tag changes in the event log (:pr:`7446`,
   thanks :user:`moliholy, unconventionaldotdev`)
 - Display embedded images in email log entries (:pr:`7338`, thanks
@@ -69,6 +67,8 @@ Improvements
   of multiple registration forms (:issue:`6424`, :pr:`7472`)
 - Add new registration form setting to require approval again after a user modifies their
   registration (:pr:`7434`, thanks :user:`moliholy`)
+- Add support for anonymous accompanying persons (numeric count only) in registration form
+  (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
 
 Bugfixes
 ^^^^^^^^
