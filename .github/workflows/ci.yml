@@ -2,7 +2,7 @@ name: CI
 
 env:
   TZ: Europe/Zurich
-  PYTHON_VERSION_312: '3.12.11'
+  PYTHON_VERSION_312: '3.12.13'
   NODE_VERSION: '22.x'
 
 on:
