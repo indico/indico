@@ -31,6 +31,7 @@ export default function FormErrorList() {
   const {errors} = useFormState({errors: true});
 
   const fieldsWithErrors = [];
+  const seenIds = new Set(); // Keep track of fields we've already added to the list so we don't duplicate them
   for (const fieldName in errors) {
     const field = fieldLabelLookup.get(fieldName) || SPECIAL_FIELDS[fieldName];
 
@@ -41,6 +42,11 @@ export default function FormErrorList() {
       );
       continue;
     }
+
+    if (seenIds.has(field.id)) {
+      continue;
+    }
+    seenIds.add(field.id);
 
     fieldsWithErrors.push({...field, message: errors[fieldName]});
   }

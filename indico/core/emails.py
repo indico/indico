@@ -58,7 +58,7 @@ def send_email_task(task, email, log_entry=None):
                            truncate(email['subject'], 100), attempt, MAX_TRIES, delay, exc)
             raise
     else:
-        event_id = log_entry.event_id if log_entry else None
+        event_id = getattr(log_entry, 'event_id', None) if log_entry else None
         if task.request.retries and event_id is not None:
             logger.info('Sent email "%s" for event %d (attempt %d/%d)', truncate(email['subject'], 100), event_id,
                         attempt, MAX_TRIES)

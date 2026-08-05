@@ -7,7 +7,7 @@
 
 import pytest
 
-from indico.modules.events.util import get_event_from_url
+from indico.modules.events.util import ZipGeneratorMixin, get_event_from_url
 
 
 @pytest.mark.parametrize(('url', 'asserted_error_message'), (
@@ -23,3 +23,14 @@ def test_get_event_from_url_raises_value_error(url, asserted_error_message):
 def test_get_event_from_url_returns_event(dummy_event):
     event = get_event_from_url(f'http://localhost/event/{dummy_event.id}')
     assert event == dummy_event
+
+
+def test_adjust_path_length_keeps_safe_margin_for_windows_zip_extraction():
+    path = '/'.join(ZipGeneratorMixin()._adjust_path_length([
+        'registration_form_' + 'a' * 100,
+        'registrant_' + 'b' * 100,
+        'file_' + 'c' * 100 + '.docx',
+    ]))
+
+    assert len(path) <= 200
+    assert path.endswith('.docx')

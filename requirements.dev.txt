@@ -4,13 +4,13 @@ aiosmtpd==1.4.6
     # via pytest-localserver
 alabaster==1.0.0
     # via sphinx
-anyio==4.12.1
+anyio==4.14.2
     # via
     #   starlette
     #   watchfiles
 atpublic==7.0.0
     # via aiosmtpd
-attrs==25.4.0
+attrs==26.1.0
     # via
     #   -c requirements.txt
     #   aiosmtpd
@@ -22,17 +22,15 @@ blinker==1.9.0
     # via
     #   -c requirements.txt
     #   flask
-build==1.4.0
-    # via -r requirements.dev.in
-certifi==2026.2.25
+certifi==2026.7.22
     # via
     #   -c requirements.txt
     #   requests
-charset-normalizer==3.4.4
+charset-normalizer==3.4.9
     # via
     #   -c requirements.txt
     #   requests
-click==8.2.1
+click==8.4.2
     # via
     #   -c requirements.txt
     #   flask
@@ -46,9 +44,9 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.13.4
+coverage==7.15.2
     # via pytest-cov
-docker==7.1.0
+docker==7.2.0
     # via -r requirements.dev.in
 docutils==0.22.4
     # via
@@ -67,20 +65,20 @@ h11==0.16.0
     # via uvicorn
 hatch-requirements-txt==0.4.1
     # via -r requirements.dev.in
-hatchling==1.29.0
+hatchling==1.31.0
     # via
     #   -r requirements.dev.in
     #   hatch-requirements-txt
-idna==3.15
+idna==3.18
     # via
     #   -c requirements.txt
     #   anyio
     #   requests
-imagesize==1.4.1
+imagesize==2.0.0
     # via sphinx
 iniconfig==2.3.0
     # via pytest
-isort==8.0.0
+isort==8.0.1
     # via -r requirements.dev.in
 itsdangerous==2.2.0
     # via
@@ -100,17 +98,18 @@ markupsafe==3.0.3
     #   werkzeug
 mirakuru==3.0.2
     # via pytest-redis
-packaging==26.0
+packaging==26.2
     # via
     #   -c requirements.txt
-    #   build
     #   hatch-requirements-txt
     #   hatchling
     #   pytest
     #   sphinx
     #   wheel
-pathspec==1.0.4
+pathspec==1.1.1
     # via hatchling
+pglast==8.4
+    # via results
 plantweb==1.3.0
     # via -r requirements.dev.in
 pluggy==1.6.0
@@ -121,10 +120,12 @@ pluggy==1.6.0
 port-for==1.0.0
     # via pytest-redis
 psutil==7.2.2
-    # via mirakuru
-psycopg==3.3.3
+    # via
+    #   -c requirements.txt
+    #   mirakuru
+psycopg==3.3.4
     # via results
-psycopg-pool==3.3.0
+psycopg-pool==3.3.1
     # via psycopg
 pygments==2.20.0
     # via
@@ -132,22 +133,20 @@ pygments==2.20.0
     #   -r requirements.dev.in
     #   pytest
     #   sphinx
-pyproject-hooks==1.2.0
-    # via build
-pytest==9.0.3
+pytest==9.1.1
     # via
     #   -r requirements.dev.in
     #   pytest-cov
     #   pytest-mock
     #   pytest-redis
     #   pytest-snapshot
-pytest-cov==7.0.0
+pytest-cov==7.1.0
     # via -r requirements.dev.in
 pytest-localserver==0.10.0
     # via -r requirements.dev.in
 pytest-mock==3.15.1
     # via -r requirements.dev.in
-pytest-redis==3.1.3
+pytest-redis==4.0.0
     # via -r requirements.dev.in
 pytest-snapshot==0.9.0
     # via -r requirements.dev.in
@@ -165,27 +164,27 @@ redis==6.4.0
     # via
     #   -c requirements.txt
     #   pytest-redis
-requests==2.33.0
+requests==2.34.2
     # via
     #   -c requirements.txt
     #   docker
     #   plantweb
     #   responses
     #   sphinx
-responses==0.26.0
+responses==0.26.2
     # via -r requirements.dev.in
-results==1.4.1770293316
+results==2.0.1783086339
     # via -r requirements.dev.in
 roman-numerals==4.1.0
     # via sphinx
-ruff==0.15.17
+ruff==0.16.1
     # via -r requirements.dev.in
 six==1.17.0
     # via
     #   -c requirements.txt
     #   plantweb
     #   python-dateutil
-snowballstemmer==3.0.1
+snowballstemmer==3.1.1
     # via sphinx
 sphinx==9.1.0
     # via
@@ -198,7 +197,7 @@ sphinx==9.1.0
     #   sphinxcontrib-mermaid
 sphinx-autobuild==2025.8.25
     # via -r requirements.dev.in
-sphinx-issues==5.0.1
+sphinx-issues==6.0.0
     # via -r requirements.dev.in
 sphinx-reredirects==1.1.0
     # via -r requirements.dev.in
@@ -214,7 +213,7 @@ sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-mermaid==2.0.0
+sphinxcontrib-mermaid==2.1.0
     # via -r requirements.dev.in
 sphinxcontrib-qthelp==2.0.0
     # via sphinx
@@ -224,11 +223,11 @@ sqlparse==0.5.5
     # via -r requirements.dev.in
 starlette==1.3.1
     # via sphinx-autobuild
-tomlkit==0.14.0
+tomlkit==0.15.1
     # via -r requirements.dev.in
-trove-classifiers==2026.1.14.14
+trove-classifiers==2026.6.1.19
     # via hatchling
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   -c requirements.txt
     #   anyio
@@ -243,20 +242,20 @@ urllib3==2.7.0
     #   docker
     #   requests
     #   responses
-uv==0.11.21
+uv==0.12.1
     # via -r requirements.dev.in
-uvicorn==0.41.0
+uvicorn==0.51.0
     # via sphinx-autobuild
-watchfiles==1.1.1
+watchfiles==1.2.0
     # via
     #   -r requirements.dev.in
     #   sphinx-autobuild
-websockets==16.0
+websockets==16.1.1
     # via sphinx-autobuild
-werkzeug==3.1.6
+werkzeug==3.1.8
     # via
     #   -c requirements.txt
     #   flask
     #   pytest-localserver
-wheel==0.46.3
+wheel==0.47.0
     # via -r requirements.dev.in

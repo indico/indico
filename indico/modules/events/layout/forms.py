@@ -7,7 +7,7 @@
 
 from wtforms.fields import BooleanField, SelectField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, Optional, ValidationError
+from wtforms.validators import URL, DataRequired, Optional, ValidationError
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -201,7 +201,7 @@ class MenuUserEntryFormBase(IndicoForm):
 
 
 class MenuLinkForm(MenuUserEntryFormBase):
-    link_url = URLField(_('URL'), [DataRequired()])
+    link_url = URLField(_('URL'), [DataRequired(), URL()])
 
 
 class MenuPageForm(MenuUserEntryFormBase):

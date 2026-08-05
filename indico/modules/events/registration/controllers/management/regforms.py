@@ -22,7 +22,7 @@ from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
-from indico.modules.events.registration.controllers.display import ParticipantListMixin
+from indico.modules.events.registration.controllers.display import ParticipantListRESTMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (MultiFormsAnnouncementForm, ParticipantsDisplayForm,
                                                       ParticipantsDisplayFormColumnsForm, RegistrationFormCloneForm,
@@ -64,10 +64,17 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
         return WPManageRegistration.render_template('management/regform_list.html', self.event, regforms=regforms)
 
 
-class RHParticipantListPreview(ParticipantListMixin, RHManageRegFormsBase):
+class RHParticipantListPreview(RHManageRegFormsBase):
     """Preview the participant list like a registered participant would see it."""
 
-    view_class = WPManageRegistration
+    def _process(self):
+        return WPManageRegistration.render_template(
+            'management/participant_list_preview.html', self.event,
+        )
+
+
+class RHParticipantListPreviewREST(ParticipantListRESTMixin, RHManageRegFormsBase):
+    """REST API for the preview of the participant list."""
 
     @use_kwargs({'guest': fields.Bool(load_default=False)}, location='query')
     def _process_args(self, guest):

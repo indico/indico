@@ -203,6 +203,9 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint("internal_name != ''", name='internal_name_not_empty'),
         db.CheckConstraint('(internal_name IS NOT NULL) OR (personal_data_type IS NULL)',
                            name='pd_internal_name_required'),
+        db.CheckConstraint('(type != {t.text}) OR (internal_name IS NULL)'  # noqa: UP032
+                           .format(t=RegistrationFormItemType),
+                           name='text_no_internal_name'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
                  postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
@@ -386,7 +389,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def view_data(self):
-        """Return object with data that the frontend can understand."""
+        """A dict with data that the frontend can understand."""
         return {'id': self.id, 'description': self.description, 'position': self.position}
 
     @property

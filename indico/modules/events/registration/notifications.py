@@ -69,7 +69,7 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
                                                template_name=template_name, to_managers=to_managers,
                                                attach_rejection_reason=attach_rejection_reason)
-    send_email(mail, event=registration.registration_form.event, module='Registration', user=user,
+    send_email(mail, obj=registration.registration_form.event, module='Registration', user=user,
                log_metadata={'registration_id': registration.id})
 
 

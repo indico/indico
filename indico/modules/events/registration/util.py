@@ -228,7 +228,7 @@ def get_initial_form_values(regform, *, management=False, **kwargs):
 def get_user_data(regform: RegistrationForm, user, invitation=None):
     affiliation_field = regform.get_personal_data_field(PersonalDataType.affiliation, force=True)
     # Old regforms have a 'text' field for affiliation, new ones have a custom 'affiliation' field
-    modern_affiliation_field = affiliation_field.input_type == 'affiliation'
+    modern_affiliation_field = bool(affiliation_field and affiliation_field.input_type == 'affiliation')
     predefined_only_affiliation = (
         modern_affiliation_field and
         affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
@@ -437,7 +437,8 @@ def create_personal_data_fields(regform):
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
-                                base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
+                                base_price=regform.base_price, currency=regform.currency,
+                                created_by_manager=management, created_by=user)
     if skip_moderation is None:
         skip_moderation = management
     all_data_by_id = {f.id: data.get(f.html_field_name) for f in regform.active_fields}
@@ -568,7 +569,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if consent_to_publish is not None:
             update_registration_consent_to_publish(registration, consent_to_publish)
 
-    registration.sync_state()
+    registration.sync_state(_skip_moderation=management)
     registration.set_modified()
     db.session.flush()
     # sanity check
@@ -622,6 +623,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         'reg_date': ('Registration date', lambda x: x.submitted_dt),
         'mod_date': ('Modification date', lambda x: x.modified_dt),
         'state': ('Registration state', lambda x: x.state.title),
+        'created_by': ('Created by', lambda x: x.created_by.full_name if x.created_by else ''),
         'price': ('Price', lambda x: x.render_price()),
         'checked_in': ('Checked in', lambda x: x.checked_in),
         'checked_in_date': ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''),
@@ -700,6 +702,10 @@ def generate_pdf_data_from_registrations(event, registrations, regform_items, st
         'state': (
             _('Registration state'),
             lambda x: x.state.title,
+        ),
+        'created_by': (
+            _('Created by'),
+            lambda x: x.created_by.full_name if x.created_by else empty_value,
         ),
         'price': (
             _('Price'),
@@ -1265,6 +1271,7 @@ def is_conditional_field_shown(field, data, *, is_db_data=False):
     return is_conditional_field_shown(field.show_if_field, data, is_db_data=is_db_data)
 
 
+@make_interceptable
 def get_hidden_conditional_fields(regform, data_by_id):
     return {f for f in regform.active_fields if not is_conditional_field_shown(f, data_by_id)}
 

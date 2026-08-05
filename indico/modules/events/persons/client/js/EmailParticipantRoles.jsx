@@ -7,6 +7,7 @@
 
 import emailMetadataURL from 'indico-url:persons.api_email_event_persons_metadata';
 import emailSendURL from 'indico-url:persons.api_email_event_persons_send';
+import emailUploadURL from 'indico-url:persons.api_email_event_persons_upload';
 import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
@@ -83,6 +84,7 @@ export function EmailParticipantRoles({
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody}}
       sentEmailsCount={sentCount}
+      attachmentsUploadURL={emailUploadURL({event_id: eventId})}
     />
   );
 }

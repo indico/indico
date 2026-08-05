@@ -230,6 +230,8 @@ class IndicoLinkListField(JSONField):
     def pre_validate(self, form):
         if not all(x.get('url') for x in self.data):
             raise ValidationError(_('URL is required'))
+        if not all(x['url'].startswith(('http://', 'https://')) for x in self.data):
+            raise ValidationError(_('Only URLs starting with https:// (or http://) are allowed'))
         if len(self.data) > 1 and not all(x.get('title') for x in self.data):
             raise ValidationError(_('Titles are required when more than one link is specified'))
 

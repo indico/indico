@@ -16,14 +16,17 @@ import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form, Modal} from 'semantic-ui-react';
 
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
+import {
+  fileTypePropTypes,
+  uploadablePropTypes,
+} from 'indico/react/components/files/FileManager/util';
 import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {EditableTypeTitles} from '../models';
 
-import {FinalFileManager} from './timeline/FileManager';
-import {fileTypePropTypes, uploadablePropTypes} from './timeline/FileManager/util';
 import {getFileTypes} from './timeline/selectors';
 
 export default function EditableSubmissionButton({

@@ -61,7 +61,7 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def field_impl(self):
-        """Gets the implementation of the field.
+        """The implementation of the field.
 
         :return: An instance of a `RegistrationFormFieldBase` subclass
         """

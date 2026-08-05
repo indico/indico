@@ -526,7 +526,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
 
     @property
     def enabled_editables(self):
-        """Return all submitted editables with enabled types."""
+        """All submitted editables with enabled types."""
         from indico.modules.events.editing.settings import editing_settings
         if not self.event.has_feature('editing'):
             return []

@@ -12,12 +12,11 @@ import fileTypeURL from 'indico-url:event_editing.api_file_types';
 import React from 'react';
 import {useParams} from 'react-router-dom';
 
+import {FileTypeManager} from 'indico/modules/events/reviewing/file_types';
 import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 
-import EditableTypeSubPageNav from '../EditableTypeSubPageNav';
-
-import FileTypeManager from './FileTypeManager';
+import EditableTypeSubPageNav from './EditableTypeSubPageNav';
 
 export default function FileTypeManagement() {
   const eventId = useNumericParam('event_id');

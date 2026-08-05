@@ -17,6 +17,7 @@ import {
   PlaceholderInfo,
   TinyMCETextEditor,
 } from 'indico/react/components';
+import {FinalFileManager} from 'indico/react/components/files/FileManager';
 import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
@@ -97,7 +98,10 @@ export function EmailDialog({
   title,
   getPreviewPayload,
   imageUploadURL,
+  attachmentsUploadURL,
 }) {
+  const maxEmailAttachmentSize = Indico.FileRestrictions.MaxEmailAttachmentSize;
+  const allowAttachments = !!attachmentsUploadURL;
   const [preview, setPreview] = useState(null);
 
   const togglePreview = async (values, contextOverride = null) => {
@@ -201,6 +205,16 @@ export function EmailDialog({
           label={Translate.string('Send a copy of each email to my mailbox')}
           showAsToggle
         />
+        {allowAttachments && (
+          <Form.Field>
+            <Translate as="label">Attachments</Translate>
+            <FinalFileManager
+              name="attachments"
+              uploadURL={attachmentsUploadURL}
+              maxTotalSize={maxEmailAttachmentSize}
+            />
+          </Form.Field>
+        )}
       </Form.Field>
     </>
   );
@@ -216,12 +230,16 @@ export function EmailDialog({
         body: '',
         bcc_addresses: [],
         copy_for_sender: false,
+        ...(allowAttachments ? {attachments: {}} : {}),
         ...initialFormValues,
       }}
       initialValuesEqual={_.isEqual}
       onClose={onClose}
-      onSubmit={async (...args) => {
-        const resp = await onSubmit(...args);
+      onSubmit={async (values, ...rest) => {
+        const transformedValues = allowAttachments
+          ? {...values, attachments: Object.values(values.attachments || {}).flat()}
+          : values;
+        const resp = await onSubmit(transformedValues, ...rest);
         if (resp) {
           setPreview(null);
         }
@@ -274,6 +292,7 @@ EmailDialog.propTypes = {
   getPreviewPayload: PropTypes.func,
   sentEmailsWarning: PropTypes.node,
   imageUploadURL: PropTypes.string,
+  attachmentsUploadURL: PropTypes.string,
 };
 
 EmailDialog.defaultProps = {
@@ -288,4 +307,5 @@ EmailDialog.defaultProps = {
   title: null,
   getPreviewPayload: null,
   imageUploadURL: null,
+  attachmentsUploadURL: null,
 };

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
 from collections import Counter
 from datetime import datetime
 from datetime import time as dt_time
@@ -17,7 +16,7 @@ from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_interval as _format_interval
 from babel.dates import format_time as _format_time
 from babel.dates import format_timedelta as _format_timedelta
-from babel.dates import get_timezone, match_skeleton
+from babel.dates import get_timezone, match_skeleton, tokenize_pattern, untokenize_pattern
 from babel.numbers import format_currency as _format_currency
 from babel.numbers import format_number as _format_number
 from dateutil.relativedelta import relativedelta as _relativedelta
@@ -171,20 +170,28 @@ def _adjust_skeleton(format, skeleton):
     See: https://cldr-smoke.unicode.org/spec/main/ldml/tr35-dates.html#Matching_Skeletons
     """
     skeleton_counter = Counter(skeleton)
-    format_counter = Counter(format)
+    tokenized_format = []
 
-    for char in skeleton_counter:
-        skeleton_count = skeleton_counter[char]
-        format_count = format_counter[char]
+    for type_, token in tokenize_pattern(format):
+        if type_ == 'chars':
+            # This is a literal string and should not be touched
+            tokenized_format.append((type_, token))
+            continue
+
+        pattern, format_count = token
+        skeleton_count = skeleton_counter[pattern]
 
         # Hours, minutes and seconds should not be expanded
-        if char in 'Hhms':
+        if pattern in 'Hhms':
+            tokenized_format.append((type_, token))
             continue
 
         if (format_count <= 2 and skeleton_count <= 2) or (format_count > 2 and skeleton_count > 2):
-            format = re.sub(fr'{re.escape(char)}+', char * skeleton_count, format)
+            tokenized_format.append((type_, (pattern, skeleton_count)))
+        else:
+            tokenized_format.append((type_, token))
 
-    return format
+    return untokenize_pattern(tokenized_format)
 
 
 def format_skeleton(dt, skeleton, locale=None, timezone=None):

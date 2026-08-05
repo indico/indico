@@ -17,7 +17,7 @@ Would you like to to help us translate Indico to your language?
  * First of all, check the [I18n section of our forum](https://talk.getindico.io/c/i18n):
    * If your language is already listed, annouce yourself in the corresponding thread;
    * If your language is not listed, create a new post for it, following [the same style of the previous ones](https://talk.getindico.io/t/japanese-ja-translation-group/542?u=pferreir);
- * Then, [create an account on Transifex](https://www.transifex.com/indico/indico/) and ask to join the corresponding team in the `indico` project;
+ * Then, [create an account on Transifex](https://explore.transifex.com/indico/indico/) and ask to join the corresponding team in the `indico` project;
  * Someone from the team will be in contact with you as soon as possible;
 
 ### Documentation :pencil:

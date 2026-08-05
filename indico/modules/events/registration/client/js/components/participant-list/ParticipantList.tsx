@@ -5,72 +5,215 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
+import participantListDataURL from 'indico-url:event_registration.api_participant_list';
+import participantListDataPreviewURL from 'indico-url:event_registration.manage_participant_list_preview_api';
 
-import React from 'react';
-import {Button, Icon} from 'semantic-ui-react';
+import React, {ReactNode, useMemo, useState} from 'react';
+import {
+  Button,
+  Icon,
+  MenuItem,
+  Message,
+  MessageContent,
+  Tab,
+  Popup,
+  TabPane,
+  Loader,
+} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {useIndicoAxios} from 'indico/react/hooks/hooks';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import ParticipantAccordion from './ParticipantAccordion';
+import {ParticipantCountHidden} from './ParticipantCountHidden';
+import ParticipantTable, {PerPageOptions} from './ParticipantTable';
 import {PreviewEnum, TableObj} from './types';
 
 import './ParticipantList.module.scss';
 
 interface ParticipantListProps {
-  published: boolean;
-  merged: boolean;
-  totalParticipantCount: number;
-  tables: TableObj[];
   eventId: number;
-  preview?: PreviewEnum;
+  preview?: boolean;
 }
 
-export default function ParticipantList({
-  published,
-  totalParticipantCount,
-  tables,
-  preview,
-  eventId,
-  merged,
-}: ParticipantListProps) {
-  let viewToggle;
+interface ParticipantCounterProps {
+  table: TableObj;
+}
 
-  if (preview === PreviewEnum.GUEST) {
+function ParticipantCounter({table}: ParticipantCounterProps) {
+  const content = (
+    <div styleName="participants-count-wrapper">
+      {table.num_anonymous_participants > 0 && (
+        <>
+          <span styleName="hidden">{table.num_anonymous_participants}</span>
+          <Icon name="user secret" styleName="hidden" />
+        </>
+      )}
+      {table.num_participants}
+      <Icon name="user" />
+    </div>
+  );
+  if (table.num_anonymous_participants === 0) {
+    return content;
+  }
+
+  return (
+    <Popup
+      position="left center"
+      content={
+        <ParticipantCountHidden
+          count={table.num_participants}
+          countHidden={table.num_anonymous_participants}
+        />
+      }
+      trigger={content}
+    />
+  );
+}
+
+export default function ParticipantList({eventId, preview}: ParticipantListProps) {
+  const [search, setSearch] = useState('');
+  const [perPage, setPerPage] = useState<PerPageOptions>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [previewMode, setPreviewMode] = useState<PreviewEnum | undefined>(
+    preview ? PreviewEnum.PARTICIPANT : undefined
+  );
+
+  const url = useMemo(() => {
+    if (previewMode) {
+      return participantListDataPreviewURL({
+        event_id: eventId,
+        guest: previewMode === PreviewEnum.GUEST ? '1' : '0',
+      });
+    }
+    return participantListDataURL({event_id: eventId});
+  }, [eventId, previewMode]);
+
+  const {data, loading, lastData} = useIndicoAxios(url);
+
+  const perPageOptions: PerPageOptions[] = useMemo(() => {
+    const maxNumParticipants = (data?.tables ?? []).reduce(
+      (max, table) => Math.max(max, table.num_participants),
+      0
+    );
+
+    if (maxNumParticipants > 0) {
+      const options = [25, 50, 100].filter(opt => opt < maxNumParticipants);
+      return [...options, 'all'];
+    }
+    return ['all'];
+  }, [data]);
+
+  let viewToggle: ReactNode, infoContent: ReactNode;
+
+  if (previewMode === PreviewEnum.GUEST) {
     viewToggle = (
       <Button
         basic
         color="blue"
-        href={participantListPreviewURL({event_id: eventId})}
+        disabled={loading}
+        loading={loading}
+        onClick={() => {
+          setPreviewMode(PreviewEnum.PARTICIPANT);
+        }}
         styleName="view-toggle"
       >
         <Icon name="user" />
-        <Translate>Show registered participant view instead</Translate>
+        <Translate>Show registered participant view</Translate>
       </Button>
     );
-  } else if (preview) {
+  } else if (previewMode) {
     viewToggle = (
       <Button
         basic
         color="blue"
-        href={participantListPreviewURL({event_id: eventId, guest: 1})}
+        disabled={loading}
+        loading={loading}
+        onClick={() => setPreviewMode(PreviewEnum.GUEST)}
         styleName="view-toggle"
       >
         <Icon name="user secret" />
-        <Translate>Show unregistered guest view instead</Translate>
+        <Translate>Show unregistered guest view</Translate>
       </Button>
+    );
+  }
+
+  if ((loading || !data) && !lastData) {
+    return <Loader active inline="centered" />;
+  }
+
+  if (!data?.published) {
+    infoContent = <Translate>There are no published registrations.</Translate>;
+  } else if (data.num_participants === 0) {
+    infoContent = <Translate>There are no registrations yet.</Translate>;
+  }
+
+  if (infoContent) {
+    return (
+      <>
+        {viewToggle}
+        <Message info size="large">
+          <MessageContent>
+            <Icon name="info circle" />
+            {infoContent}
+          </MessageContent>
+        </Message>
+      </>
     );
   }
 
   return (
     <section>
       {viewToggle}
-      <ParticipantAccordion
-        published={published}
-        totalParticipantCount={totalParticipantCount}
-        tables={tables}
-        merged={merged}
-      />
+      <h3 styleName="participant-total-count">
+        <PluralTranslate count={data.num_participants}>
+          <Singular>
+            <Param name="count" value={data.num_participants} /> participant
+          </Singular>
+          <Plural>
+            <Param name="count" value={data.num_participants} /> participants
+          </Plural>
+        </PluralTranslate>
+      </h3>
+      {data.merged ? (
+        <ParticipantTable
+          table={data.tables[0]}
+          search={search}
+          setSearch={setSearch}
+          perPageOptions={perPageOptions}
+          perPage={perPage}
+          setPerPage={setPerPage}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
+      ) : (
+        <Tab
+          styleName="tab-menu"
+          menu={{secondary: true}}
+          panes={data.tables.map((table: TableObj) => ({
+            menuItem: (
+              <MenuItem styleName="tab-title" key={table.title}>
+                <span styleName="title-text">{table.title}</span>
+                <ParticipantCounter table={table} />
+              </MenuItem>
+            ),
+            render: () => (
+              <TabPane key={table.title} attached={false}>
+                <ParticipantTable
+                  table={table}
+                  merged={data.merged}
+                  search={search}
+                  setSearch={setSearch}
+                  perPageOptions={perPageOptions}
+                  perPage={perPage}
+                  setPerPage={setPerPage}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              </TabPane>
+            ),
+          }))}
+        />
+      )}
     </section>
   );
 }

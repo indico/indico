@@ -1,0 +1,16 @@
+{% extends 'events/management/base.html' %}
+
+{% block back_button_url -%}
+    {{ url_for('.manage_regform_list', event) }}
+{%- endblock %}
+
+{% block title %}
+    {% trans %}Participant List Preview{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <ind-conference-participant-list
+        event-id="{{ event.id }}"
+        preview
+    ></ind-conference-participant-list>
+{% endblock %}

@@ -20,6 +20,7 @@ export const FileManagerContext = React.createContext(null);
 
 export const filePropTypes = {
   filename: PropTypes.string.isRequired,
+  size: PropTypes.number,
   downloadURL: PropTypes.string,
   uuid: PropTypes.string.isRequired,
   claimed: PropTypes.bool,
@@ -97,6 +98,7 @@ export function uploadFiles({
         dispatch(
           action(fileTypeId, replaceFileId, tmpFileId, {
             filename: uploadedFile.filename,
+            size: uploadedFile.size,
             id: rest.fileId,
             uuid: uploadedFile.uuid,
             claimed: false,

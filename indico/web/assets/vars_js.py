@@ -181,7 +181,8 @@ def generate_global_file():
 
         'FileRestrictions': {
             'MaxUploadFilesTotalSize': config.MAX_UPLOAD_FILES_TOTAL_SIZE,
-            'MaxUploadFileSize': config.MAX_UPLOAD_FILE_SIZE
+            'MaxUploadFileSize': config.MAX_UPLOAD_FILE_SIZE,
+            'MaxEmailAttachmentSize': config.MAX_EMAIL_ATTACHMENT_SIZE,
         }
     }
 

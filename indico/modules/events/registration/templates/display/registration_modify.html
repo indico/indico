@@ -16,6 +16,13 @@
 {% endblock %}
 
 {% block content %}
+    {% if registration.modification_resets_approval %}
+        {% call message_box('warning') %}
+            {%- trans -%}
+                If you modify this registration, it needs to be approved again by the event organizer.
+            {%- endtrans -%}
+        {% endcall %}
+    {% endif %}
     <div id="registration-form-submission-container"
          data-event-id="{{ event.id }}"
          data-regform-id="{{ regform.id }}"

@@ -536,7 +536,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def deep_children_query(self):
-        """Get a query object for all subcategories.
+        """A query object for all subcategories.
 
         This includes subcategories at any level of nesting.
         """
@@ -559,7 +559,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def chain_query(self):
-        """Get a query object for the category chain.
+        """A query object for the category chain.
 
         The query retrieves the root category first and then all the
         intermediate categories up to (and including) this category.
@@ -568,7 +568,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def parent_chain_query(self):
-        """Get a query object for the category's parent chain.
+        """A query object for the category's parent chain.
 
         The query retrieves the root category first and then all the
         intermediate categories up to (excluding) this category.
@@ -599,7 +599,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def visibility_horizon_query(self):
-        """Get a query object that returns the highest category this one is visible from."""
+        """A query object that returns the highest category this one is visible from."""
         cte_query = (select([Category.id, Category.parent_id,
                              db.case([(Category.visibility.is_(None), None)],
                                      else_=(Category.visibility - 1)).label('n'),
@@ -618,7 +618,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def own_visibility_horizon(self):
         """
-        Get the highest category this one would like to be visible
+        The highest category this one would like to be visible
         from (configured visibility).
         """
         if self.visibility is None:
@@ -629,7 +629,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def real_visibility_horizon(self):
         """
-        Get the highest category this one is actually visible
+        The highest category this one is actually visible
         from (as limited by categories above).
         """
         horizon_id, final_visibility = self.visibility_horizon_query.one()
@@ -654,10 +654,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def visible_categories_query(self):
-        """
-        Get a query object for the visible categories within
-        this category, including the category itself.
-        """
+        """A query object for the visible categories within this category, including the category itself."""
         cte_query = Category.get_visible_categories_cte(self.id)
         return Category.query.join(cte_query, Category.id == cte_query.c.id)
 
@@ -669,18 +666,18 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @property
     def icon_url(self):
-        """Get the HTTP URL of the icon."""
+        """The HTTP URL of the icon."""
         return url_for('categories.display_icon', self, slug=self.icon_metadata['hash'])
 
     @property
     def effective_icon_url(self):
-        """Get the HTTP URL of the icon (possibly inherited)."""
+        """The HTTP URL of the icon (possibly inherited)."""
         data = self.effective_icon_data
         return url_for('categories.display_icon', category_id=data['source_id'], slug=data['metadata']['hash'])
 
     @property
     def logo_url(self):
-        """Get the HTTP URL of the logo."""
+        """The HTTP URL of the logo."""
         return url_for('categories.display_logo', self, slug=self.logo_metadata['hash'])
 
 

@@ -50,6 +50,9 @@ class RegistrationListGenerator(ListGeneratorBase):
                 'title': _('State'),
                 'filter_choices': {str(state.value): state.title for state in RegistrationState}
             },
+            'created_by': {
+                'title': _('Created by'),
+            },
             'checked_in': {
                 'title': _('Checked in'),
                 'filter_choices': {

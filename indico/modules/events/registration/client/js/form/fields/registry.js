@@ -87,6 +87,7 @@ Available keys:
 - alwaysRequired: optional; always display the field as required
 - hasPrice: optional; show price field if the whole field can have a price attached
 - noRetentionPeriod: optional; hide the retention period setting
+- noInternalName: optional; hide the internal name advanced setting
 - renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies
   to fields that use multiple controls, like radios, checkboxes, multi-button controls;
   can either be a Boolean or a function that takes field options and returns a Boolean
@@ -105,6 +106,7 @@ const fieldRegistry = {
     inputComponent: LabelInput,
     noRequired: true,
     noRetentionPeriod: true,
+    noInternalName: true,
     noLabel: true,
     icon: 'tag',
     customFormItem: true,

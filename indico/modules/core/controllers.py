@@ -36,10 +36,11 @@ from indico.modules.legal import legal_settings
 from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.schemas import AffiliationSchema
+from indico.util.countries import get_countries
 from indico.util.date_time import server_to_utc
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
-from indico.util.string import render_markdown, sanitize_html
+from indico.util.string import remove_accents, render_markdown, sanitize_html, str_to_ascii
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
@@ -396,3 +397,10 @@ class RHSessionRefresh(RH):
 
     def _process(self):
         return '', 204
+
+
+class RHCountries(RH):
+    """Return the list of available countries."""
+
+    def _process(self):
+        return jsonify(sorted(get_countries().items(), key=lambda x: str_to_ascii(remove_accents(x[1]))))

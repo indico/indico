@@ -26,6 +26,7 @@ export interface TableObj {
   headers: string[];
   rows: TableRowObj[];
   num_participants: number;
+  num_anonymous_participants: number;
   show_checkin: boolean;
   title?: string;
 }

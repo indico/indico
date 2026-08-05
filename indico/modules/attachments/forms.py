@@ -8,7 +8,7 @@
 from flask import session
 from wtforms.fields import BooleanField, TextAreaField, URLField
 from wtforms.fields.simple import HiddenField, StringField
-from wtforms.validators import DataRequired, Optional, ValidationError
+from wtforms.validators import URL, DataRequired, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -91,7 +91,7 @@ class EditAttachmentFileForm(EditAttachmentFormBase):
 
 class AttachmentLinkFormMixin:
     title = StringField(_('Title'), [DataRequired()])
-    link_url = URLField(_('URL'), [DataRequired()])
+    link_url = URLField(_('URL'), [DataRequired(), URL()])
 
 
 class AddAttachmentLinkForm(AttachmentLinkFormMixin, AttachmentFormBase):

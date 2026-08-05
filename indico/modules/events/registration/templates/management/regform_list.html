@@ -162,18 +162,22 @@
                             </a>
                         </div>
                         {% if can_manage_registration %}
-                            <div class="group">
-                                <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
-                                    {% trans %}Manage{% endtrans %}
-                                </a>
-                            </div>
-                            <div class="group hide-if-locked">
-                                <button class="i-button icon-copy"
-                                        title="{% trans %}Clone this registration form{% endtrans %}"
-                                        data-href="{{ url_for('.clone_regform', regform) }}"
-                                        data-title="{% trans %}Clone registration form{% endtrans %}"
-                                        data-ajax-dialog></button>
-                            </div>
+                            {% block manage_regform_button scoped %}
+                                <div class="group">
+                                    <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
+                                        {% trans %}Manage{% endtrans %}
+                                    </a>
+                                </div>
+                            {% endblock %}
+                            {% block clone_regform_button scoped %}
+                                <div class="group hide-if-locked">
+                                    <button class="i-button icon-copy"
+                                            title="{% trans %}Clone this registration form{% endtrans %}"
+                                            data-href="{{ url_for('.clone_regform', regform) }}"
+                                            data-title="{% trans %}Clone registration form{% endtrans %}"
+                                            data-ajax-dialog></button>
+                                </div>
+                            {% endblock %}
                             {% block delete_regform_button scoped %}
                                 <div class="group hide-if-locked">
                                     <button class="i-button icon-remove danger text-color"

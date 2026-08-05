@@ -45,14 +45,6 @@ section {
   position: relative;
 }
 
-.toc-dots {
-  flex-grow: 1;
-  margin: 0 0.5rem;
-  border-bottom: 2px dotted #000;
-  align-self: baseline;
-  height: 1;
-}
-
 .participant-title {
   display: flex;
   justify-content: space-between;

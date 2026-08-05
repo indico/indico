@@ -6,10 +6,11 @@
 # LICENSE file for more details.
 
 from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMetadata, RHAPIEmailEventPersonsSend,
-                                                       RHDeleteUnusedEventPerson, RHEmailEventPersonsPreview,
-                                                       RHEventPersonSearch, RHGrantModificationRights,
-                                                       RHGrantSubmissionRights, RHManagePersonLists, RHPersonsList,
-                                                       RHRevokeSubmissionRights, RHSyncEventPerson, RHUpdateEventPerson)
+                                                       RHAPIEmailEventPersonsUpload, RHDeleteUnusedEventPerson,
+                                                       RHEmailEventPersonsPreview, RHEventPersonSearch,
+                                                       RHGrantModificationRights, RHGrantSubmissionRights,
+                                                       RHManagePersonLists, RHPersonsList, RHRevokeSubmissionRights,
+                                                       RHSyncEventPerson, RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -17,6 +18,8 @@ _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_
                       url_prefix='/event/<int:event_id>/manage')
 
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
+_bp.add_url_rule('/api/persons/email/upload', 'api_email_event_persons_upload', RHAPIEmailEventPersonsUpload,
+                 methods=('POST',))
 _bp.add_url_rule('/api/persons/email/send', 'api_email_event_persons_send', RHAPIEmailEventPersonsSend,
                  methods=('POST',))
 _bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadata', RHAPIEmailEventPersonsMetadata,

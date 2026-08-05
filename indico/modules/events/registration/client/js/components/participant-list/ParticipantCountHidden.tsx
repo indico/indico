@@ -1,0 +1,43 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import React from 'react';
+
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+
+interface ParticipantCountHiddenProps {
+  count: number;
+  countHidden: number;
+  displayTotal?: boolean;
+}
+
+export function ParticipantCountHidden({
+  count,
+  countHidden,
+  displayTotal = true,
+}: ParticipantCountHiddenProps) {
+  if (count === 0) {
+    return <Translate>No participants registered.</Translate>;
+  }
+  return (
+    <div>
+      <PluralTranslate count={countHidden}>
+        <Singular>
+          <Param name="count" value={countHidden} /> participant registered anonymously.
+        </Singular>
+        <Plural>
+          <Param name="count" value={countHidden} /> participants registered anonymously.
+        </Plural>
+      </PluralTranslate>{' '}
+      {displayTotal && (
+        <Translate>
+          Total: <Param name="total" value={count} />
+        </Translate>
+      )}
+    </div>
+  );
+}

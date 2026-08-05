@@ -14,11 +14,14 @@ import fileTypeURL from 'indico-url:papers.api_file_types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import FileTypeManager from 'indico/modules/events/editing/management/editable_type/file_types/FileTypeManager';
+import setupReactPaperTimeline from './setup';
+
+// XXX this import must come after the `setup` import. Don't ask me why, but if it's before it then
+// there's a "Conflicting order" from mini-css-extract-plugin
+// eslint-disable-next-line import/order
+import {FileTypeManager} from 'indico/modules/events/reviewing/file_types';
 
 import 'indico/modules/events/reviews';
-
-import setupReactPaperTimeline from './setup';
 
 (function(global) {
   global.setupPaperAssignmentList = function setupPaperAssignmentList() {

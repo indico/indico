@@ -15,6 +15,7 @@ import {Dropdown, Form, Popup} from 'semantic-ui-react';
 
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {getFilesFromRevision} from 'indico/react/components/files/FileManager/util';
 import {FinalCheckbox, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {DirtyInitialValue} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
@@ -24,7 +25,6 @@ import {EditingReviewAction} from '../../models';
 
 import {createRevisionComment, reviewEditable, setDraftComment} from './actions';
 import CommentForm from './CommentForm';
-import {getFilesFromRevision} from './FileManager/util';
 import JudgmentBoxHeader from './judgment/JudgmentBoxHeader';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
 import FinalTagInput from './judgment/TagInput';

@@ -7,8 +7,10 @@
 
 from flask import request
 
-from indico.modules.logs.controllers import (RHAppLogs, RHAppLogsJSON, RHCategoryLogs, RHCategoryLogsJSON, RHEventLogs,
-                                             RHEventLogsJSON, RHResendEmail, RHUserLogs, RHUserLogsJSON)
+from indico.modules.logs.controllers import (RHAppEmailAttachment, RHAppLogs, RHAppLogsJSON, RHCategoryEmailAttachment,
+                                             RHCategoryLogs, RHCategoryLogsJSON, RHEventEmailAttachment, RHEventLogs,
+                                             RHEventLogsJSON, RHResendEmail, RHUserEmailAttachment, RHUserLogs,
+                                             RHUserLogsJSON)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -17,19 +19,27 @@ _bp = IndicoBlueprint('logs', __name__, template_folder='templates', virtual_tem
 # App
 _bp.add_url_rule('/admin/logs/', 'app', RHAppLogs)
 _bp.add_url_rule('/admin/logs/api/logs', 'api_app_logs', RHAppLogsJSON)
+_bp.add_url_rule('/admin/logs/email-attachment/<int:log_entry_id>/<int:attachment_id>', 'app_email_attachment',
+                 RHAppEmailAttachment)
 
 # Categories
 _bp.add_url_rule('/category/<int:category_id>/manage/logs/', 'category', RHCategoryLogs)
 _bp.add_url_rule('/category/<int:category_id>/manage/logs/api/logs', 'api_category_logs', RHCategoryLogsJSON)
+_bp.add_url_rule('/category/<int:category_id>/manage/logs/email-attachment/<int:log_entry_id>/<int:attachment_id>',
+                 'category_email_attachment', RHCategoryEmailAttachment)
 
 # Events
 _bp.add_url_rule('/event/<int:event_id>/manage/logs/', 'event', RHEventLogs)
 _bp.add_url_rule('/event/<int:event_id>/manage/logs/api/logs', 'api_event_logs', RHEventLogsJSON)
+_bp.add_url_rule('/event/<int:event_id>/manage/logs/email-attachment/<int:log_entry_id>/<int:attachment_id>',
+                 'event_email_attachment', RHEventEmailAttachment)
 
 # Users
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/logs/', 'user', RHUserLogs)
     _bp.add_url_rule('/logs/api/logs', 'api_user_logs', RHUserLogsJSON)
+    _bp.add_url_rule('/logs/email-attachment/<int:log_entry_id>/<int:attachment_id>', 'user_email_attachment',
+                     RHUserEmailAttachment)
 
 # Actions
 _bp.add_url_rule('/event/<int:event_id>/manage/logs/api/resend-email/<int:log_entry_id>', 'resend_email',

@@ -252,6 +252,13 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: The ID of the user who created the registration
+    created_by_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
     #: The date/time until which the person can modify their registration
     modification_end_dt = db.Column(
         UTCDateTime,
@@ -276,10 +283,21 @@ class Registration(db.Model):
     user = db.relationship(
         'User',
         lazy=True,
+        foreign_keys=[user_id],
         backref=db.backref(
             'registrations',
             lazy='dynamic'
             # XXX: a delete-orphan cascade here would delete registrations when NULLing the user
+        )
+    )
+    #: The user who created this registration
+    created_by = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=[created_by_id],
+        backref=db.backref(
+            'created_registrations',
+            lazy='dynamic'
         )
     )
     #: The latest payment transaction associated with this registration
@@ -342,6 +360,7 @@ class Registration(db.Model):
         for r in source.registrations.all():
             if r.registration_form not in target_regforms_used:
                 r.user = target
+        source.created_registrations.update({cls.created_by_id: target.id})
 
     @hybrid_method
     def is_publishable(self, is_participant):
@@ -470,17 +489,17 @@ class Registration(db.Model):
 
     @property
     def full_name(self):
-        """Return the user's name in 'Firstname Lastname' notation."""
+        """The user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False)
 
     @property
     def display_full_name(self):
-        """Return the full name using the user's preferred name format."""
+        """The full name using the user's preferred name format."""
         return format_display_full_name(session.user, self)
 
     @property
     def avatar_url(self):
-        """Return the url of the user's avatar."""
+        """The url of the user's avatar."""
         return url_for('event_registration.registration_avatar', self)
 
     @property
@@ -502,7 +521,7 @@ class Registration(db.Model):
 
     @property
     def is_paid(self):
-        """Return whether the registration has been paid for."""
+        """Whether the registration has been paid for."""
         paid_states = {TransactionStatus.successful, TransactionStatus.pending}
         return self.transaction is not None and self.transaction.status in paid_states
 
@@ -683,6 +702,17 @@ class Registration(db.Model):
     def render_price_adjustment(self):
         return self._render_price(self.price_adjustment)
 
+    @property
+    def modification_resets_approval(self):
+        regform = self.registration_form
+        invitation = self.invitation
+        moderation_required = regform.moderation_enabled and (not invitation or not invitation.skip_moderation)
+        return (
+            moderation_required
+            and regform.reset_approval_on_modification
+            and self.state in (RegistrationState.unpaid, RegistrationState.complete)
+        )
+
     def sync_state(self, _skip_moderation=True):
         """Sync the state of the registration."""
         initial_state = self.state
@@ -690,6 +720,7 @@ class Registration(db.Model):
         invitation = self.invitation
         moderation_required = (regform.moderation_enabled and not _skip_moderation and
                                (not invitation or not invitation.skip_moderation))
+        reset_on_modification = moderation_required and regform.reset_approval_on_modification
         with db.session.no_autoflush:
             payment_required = regform.event.has_feature('payment') and self.price and not self.is_paid
         if self.state is None:
@@ -700,10 +731,14 @@ class Registration(db.Model):
             else:
                 self.state = RegistrationState.complete
         elif self.state == RegistrationState.unpaid:
-            if not self.price:
+            if reset_on_modification:
+                self.state = RegistrationState.pending
+            elif not self.price:
                 self.state = RegistrationState.complete
         elif self.state == RegistrationState.complete:
-            if payment_required:
+            if reset_on_modification:
+                self.state = RegistrationState.pending
+            elif payment_required:
                 self.state = RegistrationState.unpaid
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
@@ -722,7 +757,8 @@ class Registration(db.Model):
         moderation_required = (regform.moderation_enabled and not _skip_moderation and
                                (not invitation or not invitation.skip_moderation))
         with db.session.no_autoflush:
-            payment_required = regform.event.has_feature('payment') and bool(self.price)
+            payment_required = (regform.event.has_feature('payment') and bool(self.price) and
+                                not self.is_paid)
         if self.state == RegistrationState.pending:
             if approved and payment_required:
                 self.state = RegistrationState.unpaid

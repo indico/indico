@@ -113,7 +113,7 @@ class EventSettingsProxy(SettingsProxyBase):
 
     @property
     def query(self):
-        """Return a query object filtering by the proxy's module."""
+        """A query object filtering by the proxy's module."""
         return EventSetting.query.filter_by(module=self.module)
 
     @event_or_id

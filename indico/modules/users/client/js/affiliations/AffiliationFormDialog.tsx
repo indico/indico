@@ -5,30 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import countriesURL from 'indico-url:users.api_countries';
+import countriesURL from 'indico-url:core.api_countries';
 
 import type {FormApi} from 'final-form';
 import React, {useCallback} from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
 
-import {
-  FinalDropdown,
-  FinalInput,
-  FinalTextArea,
-  getChangedValues,
-  handleSubmitError,
-} from 'indico/react/forms';
+import {FinalCountryDropdown} from 'indico/react/components';
+import {FinalInput, FinalTextArea, getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
-import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects} from 'indico/utils/plugins';
 
 import FinalStringListField from './StringListField';
 import {AffiliationFormValues} from './types';
-
-const isoToFlag = (country: string) =>
-  String.fromCodePoint(...country.split('').map(char => char.charCodeAt(0) + 0x1f1a5));
 
 const defaultValues: AffiliationFormValues = {
   name: '',
@@ -83,8 +74,6 @@ export default function AffiliationFormDialog({
   onSuccess: () => void;
   edit?: boolean;
 }) {
-  const {data: countries} = useIndicoAxios(countriesURL({}), {manual: !open});
-
   const handleSubmit = useCallback(
     async (formData: AffiliationFormValues, form: FormApi<AffiliationFormValues>) => {
       const payload = edit ? getChangedValues(formData, form) : formData;
@@ -114,19 +103,11 @@ export default function AffiliationFormDialog({
             </Form.Group>
             <Form.Group widths="equal">
               <FinalInput name="city" label={Translate.string('City')} />
-              <FinalDropdown
+              <FinalCountryDropdown
                 name="country_code"
                 label={Translate.string('Country')}
                 fluid
-                selection
-                placeholder={Translate.string('Select a country')}
-                options={(countries ?? []).map(([name, title]) => ({
-                  key: name,
-                  value: name,
-                  text: `${isoToFlag(name)} ${title}`,
-                }))}
-                loading={!countries}
-                disabled={!countries}
+                countriesURL={countriesURL({})}
               />
             </Form.Group>
           </>

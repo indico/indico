@@ -7,6 +7,24 @@ Version 3.3.13
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an XSS vulnerability when resolving conflicts between concurrent edits to minutes
+- Fix an XSS vulnerability in various places that allow entering custom links
+
+.. note::
+
+    The risk of these vulnerabilities is relatively low, because for the minute editor both the
+    attacker and the victim would need to collaborate on the same minutes (ie have privileges
+    to edit them), and the others require at least submitter or management access in an event
+    and additionally an interaction (clicking the link) by the victim.
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Korean
+
 Improvements
 ^^^^^^^^^^^^
 
@@ -38,6 +56,19 @@ Improvements
   :user:`duartegalvao, unconventionaldotdev`)
 - Add support for anonymous accompanying persons (numeric count only) in registration form
   (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
+- Log registration tag changes in the event log (:pr:`7446`,
+  thanks :user:`moliholy, unconventionaldotdev`)
+- Display embedded images in email log entries (:pr:`7338`, thanks
+  :user:`duartegalvao, unconventionaldotdev`)
+- Record who created a registration on behalf of someone else (:pr:`7629`, thanks
+  :user:`moliholy, unconventionaldotdev`)
+- Support attaching files when emailing event persons (:pr:`7369`, thanks :user:`jbtwist`)
+- Let registration managers view logs for specific registrations (:pr:`7600`, thanks
+  :user:`vtran99`)
+- Add pagination to public participant list and use tabs instead of an accordion in case
+  of multiple registration forms (:issue:`6424`, :pr:`7472`)
+- Add new registration form setting to require approval again after a user modifies their
+  registration (:pr:`7434`, thanks :user:`moliholy`)
 
 Bugfixes
 ^^^^^^^^
@@ -61,6 +92,15 @@ Bugfixes
   (:issue:`7550`, :pr:`7551`)
 - Use consistent sorting and hide deleted+unused single-choice options in
   registration list filters (:pr:`7439`, thanks :user:`duartegalvao`)
+- Honor room booking details restrictions in spreadsheet export (:pr:`7612`)
+- Show favorite events in the dashboard based on their end date instead of their
+  start date (:pr:`7653`, thanks :user:`SegiNyn`)
+- Reduce max filename length in ZIP downloads to avoid issues on Windows (:pr:`7479`,
+  :user:`moliholy`)
+- Correctly format dates containing literal strings, such as "30 de junho" (:issue:`7590`,
+  :pr:`7668`)
+- Avoid serving incomplete webpack manifests during concurrent requests (:issue:`7530`,
+  :pr:`7675`, thanks :user:`shuv-amp`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -24,9 +24,11 @@ class IndicoManifestLoader(JinjaManifestLoader):
     def load(self, filepath):
         key = (filepath, os.path.getmtime(filepath))
         if key not in IndicoManifestLoader.cache:
-            IndicoManifestLoader.cache[key] = manifest = ManifestLoader.load(self, filepath)
+            manifest = ManifestLoader.load(self, filepath)
             if self.custom:
                 self._add_custom_assets(manifest)
+            # The cache is shared between threads, so only publish a fully initialized manifest.
+            IndicoManifestLoader.cache[key] = manifest
         return IndicoManifestLoader.cache[key]
 
     def _add_custom_assets(self, manifest):

@@ -71,6 +71,8 @@
                                         </td>
                                     {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
+                                    {% elif item.id == 'created_by' %}
+                                        <td class="i-table">{{ registration.created_by.full_name if registration.created_by else '' }}</td>
                                     {% elif item.id == 'price' %}
                                         <td class="i-table" data-text="{{ registration.price }}">{{ registration.render_price() }}</td>
                                     {% elif item.id == 'checked_in' %}

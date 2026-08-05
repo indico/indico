@@ -9,9 +9,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import {RevisionType} from 'indico/modules/events/editing/models';
+import {filePropTypes} from 'indico/react/components/files/FileManager/util';
 import {Translate} from 'indico/react/i18n';
-
-import {filePropTypes} from './FileManager/util';
 
 // This method defines each revision as a block
 // with a label referring to its previous state transition
