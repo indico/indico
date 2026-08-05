@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 export const domReady = new Promise(resolve => {
-  if (document.readyState === 'completed') {
+  if (document.readyState !== 'loading') {
     resolve();
   } else {
-    window.addEventListener('DOMContentLoaded', resolve);
+    document.addEventListener('DOMContentLoaded', resolve);
   }
 });
 
