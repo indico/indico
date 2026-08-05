@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.12-dev\n"
+"Project-Id-Version: Indico 3.3.13-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-18 16:20+0100\n"
+"POT-Creation-Date: 2026-08-05 18:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,7 @@ msgstr ""
 #: indico/modules/cephalopod/templates/cephalopod.html indico/modules/events/persons/client/js/PersonList.jsx
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/users/client/js/PersonalDataForm.jsx indico/modules/users/forms.py
 #: indico/modules/users/templates/registration_requests.html indico/modules/users/templates/users_merge.html
@@ -682,6 +683,205 @@ msgstr ""
 msgid "A detailed timetable containing all individual contributions."
 msgstr ""
 
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Enter an extension"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Add extension"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type has files attached"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type is used in a review condition"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Cannot delete the only publishable type"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "There are no file types defined for this event"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "There are publishable file types that will not be displayed due to the 'Hide Accepted' setting being enabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "No file types will be shown as there are no publishable file types and the 'Hide Accepted' setting is disabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "File required"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Multiple files allowed"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "File publishable"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "(no extension restrictions)"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Add a new file type"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Edit file type"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Create a new file type"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#, python-brace-format
+msgid "Are you sure you want to delete the file type {fileType}?"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Take into account that this file type has files attached to it."
+msgstr ""
+
+#: indico/core/celery/templates/celery_tasks.html indico/modules/attachments/forms.py indico/modules/categories/forms.py
+#: indico/modules/designer/templates/template.html indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#: indico/modules/events/contributions/forms.py indico/modules/events/contributions/templates/management/types_dialog.html
+#: indico/modules/events/editing/templates/management/editor_list.html indico/modules/events/forms.py
+#: indico/modules/events/papers/forms.py indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/payment/forms.py indico/modules/events/payment/plugins.py
+#: indico/modules/events/persons/client/js/PersonList.jsx indico/modules/events/registration/util.py
+#: indico/modules/events/registration/wallets/apple.py indico/modules/events/roles/forms.py
+#: indico/modules/events/sessions/forms.py indico/modules/events/sessions/templates/management/types_dialog.html
+#: indico/modules/events/templates/admin/_reference_type_list.html indico/modules/groups/templates/_group_members.html
+#: indico/modules/groups/templates/groups.html indico/modules/networks/forms.py
+#: indico/modules/networks/templates/networks.html indico/modules/oauth/forms.py
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx indico/modules/vc/forms.py
+#: indico/modules/vc/templates/manage_event.html
+msgid "Name"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Filename template"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#, python-brace-format
+msgid ""
+"Glob-style filename template that all files of this type have to conform to (e.g. {example}). No dots allowed. It is "
+"possible to use {placeholder} as a placeholder for the contribution program code."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Extensions"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Allowed file extensions. If left empty, there are no extension restrictions"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type is mandatory"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Multiple files"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type allows uploading multiple files"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Publishable"
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the files of this type can be published"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/ContributionList.tsx
+msgid "Not Scheduled"
+msgstr ""
+
+#: indico/modules/events/abstracts/fields.py indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/controllers.py indico/modules/events/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/pdf/_program.html
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx indico/modules/events/persons/controllers.py
+msgid "Author"
+msgid_plural "Authors"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+msgid "Co-author"
+msgid_plural "Co-authors"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/abstracts/forms.py indico/modules/events/abstracts/lists.py
+#: indico/modules/events/abstracts/settings.py indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py indico/modules/events/fields.py
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+msgid "Submitter"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
+msgid "Edit this contribution"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/contributions/templates/management/_contribution_list.html
+#: indico/modules/events/templates/display/common/_manage_button.html
+#: indico/modules/events/timetable/templates/balloons/contribution.html
+msgid "Edit contribution"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+msgid "There are no contributions linked to your Indico profile."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "There are no contributions in your timetable."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "You have not added any contributions to your timetable."
+msgstr ""
+
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
 msgid "Publish contributions"
@@ -772,6 +972,14 @@ msgstr ""
 
 #: indico/modules/events/contributions/client/js/PublicationSwitch.jsx
 msgid "Draft"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "This contribution has been added to your timetable. Click to remove."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "Add this contribution to your timetable."
 msgstr ""
 
 #: indico/core/db/sqlalchemy/links.py indico/modules/attachments/controllers/management/base.py
@@ -954,6 +1162,11 @@ msgid "This file was added since the last revision."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+#, python-brace-format
+msgid "{filename} (uploaded on {date})"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "No files uploaded"
 msgstr ""
 
@@ -968,64 +1181,6 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "Download anyway"
 msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Replace the existing file"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Delete the existing file"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Revert to the existing file"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/Uploads.jsx
-msgid "An error occurred while uploading this file"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "This file type is required"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "This file does not conform to the filename template {template}"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "Use an existing file"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "Filename pattern: {pattern}"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx
-msgid "Upload in progress"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "No changes yet"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Invalid file name: {files}"
-msgid_plural "Invalid file names: {files}"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Required file type missing: {types}"
-msgid_plural "Required file types missing: {types}"
-msgstr[0] ""
-msgstr[1] ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
@@ -1194,6 +1349,17 @@ msgstr[1] ""
 msgid "There is no publishable file uploaded."
 msgstr ""
 
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+#, python-brace-format
+msgid "Required files are missing. Please upload a {types} file."
+msgid_plural "Required files are missing. Please upload files of the following types: {types}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+msgid "Required file types are missing."
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/util.js
 #, python-brace-format
 msgid "{editorName} (editor) has made some changes to the paper"
@@ -1298,12 +1464,11 @@ msgstr ""
 msgid "Toggle editable types"
 msgstr ""
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/tags/index.js
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
-#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/lists.py indico/modules/events/registration/util.py
 msgid "Tags"
 msgstr ""
 
@@ -1471,13 +1636,13 @@ msgid_plural "{count} posters were skipped because of their current status."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/legacy/pdfinterface/conference.py indico/modules/categories/forms.py indico/modules/events/abstracts/settings.py
+#: indico/modules/categories/forms.py indico/modules/events/abstracts/settings.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
-#: indico/modules/events/registration/templates/management/_reglist.html
+#: indico/modules/events/registration/templates/management/_reglist.html indico/modules/events/registration/util.py
 #: indico/modules/events/sessions/templates/management/_session_list.html indico/modules/events/sessions/util.py
 #: indico/modules/events/surveys/templates/management/survey.html indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "ID"
@@ -1683,7 +1848,7 @@ msgid "Contributions without editables"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/FileTypeManagement.jsx
 #: indico/modules/events/papers/templates/management/overview.html
 msgid "File types"
 msgstr ""
@@ -1756,138 +1921,6 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx
 msgid "Editors"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Enter an extension"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Add extension"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type has files attached"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type is used in a review condition"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Cannot delete the only publishable type"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "There are no file types defined for this event"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "There are publishable file types that will not be displayed due to the 'Hide Accepted' setting being enabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "No file types will be shown as there are no publishable file types and the 'Hide Accepted' setting is disabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "File required"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Multiple files allowed"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "File publishable"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "(no extension restrictions)"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Add a new file type"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Edit file type"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Create a new file type"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#, python-brace-format
-msgid "Are you sure you want to delete the file type {fileType}?"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Take into account that this file type has files attached to it."
-msgstr ""
-
-#: indico/core/celery/templates/celery_tasks.html indico/legacy/pdfinterface/conference.py
-#: indico/modules/attachments/forms.py indico/modules/categories/forms.py indico/modules/designer/templates/template.html
-#: indico/modules/events/contributions/forms.py indico/modules/events/contributions/templates/management/types_dialog.html
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#: indico/modules/events/editing/templates/management/editor_list.html indico/modules/events/forms.py
-#: indico/modules/events/papers/forms.py indico/modules/events/papers/templates/management/_templates.html
-#: indico/modules/events/payment/forms.py indico/modules/events/payment/plugins.py
-#: indico/modules/events/persons/client/js/PersonList.jsx indico/modules/events/registration/wallets/apple.py
-#: indico/modules/events/roles/forms.py indico/modules/events/sessions/forms.py
-#: indico/modules/events/sessions/templates/management/types_dialog.html
-#: indico/modules/events/templates/admin/_reference_type_list.html indico/modules/groups/templates/_group_members.html
-#: indico/modules/groups/templates/groups.html indico/modules/networks/forms.py
-#: indico/modules/networks/templates/networks.html indico/modules/oauth/forms.py
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
-#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx indico/modules/vc/forms.py
-#: indico/modules/vc/templates/manage_event.html
-msgid "Name"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Filename template"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#, python-brace-format
-msgid ""
-"Glob-style filename template that all files of this type have to conform to (e.g. {example}). No dots allowed. It is "
-"possible to use {placeholder} as a placeholder for the contribution program code."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Extensions"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Allowed file extensions. If left empty, there are no extension restrictions"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type is mandatory"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Multiple files"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type allows uploading multiple files"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Publishable"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the files of this type can be published"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx
@@ -2305,7 +2338,6 @@ msgid "The paper was {url}submitted{/url} for editing"
 msgstr ""
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx
-#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
 msgid "Paper files"
 msgstr ""
 
@@ -2513,48 +2545,6 @@ msgstr ""
 msgid "Edit person information"
 msgstr ""
 
-#: indico/modules/events/abstracts/fields.py indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx indico/modules/events/persons/controllers.py
-#: indico/modules/events/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/pdf/_program.html
-msgid "Speaker"
-msgid_plural "Speakers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx indico/modules/events/persons/controllers.py
-msgid "Author"
-msgid_plural "Authors"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-msgid "Co-author"
-msgid_plural "Co-authors"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/modules/events/abstracts/forms.py indico/modules/events/abstracts/lists.py
-#: indico/modules/events/abstracts/settings.py indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html indico/modules/events/fields.py
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-msgid "Submitter"
-msgstr ""
-
 #: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
 msgid "Send emails to these roles"
 msgstr ""
@@ -2572,8 +2562,7 @@ msgstr ""
 msgid "Recipients"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx indico/web/client/js/custom_elements/ind_share_widget.js
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx
+#: indico/modules/events/persons/client/js/EmailDialog.jsx indico/web/client/js/react/components/ICSCalendarLink.jsx
 msgid "Copied!"
 msgstr ""
 
@@ -2646,6 +2635,11 @@ msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx indico/modules/events/registration/forms.py
 msgid "Send a copy of each email to my mailbox"
+msgstr ""
+
+#: indico/modules/events/abstracts/forms.py indico/modules/events/persons/client/js/EmailDialog.jsx
+#: indico/modules/logs/templates/entry_email.html
+msgid "Attachments"
 msgstr ""
 
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html
@@ -2726,6 +2720,17 @@ msgstr ""
 #, python-brace-format
 msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+#, python-brace-format
+msgid ""
+"{count} imported invitation contains affiliation data that will not be pre-filled because this form only allows "
+"predefined affiliations."
+msgid_plural ""
+"{count} imported invitations contain affiliation data that will not be pre-filled because this form only allows "
+"predefined affiliations."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2906,44 +2911,60 @@ msgstr ""
 msgid "Add tags"
 msgstr ""
 
-#: indico/modules/events/registration/__init__.py
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/display/event_header.html
-#: indico/modules/events/registration/templates/management/participants.html indico/modules/events/reminders/forms.py
-#: indico/modules/events/surveys/forms.py indico/modules/logs/models/entries.py
-msgid "Participants"
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+msgid "No participants registered."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-msgid "There are no published registrations."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/management/_reglist.html
-msgid "There are no registrations yet."
-msgstr ""
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show registered participant view instead"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show unregistered guest view instead"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantSharedTranslations.tsx
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
 #, python-brace-format
 msgid "{count} participant registered anonymously."
 msgid_plural "{count} participants registered anonymously."
 msgstr[0] ""
 msgstr[1] ""
 
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+#, python-brace-format
+msgid "Total: {total}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show registered participant view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show unregistered guest view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "There are no published registrations."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#: indico/modules/events/registration/templates/management/_reglist.html
+msgid "There are no registrations yet."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#, python-brace-format
+msgid "{count} participant"
+msgid_plural "{count} participants"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Rows per page:"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Search participants"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
-msgid "No participants registered."
+msgid "No participants to display."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx indico/modules/events/registration/forms.py
@@ -3084,6 +3105,16 @@ msgstr ""
 msgid "You need to have at least one enabled option."
 msgstr ""
 
+#: indico/modules/designer/placeholders.py
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Number of accompanying persons"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+#, python-brace-format
+msgid "{price} (Total: {totalPrice})"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
 msgstr ""
@@ -3105,6 +3136,10 @@ msgid "Edit accompanying person"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Disable tickets for accompanying persons to enable anonymous accompanying person registration."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
 msgstr ""
 
@@ -3119,10 +3154,45 @@ msgstr ""
 msgid "Accompanying persons count against registration limit"
 msgstr ""
 
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Anonymous accompanying persons"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Collect only the number of accompanying persons instead of their names."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Tickets and badge printing are not available for anonymous accompanying persons."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx indico/web/client/js/react/forms/validators.js
 msgid "This field is required."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Allowed affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Predefined and custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only predefined affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid ""
+"Affiliations specified in invitations are custom text and will not be pre-filled in the registration form when only "
+"predefined affiliations are allowed."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
@@ -3664,8 +3734,9 @@ msgstr ""
 msgid "You may use Markdown for formatting."
 msgstr ""
 
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 #: indico/modules/events/registration/lists.py indico/modules/events/registration/stats.py
+#: indico/modules/events/registration/util.py
 msgid "Price"
 msgstr ""
 
@@ -3708,6 +3779,28 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "Please note that invoice information will be lost as well once a field's retention period expires."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Advanced settings"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Internal name"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Only lowercase alphanumeric characters and dashes are allowed."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid ""
+"Used for identifying the same field across registration forms regardless of the title. This can also be used across "
+"events if you make sure to use the same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "The internal name for a personal data field cannot be changed."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx
@@ -6595,10 +6688,6 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-msgid "Select a country"
-msgstr ""
-
 #: indico/modules/events/contributions/templates/forms/contribution.html
 #: indico/modules/events/contributions/templates/forms/subcontribution.html
 #: indico/modules/events/templates/forms/event_creation_form.html
@@ -6616,6 +6705,14 @@ msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Add affiliation"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Short name"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Enter a short identifier for the affiliation"
 msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
@@ -6661,7 +6758,27 @@ msgid "Please select an item in the list."
 msgstr ""
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
-msgid "Copy Link"
+msgid "Link copied to clipboard"
+msgstr ""
+
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/registration/templates/management/regform.html
+#: indico/modules/events/surveys/templates/management/survey.html indico/web/client/js/custom_elements/ind_share_widget.js
+#: indico/web/templates/overview/base.html
+msgid "Copy link to clipboard"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Download QR code"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#, python-brace-format
+msgid "{size} ({pixels}x{pixels} px)"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Show QR code"
 msgstr ""
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
@@ -6726,6 +6843,30 @@ msgstr ""
 msgid "Group"
 msgstr ""
 
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Use custom affiliation:"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation or add your own"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation or enter one manually"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "You entered this option manually"
+msgstr ""
+
 #: indico/web/client/js/react/components/Captcha.jsx
 msgid "Pause"
 msgstr ""
@@ -6773,6 +6914,10 @@ msgstr ""
 #: indico/web/client/js/react/components/ConfirmButton.jsx
 #, python-brace-format
 msgid "Click again to confirm ({delay})"
+msgstr ""
+
+#: indico/web/client/js/react/components/CountryDropdown.jsx
+msgid "Select a country..."
 msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx indico/web/client/js/react/components/DateRangePicker.jsx
@@ -6944,30 +7089,6 @@ msgstr ""
 
 #: indico/modules/users/models/users.py indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Mx"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Use custom affiliation:"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation or add your own"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation or enter one manually"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/syncedInputs.jsx
-msgid "You entered this option manually"
 msgstr ""
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -7194,6 +7315,69 @@ msgstr ""
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Choose new file from your computer"
 msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Replace the existing file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Delete the existing file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Revert to the existing file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/Uploads.jsx
+msgid "An error occurred while uploading this file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "This file type is required"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "This file does not conform to the filename template {template}"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "Use an existing file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Filename pattern: {pattern}"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Total attachment size ({current} MB) exceeds the {limit} MB limit"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx
+msgid "Upload in progress"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "No changes yet"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Invalid file name: {files}"
+msgid_plural "Invalid file names: {files}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Required file type missing: {types}"
+msgid_plural "Required file types missing: {types}"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing the file failed."
@@ -8002,6 +8186,11 @@ msgstr ""
 msgid "The request was invalid or contained invalid arguments."
 msgstr ""
 
+#: indico/core/notifications.py
+#, python-brace-format
+msgid "Total attachment size too large (max. {} MB)"
+msgstr ""
+
 #: indico/core/permissions.py
 msgid "Unrestricted management access for the whole event"
 msgstr ""
@@ -8197,70 +8386,11 @@ msgstr ""
 msgid "This plugin has no configurable options"
 msgstr ""
 
-#: indico/legacy/pdfinterface/base.py indico/modules/events/timetable/templates/pdf/_toc.html
-msgid "Table of contents"
-msgstr ""
-
 #: indico/legacy/pdfinterface/conference.py indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
 #: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 #: indico/legacy/pdfinterface/latex_templates/report.tex
 #, python-brace-format
 msgid "Page {}"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrant"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/registration/wallets/apple.py
-#: indico/modules/logs/models/entries.py
-msgid "Registration details"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration date"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration state"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/payment/templates/transaction_details.html
-#: indico/modules/events/registration/lists.py
-msgid "Payment date"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/registration/lists.py
-#: indico/modules/events/registration/templates/management/_registration_details.html
-msgid "Checked in"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/registration/lists.py
-msgid "Check-in date"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Arrival date"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Departure date"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants Book"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py indico/modules/events/layout/models/menu.py
-msgid "Page"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants List"
-msgstr ""
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "List of registrants"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex.py indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
@@ -11127,10 +11257,6 @@ msgid "Price (with currency)"
 msgstr ""
 
 #: indico/modules/designer/placeholders.py
-msgid "Number of accompanying persons"
-msgstr ""
-
-#: indico/modules/designer/placeholders.py
 msgid "Accompanying persons"
 msgstr ""
 
@@ -11806,8 +11932,8 @@ msgstr ""
 msgid "Link to the event"
 msgstr ""
 
-#: indico/modules/events/placeholders.py indico/modules/events/registration/placeholders/registrations.py
-#: indico/modules/events/surveys/placeholders.py
+#: indico/modules/events/persons/placeholders.py indico/modules/events/placeholders.py
+#: indico/modules/events/registration/placeholders/registrations.py indico/modules/events/surveys/placeholders.py
 msgid "Custom link text instead of the full URL"
 msgstr ""
 
@@ -12434,10 +12560,6 @@ msgstr ""
 msgid "No type selected"
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py indico/modules/logs/templates/entry_email.html
-msgid "Attachments"
-msgstr ""
-
 #: indico/modules/events/abstracts/forms.py
 msgid "No track selected"
 msgstr ""
@@ -12546,7 +12668,8 @@ msgstr ""
 msgid "Submission date"
 msgstr ""
 
-#: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/abstracts/lists.py indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Modification date"
 msgstr ""
 
@@ -12668,7 +12791,7 @@ msgid "The title of the submitter (Dr, Prof., etc...)"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py
-msgid "Contribution URL"
+msgid "The URL of the contribution"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py
@@ -13816,10 +13939,6 @@ msgid "This operation is irreversible."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "Withdraw abstract"
-msgstr ""
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Withdraw Abstract"
 msgstr ""
 
@@ -13830,13 +13949,13 @@ msgid "Withdraw"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid ""
-"You cannot withdraw this abstract as it has already been accepted. Please contact the event organizers if you want to"
-" withdraw the abstract anyway."
+msgid "Withdraw abstract"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "This abstract has been withdrawn but can be restored."
+msgid ""
+"You cannot withdraw this abstract as it has already been accepted. Please contact the event organizers if you want to"
+" withdraw the abstract anyway."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
@@ -13845,6 +13964,10 @@ msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Do you really want to restore this abstract?"
+msgstr ""
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "This abstract has been withdrawn but can be restored."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
@@ -13869,6 +13992,10 @@ msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "You are not authorized to edit this abstract"
+msgstr ""
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Export PDF"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
@@ -14458,6 +14585,10 @@ msgstr ""
 msgid "Grants management rights for materials and minutes."
 msgstr ""
 
+#: indico/modules/events/contributions/__init__.py
+msgid "My Timetable"
+msgstr ""
+
 #: indico/modules/events/contributions/clone.py
 msgid "The target event already has contribution types"
 msgstr ""
@@ -14600,6 +14731,10 @@ msgstr ""
 #: indico/modules/events/contributions/templates/management/_contribution_list.html indico/modules/events/papers/lists.py
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "No session"
+msgstr ""
+
+#: indico/modules/events/contributions/lists.py
+msgid "Interested"
 msgstr ""
 
 #: indico/modules/events/contributions/lists.py
@@ -14762,11 +14897,14 @@ msgid "There are no contributions yet."
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
-msgid "Go to contribution page"
-msgstr ""
+#, python-format
+msgid "One person has added this contribution to their timetable."
+msgid_plural "%(count)s people have added this contribution to their timetable."
+msgstr[0] ""
+msgstr[1] ""
 
-#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
-msgid "Edit this contribution"
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
@@ -14803,13 +14941,6 @@ msgstr[1] ""
 #: indico/modules/events/contributions/templates/display/contribution_display.html
 #, python-format
 msgid "Board: %(board_number)s"
-msgstr ""
-
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/management/_contribution_list.html
-#: indico/modules/events/templates/display/common/_manage_button.html
-#: indico/modules/events/timetable/templates/balloons/contribution.html
-msgid "Edit contribution"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_display.html
@@ -14865,7 +14996,6 @@ msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
 #: indico/modules/events/registration/templates/display/regform_list.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/surveys/templates/display/survey_list.html
@@ -15827,6 +15957,10 @@ msgstr ""
 msgid "Plugin Link"
 msgstr ""
 
+#: indico/modules/events/layout/models/menu.py
+msgid "Page"
+msgstr ""
+
 #: indico/modules/events/layout/templates/_menu.html
 msgid "Toggle default event homepage"
 msgstr ""
@@ -16627,12 +16761,6 @@ msgstr ""
 
 #: indico/modules/events/management/templates/_settings.html
 msgid "Short URL"
-msgstr ""
-
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/registration/templates/management/regform.html
-#: indico/modules/events/surveys/templates/management/survey.html indico/web/templates/overview/base.html
-msgid "Copy link to clipboard"
 msgstr ""
 
 #: indico/modules/events/management/templates/_settings.html
@@ -18178,6 +18306,11 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
+#: indico/modules/events/payment/templates/transaction_details.html indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Payment date"
+msgstr ""
+
 #: indico/modules/events/payment/templates/transaction_details.html
 msgid "Paid with"
 msgstr ""
@@ -18357,11 +18490,27 @@ msgid "The program code of the contribution"
 msgstr ""
 
 #: indico/modules/events/persons/placeholders.py
+msgid "The board number of the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "Link to the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
 msgid "The duration of the contribution (e.g. \"20 minutes\")"
 msgstr ""
 
 #: indico/modules/events/persons/placeholders.py
 msgid "The scheduled date/time of the contribution, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The scheduled date/time including the weekday, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "Link to the contribution created from the abstract (empty if not accepted)"
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
@@ -18541,6 +18690,12 @@ msgstr[1] ""
 msgid "No persons"
 msgstr ""
 
+#: indico/modules/events/registration/__init__.py indico/modules/events/registration/templates/display/event_header.html
+#: indico/modules/events/registration/templates/management/participants.html indico/modules/events/reminders/forms.py
+#: indico/modules/events/surveys/forms.py indico/modules/logs/models/entries.py
+msgid "Participants"
+msgstr ""
+
 #: indico/modules/events/registration/__init__.py
 #: indico/modules/events/registration/templates/display/_event_regform_base.html
 #: indico/modules/events/registration/templates/display/_meeting_registration_base.html
@@ -18556,7 +18711,7 @@ msgid_plural "Registrations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/__init__.py indico/modules/events/registration/templates/pdf/participants_table.html
 msgid "Participant List"
 msgstr ""
 
@@ -18593,6 +18748,14 @@ msgstr ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view and check-in registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (manage participants only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, create, edit and delete registrations."
 msgstr ""
 
 #: indico/modules/events/registration/badges.py
@@ -18651,6 +18814,16 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "If enabled, registrations require manager approval"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Reset approval on modification"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"If enabled, modifying a registration resets its approval status back to pending. Only applies to modifications made "
+"by the registrant, not by a manager."
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -18932,6 +19105,18 @@ msgstr ""
 msgid "Default category template"
 msgstr ""
 
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Create tickets for each of the users accompanying persons. This option is unavailable because anonymous accompanying "
+"person registration is enabled."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Tickets for accompanying persons cannot be enabled because the registration form contains anonymous accompanying "
+"person registrations."
+msgstr ""
+
 #: indico/modules/events/registration/forms.py indico/modules/events/registration/templates/management/regform_list.html
 msgid "Registration managers"
 msgstr ""
@@ -19123,8 +19308,23 @@ msgid ""
 "choose from."
 msgstr ""
 
+#: indico/modules/events/registration/lists.py indico/modules/events/registration/util.py
+msgid "Registration date"
+msgstr ""
+
+#: indico/modules/events/registration/lists.py indico/modules/events/registration/util.py
+#: indico/modules/events/requests/templates/event_request_details.html
+msgid "Created by"
+msgstr ""
+
 #: indico/modules/events/registration/lists.py
-msgid "Registration Date"
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#: indico/modules/events/registration/util.py
+msgid "Checked in"
+msgstr ""
+
+#: indico/modules/events/registration/lists.py indico/modules/events/registration/util.py
+msgid "Check-in date"
 msgstr ""
 
 #: indico/modules/events/registration/lists.py
@@ -19195,6 +19395,10 @@ msgstr ""
 #: indico/modules/events/registration/util.py
 #, python-brace-format
 msgid "Row {}: email address belongs to the same user as in row {}"
+msgstr ""
+
+#: indico/modules/events/registration/util.py
+msgid "Registration state"
 msgstr ""
 
 #: indico/modules/events/registration/util.py
@@ -19283,6 +19487,20 @@ msgid "The retention period cannot be longer than 10 years. Leave the field empt
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
+msgid "Changing internal name for personal data field is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{}\" on this form has the same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{field}\" with the same internal name on form \"{form}\" uses a different input type which is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid "This field depends on \"{field}\", which has a shorter retention period ({period})."
 msgstr ""
@@ -19295,6 +19513,11 @@ msgstr ""
 #: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid "This field is a condition for \"{field}\", which has a longer retention period ({period})."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{}\" with the same internal name on form \"{}\" uses a different input type which is not allowed."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
@@ -19423,10 +19646,6 @@ msgid "The registration was created."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
-msgid "Text too large to generate a PDF with table style. Please try again generating with book style."
-msgstr ""
-
-#: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
@@ -19545,6 +19764,25 @@ msgstr ""
 msgid "Tag {} has been modified."
 msgstr ""
 
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Cannot be switched back to named mode when anonymous accompanying persons are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Anonymous accompanying persons cannot be enabled while tickets for accompanying persons are enabled."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Cannot be enabled when accompanying persons are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+#, python-brace-format
+msgid "{count} person"
+msgid_plural "{count} persons"
+msgstr[0] ""
+msgstr[1] ""
+
 #: indico/modules/events/registration/fields/accompanying.py indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
 msgstr ""
@@ -19586,6 +19824,13 @@ msgstr ""
 #, python-brace-format
 msgid "Not enough rooms in '{0}'"
 msgstr ""
+
+#: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
+msgid "{n} night"
+msgid_plural "{n} nights"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/registration/fields/sessions.py
 #, python-brace-format
@@ -20011,29 +20256,6 @@ msgstr[1] ""
 msgid "See the full list"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "Participant List Preview"
-msgstr ""
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-#, python-format
-msgid "1 participant"
-msgid_plural "%(num)s participants"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "This preview shows the participant list like an unregistered guest would see it."
-msgstr ""
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "This preview shows the participant list like a registered participant would see it."
-msgstr ""
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "The lists of participants grouped by the registration form they used to register for the event."
-msgstr ""
-
 #: indico/modules/events/registration/templates/display/regform_display.html
 #, python-format
 msgid "Add registration to \"%(title)s\""
@@ -20118,6 +20340,10 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/display/regform_list.html
 msgid "No registration forms available for this event"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/registration_modify.html
+msgid "If you modify this registration, it needs to be approved again by the event organizer."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_modify.html
@@ -20607,6 +20833,11 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
+msgid "Modified: %(modified)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#, python-format
 msgid "This registration is %(state)s"
 msgstr ""
 
@@ -20770,6 +21001,10 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Phone Number"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/participant_list_preview.html
+msgid "Participant List Preview"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/participants.html
@@ -21263,6 +21498,36 @@ msgstr ""
 msgid "Reschedule registrations"
 msgstr ""
 
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants List"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants Book"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Table of Contents"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#: indico/modules/events/registration/wallets/apple.py indico/modules/logs/models/entries.py
+msgid "Registration details"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Personal details"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#, python-format
+msgid "Page %(page)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_table.html
+msgid "List of registrants"
+msgstr ""
+
 #: indico/modules/events/registration/wallets/apple.py
 msgid "Ticket number"
 msgstr ""
@@ -21635,10 +21900,6 @@ msgstr ""
 
 #: indico/modules/events/requests/templates/event_request_details.html
 msgid "These are the details provided by the event manager."
-msgstr ""
-
-#: indico/modules/events/requests/templates/event_request_details.html
-msgid "Created by"
 msgstr ""
 
 #: indico/modules/events/requests/templates/event_request_details.html
@@ -22560,6 +22821,10 @@ msgstr ""
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "This section will not be displayed as a section but its contents will show up standalone."
+msgstr ""
+
+#: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
+msgid "Clone section"
 msgstr ""
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
@@ -23801,6 +24066,10 @@ msgid "Convener:"
 msgid_plural "Conveners:"
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/modules/events/timetable/templates/pdf/_toc.html
+msgid "Table of contents"
+msgstr ""
 
 #: indico/modules/events/tracks/__init__.py indico/modules/events/tracks/forms.py
 #: indico/modules/events/tracks/templates/management.html
@@ -25936,7 +26205,15 @@ msgid "Your events at hand"
 msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You do not have management rights"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You are a reviewer"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You are not a reviewer"
 msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
@@ -25944,7 +26221,15 @@ msgid "You are an attendee"
 msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You are not an attendee"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You have favorited this event"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You have not favorited this event"
 msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
@@ -27172,6 +27457,10 @@ msgid "URL is required"
 msgstr ""
 
 #: indico/web/forms/fields/simple.py
+msgid "Only URLs starting with https:// (or http://) are allowed"
+msgstr ""
+
+#: indico/web/forms/fields/simple.py
 msgid "Titles are required when more than one link is specified"
 msgstr ""
 
@@ -27370,6 +27659,10 @@ msgstr ""
 #: indico/web/templates/footer.html
 #, python-format
 msgid "Powered by %(indico)s"
+msgstr ""
+
+#: indico/web/templates/footer.html
+msgid "Site links"
 msgstr ""
 
 #: indico/web/templates/header.html
