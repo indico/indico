@@ -101,6 +101,8 @@ Bugfixes
   :pr:`7668`)
 - Avoid serving incomplete webpack manifests during concurrent requests (:issue:`7530`,
   :pr:`7675`, thanks :user:`shuv-amp`)
+- Fix dropdown menus, tooltips and skip links being inert when their bundle is
+  evaluated after the document finished parsing (:issue:`7684`, :pr:`7685`)
 
 Accessibility
 ^^^^^^^^^^^^^
