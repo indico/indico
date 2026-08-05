@@ -202,6 +202,12 @@
           display: flex;
           align-items: center;
         }
+
+        .anonymous {
+          padding-left: 0.5rem;
+          display: flex;
+          align-items: center;
+        }
       }
 
       label:hover::before {

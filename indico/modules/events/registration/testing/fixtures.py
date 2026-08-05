@@ -99,7 +99,7 @@ def create_accompanying_persons():
 @pytest.fixture
 def create_accompanying_persons_field(db, dummy_regform, create_accompanying_persons):
     def _create_accompanying_persons_field(max_persons, persons_count_against_limit,
-                                           registration=None, data=None, num_persons=0):
+                                           registration=None, data=None, num_persons=0, is_anonymous=False, price=0):
         section = RegistrationFormSection(
             registration_form=dummy_regform,
             title='dummy_section',
@@ -113,15 +113,17 @@ def create_accompanying_persons_field(db, dummy_regform, create_accompanying_per
             parent=section,
             registration_form=dummy_regform
         )
-        field.field_impl.form_item.data = {
+        field.data, field.versioned_data = field.field_impl.process_field_data({
+            'price': price,
             'max_persons': max_persons,
             'persons_count_against_limit': persons_count_against_limit,
-        }
-        field.versioned_data = field.field_impl.form_item.data
+            'is_anonymous': is_anonymous,
+        })
         if registration:
             registration.data.append(RegistrationData(
                 field_data=field.current_data,
-                data=(data if data is not None else create_accompanying_persons(num_persons))
+                data=(data if data is not None else (num_persons if is_anonymous
+                                                     else create_accompanying_persons(num_persons)))
             ))
             db.session.flush()
         return field

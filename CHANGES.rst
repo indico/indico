@@ -67,6 +67,8 @@ Improvements
   of multiple registration forms (:issue:`6424`, :pr:`7472`)
 - Add new registration form setting to require approval again after a user modifies their
   registration (:pr:`7434`, thanks :user:`moliholy`)
+- Add support for anonymous accompanying persons (numeric count only) in registration form
+  (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
 
 Bugfixes
 ^^^^^^^^

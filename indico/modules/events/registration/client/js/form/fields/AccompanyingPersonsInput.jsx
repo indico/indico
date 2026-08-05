@@ -14,9 +14,9 @@ import {Button, Form, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 
-import {getPriceFormatter, getItems} from '../selectors';
+import {getPriceFormatter, getItems, getStaticData} from '../selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -56,13 +56,26 @@ AccompanyingPersonModal.defaultProps = {
   },
 };
 
+function getAccompanyingPersonCount(value) {
+  if (Array.isArray(value)) {
+    return value.length;
+  }
+
+  if (Number.isFinite(value)) {
+    return value;
+  }
+
+  return Number(value) || 0;
+}
+
 // Gather all accompanying persons field's counts.
-function countAllAccompanyingPersons(items, formState) {
+function getTotalAccompanyingPersonCount(items, formState) {
+  const values = formState.values || {};
   const allAccompanyingPersonFieldNames = Object.values(items)
     .filter(f => f.inputType === 'accompanying_persons' && f.personsCountAgainstLimit)
     .map(apf => apf.htmlName);
   return allAccompanyingPersonFieldNames.reduce(
-    (count, field) => count + formState.values[field]?.length || 0,
+    (count, field) => count + getAccompanyingPersonCount(values[field]),
     0
   );
 }
@@ -79,16 +92,33 @@ function calculatePlaces(availablePlaces, maxPersons, personsInCurrentField, ite
     }
   } else {
     // Field counts towards registration limit...
-    const personsInAllFieldsCount = countAllAccompanyingPersons(items, formState);
+    const totalAccompanyingPersonCount = getTotalAccompanyingPersonCount(items, formState);
 
-    if (!maxPersons || maxPersons >= availablePlaces - personsInAllFieldsCount) {
+    if (!maxPersons || maxPersons >= availablePlaces - totalAccompanyingPersonCount) {
       // ...and has no person limit, or its person limit is greater than the registration limit.
-      return [personsInAllFieldsCount, availablePlaces];
+      return [totalAccompanyingPersonCount, availablePlaces];
     } else {
       // ...and has a person limit lower than the registration limit.
       return [personsInCurrentField, maxPersons];
     }
   }
+}
+
+function getMaxCount(personsInCurrentField, placesUsed, placesLimit) {
+  if (placesLimit === Infinity) {
+    return null;
+  }
+  return personsInCurrentField + placesLimit - placesUsed;
+}
+
+function clampAnonymousCount(value, maxCount) {
+  const normalizedValue = Math.max(0, Math.trunc(Number.isFinite(value) ? value : 0));
+
+  if (maxCount === null) {
+    return normalizedValue;
+  }
+
+  return Math.min(normalizedValue, maxCount);
 }
 
 function AccompanyingPersonsComponent({
@@ -99,29 +129,36 @@ function AccompanyingPersonsComponent({
   price,
   availablePlaces,
   maxPersons,
+  isAnonymous,
 }) {
   const [operation, setOperation] = useState({type: null, person: null});
   const formatPrice = useSelector(getPriceFormatter);
-  const totalPrice = (value.length * price).toFixed(2);
   const items = useSelector(getItems);
   const formState = useFormState();
+  const accompanyingPersonCount = getAccompanyingPersonCount(value);
+  const persons = Array.isArray(value) ? value : [];
+  const totalPrice = accompanyingPersonCount * price;
 
   const [placesUsed, placesLimit] = calculatePlaces(
     availablePlaces,
     maxPersons,
-    value.length,
+    accompanyingPersonCount,
     items,
     formState
   );
+  const maxCount = getMaxCount(accompanyingPersonCount, placesUsed, placesLimit);
+  const noPlacesLeft = maxCount !== null && accompanyingPersonCount >= maxCount;
 
   const changeReducer = action => {
     switch (action.type) {
       case 'ADD':
-        return [...value, {id: `new:${nanoid()}`, ...action.person}];
+        return [...persons, {id: `new:${nanoid()}`, ...action.person}];
       case 'EDIT':
-        return value.map(p => (p.id === action.person.id ? action.person : p));
+        return persons.map(p => (p.id === action.person.id ? action.person : p));
       case 'REMOVE':
-        return value.filter(p => p.id !== action.id);
+        return persons.filter(p => p.id !== action.id);
+      default:
+        return persons;
     }
   };
 
@@ -130,7 +167,7 @@ function AccompanyingPersonsComponent({
   };
 
   const handleAccompanyingPersonEdit = personId => {
-    setOperation({type: 'EDIT', person: value.find(p => p.id === personId)});
+    setOperation({type: 'EDIT', person: persons.find(p => p.id === personId)});
   };
 
   const handleAccompanyingPersonRemove = personId => {
@@ -141,15 +178,51 @@ function AccompanyingPersonsComponent({
     setOperation({type: null, person: null});
   };
 
+  if (isAnonymous) {
+    return (
+      <Form.Group styleName="accompanyingpersons-field">
+        <div styleName="anonymous">
+          <Form.Input
+            id={id}
+            type="number"
+            min="0"
+            max={maxCount ?? undefined}
+            step="1"
+            value={accompanyingPersonCount}
+            disabled={disabled}
+            onChange={(_, {value: nextValue}) =>
+              onChange(clampAnonymousCount(Number(nextValue), maxCount))
+            }
+            aria-describedby={id ? `${id}-placeslimit` : undefined}
+            aria-label={Translate.string('Number of accompanying persons')}
+          />
+          {!!price && (
+            <Label basic pointing="left" styleName="price-tag" size="small">
+              <Translate>
+                <Param name="price" value={formatPrice(price)} /> (Total:{' '}
+                <Param name="totalPrice" value={formatPrice(totalPrice)} />)
+              </Translate>
+            </Label>
+          )}
+          {placesLimit !== Infinity && (
+            <div id={`${id}-placeslimit`} styleName="places-left">
+              <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
+            </div>
+          )}
+        </div>
+      </Form.Group>
+    );
+  }
+
   return (
     <Form.Group styleName="accompanyingpersons-field">
       <ul>
-        {!value.length && (
+        {!persons.length && (
           <li styleName="light">
             <Translate>No accompanying persons registered</Translate>
           </li>
         )}
-        {value.map(person => (
+        {persons.map(person => (
           <li key={person.id}>
             <span>
               {person.firstName} {person.lastName}
@@ -174,14 +247,17 @@ function AccompanyingPersonsComponent({
           size="small"
           type="button"
           onClick={handleAccompanyingPersonAdd}
-          disabled={disabled || placesLimit - placesUsed === 0}
+          disabled={disabled || noPlacesLeft}
           aria-describedby={id ? `${id}-placeslimit` : ''}
         >
           <Translate>Add accompanying person</Translate>
         </Button>
         {!!price && (
           <Label basic pointing="left" styleName="price-tag" size="small">
-            {formatPrice(price)} (Total: {formatPrice(totalPrice)})
+            <Translate>
+              <Param name="price" value={formatPrice(price)} /> (Total:{' '}
+              <Param name="totalPrice" value={formatPrice(totalPrice)} />)
+            </Translate>
           </Label>
         )}
         {placesLimit !== Infinity && (
@@ -211,18 +287,22 @@ function AccompanyingPersonsComponent({
 
 AccompanyingPersonsComponent.propTypes = {
   id: PropTypes.string.isRequired,
-  value: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      firstName: PropTypes.string.isRequired,
-      lastName: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        firstName: PropTypes.string.isRequired,
+        lastName: PropTypes.string.isRequired,
+      })
+    ),
+  ]).isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   price: PropTypes.number,
   availablePlaces: PropTypes.number,
   maxPersons: PropTypes.number,
+  isAnonymous: PropTypes.bool,
 };
 
 AccompanyingPersonsComponent.defaultProps = {
@@ -230,6 +310,7 @@ AccompanyingPersonsComponent.defaultProps = {
   price: 0,
   availablePlaces: null,
   maxPersons: null,
+  isAnonymous: false,
 };
 
 export default function AccompanyingPersonsInput({
@@ -239,6 +320,7 @@ export default function AccompanyingPersonsInput({
   price,
   availablePlaces,
   maxPersons,
+  isAnonymous,
 }) {
   return (
     <FinalField
@@ -249,6 +331,7 @@ export default function AccompanyingPersonsInput({
       price={price}
       availablePlaces={availablePlaces}
       maxPersons={maxPersons}
+      isAnonymous={isAnonymous}
     />
   );
 }
@@ -260,6 +343,7 @@ AccompanyingPersonsInput.propTypes = {
   price: PropTypes.number,
   availablePlaces: PropTypes.number,
   maxPersons: PropTypes.number,
+  isAnonymous: PropTypes.bool,
 };
 
 AccompanyingPersonsInput.defaultProps = {
@@ -267,14 +351,23 @@ AccompanyingPersonsInput.defaultProps = {
   price: 0,
   availablePlaces: null,
   maxPersons: null,
+  isAnonymous: false,
 };
 
 export const accompanyingPersonsSettingsInitialData = {
   maxPersons: 1,
   personsCountAgainstLimit: false,
+  isAnonymous: false,
 };
 
-export function AccompanyingPersonsSettings() {
+export function AccompanyingPersonsSettings({isAnonymousLocked, anonymousLockReason}) {
+  const {ticketsForAccompanyingPersons} = useSelector(getStaticData);
+  const anonymousDisabledReason = ticketsForAccompanyingPersons
+    ? Translate.string(
+        'Disable tickets for accompanying persons to enable anonymous accompanying person registration.'
+      )
+    : anonymousLockReason;
+
   return (
     <>
       <FinalInput
@@ -293,6 +386,38 @@ export function AccompanyingPersonsSettings() {
         name="personsCountAgainstLimit"
         label={Translate.string('Accompanying persons count against registration limit')}
       />
+      <FinalCheckbox
+        name="isAnonymous"
+        label={Translate.string('Anonymous accompanying persons')}
+        disabled={ticketsForAccompanyingPersons || isAnonymousLocked}
+        description={
+          <>
+            <Translate>
+              Collect only the number of accompanying persons instead of their names.
+            </Translate>
+            <br />
+            <Translate>
+              Tickets and badge printing are not available for anonymous accompanying persons.
+            </Translate>
+            {anonymousDisabledReason && (
+              <>
+                <br />
+                {anonymousDisabledReason}
+              </>
+            )}
+          </>
+        }
+      />
     </>
   );
 }
+
+AccompanyingPersonsSettings.propTypes = {
+  isAnonymousLocked: PropTypes.bool,
+  anonymousLockReason: PropTypes.string,
+};
+
+AccompanyingPersonsSettings.defaultProps = {
+  isAnonymousLocked: false,
+  anonymousLockReason: null,
+};

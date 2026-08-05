@@ -5,8 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from decimal import Decimal
+
 import pytest
 from marshmallow import ValidationError
+from sqlalchemy.orm import undefer
 
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -43,6 +46,10 @@ def _assert_registration_count(regform, count):
     assert (RegistrationForm.query.with_parent(regform.event)
             .filter(RegistrationForm.existing_registrations_count == count)
             .count() == 1)
+
+
+def _anonymous_value(count):
+    return count
 
 
 @pytest.mark.parametrize(('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'), (
@@ -196,3 +203,147 @@ def test_registration_count_multiple_fields(dummy_regform, create_accompanying_p
     assert dummy_regform.limit_reached
     dummy_regform.registration_limit = 6
     assert not dummy_regform.limit_reached
+
+
+@pytest.mark.parametrize(
+    ('max_persons', 'persons_count_against_limit', 'registration_limit', 'expected_limit'),
+    (
+        (0, False, None, None),
+        (5, False, None, 5),
+        (10, True, 5, 4),
+    ),
+)
+def test_new_registration_anonymous(
+    dummy_event,
+    dummy_regform,
+    create_accompanying_persons_field,
+    max_persons,
+    persons_count_against_limit,
+    registration_limit,
+    expected_limit,
+):
+    set_feature_enabled(dummy_event, 'registration', True)
+
+    field = create_accompanying_persons_field(max_persons, persons_count_against_limit, is_anonymous=True)
+    validator = field.field_impl.get_validators(None)
+    dummy_regform.registration_limit = registration_limit
+
+    assert field.field_impl._get_field_available_places(None) == expected_limit
+    validator(_anonymous_value(0))
+    if expected_limit:
+        validator(_anonymous_value(expected_limit))
+        with pytest.raises(ValidationError):
+            validator(_anonymous_value(expected_limit + 1))
+    else:
+        validator(_anonymous_value(10))
+
+
+@pytest.mark.usefixtures('dummy_reg')
+def test_modifying_registration_field_untouched_anonymous(
+    db, dummy_event, dummy_regform, create_accompanying_persons_field
+):
+    set_feature_enabled(dummy_event, 'registration', True)
+
+    dummy_regform.registration_limit = 8
+    reg = dummy_event.registrations.one()
+    field = create_accompanying_persons_field(0, True, registration=reg, data=3, is_anonymous=True)
+    db.session.flush()
+    validator = field.field_impl.get_validators(reg)
+
+    _assert_occupied_slots(reg, 4)
+    _assert_registration_count(dummy_regform, 4)
+    validator(3)
+
+
+@pytest.mark.usefixtures('dummy_reg')
+def test_modifying_registration_field_changed_anonymous_same_or_lower(
+    dummy_event, dummy_regform, create_accompanying_persons_field
+):
+    set_feature_enabled(dummy_event, 'registration', True)
+
+    dummy_regform.registration_limit = 8
+    reg = dummy_event.registrations.one()
+    field = create_accompanying_persons_field(0, True, registration=reg, data=3, is_anonymous=True)
+    validator = field.field_impl.get_validators(reg)
+
+    validator(3)
+    validator(2)
+
+
+@pytest.mark.usefixtures('dummy_reg')
+def test_modifying_registration_field_changed_anonymous_beyond_limit(
+    dummy_event, dummy_regform, create_accompanying_persons_field
+):
+    set_feature_enabled(dummy_event, 'registration', True)
+
+    dummy_regform.registration_limit = 5
+    reg = dummy_event.registrations.one()
+    field = create_accompanying_persons_field(0, True, registration=reg, data=1, is_anonymous=True)
+    validator = field.field_impl.get_validators(reg)
+
+    with pytest.raises(ValidationError):
+        validator(5)
+
+
+def test_anonymous_price_calculation(dummy_event, dummy_regform, create_accompanying_persons_field):
+    field = create_accompanying_persons_field(0, False, is_anonymous=True, price=12.5)
+
+    assert field.field_impl.calculate_price(3, field.versioned_data) == Decimal('37.5')
+
+
+def test_registration_count_mixed_named_and_anonymous_fields(
+    dummy_event,
+    dummy_regform,
+    create_accompanying_persons,
+    create_accompanying_persons_field,
+    create_registration_for_user,
+):
+    reg = create_registration_for_user(1)
+    create_accompanying_persons_field(0, False, registration=reg, num_persons=1)
+    create_accompanying_persons_field(0, True, registration=reg, num_persons=2)
+    create_accompanying_persons_field(0, True, registration=reg, data=3, is_anonymous=True)
+
+    db_reg = (
+        Registration.query.filter_by(id=reg.id)
+        .options(undefer('occupied_slots'), undefer('num_accompanying_persons'))
+        .one()
+    )
+    expected_people = create_accompanying_persons(1) + create_accompanying_persons(2)
+    assert db_reg.num_accompanying_persons == 6
+    assert db_reg.occupied_slots == 6
+    assert len(db_reg.accompanying_persons) == 3
+    assert sorted(person['id'] for person in db_reg.accompanying_persons) == sorted(
+        person['id'] for person in expected_people
+    )
+    _assert_registration_count(dummy_regform, 6)
+
+
+def test_registration_count_uses_stored_data_shape_for_legacy_accompanying_persons(
+    db,
+    dummy_regform,
+    create_accompanying_persons,
+    create_accompanying_persons_field,
+    create_registration_for_user,
+):
+    reg = create_registration_for_user(1)
+    named_field = create_accompanying_persons_field(0, True, registration=reg, num_persons=2)
+    anonymous_field = create_accompanying_persons_field(0, True, registration=reg, data=3, is_anonymous=True)
+
+    named_field.data = {**(named_field.data or {}), 'is_anonymous': True}
+    anonymous_field.data = {**(anonymous_field.data or {}), 'is_anonymous': False}
+    db.session.flush()
+
+    db_reg = (
+        Registration.query.filter_by(id=reg.id)
+        .options(undefer('occupied_slots'), undefer('num_accompanying_persons'))
+        .one()
+    )
+    expected_people = create_accompanying_persons(2)
+
+    assert db_reg.num_accompanying_persons == 5
+    assert db_reg.occupied_slots == 6
+    assert len(db_reg.accompanying_persons) == 2
+    assert sorted(person['id'] for person in db_reg.accompanying_persons) == sorted(
+        person['id'] for person in expected_people
+    )
+    _assert_registration_count(dummy_regform, 6)
