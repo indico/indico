@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system';
 
 .person-link-field {
   color: rgba(0, 0, 0, 0.87);
@@ -54,6 +55,65 @@
   }
 }
 
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.sort-checkbox {
+  @extend %visually-hidden;
+}
+
+.sort-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85714286rem;
+  padding: 0.78571429em;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.6);
+  background: #e0e1e2;
+  border-radius: 0.28571429rem 0 0 0.28571429rem;
+  transition: background-color 0.1s ease, color 0.1s ease;
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.8);
+    background: #cacbcd;
+  }
+
+  &:has(.sort-checkbox:checked) {
+    color: #fff;
+    background: #21ba45;
+
+    &:hover {
+      background: #16ab39;
+    }
+  }
+
+  &:has(.sort-checkbox:focus-visible) {
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 40%);
+  }
+
+  :global(i.icon) {
+    margin: 0;
+  }
+}
+
+ind-with-tooltip:has(.sort-toggle) + :global(.ui.button) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .titled-rule {
   display: flex;
   align-items: center;
@@ -85,11 +145,13 @@
   margin: 0;
 }
 
+.roles ind-with-tooltip:not(:first-child) :global(.ui.label),
 .roles :global(.ui.label):not(:first-child) {
   border-bottom-left-radius: 0 !important;
   border-top-left-radius: 0 !important;
 }
 
+.roles ind-with-tooltip:not(:last-child) :global(.ui.label),
 .roles :global(.ui.label):not(:last-child) {
   border-bottom-right-radius: 0 !important;
   border-top-right-radius: 0 !important;

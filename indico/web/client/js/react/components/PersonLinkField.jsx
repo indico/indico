@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {Button, Icon, Label, List, Popup, Ref, Segment} from 'semantic-ui-react';
+import {Button, Icon, Label, List, Ref, Segment} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
@@ -48,46 +48,53 @@ const PersonListItem = ({
     />
     <div styleName="roles">
       {roles &&
-        roles.map(({name, label, icon, active}, idx) => (
-          <Popup
-            key={name}
-            trigger={
-              <Label
-                as="a"
-                size="small"
-                color={active ? 'blue' : undefined}
-                onClick={() => onClickRole && onClickRole(idx, roles)}
-              >
-                {icon ? <Icon styleName="label-icon" name={icon} /> : label}
-              </Label>
-            }
-            disabled={!icon}
-            content={label}
-            size="tiny"
-          />
-        ))}
+        roles.map(({name, label, icon, active}, idx) => {
+          const roleLabel = (
+            <Label
+              as="a"
+              size="small"
+              color={active ? 'blue' : undefined}
+              onClick={() => onClickRole && onClickRole(idx, roles)}
+            >
+              {icon ? (
+                <>
+                  <Icon styleName="label-icon" name={icon} />
+                  <span data-tip-content>{label}</span>
+                </>
+              ) : (
+                label
+              )}
+            </Label>
+          );
+          return icon ? (
+            <ind-with-tooltip key={name}>{roleLabel}</ind-with-tooltip>
+          ) : (
+            <React.Fragment key={name}>{roleLabel}</React.Fragment>
+          );
+        })}
     </div>
     <div styleName="actions">
       {renderPluginComponents('personListItemActions', {person, onEdit, disabled, extraParams})}
       {canEdit && (
-        <Icon
-          styleName="button edit"
-          name="pencil alternate"
-          title={Translate.string('Edit person')}
-          size="large"
-          onClick={() => onEdit('details')}
-          disabled={disabled}
-        />
+        <ind-with-tooltip>
+          <button
+            type="button"
+            styleName="action-button"
+            onClick={() => onEdit('details')}
+            disabled={disabled}
+          >
+            <Icon styleName="button edit" name="pencil alternate" size="large" />
+            <span data-tip-content>{Translate.string('Edit person')}</span>
+          </button>
+        </ind-with-tooltip>
       )}
       {canDelete && (
-        <Icon
-          styleName="button delete"
-          name="remove"
-          title={Translate.string('Delete person')}
-          size="large"
-          onClick={onDelete}
-          disabled={disabled}
-        />
+        <ind-with-tooltip>
+          <button type="button" styleName="action-button" onClick={onDelete} disabled={disabled}>
+            <Icon styleName="button delete" name="remove" size="large" />
+            <span data-tip-content>{Translate.string('Delete person')}</span>
+          </button>
+        </ind-with-tooltip>
       )}
     </div>
   </PrincipalItem>
@@ -373,13 +380,18 @@ function PersonLinkField({
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
         </Segment>
         <Button.Group size="small" attached="bottom">
-          <Button
-            toggle
-            icon="sort alphabet down"
-            type="button"
-            active={autoSort}
-            onClick={() => setAutoSort && setAutoSort(!autoSort)}
-          />
+          <ind-with-tooltip>
+            <label styleName="sort-toggle">
+              <input
+                type="checkbox"
+                styleName="sort-checkbox"
+                checked={autoSort}
+                onChange={() => setAutoSort && setAutoSort(!autoSort)}
+              />
+              <Icon name="sort alphabet down" />
+              <span data-tip-content>{Translate.string('Sort alphabetically')}</span>
+            </label>
+          </ind-with-tooltip>
           {sessionUser && (
             <Button
               type="button"
