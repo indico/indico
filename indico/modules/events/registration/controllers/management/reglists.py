@@ -943,7 +943,7 @@ class RHRegistrationsApprove(RHRegistrationsActionModerationBase):
     """Accept selected registrations from registration list."""
 
     def _process(self):
-        num_approved, num_skipped = _bulk_modify_registration_status(self.registrations, approve=True)
+        num_approved, num_skipped = _bulk_modify_registration_status(self.manageable_registrations, approve=True)
         if num_approved:
             flash(ngettext('{num} registration was successfully approved.',
                            '{num} registrations were successfully approved.',
@@ -961,11 +961,12 @@ class RHRegistrationsReject(RHRegistrationsActionModerationBase):
     """Reject selected registrations from registration list."""
 
     def _process(self):
-        form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
+        registrations = self.manageable_registrations
+        form = RejectRegistrantsForm(registration_id=[r.id for r in registrations])
         message = _('Rejecting these registrations will trigger a notification email for each registrant.')
         if form.validate_on_submit():
             num_rejected, num_skipped = _bulk_modify_registration_status(
-                self.registrations,
+                registrations,
                 approve=False,
                 rejection_reason=form.rejection_reason.data,
                 attach_rejection_reason=form.attach_rejection_reason.data
@@ -988,7 +989,7 @@ class RHRegistrationsReset(RHRegistrationsActionModerationBase):
     """Reset selected registration from registration list."""
 
     def _process(self):
-        for registration in self.registrations:
+        for registration in self.manageable_registrations:
             registration.reset_state()
         db.session.flush()
         flash(_('The selected registrations were successfully reset.'), 'success')
