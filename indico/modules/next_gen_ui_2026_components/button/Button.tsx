@@ -40,6 +40,7 @@ interface CustomButtonProps {
   animated?: boolean;
   rounded?: boolean;
   fullWidth?: boolean;
+  active?: boolean;
   icon?: IconSource;
   iconPosition?: ButtonIconPosition;
   // onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
@@ -87,6 +88,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       animated = false,
       rounded = false,
       fullWidth = false,
+      active = false,
       icon,
       iconPosition = 'left',
       // onClick,
@@ -121,6 +123,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       'data-animated': animated ? '' : undefined,
       'data-rounded': rounded ? '' : undefined,
       'data-full-width': fullWidth ? '' : undefined,
+      'data-active': active ? '' : undefined,
       'data-icon': icon ? '' : undefined,
       'data-icon-position': iconPosition,
     };

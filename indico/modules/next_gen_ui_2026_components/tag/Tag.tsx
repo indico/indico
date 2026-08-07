@@ -28,6 +28,7 @@ export interface CustomTagProps {
   opaque?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
+  iconHref?: string;
   onIconClick?: React.MouseEventHandler<HTMLSpanElement>;
   children?: React.ReactNode;
 }
@@ -61,6 +62,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
     opaque = false,
     icon,
     iconPosition = 'left',
+    iconHref,
     ...nativeProps
   } = props;
 
@@ -86,6 +88,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
       variant="compact"
       decorative
       styleName="tag-icon"
+      href={iconHref}
     />
   );
 

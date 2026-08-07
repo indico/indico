@@ -33,6 +33,7 @@ interface BaseIconProps {
   ariaLabel?: string;
   title?: string;
   onClick?: React.MouseEventHandler<HTMLSpanElement>;
+  href?: string;
 }
 
 export type IconProps =
@@ -77,6 +78,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
     ariaLabel,
     title,
     onClick,
+    href,
   } = props;
 
   const isDecorative = decorative || !ariaLabel;
@@ -84,7 +86,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
 
   if (isCustomIcon(icon)) {
     const SvgIcon = icon;
-    content = <SvgIcon className="indico-ui" focusable="false" aria-hidden="true" />;
+    content = <SvgIcon className="indico-ui" focusable="false" aria-hidden="true" href={href} />;
   } else {
     const {prefix, iconName} = parseIconString(icon);
     content = (
@@ -94,6 +96,8 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
           iconName,
         }}
         focusable="false"
+        aria-hidden="true"
+        href={href}
       />
     );
   }
