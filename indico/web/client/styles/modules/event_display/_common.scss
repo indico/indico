@@ -72,6 +72,12 @@
   .button-bar {
     align-self: stretch;
 
+    ind-with-tooltip {
+      align-self: stretch;
+      align-items: stretch;
+      height: 100%;
+    }
+
     .i-button {
       @include i-button-states($black, transparent, transparent, $gray, white, false);
       border-radius: 0;
