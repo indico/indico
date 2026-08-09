@@ -48,7 +48,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.34",
     "monaco-editor": "^0.47.0",
-    "nanoid": "^5.0.6",
+    "nanoid": "^5.1.16",
     "pagedown": "^1.1.0",
     "pagedown-editor": "0.0.10",
     "prismjs": "^1.30.0",
