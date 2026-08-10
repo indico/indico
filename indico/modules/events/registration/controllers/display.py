@@ -315,8 +315,10 @@ class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayB
 class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
+    view_class = WPDisplayRegistrationParticipantList  # needed for offline archive generation
+
     def _process(self):
-        return WPDisplayRegistrationParticipantList.render_template('display/participant_list.html', self.event)
+        return self.view_class.render_template('display/participant_list.html', self.event)
 
 
 class InvitationMixin:
