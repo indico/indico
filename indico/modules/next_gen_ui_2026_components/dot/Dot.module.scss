@@ -35,56 +35,56 @@
         }
 
         &[data-color='red'] {
-            --intenzity-500: var(--color-tag-red);
+            --intensity-500: var(--color-tag-red);
         }
 
         &[data-color='orange'] {
-            --intenzity-500: var(--color-tag-orange);
+            --intensity-500: var(--color-tag-orange);
         }
 
         &[data-color='yellow'] {
-            --intenzity-500: var(--color-tag-yellow);
+            --intensity-500: var(--color-tag-yellow);
         }
 
         &[data-color='olive'] {
-            --intenzity-500: var(--color-tag-olive);
+            --intensity-500: var(--color-tag-olive);
         }
 
         &[data-color='green'] {
-            --intenzity-500: var(--color-tag-green);
+            --intensity-500: var(--color-tag-green);
         }
 
         &[data-color='teal'] {
-            --intenzity-500: var(--color-tag-teal);
+            --intensity-500: var(--color-tag-teal);
         }
 
         &[data-color='blue'] {
-            --intenzity-500: var(--color-tag-blue);
+            --intensity-500: var(--color-tag-blue);
         }
 
         &[data-color='violet'] {
-            --intenzity-500: var(--color-tag-violet);
+            --intensity-500: var(--color-tag-violet);
         }
 
         &[data-color='purple'] {
-            --intenzity-500: var(--color-tag-purple);
+            --intensity-500: var(--color-tag-purple);
         }
 
         &[data-color='pink'] {
-            --intenzity-500: var(--color-tag-pink);
+            --intensity-500: var(--color-tag-pink);
         }
 
         &[data-color='brown'] {
-            --intenzity-500: var(--color-tag-brown);
+            --intensity-500: var(--color-tag-brown);
         }
 
         &[data-color='grey'] {
             // Semantic UI uses "grey" instead of "gray"
-            --intenzity-500: var(--color-tag-gray);
+            --intensity-500: var(--color-tag-gray);
         }
 
         &[data-color='black'] {
-            --intenzity-500: var(--color-tag-black);
+            --intensity-500: var(--color-tag-black);
         }
 
         &[data-size='xxs'] {
@@ -111,7 +111,7 @@
             @include dot-size('6');
         }
 
-        background-color: var(--intenzity-500);
+        background-color: var(--intensity-500);
         border-radius: 50%;
         display: inline-block;
         align-self: center;

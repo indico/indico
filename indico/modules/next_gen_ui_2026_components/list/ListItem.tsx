@@ -7,11 +7,9 @@
 
 import React, {forwardRef, ReactElement} from 'react';
 
-import {Dot} from '../dot/Dot';
 import {Icon, IconProps} from '../icon/Icon';
 import {Tag, TagProps} from '../tag/Tag';
 import './ListItem.module.scss';
-import {LegacyColor} from '../tokens';
 
 interface ListItemHeaderProps {
   children: React.ReactNode;
@@ -35,33 +33,16 @@ export const ListItemDetails = ({children, className}: ListItemDetailsProps) => 
   </div>
 );
 
-interface LabelIndicatorProps {
-  color: LegacyColor;
-  label: string;
-  className?: string;
-}
-
-export function LabelIndicator({color, label, className}: LabelIndicatorProps) {
-  return (
-    <div styleName="label-indicator" className={`indico-ui ${className || ''}`}>
-      <Dot styleName="dot" color={color} size="xxs" />
-      <p styleName="label-indicator-text">{label}</p>
-    </div>
-  );
-}
-
 type ListItemHeaderElement = ReactElement<ListItemHeaderProps, typeof ListItemHeader>;
 type ListItemDetailsElement = ReactElement<ListItemDetailsProps, typeof ListItemDetails>;
 type ListItemTagElement = ReactElement<TagProps, typeof Tag>;
 type ListItemIconElement = ReactElement<IconProps, typeof Icon>;
-type ListItemLabelIndicatorElement = ReactElement<LabelIndicatorProps, typeof LabelIndicator>;
 
 type ListItemChild =
   | ListItemIconElement
   | ListItemHeaderElement
   | ListItemDetailsElement
-  | ListItemTagElement
-  | ListItemLabelIndicatorElement;
+  | ListItemTagElement;
 
 interface ListItemProps {
   children: ListItemChild | ListItemChild[];
@@ -104,7 +85,6 @@ type ListItemComponent = React.FunctionComponent<ListItemProps> & {
   Header: typeof ListItemHeader;
   Details: typeof ListItemDetails;
   Tag: typeof Tag;
-  LabelIndicator: typeof LabelIndicator;
 };
 
 export const ListItem = Object.assign(ListItemRoot, {
@@ -112,5 +92,4 @@ export const ListItem = Object.assign(ListItemRoot, {
   Header: ListItemHeader,
   Details: ListItemDetails,
   Tag,
-  LabelIndicator,
 }) as ListItemComponent;

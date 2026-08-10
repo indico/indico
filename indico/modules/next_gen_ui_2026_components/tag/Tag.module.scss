@@ -46,7 +46,7 @@
       }
     }
 
-// --------- Layout ---------
+    // --------- Layout ---------
     &[data-size='xs'] {
       @include button-size-spacing('xs', '1');
       @include button-typography('text-xs');
@@ -80,14 +80,6 @@
       @include button-text-weight('regular');
     }
 
-    &[data-text-weight='medium'] {
-      @include button-text-weight('medium');
-    }
-
-    &[data-text-weight='semibold'] {
-      @include button-text-weight('semibold');
-    }
-
     &[data-text-weight='bold'] {
       @include button-text-weight('bold');
     }
@@ -113,76 +105,76 @@
     }
 
     &[data-color='red'] {
-     --intenzity-500: var(--color-tag-red);
-     --intenzity-600: var(--color-tag-red);
+      --intensity-500: var(--color-tag-red);
+      --intensity-600: var(--color-tag-red);
     }
 
     &[data-color='orange'] {
-     --intenzity-500: var(--color-tag-orange);
-     --intenzity-600: var(--color-tag-orange);
+      --intensity-500: var(--color-tag-orange);
+      --intensity-600: var(--color-tag-orange);
     }
 
     &[data-color='yellow'] {
-     --intenzity-500: var(--color-tag-yellow);
-     --intenzity-600: var(--color-tag-yellow);
+      --intensity-500: var(--color-tag-yellow);
+      --intensity-600: var(--color-tag-yellow);
     }
 
     &[data-color='olive'] {
-     --intenzity-500: var(--color-tag-olive);
-     --intenzity-600: var(--color-tag-olive);
+      --intensity-500: var(--color-tag-olive);
+      --intensity-600: var(--color-tag-olive);
     }
 
     &[data-color='green'] {
-     --intenzity-500: var(--color-tag-green);
-     --intenzity-600: var(--color-tag-green);
+      --intensity-500: var(--color-tag-green);
+      --intensity-600: var(--color-tag-green);
     }
 
     &[data-color='teal'] {
-     --intenzity-500: var(--color-tag-teal);
-     --intenzity-600: var(--color-tag-teal);
+      --intensity-500: var(--color-tag-teal);
+      --intensity-600: var(--color-tag-teal);
     }
 
     &[data-color='blue'] {
-     --intenzity-500: var(--color-tag-blue);
-     --intenzity-600: var(--color-tag-blue);
+      --intensity-500: var(--color-tag-blue);
+      --intensity-600: var(--color-tag-blue);
     }
 
     &[data-color='violet'] {
-     --intenzity-500: var(--color-tag-violet);
-     --intenzity-600: var(--color-tag-violet);
+      --intensity-500: var(--color-tag-violet);
+      --intensity-600: var(--color-tag-violet);
     }
 
     &[data-color='purple'] {
-     --intenzity-500: var(--color-tag-purple);
-     --intenzity-600: var(--color-tag-purple);
+      --intensity-500: var(--color-tag-purple);
+      --intensity-600: var(--color-tag-purple);
     }
 
     &[data-color='pink'] {
-     --intenzity-500: var(--color-tag-pink);
-     --intenzity-600: var(--color-tag-pink);
+      --intensity-500: var(--color-tag-pink);
+      --intensity-600: var(--color-tag-pink);
     }
 
     &[data-color='grey'] {
-     // Semantic UI uses "grey" instead of "gray"
-     --intenzity-500: var(--color-tag-gray);
-     --intenzity-600: var(--color-tag-gray);
+      // Semantic UI uses "grey" instead of "gray"
+      --intensity-500: var(--color-tag-gray);
+      --intensity-600: var(--color-tag-gray);
     }
 
     &[data-color='brown'] {
-     --intenzity-500: var(--color-tag-brown);
-     --intenzity-600: var(--color-tag-brown);
+      --intensity-500: var(--color-tag-brown);
+      --intensity-600: var(--color-tag-brown);
     }
 
     &[data-color='black'] {
-     --intenzity-500: var(--color-tag-black);
-     --intenzity-600: var(--color-tag-black);
+      --intensity-500: var(--color-tag-black);
+      --intensity-600: var(--color-tag-black);
     }
 
-// --------- Icons ---------
+    // --------- Icons ---------
     .tag-icon {
       width: var(--icon-height);
       height: var(--icon-height);
-      color: inherit;
+      color: var(--tag-text);
     }
 
     &[data-icon-position='left'] .tag-icon {
@@ -198,35 +190,35 @@
     }
   }
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
+  // ============================================================================
+  // VARIANTS
+  // ============================================================================
 
-// --------- Solid ----------
+  // --------- Solid ----------
   &.tag[data-variant='solid'] {
-    --tag-bg: var(--intenzity-500);
+    --tag-bg: var(--intensity-500);
     --tag-text: var(--color-accent-buttons);
 
     &[data-opaque] {
-      --tag-bg: color-mix(in srgb, var(--intenzity-500) 20%);
+      --tag-bg: color-mix(in srgb, var(--intensity-500) 20%);
     }
   }
 
   // ---------- Light ---------
   &.tag[data-variant='light'] {
-    --tag-bg: var(--intenzity-100);
-    --tag-text: var(--intenzity-600);
+    --tag-bg: var(--intensity-100);
+    --tag-text: var(--intensity-600);
 
     &[data-opaque] {
-      --tag-bg: color-mix(in srgb, var(--intenzity-100) 20%);
-      --tag-text: var(--intenzity-600);
+      --tag-bg: color-mix(in srgb, var(--intensity-100) 20%);
+      --tag-text: var(--intensity-600);
     }
   }
 
   // --------- White ---------
   &.tag[data-variant='white'] {
     --tag-bg: var(--color-accent-buttons);
-    --tag-text: var(--intenzity-500);
+    --tag-text: var(--intensity-500);
 
     &[data-opaque] {
       --tag-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
@@ -234,16 +226,16 @@
     }
 
     &[data-outlined] {
-      --tag-border: var(--intenzity-600);
-      --tag-border-active: var(--intenzity-700);
+      --tag-border: var(--intensity-600);
+      --tag-border-active: var(--intensity-700);
     }
   }
 
   // --------- Transparent ----------
   &.tag[data-variant='transparent'] {
     --tag-bg: transparent;
-    --tag-text: var(--intenzity-600);
-    --tag-border: var(--intenzity-600);
+    --tag-text: var(--intensity-600);
+    --tag-border: var(--intensity-600);
 
     &[data-color='white'] {
       --tag-text: var(--color-accent-buttons);
