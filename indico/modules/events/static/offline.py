@@ -21,7 +21,6 @@ from werkzeug.utils import secure_filename
 
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
-from indico.legacy.pdfinterface.conference import ProgrammeToPDF
 from indico.legacy.pdfinterface.latex import AbstractBook, ContribsToPDF, ContribToPDF
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -47,6 +46,7 @@ from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConf
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import generate_pdf_timetable
 from indico.modules.events.tracks.controllers import RHDisplayTracks
+from indico.modules.events.tracks.util import generate_program_pdf
 from indico.util.fs import chmod_umask
 from indico.util.string import strip_tags
 from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
@@ -310,7 +310,8 @@ class StaticConferenceCreator(StaticEventCreator):
         if entry.name == 'abstracts_book' and config.LATEX_ENABLED:
             self._add_pdf(self.event, 'abstracts.export_boa', AbstractBook, event=self.event)
         if entry.name == 'program':
-            self._add_pdf(self.event, 'tracks.program_pdf', ProgrammeToPDF, event=self.event)
+            pdf = generate_program_pdf(self.event)
+            self._add_pdf(self.event, 'tracks.program_pdf', pdf)
 
     def _get_custom_page(self, page):
         html = WPStaticCustomPage.render_template('page.html', self.event, page=page)

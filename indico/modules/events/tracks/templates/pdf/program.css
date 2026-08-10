@@ -1,0 +1,102 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2026 CERN
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License; see the
+ * LICENSE file for more details.
+ */
+
+@page {
+  size: a4;
+  margin: 20mm;
+
+  @top-center {
+    content: element(event-title-header);
+  }
+}
+
+@page cover {
+  counter-reset: page 0;
+}
+
+@page content {
+  @bottom-center {
+    color: gray;
+    font-size: 0.8rem;
+    content: counter(page);
+  }
+}
+
+header {
+  color: gray;
+  font-size: 0.8rem;
+}
+
+.event-title-header {
+  position: running(event-title-header);
+}
+
+* {
+  font-family: 'Lato', sans-serif;
+}
+
+body {
+  font-size: 0.8em;
+}
+
+.pagebreak {
+  break-before: always;
+}
+
+.cover-page {
+  page: cover;
+
+  h1,
+  h2,
+  h3 {
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 3em;
+    font-size: 3em;
+  }
+
+  h2 {
+    font-size: 2em;
+  }
+
+  h3 {
+    margin-top: 5em;
+    font-size: 2.5em;
+  }
+}
+
+.content {
+  page: content;
+}
+
+.track-list {
+  margin: 0;
+  padding: 0;
+
+  li {
+    list-style-type: none;
+  }
+
+  > li + li {
+    margin-top: 2em;
+  }
+
+  .child-track-list > li + li {
+    margin-top: 1em;
+  }
+
+  h1 {
+    font-size: 1.75em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+}

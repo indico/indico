@@ -1,0 +1,50 @@
+{% from 'events/display/conference/_util.html' import format_event_date %}
+
+{%- macro format_event_date(event) -%}
+    {% set start_dt = event.start_dt_display.astimezone(event.display_tzinfo) %}
+    {% set end_dt = event.end_dt_display.astimezone(event.display_tzinfo) %}
+    {% if start_dt.date() == end_dt.date() %}
+        {{ start_dt | format_date('long') }}
+    {% elif start_dt.year == end_dt.year and start_dt.month == end_dt.month %}
+        {{ start_dt | format_date('long') }} - {{ end_dt | format_date('long') }}
+    {% else %}
+        {% trans start=start_dt|format_date('long'), end=end_dt|format_date('long') -%}
+            {{ start }} to {{ end }}
+        {%- endtrans %}
+    {% endif %}
+{%- endmacro -%}
+
+
+<!DOCTYPE html>
+<title>{{ event.title }}</title>
+
+<acticle class="cover-page">
+    <h1>{{ event.title }}</h1>
+    <h2>{{ format_event_date(event) }}</h2>
+    {% if event.venue_name %}
+        <h2>{{ event.venue_name }}</h2>
+    {% endif %}
+    <h3>{{ title }}</h3>
+</acticle>
+
+<article class="content pagebreak">
+    <header class="event-title-header">{{ event.title }}</header>
+
+    <section>
+        {{ program_text | markdown }}
+    </section>
+
+    <ul class="track-list">
+        {% for item in top_level_tracks recursive %}
+            <li>
+                <h{{ loop.depth }}>{{ item.title }}</h{{ loop.depth }}>
+                {{ item.description | markdown }}
+                {% if item.is_track_group and item.tracks %}
+                    <ul class="child-track-list">
+                        {{ loop(item.tracks) }}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</article>
