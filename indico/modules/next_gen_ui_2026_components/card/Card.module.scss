@@ -28,7 +28,7 @@
 
   &.card-header {
     @include text-ellipsis();
-    @include typography('text-sm', 'semibold'); // 14px
+    @include typography('text-sm', 'bold'); // 14px
     color: var(--color-text-heading);
     max-width: 100%;
   }

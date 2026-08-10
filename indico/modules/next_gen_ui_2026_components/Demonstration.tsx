@@ -48,7 +48,7 @@ const tagAttributes = [
   'icon=fas:calendar iconPosition=right',
   'opaque',
 ] as const;
-const textWeights = ['regular', 'medium', 'semibold', 'bold'] as const;
+const textWeights = ['regular', 'bold'] as const;
 
 export function Demonstration() {
   const [isIconExpanded, setIsIconExpanded] = useState(false);
@@ -171,6 +171,20 @@ export function Demonstration() {
               </div>
             ))}
           </div>
+          <h3> Circular </h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-circular`}
+                styleName="demo-item align-center"
+              >
+                <Button color="primary" variant="solid" size={size} circular>
+                  Button
+                </Button>
+                <div styleName="demo-label">solid • primary • {size} • circular</div>
+              </div>
+            ))}
+          </div>
           <h3> Icon only </h3>
           <div className="grid-5">
             {sizes.map(size => (
@@ -207,6 +221,26 @@ export function Demonstration() {
                   aria-label="Calendar"
                 />
                 <div styleName="demo-label">solid • primary • {size} • icon only rounded</div>
+              </div>
+            ))}
+          </div>
+          <h3> Icon only circular</h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-icon-only-circular`}
+                styleName="demo-item align-center"
+              >
+                <Button
+                  color="primary"
+                  variant="solid"
+                  size={size}
+                  icon="fas:calendar"
+                  iconPosition="icon-only"
+                  circular
+                  aria-label="Calendar"
+                />
+                <div styleName="demo-label">solid • primary • {size} • icon only circular</div>
               </div>
             ))}
           </div>

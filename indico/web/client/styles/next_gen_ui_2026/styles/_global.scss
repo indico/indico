@@ -32,22 +32,22 @@
   }
 
   & h3 {
-    @include typography('text-xl', 'semibold'); // 20px
+    @include typography('text-xl', 'bold'); // 20px
     color: var(--color-text-heading);
   }
 
   & h4 {
-    @include typography('text-lg', 'semibold'); // 18px
+    @include typography('text-lg', 'bold'); // 18px
     color: var(--color-text-heading);
   }
 
   & h5 {
-    @include typography('text-md', 'semibold'); // 16px
+    @include typography('text-md', 'bold'); // 16px
     color: var(--color-text-heading);
   }
 
   & h6 {
-    @include typography('text-sm', 'semibold'); // 14px
+    @include typography('text-sm', 'bold'); // 14px
     color: var(--color-text-heading);
   }
 }

@@ -39,6 +39,7 @@ interface CustomButtonProps {
   compact?: boolean;
   animated?: boolean;
   rounded?: boolean;
+  circular?: boolean;
   fullWidth?: boolean;
   active?: boolean;
   icon?: IconSource;
@@ -56,7 +57,9 @@ interface CustomButtonProps {
 type NativeButtonProps = NativeProps<'button'>;
 type NativeAnchorProps = NativeProps<'a'>;
 
-type hrefUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
+type nativeUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
+
+type RoudnessUnion = {rounded?: boolean; circular?: never} | {rounded?: never; circular?: boolean};
 
 type VariantColorUnion =
   | {variant?: 'transparent'; color?: ExtendedIndicoPaletteColor; opaque?: never}
@@ -70,7 +73,11 @@ type IconOnlyUnion =
   | {icon?: IconSource; iconPosition?: 'left' | 'right'; children?: React.ReactNode}
   | {icon: IconSource; iconPosition: 'icon-only'; children?: never; 'aria-label': string};
 
-export type ButtonProps = CustomButtonProps & hrefUnion & VariantColorUnion & IconOnlyUnion;
+export type ButtonProps = CustomButtonProps &
+  nativeUnion &
+  VariantColorUnion &
+  IconOnlyUnion &
+  RoudnessUnion;
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   (props, ref) => {
@@ -79,7 +86,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       color = 'primary',
       variant = 'solid',
       size = 'md',
-      textWeight = 'semibold',
+      textWeight = 'bold',
       disabled = false,
       loading = false,
       opaque = false,
@@ -87,6 +94,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       compact = false,
       animated = false,
       rounded = false,
+      circular = false,
       fullWidth = false,
       active = false,
       icon,
@@ -122,6 +130,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       'data-compact': compact ? '' : undefined,
       'data-animated': animated ? '' : undefined,
       'data-rounded': rounded ? '' : undefined,
+      'data-circular': circular ? '' : undefined,
       'data-full-width': fullWidth ? '' : undefined,
       'data-active': active ? '' : undefined,
       'data-icon': icon ? '' : undefined,

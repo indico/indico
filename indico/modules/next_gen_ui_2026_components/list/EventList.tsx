@@ -106,11 +106,10 @@ export function EventList({categoryId}: EventListProps) {
                 <div styleName="event-list-item-start-section">
                   <ListItem.Tag
                     icon="fas:calendar"
-                    iconHref={event.exportIcalUrl}
                     color="primary"
                     variant="light"
                     size="sm"
-                    textWeight="medium"
+                    textWeight="regular"
                     styleName="event-list-item-date-time-tag"
                   >
                     {event.date}
@@ -124,7 +123,7 @@ export function EventList({categoryId}: EventListProps) {
                           icon="fas:star"
                           color="warning"
                           variant="compact"
-                          size="xxs"
+                          size="xs"
                           styleName="event-list-item-favorite-icon"
                         />
                       )}
@@ -135,7 +134,9 @@ export function EventList({categoryId}: EventListProps) {
                       )}
                     </div>
                     {event.label && (
-                      <ListItem.LabelIndicator color={event.labelColor} label={event.label} />
+                      <ListItem.Tag color={event.labelColor} icon="fas:tag" size="xs">
+                        {event.label}
+                      </ListItem.Tag>
                     )}
                   </div>
                 </div>

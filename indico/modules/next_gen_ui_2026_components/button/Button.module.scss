@@ -13,20 +13,22 @@
 
 @mixin button-size-spacing($size, $space) {
   height: var(--button-height-#{$size});
-  padding: var(--button-padding-y-#{$size}) var(--button-padding-x-#{$size});
+  padding-right: var(--button-padding-#{$size});
+  padding-left: var(--button-padding-#{$size});
   border-radius: var(--radius-#{$size});
 
   &[data-icon] {
-    --icon-height: calc(var(--button-height-#{$size}) - ((var(--button-padding-y-#{$size})) * 2));
+    --icon-height: var(--icon-size-#{$size});
     --icon-margin: var(--space-#{$space});
   }
 
   &[data-compact] {
     height: var(--button-height-#{$size}-compact);
-    padding: var(--button-padding-y-#{$size}-compact) var(--button-padding-x-#{$size}-compact);
+    padding-right: var(--button-padding-#{$size}-compact);
+    padding-left: var(--button-padding-#{$size}-compact);
 
     &[data-icon] {
-      --icon-height: calc(var(--button-height-#{$size}-compact) - ((var(--button-padding-y-#{$size}-compact)) * 2));
+      --icon-height: var(--icon-size-#{$size});
       --icon-margin: var(--space-#{$space});
     }
   }
@@ -76,7 +78,7 @@
     }
 
     &[data-outlined] {
-      border: 2px solid var(--btn-border, currentColor);
+      border: 1px solid var(--btn-border, currentColor);
 
       &:hover:not([data-disabled]) {
         border-color: var(--btn-border-hover, var(--btn-border, currentColor));
@@ -89,7 +91,7 @@
 
     // --------- Layout ---------
     &[data-size='xs'] {
-      @include button-size-spacing('xs', '1');
+      @include button-size-spacing('xs', '1-5');
       @include button-typography('text-xs');
     }
 
@@ -115,14 +117,6 @@
 
     &[data-text-weight='regular'] {
       @include button-text-weight('regular');
-    }
-
-    &[data-text-weight='medium'] {
-      @include button-text-weight('medium');
-    }
-
-    &[data-text-weight='semibold'] {
-      @include button-text-weight('semibold');
     }
 
     &[data-text-weight='bold'] {
@@ -153,6 +147,13 @@
       border-radius: var(--radius-pill);
     }
 
+    &[data-circular] {
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      width: auto;
+      height: auto;
+    }
+
     &[data-full-width] {
       display: flex;
       width: 100%;
@@ -169,9 +170,9 @@
 
     // --------- Icons ---------
     .button-icon {
-      width: var(--icon-height);
+      width: (var(--icon-width),var(--icon-height));
       height: var(--icon-height);
-      color: inherit;
+      color: var(--btn-text);
     }
 
     &[data-icon-position='left'] .button-icon {
@@ -193,46 +194,46 @@
 
   // --------- Solid ----------
   &.button[data-variant='solid'] {
-    --btn-bg: var(--intenzity-500);
+    --btn-bg: var(--intensity-500);
     --btn-text: var(--color-accent-buttons);
-    --btn-bg-hover: var(--intenzity-600);
-    --btn-bg-active: var(--intenzity-700);
-    --btn-bg-disabled: var(--intenzity-200);
-    --btn-text-disabled: var(--intenzity-50);
+    --btn-bg-hover: var(--intensity-600);
+    --btn-bg-active: var(--intensity-700);
+    --btn-bg-disabled: var(--intensity-200);
+    --btn-text-disabled: var(--intensity-50);
 
     &[data-opaque] {
-      --btn-bg: color-mix(in srgb, var(--intenzity-500) 20%);
-      --btn-bg-hover: color-mix(in srgb, var(--intenzity-500) 30%);
-      --btn-bg-active: color-mix(in srgb, var(--intenzity-500) 40%);
-      --btn-bg-disabled: color-mix(in srgb, var(--intenzity-200) 10%);
+      --btn-bg: color-mix(in srgb, var(--intensity-500) 20%);
+      --btn-bg-hover: color-mix(in srgb, var(--intensity-500) 30%);
+      --btn-bg-active: color-mix(in srgb, var(--intensity-500) 40%);
+      --btn-bg-disabled: color-mix(in srgb, var(--intensity-200) 10%);
     }
   }
 
   // ---------- Light ---------
   &.button[data-variant='light'] {
-    --btn-bg: var(--intenzity-100);
-    --btn-text: var(--intenzity-700);
-    --btn-bg-hover: var(--intenzity-200);
-    --btn-bg-active: var(--intenzity-300);
+    --btn-bg: var(--intensity-100);
+    --btn-text: var(--intensity-700);
+    --btn-bg-hover: var(--intensity-200);
+    --btn-bg-active: var(--intensity-300);
     --btn-bg-disabled: var(--color-disabled-buttons);
     --btn-text-disabled: var(--color-disabled-buttons-text);
 
     &[data-opaque] {
-      --btn-bg: color-mix(in srgb, var(--intenzity-100) 20%);
-      --btn-text: var(--intenzity-600);
-      --btn-bg-hover: color-mix(in srgb, var(--intenzity-100) 30%);
-      --btn-bg-active: color-mix(in srgb, var(--intenzity-100) 40%);
-      --btn-bg-disabled: color-mix(in srgb, var(--intenzity-100) 10%);
+      --btn-bg: color-mix(in srgb, var(--intensity-100) 20%);
+      --btn-text: var(--intensity-600);
+      --btn-bg-hover: color-mix(in srgb, var(--intensity-100) 30%);
+      --btn-bg-active: color-mix(in srgb, var(--intensity-100) 40%);
+      --btn-bg-disabled: color-mix(in srgb, var(--intensity-100) 10%);
     }
   }
 
   // --------- White ---------
   &.button[data-variant='white'] {
     --btn-bg: var(--color-accent-buttons);
-    --btn-text: var(--intenzity-600);
-    --btn-bg-hover: var(--intenzity-600);
+    --btn-text: var(--intensity-600);
+    --btn-bg-hover: var(--intensity-600);
     --btn-text-hover: var(--color-accent-buttons);
-    --btn-bg-active: var(--intenzity-700);
+    --btn-bg-active: var(--intensity-700);
     --btn-text-active: var(--color-accent-buttons);
     --btn-bg-disabled: var(--color-disabled-buttons);
     --btn-text-disabled: var(--color-disabled-buttons-text);
@@ -242,25 +243,25 @@
       --btn-text: var(--color-accent-buttons);
       --btn-bg-hover: color-mix(in srgb, var(--color-accent-buttons) 30%);
       --btn-bg-active: var(--color-accent-buttons);
-      --btn-text-active: var(--intenzity-600);
+      --btn-text-active: var(--intensity-600);
       --btn-bg-disabled: color-mix(in srgb, var(--color-accent-buttons) 10%);
     }
 
     &[data-outlined] {
-      --btn-border: var(--intenzity-600);
-      --btn-border-active: var(--intenzity-700);
+      --btn-border: var(--intensity-600);
+      --btn-border-active: var(--intensity-700);
     }
   }
 
   // --------- Transparent ----------
   &.button[data-variant='transparent'] {
     --btn-bg: transparent;
-    --btn-text: var(--intenzity-600);
-    --btn-text-hover: var(--intenzity-700);
-    --btn-text-active: var(--intenzity-800);
-    --btn-border: var(--intenzity-600);
-    --btn-border-hover: var(--intenzity-700);
-    --btn-border-active: var(--intenzity-800);
+    --btn-text: var(--intensity-600);
+    --btn-text-hover: var(--intensity-700);
+    --btn-text-active: var(--intensity-800);
+    --btn-border: var(--intensity-600);
+    --btn-border-hover: var(--intensity-700);
+    --btn-border-active: var(--intensity-800);
     --btn-text-disabled: var(--color-disabled-buttons-text);
 
     &[data-color='white'] {
