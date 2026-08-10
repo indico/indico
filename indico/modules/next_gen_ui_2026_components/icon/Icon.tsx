@@ -14,6 +14,7 @@ import React, {forwardRef} from 'react';
 
 import './Icon.module.scss';
 import {ExtendedIndicoPaletteColor, Size} from '../tokens';
+import {NativeProps} from '../utils';
 
 library.add(fas, far, fab);
 
@@ -22,7 +23,7 @@ export type IconColor = ExtendedIndicoPaletteColor;
 export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
 export type IconSize = Size;
 
-interface BaseIconProps {
+interface CustomIconProps {
   icon: IconSource;
   className?: string;
   color?: IconColor;
@@ -31,22 +32,22 @@ interface BaseIconProps {
   rounded?: boolean;
   decorative?: boolean;
   ariaLabel?: string;
-  title?: string;
   onClick?: React.MouseEventHandler<HTMLSpanElement>;
-  href?: string;
 }
 
-export type IconProps =
-  | (BaseIconProps & {
+type VariantUnion =
+  | {
       variant?: 'light' | 'solid' | 'dark';
       rounded?: boolean;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error';
-    })
-  | (BaseIconProps & {
+    }
+  | {
       variant?: 'plain' | 'compact';
       rounded?: never;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
-    });
+    };
+
+export type IconProps = CustomIconProps & NativeProps<'span', 'onClick'> & VariantUnion;
 
 function isCustomIcon(
   icon: IconSource
@@ -66,7 +67,7 @@ function parseIconString(icon: string): {
   };
 }
 
-export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
+export const Icon = forwardRef<HTMLSpanElement | HTMLAnchorElement, IconProps>((props, ref) => {
   const {
     icon,
     className,
@@ -77,8 +78,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
     decorative = true,
     ariaLabel,
     title,
-    onClick,
-    href,
+    ...nativeProps
   } = props;
 
   const isDecorative = decorative || !ariaLabel;
@@ -86,7 +86,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
 
   if (isCustomIcon(icon)) {
     const SvgIcon = icon;
-    content = <SvgIcon className="indico-ui" focusable="false" aria-hidden="true" href={href} />;
+    content = <SvgIcon className="indico-ui" focusable="false" aria-hidden="true" />;
   } else {
     const {prefix, iconName} = parseIconString(icon);
     content = (
@@ -97,24 +97,27 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => {
         }}
         focusable="false"
         aria-hidden="true"
-        href={href}
       />
     );
   }
 
+  const dataProps = {
+    'data-color': color,
+    'data-size': size,
+    'data-variant': variant,
+    'data-rounded': rounded ? '' : undefined,
+    'aria-hidden': isDecorative,
+    'aria-label': !isDecorative ? ariaLabel : undefined,
+  };
+
   return (
     <span
-      ref={ref}
+      ref={ref as React.Ref<HTMLSpanElement>}
       styleName="root"
       className={`indico-ui ${className || ''}`}
-      data-color={color}
-      data-size={size}
-      data-variant={variant}
-      data-rounded={rounded ? '' : undefined}
       title={title}
-      aria-hidden={isDecorative}
-      aria-label={!isDecorative ? ariaLabel : undefined}
-      onClick={onClick}
+      {...dataProps}
+      {...nativeProps}
     >
       {content}
     </span>

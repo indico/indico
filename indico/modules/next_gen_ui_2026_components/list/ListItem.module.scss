@@ -56,7 +56,7 @@
     }
 
     &.list-item-header {
-        @include typography('text-sm', 'semibold'); // 14px
+        @include typography('text-sm', 'bold'); // 14px
         color: var(--color-text-heading);
         max-width: 100%;
 
@@ -82,17 +82,5 @@
         min-width: 0;
         flex: 1 1 auto;
         white-space: nowrap;
-    }
-
-    &.label-indicator {
-        display: flex;
-
-        .label-indicator-text {
-            @include typography('text-xxs', 'regular');
-        }
-
-        .dot {
-            margin-right: var(--space-1);
-        }
     }
 }

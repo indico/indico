@@ -56,13 +56,12 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
     color = 'primary',
     variant = 'solid',
     size = 'md',
-    textWeight = 'medium',
+    textWeight = 'regular',
     outlined = false,
-    rounded = true,
+    rounded = false,
     opaque = false,
     icon,
     iconPosition = 'left',
-    iconHref,
     ...nativeProps
   } = props;
 
@@ -88,7 +87,6 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
       variant="compact"
       decorative
       styleName="tag-icon"
-      href={iconHref}
     />
   );
 
