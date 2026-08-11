@@ -129,6 +129,8 @@ Internal Changes
 - Relax the videoconference name length limit to 255 characters, delegating
   service-specific limits to each plugin (:pr:`7560`, thanks
   :user:`moliholy, unconventionaldotdev`)
+- Modernize the scientific program + session list PDF generation using weasyprint
+  (:pr:`7694`)
 
 
 Version 3.3.12
