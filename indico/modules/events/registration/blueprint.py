@@ -123,12 +123,12 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/import', 
                  reglists.RHRegistrationsImport, methods=('GET', 'POST'))
 _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<any(table, book):export_type>.pdf',
-    'registrations_pdf_export', reglists.RHRegistrationsExportPDF, methods=('POST',),
+    'registrations_pdf_export', reglists.RHRegistrationsExportPDF, methods=('GET', 'POST'),
 )
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv', 'registrations_csv_export',
-                 reglists.RHRegistrationsExportCSV, methods=('POST',))
+                 reglists.RHRegistrationsExportCSV, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
-                 'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('POST',))
+                 'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/approve', 'registrations_approve',
                  reglists.RHRegistrationsApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reject', 'registrations_reject',

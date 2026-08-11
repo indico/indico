@@ -278,18 +278,25 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
     """Base class for classes performing actions on registrations."""
 
     registration_query_options = ()
+    _allow_get_all = False
 
     @use_kwargs({
         'registration_ids': fields.List(fields.Integer(), data_key='registration_id', load_default=lambda: []),
     })
     def _process_args(self, registration_ids):
         RHManageRegFormBase._process_args(self)
-        self.registrations = (Registration.query.with_parent(self.regform)
-                              .filter(Registration.id.in_(registration_ids),
-                                      ~Registration.is_deleted)
-                              .order_by(*Registration.order_by_name)
-                              .options(*self.registration_query_options)
-                              .all())
+        query = (
+            Registration.query
+            .with_parent(self.regform)
+            .filter(~Registration.is_deleted)
+            .order_by(*Registration.order_by_name)
+            .options(*self.registration_query_options)
+        )
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by registration ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            query = query.filter(Registration.id.in_(registration_ids))
+        self.registrations = query.all()
 
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
@@ -493,6 +500,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     """Base class for all registration list export RHs."""
 
     ALLOW_LOCKED = True
+    _allow_get_all = True
     registration_query_options = (subqueryload('data'),)
 
     def _process_args(self):
