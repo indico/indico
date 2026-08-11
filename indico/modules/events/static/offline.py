@@ -383,9 +383,6 @@ class StaticConferenceCreator(StaticEventCreator):
 
         if isinstance(pdf, BytesIO):
             self._add_file(pdf, uh_or_endpoint, target)
-        elif hasattr(pdf, 'getPDFBin'):
-            # Got legacy reportlab PDF generator instead of the LaTex-based one
-            self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:
             with open(pdf.generate(), 'rb') as f:
                 self._add_file(f, uh_or_endpoint, target)

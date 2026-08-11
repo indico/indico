@@ -21,7 +21,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 
 from indico.core import signals
-from indico.legacy.pdfinterface.base import setTTFonts
+from indico.legacy.pdfinterface.base import init_reportlab_fonts
 from indico.modules.designer import PageOrientation
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, sanitize_html, strip_tags
@@ -68,7 +68,7 @@ class DesignerPDFBase:
         if self.config.page_orientation == PageOrientation.landscape:
             self.page_size = pagesizes.landscape(self.page_size)
         self.width, self.height = self.page_size
-        setTTFonts()
+        init_reportlab_fonts()
 
     def _process_tpl_data(self, tpl_data):
         return TplData(width_cm=(float(tpl_data['width']) / PIXELS_CM),
