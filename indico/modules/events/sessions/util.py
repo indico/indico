@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 from collections import defaultdict
-from io import BytesIO
 
+from flask import render_template
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
@@ -89,10 +89,12 @@ class SessionListToPDF(PDFBase):
         return story
 
 
-def generate_pdf_from_sessions(sessions):
+def generate_pdf_from_sessions(event, sessions):
     """Generate a PDF file from a given session list."""
-    pdf = SessionListToPDF(sessions)
-    return BytesIO(pdf.getPDFBin())
+    from indico.modules.events.timetable.util import create_pdf
+    css = render_template('events/sessions/pdf/session_table.css')
+    html = render_template('events/sessions/pdf/session_table.html', event=event, sessions=sessions)
+    return create_pdf(html, css, event)
 
 
 def session_coordinator_priv_enabled(event, priv):

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<title>{% trans %}List of sessions{% endtrans %}</title>
+
+<header class="event-title-header">{{ event.title }}</header>
+<h1>{%- trans %}List of sessions{% endtrans -%}</h2>
+
+{% set has_codes = sessions|selectattr('code')|any %}
+{% set has_types = sessions|selectattr('type')|any %}
+{% set has_descriptions = sessions|selectattr('description')|any %}
+
+<table>
+    <colgroup>
+        <col style="width: 5%">
+        {% if has_codes %}
+            <col style="width: 15%">
+        {% endif %}
+        {% if has_types %}
+            <col style="width: 15%">
+        {% endif %}
+        <col>
+        {% if has_descriptions %}
+            <col>
+        {% endif %}
+    </colgroup>
+
+    <thead>
+        <tr>
+            <th>{% trans %}ID{% endtrans %}</th>
+            {% if has_codes %}
+                <th>{% trans %}Code{% endtrans %}</th>
+            {% endif %}
+            {% if has_types %}
+                <th>{% trans %}Type{% endtrans %}</th>
+            {% endif %}
+            <th>{% trans %}Title{% endtrans %}</th>
+            {% if has_descriptions %}
+                <th>{% trans %}Description{% endtrans %}</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for sess in sessions|sort(attribute='friendly_id') %}
+            <tr>
+                <td>{{ sess.friendly_id }}</td>
+                {% if has_codes %}
+                    <td>{{ sess.code }}</td>
+                {% endif %}
+                {% if has_types %}
+                    <td>{{ sess.type.name if sess.type }}</td>
+                {% endif %}
+                <td>{{ sess.title }}</td>
+                {% if has_descriptions %}
+                    <td>{{ sess.description }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
