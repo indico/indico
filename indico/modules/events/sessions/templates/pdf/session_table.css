@@ -50,25 +50,16 @@ table {
   table-layout: fixed;
 }
 
-th {
-  font-weight: bold;
-  vertical-align: middle;
-  padding: 8px 4px;
+thead {
   border-bottom: 1px solid #000;
-  font-size: 8pt;
-  overflow-wrap: break-word;
 }
 
-td {
+td,
+th {
   border: none;
-  font-size: 8pt;
-  line-height: 1.2;
+  padding: 0.4em 0;
 }
 
 tbody tr {
   border-bottom: 0.5px solid #ddd;
-}
-
-tr {
-  height: 20px;
 }
