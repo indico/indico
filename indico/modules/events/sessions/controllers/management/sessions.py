@@ -114,6 +114,7 @@ class RHDeleteSessions(RHManageSessionsActionsBase):
 
 class RHManageSessionsExportBase(RHManageSessionsActionsBase):
     ALLOW_LOCKED = True
+    _allow_get_all = True
 
 
 class RHExportSessionsCSV(RHManageSessionsExportBase):

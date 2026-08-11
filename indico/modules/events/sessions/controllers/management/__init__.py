@@ -6,10 +6,12 @@
 # LICENSE file for more details.
 
 from flask import request, session
+from marshmallow import fields
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.sessions.models.sessions import Session
+from indico.web.args import use_kwargs
 
 
 class RHManageSessionsBase(RHManageEventBase):
@@ -37,7 +39,16 @@ class RHManageSessionBase(RHManageSessionsBase):
 class RHManageSessionsActionsBase(RHManageSessionsBase):
     """Base class for classes performing actions on sessions."""
 
-    def _process_args(self):
+    _allow_get_all = False
+
+    @use_kwargs({
+        'session_ids': fields.List(fields.Int(), data_key='session_id', load_default=lambda: [])
+    })
+    def _process_args(self, session_ids):
         RHManageSessionsBase._process_args(self)
-        session_ids = set(map(int, request.form.getlist('session_id')))
-        self.sessions = Session.query.with_parent(self.event).filter(Session.id.in_(session_ids)).all()
+        query = Session.query.with_parent(self.event)
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by session ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            query = query.filter(Session.id.in_(session_ids))
+        self.sessions = query.all()
