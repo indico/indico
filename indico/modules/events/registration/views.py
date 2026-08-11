@@ -57,6 +57,7 @@ class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConfer
 
 
 class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
+    is_static = False
     menu_entry_name = 'participants'
 
 

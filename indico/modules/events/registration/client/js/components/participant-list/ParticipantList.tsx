@@ -33,6 +33,12 @@ import './ParticipantList.module.scss';
 interface ParticipantListProps {
   eventId: number;
   preview?: boolean;
+  staticData?: {
+    published: boolean;
+    merged: boolean;
+    num_participants: number;
+    tables: TableObj[];
+  };
 }
 
 interface ParticipantCounterProps {
@@ -70,7 +76,7 @@ function ParticipantCounter({table}: ParticipantCounterProps) {
   );
 }
 
-export default function ParticipantList({eventId, preview}: ParticipantListProps) {
+export default function ParticipantList({eventId, preview, staticData}: ParticipantListProps) {
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState<PerPageOptions>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,7 +94,17 @@ export default function ParticipantList({eventId, preview}: ParticipantListProps
     return participantListDataURL({event_id: eventId});
   }, [eventId, previewMode]);
 
-  const {data, loading, lastData} = useIndicoAxios(url);
+  const {
+    data: axiosData,
+    loading: axiosLoading,
+    lastData: axiosLastData,
+  } = useIndicoAxios(url, {
+    manual: Boolean(staticData),
+  });
+
+  const data = staticData ?? axiosData;
+  const loading = staticData ? false : axiosLoading;
+  const lastData = staticData ? null : axiosLastData;
 
   const perPageOptions: PerPageOptions[] = useMemo(() => {
     const maxNumParticipants = (data?.tables ?? []).reduce(

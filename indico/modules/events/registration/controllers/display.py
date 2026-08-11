@@ -292,17 +292,19 @@ class ParticipantListRESTMixin:
 
         return tables, merged, regforms
 
-    def _process(self):
-        is_participant = self.is_participant(session.user)
+    def _get_participant_list(self, is_participant):
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
         num_participants = sum(table['num_participants'] for table in tables)
 
-        return jsonify({
+        return {
             'published': bool(regforms),
             'merged': merged,
             'num_participants': num_participants,
             'tables': tables,
-        })
+        }
+
+    def _process(self):
+        return jsonify(self._get_participant_list(self.is_participant(session.user)))
 
 
 class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
@@ -312,13 +314,20 @@ class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayB
         return self.event.is_user_registered(user)
 
 
-class RHParticipantList(RHRegistrationFormDisplayBase):
+class RHParticipantList(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList  # needed for offline archive generation
 
     def _process(self):
-        return self.view_class.render_template('display/participant_list.html', self.event)
+        if (self.view_class.is_static):
+            return self.view_class.render_template('display/participant_list.html',
+                                               self.event,
+                                               static_data=self._get_participant_list(False))
+        else:
+            return self.view_class.render_template('display/participant_list.html',
+                                                   self.event,
+                                                   static_data=None)
 
 
 class InvitationMixin:
