@@ -7,7 +7,7 @@
 
 from uuid import UUID
 
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, g, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -292,17 +292,19 @@ class ParticipantListRESTMixin:
 
         return tables, merged, regforms
 
-    def _process(self):
-        is_participant = self.is_participant(session.user)
+    def _get_participant_list(self, is_participant):
         tables, merged, regforms = self._get_participant_list_tables(is_participant)
         num_participants = sum(table['num_participants'] for table in tables)
 
-        return jsonify({
+        return {
             'published': bool(regforms),
             'merged': merged,
             'num_participants': num_participants,
             'tables': tables,
-        })
+        }
+
+    def _process(self):
+        return jsonify(self._get_participant_list(self.is_participant(session.user)))
 
 
 class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
@@ -312,13 +314,14 @@ class RHParticipantListREST(ParticipantListRESTMixin, RHRegistrationFormDisplayB
         return self.event.is_user_registered(user)
 
 
-class RHParticipantList(RHRegistrationFormDisplayBase):
+class RHParticipantList(ParticipantListRESTMixin, RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList  # needed for offline archive generation
 
     def _process(self):
-        return self.view_class.render_template('display/participant_list.html', self.event)
+        static_data = self._get_participant_list(False) if g.get('static_site') else None
+        return self.view_class.render_template('display/participant_list.html', self.event, static_data=static_data)
 
 
 class InvitationMixin:
