@@ -13,6 +13,7 @@ from io import BytesIO
 from flask import flash, jsonify, request, session
 from markupsafe import Markup
 from PIL import Image
+from reportlab import rl_config
 from reportlab.lib.colors import toColor
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -373,6 +374,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         return jsonify_data()
 
     def _validate_color(self, color):
+        rl_config.toColorCanUse = None
         try:
             toColor(color)
         except ValueError:
