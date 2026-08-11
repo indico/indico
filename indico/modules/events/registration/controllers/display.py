@@ -320,11 +320,8 @@ class RHParticipantList(ParticipantListRESTMixin, RHRegistrationFormDisplayBase)
     view_class = WPDisplayRegistrationParticipantList  # needed for offline archive generation
 
     def _process(self):
-        return self.view_class.render_template(
-            'display/participant_list.html',
-            self.event,
-            static_data=self._get_participant_list(False) if g.get('static_site') else None,
-        )
+        static_data = self._get_participant_list(False) if g.get('static_site') else None
+        return self.view_class.render_template('display/participant_list.html', self.event, static_data=static_data)
 
 
 class InvitationMixin:
