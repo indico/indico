@@ -99,7 +99,7 @@ export default function ParticipantList({eventId, preview, staticData}: Particip
     loading: axiosLoading,
     lastData: axiosLastData,
   } = useIndicoAxios(url, {
-    manual: Boolean(staticData),
+    manual: staticData !== null,
   });
 
   const data = staticData ?? axiosData;

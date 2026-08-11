@@ -154,7 +154,7 @@ import setupRegformSubmission from './form_submission';
             <ParticipantList
               eventId={Number(this.getAttribute('event-id'))}
               preview={this.hasAttribute('preview')}
-              staticData={staticData ? JSON.parse(staticData) : undefined}
+              staticData={JSON.parse(staticData)}
             />,
             this
           );

@@ -7,7 +7,7 @@
 
 from uuid import UUID
 
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, g, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -320,14 +320,11 @@ class RHParticipantList(ParticipantListRESTMixin, RHRegistrationFormDisplayBase)
     view_class = WPDisplayRegistrationParticipantList  # needed for offline archive generation
 
     def _process(self):
-        if (self.view_class.is_static):
-            return self.view_class.render_template('display/participant_list.html',
-                                               self.event,
-                                               static_data=self._get_participant_list(False))
-        else:
-            return self.view_class.render_template('display/participant_list.html',
-                                                   self.event,
-                                                   static_data=None)
+        return self.view_class.render_template(
+            'display/participant_list.html',
+            self.event,
+            static_data=self._get_participant_list(False) if g.get('static_site') else None,
+        )
 
 
 class InvitationMixin:

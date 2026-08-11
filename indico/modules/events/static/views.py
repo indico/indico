@@ -46,7 +46,6 @@ class WPStaticConferenceProgram(WPStaticEventBase, WPDisplayTracks):
 
 
 class WPStaticDisplayRegistrationParticipantList(WPStaticEventBase, WPDisplayRegistrationParticipantList):
-    is_static = True
     endpoint = 'event_registration.participant_list'
 
 

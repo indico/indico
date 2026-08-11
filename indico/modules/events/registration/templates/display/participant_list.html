@@ -5,5 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    <ind-conference-participant-list event-id="{{ event.id }}" static-data="{{ static_data | tojson | forceescape }}"></ind-conference-participant-list>
+    <ind-conference-participant-list 
+        event-id="{{ event.id }}" 
+        {% if static_data %}static-data="{{ static_data | tojson | forceescape }}"{% endif %}>
+    </ind-conference-participant-list>
 {% endblock %}
