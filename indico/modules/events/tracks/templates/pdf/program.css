@@ -76,6 +76,10 @@ body {
   page: content;
 }
 
+img {
+  max-width: 100%;
+}
+
 .track-list {
   margin: 0;
   padding: 0;
