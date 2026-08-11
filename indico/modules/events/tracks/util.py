@@ -7,14 +7,16 @@
 
 from flask import render_template
 
+from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.timetable.util import create_pdf
 from indico.modules.events.tracks.settings import track_settings
 
 
 def generate_program_pdf(event):
+    render_mode = track_settings.get(event, 'program_render_mode')
     title = get_menu_entry_by_name('program', event).localized_title
-    program_text = track_settings.get(event, 'program')
+    program_text = RENDER_MODE_WRAPPER_MAP[render_mode](track_settings.get(event, 'program'))
     top_level_tracks = event.get_sorted_tracks()
     css = render_template('events/tracks/pdf/program.css')
     html = render_template(
