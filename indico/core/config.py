@@ -146,6 +146,11 @@ REQUIRED_KEYS = {'SQLALCHEMY_DATABASE_URI', 'SECRET_KEY', 'BASE_URL', 'CELERY_BR
                  'DEFAULT_TIMEZONE', 'DEFAULT_LOCALE', 'CACHE_DIR', 'TEMP_DIR', 'LOG_DIR', 'STORAGE_BACKENDS',
                  'ATTACHMENT_STORAGE', 'SUPPORT_EMAIL', 'NO_REPLY_EMAIL'}
 
+# Reserved namespace for file-backed plugin config keys (``PLUGIN_<NAME>_<KEY>``). These are
+# collected during config loading and resolved later, once each plugin is initialized, so that
+# loading the config never has to import any plugin.
+PLUGIN_CONFIG_PREFIX = 'PLUGIN_'
+
 
 def get_config_path():
     """Get the path of the indico config file.
@@ -207,12 +212,36 @@ def _postprocess_config(data):
 
 
 def _sanitize_data(data, allow_internal=False):
+    """Split raw config into known core keys and pending plugin keys.
+
+    Returns a ``(clean, plugin)`` tuple: ``clean`` holds recognized core keys,
+    ``plugin`` holds keys under the reserved ``PLUGIN_`` namespace (left for the
+    owning plugin to claim later). Unknown keys outside that namespace are dropped
+    with a warning.
+    """
     allowed = set(DEFAULTS)
     if allow_internal:
         allowed |= set(INTERNAL_DEFAULTS)
-    for key in set(data) - allowed:
+    clean = {}
+    plugin = {}
+    for key, value in data.items():
+        if key in allowed:
+            clean[key] = value
+        elif key.startswith(PLUGIN_CONFIG_PREFIX):
+            plugin[key] = value
+        else:
+            warnings.warn(f'Ignoring unknown config key {key}', stacklevel=2)
+    return clean, plugin
+
+
+def _warn_unclaimed_plugin_config(data):
+    """Warn about ``PLUGIN_*`` keys that no initialized plugin claimed.
+
+    Runs after all plugins are loaded (via :meth:`IndicoConfig.validate`), so any key
+    still pending belongs to a plugin that is not enabled or does not declare it.
+    """
+    for key in data['PLUGIN_CONFIG']['pending']:
         warnings.warn(f'Ignoring unknown config key {key}', stacklevel=2)
-    return {k: v for k, v in data.items() if k in allowed}
 
 
 def _validate_config(data):
@@ -231,14 +260,23 @@ def load_config(only_defaults=False, override=None):
                      the configuration.  Any values provided here
                      will override values from the config file.
     """
-    data = DEFAULTS | INTERNAL_DEFAULTS
+    raw_config = {}
+    path = None
     if not only_defaults:
         path = get_config_path()
-        config = _sanitize_data(_parse_config(path))
+        raw_config = _parse_config(path)
+
+    data = DEFAULTS | INTERNAL_DEFAULTS
+    # Plugin keys are held here until the owning plugin claims them during its init.
+    plugin_pending = {}
+    if not only_defaults:
+        config, plugin = _sanitize_data(raw_config)
         data.update(config)
-        env_override = os.environ.get('INDICO_CONF_OVERRIDE')
-        if env_override:
-            data.update(_sanitize_data(ast.literal_eval(env_override)))
+        plugin_pending.update(plugin)
+        if env_override := os.environ.get('INDICO_CONF_OVERRIDE'):
+            config, plugin = _sanitize_data(ast.literal_eval(env_override))
+            data.update(config)
+            plugin_pending.update(plugin)
         resolved_path = resolve_link(path) if os.path.islink(path) else path
         resolved_path = None if resolved_path == os.devnull else resolved_path
         data['CONFIG_PATH'] = path
@@ -247,7 +285,12 @@ def load_config(only_defaults=False, override=None):
             data['LOGGING_CONFIG_PATH'] = os.path.join(os.path.dirname(resolved_path), data['LOGGING_CONFIG_FILE'])
 
     if override:
-        data.update(_sanitize_data(override, allow_internal=True))
+        config, plugin = _sanitize_data(override, allow_internal=True)
+        data.update(config)
+        plugin_pending.update(plugin)
+    # ``pending`` and ``resolved`` are mutable on purpose: plugins move their keys from the former
+    # to the latter (via ``register_plugin_config``) after this immutable config is already built.
+    data['PLUGIN_CONFIG'] = {'pending': plugin_pending, 'resolved': {}}
     _postprocess_config(data)
     if not only_defaults:
         _validate_config(data)
@@ -347,12 +390,41 @@ class IndicoConfig:
             self.XELATEX_PODMAN_CONFIG  # noqa: B018
         except ValidationError as err:
             raise ValueError(f'Invalid value for XELATEX_PATH: {err}')
+        _warn_unclaimed_plugin_config(self.data)
+
+    def register_plugin_config(self, plugin):
+        """Resolve a plugin's file-backed config once the plugin is initialized.
+
+        Called from :meth:`~indico.core.plugins.IndicoPlugin.init`, when the plugin is
+        already imported. Declared defaults are applied for keys omitted from the config
+        file, and any values collected during :func:`load_config` are consumed here.
+        Collisions with a core key are warned about and the plugin default is ignored;
+        collisions between plugins raise ``RuntimeError``.
+        """
+        store = self.data['PLUGIN_CONFIG']
+        pending, resolved = store['pending'], store['resolved']
+        prefix = f'{PLUGIN_CONFIG_PREFIX}{plugin.name.upper()}'
+        for key, default in plugin.plugin_config_defaults.items():
+            full = f'{prefix}_{key}'
+            if full in DEFAULTS:
+                warnings.warn(f'Plugin {plugin.name!r} config key {full!r} collides with a core config key; '
+                              f'plugin default ignored', stacklevel=2)
+                continue
+            if full in resolved:
+                raise RuntimeError(f'Plugin {plugin.name!r} config key {full!r} collides with another plugin')
+            resolved[full] = pending.pop(full, default)
 
     def __getattr__(self, name):
         try:
             return self.data[name]
         except KeyError:
-            raise self._exc('no such setting: ' + name)
+            pass
+        if name.startswith(PLUGIN_CONFIG_PREFIX):
+            try:
+                return self.data['PLUGIN_CONFIG']['resolved'][name]
+            except KeyError:
+                pass
+        raise self._exc('no such setting: ' + name)
 
     def __setattr__(self, key, value):
         raise AttributeError('cannot change config at runtime')
