@@ -60,6 +60,14 @@ th {
   padding: 0.4em 0;
 }
 
+p {
+  margin: 0;
+}
+
+td {
+  vertical-align: top;
+}
+
 tbody tr {
   border-bottom: 0.5px solid #ddd;
 }
