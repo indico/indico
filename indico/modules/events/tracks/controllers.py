@@ -5,13 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from io import BytesIO
 from operator import attrgetter, itemgetter
 
 from flask import flash, request
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
-from indico.legacy.pdfinterface.conference import ProgrammeToPDF
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.tracks.forms import ProgramForm, TrackForm, TrackGroupForm
@@ -21,6 +19,7 @@ from indico.modules.events.tracks.operations import (create_track, create_track_
                                                      update_program, update_track, update_track_group)
 from indico.modules.events.tracks.schemas import ProgramSchema
 from indico.modules.events.tracks.settings import track_settings
+from indico.modules.events.tracks.util import generate_program_pdf
 from indico.modules.events.tracks.views import WPDisplayTracks, WPManageTracks
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
@@ -149,8 +148,8 @@ class RHDisplayTracks(RHDisplayEventBase):
 
 class RHTracksPDF(RHDisplayEventBase):
     def _process(self):
-        pdf = ProgrammeToPDF(self.event)
-        return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        pdf = generate_program_pdf(self.event)
+        return send_file('program.pdf', pdf, 'application/pdf')
 
 
 class RHTracksJSON(RHDisplayEventBase):

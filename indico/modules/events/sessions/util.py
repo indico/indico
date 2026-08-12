@@ -6,22 +6,15 @@
 # LICENSE file for more details.
 
 from collections import defaultdict
-from io import BytesIO
 
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.platypus import Table, TableStyle
+from flask import render_template
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.legacy.pdfinterface.base import Paragraph, PDFBase
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
-from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 
 
@@ -48,51 +41,12 @@ def generate_spreadsheet_from_sessions(sessions):
     return column_names, rows
 
 
-class SessionListToPDF(PDFBase):
-    def __init__(self, sessions):
-        PDFBase.__init__(self, story=[])
-        self.sessions = sessions
-        self.PAGE_WIDTH, self.PAGE_HEIGHT = landscape(A4)
-
-    def getBody(self, story=None):  # noqa: N802
-        story = story or self._story
-        header_style = ParagraphStyle(name='header_style', fontSize=12, alignment=TA_CENTER)
-        story.append(Paragraph('<b>{}</b>'.format(_('List of sessions')), header_style))
-
-        text_style = ParagraphStyle(name='text_style', fontSize=8, alignment=TA_LEFT, leading=10, leftIndent=10)
-        text_style.fontName = 'Times-Roman'
-        text_style.spaceBefore = 0
-        text_style.spaceAfter = 0
-        text_style.firstLineIndent = 0
-
-        headers = [
-            Paragraph(f'<b>{col}</b>', text_style)
-            for col in (_('ID'), _('Type'), _('Title'), _('Code'), _('Description'))
-        ]
-        rows = [headers]
-        rows.extend([
-            Paragraph(sess.friendly_id, text_style),
-            Paragraph(sess.type.name if sess.type else '', text_style),
-            Paragraph(sess.title, text_style),
-            Paragraph(sess.code, text_style),
-            Paragraph(sess.description, text_style)
-        ] for sess in self.sessions)
-
-        col_widths = (None,) * 5
-        table_style = TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
-            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-            ('ALIGN', (0, 1), (-1, -1), 'LEFT')
-        ])
-        story.append(Table(rows, colWidths=col_widths, style=table_style))
-        return story
-
-
-def generate_pdf_from_sessions(sessions):
+def generate_pdf_from_sessions(event, sessions):
     """Generate a PDF file from a given session list."""
-    pdf = SessionListToPDF(sessions)
-    return BytesIO(pdf.getPDFBin())
+    from indico.modules.events.timetable.util import create_pdf
+    css = render_template('events/sessions/pdf/session_table.css')
+    html = render_template('events/sessions/pdf/session_table.html', event=event, sessions=sessions)
+    return create_pdf(html, css, event)
 
 
 def session_coordinator_priv_enabled(event, priv):
