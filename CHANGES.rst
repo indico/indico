@@ -101,6 +101,7 @@ Bugfixes
   :pr:`7668`)
 - Avoid serving incomplete webpack manifests during concurrent requests (:issue:`7530`,
   :pr:`7675`, thanks :user:`shuv-amp`)
+- Fix missing fonts in Offline Copy archives (:pr:`7697`)
 
 Accessibility
 ^^^^^^^^^^^^^
