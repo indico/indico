@@ -130,6 +130,11 @@ Accessibility
   title as plain text with no heading (:pr:`7617`, thanks :user:`foxbunny`)
 - The abstract submission ID is now easier to read for users with low vision
   (:pr:`7463`, thanks :user:`foxbunny`)
+- Screen reader users can now reliably hear their relationship to each event in
+  the dashboard's "Your events at hand" list (management, reviewing, attendance
+  and favourite status), which was previously exposed only through role-icon
+  tooltips that assistive technology did not announce dependably (:pr:`7589`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
