@@ -64,6 +64,10 @@
 
   .submission-id {
     color: $gray;
+
+    #abstract-review-page & {
+      color: var(--text-secondary-color);
+    }
   }
 
   .submission-code {

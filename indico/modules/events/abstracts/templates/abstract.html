@@ -20,6 +20,7 @@
 {% endblock %}
 
 {% block content %}
+<div id="abstract-review-page">
     {{ render_abstract_info(abstract) }}
 
     {% call(block, __) render_timeline(abstract, comment_form, review_form) %}
@@ -75,4 +76,5 @@
             });
         </script>
     {% endif %}
+</div>
 {% endblock %}
