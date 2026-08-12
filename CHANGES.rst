@@ -102,6 +102,7 @@ Bugfixes
 - Avoid serving incomplete webpack manifests during concurrent requests (:issue:`7530`,
   :pr:`7675`, thanks :user:`shuv-amp`)
 - Fix missing fonts in Offline Copy archives (:pr:`7697`)
+- Reject invalid email addresses when entering person details (:issue:`7644`, :pr:`7698`)
 
 Accessibility
 ^^^^^^^^^^^^^

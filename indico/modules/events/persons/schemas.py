@@ -13,7 +13,7 @@ from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import ModelField, NoneValueEnumField
+from indico.util.marshmallow import ModelField, NoneValueEnumField, valid_email
 
 
 class PersonLinkSchema(mm.Schema):
@@ -31,7 +31,7 @@ class PersonLinkSchema(mm.Schema):
     affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
     phone = fields.String(load_default='')
     address = fields.String(load_default='')
-    email = fields.String(load_default='')
+    email = fields.String(load_default='', validate=lambda x: valid_email(x) if x else None)
     display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None, dump_only=True)
     roles = fields.List(fields.String(), load_only=True)
