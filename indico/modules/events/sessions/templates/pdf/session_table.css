@@ -47,7 +47,6 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 8pt;
-  table-layout: fixed;
 }
 
 thead {
@@ -57,7 +56,9 @@ thead {
 td,
 th {
   border: none;
-  padding: 0.4em 0;
+  padding: 0.4em 0.5em;
+  overflow-wrap: break-word;
+  text-align: left;
 }
 
 p {
@@ -68,6 +69,6 @@ td {
   vertical-align: top;
 }
 
-tbody tr {
+tbody tr:not(:last-child) {
   border-bottom: 0.5px solid #ddd;
 }
