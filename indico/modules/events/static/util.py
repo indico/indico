@@ -25,19 +25,20 @@ from indico.util.network import InsecureRequestError, make_validate_request_url_
 from indico.web.flask.util import endpoint_for_url
 
 
-_css_url_pattern = r'''url\((['"]?)({}|https?:)?([^)'"]+)\1\)'''
+_css_url_pattern = r'''url\((['"]?)({}https?:)?([^)'"]+)\1\)'''
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
-_plugin_url_pattern = r'(?:{})?/static/plugins/([^/]+)/(.*?)(?:__v[0-9a-f]+)?\.([^.]+)$'
-_static_url_pattern = r'(?:{})?/(images|dist|fonts)(.*)/(.+?)(?:__v[0-9a-f]+)?\.([^.]+)$'
-_custom_url_pattern = r'(?:{})?/static/custom/(.+)$'
+_plugin_url_pattern = r'/static/plugins/([^/]+)/(.*?)(?:__v[0-9a-f]+)?\.([^.]+)$'
+_static_url_pattern = r'/(images|dist|fonts)(.*)/(.+?)(?:__v[0-9a-f]+)?\.([^.]+)$'
+_custom_url_pattern = r'/static/custom/(.+)$'
 
 
 def rewrite_static_url(path):
     """Remove __vxxx prefix from static URLs."""
     base_path = urlsplit(config.BASE_URL).path
-    plugin_pattern = _plugin_url_pattern.format(base_path)
-    static_pattern = _static_url_pattern.format(base_path)
-    custom_pattern = _custom_url_pattern.format(base_path)
+    base_path_pattern_prefix = f'(?:{base_path})?' if base_path else ''
+    plugin_pattern = base_path_pattern_prefix + _plugin_url_pattern
+    static_pattern = base_path_pattern_prefix + _static_url_pattern
+    custom_pattern = base_path_pattern_prefix + _custom_url_pattern
     if re.match(plugin_pattern, path):
         return re.sub(plugin_pattern, r'static/plugins/\1/\2.\3', path)
     elif re.match(static_pattern, path):
@@ -119,8 +120,9 @@ def rewrite_css_urls(event, css):
             else:
                 return f"url('../../../{rewritten_url}')"
 
-    indico_path = urlsplit(config.BASE_URL).path or '/'
-    new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE)
+    indico_path = urlsplit(config.BASE_URL).path
+    css_url_pattern = _css_url_pattern.format(f'{indico_path}|') if indico_path else _css_url_pattern
+    new_css = re.sub(css_url_pattern, _replace_url, css, flags=re.MULTILINE)
     return new_css, used_urls, used_images
 
 
