@@ -57,7 +57,6 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 8pt;
-  table-layout: fixed;
 }
 
 th {
