@@ -135,6 +135,9 @@ Accessibility
   and favourite status), which was previously exposed only through role-icon
   tooltips that assistive technology did not announce dependably (:pr:`7589`,
   thanks :user:`foxbunny`)
+- Screen reader users now hear the affiliation, email and phone on their profile
+  dashboard announced as labelled fields instead of bare values (:pr:`7593`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
