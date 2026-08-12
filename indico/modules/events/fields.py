@@ -161,7 +161,14 @@ class PersonLinkListFieldBase(PrincipalListField):
         try:
             data = schema.load(data)
         except MMValidationError as exc:
-            # XXX this happens when custom affiliations are disabled but someone sends one anyway.
+            if isinstance(exc.messages, dict) and exc.messages.keys() == {'email'}:
+                raise UserValueError(
+                    _('Validation of {email} failed: {error}').format(
+                        email=exc.data['email'],
+                        error=', '.join(exc.messages['email']),
+                    )
+                )
+            # XXX this also happens when custom affiliations are disabled but someone sends one anyway.
             # it should never happen so we don't bother formatting it in a pretty way
             raise UserValueError(f'Validation failed: {exc}')
         if not data.get('type'):

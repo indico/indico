@@ -23,7 +23,7 @@ from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders
-from indico.util.string import get_format_placeholders, has_endpoint_links, has_relative_links
+from indico.util.string import get_format_placeholders, has_endpoint_links, has_relative_links, validate_email_verbose
 from indico.util.user import principal_from_identifier
 
 
@@ -54,6 +54,15 @@ def not_empty(value):
     """
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
+
+
+def valid_email(value):
+    """Validator which ensures the value looks like an email address.
+
+    This does not include a strict check if the email address can receive emails.
+    """
+    if validate_email_verbose(value) == 'invalid':
+        raise ValidationError(_('This email address is invalid.'))
 
 
 def no_relative_urls(value):
