@@ -2,7 +2,7 @@
 <title>{% trans %}List of sessions{% endtrans %}</title>
 
 <header class="event-title-header">{{ event.title }}</header>
-<h1>{%- trans %}List of sessions{% endtrans -%}</h2>
+<h1>{%- trans %}List of sessions{% endtrans -%}</h1>
 
 {% set has_codes = sessions|selectattr('code')|any %}
 {% set has_types = sessions|selectattr('type')|any %}
