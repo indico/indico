@@ -6,6 +6,11 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
+
+.submission-timeline-summary {
+  @extend %visually-hidden;
+}
 
 @keyframes step-fade-in-background {
   0% {
