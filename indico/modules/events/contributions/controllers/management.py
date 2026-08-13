@@ -42,7 +42,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
-                                                         ContributionUpdateSchema, FullContributionSchema)
+                                                         FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, get_contribution_person_link_field_params,
                                                       import_contributions_from_csv, make_contribution_form)
@@ -305,9 +305,13 @@ class RHContributionREST(RHManageContributionBase):
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
-    @use_args(ContributionUpdateSchema, partial=True)
+    @use_args({
+        'session_id': fields.Integer(allow_none=True),
+        'track_id': fields.Integer(allow_none=True),
+    }, partial=True)
     def _process_PATCH(self, data):
-        updates = {k: v for k, v in data.items() if k in {'title', 'description', 'keywords', 'board_number', 'code'}}
+        # XXX this is ONLY used for the session/track dropdowns on the contribution management page
+        updates = {}
         if 'session_id' in data:
             if not self._can_update_scheduling():
                 raise Forbidden
