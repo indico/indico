@@ -14,9 +14,11 @@ import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
 import {Button} from '../button/Button';
+import {Indicator} from '../indicator/Indicator';
 import {TimelineItem} from '../timeline/Timeline';
 import {YearPicker} from '../yearPicker/YearPicker';
 
+import {FavoriteButton} from './FavoriteButton';
 import {ListItem} from './ListItem';
 
 import './EventList.module.scss';
@@ -71,6 +73,54 @@ export function EventList({categoryId}: EventListProps) {
     return <div>Loading...</div>;
   }
 
+  const listItem = (event, month) =>
+    (
+      <ListItem styleName="event-list-item" key={event.id + month.name} href={event.url}>
+        <div styleName="event-list-item-start-section">
+          <ListItem.Tag
+            color="primary"
+            variant="transparent"
+            size="sm"
+            textWeight="regular"
+            styleName="event-list-item-date-tag"
+          >
+            {event.date}
+          </ListItem.Tag>
+          <ListItem.Header title={event.verbosedTitle}>{event.verbosedTitle}</ListItem.Header>
+
+          {event.seriesLabel && <ListItem.Details>{event.seriesLabel}</ListItem.Details>}
+        </div>
+        <div styleName="event-list-item-tag-section">
+          {event.label && (
+            <ListItem.Tag color={event.labelColor} size="xs" styleName="event-list-item-label">
+              {event.label}
+            </ListItem.Tag>
+          )}
+          {event.visibility === 0 && (
+            <ListItem.Icon
+              icon="fas:eye-slash"
+              color="gray"
+              size="sm"
+              variant="transparent"
+              ariaLabel="Hidden Event"
+              title={Translate.string('Hidden')}
+            />
+          )}
+
+          {event.isProtected && (
+            <ListItem.Icon
+              icon="fas:shield-halved"
+              color="error"
+              size="sm"
+              variant="transparent"
+              ariaLabel="Protected Category"
+              title={Translate.string('Protected')}
+            />
+          )}
+        </div>
+      </ListItem>
+    ) as React.ReactNode;
+
   return (
     <div styleName="event-list">
       <YearPicker
@@ -101,90 +151,34 @@ export function EventList({categoryId}: EventListProps) {
         <TimelineItem key={month.name} styleName="event-list-month">
           <TimelineItem.Title dotColor="primary">{month.name.split(' ')[0]}</TimelineItem.Title>
           <TimelineItem.Content>
-            {month.events.map(event => (
-              <ListItem styleName="event-list-item" key={event.id + month.name} href={event.url}>
-                <div styleName="event-list-item-start-section">
-                  <ListItem.Tag
-                    icon="fas:calendar"
-                    color="primary"
-                    variant="light"
-                    size="sm"
-                    textWeight="regular"
-                    styleName="event-list-item-date-time-tag"
-                  >
-                    {event.date}
-                  </ListItem.Tag>
-                  <div styleName="event-list-item-header-label-section">
-                    <div styleName="event-list-item-header-section">
-                      <ListItem.Header>{event.verbosedTitle}</ListItem.Header>
-                      {event.isFavorite && (
-                        <ListItem.Icon
-                          title={Translate.string('You have favorited this event.')}
-                          icon="fas:star"
-                          color="warning"
-                          variant="compact"
-                          size="xs"
-                          styleName="event-list-item-favorite-icon"
-                        />
-                      )}
-                      {event.seriesLabel && (
-                        <ListItem.Details styleName="event-list-item-series-label">
-                          {event.seriesLabel}
-                        </ListItem.Details>
-                      )}
-                    </div>
-                    {event.label && (
-                      <ListItem.Tag color={event.labelColor} icon="fas:tag" size="xs">
-                        {event.label}
-                      </ListItem.Tag>
-                    )}
-                  </div>
+            {month.events.map(event =>
+              event.isRecent ? (
+                <Indicator
+                  key={event.id + event.date}
+                  styleName="event-list-item-wrapper"
+                  size="sm"
+                  title={Translate.string('New')}
+                >
+                  <FavoriteButton
+                    type="event"
+                    id={event.id}
+                    favorited={event.isFavorite}
+                    styleName="event-list-item-favorite-icon"
+                  />
+                  {listItem(event, month)}
+                </Indicator>
+              ) : (
+                <div key={event.id + event.date} styleName="event-list-item-wrapper">
+                  <FavoriteButton
+                    type="event"
+                    id={event.id}
+                    favorited={event.isFavorite}
+                    styleName="event-list-item-favorite-icon"
+                  />
+                  {listItem(event, month)}
                 </div>
-                <div styleName="event-list-item-tag-section">
-                  {event.isRecent && (
-                    <ListItem.Tag
-                      title={Translate.string('New')}
-                      color="primary"
-                      variant="light"
-                      size="xs"
-                    >
-                      New
-                    </ListItem.Tag>
-                  )}
-                  {event.visibility === 0 && (
-                    <ListItem.Tag
-                      title={Translate.string('This event is hidden')}
-                      color="gray"
-                      variant="light"
-                      size="xs"
-                    >
-                      Hidden
-                    </ListItem.Tag>
-                  )}
-                  {event.isHappeningNow && (
-                    <ListItem.Tag
-                      title={Translate.string('Ongoing')}
-                      color="warning"
-                      variant="light"
-                      size="xs"
-                    >
-                      Ongoing
-                    </ListItem.Tag>
-                  )}
-
-                  {event.isProtected && (
-                    <ListItem.Icon
-                      icon="fas:shield-halved"
-                      color="error"
-                      size="xs"
-                      variant="light"
-                      ariaLabel="Protected Category"
-                      title={Translate.string('Protected')}
-                    />
-                  )}
-                </div>
-              </ListItem>
-            ))}
+              )
+            )}
           </TimelineItem.Content>
         </TimelineItem>
       ))}
