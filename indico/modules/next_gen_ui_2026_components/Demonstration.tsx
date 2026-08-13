@@ -15,9 +15,10 @@ import {Tag} from './tag/Tag';
 const colors = ['primary', 'gray', 'success', 'warning', 'error'] as const;
 const colorsWithWhite = ['primary', 'gray', 'success', 'warning', 'error', 'white'] as const;
 const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
-const iconVariants = ['light', 'solid', 'dark', 'plain', 'compact'] as const;
-const iconVariantsRestricted = ['light', 'solid', 'dark'] as const;
-const iconVariantsRestrictedForWhite = ['plain', 'compact'] as const;
+const iconSizes = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl', 'xxxl', 'xxxxl'] as const;
+const iconVariants = ['light', 'solid', 'transparent'] as const;
+const iconVariantsRestricted = ['light', 'solid'] as const;
+const iconVariantsRestrictedForWhite = ['transparent'] as const;
 const buttonAttributes = [
   '',
   'animated',
@@ -66,23 +67,23 @@ export function Demonstration() {
               <Icon
                 icon={isIconExpanded ? 'fas:chevron-up' : 'fas:chevron-down'}
                 color="primary"
-                variant="plain"
+                variant="transparent"
                 size="xs"
               />
             </h2>
           </summary>
           <section>
-            <div className="grid-5">
-              {iconVariants.slice(0, 3).map(variant =>
+            <div className="grid-8">
+              {iconVariants.map(variant =>
                 colors.map(color =>
-                  sizes.map(size => (
+                  iconSizes.map(size => (
                     <div
                       key={`${variant}-${color}-${size}-square`}
                       styleName="demo-item align-center"
                     >
                       <Icon icon="fas:pen" variant={variant} color={color} size={size} />
                       <div styleName="demo-label">
-                        {variant} • {color} • {size}
+                        variant: {variant} • color: {color} • size: {size}
                       </div>
                     </div>
                   ))
@@ -91,17 +92,17 @@ export function Demonstration() {
             </div>
           </section>
           <section>
-            <div className="grid-5">
+            <div className="grid-8">
               {iconVariantsRestricted.map(variant =>
                 colors.map(color =>
-                  sizes.map(size => (
+                  iconSizes.map(size => (
                     <div
                       key={`${variant}-${color}-${size}-rounded`}
                       styleName="demo-item align-center"
                     >
                       <Icon icon="fas:pen" variant={variant} color={color} size={size} rounded />
                       <div styleName="demo-label">
-                        {variant} • {color} • {size} • rounded
+                        variant: {variant} • color: {color} • size: {size} • rounded
                       </div>
                     </div>
                   ))
@@ -110,14 +111,33 @@ export function Demonstration() {
             </div>
           </section>
           <section>
-            <div className="grid-5">
+            <div className="grid-8">
               {iconVariantsRestrictedForWhite.map(variant =>
                 colorsWithWhite.map(color =>
-                  sizes.map(size => (
+                  iconSizes.map(size => (
                     <div key={`${variant}-${color}-${size}`} styleName="demo-item align-center">
                       <Icon icon="fas:pen" variant={variant} color={color} size={size} />
                       <div styleName="demo-label">
-                        {variant} • {color} • {size}
+                        variant: {variant} • color: {color} • size: {size}
+                      </div>
+                    </div>
+                  ))
+                )
+              )}
+            </div>
+          </section>
+          <section>
+            <div className="grid-8">
+              {iconVariantsRestrictedForWhite.map(variant =>
+                colorsWithWhite.map(color =>
+                  iconSizes.map(size => (
+                    <div
+                      key={`${variant}-${color}-${size}-compact`}
+                      styleName="demo-item align-center"
+                    >
+                      <Icon icon="fas:pen" variant={variant} color={color} size={size} compact />
+                      <div styleName="demo-label">
+                        variant: {variant} • color: {color} • size: {size} • compact
                       </div>
                     </div>
                   ))
@@ -134,7 +154,7 @@ export function Demonstration() {
               <Icon
                 icon={!isButtonExpanded ? 'fas:chevron-up' : 'fas:chevron-down'}
                 color="primary"
-                variant="plain"
+                variant="transparent"
                 size="xs"
               />
             </h2>
@@ -197,7 +217,7 @@ export function Demonstration() {
                   variant="solid"
                   size={size}
                   icon="fas:calendar"
-                  iconPosition="icon-only"
+                  iconOnly
                   aria-label="Calendar"
                 />
                 <div styleName="demo-label">solid • primary • {size} • icon only</div>
@@ -216,7 +236,7 @@ export function Demonstration() {
                   variant="solid"
                   size={size}
                   icon="fas:calendar"
-                  iconPosition="icon-only"
+                  iconOnly
                   rounded
                   aria-label="Calendar"
                 />
@@ -236,11 +256,31 @@ export function Demonstration() {
                   variant="solid"
                   size={size}
                   icon="fas:calendar"
-                  iconPosition="icon-only"
+                  iconOnly
                   circular
                   aria-label="Calendar"
                 />
                 <div styleName="demo-label">solid • primary • {size} • icon only circular</div>
+              </div>
+            ))}
+          </div>
+          <h3> Icon only squared</h3>
+          <div className="grid-5">
+            {sizes.map(size => (
+              <div
+                key={`${'solid'}-${'primary'}-${size}-icon-only-squared`}
+                styleName="demo-item align-center"
+              >
+                <Button
+                  color="primary"
+                  variant="solid"
+                  size={size}
+                  icon="fas:calendar"
+                  iconOnly
+                  squared
+                  aria-label="Calendar"
+                />
+                <div styleName="demo-label">solid • primary • {size} • icon only squared</div>
               </div>
             ))}
           </div>
@@ -393,7 +433,7 @@ export function Demonstration() {
               <Icon
                 icon={isTagExpanded ? 'fas:chevron-up' : 'fas:chevron-down'}
                 color="primary"
-                variant="plain"
+                variant="transparent"
                 size="xs"
               />
             </h2>
