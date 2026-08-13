@@ -188,8 +188,8 @@ $content-pane-bg-color: $white;
   font-size: 1.125rem;
   font-weight: bold;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
 
   :global(.icon) {
     opacity: 0.5;
@@ -448,5 +448,27 @@ $content-pane-bg-color: $white;
     font-size: 1rem;
     font-weight: 500;
     color: $gray;
+  }
+}
+
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.close-panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $light-black;
+  cursor: pointer;
+
+  :global(.icon) {
+    margin: 0;
+  }
+
+  &:hover {
+    color: $dark-black;
   }
 }
