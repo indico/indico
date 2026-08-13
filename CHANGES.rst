@@ -10,7 +10,8 @@ Version 3.3.14
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Save rows of list widgets that are still being edited when the form is submitted instead
+  of dropping them (:pr:`7702`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
