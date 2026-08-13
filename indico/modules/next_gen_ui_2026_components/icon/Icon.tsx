@@ -13,15 +13,15 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React, {forwardRef} from 'react';
 
 import './Icon.module.scss';
-import {ExtendedIndicoPaletteColor, Size} from '../tokens';
-import {NativeProps} from '../utils';
+import {ExtendedIndicoPaletteColor, Size, Variant} from '../tokens';
+import {NativeProps, sharedClassName} from '../utils';
 
 library.add(fas, far, fab);
 
 export type IconSource = string | React.ComponentType<React.SVGProps<SVGSVGElement>>;
 export type IconColor = ExtendedIndicoPaletteColor;
-export type IconVariant = 'light' | 'solid' | 'dark' | 'plain' | 'compact';
-export type IconSize = Size;
+export type IconVariant = Exclude<Variant, 'white'>;
+export type IconSize = Size | 'xxl' | 'xxxl' | 'xxxxl';
 
 interface CustomIconProps {
   icon: IconSource;
@@ -29,6 +29,7 @@ interface CustomIconProps {
   color?: IconColor;
   size?: IconSize;
   variant?: IconVariant;
+  compact?: boolean;
   rounded?: boolean;
   decorative?: boolean;
   ariaLabel?: string;
@@ -37,14 +38,16 @@ interface CustomIconProps {
 
 type VariantUnion =
   | {
-      variant?: 'light' | 'solid' | 'dark';
+      variant?: 'light' | 'solid';
       rounded?: boolean;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error';
+      compact?: never;
     }
   | {
-      variant?: 'plain' | 'compact';
+      variant?: 'transparent';
       rounded?: never;
       color?: 'primary' | 'gray' | 'success' | 'warning' | 'error' | 'white';
+      compact?: boolean;
     };
 
 export type IconProps = CustomIconProps & NativeProps<'span', 'onClick'> & VariantUnion;
@@ -73,7 +76,8 @@ export const Icon = forwardRef<HTMLSpanElement | HTMLAnchorElement, IconProps>((
     className,
     color = 'primary',
     size = 'md',
-    variant = 'plain',
+    variant = 'transparent',
+    compact = false,
     rounded = false,
     decorative = true,
     ariaLabel,
@@ -105,6 +109,7 @@ export const Icon = forwardRef<HTMLSpanElement | HTMLAnchorElement, IconProps>((
     'data-color': color,
     'data-size': size,
     'data-variant': variant,
+    'data-compact': compact ? '' : undefined,
     'data-rounded': rounded ? '' : undefined,
     'aria-hidden': isDecorative,
     'aria-label': !isDecorative ? ariaLabel : undefined,
@@ -114,7 +119,7 @@ export const Icon = forwardRef<HTMLSpanElement | HTMLAnchorElement, IconProps>((
     <span
       ref={ref as React.Ref<HTMLSpanElement>}
       styleName="root"
-      className={`indico-ui ${className || ''}`}
+      className={sharedClassName(className)}
       title={title}
       {...dataProps}
       {...nativeProps}
