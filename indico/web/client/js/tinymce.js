@@ -266,7 +266,9 @@ export const getConfig = (
       tooltip: 'Mark',
       icon: 'permanent-pen',
       onAction() {
-        editor.formatter.toggle('mark');
+        editor.undoManager.transact(() => {
+          editor.formatter.toggle('mark');
+        });
       },
     });
 
