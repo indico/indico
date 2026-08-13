@@ -8,27 +8,32 @@
 import React, {forwardRef} from 'react';
 
 import {IndicoPaletteColor, LegacyColor} from '../tokens';
-
+import {sharedClassName, NativeProps} from '../utils';
 import './Dot.module.scss';
 
 export type DotColor = IndicoPaletteColor | LegacyColor;
 
-interface DotProps {
+interface CustomDotProps {
+  className?: string;
   color?: DotColor;
   size?: string;
-  className?: string;
 }
 
-export const Dot = forwardRef<HTMLSpanElement, DotProps>(
-  ({color = 'primary', size = 'md', className}, ref) => (
+export type DotProps = CustomDotProps & NativeProps<'span'>;
+
+export const Dot = forwardRef<HTMLSpanElement, DotProps>((props, ref) => {
+  const {className, color = 'primary', size = 'md', ...nativeProps} = props;
+
+  return (
     <span
+      {...nativeProps}
       ref={ref}
       styleName="dot"
-      className={`indico-ui ${className || ''}`}
+      className={sharedClassName(className)}
       data-color={color}
       data-size={size}
     />
-  )
-);
+  );
+});
 
 Dot.displayName = 'Dot';

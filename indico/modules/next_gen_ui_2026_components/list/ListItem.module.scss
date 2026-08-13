@@ -24,28 +24,10 @@
 
         border-radius: var(--radius-xl);
 
-        // left strip on listitem
-        overflow: hidden;
-        position: relative;
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: var(--space-2);
-            background-color: var(--color-surface-soft-accent);
-        }
-
         &:hover,
         &:focus-visible {
             background: var(--color-surface-soft-hover);
             color: none;
-
-            &::before {
-                background-color: var(--color-surface-soft-accent-hover);
-            }
         }
 
         @media (max-width: $viewport-mobile) {
@@ -56,7 +38,7 @@
     }
 
     &.list-item-header {
-        @include typography('text-sm', 'bold'); // 14px
+        @include typography('text-sm', 'bold');
         color: var(--color-text-heading);
         max-width: 100%;
 
@@ -76,7 +58,7 @@
     }
 
     &.list-item-details {
-        @include typography('text-sm', 'regular'); // 14px
+        @include typography('text-sm', 'regular');
         color: var(--color-text-muted);
         max-width: 100%;
         min-width: 0;

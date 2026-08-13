@@ -105,7 +105,7 @@ def serialize_news(news):
 
 
 def serialize_events_by_month(events_by_month, category, now):
-    format_event_date = make_format_event_date_func(category, with_time=True)
+    format_event_date = make_format_event_date_func(category, omit_year=True)
     is_recent = make_is_recent_func(now)
     happening_now = make_happening_now_func(now)
 
@@ -127,24 +127,24 @@ def serialize_events_by_month(events_by_month, category, now):
     ]
 
 
-def make_format_event_date_func(category, with_time=False):
+def make_format_event_date_func(category, omit_year=False):
     day_month = 'ddMMM'
-    time = 'HHmm'
 
     def fn(event):
         tzinfo = category.display_tzinfo
         start_dt = event.start_dt.astimezone(tzinfo)
         end_dt = event.end_dt.astimezone(tzinfo)
-        if start_dt.year != end_dt.year:
+        show_full_year = (start_dt.year != end_dt.year) and (
+            not omit_year or start_dt.month <= end_dt.month or end_dt.year > start_dt.year + 1
+        )
+
+        if show_full_year:
             return f'{format_date(start_dt, timezone=tzinfo)} - {format_date(end_dt, timezone=tzinfo)}'
         elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
             start = format_skeleton(start_dt, day_month, timezone=tzinfo)
             end = format_skeleton(end_dt, day_month, timezone=tzinfo)
             return f'{start} - {end}'
         else:
-            if with_time:
-                return format_skeleton(start_dt, day_month, timezone=tzinfo)+ ' - ' + format_skeleton(start_dt, time,
-                                                                                                      timezone=tzinfo)
             return format_skeleton(start_dt, day_month, timezone=tzinfo)
 
     return fn
@@ -292,13 +292,15 @@ def get_event_list_view_params(category, now, year, is_flat=False, for_category_
         extra_events_queries = [Event.query.filter(Event.id.in_(extra_event_ids))]
 
     next_event_start_dt = (db.session.query(Event.id, Event.start_dt)
-                            .filter(event_query_filter, Event.start_dt >= (now + relativedelta(year=year)))
+                            .filter(event_query_filter, Event.start_dt >= (now + relativedelta(year=year)),
+                                    Event.start_dt <= future_month_threshold)
                             .union(*extra_events_start_dt_queries)
                             .with_entities(Event.start_dt)
                             .order_by(Event.start_dt.asc(), Event.id.asc())
                             .limit(1).scalar())
     previous_event_start_dt = (db.session.query(Event.id, Event.start_dt)
-                                .filter(event_query_filter, Event.start_dt < (now + relativedelta(year=year)))
+                                .filter(event_query_filter, Event.start_dt < (now + relativedelta(year=year)),
+                                        Event.start_dt >= past_month_threshold)
                                 .union(*extra_events_start_dt_queries)
                                 .with_entities(Event.start_dt)
                                 .order_by(Event.start_dt.desc(), Event.id.desc())
