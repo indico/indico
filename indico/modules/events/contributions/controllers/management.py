@@ -42,7 +42,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
-                                                         FullContributionSchema)
+                                                         ContributionUpdateSchema, FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, get_contribution_person_link_field_params,
                                                       import_contributions_from_csv, make_contribution_form)
@@ -305,17 +305,17 @@ class RHContributionREST(RHManageContributionBase):
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
-    @use_args(FullContributionSchema, partial=True)
+    @use_args(ContributionUpdateSchema, partial=True)
     def _process_PATCH(self, data):
         updates = {k: v for k, v in data.items() if k in {'title', 'description', 'keywords', 'board_number', 'code'}}
-        if session := data.get('session'):
+        if 'session_id' in data:
             if not self._can_update_scheduling():
                 raise Forbidden
-            updates.update(self._get_contribution_session_updates(session.get('id')))
-        if track := data.get('track'):
+            updates.update(self._get_contribution_session_updates(data['session_id']))
+        if 'track_id' in data:
             if not self._can_update_scheduling():
                 raise Forbidden
-            updates.update(self._get_contribution_track_updates(track.get('id')))
+            updates.update(self._get_contribution_track_updates(data['track_id']))
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
@@ -622,7 +622,6 @@ class RHContributionsExportJSON(RHManageContributionsExportActionsBase):
     """Export list of contributions to JSON."""
 
     def _process(self):
-        from indico.modules.events.contributions.schemas import FullContributionSchema
         resp = FullContributionSchema(many=True).jsonify(sorted(self.contribs, key=attrgetter('friendly_id')))
         resp.headers['Content-Disposition'] = 'attachment; filename="contributions.json"'
         return resp

@@ -112,6 +112,15 @@ class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
     type = fields.Integer(attribute='reference_type_id')
 
 
+class ContributionUpdateSchema(mm.Schema):
+    class Meta:
+        model = Contribution
+        fields = ('title', 'description', 'keywords', 'board_number', 'code', 'session_id', 'track_id')
+
+    session_id = fields.Integer(allow_none=True)
+    track_id = fields.Integer(allow_none=True)
+
+
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution

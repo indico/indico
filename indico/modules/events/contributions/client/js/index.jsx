@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         onSelect(newSession, oldSession) {
           const $this = $(this);
           const styleObject = $this[0].style;
-          const postData = {session: {id: newSession ? newSession.id : null}};
+          const postData = {session_id: newSession ? newSession.id : null};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(data => {
             const label = newSession ? newSession.title : $T.gettext('No session');
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         onSelect(newTrack) {
           const $this = $(this);
-          const postData = {track: {id: newTrack ? newTrack.id : null}};
+          const postData = {track_id: newTrack ? newTrack.id : null};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(() => {
             const label = newTrack ? newTrack.title : $T.gettext('No track');
