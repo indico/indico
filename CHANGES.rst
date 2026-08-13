@@ -54,6 +54,8 @@ Improvements
   :pr:`7187`)
 - Add new regform setting to allow withdrawing a registration outside the modification
   period (enabled by default for new forms) (:pr:`7769`)
+- Save rows of list widgets that are still being edited when the form is submitted instead
+  of dropping them (:pr:`7702`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
