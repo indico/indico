@@ -6,13 +6,14 @@ export type NativeProps<
 > = Omit<React.ComponentPropsWithoutRef<Tag>, Omitted>;
 
 export function guardDisabledClick<E extends HTMLElement>(
-  disabled: boolean | undefined,
-  onClick: ((event: React.MouseEvent<E>) => void) | undefined,
-  loading?: boolean | undefined
+  disabled?: boolean,
+  onClick?: (event: React.MouseEvent<E>) => void,
+  loading?: boolean
 ) {
   return (event: React.MouseEvent<E>) => {
     if (disabled || loading) {
       event.preventDefault();
+      event.stopPropagation();
       return;
     }
     onClick?.(event);
@@ -39,3 +40,5 @@ export function disabledLoadingAnchorProps(
     tabIndex: disabled || loading ? -1 : tabIndex,
   };
 }
+
+export const sharedClassName = (className?: string) => `indico-ui ${className || ''}`;
