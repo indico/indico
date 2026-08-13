@@ -29,6 +29,7 @@ import {
   DropdownItem,
 } from 'semantic-ui-react';
 
+import {WithPopup} from 'indico/react/components';
 import {FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -59,20 +60,25 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
     <div styleName="copy-to-clipboard-container">
       <div styleName="input-copy-qr-container">
         <Input
+          aria-label={Translate.string('Event URL')}
           label={
-            <Button
-              icon={isCopied ? 'check' : 'copy'}
-              title={
-                isCopied
-                  ? Translate.string('Link copied to clipboard')
-                  : Translate.string('Copy link to clipboard')
-              }
-              positive={isCopied}
-              onClick={() => {
-                navigator.clipboard.writeText(eventShortUrl);
-                setCopied(true);
-              }}
-            />
+            <ind-with-tooltip>
+              <Button
+                icon
+                positive={isCopied}
+                onClick={() => {
+                  navigator.clipboard.writeText(eventShortUrl);
+                  setCopied(true);
+                }}
+              >
+                <Icon name={isCopied ? 'check' : 'copy'} />
+                <span data-tip-content>
+                  {isCopied
+                    ? Translate.string('Link copied to clipboard')
+                    : Translate.string('Copy link to clipboard')}
+                </span>
+              </Button>
+            </ind-with-tooltip>
           }
           labelPosition="right"
           defaultValue={eventShortUrl}
@@ -85,7 +91,7 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
             floating
             className="ui primary icon"
             icon="download"
-            title={Translate.string('Download QR code')}
+            aria-label={Translate.string('Download QR code')}
             direction="left"
           >
             <DropdownMenu>
@@ -106,11 +112,12 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <Button
-            icon="qrcode"
-            title={Translate.string('Show QR code')}
-            onClick={() => showQR(true)}
-          />
+          <ind-with-tooltip>
+            <Button icon onClick={() => showQR(true)}>
+              <Icon name="qrcode" />
+              <span data-tip-content>{Translate.string('Show QR code')}</span>
+            </Button>
+          </ind-with-tooltip>
         )}
       </div>
       {isQrShown && (
@@ -118,6 +125,7 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
           <img
             styleName="qr-code-img"
             src={qrData?.imageSourceURL}
+            alt=""
             onLoad={() => setIsImageLoaded(true)}
             style={{display: isImageLoaded ? 'block' : 'none'}}
           />
@@ -161,7 +169,7 @@ function CalendarButtons({googleCalParams, outlookCalParams}) {
             color={calendar.color}
             styleName="share-button"
           >
-            <img src={calendar.logo} alt={calendar.name} />
+            <img src={calendar.logo} alt="" />
             <span>{calendar.name}</span>
           </Button>
         </GridColumn>
@@ -186,7 +194,7 @@ function TwitterButton({shareText}) {
         color="blue"
         styleName="share-button"
       >
-        <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt={Translate.string('Twitter')} />
+        <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt="" />
         <Translate as="span">Twitter</Translate>
       </Button>
     </GridColumn>
@@ -197,7 +205,7 @@ TwitterButton.propTypes = {
   shareText: PropTypes.string.isRequired,
 };
 
-function MastodonButton({shareText, setMastodonOpen}) {
+function MastodonButton({shareText}) {
   const href = Indico.User.mastodonServerURL
     ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
     : null;
@@ -217,7 +225,7 @@ function MastodonButton({shareText, setMastodonOpen}) {
           : null
       }
     >
-      <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt={Translate.string('Mastodon')} />
+      <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
       <span>
         {hasMastodonServer ? Indico.User.mastodonServerName : Translate.string('Mastodon')}
       </span>
@@ -227,11 +235,7 @@ function MastodonButton({shareText, setMastodonOpen}) {
   return (
     <GridColumn styleName="share-button-column">
       {isLoggedIn ? (
-        <SetupMastodonServer
-          button={button}
-          setMastodonOpen={setMastodonOpen}
-          shareText={shareText}
-        />
+        <SetupMastodonServer button={button} shareText={shareText} />
       ) : (
         <Popup
           trigger={button}
@@ -246,10 +250,9 @@ function MastodonButton({shareText, setMastodonOpen}) {
 
 MastodonButton.propTypes = {
   shareText: PropTypes.string.isRequired,
-  setMastodonOpen: PropTypes.func.isRequired,
 };
 
-function SetupMastodonServer({setMastodonOpen, button, shareText}) {
+function SetupMastodonServer({button, shareText}) {
   const [serverURL, setServerURL] = useState(null);
   const [mastodonServerName, setMastodonServerName] = useState(null);
 
@@ -268,17 +271,7 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
   }
 
   return (
-    <Popup
-      wide
-      pinned
-      position="top right"
-      onOpen={() => setMastodonOpen(true)}
-      onClose={() => {
-        setMastodonOpen(false);
-      }}
-      trigger={button}
-      on="click"
-    >
+    <Popup wide pinned position="top right" trigger={button} on="click">
       <Popup.Content>
         {!serverURL ? (
           <>
@@ -364,7 +357,6 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
               })}
               positive
               fluid
-              onClick={() => setMastodonOpen(false)}
             />
           </>
         )}
@@ -374,7 +366,6 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
 }
 
 SetupMastodonServer.propTypes = {
-  setMastodonOpen: PropTypes.func.isRequired,
   button: PropTypes.element.isRequired,
   shareText: PropTypes.string.isRequired,
 };
@@ -388,62 +379,49 @@ function ShareWidget({
   googleCalParams,
   outlookCalParams,
 }) {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isMastodonOpen, setMastodonOpen] = useState(false);
   const shareText = `${eventName} (${eventStartDt}) · Indico (${eventShortUrl})`;
   return (
-    <Popup
+    <WithPopup
       trigger={
-        <img
-          src={shareIcon}
-          styleName={isPopupOpen ? 'share-widget show' : 'share-widget'}
-          tabIndex={0}
-          aria-label={Translate.string('Share this page')}
-          aria-modal
-          alt={Translate.string('Share widget icon')}
-        />
+        <ind-with-tooltip>
+          <button type="button" styleName="share-widget" data-trigger>
+            <img src={shareIcon} alt="" />
+            <span data-tip-content>{Translate.string('Share this page')}</span>
+          </button>
+        </ind-with-tooltip>
       }
-      content={
-        <>
-          <div styleName="share-header-title">
-            <Icon name="share alternate" styleName="icon" />
-            <Translate as="strong">Share this page</Translate>
-          </div>
-          <Header styleName="share-section-header">
-            <Icon name="linkify" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Direct link</Translate>
-            </HeaderContent>
-          </Header>
-          <ShareURLDisplayQR eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
-          <Header styleName="share-section-header">
-            <Icon name="calendar alternate outline" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Add to calendar</Translate>
-            </HeaderContent>
-          </Header>
-          <CalendarButtons googleCalParams={googleCalParams} outlookCalParams={outlookCalParams} />
-          <Header styleName="share-section-header">
-            <Icon name="share square" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Share on social media</Translate>
-            </HeaderContent>
-          </Header>
-          <Grid columns={2} stretched>
-            <MastodonButton shareText={shareText} setMastodonOpen={setMastodonOpen} />
-            <TwitterButton shareText={shareText} />
-          </Grid>
-        </>
-      }
-      on="click"
-      onOpen={() => setIsPopupOpen(true)}
-      onClose={() => !isMastodonOpen && setIsPopupOpen(false)}
-      position="top right"
-      pinned
-      open={isPopupOpen}
-      wide="very"
-      style={{width: '450px'}}
-    />
+    >
+      <div styleName="share-content">
+        <div styleName="share-header-title">
+          <Icon name="share alternate" styleName="icon" />
+          <Translate as="strong">Share this page</Translate>
+        </div>
+        <Header styleName="share-section-header">
+          <Icon name="linkify" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Direct link</Translate>
+          </HeaderContent>
+        </Header>
+        <ShareURLDisplayQR eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
+        <Header styleName="share-section-header">
+          <Icon name="calendar alternate outline" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Add to calendar</Translate>
+          </HeaderContent>
+        </Header>
+        <CalendarButtons googleCalParams={googleCalParams} outlookCalParams={outlookCalParams} />
+        <Header styleName="share-section-header">
+          <Icon name="share square" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Share on social media</Translate>
+          </HeaderContent>
+        </Header>
+        <Grid columns={2} stretched>
+          <MastodonButton shareText={shareText} />
+          <TwitterButton shareText={shareText} />
+        </Grid>
+      </div>
+    </WithPopup>
   );
 }
 
