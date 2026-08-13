@@ -9,7 +9,7 @@ import React, {forwardRef} from 'react';
 
 import {Icon, IconSource} from '../icon/Icon';
 import {IconPosition, IndicoPaletteColor, LegacyColor, Size, TextWeight, Variant} from '../tokens';
-import {NativeProps} from '../utils';
+import {NativeProps, sharedClassName} from '../utils';
 
 import './Tag.module.scss';
 
@@ -28,8 +28,6 @@ export interface CustomTagProps {
   opaque?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
-  iconHref?: string;
-  onIconClick?: React.MouseEventHandler<HTMLSpanElement>;
   children?: React.ReactNode;
 }
 
@@ -65,8 +63,6 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
     ...nativeProps
   } = props;
 
-  const sharedClassName = `indico-ui ${className || ''}`;
-
   const dataProps = {
     'data-color': color,
     'data-variant': variant,
@@ -80,14 +76,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
   };
 
   const iconElement = icon && (
-    <Icon
-      icon={icon}
-      data-clickable={!!props.onIconClick}
-      onClick={props.onIconClick}
-      variant="compact"
-      decorative
-      styleName="tag-icon"
-    />
+    <Icon icon={icon} compact decorative size={size} styleName="tag-icon" />
   );
 
   const content = (
@@ -103,7 +92,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
       ref={ref as React.Ref<HTMLSpanElement>}
       styleName="tag"
       data-clickable={false}
-      className={sharedClassName}
+      className={sharedClassName(className)}
       {...dataProps}
       {...nativeProps}
     >
