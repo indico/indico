@@ -42,6 +42,7 @@ export {default as RadioButton} from './RadioButton';
 export {default as RequestConfirm, RequestConfirmDelete} from './RequestConfirm';
 export {default as ReviewRating} from './ReviewRating';
 export {default as ManagementPageBackButton} from './ManagementPageBackButton';
+export {default as WithPopup} from './WithPopup';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as ManageNotes} from './notes/ManageNotes';
