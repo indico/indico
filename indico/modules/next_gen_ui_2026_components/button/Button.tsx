@@ -17,7 +17,7 @@ import {
   TextWeight,
   Variant,
 } from '../tokens';
-import {guardDisabledClick, NativeProps} from '../utils';
+import {guardDisabledClick, sharedClassName, NativeProps} from '../utils';
 
 // TODO: Add support for loading state (spinner)
 
@@ -25,7 +25,7 @@ export type ButtonColor = IndicoPaletteColor;
 export type ButtonVariant = Variant;
 export type ButtonSize = Exclude<Size, 'xxs'>;
 export type ButtonTextWeight = TextWeight;
-export type ButtonIconPosition = IconPosition | 'icon-only';
+export type ButtonIconPosition = IconPosition;
 
 interface CustomButtonProps {
   className?: string;
@@ -40,26 +40,24 @@ interface CustomButtonProps {
   animated?: boolean;
   rounded?: boolean;
   circular?: boolean;
+  squared?: boolean;
   fullWidth?: boolean;
   active?: boolean;
   icon?: IconSource;
   iconPosition?: ButtonIconPosition;
-  // onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
+  iconOnly?: boolean;
 }
-
-// type NativeButtonProps =
-//   React.ButtonHTMLAttributes<HTMLButtonElement>
-// ;
-// type NativeAnchorProps =
-//   React.AnchorHTMLAttributes<HTMLAnchorElement>
-// ;
 
 type NativeButtonProps = NativeProps<'button'>;
 type NativeAnchorProps = NativeProps<'a'>;
 
 type nativeUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
 
-type RoudnessUnion = {rounded?: boolean; circular?: never} | {rounded?: never; circular?: boolean};
+type RoundnessUnion = {rounded?: boolean; circular?: never} | {rounded?: never; circular?: boolean};
+
+type SquaredUnion =
+  | {squared?: boolean; rounded?: never; circular?: never; iconPosition?: 'icon-only'}
+  | {squared?: never};
 
 type VariantColorUnion =
   | {variant?: 'transparent'; color?: ExtendedIndicoPaletteColor; opaque?: never}
@@ -71,13 +69,20 @@ type VariantColorUnion =
 
 type IconOnlyUnion =
   | {icon?: IconSource; iconPosition?: 'left' | 'right'; children?: React.ReactNode}
-  | {icon: IconSource; iconPosition: 'icon-only'; children?: never; 'aria-label': string};
+  | {
+      icon: IconSource;
+      iconOnly: true;
+      children?: never;
+      'aria-label': string;
+      iconPosition?: never;
+    };
 
 export type ButtonProps = CustomButtonProps &
   nativeUnion &
   VariantColorUnion &
   IconOnlyUnion &
-  RoudnessUnion;
+  RoundnessUnion &
+  SquaredUnion;
 
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   (props, ref) => {
@@ -95,12 +100,12 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       animated = false,
       rounded = false,
       circular = false,
+      squared = false,
       fullWidth = false,
       active = false,
       icon,
       iconPosition = 'left',
-      // onClick,
-      // children,
+      iconOnly = false,
       ...nativeProps
     } = props;
 
@@ -109,14 +114,6 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       nativeProps.onClick,
       loading
     );
-
-    // const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
-    //   if (disabled || loading) {
-    //     event.preventDefault();
-    //     return;
-    //   }
-    //   onClick?.(event);
-    // };
 
     const dataProps = {
       'data-color': color,
@@ -131,14 +128,23 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       'data-animated': animated ? '' : undefined,
       'data-rounded': rounded ? '' : undefined,
       'data-circular': circular ? '' : undefined,
+      'data-squared': squared ? '' : undefined,
       'data-full-width': fullWidth ? '' : undefined,
       'data-active': active ? '' : undefined,
       'data-icon': icon ? '' : undefined,
       'data-icon-position': iconPosition,
+      'data-icon-only': iconOnly ? '' : undefined,
     };
 
     const iconElement = icon && (
-      <Icon icon={icon} variant="compact" decorative styleName="button-icon" />
+      <Icon
+        icon={icon}
+        variant="transparent"
+        compact
+        size={size}
+        decorative
+        styleName="button-icon"
+      />
     );
 
     // if content has no children but has an icon, aria-label is required for accessibility
@@ -150,22 +156,21 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       </>
     );
 
-    const sharedClassName = `indico-ui ${className || ''}`;
-
     if (nativeProps.href !== undefined) {
       const rest = nativeProps as NativeAnchorProps;
       return (
         <a
+          {...rest}
+          {...dataProps}
           ref={ref as React.Ref<HTMLAnchorElement>}
           styleName="button"
-          className={sharedClassName}
-          href={disabled ? undefined : nativeProps.href}
+          className={sharedClassName(className)}
+          href={disabled || loading ? undefined : rest.href}
           aria-disabled={disabled || loading || undefined}
           tabIndex={disabled || loading ? -1 : rest.tabIndex}
           aria-busy={loading || undefined}
           onClick={handleClick}
-          {...dataProps}
-          {...rest}
+          role={disabled || loading ? undefined : 'button'}
         >
           {content}
         </a>
@@ -175,17 +180,17 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     const rest = nativeProps as NativeButtonProps;
     return (
       <button
+        {...rest}
+        {...dataProps}
         ref={ref as React.Ref<HTMLButtonElement>}
         type="button"
         styleName="button"
-        className={sharedClassName}
-        disabled={disabled}
+        className={sharedClassName(className)}
+        disabled={disabled || loading}
         onClick={handleClick}
         aria-disabled={disabled || loading || undefined}
         tabIndex={disabled || loading ? -1 : rest.tabIndex}
         aria-busy={loading || undefined}
-        {...dataProps}
-        {...rest}
       >
         {content}
       </button>
