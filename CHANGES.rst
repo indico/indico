@@ -103,6 +103,7 @@ Bugfixes
   :pr:`7675`, thanks :user:`shuv-amp`)
 - Fix missing fonts in Offline Copy archives (:pr:`7697`)
 - Reject invalid email addresses when entering person details (:issue:`7644`, :pr:`7698`)
+- Allow saving minutes after using the "Mark" formatting button in the editor (:pr:`7700`)
 
 Accessibility
 ^^^^^^^^^^^^^
