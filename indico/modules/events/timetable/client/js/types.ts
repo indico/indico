@@ -117,7 +117,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   id: ContribId;
   type: EntryType.Contribution;
   attachments?: Attachment[];
-  sessionId?: number;
+  sessionId?: number | null;
   boardNumber?: string;
   keywords?: string[];
 }
@@ -125,7 +125,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
 export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: BreakId;
   type: EntryType.Break;
-  sessionId?: number;
+  sessionId?: number | null;
 }
 
 export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {

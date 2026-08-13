@@ -56,7 +56,12 @@ export default {
           startDt: action.entry.startDt,
         };
         if (isChildEntry(action.entry)) {
+          newEntry.sessionId = action.entry.sessionId;
           (newEntry as ChildEntry).sessionBlockId = action.entry.sessionBlockId;
+        } else {
+          newEntry.sessionId = null;
+          // XXX decide on null vs unset - I think right now we have a mix of the two
+          delete (newEntry as ChildEntry).sessionBlockId;
         }
 
         const updatedEntries: Record<string, Entry> = {
