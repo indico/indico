@@ -22,8 +22,8 @@ CONDITIONS_DESC = _('The registrant must agree to these conditions before paying
 
 class AdminSettingsForm(IndicoForm):
     currencies = MultipleItemsField(_('Currencies'), [DataRequired()],
-                                    fields=[{'id': 'code', 'caption': _('Code')},
-                                            {'id': 'name', 'caption': _('Name')}],
+                                    fields=[{'id': 'code', 'caption': _('Code'), 'required': True},
+                                            {'id': 'name', 'caption': _('Name'), 'required': True}],
                                     unique_field='code',
                                     description=_('List of currencies that can be selected for an event. When deleting '
                                                   'a currency, existing events will keep using it. The currency code '
