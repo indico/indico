@@ -14,14 +14,17 @@ export function preprocessSessionData(
   return Object.fromEntries(Object.entries(data).map(([, s]) => [s.id, mapDataToSession(s)]));
 }
 
-export function preprocessTimetableEntries(data: Record<string, unknown>): Entry[] {
+export function preprocessTimetableEntries(data: Record<string, unknown>): Record<string, Entry> {
   return Object.fromEntries(
-    Object.entries(data).map(([id, entryData]) => [id, mapDataToEntry(entryData)])
+    Object.entries(data).map(([id, entryData]) => [
+      id,
+      mapDataToEntry(entryData as Record<string, unknown>),
+    ])
   );
 }
 
 export function preprocessUnscheduledContributions(
-  contributions: unknown
+  contributions: Record<string, unknown>[]
 ): UnscheduledContribEntry[] {
   return contributions.map(c => mapDataToEntry(c) as UnscheduledContribEntry);
 }

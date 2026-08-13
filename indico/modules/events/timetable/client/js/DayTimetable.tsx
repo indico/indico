@@ -41,6 +41,7 @@ import {
   isChildEntry,
   EntryType,
   Session,
+  ContribEntry,
 } from './types';
 import {
   DAY_SIZE,
@@ -325,7 +326,7 @@ export function DayTimetable({
         c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
       );
       showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
-      dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
+      dispatch(actions.scheduleEntry(eventId, entry as ContribEntry, layoutOverrides!));
     }
   }
 

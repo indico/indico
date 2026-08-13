@@ -18,6 +18,8 @@ import {
   ChildContribEntry,
   ContribEntry,
   UnscheduledContribEntry,
+  LayoutOverrides,
+  ChildContribEntryWithoutLayout,
 } from './types';
 import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
@@ -282,7 +284,7 @@ export function layoutAfterUnscheduledDrop(
   offset: MousePosition,
   minStartDt: Moment,
   maxEndDt: Moment
-): [TopLevelEntry[], UnscheduledContribEntry[], Moment] | undefined {
+): [TopLevelEntry, LayoutOverrides] | undefined {
   // TODO: add proper typing for unscheduled contribs
   const id = who.slice('unscheduled-'.length);
   const deltaMinutes = 0;
@@ -339,7 +341,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   calendar: Over,
   eventStartDt: Moment,
   eventEndDt: Moment
-): [ChildContribEntry, any] | undefined {
+): [ChildContribEntryWithoutLayout, any] | undefined {
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);

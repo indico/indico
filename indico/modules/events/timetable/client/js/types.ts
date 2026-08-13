@@ -159,7 +159,13 @@ export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
 export type LayoutOverrides = Record<string, LayoutOverride>;
 
-export function isChildEntry(entry: Entry): entry is ChildEntry {
+export type ChildContribEntryWithoutLayout = Omit<ChildContribEntry, 'column' | 'maxColumn' | 'y'>;
+export type ToplevelContribEntryWithoutLayout = Omit<ContribEntry, 'column' | 'maxColumn' | 'y'>;
+export type ContribEntryWithoutLayout =
+  | ToplevelContribEntryWithoutLayout
+  | ChildContribEntryWithoutLayout;
+
+export function isChildEntry(entry: Entry | ContribEntryWithoutLayout): entry is ChildEntry {
   // TODO: (Ajob) This is bypassing the 'Entry' type check because 'sessionBlockId'
   //              is not in the 'Entry' type. Find cleaner solution
   return !!entry['sessionBlockId'];

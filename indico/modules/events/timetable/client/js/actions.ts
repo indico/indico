@@ -39,6 +39,8 @@ import {
   SidePanelView,
   ContribId,
   isChildEntry,
+  LayoutOverrides,
+  ContribEntryWithoutLayout,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -105,9 +107,8 @@ interface DeselectEntryAction {
 
 interface ScheduleEntryAction {
   type: typeof SCHEDULE_ENTRY;
-  date: string;
-  entries: TopLevelEntry[];
-  unscheduled: UnscheduledContribEntry[];
+  entry: ContribEntryWithoutLayout;
+  layoutOverrides: LayoutOverrides;
 }
 
 interface UnscheduleEntryAction {
@@ -421,8 +422,8 @@ export function deleteBlock(entry: BlockEntry, eventId: number) {
 
 export function scheduleEntry(
   eventId: number,
-  entry: ContribEntry | ChildContribEntry,
-  layoutOverrides
+  entry: ContribEntryWithoutLayout,
+  layoutOverrides: LayoutOverrides
 ) {
   const scheduleURL = scheduleContribURL(
     isChildEntry(entry)
