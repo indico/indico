@@ -150,6 +150,8 @@ Internal Changes
   :user:`moliholy, unconventionaldotdev`)
 - Modernize the scientific program + session list PDF generation using weasyprint
   (:pr:`7694`)
+- Use the latest TeXLive container image (``TL2026-2026-08-09-full``) for LaTeX-based
+  PDF builds (:pr:`7699`)
 
 
 Version 3.3.12

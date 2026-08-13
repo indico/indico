@@ -184,7 +184,7 @@ def _latex_escape(s, ignore_braces=False):
 
 @dataclass(frozen=True)
 class PodmanConfig:
-    image: str = 'registry.gitlab.com/islandoftex/images/texlive:TL2026-2026-03-08-full'
+    image: str = 'registry.gitlab.com/islandoftex/images/texlive:TL2026-2026-08-09-full'
     connection: str = ''
     timeout: int = 0
     allow_pull: bool = True
