@@ -26,7 +26,7 @@ import {
 } from './ModalContext';
 import * as selectors from './selectors';
 import './TimetableSidePanel.module.scss';
-import {EntryType, UnscheduledContribEntry} from './types';
+import {EntryType, SidePanelView, UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
 
 enum GenericFilterType {
@@ -226,9 +226,21 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
         {showUnscheduled && (
           <>
             <div styleName="container-header">
-              <h1 styleName="title">
-                <Translate>Unscheduled Contributions</Translate>
-              </h1>
+              <div styleName="title-wrapper">
+                <h1 styleName="title">
+                  <Translate>Unscheduled Contributions</Translate>
+                </h1>
+                <Button
+                  basic
+                  icon
+                  type="button"
+                  styleName="close-panel"
+                  title={Translate.string('Close panel')}
+                  onClick={() => dispatch(actions.setActivePanel(SidePanelView.None))}
+                >
+                  <Icon name="close" />
+                </Button>
+              </div>
               <div styleName="actions">
                 <Input
                   icon={
@@ -348,18 +360,35 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
         {showSessions && (
           <>
             <div styleName="container-header">
-              <h1 styleName="title">
-                <Translate>Sessions</Translate>
+              <div styleName="title-wrapper">
+                <h1 styleName="title">
+                  <Translate>Sessions</Translate>
 
-                <Popup inverted position="bottom right" basic trigger={<Icon name="info circle" />}>
-                  <Translate>
-                    Sessions help organize related contributions. When you add a session block to
-                    the timetable, you can assign it a session. Contributions placed inside that
-                    block automatically inherit the session's location and color, keeping everything
-                    consistent.
-                  </Translate>
-                </Popup>
-              </h1>
+                  <Popup
+                    inverted
+                    position="bottom right"
+                    basic
+                    trigger={<Icon name="info circle" />}
+                  >
+                    <Translate>
+                      Sessions help organize related contributions. When you add a session block to
+                      the timetable, you can assign it a session. Contributions placed inside that
+                      block automatically inherit the session's location and color, keeping
+                      everything consistent.
+                    </Translate>
+                  </Popup>
+                </h1>
+                <Button
+                  basic
+                  icon
+                  type="button"
+                  styleName="close-panel"
+                  title={Translate.string('Close panel')}
+                  onClick={() => dispatch(actions.setActivePanel(SidePanelView.None))}
+                >
+                  <Icon name="close" />
+                </Button>
+              </div>
               <div styleName="actions">
                 <Input
                   icon={
