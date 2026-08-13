@@ -94,15 +94,6 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: v => moment(v),
     toTransform: v => v.toISOString(),
   },
-  // {
-  //   from: 'children',
-  //   to: 'children',
-  //   // TODO: (Ajob) Find a clean way to fix this use-before-define error...
-  //   // eslint-disable-next-line no-use-before-define
-  //   fromTransform: (children: Record<string, unknown>[]) => children.map(c => mapDataToEntry(c)),
-  //   // eslint-disable-next-line no-use-before-define
-  //   toTransform: (children: Entry[]) => children.map(c => mapEntryToData(c)),
-  // },
 ];
 
 const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
