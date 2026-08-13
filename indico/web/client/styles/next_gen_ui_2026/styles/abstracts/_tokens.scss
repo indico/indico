@@ -17,7 +17,9 @@ $viewport-desktop: 1280px;
   --space-1: 0.286rem; // 4px
   --space-1-5: 0.429rem; // 6px
   --space-2: 0.571rem; // 8px
+  --space-2-5: 0.714rem; // 10px
   --space-3: 0.857rem; // 12px
+  --space-3-5: 1rem; // 14px
   --space-4: 1.143rem; // 16px
   --space-5: 1.429rem; // 20px
   --space-6: 1.714rem; // 24px
@@ -48,6 +50,9 @@ $viewport-desktop: 1280px;
   --radius-md: 0.571rem; // 8px
   --radius-lg: 0.714rem; // 10px
   --radius-xl: 0.857rem; // 12px
+  --radius-xxl: 1rem; // 14px
+  --radius-xxxl: 1.143rem; // 16px
+  --radius-xxxxl: 1.286rem; // 18px
   --radius-pill: 999px;
 
   // Shadows
@@ -75,12 +80,14 @@ $viewport-desktop: 1280px;
   --animation-duration-slow: 400ms;
 
   // Icon sizes
-  --icon-size-xs: 1.143rem; // 16px
-  --icon-size-sm: 1.429rem; // 20px
-  --icon-size-md: 1.714rem; // 24px
-  --icon-size-lg: 2rem; // 28px
-  --icon-size-xl: 2.286rem; // 32px
-  --icon-size-xxl: 2.571rem; // 36px
+  --icon-size-xs: 0.857rem; // 12px
+  --icon-size-sm: 1rem; // 14px
+  --icon-size-md: 1.14rem; // 16px
+  --icon-size-lg: 1.286rem; // 18px
+  --icon-size-xl: 1.429rem; // 20px
+  --icon-size-xxl: 1.714rem; // 24px
+  --icon-size-xxxl: 2.143rem; // 30px
+  --icon-size-xxxxl: 2.571rem; // 36px
 
   // --icon-size-xs: 1.143rem; // 16px
   // --icon-size-sm: 1.714rem; // 24px
@@ -94,26 +101,41 @@ $viewport-desktop: 1280px;
   --button-height-xs-compact: 1.857rem; // 26px
   --button-height-sm: 2.571rem; // 36px
   --button-height-sm-compact: 2.286rem; // 32px
-  --button-height-md: 3.143rem; // 44px
-  --button-height-md-compact: 2.857rem; // 40px
-  --button-height-lg: 3.714rem; // 52px
-  --button-height-lg-compact: 3.429rem; // 48px
-  --button-height-xl: 4.286rem; // 60px
-  --button-height-xl-compact: 4rem; // 56px
+  --button-height-md: 3rem; // 42px
+  --button-height-md-compact: 2.714rem; // 38px
+  --button-height-lg: 3.429rem; // 48px
+  --button-height-lg-compact: 3.143rem; // 44px
+  --button-height-xl: 3.857rem; // 54px
+  --button-height-xl-compact: 3.571rem; // 50px
 
   // Button padding
   --button-padding-xs: 1rem; // 14px
   --button-padding-xs-compact: 0.714rem; // 10px
-
+  --button-padding-icon-only-xs: 0.571rem; // 8px
   --button-padding-sm: 1.286rem; // 18px
   --button-padding-sm-compact: 1rem; // 14px
-
+  --button-padding-icon-only-sm: 0.714rem; // 10px
   --button-padding-md: 1.714rem; // 24px
   --button-padding-md-compact: 1.429rem; // 20px
-
+  --button-padding-icon-only-md: 1rem; // 14px
   --button-padding-lg: 2rem; // 28px
   --button-padding-lg-compact: 1.714rem; // 24px
-
+  --button-padding-icon-only-lg: 1.286rem; // 18px
   --button-padding-xl: 2.286rem; // 32px
   --button-padding-xl-compact: 2rem; // 28px
+  --button-padding-icon-only-xl: 1.571rem; // 22px
+
+  // Tag sizes
+  --tag-height-xs: 1.714rem; // 24px
+  --tag-height-sm: 2.143rem; // 30px
+  --tag-height-md: 2.571rem; // 36px
+  --tag-height-lg: 3rem; // 42px
+  --tag-height-xl: 3.429rem; // 48px
+
+  // Tag padding
+  --tag-padding-xs: 0.714rem; // 10px
+  --tag-padding-sm: 1rem; // 14px
+  --tag-padding-md: 1.429rem; // 20px
+  --tag-padding-lg: 1.714rem; // 24px
+  --tag-padding-xl: 2rem; // 28px
   }

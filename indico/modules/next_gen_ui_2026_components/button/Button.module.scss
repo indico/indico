@@ -18,7 +18,6 @@
   border-radius: var(--radius-#{$size});
 
   &[data-icon] {
-    --icon-height: var(--icon-size-#{$size});
     --icon-margin: var(--space-#{$space});
   }
 
@@ -28,9 +27,13 @@
     padding-left: var(--button-padding-#{$size}-compact);
 
     &[data-icon] {
-      --icon-height: var(--icon-size-#{$size});
       --icon-margin: var(--space-#{$space});
     }
+  }
+
+  &[data-icon][data-icon-only]:is([data-circular], [data-squared]) {
+    padding-right: var(--button-padding-icon-only-#{$size});
+    padding-left: var(--button-padding-icon-only-#{$size});
   }
 }
 
@@ -91,27 +94,27 @@
 
     // --------- Layout ---------
     &[data-size='xs'] {
-      @include button-size-spacing('xs', '1-5');
+      @include button-size-spacing('xs', '1');
       @include button-typography('text-xs');
     }
 
     &[data-size='sm'] {
-      @include button-size-spacing('sm', '2');
+      @include button-size-spacing('sm', '1-5');
       @include button-typography('text-sm');
     }
 
     &[data-size='md'] {
-      @include button-size-spacing('md', '3');
+      @include button-size-spacing('md', '2');
       @include button-typography('text-md');
     }
 
     &[data-size='lg'] {
-      @include button-size-spacing('lg', '4');
+      @include button-size-spacing('lg', '2-5');
       @include button-typography('text-lg');
     }
 
     &[data-size='xl'] {
-      @include button-size-spacing('xl', '5');
+      @include button-size-spacing('xl', '3');
       @include button-typography('text-xl');
     }
 
@@ -154,6 +157,12 @@
       height: auto;
     }
 
+    &[data-squared] {
+      aspect-ratio: 1 / 1;
+      width: auto;
+      height: auto;
+    }
+
     &[data-full-width] {
       display: flex;
       width: 100%;
@@ -170,9 +179,7 @@
 
     // --------- Icons ---------
     .button-icon {
-      width: (var(--icon-width),var(--icon-height));
-      height: var(--icon-height);
-      color: var(--btn-text);
+      color: inherit;
     }
 
     &[data-icon-position='left'] .button-icon {
@@ -183,7 +190,7 @@
       margin-left: var(--icon-margin);
     }
 
-    &[data-icon-position='icon-only'] .button-icon {
+    &[data-icon-only] .button-icon {
       margin: 0;
     }
   }
@@ -256,10 +263,10 @@
   // --------- Transparent ----------
   &.button[data-variant='transparent'] {
     --btn-bg: transparent;
-    --btn-text: var(--intensity-600);
+    --btn-text: var(--intensity-500);
     --btn-text-hover: var(--intensity-700);
     --btn-text-active: var(--intensity-800);
-    --btn-border: var(--intensity-600);
+    --btn-border: var(--intensity-500);
     --btn-border-hover: var(--intensity-700);
     --btn-border-active: var(--intensity-800);
     --btn-text-disabled: var(--color-disabled-buttons-text);
