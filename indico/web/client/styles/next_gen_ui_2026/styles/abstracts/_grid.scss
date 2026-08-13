@@ -17,6 +17,10 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
+.grid-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
 .grid-6 {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
@@ -63,6 +67,10 @@
 
 .grid-6-responsive {
   @include responsive-grid(6);
+}
+
+.grid-8-responsive {
+  @include responsive-grid(8);
 }
 
 .grid-12-responsive {

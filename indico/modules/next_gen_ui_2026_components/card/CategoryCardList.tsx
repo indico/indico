@@ -37,7 +37,13 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
     <div className={gridClass} role="group">
       {categories.map(category => (
         <Card styleName="category-card" key={category.id} href={category.displayURL}>
-          <Card.Icon icon="fas:folder" color="primary" size="md" variant="compact" decorative />
+          <Card.Icon
+            icon="fas:folder"
+            compact
+            size="xxxl"
+            decorative
+            styleName="category-card-folder-icon"
+          />
           <div styleName="category-card-main">
             <Card.Header styleName="category-card-header">{category.title}</Card.Header>
             <Card.Meta styleName="category-card-meta">
@@ -65,7 +71,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
               icon="fas:shield-halved"
               color="error"
               size="sm"
-              variant="light"
+              variant="transparent"
               ariaLabel="Protected Category"
             />
           ) : (
@@ -74,7 +80,7 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
               styleName="category-card-arrow-icon"
               color="gray"
               size="xs"
-              variant="plain"
+              variant="transparent"
               ariaLabel="View Category"
             />
           )}
