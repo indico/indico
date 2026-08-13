@@ -141,6 +141,10 @@ Accessibility
 - Screen reader users now hear the affiliation, email and phone on their profile
   dashboard announced as labelled fields instead of bare values (:pr:`7593`,
   thanks :user:`foxbunny`)
+- Keyboard and screen reader users can now open and use the event footer "Share
+  this page" widget, which previously could not be opened with the keyboard and
+  whose controls had no accessible names (:issue:`7623`, :pr:`7706`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
