@@ -305,17 +305,21 @@ class RHContributionREST(RHManageContributionBase):
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
-    @use_args(FullContributionSchema, partial=True)
+    @use_args({
+        'session_id': fields.Integer(allow_none=True),
+        'track_id': fields.Integer(allow_none=True),
+    }, partial=True)
     def _process_PATCH(self, data):
-        updates = {k: v for k, v in data.items() if k in {'title', 'description', 'keywords', 'board_number', 'code'}}
-        if session := data.get('session'):
+        # XXX this is ONLY used for the session/track dropdowns on the contribution management page
+        updates = {}
+        if 'session_id' in data:
             if not self._can_update_scheduling():
                 raise Forbidden
-            updates.update(self._get_contribution_session_updates(session.get('id')))
-        if track := data.get('track'):
+            updates.update(self._get_contribution_session_updates(data['session_id']))
+        if 'track_id' in data:
             if not self._can_update_scheduling():
                 raise Forbidden
-            updates.update(self._get_contribution_track_updates(track.get('id')))
+            updates.update(self._get_contribution_track_updates(data['track_id']))
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
@@ -622,7 +626,6 @@ class RHContributionsExportJSON(RHManageContributionsExportActionsBase):
     """Export list of contributions to JSON."""
 
     def _process(self):
-        from indico.modules.events.contributions.schemas import FullContributionSchema
         resp = FullContributionSchema(many=True).jsonify(sorted(self.contribs, key=attrgetter('friendly_id')))
         resp.headers['Content-Disposition'] = 'attachment; filename="contributions.json"'
         return resp
