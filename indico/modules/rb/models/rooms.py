@@ -335,8 +335,13 @@ class Room(ProtectionManagersMixin, db.Model):
     @property
     def sprite_position(self):
         from indico.modules.rb import rb_cache
-        sprite_mapping = rb_cache.get('rooms-sprite-mapping')
-        return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
+        if (sprite_mapping := rb_cache.get('rooms-sprite-mapping')) is None:
+            return (0, 0)
+        entry = sprite_mapping.get(self.id, (0, 0))
+        if isinstance(entry, int):
+            # legacy single-row sprite sheet
+            return (entry, 0)
+        return entry
 
     def __repr__(self):
         return format_repr(self, 'id', 'full_name', is_deleted=False)

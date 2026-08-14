@@ -9,6 +9,7 @@ import os
 from collections import namedtuple
 from datetime import datetime, time, timedelta
 from io import BytesIO
+from math import ceil
 from operator import attrgetter
 
 import pytz
@@ -37,6 +38,7 @@ from indico.web.util import ExpectedError
 
 WEEKDAYS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
 ROOM_PHOTO_DIMENSIONS = (290, 170)
+SPRITE_IMAGES_PER_ROW = 20
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))
 
@@ -85,9 +87,10 @@ def build_rooms_spritesheet():
     from indico.modules.rb.models.rooms import Room
     image_width, image_height = ROOM_PHOTO_DIMENSIONS
     rooms = Room.query.filter(Room.photo).options(joinedload('photo')).all()
-    room_count = len(rooms)
-    sprite_width = (image_width * (room_count + 1))  # +1 for the placeholder
-    sprite_height = image_height
+    image_count = len(rooms) + 1  # +1 for the placeholder
+    row_count = ceil(image_count / SPRITE_IMAGES_PER_ROW)
+    sprite_width = image_width * min(image_count, SPRITE_IMAGES_PER_ROW)
+    sprite_height = image_height * row_count
     sprite = Image.new(mode='RGB', size=(sprite_width, sprite_height), color=(0, 0, 0))
     # Placeholder image at position 0
     no_photo_path = 'web/static/images/rooms/large_photos/NoPhoto.jpg'
@@ -95,11 +98,13 @@ def build_rooms_spritesheet():
     image = no_photo_image.resize(ROOM_PHOTO_DIMENSIONS, Image.LANCZOS)
     sprite.paste(image, (0, 0))
     mapping = {}
-    for count, room in enumerate(rooms, start=1):
-        location = image_width * count
+    for i, room in enumerate(rooms, start=1):
+        row, col = divmod(i, SPRITE_IMAGES_PER_ROW)
+        x = image_width * col
+        y = image_height * row
         image = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.LANCZOS)
-        sprite.paste(image, (location, 0))
-        mapping[room.id] = count
+        sprite.paste(image, (x, y))
+        mapping[room.id] = (col, row)
 
     output = BytesIO()
     sprite.save(output, 'JPEG')
