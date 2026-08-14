@@ -10,12 +10,10 @@
 :global(.indico-ui) {
     .year-picker {
         background-color: var(--color-surface-soft);
-        margin-bottom: var(--space-4); // TODO: one level up
         border-radius: var(--radius-sm);
         display: flex;
         align-items: center;
         width: 100%;
-        // max-width: var(--container-md);
         overflow: hidden;
     }
 
@@ -44,6 +42,7 @@
     }
 
     .year-picker-year-button {
+        @include focus-ring();
         flex-shrink: 0;
         color: var(--color-text-muted);
 
@@ -58,6 +57,7 @@
     }
 
     .year-picker-chevron-button {
+        @include focus-ring();
         color: var(--color-text-heading);
     }
 }

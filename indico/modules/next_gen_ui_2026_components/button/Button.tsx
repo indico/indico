@@ -29,7 +29,6 @@ export type ButtonIconPosition = IconPosition;
 
 interface CustomButtonProps {
   className?: string;
-  variant?: ButtonVariant;
   size?: ButtonSize;
   textWeight?: ButtonTextWeight;
   opaque?: boolean;
@@ -50,14 +49,11 @@ interface CustomButtonProps {
 
 type NativeButtonProps = NativeProps<'button'>;
 type NativeAnchorProps = NativeProps<'a'>;
-
-type nativeUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
+type NativeUnion = ({href?: undefined} & NativeButtonProps) | ({href: string} & NativeAnchorProps);
 
 type RoundnessUnion = {rounded?: boolean; circular?: never} | {rounded?: never; circular?: boolean};
 
-type SquaredUnion =
-  | {squared?: boolean; rounded?: never; circular?: never; iconPosition?: 'icon-only'}
-  | {squared?: never};
+type SquaredUnion = {squared: boolean; rounded?: never; circular?: never} | {squared?: never};
 
 type VariantColorUnion =
   | {variant?: 'transparent'; color?: ExtendedIndicoPaletteColor; opaque?: never}
@@ -68,7 +64,12 @@ type VariantColorUnion =
     };
 
 type IconOnlyUnion =
-  | {icon?: IconSource; iconPosition?: 'left' | 'right'; children?: React.ReactNode}
+  | {
+      icon?: IconSource;
+      iconPosition?: 'left' | 'right';
+      children?: React.ReactNode;
+      iconOnly?: false;
+    }
   | {
       icon: IconSource;
       iconOnly: true;
@@ -78,7 +79,7 @@ type IconOnlyUnion =
     };
 
 export type ButtonProps = CustomButtonProps &
-  nativeUnion &
+  NativeUnion &
   VariantColorUnion &
   IconOnlyUnion &
   RoundnessUnion &

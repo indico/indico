@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import apiEventListURL from 'indico-url:categories.api_event_list';
-import apiViewDataURL from 'indico-url:categories.api_view_data';
 
 import React from 'react';
 
@@ -16,6 +15,7 @@ import {Translate} from 'indico/react/i18n';
 import {Button} from '../button/Button';
 import {Indicator} from '../indicator/Indicator';
 import {TimelineItem} from '../timeline/Timeline';
+import {CategoryViewData, Event, EventsMonth} from '../types';
 import {YearPicker} from '../yearPicker/YearPicker';
 
 import {FavoriteButton} from './FavoriteButton';
@@ -25,16 +25,10 @@ import './EventList.module.scss';
 
 interface EventListProps {
   categoryId: number;
+  viewData: CategoryViewData;
 }
-export function EventList({categoryId}: EventListProps) {
+export function EventList({categoryId, viewData}: EventListProps) {
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
-
-  const viewDataURL = apiViewDataURL({
-    category_id: String(categoryId),
-  });
-  const {data: viewData} = useIndicoAxios(viewDataURL, {
-    camelize: true,
-  });
 
   const {data: eventListData, loading: fetchingList} = useIndicoAxios(
     apiEventListURL({
@@ -73,7 +67,7 @@ export function EventList({categoryId}: EventListProps) {
     return <div>Loading...</div>;
   }
 
-  const listItem = (event, month) =>
+  const listItem = (event: Event, month: EventsMonth) =>
     (
       <ListItem styleName="event-list-item" key={event.id + month.name} href={event.url}>
         <div styleName="event-list-item-start-section">
@@ -129,6 +123,7 @@ export function EventList({categoryId}: EventListProps) {
         onYearSelect={year => {
           setSelectedYear(year);
         }}
+        styleName="event-list-year-picker"
       />
 
       {futureEventsCount > 0 && (
@@ -151,7 +146,7 @@ export function EventList({categoryId}: EventListProps) {
         <TimelineItem key={month.name} styleName="event-list-month">
           <TimelineItem.Title dotColor="primary">{month.name.split(' ')[0]}</TimelineItem.Title>
           <TimelineItem.Content>
-            {month.events.map(event =>
+            {month.events.map((event: Event) =>
               event.isRecent ? (
                 <Indicator
                   key={event.id + event.date}

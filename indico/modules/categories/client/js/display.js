@@ -12,9 +12,9 @@ import ReactDOM from 'react-dom';
 
 import {$T} from 'indico/utils/i18n';
 
-import {CategoryCardList} from '../../../next_gen_ui_2026_components/card/CategoryCardList';
-import {EventList} from '../../../next_gen_ui_2026_components/list/EventList';
+import {Category} from '../../../next_gen_ui_2026_components/category/Category';
 
+// import {Demonstration} from './../../../next_gen_ui_2026_components/Demonstration';
 import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
@@ -146,8 +146,8 @@ import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIP
     const categoryId = Number(root.dataset.categoryId);
     ReactDOM.render(
       <IndicoUIProvider>
-        <CategoryCardList categoryId={categoryId} />
-        <EventList categoryId={categoryId} />
+        <Category categoryId={categoryId} />
+        {/* <Demonstration /> */}
       </IndicoUIProvider>,
       root
     );

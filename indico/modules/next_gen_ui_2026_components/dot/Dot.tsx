@@ -14,7 +14,6 @@ import './Dot.module.scss';
 export type DotColor = IndicoPaletteColor | LegacyColor;
 
 interface CustomDotProps {
-  className?: string;
   color?: DotColor;
   size?: string;
 }
@@ -22,14 +21,14 @@ interface CustomDotProps {
 export type DotProps = CustomDotProps & NativeProps<'span'>;
 
 export const Dot = forwardRef<HTMLSpanElement, DotProps>((props, ref) => {
-  const {className, color = 'primary', size = 'md', ...nativeProps} = props;
+  const {color = 'primary', size = 'md', ...nativeProps} = props;
 
   return (
     <span
       {...nativeProps}
       ref={ref}
       styleName="dot"
-      className={sharedClassName(className)}
+      className={sharedClassName(nativeProps.className)}
       data-color={color}
       data-size={size}
     />

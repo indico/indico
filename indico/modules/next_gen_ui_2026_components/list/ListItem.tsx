@@ -60,29 +60,33 @@ interface CustomListItemProps {
   children: ListItemChild | ListItemChild[];
 }
 
-export type ListItemProps = CustomListItemProps & NativeProps<'div'> & NativeProps<'a'>;
+type NativeDivProps = NativeProps<'div'>;
+type NativeAnchorProps = NativeProps<'a'>;
+type NativeUnion = ({href?: undefined} & NativeDivProps) | ({href: string} & NativeAnchorProps);
+export type ListItemProps = CustomListItemProps & NativeUnion;
 
 const ListItemRoot = forwardRef<HTMLAnchorElement | HTMLDivElement, ListItemProps>((props, ref) => {
   const {children, ...nativeProps} = props;
   if (nativeProps.href !== undefined) {
+    const rest = nativeProps as NativeAnchorProps;
     return (
       <a
-        {...nativeProps}
+        {...rest}
         ref={ref as React.Ref<HTMLAnchorElement>}
-        href={nativeProps.href}
         styleName="list-item-root"
-        className={sharedClassName(nativeProps.className)}
+        className={sharedClassName(rest.className)}
       >
         {children}
       </a>
     );
   }
+  const rest = nativeProps as NativeDivProps;
   return (
     <div
-      {...nativeProps}
+      {...rest}
       ref={ref as React.Ref<HTMLDivElement>}
       styleName="list-item-root"
-      className={sharedClassName(nativeProps.className)}
+      className={sharedClassName(rest.className)}
     >
       {children}
     </div>

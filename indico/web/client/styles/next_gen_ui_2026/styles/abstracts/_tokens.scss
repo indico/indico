@@ -11,8 +11,8 @@ $viewport-tablet: 768px;
 $viewport-desktop: 1280px;
 
 :root {
-  // Spacing system
   // Base: 14px
+  // Spacing system
 
   --space-1: 0.286rem; // 4px
   --space-1-5: 0.429rem; // 6px
@@ -36,7 +36,6 @@ $viewport-desktop: 1280px;
   --space-64: 18.286rem; // 256px
 
   // Container widths
-  // Based on 14px root font size
 
   --container-sm: 45.714rem; // 640px
   --container-md: 54.857rem; // 768px
@@ -88,13 +87,6 @@ $viewport-desktop: 1280px;
   --icon-size-xxl: 1.714rem; // 24px
   --icon-size-xxxl: 2.143rem; // 30px
   --icon-size-xxxxl: 2.571rem; // 36px
-
-  // --icon-size-xs: 1.143rem; // 16px
-  // --icon-size-sm: 1.714rem; // 24px
-  // --icon-size-md: 2.286rem; // 32px
-  // --icon-size-lg: 2.857rem; // 40px
-  // --icon-size-xl: 3.429rem; // 48px
-  // --icon-size-xxl: 4rem; // 56px
 
   // Button sizes
   --button-height-xs: 2.143rem; // 30px
