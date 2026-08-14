@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@keyframes slight-shift-up {
+@keyframes push-down {
   0% {
     transform: translateY(0);
   }
@@ -20,5 +20,5 @@
 }
 
 :root {
-  --slight-shift-up: slight-shift-up;
+  --push-down: push-down;
 }

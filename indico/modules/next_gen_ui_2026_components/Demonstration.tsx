@@ -510,7 +510,7 @@ export function Demonstration() {
           <section>
             <div className="grid-5">
               {colors.map(color =>
-                tagAttributes.map(attribute =>
+                tagAttributes.slice(0, 4).map(attribute =>
                   sizes.map(size => (
                     <div
                       key={`${'white'}-${color}-${size}-${attribute}-square`}
@@ -544,7 +544,7 @@ export function Demonstration() {
           <section>
             <div className="grid-5">
               {colors.map(color =>
-                tagAttributes.map(attribute =>
+                tagAttributes.slice(0, 4).map(attribute =>
                   sizes.map(size => {
                     return (
                       <div

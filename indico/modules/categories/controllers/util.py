@@ -44,6 +44,7 @@ def serialize_upcoming_events(events):
         {
             'id': event.id,
             'title': event.title,
+            'isHappeningNow': event.is_happening_now,
             'url': event.url,
             'startDt': event.start_dt.isoformat(),
             'endDt': event.end_dt.isoformat(),
@@ -73,7 +74,6 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
         'label': event.label.title if event.label else None,
         'labelColor': event.label.color if event.label else None,
         'isFavorite': event in session.user.favorite_events,
-        'exportIcalUrl': url_for('events.export_event_ical', event),
     }
 
 
@@ -384,7 +384,5 @@ def get_category_year_view_params(category, now, year, is_flat=False):
         'has_hidden_events': has_hidden_events,
         'managers': managers,
         'is_flat': is_flat,
-        'atom_feed_url': url_for('.export_atom', category),
-        'atom_feed_title': _('Events of "{}"').format(category.title),
         'pending_event_moves': pending_event_moves,
     }

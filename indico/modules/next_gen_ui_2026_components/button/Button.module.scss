@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------
 
 :global(.indico-ui) {
-  &.button {
+  .button {
     @include focus-ring();
     display: inline-flex;
     align-items: center;
@@ -59,7 +59,6 @@
     border: none;
     transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast);
 
-    // --- States ---
     background-color: var(--btn-bg, transparent);
     color: var(--btn-text);
 
@@ -173,7 +172,7 @@
       backface-visibility: hidden;
 
       &:active {
-        animation: var(--slight-shift-up) var(--animation-duration-slow) ease-in;
+        animation: var(--push-down) var(--animation-duration-slow) ease-in;
       }
     }
 
@@ -193,92 +192,92 @@
     &[data-icon-only] .button-icon {
       margin: 0;
     }
-  }
 
-  // ----------------------------------------------------------------
-  // VARIANTS
-  // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // VARIANTS
+    // ----------------------------------------------------------------
 
-  // --------- Solid ----------
-  &.button[data-variant='solid'] {
-    --btn-bg: var(--intensity-500);
-    --btn-text: var(--color-accent-buttons);
-    --btn-bg-hover: var(--intensity-600);
-    --btn-bg-active: var(--intensity-700);
-    --btn-bg-disabled: var(--intensity-200);
-    --btn-text-disabled: var(--intensity-50);
-
-    &[data-opaque] {
-      --btn-bg: color-mix(in srgb, var(--intensity-500) 20%);
-      --btn-bg-hover: color-mix(in srgb, var(--intensity-500) 30%);
-      --btn-bg-active: color-mix(in srgb, var(--intensity-500) 40%);
-      --btn-bg-disabled: color-mix(in srgb, var(--intensity-200) 10%);
-    }
-  }
-
-  // ---------- Light ---------
-  &.button[data-variant='light'] {
-    --btn-bg: var(--intensity-100);
-    --btn-text: var(--intensity-700);
-    --btn-bg-hover: var(--intensity-200);
-    --btn-bg-active: var(--intensity-300);
-    --btn-bg-disabled: var(--color-disabled-buttons);
-    --btn-text-disabled: var(--color-disabled-buttons-text);
-
-    &[data-opaque] {
-      --btn-bg: color-mix(in srgb, var(--intensity-100) 20%);
-      --btn-text: var(--intensity-600);
-      --btn-bg-hover: color-mix(in srgb, var(--intensity-100) 30%);
-      --btn-bg-active: color-mix(in srgb, var(--intensity-100) 40%);
-      --btn-bg-disabled: color-mix(in srgb, var(--intensity-100) 10%);
-    }
-  }
-
-  // --------- White ---------
-  &.button[data-variant='white'] {
-    --btn-bg: var(--color-accent-buttons);
-    --btn-text: var(--intensity-600);
-    --btn-bg-hover: var(--intensity-600);
-    --btn-text-hover: var(--color-accent-buttons);
-    --btn-bg-active: var(--intensity-700);
-    --btn-text-active: var(--color-accent-buttons);
-    --btn-bg-disabled: var(--color-disabled-buttons);
-    --btn-text-disabled: var(--color-disabled-buttons-text);
-
-    &[data-opaque] {
-      --btn-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
+    // --------- Solid ----------
+    &[data-variant='solid'] {
+      --btn-bg: var(--intensity-500);
       --btn-text: var(--color-accent-buttons);
-      --btn-bg-hover: color-mix(in srgb, var(--color-accent-buttons) 30%);
-      --btn-bg-active: var(--color-accent-buttons);
-      --btn-text-active: var(--intensity-600);
-      --btn-bg-disabled: color-mix(in srgb, var(--color-accent-buttons) 10%);
+      --btn-bg-hover: var(--intensity-600);
+      --btn-bg-active: var(--intensity-700);
+      --btn-bg-disabled: var(--intensity-200);
+      --btn-text-disabled: var(--intensity-50);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--intensity-500) 20%);
+        --btn-bg-hover: color-mix(in srgb, var(--intensity-500) 30%);
+        --btn-bg-active: color-mix(in srgb, var(--intensity-500) 40%);
+        --btn-bg-disabled: color-mix(in srgb, var(--intensity-200) 10%);
+      }
     }
 
-    &[data-outlined] {
-      --btn-border: var(--intensity-600);
-      --btn-border-active: var(--intensity-700);
-    }
-  }
-
-  // --------- Transparent ----------
-  &.button[data-variant='transparent'] {
-    --btn-bg: transparent;
-    --btn-text: var(--intensity-500);
-    --btn-text-hover: var(--intensity-700);
-    --btn-text-active: var(--intensity-800);
-    --btn-border: var(--intensity-500);
-    --btn-border-hover: var(--intensity-700);
-    --btn-border-active: var(--intensity-800);
-    --btn-text-disabled: var(--color-disabled-buttons-text);
-
-    &[data-color='white'] {
-      --btn-text: var(--color-accent-buttons);
-      --btn-text-hover: var(--indico-gray-200);
-      --btn-text-active: var(--indico-gray-300);
-      --btn-border: var(--color-accent-buttons);
-      --btn-border-hover: var(--indico-gray-200);
-      --btn-border-active: var(--indico-gray-300);
+    // ---------- Light ---------
+    &[data-variant='light'] {
+      --btn-bg: var(--intensity-100);
+      --btn-text: var(--intensity-700);
+      --btn-bg-hover: var(--intensity-200);
+      --btn-bg-active: var(--intensity-300);
+      --btn-bg-disabled: var(--color-disabled-buttons);
       --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--intensity-100) 20%);
+        --btn-text: var(--intensity-600);
+        --btn-bg-hover: color-mix(in srgb, var(--intensity-100) 30%);
+        --btn-bg-active: color-mix(in srgb, var(--intensity-100) 40%);
+        --btn-bg-disabled: color-mix(in srgb, var(--intensity-100) 10%);
+      }
+    }
+
+    // --------- White ---------
+    &[data-variant='white'] {
+      --btn-bg: var(--color-accent-buttons);
+      --btn-text: var(--intensity-600);
+      --btn-bg-hover: var(--intensity-600);
+      --btn-text-hover: var(--color-accent-buttons);
+      --btn-bg-active: var(--intensity-700);
+      --btn-text-active: var(--color-accent-buttons);
+      --btn-bg-disabled: var(--color-disabled-buttons);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
+        --btn-text: var(--color-accent-buttons);
+        --btn-bg-hover: color-mix(in srgb, var(--color-accent-buttons) 30%);
+        --btn-bg-active: var(--color-accent-buttons);
+        --btn-text-active: var(--intensity-600);
+        --btn-bg-disabled: color-mix(in srgb, var(--color-accent-buttons) 10%);
+      }
+
+      &[data-outlined] {
+        --btn-border: var(--intensity-600);
+        --btn-border-active: var(--intensity-700);
+      }
+    }
+
+    // --------- Transparent ----------
+    &[data-variant='transparent'] {
+      --btn-bg: transparent;
+      --btn-text: var(--intensity-500);
+      --btn-text-hover: var(--intensity-700);
+      --btn-text-active: var(--intensity-800);
+      --btn-border: var(--intensity-500);
+      --btn-border-hover: var(--intensity-700);
+      --btn-border-active: var(--intensity-800);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-color='white'] {
+        --btn-text: var(--color-accent-buttons);
+        --btn-text-hover: var(--indico-gray-200);
+        --btn-text-active: var(--indico-gray-300);
+        --btn-border: var(--color-accent-buttons);
+        --btn-border-hover: var(--indico-gray-200);
+        --btn-border-active: var(--indico-gray-300);
+        --btn-text-disabled: var(--color-disabled-buttons-text);
+      }
     }
   }
 }

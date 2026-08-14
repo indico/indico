@@ -20,7 +20,7 @@ export type TagTextWeight = TextWeight;
 
 export interface CustomTagProps {
   className?: string;
-  variant?: TagVariant;
+  color?: TagColorMerged;
   size?: TagSize;
   textWeight?: TagTextWeight;
   outlined?: boolean;
@@ -28,25 +28,19 @@ export interface CustomTagProps {
   opaque?: boolean;
   icon?: IconSource;
   iconPosition?: IconPosition;
-  children?: React.ReactNode;
 }
 
-type NativeSpanProps = NativeProps<'span'>;
+type VariantUnion =
+  | {
+      variant?: 'transparent' | 'white';
+      opaque?: never;
+    }
+  | {
+      variant?: 'solid' | 'light';
+      opaque?: boolean;
+    };
 
-export type TagProps = CustomTagProps &
-  NativeSpanProps &
-  (
-    | {
-        variant?: 'transparent' | 'white';
-        color?: TagColorMerged;
-        opaque?: never;
-      }
-    | {
-        variant?: 'solid' | 'light';
-        color?: IndicoPaletteColor;
-        opaque?: boolean;
-      }
-  );
+export type TagProps = VariantUnion & CustomTagProps & NativeProps<'span'>;
 
 export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
   const {
@@ -89,12 +83,12 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>((props, ref) => {
 
   return (
     <span
+      {...nativeProps}
+      {...dataProps}
       ref={ref as React.Ref<HTMLSpanElement>}
       styleName="tag"
       data-clickable={false}
       className={sharedClassName(className)}
-      {...dataProps}
-      {...nativeProps}
     >
       {content}
     </span>

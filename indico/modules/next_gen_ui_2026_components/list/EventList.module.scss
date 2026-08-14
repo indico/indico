@@ -14,6 +14,7 @@
         flex-direction: column;
         justify-content: flex-start;
         margin-top: var(--space-6);
+        margin-bottom: var(--space-6);
 
         .event-list-month {
             margin-left: var(--space-6);
@@ -22,6 +23,10 @@
                 margin-left: 0;
             }
         }
+    }
+
+    .event-list-year-picker {
+        margin-bottom: var(--space-4);
     }
 
     .event-list-show-more {
@@ -55,7 +60,7 @@
             .event-list-item-favorite-icon {
                 top: 0;
                 left: 0;
-                transform: translate(5%, 15%);
+                transform: translate(5%, 8%);
                 position: absolute;
                 z-index: 1;
             }
@@ -98,9 +103,7 @@
                     flex: 1 1 auto;
 
                     .event-list-item-date-tag {
-                        padding-left: var(--space-4);
-                        cursor: not-allowed;
-                        pointer-events: none;
+                        padding-left: var(--space-8);
                     }
                 }
             }

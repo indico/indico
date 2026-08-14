@@ -5,31 +5,23 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import getCategoryChildrenURL from 'indico-url:categories.get_category_children';
-
 import React from 'react';
 
-import {useIndicoAxios} from 'indico/react/hooks/hooks';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+
+import {Category} from '../types';
 
 import {Card} from './Card';
 
 import './CategoryCardList.module.scss';
 
 interface CategoryCardListProps {
-  categoryId: number;
+  data: {categories: Category[]; parentId: number};
   columns?: 1 | 2 | 3;
 }
 
-export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProps) {
-  const url = getCategoryChildrenURL({
-    category_id: String(categoryId),
-  });
-
-  const {data} = useIndicoAxios(url, {
-    camelize: true,
-  });
-
-  const categories = data?.categories ?? [];
+export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
+  const categories = data.categories ?? [];
 
   const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
 
@@ -48,12 +40,19 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
             <Card.Header styleName="category-card-header">{category.title}</Card.Header>
             <Card.Meta styleName="category-card-meta">
               {category.deepCategoryCount === 0 && category.deepEventCount === 0 ? (
-                'Empty'
+                <Translate>Empty</Translate>
               ) : (
                 <>
                   {category.deepCategoryCount > 0 && (
                     <>
-                      {category.deepCategoryCount} Categories
+                      <PluralTranslate count={category.deepCategoryCount}>
+                        <Singular>
+                          <Param name="count" value={category.deepCategoryCount} /> Category
+                        </Singular>
+                        <Plural>
+                          <Param name="count" value={category.deepCategoryCount} /> Categories
+                        </Plural>
+                      </PluralTranslate>
                       {category.deepEventCount > 0 && (
                         <span styleName="category-card-dot-divider" aria-hidden="true">
                           •
@@ -61,7 +60,16 @@ export function CategoryCardList({categoryId, columns = 2}: CategoryCardListProp
                       )}
                     </>
                   )}
-                  {category.deepEventCount > 0 ? `${category.deepEventCount} Events` : null}
+                  {category.deepEventCount > 0 && (
+                    <PluralTranslate count={category.deepEventCount}>
+                      <Singular>
+                        <Param name="count" value={category.deepEventCount} /> Event
+                      </Singular>
+                      <Plural>
+                        <Param name="count" value={category.deepEventCount} /> Events
+                      </Plural>
+                    </PluralTranslate>
+                  )}
                 </>
               )}
             </Card.Meta>
