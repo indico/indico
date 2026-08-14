@@ -555,7 +555,10 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             template = 'display/overview/month.html'
 
         events_by_day = [
-            (day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events))  # ruff: ignore[function-uses-loop-variable]
+            (
+                day,
+                self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events)  # ruff: ignore[function-uses-loop-variable]
+            )
             for day in days
         ]
 
