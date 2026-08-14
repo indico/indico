@@ -60,6 +60,7 @@
         {% endcall %}
     {% endif %}
 
+    <div id="category-cards-root" data-category-id="{{ category.id }}"></div>
     <div class="event-list"
          data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
@@ -87,6 +88,7 @@
             {% endcall %}
         {% endif %}
     </div>
+
     <script>
         setupCategoryDisplayEventList({{ (show_future_events and not future_events_by_month) | tojson }},
                                       {{ (show_past_events and not past_events_by_month) | tojson }},

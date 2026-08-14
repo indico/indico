@@ -8,83 +8,72 @@
 import React, {forwardRef, ReactElement} from 'react';
 
 import {Icon, IconProps} from '../icon/Icon';
-
 import './Card.module.scss';
+import {NativeProps, sharedClassName} from '../utils';
 
-// HEADER COMPONENT
-interface CardHeaderProps {
-  children: React.ReactNode;
-  className?: string;
-}
+export type CardHeaderProps = NativeProps<'h6'>;
 
-export const CardHeader = ({children, className}: CardHeaderProps) => (
-  <h6 styleName="card-header" className={`indico-ui ${className || ''}`}>
-    {children}
+export const CardHeader = ({...nativeProps}: CardHeaderProps) => (
+  <h6 styleName="card-header" className={`indico-ui ${nativeProps.className || ''}`}>
+    {nativeProps.children}
   </h6>
 );
 
-type CardHeaderElement = ReactElement<CardHeaderProps, typeof CardHeader>;
+export type CardMetaProps = NativeProps<'p'>;
 
-// META DATA CATEGORY COMPONENT
-interface CardMetaProps {
-  children: React.ReactNode;
-  className?: string;
-}
+export const CardMeta = ({...nativeProps}: CardMetaProps) => (
+  <p styleName="card-meta" className={`indico-ui ${nativeProps.className || ''}`}>
+    {nativeProps.children}
+  </p>
+);
 
-export const CardMeta = ({children, className}: CardMetaProps) => (
-  <p styleName="card-meta" className={`indico-ui ${className || ''}`}>
-    {children}
+export type CardDescriptionProps = NativeProps<'p'>;
+
+export const CardDescription = ({...nativeProps}: CardDescriptionProps) => (
+  <p styleName="card-description" className={`indico-ui ${nativeProps.className || ''}`}>
+    {nativeProps.children}
   </p>
 );
 
 type CardMetaElement = ReactElement<CardMetaProps, typeof CardMeta>;
-
-// DESCRIPTION COMPONENT
-interface CardDescriptionProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export const CardDescription = ({children, className}: CardDescriptionProps) => (
-  <p styleName="card-description" className={`indico-ui ${className || ''}`}>
-    {children}
-  </p>
-);
-
+type CardHeaderElement = ReactElement<CardHeaderProps, typeof CardHeader>;
 type CardDescriptionElement = ReactElement<CardDescriptionProps, typeof CardDescription>;
-
 type CardIconElement = ReactElement<IconProps, typeof Icon>;
 
-// CARD ROOT COMPONENT
 type CardChild = CardIconElement | CardHeaderElement | CardMetaElement | CardDescriptionElement;
 
-interface CardProps {
+interface CustomCardProps {
   children: CardChild | CardChild[];
-  className?: string;
-  href?: string;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
+type NativeAnchorProps = NativeProps<'a'>;
+type NativeDivProps = NativeProps<'div'>;
+
+type NativeUnion = ({href?: undefined} & NativeDivProps) | ({href: string} & NativeAnchorProps);
+export type CardProps = CustomCardProps & NativeUnion;
+
 const CardRoot = forwardRef<HTMLAnchorElement | HTMLDivElement, CardProps>(
-  ({children, href, onClick, className}, ref) => {
-    if (href) {
+  ({children, ...nativeProps}, ref) => {
+    if (nativeProps.href !== undefined) {
+      const rest = nativeProps as NativeAnchorProps;
       return (
         <a
+          {...rest}
           ref={ref as React.Ref<HTMLAnchorElement>}
-          href={href}
-          onClick={onClick}
           styleName="card-root"
-          className={`indico-ui ${className ?? ''}`}
+          className={sharedClassName(rest.className)}
         >
           {children}
         </a>
       );
     }
+    const rest = nativeProps as NativeDivProps;
     return (
       <div
-        styleName="card-root"
-        className={`indico-ui ${className ?? ''}`}
+        {...rest}
         ref={ref as React.Ref<HTMLDivElement>}
+        styleName="card-root"
+        className={sharedClassName(rest.className)}
       >
         {children}
       </div>

@@ -296,8 +296,6 @@ class RHCategoryViewDataJSON(RHDisplayCategoryEventsBase):
             has_hidden_events=params['has_hidden_events'],
             managers=serialize_managers(params['managers']),
             is_flat=params['is_flat'],
-            atom_feed_url=params['atom_feed_url'],
-            atom_feed_title=params['atom_feed_title'],
             pending_event_moves=params['pending_event_moves'],
             show_past_events=params['show_past_events'],
             show_future_events=params['show_future_events'],
@@ -318,10 +316,10 @@ class RHCategoryChildrenJSON(RHDisplayCategoryBase):
     def _process(self):
         serialized_categories = []
 
-        for c in self.category.children:
-            data = serialize_category(c, with_path=True, with_favorite=True)
-            data['display_url'] = url_for('.display', c)
-            data['description'] = c.description
+        for child in self.category.children:
+            data = serialize_category(child, with_path=True, with_favorite=True)
+            data['display_url'] = url_for('.display', child)
+            data['description'] = child.description
             serialized_categories.append(data)
 
         return jsonify_data(
@@ -557,7 +555,7 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             template = 'display/overview/month.html'
 
         events_by_day = [
-            (day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events))  # noqa: B023
+            (day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events))  # ruff: ignore[function-uses-loop-variable]
             for day in days
         ]
 

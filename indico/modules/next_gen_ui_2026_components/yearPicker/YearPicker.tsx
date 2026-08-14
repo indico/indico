@@ -8,16 +8,23 @@
 import React from 'react';
 
 import {Button} from '../button/Button';
-
 import './YearPicker.module.scss';
+import {sharedClassName} from '../utils';
 
-interface YearPickerProps {
+interface CustomYearPickerProps {
   yearList: number[];
   selectedYear?: number | null;
   onYearSelect: (year: number) => void;
 }
 
-export function YearPicker({yearList, selectedYear, onYearSelect}: YearPickerProps) {
+export type YearPickerProps = CustomYearPickerProps & React.HTMLAttributes<HTMLDivElement>;
+
+export function YearPicker({
+  yearList,
+  selectedYear,
+  onYearSelect,
+  ...nativeProps
+}: YearPickerProps) {
   const yearListRef = React.useRef<HTMLDivElement | null>(null);
   const currentYearIdx = yearList.findIndex(year => year === selectedYear);
   const reachedLastYear = currentYearIdx >= yearList.length - 1;
@@ -47,11 +54,15 @@ export function YearPicker({yearList, selectedYear, onYearSelect}: YearPickerPro
   };
 
   return (
-    <div styleName="year-picker">
+    <div
+      {...nativeProps}
+      styleName="year-picker"
+      className={sharedClassName(nativeProps.className)}
+    >
       <Button
         variant="transparent"
         icon="fas:chevron-left"
-        iconPosition="icon-only"
+        iconOnly
         size="sm"
         styleName="year-picker-chevron-button"
         aria-label="Previous years"
@@ -77,7 +88,7 @@ export function YearPicker({yearList, selectedYear, onYearSelect}: YearPickerPro
       <Button
         variant="transparent"
         icon="fas:chevron-right"
-        iconPosition="icon-only"
+        iconOnly
         size="sm"
         styleName="year-picker-chevron-button"
         aria-label="Next years"
