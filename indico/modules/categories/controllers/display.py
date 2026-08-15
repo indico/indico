@@ -396,7 +396,7 @@ class RHEventListJSON(RHDisplayCategoryEventsBase):
                     is_flat=self.is_flat
                 )
         return jsonify_data(
-                    is_flat=False,
+                    is_flat=self.is_flat,
                     event_count=params['event_count'],
                     events_by_month=serialize_events_by_month(params['events_by_month'], self.category, self.now),
                     past_events_by_month=serialize_events_by_month(params['past_events_by_month'],
