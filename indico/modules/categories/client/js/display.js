@@ -14,7 +14,6 @@ import {$T} from 'indico/utils/i18n';
 
 import {Category} from '../../../next_gen_ui_2026_components/category/Category';
 
-// import {Demonstration} from './../../../next_gen_ui_2026_components/Demonstration';
 import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
@@ -148,7 +147,6 @@ import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIP
     ReactDOM.render(
       <IndicoUIProvider>
         <Category categoryId={categoryId} isFlat={isFlat} />
-        {/* <Demonstration /> */}
       </IndicoUIProvider>,
       root
     );

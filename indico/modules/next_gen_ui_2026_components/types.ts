@@ -11,8 +11,17 @@ export interface CategorySimple {
   id: number;
   title: string;
 }
+export interface CategoryType {
+  id: number;
+  title: string;
+  description: string;
+  logoURL: string | null;
+  isFlat: boolean;
+  isRoot: boolean;
+  hasChildren: boolean;
+}
 
-export interface Category {
+export interface CategoryMetaData {
   id: number;
   title: string;
   isProtected: boolean;
@@ -52,46 +61,21 @@ export interface EventsMonth {
   events: Event[];
 }
 
-export interface Manager {
-  id: number;
-  name: string;
-  email: string;
-  avatarURL: string;
-  profileURL: string;
-}
-
-export interface NewsItem {
-  id: number;
-  title: string;
-  content: string;
-  createdDt: string;
-  anchor: string;
-  url: string;
-}
-
-export interface UpcomingEvent {
-  id: number;
-  title: string;
-  isHappeningNow: boolean;
-  url: string;
-  startDt: string;
-  endDt: string;
-}
-
-export interface CategoryViewData {
-  availableYears: number[];
-  hasHiddenEvents: boolean;
-  managers: Manager[];
+export interface EventListData {
   isFlat: boolean;
-  pendingEventMoves: number;
-  showPastEvents: boolean;
-  showFutureEvents: boolean;
   eventCount: number;
   eventsByMonth: EventsMonth;
   futureEventsByMonth: EventsMonth;
   pastEventsByMonth: EventsMonth;
   futureEventCount: number;
   pastEventCount: number;
-  news: NewsItem[];
-  upcomingEvents: UpcomingEvent[];
+}
+export interface CategoryEventListWithMetaData {
+  availableYears: number[];
+  hasHiddenEvents: boolean;
+  isFlat: boolean;
+  pendingEventMoves: number;
+  showPastEvents: boolean;
+  showFutureEvents: boolean;
+  eventListData: EventListData;
 }
