@@ -39,20 +39,6 @@ def group_by_month(events, now, tzinfo):
     return list(map(_format_tuple, months))
 
 
-def serialize_upcoming_events(events):
-    return [
-        {
-            'id': event.id,
-            'title': event.title,
-            'isHappeningNow': event.is_happening_now,
-            'url': event.url,
-            'startDt': event.start_dt.isoformat(),
-            'endDt': event.end_dt.isoformat(),
-        }
-        for event in events
-    ]
-
-
 def serialize_event(event, format_event_date, is_recent, happening_now):
     is_lecture = (event.type == 'lecture')
     if event.series and event.series.show_sequence_in_title:
@@ -75,33 +61,6 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
         'labelColor': event.label.color if event.label else None,
         'isFavorite': event in session.user.favorite_events,
     }
-
-
-def serialize_managers(managers):
-    return [
-        {
-            'id': manager.id,
-            'name': manager.name,
-            'email': manager.email,
-            'avatarUrl': manager.avatar_url,
-            'profileUrl': url_for('users.user_profile', manager),
-        }
-        for manager in managers
-    ]
-
-
-def serialize_news(news):
-    return [
-        {
-            'id': item.id,
-            'title': item.title,
-            'content': item.content,
-            'createdDt': item.created_dt.isoformat(),
-            'anchor': item.anchor,
-            'url': item.url,
-        }
-        for item in news
-    ]
 
 
 def serialize_events_by_month(events_by_month, category, now):
@@ -372,7 +331,6 @@ def get_category_year_view_params(category, now, year, is_flat=False):
 
     sorted_years = sorted(available_years, reverse=True)
 
-    managers = sorted(category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
     pending_event_moves = 0
     if category.can_manage(session.user):
         pending_event_moves = category.event_move_requests.filter_by(state=MoveRequestState.pending).count()
@@ -382,7 +340,6 @@ def get_category_year_view_params(category, now, year, is_flat=False):
     return event_list_params | {
         'available_years': sorted_years,
         'has_hidden_events': has_hidden_events,
-        'managers': managers,
         'is_flat': is_flat,
         'pending_event_moves': pending_event_moves,
     }

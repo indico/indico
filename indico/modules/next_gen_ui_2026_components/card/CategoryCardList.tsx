@@ -9,30 +9,30 @@ import React from 'react';
 
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import {Category} from '../types';
+import {CategoryMetaData} from '../types';
 
 import {Card} from './Card';
 
 import './CategoryCardList.module.scss';
 
 interface CategoryCardListProps {
-  data: {categories: Category[]; parentId: number};
+  data: CategoryMetaData[];
   columns?: 1 | 2 | 3;
 }
 
 export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
-  const categories = data.categories ?? [];
+  const categories = data ?? [];
 
   const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
 
   return (
-    <div className={gridClass} role="group">
+    <div className={gridClass} role="group" styleName="category-card-list">
       {categories.map(category => (
         <Card styleName="category-card" key={category.id} href={category.displayURL}>
           <Card.Icon
             icon="fas:folder"
             compact
-            size="xxxl"
+            size="xxxxl"
             decorative
             styleName="category-card-folder-icon"
           />
