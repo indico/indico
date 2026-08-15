@@ -25,15 +25,17 @@ import './EventList.module.scss';
 
 interface EventListProps {
   categoryId: number;
+  isFlat?: boolean;
   viewData: CategoryViewData;
 }
-export function EventList({categoryId, viewData}: EventListProps) {
+export function EventList({categoryId, isFlat, viewData}: EventListProps) {
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
 
   const {data: eventListData, loading: fetchingList} = useIndicoAxios(
     apiEventListURL({
       category_id: String(categoryId),
       year: String(selectedYear),
+      flat: isFlat ? 1 : 0,
     }),
     {
       camelize: true,
@@ -64,7 +66,7 @@ export function EventList({categoryId, viewData}: EventListProps) {
   }, [activeData, futureEventsExpanded, pastEventsExpanded]);
 
   if (!viewData) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   const listItem = (event: Event, month: EventsMonth) =>

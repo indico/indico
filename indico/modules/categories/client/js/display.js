@@ -144,9 +144,10 @@ import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIP
       return;
     }
     const categoryId = Number(root.dataset.categoryId);
+    const isFlat = Boolean(root.dataset.isFlat);
     ReactDOM.render(
       <IndicoUIProvider>
-        <Category categoryId={categoryId} />
+        <Category categoryId={categoryId} isFlat={isFlat} />
         {/* <Demonstration /> */}
       </IndicoUIProvider>,
       root
