@@ -264,7 +264,7 @@ def get_category_view_params(category, now, is_flat=False):
     }
 
 
-def get_event_list_view_params(category, now, year, is_flat=False, for_category_view=False):
+def get_event_list_view_params(category, now, year, is_flat, for_category_view=False):
     from .display import RHDisplayCategoryEventsBase
 
     # Current events, which are always shown by default are events of this month
