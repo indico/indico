@@ -1,0 +1,27 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+:global(.indico-ui) {
+    .category-title {
+        margin-bottom: var(--space-6);
+    }
+
+    .category-info {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: var(--space-1);
+        margin-bottom: var(--space-6);
+
+        .category-description {
+            margin-left: var(--space-4);
+            @include typography('text-md', 'regular');
+        }
+    }
+}
