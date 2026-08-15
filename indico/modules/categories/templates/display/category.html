@@ -1,70 +1,27 @@
 {% extends 'categories/display/base.html' %}
-{% from 'categories/display/category_list.html' import category_list %}
-{% from 'categories/display/event_list.html' import event_list %}
 {% from 'categories/display/sidebar.html' import render_attachments, render_managers %}
 {% from 'message_box.html' import message_box %}
 
 {% block content %}
-    <div class="category-info flexrow">
-        {% if category.has_logo %}
-            <div class="category-logo">
-                <img src="{{ category.logo_url }}" alt="">
-            </div>
-        {% endif %}
-        {% block category_description %}
-            <div class="category-description">
-                {{ category.description }}
-            </div>
-        {% endblock %}
-    </div>
-    {% if pending_event_moves %}
-        {% call message_box('info') %}
-            {%- set link_start -%}
-                <a href="{{ url_for('categories.manage_moderation', category) }}">
-            {%- endset -%}
-            {%- set link_end -%}
-                </a>
-            {%- endset -%}
-            {% trans count=pending_event_moves %}
-                There is {{ count }} event move request {{ link_start }}pending moderation{{ link_end }}.
-            {% pluralize %}
-                There are {{ count }} event move requests {{ link_start }}pending moderation{{ link_end }}.
-            {% endtrans %}
-        {% endcall %}
-    {% endif %}
-    {% if not category.children and not events_by_month and not past_event_count and not future_event_count %}
-        {% if has_hidden_events %}
-            {% call message_box('highlight', icon=true) %}
-                <div class="content smaller">
-                    <span class="js-show-message">
-                        {% trans %}Some events in this category have been hidden.{% endtrans %}
-                    </span>
-                </div>
-            {% endcall %}
+    {% block category_content %}
+        {% if not is_flat %}
+            {% if category.children %}
+                {% set category_title = category.title %}
+                <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
+                    {%- trans %}Categories in {{ category_title }}{% endtrans -%}
+                </h2>
+                <div id="category-cards-root" data-category-id="{{ category.id }}"></div>
+            {% endif %}
         {% else %}
             {% call message_box('info', icon=false) %}
-                {% trans %}This category is empty.{% endtrans %}
+                {% trans %}Displaying all the events from subcategories.{% endtrans %}
+                <a href="{{ url_for('.display', category) }}">
+                    {% trans %}Go back to single category view.{% endtrans %}
+                </a>
             {% endcall %}
         {% endif %}
-    {% else %}
-        {% block category_content %}
-            {% if not is_flat %}
-                {{ category_list(category) }}
-            {% else %}
-                {% call message_box('info', icon=false) %}
-                    {% trans %}Displaying all the events from subcategories.{% endtrans %}
-                    <a href="{{ url_for('.display', category) }}">
-                        {% trans %}Go back to single category view.{% endtrans %}
-                    </a>
-                {% endcall %}
-            {% endif %}
-            {{ event_list(events_by_month=events_by_month, format_event_date=format_event_date, is_recent=is_recent,
-                          happening_now=happening_now, category=category, future_event_count=future_event_count,
-                          past_event_count=past_event_count, future_threshold=future_threshold, past_threshold=past_threshold,
-                          show_future_events=show_future_events, show_past_events=show_past_events,
-                          has_hidden_events=has_hidden_events, is_flat=is_flat) }}
-        {% endblock %}
-    {% endif %}
+        <div id="category-cards-root" data-category-id="{{ category.id }}" data-is-flat="{{ is_flat }}"></div>
+    {% endblock %}
 {% endblock %}
 
 {% block sidebar -%}

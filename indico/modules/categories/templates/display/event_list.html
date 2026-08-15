@@ -60,7 +60,6 @@
         {% endcall %}
     {% endif %}
 
-    <div id="category-cards-root" data-category-id="{{ category.id }}" data-is-flat="{{ is_flat }}"></div>
     <div class="event-list"
          data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
