@@ -9,7 +9,8 @@
 
 :global(.indico-ui) {
     .category-title {
-        margin-bottom: var(--space-6);
+        margin-top: var(--space-6);
+        margin-bottom: var(--space-12);
     }
 
     .category-info {
