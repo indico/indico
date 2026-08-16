@@ -1,0 +1,76 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+:global(.indico-ui) {
+    .wrapper-demonstration {
+        background-image: linear-gradient(to right, #e0eaf3, #5e298ca3);
+        max-width: 110em !important;
+        width: 2600px;
+        translate: -22% 0;
+        border-radius: 15px;
+
+        .background-colorful {
+            padding: 24px;
+            width: 100%;
+            background-image:
+                radial-gradient(#ededed1d 1px, transparent 1px),
+                radial-gradient(#ededed39 1px, transparent 1px);
+            background-size: 8px 8px;
+            background-position: 0 0, 8px 8px;
+            color: #ededed46;
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+
+        h1 {
+            color: var(--indico-primary-blue-900);
+        }
+
+        details {
+            summary {
+                cursor: pointer;
+                outline: none;
+                user-select: none;
+
+                h2 {
+                    color: var(--indico-primary-blue-900);
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin: 0;
+                }
+            }
+        }
+
+        .demo-item {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 4px;
+
+            &.align-center {
+                align-items: center;
+                justify-content: center;
+            }
+
+            &.align-start {
+                align-items: flex-start;
+                justify-content: flex-start;
+            }
+        }
+
+        .demo-label {
+            font-size: 11px;
+            color: #272727;
+            margin-top: 8px;
+            text-align: center;
+            text-wrap: wrap;
+        }
+    }
+}

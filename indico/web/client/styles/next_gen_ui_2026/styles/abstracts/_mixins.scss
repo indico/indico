@@ -1,0 +1,65 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use '../base/colors' as *;
+
+@mixin typography($size, $weight: 'regular') {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-#{$size});
+  line-height: var(--line-height-#{$size});
+  font-weight: var(--font-weight-#{$weight});
+
+  @if $size == 'display-2xl' or $size == 'display-xl' or $size == 'display-lg' or $size == 'display-md' {
+    letter-spacing: var(--letter-spacing-#{$size});
+  }
+}
+
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin container($size: 'xl') {
+  width: 100%;
+  max-width: var(--container-#{$size});
+  margin-inline: auto;
+}
+
+@mixin centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin focus-ring($ring-color: var(--color-focus-ring)) {
+  &:focus-visible {
+    outline: 2px solid $ring-color;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-on-primary);
+  }
+
+  @media (forced-colors: active) {
+    &:focus-visible {
+      outline: 2px solid CanvasText;
+    }
+  }
+}
+
+@mixin color($color) {
+  $palette: if($color == 'primary', 'primary-blue', $color);
+
+  --intensity-50: var(--indico-#{$palette}-50);
+  --intensity-100: var(--indico-#{$palette}-100);
+  --intensity-200: var(--indico-#{$palette}-200);
+  --intensity-300: var(--indico-#{$palette}-300);
+  --intensity-400: var(--indico-#{$palette}-400);
+  --intensity-500: var(--indico-#{$palette}-500);
+  --intensity-600: var(--indico-#{$palette}-600);
+  --intensity-700: var(--indico-#{$palette}-700);
+  --intensity-800: var(--indico-#{$palette}-800);
+}

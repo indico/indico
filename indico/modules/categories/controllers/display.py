@@ -26,9 +26,11 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
-from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
+from indico.modules.categories.controllers.util import (get_category_view_params, get_category_year_view_params,
+                                                        get_event_list_view_params, get_event_query_filter,
                                                         group_by_month, make_format_event_date_func,
-                                                        make_happening_now_func, make_is_recent_func)
+                                                        make_happening_now_func, make_is_recent_func,
+                                                        serialize_events_by_month)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
@@ -267,6 +269,93 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         upcoming_events = get_upcoming_events()
         return WPCategory.render_template('display/root_category.html', self.category, news=news,
                                           upcoming_events=upcoming_events, **params)
+
+
+class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):
+    """Return data needed to display a category."""
+
+    def _process(self):
+        return jsonify_data(
+            id=self.category.id,
+            title=self.category.title,
+            description=self.category.description,
+            logo_url=(self.category.has_logo and self.category.logo_url) or None,
+            is_flat=self.is_flat,
+            is_root=self.category.is_root,
+            has_children=self.category.has_children,
+        )
+
+
+class RHCategoryChildrenJSON(RHDisplayCategoryBase):
+    """Return the children of a category in JSON format."""
+
+    def _process(self):
+        serialized_categories = []
+
+        for child in self.category.children:
+            data = serialize_category(child, with_path=True, with_favorite=True)
+            data['display_url'] = url_for('.display', child)
+            data['description'] = child.description
+            serialized_categories.append(data)
+
+        return jsonify_data(categories=serialized_categories, flash=False)
+
+
+class RHCategoryEventListWithMetaDataJSON(RHDisplayCategoryEventsBase):
+    """Return meta data needed to display event list within category."""
+
+    def _process(self):
+        params = get_category_year_view_params(self.category, self.now, year=self.now.year, is_flat=self.is_flat)
+
+        return jsonify_data(
+            flash=False,
+            available_years=params['available_years'],
+            has_hidden_events=params['has_hidden_events'],
+            is_flat=params['is_flat'],
+            pending_event_moves=params['pending_event_moves'],
+            show_past_events=params['show_past_events'],
+            show_future_events=params['show_future_events'],
+            event_list_data={
+                'event_count': params['event_count'],
+                'events_by_month': serialize_events_by_month(params['events_by_month'], self.category, self.now),
+                'past_events_by_month': serialize_events_by_month(
+                    params['past_events_by_month'], self.category, self.now
+                ),
+                'past_event_count': params['past_event_count'],
+                'future_events_by_month': serialize_events_by_month(
+                    params['future_events_by_month'], self.category, self.now
+                ),
+                'future_event_count': params['future_event_count'],
+            },
+        )
+
+
+class RHEventListJSON(RHDisplayCategoryEventsBase):
+    """Return the JSON for the event list for specific year."""
+
+    def _parse_year(self, string):
+        try:
+            return int(string)
+        except (TypeError, ValueError):
+            return None
+
+    def _process_args(self):
+        RHDisplayCategoryEventsBase._process_args(self)
+        self.year = self._parse_year(request.args.get('year'))
+        if self.year is None:
+            raise BadRequest('Year parameter must be specified')
+
+    def _process(self):
+        params = get_event_list_view_params(self.category, self.now, year=self.year, is_flat=self.is_flat)
+        return jsonify_data(
+            is_flat=self.is_flat,
+            event_count=params['event_count'],
+            events_by_month=serialize_events_by_month(params['events_by_month'], self.category, self.now),
+            past_events_by_month=serialize_events_by_month(params['past_events_by_month'], self.category, self.now),
+            past_event_count=params['past_event_count'],
+            future_events_by_month=serialize_events_by_month(params['future_events_by_month'], self.category, self.now),
+            future_event_count=params['future_event_count'],
+        )
 
 
 class RHEventList(RHDisplayCategoryEventsBase):

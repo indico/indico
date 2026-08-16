@@ -7,7 +7,14 @@
 
 /* global handleAjaxError:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {$T} from 'indico/utils/i18n';
+
+import {Category} from '../../../next_gen_ui_2026_components/category/Category';
+
+import {IndicoUIProvider} from './../../../next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
@@ -129,4 +136,19 @@ import {$T} from 'indico/utils/i18n';
       });
     }
   };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('category-cards-root');
+    if (!root) {
+      return;
+    }
+    const categoryId = Number(root.dataset.categoryId);
+    const isFlat = Boolean(root.dataset.isFlat);
+    ReactDOM.render(
+      <IndicoUIProvider>
+        <Category categoryId={categoryId} isFlat={isFlat} />
+      </IndicoUIProvider>,
+      root
+    );
+  });
 })(window);

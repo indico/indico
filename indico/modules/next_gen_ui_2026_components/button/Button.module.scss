@@ -1,0 +1,283 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base' as *;
+
+// ----------------------------------------------------------------
+// MIXINS
+// ----------------------------------------------------------------
+
+@mixin button-size-spacing($size, $space) {
+  height: var(--button-height-#{$size});
+  padding-right: var(--button-padding-#{$size});
+  padding-left: var(--button-padding-#{$size});
+  border-radius: var(--radius-#{$size});
+
+  &[data-icon] {
+    --icon-margin: var(--space-#{$space});
+  }
+
+  &[data-compact] {
+    height: var(--button-height-#{$size}-compact);
+    padding-right: var(--button-padding-#{$size}-compact);
+    padding-left: var(--button-padding-#{$size}-compact);
+
+    &[data-icon] {
+      --icon-margin: var(--space-#{$space});
+    }
+  }
+
+  &[data-icon][data-icon-only]:is([data-circular], [data-squared]) {
+    padding-right: var(--button-padding-icon-only-#{$size});
+    padding-left: var(--button-padding-icon-only-#{$size});
+  }
+}
+
+@mixin button-typography($size) {
+  @include typography($size);
+  font-weight: var(--button-font-weight);
+}
+
+@mixin button-text-weight($weight) {
+  --button-font-weight: var(--font-weight-#{$weight});
+}
+
+// ----------------------------------------------------------------
+// CORE
+// ----------------------------------------------------------------
+
+:global(.indico-ui) {
+  .button {
+    @include focus-ring();
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast);
+
+    background-color: var(--btn-bg, transparent);
+    color: var(--btn-text);
+
+    &:hover:not([data-disabled]) {
+      background-color: var(--btn-bg-hover, var(--btn-bg));
+      color: var(--btn-text-hover, var(--btn-text));
+    }
+
+    &:active:not([data-disabled]) {
+      background-color: var(--btn-bg-active, var(--btn-bg-hover));
+      color: var(--btn-text-active, var(--btn-text));
+    }
+
+    &[data-disabled] {
+      cursor: not-allowed;
+      pointer-events: none;
+      background-color: var(--btn-bg-disabled, transparent);
+      color: var(--btn-text-disabled);
+    }
+
+    &[data-outlined] {
+      border: 1px solid var(--btn-border, currentColor);
+
+      &:hover:not([data-disabled]) {
+        border-color: var(--btn-border-hover, var(--btn-border, currentColor));
+      }
+
+      &:active:not([data-disabled]) {
+        border-color: var(--btn-border-active, var(--btn-border, currentColor));
+      }
+    }
+
+    // --------- Layout ---------
+    &[data-size='xs'] {
+      @include button-size-spacing('xs', '1');
+      @include button-typography('text-xs');
+    }
+
+    &[data-size='sm'] {
+      @include button-size-spacing('sm', '1-5');
+      @include button-typography('text-sm');
+    }
+
+    &[data-size='md'] {
+      @include button-size-spacing('md', '2');
+      @include button-typography('text-md');
+    }
+
+    &[data-size='lg'] {
+      @include button-size-spacing('lg', '2-5');
+      @include button-typography('text-lg');
+    }
+
+    &[data-size='xl'] {
+      @include button-size-spacing('xl', '3');
+      @include button-typography('text-xl');
+    }
+
+    &[data-text-weight='regular'] {
+      @include button-text-weight('regular');
+    }
+
+    &[data-text-weight='bold'] {
+      @include button-text-weight('bold');
+    }
+
+    &[data-color='primary'] {
+      @include color('primary');
+    }
+
+    &[data-color='gray'] {
+      @include color('gray');
+    }
+
+    &[data-color='success'] {
+      @include color('success');
+    }
+
+    &[data-color='warning'] {
+      @include color('warning');
+    }
+
+    &[data-color='error'] {
+      @include color('error');
+    }
+
+    &[data-rounded] {
+      border-radius: var(--radius-pill);
+    }
+
+    &[data-circular] {
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      width: auto;
+      height: auto;
+    }
+
+    &[data-squared] {
+      aspect-ratio: 1 / 1;
+      width: auto;
+      height: auto;
+    }
+
+    &[data-full-width] {
+      display: flex;
+      width: 100%;
+    }
+
+    &[data-animated]:not([data-disabled]) {
+      will-change: transform;
+      backface-visibility: hidden;
+
+      &:active {
+        animation: var(--push-down) var(--animation-duration-slow) ease-in;
+      }
+    }
+
+    // --------- Icons ---------
+    .button-icon {
+      color: inherit;
+    }
+
+    &[data-icon-position='left'] .button-icon {
+      margin-right: var(--icon-margin);
+    }
+
+    &[data-icon-position='right'] .button-icon {
+      margin-left: var(--icon-margin);
+    }
+
+    &[data-icon-only] .button-icon {
+      margin: 0;
+    }
+
+    // ----------------------------------------------------------------
+    // VARIANTS
+    // ----------------------------------------------------------------
+
+    // --------- Solid ----------
+    &[data-variant='solid'] {
+      --btn-bg: var(--intensity-500);
+      --btn-text: var(--color-accent-buttons);
+      --btn-bg-hover: var(--intensity-600);
+      --btn-bg-active: var(--intensity-700);
+      --btn-bg-disabled: var(--intensity-200);
+      --btn-text-disabled: var(--intensity-50);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--intensity-500) 20%);
+        --btn-bg-hover: color-mix(in srgb, var(--intensity-500) 30%);
+        --btn-bg-active: color-mix(in srgb, var(--intensity-500) 40%);
+        --btn-bg-disabled: color-mix(in srgb, var(--intensity-200) 10%);
+      }
+    }
+
+    // ---------- Light ---------
+    &[data-variant='light'] {
+      --btn-bg: var(--intensity-100);
+      --btn-text: var(--intensity-700);
+      --btn-bg-hover: var(--intensity-200);
+      --btn-bg-active: var(--intensity-300);
+      --btn-bg-disabled: var(--color-disabled-buttons);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--intensity-100) 20%);
+        --btn-text: var(--intensity-600);
+        --btn-bg-hover: color-mix(in srgb, var(--intensity-100) 30%);
+        --btn-bg-active: color-mix(in srgb, var(--intensity-100) 40%);
+        --btn-bg-disabled: color-mix(in srgb, var(--intensity-100) 10%);
+      }
+    }
+
+    // --------- White ---------
+    &[data-variant='white'] {
+      --btn-bg: var(--color-accent-buttons);
+      --btn-text: var(--intensity-600);
+      --btn-bg-hover: var(--intensity-600);
+      --btn-text-hover: var(--color-accent-buttons);
+      --btn-bg-active: var(--intensity-700);
+      --btn-text-active: var(--color-accent-buttons);
+      --btn-bg-disabled: var(--color-disabled-buttons);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-opaque] {
+        --btn-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
+        --btn-text: var(--color-accent-buttons);
+        --btn-bg-hover: color-mix(in srgb, var(--color-accent-buttons) 30%);
+        --btn-bg-active: var(--color-accent-buttons);
+        --btn-text-active: var(--intensity-600);
+        --btn-bg-disabled: color-mix(in srgb, var(--color-accent-buttons) 10%);
+      }
+
+      &[data-outlined] {
+        --btn-border: var(--intensity-600);
+        --btn-border-active: var(--intensity-700);
+      }
+    }
+
+    // --------- Transparent ----------
+    &[data-variant='transparent'] {
+      --btn-bg: transparent;
+      --btn-text: var(--intensity-500);
+      --btn-text-hover: var(--intensity-700);
+      --btn-text-active: var(--intensity-800);
+      --btn-border: var(--intensity-500);
+      --btn-border-hover: var(--intensity-700);
+      --btn-border-active: var(--intensity-800);
+      --btn-text-disabled: var(--color-disabled-buttons-text);
+
+      &[data-color='white'] {
+        --btn-text: var(--color-accent-buttons);
+        --btn-text-hover: var(--indico-gray-200);
+        --btn-text-active: var(--indico-gray-300);
+        --btn-border: var(--color-accent-buttons);
+        --btn-border-hover: var(--indico-gray-200);
+        --btn-border-active: var(--indico-gray-300);
+        --btn-text-disabled: var(--color-disabled-buttons-text);
+      }
+    }
+  }
+}

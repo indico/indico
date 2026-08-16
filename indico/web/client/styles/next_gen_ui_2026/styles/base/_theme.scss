@@ -1,0 +1,50 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:root {
+  --color-text: var(--indico-gray-500);
+  --color-text-muted: var(--indico-gray-400);
+  --color-text-disabled: var(--indico-gray-300);
+  --color-text-heading: var(--indico-primary-blue-900);
+  --color-text-display-heading: var(--indico-primary-blue-900); // should be white on dark backgrounds
+  --color-text-link: var(--indico-primary-blue-600);
+  --color-text-link-hover: var(--indico-primary-blue-700);
+  --color-text-link-visited: var(--indico-primary-blue-900);
+
+  --color-on-primary: white;
+  --color-surface-soft: var(--indico-gray-50);
+  --color-surface-soft-hover: var(--indico-gray-100);
+  --color-surface-soft-accent: var(--indico-gray-200);
+  --color-surface-soft-accent-hover: var(--indico-gray-300);
+
+  --color-accent: var(--indico-primary-blue-500);
+  --color-accent-hover: var(--indico-primary-blue-600);
+
+  --color-primary: var(--indico-primary-blue-500);
+  --color-primary-hover: var(--indico-primary-blue-600);
+
+  --color-focus-ring: var(--indico-accent-500);
+
+  --color-accent-buttons: white;
+  --color-disabled-buttons: var(--indico-gray-100);
+  --color-disabled-buttons-text: var(--indico-gray-400);
+
+  // Semantic UI colors (for event labels)
+  --color-tag-red: #c00;
+  --color-tag-orange: #f80;
+  --color-tag-yellow: #ffcf00;
+  --color-tag-olive: #b5cc18;
+  --color-tag-green: #00c851;
+  --color-tag-teal: #45ba97;
+  --color-tag-blue: #09c;
+  --color-tag-violet: #6435c9;
+  --color-tag-purple: #6e5494;
+  --color-tag-pink: #e03997;
+  --color-tag-brown: #a5673f;
+  --color-tag-gray: #bbb;
+  --color-tag-black: #31393c;
+}

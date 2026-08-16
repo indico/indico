@@ -1,0 +1,52 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'next_gen_ui_2026/styles/base/reset';
+@use 'next_gen_ui_2026/styles/base' as *;
+
+.indico-ui {
+  @include typography('text-sm', 'regular'); // 14 px
+
+  & a {
+    color: inherit;
+  }
+
+  & p {
+    @include typography('text-sm', 'regular'); // 14px
+    color: var(--color-text);
+  }
+
+  & h1 {
+    @include typography('display-sm', 'bold'); // 30px
+    color: var(--color-text-display-heading);
+  }
+
+  & h2 {
+    @include typography('display-xs', 'bold'); // 24px
+    color: var(--color-text-display-heading);
+  }
+
+  & h3 {
+    @include typography('text-xl', 'bold'); // 20px
+    color: var(--color-text-heading);
+  }
+
+  & h4 {
+    @include typography('text-lg', 'bold'); // 18px
+    color: var(--color-text-heading);
+  }
+
+  & h5 {
+    @include typography('text-md', 'bold'); // 16px
+    color: var(--color-text-heading);
+  }
+
+  & h6 {
+    @include typography('text-sm', 'bold'); // 14px
+    color: var(--color-text-heading);
+  }
+}
