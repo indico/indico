@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import itertools
+import os
 from collections import defaultdict
 
 from flask import flash, jsonify, redirect, request, session
@@ -27,7 +28,8 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.controllers.base import EditEventSettingsMixin, RHAuthenticatedEventBase
+from indico.modules.events.controllers.base import (EditEventSettingsMixin, RHAuthenticatedEventBase,
+                                                    RHProtectedEventBase)
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
@@ -35,8 +37,8 @@ from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons import logger, persons_settings
 from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
-from indico.modules.events.persons.views import WPManagePersons
+from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema, SpeakerProfileSchema
+from indico.modules.events.persons.views import WPDisplaySpeakers, WPManagePersons, WPManageSpeakers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -47,7 +49,8 @@ from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import FilesField, LowercaseString, no_relative_urls, not_empty, validate_with_message
+from indico.util.marshmallow import (FileField, FilesField, LowercaseString, file_extension, no_relative_urls,
+                                     not_empty, validate_with_message)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.user import principal_from_identifier, validate_search_token
 from indico.web.args import use_args, use_kwargs
@@ -225,6 +228,24 @@ class RHPersonsBase(RHManageEventBase):
         return persons
 
 
+class RHSpeakerBase(RHProtectedEventBase):
+    def _process_args(self):
+        RHProtectedEventBase._process_args(self)
+        self.person = (EventPerson.query
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
+                       .first())
+
+
+class RHManageSpeakerProfileBase(RHManageEventBase):
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.person = (EventPerson.query
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
+                       .first())
+
+
 class RHPersonsList(RHPersonsBase):
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event)
@@ -276,6 +297,65 @@ class RHAPIEmailEventPersonsUpload(UploadFileMixin, RHManageEventBase):
 
     def get_file_context(self):
         return 'event', self.event.id, 'email-attachments'
+
+
+class RHSpeakerProfiles(RHPersonsBase):
+    def _process(self):
+        return WPManageSpeakers.render_template('management/speakers.html', self.event)
+
+
+class RHDisplaySpeakerProfiles(RHProtectedEventBase):
+    def _process(self):
+        return WPDisplaySpeakers.render_template('display/speakers.html', self.event)
+
+
+class RHAPISpeakersList(RHProtectedEventBase):
+    def _process(self):
+        matches = self.event.persons.filter(
+            EventPerson.contribution_links.any(and_(
+                ContributionPersonLink.is_speaker,
+                ContributionPersonLink.contribution.has(Contribution.is_deleted.is_(False))
+        ))).all()
+        return SpeakerProfileSchema().dump(matches, many=True)
+
+
+class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
+    def get_file_context(self):
+        return 'event', self.event.id, 'speaker', self.person.id
+
+    def validate_file(self, file):
+        return os.path.splitext(file.filename)[1].lower() in {'.png', '.jpg', '.jpeg'}
+
+
+class RHAPISpeaker(RHManageSpeakerProfileBase):
+    @use_kwargs({
+        'photo': FileField(validate=file_extension('png', 'jpg', 'jpeg')),
+        'description': fields.String(validate=validate.Length(max=1000)),
+        'socials': fields.Dict(
+            keys=fields.String(validate=validate.Length(max=100)),
+            values=fields.Nested({
+                'url': fields.String(required=True, validate=validate.Length(max=500)),
+                'icon': fields.String(required=True, validate=validate.Length(max=100)),
+            })
+        ),
+    })
+    def _process_POST(self, description=None, socials=None, photo=None):
+        if description is not None:
+            self.person.speaker_description = description
+        if photo is not None:
+            self.person.speaker_photo = photo
+            photo.claim()
+        if socials is not None:
+            self.person.speaker_socials = socials
+        return SpeakerProfileSchema().dump(self.person)
+
+    def _process_DELETE(self):
+        self.person.speaker_description = None
+        self.person.speaker_socials = None
+        if self.person.speaker_photo is not None:
+            self.person.speaker_photo.claimed = False
+            self.person.speaker_photo_file_id = None
+        return jsonify(success=True)
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):

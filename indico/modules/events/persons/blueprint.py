@@ -6,20 +6,31 @@
 # LICENSE file for more details.
 
 from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMetadata, RHAPIEmailEventPersonsSend,
-                                                       RHAPIEmailEventPersonsUpload, RHDeleteUnusedEventPerson,
+                                                       RHAPIEmailEventPersonsUpload, RHAPISpeaker, RHAPISpeakersList,
+                                                       RHDeleteUnusedEventPerson, RHDisplaySpeakerProfiles,
                                                        RHEmailEventPersonsPreview, RHEventPersonSearch,
                                                        RHGrantModificationRights, RHGrantSubmissionRights,
                                                        RHManagePersonLists, RHPersonsList, RHRevokeSubmissionRights,
-                                                       RHSyncEventPerson, RHUpdateEventPerson)
+                                                       RHSpeakerPhotoUpload, RHSpeakerProfiles, RHSyncEventPerson,
+                                                       RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_template_folder='events/persons',
                       url_prefix='/event/<int:event_id>/manage')
 
+# Display
+_bp.add_url_rule('!/event/<int:event_id>/speakers/', 'display_speaker_profiles', RHDisplaySpeakerProfiles)
+
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
 _bp.add_url_rule('/api/persons/email/upload', 'api_email_event_persons_upload', RHAPIEmailEventPersonsUpload,
                  methods=('POST',))
+_bp.add_url_rule('/speakers/', 'speaker_profiles', RHSpeakerProfiles)
+_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker_profile', RHAPISpeaker,
+                 methods=('POST', 'DELETE'))
+_bp.add_url_rule('/speakers/<int:person_id>/photo', 'upload_speaker_photo', RHSpeakerPhotoUpload, methods=('POST',))
+_bp.add_url_rule('/api/speakers/', 'api_speakers_list', RHAPISpeakersList)
+_bp.add_url_rule('/api/speakers/<int:person_id>/', 'api_speaker', RHAPISpeaker, methods=('POST', 'DELETE'))
 _bp.add_url_rule('/api/persons/email/send', 'api_email_event_persons_send', RHAPIEmailEventPersonsSend,
                  methods=('POST',))
 _bp.add_url_rule('/api/persons/email/metadata', 'api_email_event_persons_metadata', RHAPIEmailEventPersonsMetadata,
