@@ -91,7 +91,11 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
     return [...futureEvents, ...baseEvents, ...pastEvents];
   }, [activeData, futureEventsExpanded, pastEventsExpanded]);
 
-  if (!viewData || !activeData || (events.length === 0 && futureEventsCount === 0 && pastEventsCount === 0)) {
+  if (
+    !viewData ||
+    !activeData ||
+    (events.length === 0 && futureEventsCount === 0 && pastEventsCount === 0)
+  ) {
     return null;
   }
 
