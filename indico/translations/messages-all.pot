@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.13-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-05 18:27+0200\n"
+"POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,9 +72,9 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/users/client/js/PersonalDataForm.jsx indico/modules/users/forms.py
-#: indico/modules/users/templates/registration_requests.html indico/modules/users/templates/users_merge.html
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx indico/web/client/js/react/components/principals/Search.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
+#: indico/modules/users/templates/dashboard.html indico/modules/users/templates/registration_requests.html
+#: indico/modules/users/templates/users_merge.html indico/web/client/js/react/components/PersonDetailsModal.jsx
+#: indico/web/client/js/react/components/principals/Search.jsx indico/web/client/js/react/components/syncedInputs.jsx
 msgid "Affiliation"
 msgstr ""
 
@@ -1643,7 +1643,8 @@ msgstr[1] ""
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
 #: indico/modules/events/registration/templates/management/_reglist.html indico/modules/events/registration/util.py
-#: indico/modules/events/sessions/templates/management/_session_list.html indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/management/_session_list.html
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/templates/management/survey.html indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "ID"
 msgstr ""
@@ -1653,7 +1654,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx indico/modules/events/payment/forms.py
 #: indico/modules/events/roles/forms.py indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py indico/modules/events/tracks/forms.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html indico/modules/events/tracks/forms.py
 msgid "Code"
 msgstr ""
 
@@ -1676,11 +1677,11 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx
 #: indico/modules/events/registration/forms.py indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/templates/management/session_blocks.html indico/modules/events/sessions/util.py
-#: indico/modules/events/surveys/fields/base.py indico/modules/events/surveys/forms.py
-#: indico/modules/events/templates/emails/event_creation.txt indico/modules/events/timetable/forms.py
-#: indico/modules/events/tracks/forms.py indico/modules/news/forms.py indico/modules/news/templates/admin/news.html
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+#: indico/modules/events/sessions/templates/management/session_blocks.html
+#: indico/modules/events/sessions/templates/pdf/session_table.html indico/modules/events/surveys/fields/base.py
+#: indico/modules/events/surveys/forms.py indico/modules/events/templates/emails/event_creation.txt
+#: indico/modules/events/timetable/forms.py indico/modules/events/tracks/forms.py indico/modules/news/forms.py
+#: indico/modules/news/templates/admin/news.html indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx indico/modules/receipts/client/js/templates/Editor.jsx
 #: indico/web/client/js/legacy/libs/timetable/Management.js indico/web/client/js/react/components/WTFLinkListField.jsx
 #: indico/web/fields/base.py
@@ -2665,7 +2666,8 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/registry.js indico/modules/events/registration/wallets/apple.py
 #: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx
 #: indico/modules/events/surveys/templates/management/survey.html indico/modules/groups/templates/_group_members.html
-#: indico/modules/users/forms.py indico/web/client/js/react/components/PersonDetailsModal.jsx
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Email"
 msgstr ""
 
@@ -3370,7 +3372,7 @@ msgstr ""
 msgid "The domain used in the email address does not exist."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx indico/util/marshmallow.py
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "This email address is invalid."
 msgstr ""
@@ -3590,7 +3592,7 @@ msgid "Yes/No"
 msgstr ""
 
 #: indico/modules/designer/placeholders.py indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/registration/client/js/form/fields/registry.js
+#: indico/modules/events/registration/client/js/form/fields/registry.js indico/modules/users/templates/dashboard.html
 msgid "Phone"
 msgstr ""
 
@@ -3719,12 +3721,13 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx
 #: indico/modules/events/reminders/templates/emails/event_reminder.html
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt indico/modules/events/sessions/forms.py
-#: indico/modules/events/sessions/templates/display/session_display.html indico/modules/events/sessions/util.py
-#: indico/modules/events/surveys/fields/base.py indico/modules/events/surveys/forms.py
-#: indico/modules/events/templates/display/indico/_details.html indico/modules/events/templates/emails/event_creation.txt
-#: indico/modules/events/timetable/forms.py indico/modules/events/timetable/templates/pdf/_program.html
-#: indico/modules/events/tracks/forms.py indico/modules/networks/forms.py indico/modules/networks/templates/networks.html
-#: indico/modules/oauth/forms.py indico/web/fields/base.py
+#: indico/modules/events/sessions/templates/display/session_display.html
+#: indico/modules/events/sessions/templates/pdf/session_table.html indico/modules/events/surveys/fields/base.py
+#: indico/modules/events/surveys/forms.py indico/modules/events/templates/display/indico/_details.html
+#: indico/modules/events/templates/emails/event_creation.txt indico/modules/events/timetable/forms.py
+#: indico/modules/events/timetable/templates/pdf/_program.html indico/modules/events/tracks/forms.py
+#: indico/modules/networks/forms.py indico/modules/networks/templates/networks.html indico/modules/oauth/forms.py
+#: indico/web/fields/base.py
 msgid "Description"
 msgstr ""
 
@@ -8386,13 +8389,6 @@ msgstr ""
 msgid "This plugin has no configurable options"
 msgstr ""
 
-#: indico/legacy/pdfinterface/conference.py indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
-#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
-#: indico/legacy/pdfinterface/latex_templates/report.tex
-#, python-brace-format
-msgid "Page {}"
-msgstr ""
-
 #: indico/legacy/pdfinterface/latex.py indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 msgid "Report of Abstracts"
 msgstr ""
@@ -8404,6 +8400,13 @@ msgstr ""
 
 #: indico/legacy/pdfinterface/latex.py
 msgid "Report of Contributions"
+msgstr ""
+
+#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
+#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
+#: indico/legacy/pdfinterface/latex_templates/report.tex
+#, python-brace-format
+msgid "Page {}"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
@@ -8468,7 +8471,7 @@ msgstr ""
 #: indico/modules/events/contributions/forms.py indico/modules/events/contributions/lists.py
 #: indico/modules/events/fields.py indico/modules/events/papers/lists.py indico/modules/events/reminders/forms.py
 #: indico/modules/events/sessions/forms.py indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 msgid "Type"
 msgstr ""
 
@@ -11769,6 +11772,11 @@ msgstr ""
 
 #: indico/modules/events/fields.py indico/modules/events/registration/templates/display/_registration_summary_blocks.html
 msgid "Value"
+msgstr ""
+
+#: indico/modules/events/fields.py
+#, python-brace-format
+msgid "Validation of {email} failed: {error}"
 msgstr ""
 
 #: indico/modules/events/fields.py
@@ -22234,10 +22242,6 @@ msgstr ""
 msgid "A session type with this name already exists"
 msgstr ""
 
-#: indico/modules/events/sessions/util.py
-msgid "List of sessions"
-msgstr ""
-
 #: indico/modules/events/sessions/templates/display/session_display.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/timetable/templates/balloons/block.html
@@ -22373,6 +22377,10 @@ msgstr ""
 
 #: indico/modules/events/sessions/templates/management/types_dialog.html
 msgid "There are no session types yet."
+msgstr ""
+
+#: indico/modules/events/sessions/templates/pdf/session_table.html
+msgid "List of sessions"
 msgstr ""
 
 #: indico/modules/events/static/__init__.py indico/modules/events/static/templates/static_sites.html
@@ -23513,7 +23521,7 @@ msgstr ""
 msgid "Event privacy information"
 msgstr ""
 
-#: indico/modules/events/templates/display/conference/_util.html
+#: indico/modules/events/templates/display/conference/_util.html indico/modules/events/tracks/templates/pdf/program.html
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr ""
@@ -23703,6 +23711,22 @@ msgstr ""
 #: indico/modules/events/templates/reviews/_common.html
 #, python-format
 msgid "Please don't forget to read the %(link)sjudgment instructions%(endlink)s before taking your decision."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has ended."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open until the submission deadline."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open. No submission deadline is set."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has not yet opened."
 msgstr ""
 
 #: indico/modules/events/templates/reviews/_common.html
