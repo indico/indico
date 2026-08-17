@@ -90,28 +90,10 @@ export const getDayEntries = createSelector(
 // You should not use this selector directly, use makeIsSelectedSelector instead
 // to check if an entry is selected
 export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
-// TODO(tomas): This is inefficient, but it'll go away when we refactor the whole redux state
+
 export const getSelectedEntry = createSelector(
-  [getDayEntries, getSelectedId],
-  (entries, selectedId) => {
-    if (!selectedId) {
-      return null;
-    }
-    for (const dayEntries of Object.values(entries)) {
-      for (const entry of dayEntries) {
-        if (entry.id === selectedId) {
-          return entry;
-        }
-        if (entry.type === EntryType.SessionBlock) {
-          for (const child of entry.children) {
-            if (child.id === selectedId) {
-              return child;
-            }
-          }
-        }
-      }
-    }
-  }
+  [getEntries, getSelectedId],
+  (entries, selectedId) => (selectedId === null ? null : entries.entries[selectedId])
 );
 
 export const getCurrentDate = (state: ReduxState) => state.navigation.currentDate;

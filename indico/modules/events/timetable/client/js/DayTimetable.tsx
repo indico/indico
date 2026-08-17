@@ -144,7 +144,7 @@ export function DayTimetable({
   const draftEntry = useSelector(selectors.getDraftEntry);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
-  const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const hasSelectedEntry = useSelector(selectors.getSelectedId) !== null;
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const [hoverGuideY, setHoverGuideY] = useState<number | null>(null);
@@ -170,7 +170,7 @@ export function DayTimetable({
       const offsetY = clientY - wrapperRef.current.offsetTop;
       const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
-      if (isDragging || selectedEntry || isWithinLimitsWithOffset) {
+      if (isDragging || hasSelectedEntry || isWithinLimitsWithOffset) {
         if (hoverGuideY !== null) {
           setHoverGuideY(null);
         }
@@ -503,7 +503,7 @@ export function DayTimetable({
         event.button !== 0 ||
         !clickedOnCalendar ||
         isWithinLimitsWithOffset ||
-        selectedEntry?.id !== undefined
+        hasSelectedEntry
       ) {
         return;
       }
@@ -588,7 +588,7 @@ export function DayTimetable({
       wrapper.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, selectedEntry]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, hasSelectedEntry]);
 
   useEffect(() => {
     // We use a ref instead of scrollPosition directly to prevent jumping
