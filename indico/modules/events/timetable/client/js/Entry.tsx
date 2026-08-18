@@ -209,6 +209,13 @@ export default function Entry({
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
   const draftEntry = useSelector(selectors.getDraftEntry);
+  const eventEndDt = useSelector(selectors.getEventEndDt);
+  const maxDuration = useMemo(() => {
+    if (parentEndDt) {
+      return moment(parentEndDt).diff(startDt, 'minutes');
+    }
+    return eventEndDt.diff(startDt, 'minutes');
+  }, [parentEndDt, eventEndDt, startDt]);
 
   let style: Record<string, string | number | undefined> = transform
     ? {
@@ -380,7 +387,7 @@ export default function Entry({
       <ResizeHandle
         duration={duration}
         minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}
-        maxDuration={parentEndDt ? moment(parentEndDt).diff(startDt, 'minutes') : undefined}
+        maxDuration={maxDuration}
         resizeStartRef={resizeStartRef}
         setLocalDuration={setDuration}
         setGlobalDuration={_setDuration}
