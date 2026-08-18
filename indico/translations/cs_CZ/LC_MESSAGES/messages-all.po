@@ -8,19 +8,19 @@
 # Sombie2 <simon.brabec.05@gmail.com>, 2024
 # Ondřej Kořistka <ondrej.koristka@fjfi.cvut.cz>, 2024
 # Transifex Bot <>, 2025
+# Tomáš Roun <tomas.roun8@gmail.com>, 2025
 # Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2025
 # Michael Lang, 2025
 # Ajob Kustra, 2025
 # Vaclav Stepan <vaclav.stepan@gmail.com>, 2025
-# Tomáš Roun <tomas.roun8@gmail.com>, 2026
 # Vladimir Trestik <trestikv@cesnet.cz>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.12-dev\n"
+"Project-Id-Version: Indico 3.3.13-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-18 16:20+0100\n"
+"POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Vladimir Trestik <trestikv@cesnet.cz>, 2026\n"
 "Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
@@ -97,9 +97,10 @@ msgstr "Příjmení"
 #: indico/modules/events/persons/client/js/PersonList.jsx
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/users/client/js/PersonalDataForm.jsx
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_merge.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -818,6 +819,241 @@ msgstr "Podrobný"
 msgid "A detailed timetable containing all individual contributions."
 msgstr "Podrobný časový rozvrh obsahující jednotlivé příspěvky."
 
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Enter an extension"
+msgstr "Zadejte rozšíření"
+
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Add extension"
+msgstr "Přidat příponu"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type has files attached"
+msgstr "K tomuto typu jsou připojené soubory"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type is used in a review condition"
+msgstr "Tento typ se používá k posouzení stavu"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Cannot delete the only publishable type"
+msgstr "Nelze odstranit jediný publikovatelný typ"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "There are no file types defined for this event"
+msgstr "Pro tuto událost nejsou definovány žádné typy souborů"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"There are publishable file types that will not be displayed due to the 'Hide"
+" Accepted' setting being enabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"No file types will be shown as there are no publishable file types and the "
+"'Hide Accepted' setting is disabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "File required"
+msgstr "Soubor požadován"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Multiple files allowed"
+msgstr "Více souborů povoleno"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "File publishable"
+msgstr "Soubor zveřejnitelný"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "(no extension restrictions)"
+msgstr "(žádné omezení přípon)"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Add a new file type"
+msgstr "Přidejte nový typ souboru"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Edit file type"
+msgstr "Upravit typ souboru"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Create a new file type"
+msgstr "Vytvořte nový typ souboru"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#, python-brace-format
+msgid "Are you sure you want to delete the file type {fileType}?"
+msgstr "Opravdu chcete smazat typ souboru {fileType}?"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Take into account that this file type has files attached to it."
+msgstr "Vezměte v potaz, že tento typ zahrnuje přílohy."
+
+#: indico/core/celery/templates/celery_tasks.html
+#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
+#: indico/modules/designer/templates/template.html
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#: indico/modules/events/contributions/forms.py
+#: indico/modules/events/contributions/templates/management/types_dialog.html
+#: indico/modules/events/editing/templates/management/editor_list.html
+#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
+#: indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/payment/forms.py
+#: indico/modules/events/payment/plugins.py
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/events/roles/forms.py
+#: indico/modules/events/sessions/forms.py
+#: indico/modules/events/sessions/templates/management/types_dialog.html
+#: indico/modules/events/templates/admin/_reference_type_list.html
+#: indico/modules/groups/templates/_group_members.html
+#: indico/modules/groups/templates/groups.html
+#: indico/modules/networks/forms.py
+#: indico/modules/networks/templates/networks.html
+#: indico/modules/oauth/forms.py
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
+msgid "Name"
+msgstr "Jméno"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Filename template"
+msgstr "Šablona názvu souboru"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#, python-brace-format
+msgid ""
+"Glob-style filename template that all files of this type have to conform to "
+"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
+"placeholder for the contribution program code."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Extensions"
+msgstr "Rozšíření"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid ""
+"Allowed file extensions. If left empty, there are no extension restrictions"
+msgstr ""
+"Povolené přípony souboru. Prázdné pole znamená – bez omezení na přípony"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type is mandatory"
+msgstr "Zda je typ souboru povinný"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Multiple files"
+msgstr "Více souborů"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type allows uploading multiple files"
+msgstr "Zda typ souboru umožňuje nahrávání více souborů"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Publishable"
+msgstr "Zveřejnitelné"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the files of this type can be published"
+msgstr "Zda lze soubory tohoto typu publikovat"
+
+#: indico/modules/events/contributions/client/js/ContributionList.tsx
+msgid "Not Scheduled"
+msgstr ""
+
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/controllers.py
+#: indico/modules/events/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/pdf/_program.html
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] "Přednášející"
+msgstr[1] "Přednášející"
+msgstr[2] "Přednášející"
+msgstr[3] "Přednášející"
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/persons/controllers.py
+msgid "Author"
+msgid_plural "Authors"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+msgid "Co-author"
+msgid_plural "Co-authors"
+msgstr[0] "Spoluautor"
+msgstr[1] "Spoluautoři"
+msgstr[2] "Spoluautoři"
+msgstr[3] "Spoluautoři"
+
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/abstracts/settings.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/fields.py
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+msgid "Submitter"
+msgstr "Navrhovatelé"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
+msgid "Edit this contribution"
+msgstr "Upravit tento příspěvek"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/contributions/templates/management/_contribution_list.html
+#: indico/modules/events/templates/display/common/_manage_button.html
+#: indico/modules/events/timetable/templates/balloons/contribution.html
+msgid "Edit contribution"
+msgstr "Upravit příspěvek"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+msgid "There are no contributions linked to your Indico profile."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "There are no contributions in your timetable."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "You have not added any contributions to your timetable."
+msgstr ""
+
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
 msgid "Publish contributions"
@@ -923,6 +1159,14 @@ msgstr "Zveřejněno"
 #: indico/modules/events/contributions/client/js/PublicationSwitch.jsx
 msgid "Draft"
 msgstr "Koncept"
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "This contribution has been added to your timetable. Click to remove."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "Add this contribution to your timetable."
+msgstr ""
 
 #: indico/core/db/sqlalchemy/links.py
 #: indico/modules/attachments/controllers/management/base.py
@@ -1122,6 +1366,11 @@ msgid "This file was added since the last revision."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+#, python-brace-format
+msgid "{filename} (uploaded on {date})"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "No files uploaded"
 msgstr "Nebyly nahrány žádné soubory"
 
@@ -1138,68 +1387,6 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "Download anyway"
 msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Replace the existing file"
-msgstr "Nahradit existující soubor"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Delete the existing file"
-msgstr "Vymazat existujícící soubor"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Revert to the existing file"
-msgstr "Vrátit se k existujícícmu souboru"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/Uploads.jsx
-msgid "An error occurred while uploading this file"
-msgstr "Při nahrávání tohoto souboru došlo k chybě"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "This file type is required"
-msgstr "Tento typ souboru je vyžadován"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "This file does not conform to the filename template {template}"
-msgstr "Tento soubor nevyhovuje šabloně názvu souboru: {template}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "Use an existing file"
-msgstr "Použít existující soubor"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "Filename pattern: {pattern}"
-msgstr "Maska názvu souboru: {pattern}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx
-msgid "Upload in progress"
-msgstr "Nahrávání probíhá"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "No changes yet"
-msgstr "Zatím beze změny"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Invalid file name: {files}"
-msgid_plural "Invalid file names: {files}"
-msgstr[0] "Neplatné jméno souboru: {files}"
-msgstr[1] "Neplatná jména souborů: {files}"
-msgstr[2] "Neplatná jména souborů: {files}"
-msgstr[3] "Neplatná jména souborů: {files}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Required file type missing: {types}"
-msgid_plural "Required file types missing: {types}"
-msgstr[0] "Chybí požadovaný typ souboru: {types}"
-msgstr[1] "Chybí požadované typy souboru: {types}"
-msgstr[2] "Chybí požadované typy souboru: {types}"
-msgstr[3] "Chybí požadované typy souborů: {types}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
@@ -1383,6 +1570,21 @@ msgstr[3] ""
 msgid "There is no publishable file uploaded."
 msgstr "Není nahrán žádný zveřejnitelný soubor."
 
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+#, python-brace-format
+msgid "Required files are missing. Please upload a {types} file."
+msgid_plural ""
+"Required files are missing. Please upload files of the following types: "
+"{types}"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+msgid "Required file types are missing."
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/util.js
 #, python-brace-format
 msgid "{editorName} (editor) has made some changes to the paper"
@@ -1503,12 +1705,12 @@ msgstr "Seznam editovatelných typů"
 msgid "Toggle editable types"
 msgstr "Přepnout editovatelné typy"
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/tags/index.js
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Tags"
 msgstr "Značky"
 
@@ -1706,7 +1908,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: indico/legacy/pdfinterface/conference.py indico/modules/categories/forms.py
+#: indico/modules/categories/forms.py
 #: indico/modules/events/abstracts/settings.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -1714,8 +1916,9 @@ msgstr[3] ""
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
 #: indico/modules/events/registration/templates/management/_reglist.html
+#: indico/modules/events/registration/util.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "ID"
@@ -1728,7 +1931,7 @@ msgstr "ID"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx
 #: indico/modules/events/payment/forms.py indico/modules/events/roles/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/tracks/forms.py
 msgid "Code"
 msgstr "Kód"
@@ -1757,7 +1960,7 @@ msgstr "Kód"
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
 #: indico/modules/events/sessions/templates/management/session_blocks.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/emails/event_creation.txt
@@ -1945,7 +2148,7 @@ msgid "Contributions without editables"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/FileTypeManagement.jsx
 #: indico/modules/events/papers/templates/management/overview.html
 msgid "File types"
 msgstr "Typy souborů"
@@ -2020,156 +2223,6 @@ msgstr "Nastavit editory"
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx
 msgid "Editors"
 msgstr "Editoři"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Enter an extension"
-msgstr "Zadejte rozšíření"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Add extension"
-msgstr "Přidat příponu"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type has files attached"
-msgstr "K tomuto typu jsou připojené soubory"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type is used in a review condition"
-msgstr "Tento typ se používá k posouzení stavu"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Cannot delete the only publishable type"
-msgstr "Nelze odstranit jediný publikovatelný typ"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "There are no file types defined for this event"
-msgstr "Pro tuto událost nejsou definovány žádné typy souborů"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"There are publishable file types that will not be displayed due to the 'Hide"
-" Accepted' setting being enabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"No file types will be shown as there are no publishable file types and the "
-"'Hide Accepted' setting is disabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "File required"
-msgstr "Soubor požadován"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Multiple files allowed"
-msgstr "Více souborů povoleno"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "File publishable"
-msgstr "Soubor zveřejnitelný"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "(no extension restrictions)"
-msgstr "(žádné omezení přípon)"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Add a new file type"
-msgstr "Přidejte nový typ souboru"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Edit file type"
-msgstr "Upravit typ souboru"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Create a new file type"
-msgstr "Vytvořte nový typ souboru"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#, python-brace-format
-msgid "Are you sure you want to delete the file type {fileType}?"
-msgstr "Opravdu chcete smazat typ souboru {fileType}?"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Take into account that this file type has files attached to it."
-msgstr "Vezměte v potaz, že tento typ zahrnuje přílohy."
-
-#: indico/core/celery/templates/celery_tasks.html
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
-#: indico/modules/designer/templates/template.html
-#: indico/modules/events/contributions/forms.py
-#: indico/modules/events/contributions/templates/management/types_dialog.html
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#: indico/modules/events/editing/templates/management/editor_list.html
-#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
-#: indico/modules/events/papers/templates/management/_templates.html
-#: indico/modules/events/payment/forms.py
-#: indico/modules/events/payment/plugins.py
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/events/roles/forms.py
-#: indico/modules/events/sessions/forms.py
-#: indico/modules/events/sessions/templates/management/types_dialog.html
-#: indico/modules/events/templates/admin/_reference_type_list.html
-#: indico/modules/groups/templates/_group_members.html
-#: indico/modules/groups/templates/groups.html
-#: indico/modules/networks/forms.py
-#: indico/modules/networks/templates/networks.html
-#: indico/modules/oauth/forms.py
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
-#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
-#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
-#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
-msgid "Name"
-msgstr "Jméno"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Filename template"
-msgstr "Šablona názvu souboru"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#, python-brace-format
-msgid ""
-"Glob-style filename template that all files of this type have to conform to "
-"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
-"placeholder for the contribution program code."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Extensions"
-msgstr "Rozšíření"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid ""
-"Allowed file extensions. If left empty, there are no extension restrictions"
-msgstr ""
-"Povolené přípony souboru. Prázdné pole znamená – bez omezení na přípony"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type is mandatory"
-msgstr "Zda je typ souboru povinný"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Multiple files"
-msgstr "Více souborů"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type allows uploading multiple files"
-msgstr "Zda typ souboru umožňuje nahrávání více souborů"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Publishable"
-msgstr "Zveřejnitelné"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the files of this type can be published"
-msgstr "Zda lze soubory tohoto typu publikovat"
 
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx
 msgid "AND"
@@ -2634,7 +2687,6 @@ msgid "The paper was {url}submitted{/url} for editing"
 msgstr "Článek byl {url}odeslán{/url} k editování"
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx
-#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
 msgid "Paper files"
 msgstr "Soubory článku"
 
@@ -2857,62 +2909,6 @@ msgstr "Zavřít"
 msgid "Edit person information"
 msgstr "Upravit informace o osobě"
 
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/controllers.py
-#: indico/modules/events/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/pdf/_program.html
-msgid "Speaker"
-msgid_plural "Speakers"
-msgstr[0] "Přednášející"
-msgstr[1] "Přednášející"
-msgstr[2] "Přednášející"
-msgstr[3] "Přednášející"
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/persons/controllers.py
-msgid "Author"
-msgid_plural "Authors"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-msgid "Co-author"
-msgid_plural "Co-authors"
-msgstr[0] "Spoluautor"
-msgstr[1] "Spoluautoři"
-msgstr[2] "Spoluautoři"
-msgstr[3] "Spoluautoři"
-
-#: indico/modules/events/abstracts/forms.py
-#: indico/modules/events/abstracts/lists.py
-#: indico/modules/events/abstracts/settings.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/fields.py
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-msgid "Submitter"
-msgstr "Navrhovatelé"
-
 #: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
 msgid "Send emails to these roles"
 msgstr ""
@@ -2934,7 +2930,6 @@ msgid "Recipients"
 msgstr "Příjemci"
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
-#: indico/web/client/js/custom_elements/ind_share_widget.js
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx
 msgid "Copied!"
 msgstr "Zkopírované!"
@@ -3029,6 +3024,12 @@ msgstr "Poslat kopii každého e-mailu na tyto adresy"
 msgid "Send a copy of each email to my mailbox"
 msgstr "Poslat kopii každého e-mailu do mé schránky"
 
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/persons/client/js/EmailDialog.jsx
+#: indico/modules/logs/templates/entry_email.html
+msgid "Attachments"
+msgstr "Přílohy"
+
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 #: indico/modules/events/registration/templates/management/email.html
@@ -3055,7 +3056,7 @@ msgstr "Tato osoba není přednášející"
 #: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/modules/groups/templates/_group_members.html
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Email"
 msgstr "E-mail"
@@ -3114,6 +3115,19 @@ msgstr "Zobrazit moji účast všem, kdo mají přístup k této události"
 #, python-brace-format
 msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+#, python-brace-format
+msgid ""
+"{count} imported invitation contains affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
+msgid_plural ""
+"{count} imported invitations contain affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -3322,34 +3336,11 @@ msgstr "Nejsou přiřazeny žádné značky."
 msgid "Add tags"
 msgstr "Přidat značky"
 
-#: indico/modules/events/registration/__init__.py
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/display/event_header.html
-#: indico/modules/events/registration/templates/management/participants.html
-#: indico/modules/events/reminders/forms.py
-#: indico/modules/events/surveys/forms.py
-#: indico/modules/logs/models/entries.py
-msgid "Participants"
-msgstr "Účastníci"
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-msgid "There are no published registrations."
-msgstr "Nejsou tu žádné zveřejněné registrace."
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/management/_reglist.html
-msgid "There are no registrations yet."
-msgstr "Zatím tu nejsou žádné registrace."
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show registered participant view instead"
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+msgid "No participants registered."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show unregistered guest view instead"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantSharedTranslations.tsx
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
 #, python-brace-format
 msgid "{count} participant registered anonymously."
 msgid_plural "{count} participants registered anonymously."
@@ -3358,12 +3349,51 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+#, python-brace-format
+msgid "Total: {total}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show registered participant view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show unregistered guest view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "There are no published registrations."
+msgstr "Nejsou tu žádné zveřejněné registrace."
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#: indico/modules/events/registration/templates/management/_reglist.html
+msgid "There are no registrations yet."
+msgstr "Zatím tu nejsou žádné registrace."
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#, python-brace-format
+msgid "{count} participant"
+msgid_plural "{count} participants"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Rows per page:"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Search participants"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
-msgid "No participants registered."
+msgid "No participants to display."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
@@ -3472,7 +3502,7 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Please provide the arrival date"
-msgstr ""
+msgstr "Prosím uveďte datum příjezdu"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Please enter the departure date using the specified format"
@@ -3480,7 +3510,7 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Please provide the departure date"
-msgstr ""
+msgstr "Prosím uveďte datum odjezdu"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 #, python-brace-format
@@ -3518,6 +3548,16 @@ msgstr "Možnosti"
 msgid "You need to have at least one enabled option."
 msgstr "Musíte mít alespoň jednu povolenou možnost."
 
+#: indico/modules/designer/placeholders.py
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Number of accompanying persons"
+msgstr "Počet doprovázejících osob"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+#, python-brace-format
+msgid "{price} (Total: {totalPrice})"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
 msgstr "Žádná registrovaná doprovázející osoba"
@@ -3539,6 +3579,12 @@ msgid "Edit accompanying person"
 msgstr "Upravit doprovázející osobu"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Disable tickets for accompanying persons to enable anonymous accompanying "
+"person registration."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
 msgstr "Maximum na jednu osobu"
 
@@ -3553,12 +3599,51 @@ msgstr "Bez maxima"
 msgid "Accompanying persons count against registration limit"
 msgstr "Doprovázející osoby se počítají do limitu registrací"
 
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Anonymous accompanying persons"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Collect only the number of accompanying persons instead of their names."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Tickets and badge printing are not available for anonymous accompanying "
+"persons."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
 #: indico/web/client/js/react/forms/validators.js
 msgid "This field is required."
 msgstr "Toto pole je vyžadováno."
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Allowed affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Predefined and custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only predefined affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid ""
+"Affiliations specified in invitations are custom text and will not be pre-"
+"filled in the registration form when only predefined affiliations are "
+"allowed."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
@@ -3750,6 +3835,7 @@ msgid "The domain used in the email address does not exist."
 msgstr "Doména užitá v adrese elektronické pošty neexistuje."
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+#: indico/util/marshmallow.py
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "This email address is invalid."
 msgstr "Tato adresa elektronické pošty je neplatná."
@@ -3788,10 +3874,10 @@ msgstr "Toto pole je povinné"
 #, python-brace-format
 msgid "At most {n} option can be selected"
 msgid_plural "At most {n} options can be selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Lze vybrat maximálně {n} možnost"
+msgstr[1] "Lze vybrat maximálně {n} možnosti"
+msgstr[2] "Lze vybrat maximálně {n} možností"
+msgstr[3] "Lze vybrat maximálně {n} možností"
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx
@@ -3801,6 +3887,8 @@ msgstr "Maximální počet možností"
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 msgid "Maximum number of choices that can be selected. Leave empty to unset."
 msgstr ""
+"Maximální počet možností, které lze vybrat. Pro zrušení nastavení ponechte "
+"pole prázdné."
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
@@ -3994,6 +4082,7 @@ msgstr "Ano/Ne"
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/registration/client/js/form/fields/registry.js
+#: indico/modules/users/templates/dashboard.html
 msgid "Phone"
 msgstr "Telefon"
 
@@ -4135,7 +4224,7 @@ msgstr "Zvolte prosím typ pole."
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/display/session_display.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/display/indico/_details.html
@@ -4154,10 +4243,10 @@ msgstr "Popis"
 msgid "You may use Markdown for formatting."
 msgstr "Pro formátování můžete použít Markdown."
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 #: indico/modules/events/registration/lists.py
 #: indico/modules/events/registration/stats.py
+#: indico/modules/events/registration/util.py
 msgid "Price"
 msgstr "Cena"
 
@@ -4210,6 +4299,29 @@ msgid ""
 "retention period expires."
 msgstr ""
 "Upozorňujeme, že po vypršení doby uchování bude ztracen také účetní doklad."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Advanced settings"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Internal name"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Only lowercase alphanumeric characters and dashes are allowed."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid ""
+"Used for identifying the same field across registration forms regardless of "
+"the title. This can also be used across events if you make sure to use the "
+"same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "The internal name for a personal data field cannot be changed."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx
 msgid "Choose type"
@@ -6878,7 +6990,7 @@ msgstr ""
 
 #: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx
 msgid "Filename"
-msgstr ""
+msgstr "Název souboru"
 
 #: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx
 msgid "Remember settings"
@@ -6967,7 +7079,7 @@ msgstr ""
 
 #: indico/modules/receipts/client/js/templates/Editor.jsx
 msgid "Default filename"
-msgstr ""
+msgstr "Výchozí název souboru"
 
 #: indico/modules/receipts/client/js/templates/Previewer.jsx
 msgid "YAML Metadata"
@@ -7399,10 +7511,6 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-msgid "Select a country"
-msgstr "Vybrat zemi"
-
 #: indico/modules/events/contributions/templates/forms/contribution.html
 #: indico/modules/events/contributions/templates/forms/subcontribution.html
 #: indico/modules/events/templates/forms/event_creation_form.html
@@ -7420,6 +7528,14 @@ msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Add affiliation"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Short name"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Enter a short identifier for the affiliation"
 msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
@@ -7466,7 +7582,28 @@ msgid "Please select an item in the list."
 msgstr ""
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
-msgid "Copy Link"
+msgid "Link copied to clipboard"
+msgstr ""
+
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/registration/templates/management/regform.html
+#: indico/modules/events/surveys/templates/management/survey.html
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#: indico/web/templates/overview/base.html
+msgid "Copy link to clipboard"
+msgstr "Zkopírovat odkaz do schránky"
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Download QR code"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#, python-brace-format
+msgid "{size} ({pixels}x{pixels} px)"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Show QR code"
 msgstr ""
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
@@ -7534,6 +7671,30 @@ msgstr "Určitě chcete opustit tuto stránku bez uložení?"
 msgid "Group"
 msgstr "Skupina"
 
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Use custom affiliation:"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation or add your own"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation or enter one manually"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "You entered this option manually"
+msgstr ""
+
 #: indico/web/client/js/react/components/Captcha.jsx
 msgid "Pause"
 msgstr "Pozastavit"
@@ -7586,6 +7747,10 @@ msgstr ""
 #, python-brace-format
 msgid "Click again to confirm ({delay})"
 msgstr "Klikněte znovu pro potvrzení ({delay})"
+
+#: indico/web/client/js/react/components/CountryDropdown.jsx
+msgid "Select a country..."
+msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx
 #: indico/web/client/js/react/components/DateRangePicker.jsx
@@ -7662,7 +7827,7 @@ msgstr ""
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please provide the start date"
-msgstr ""
+msgstr "Prosím zadejte datum pro začátek"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please enter the end date using the specified format"
@@ -7670,7 +7835,7 @@ msgstr ""
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Please provide the end date"
-msgstr ""
+msgstr "Prosím zadejte datum pro konec"
 
 #: indico/web/client/js/react/components/DateRangePicker.jsx
 #, python-brace-format
@@ -7777,36 +7942,6 @@ msgstr "Prof."
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Mx"
 msgstr "osoba"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Use custom affiliation:"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation or add your own"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation or enter one manually"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "You entered this option manually"
-msgstr ""
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Edit Person"
@@ -8055,6 +8190,73 @@ msgstr "Přetáhněte soubor sem"
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Choose new file from your computer"
 msgstr "Vyber nový soubor na Vašem počítači"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Replace the existing file"
+msgstr "Nahradit existující soubor"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Delete the existing file"
+msgstr "Vymazat existujícící soubor"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Revert to the existing file"
+msgstr "Vrátit se k existujícícmu souboru"
+
+#: indico/web/client/js/react/components/files/FileManager/Uploads.jsx
+msgid "An error occurred while uploading this file"
+msgstr "Při nahrávání tohoto souboru došlo k chybě"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "This file type is required"
+msgstr "Tento typ souboru je vyžadován"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "This file does not conform to the filename template {template}"
+msgstr "Tento soubor nevyhovuje šabloně názvu souboru: {template}"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "Use an existing file"
+msgstr "Použít existující soubor"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Filename pattern: {pattern}"
+msgstr "Maska názvu souboru: {pattern}"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Total attachment size ({current} MB) exceeds the {limit} MB limit"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx
+msgid "Upload in progress"
+msgstr "Nahrávání probíhá"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "No changes yet"
+msgstr "Zatím beze změny"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Invalid file name: {files}"
+msgid_plural "Invalid file names: {files}"
+msgstr[0] "Neplatné jméno souboru: {files}"
+msgstr[1] "Neplatná jména souborů: {files}"
+msgstr[2] "Neplatná jména souborů: {files}"
+msgstr[3] "Neplatná jména souborů: {files}"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Required file type missing: {types}"
+msgid_plural "Required file types missing: {types}"
+msgstr[0] "Chybí požadovaný typ souboru: {types}"
+msgstr[1] "Chybí požadované typy souboru: {types}"
+msgstr[2] "Chybí požadované typy souboru: {types}"
+msgstr[3] "Chybí požadované typy souborů: {types}"
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing the file failed."
@@ -8633,7 +8835,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/components/InviteDialogButton.jsx
 msgctxt "verb"
 msgid "Invite"
-msgstr ""
+msgstr "Pozvat"
 
 #: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
 msgctxt "verb"
@@ -8682,7 +8884,7 @@ msgstr ""
 #: indico/modules/events/templates/admin/_event_label_list.html
 msgctxt "Classification"
 msgid "Label"
-msgstr ""
+msgstr "Štítek"
 
 #. Apply for participation (analogous to 'Register' but 'Apply' is used when
 #. the registration form is moderated)
@@ -8907,6 +9109,11 @@ msgstr "Stránka, kterou hledáte, neexistuje."
 msgid "The request was invalid or contained invalid arguments."
 msgstr "Požadavek byl neplatný nebo obsahoval neplatné argumenty."
 
+#: indico/core/notifications.py
+#, python-brace-format
+msgid "Total attachment size too large (max. {} MB)"
+msgstr ""
+
 #: indico/core/permissions.py
 msgid "Unrestricted management access for the whole event"
 msgstr "Neomezený přístup k správě události"
@@ -9118,79 +9325,6 @@ msgstr "Tento přídavný modul nemá žádná nastavení."
 msgid "This plugin has no configurable options"
 msgstr "Tento přídavný modul nemá žádné nastavitelné volby."
 
-#: indico/legacy/pdfinterface/base.py
-#: indico/modules/events/timetable/templates/pdf/_toc.html
-msgid "Table of contents"
-msgstr "Obsah"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
-#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
-#: indico/legacy/pdfinterface/latex_templates/report.tex
-#, python-brace-format
-msgid "Page {}"
-msgstr "Strana {}"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrant"
-msgstr "Přihlášená osoba"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/logs/models/entries.py
-msgid "Registration details"
-msgstr "Podrobnosti k registraci"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration date"
-msgstr "Datum registrace"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration state"
-msgstr "Stav registrace"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/payment/templates/transaction_details.html
-#: indico/modules/events/registration/lists.py
-msgid "Payment date"
-msgstr "Datum platby"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-#: indico/modules/events/registration/templates/management/_registration_details.html
-msgid "Checked in"
-msgstr "Přihlášeno"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-msgid "Check-in date"
-msgstr "Check-in datum"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Arrival date"
-msgstr "Datum příjezdu"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Departure date"
-msgstr "Datum odjezdu"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants Book"
-msgstr "Kniha účastníků"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/layout/models/menu.py
-msgid "Page"
-msgstr "Strana"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants List"
-msgstr "Seznam přihlášených osob"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "List of registrants"
-msgstr "Seznam přihlášených osob"
-
 #: indico/legacy/pdfinterface/latex.py
 #: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 msgid "Report of Abstracts"
@@ -9204,6 +9338,13 @@ msgstr "Navrženo pro jiné tematické okruhy: {}"
 #: indico/legacy/pdfinterface/latex.py
 msgid "Report of Contributions"
 msgstr "Přehled příspěvků"
+
+#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
+#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
+#: indico/legacy/pdfinterface/latex_templates/report.tex
+#, python-brace-format
+msgid "Page {}"
+msgstr "Strana {}"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
 msgid "Abstract ID"
@@ -9275,7 +9416,7 @@ msgstr ""
 #: indico/modules/events/reminders/forms.py
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 msgid "Type"
 msgstr "Typ"
 
@@ -12291,7 +12432,7 @@ msgstr "Přidána nová šablona '{}'"
 
 #: indico/modules/designer/controllers.py
 msgid "A Fixed Image element must contain an image"
-msgstr ""
+msgstr "Prvek Pevný obrázek musí obsahovat obrázek"
 
 #: indico/modules/designer/controllers.py
 msgid "The image file does not belong to this template"
@@ -12355,15 +12496,15 @@ msgstr "Data události"
 
 #: indico/modules/designer/placeholders.py
 msgid "Fixed Data"
-msgstr ""
+msgstr "Pevná data"
 
 #: indico/modules/designer/placeholders.py
 msgid "Common Registrant Data"
-msgstr ""
+msgstr "Společné údaje o přihlášené osobě"
 
 #: indico/modules/designer/placeholders.py
 msgid "Custom Registrant Data"
-msgstr ""
+msgstr "Vlastní údaje o přihlášené osobě"
 
 #: indico/modules/designer/placeholders.py
 msgid "Event Dates"
@@ -12436,7 +12577,7 @@ msgstr "Celé jméno D (zkráceně, bez titulu)"
 
 #: indico/modules/designer/placeholders.py
 msgid "Last Name (uppercase)"
-msgstr ""
+msgstr "Příjmení (velká písmena)"
 
 #: indico/modules/designer/placeholders.py
 msgid "Price (no currency)"
@@ -12447,16 +12588,12 @@ msgid "Price (with currency)"
 msgstr "Cena (včetně měny)"
 
 #: indico/modules/designer/placeholders.py
-msgid "Number of accompanying persons"
-msgstr ""
-
-#: indico/modules/designer/placeholders.py
 msgid "Accompanying persons"
-msgstr ""
+msgstr "Doprovázející osoby"
 
 #: indico/modules/designer/placeholders.py
 msgid "Accompanying persons (abbrev.)"
-msgstr ""
+msgstr "Doprovázející osoby (zkratka)"
 
 #: indico/modules/designer/placeholders.py
 msgid "Registration ID"
@@ -12483,7 +12620,7 @@ msgstr "Pevný text"
 #: indico/modules/designer/placeholders.py
 #: indico/modules/designer/templates/template.html
 msgid "Fixed Image"
-msgstr ""
+msgstr "Pevný obrázek"
 
 #: indico/modules/designer/templates/_list.html
 msgid "Registration Form has no registrations"
@@ -13001,6 +13138,11 @@ msgstr "Hodnota"
 
 #: indico/modules/events/fields.py
 #, python-brace-format
+msgid "Validation of {email} failed: {error}"
+msgstr ""
+
+#: indico/modules/events/fields.py
+#, python-brace-format
 msgid "There is already a person with the email {email}"
 msgstr "Osoba s e-mailovou adresou {email} již existuje"
 
@@ -13166,6 +13308,7 @@ msgstr ""
 msgid "Link to the event"
 msgstr "Odkaz na událost"
 
+#: indico/modules/events/persons/placeholders.py
 #: indico/modules/events/placeholders.py
 #: indico/modules/events/registration/placeholders/registrations.py
 #: indico/modules/events/surveys/placeholders.py
@@ -13868,11 +14011,6 @@ msgid "No type selected"
 msgstr "Není vybrán typ"
 
 #: indico/modules/events/abstracts/forms.py
-#: indico/modules/logs/templates/entry_email.html
-msgid "Attachments"
-msgstr "Přílohy"
-
-#: indico/modules/events/abstracts/forms.py
 msgid "No track selected"
 msgstr "Není vybrán tematický okruh"
 
@@ -13994,6 +14132,8 @@ msgid "Submission date"
 msgstr "Datum odeslání"
 
 #: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Modification date"
 msgstr "Datum modifikace"
 
@@ -14118,8 +14258,8 @@ msgid "The title of the submitter (Dr, Prof., etc...)"
 msgstr "Titul navrhovatele (Dr, Prof apod.)"
 
 #: indico/modules/events/abstracts/placeholders.py
-msgid "Contribution URL"
-msgstr "URL příspěvku"
+msgid "The URL of the contribution"
+msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The ID of the target abstract (merge or duplicate)"
@@ -15416,10 +15556,6 @@ msgid "This operation is irreversible."
 msgstr "Tato operace je nevratná."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "Withdraw abstract"
-msgstr "Stornovat přihlášení abstraktu"
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Withdraw Abstract"
 msgstr "Stornovat abstrakt"
 
@@ -15431,6 +15567,10 @@ msgid "Withdraw"
 msgstr "Stornovat"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Withdraw abstract"
+msgstr "Stornovat přihlášení abstraktu"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
@@ -15439,16 +15579,16 @@ msgstr ""
 " se přímo s organizátory události, chcete-li tenhle abstrakt stáhnout i tak."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "This abstract has been withdrawn but can be restored."
-msgstr "Tenhle abstrakt byl stažen, ale může být obnoven."
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Restore Abstract"
 msgstr "Obnovit abstrakt"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Do you really want to restore this abstract?"
 msgstr "Opravdu chcete obnovit tento abstrakt?"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "This abstract has been withdrawn but can be restored."
+msgstr "Tenhle abstrakt byl stažen, ale může být obnoven."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Edit abstract"
@@ -15474,6 +15614,10 @@ msgstr "Abstrakt nelze upravovat, protože už je po uzávěrce pro úpravy."
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "You are not authorized to edit this abstract"
 msgstr "Nemáte oprávnění upravovat tento abstrakt"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Export PDF"
+msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "PDF with reviews"
@@ -16149,6 +16293,10 @@ msgstr ""
 msgid "Grants management rights for materials and minutes."
 msgstr ""
 
+#: indico/modules/events/contributions/__init__.py
+msgid "My Timetable"
+msgstr ""
+
 #: indico/modules/events/contributions/clone.py
 msgid "The target event already has contribution types"
 msgstr "Cílová událost již má typy příspěvků"
@@ -16313,6 +16461,10 @@ msgstr "Formát"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "No session"
 msgstr "Žádná sekce"
+
+#: indico/modules/events/contributions/lists.py
+msgid "Interested"
+msgstr ""
 
 #: indico/modules/events/contributions/lists.py
 msgid "Registered"
@@ -16496,12 +16648,18 @@ msgid "There are no contributions yet."
 msgstr "Zatím tu nejsou žádné příspěvky."
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
+#, python-format
+msgid "One person has added this contribution to their timetable."
+msgid_plural ""
+"%(count)s people have added this contribution to their timetable."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
 msgid "Go to contribution page"
 msgstr ""
-
-#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
-msgid "Edit this contribution"
-msgstr "Upravit tento příspěvek"
 
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -16540,13 +16698,6 @@ msgstr[3] "Autor v následujících příspěvcích"
 #, python-format
 msgid "Board: %(board_number)s"
 msgstr ""
-
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/management/_contribution_list.html
-#: indico/modules/events/templates/display/common/_manage_button.html
-#: indico/modules/events/timetable/templates/balloons/contribution.html
-msgid "Edit contribution"
-msgstr "Upravit příspěvek"
 
 #: indico/modules/events/contributions/templates/display/contribution_display.html
 msgid ""
@@ -16604,7 +16755,6 @@ msgstr "Generovat URL pro vybrané filtry."
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
 #: indico/modules/events/registration/templates/display/regform_list.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/surveys/templates/display/survey_list.html
@@ -17659,6 +17809,10 @@ msgstr "Odkaz na uživatele"
 msgid "Plugin Link"
 msgstr "Odkaz na plugin"
 
+#: indico/modules/events/layout/models/menu.py
+msgid "Page"
+msgstr "Strana"
+
 #: indico/modules/events/layout/templates/_menu.html
 msgid "Toggle default event homepage"
 msgstr "Přepnout použití výchozí domovské stránky události"
@@ -18193,7 +18347,7 @@ msgstr ""
 
 #: indico/modules/events/management/forms.py
 msgid "No default language"
-msgstr ""
+msgstr "Žádný výchozí jazyk"
 
 #: indico/modules/events/management/program_codes.py
 #, python-brace-format
@@ -18551,13 +18705,6 @@ msgstr "Upravit základní údaje"
 #: indico/modules/events/management/templates/_settings.html
 msgid "Short URL"
 msgstr "Krátké URL"
-
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/registration/templates/management/regform.html
-#: indico/modules/events/surveys/templates/management/survey.html
-#: indico/web/templates/overview/base.html
-msgid "Copy link to clipboard"
-msgstr "Zkopírovat odkaz do schránky"
 
 #: indico/modules/events/management/templates/_settings.html
 msgid "Edit event dates"
@@ -20295,6 +20442,12 @@ msgid "Amount"
 msgstr "Částka"
 
 #: indico/modules/events/payment/templates/transaction_details.html
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Payment date"
+msgstr "Datum platby"
+
+#: indico/modules/events/payment/templates/transaction_details.html
 msgid "Paid with"
 msgstr "Zaplaceno pomocí"
 
@@ -20499,11 +20652,28 @@ msgid "The program code of the contribution"
 msgstr ""
 
 #: indico/modules/events/persons/placeholders.py
+msgid "The board number of the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "Link to the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
 msgid "The duration of the contribution (e.g. \"20 minutes\")"
 msgstr ""
 
 #: indico/modules/events/persons/placeholders.py
 msgid "The scheduled date/time of the contribution, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The scheduled date/time including the weekday, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid ""
+"Link to the contribution created from the abstract (empty if not accepted)"
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
@@ -20714,6 +20884,15 @@ msgid "No persons"
 msgstr "Žádné osoby"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/display/event_header.html
+#: indico/modules/events/registration/templates/management/participants.html
+#: indico/modules/events/reminders/forms.py
+#: indico/modules/events/surveys/forms.py
+#: indico/modules/logs/models/entries.py
+msgid "Participants"
+msgstr "Účastníci"
+
+#: indico/modules/events/registration/__init__.py
 #: indico/modules/events/registration/templates/display/_event_regform_base.html
 #: indico/modules/events/registration/templates/display/_meeting_registration_base.html
 #: indico/modules/events/registration/templates/display/conference_home.html
@@ -20731,6 +20910,7 @@ msgstr[2] "Registrací"
 msgstr[3] "Registrací"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/pdf/participants_table.html
 msgid "Participant List"
 msgstr "Seznam účastníků"
 
@@ -20771,6 +20951,14 @@ msgstr ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view and check-in registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (manage participants only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, create, edit and delete registrations."
 msgstr ""
 
 #: indico/modules/events/registration/badges.py
@@ -20837,6 +21025,17 @@ msgstr "Moderováno"
 #: indico/modules/events/registration/forms.py
 msgid "If enabled, registrations require manager approval"
 msgstr "Registrace vyžadují schválení správce"
+
+#: indico/modules/events/registration/forms.py
+msgid "Reset approval on modification"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"If enabled, modifying a registration resets its approval status back to "
+"pending. Only applies to modifications made by the registrant, not by a "
+"manager."
+msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid ""
@@ -21060,7 +21259,7 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Deadline until which registration information can be modified"
-msgstr ""
+msgstr "Uzávěrka, do kdy lze upravovat registrační údaje"
 
 #: indico/modules/events/registration/forms.py
 msgid "Beware, addresses in this field will receive one mail per registrant."
@@ -21142,11 +21341,11 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Tickets for accompanying persons"
-msgstr ""
+msgstr "Vstupenky pro doprovázející osoby"
 
 #: indico/modules/events/registration/forms.py
 msgid "Create tickets for each of the user's accompanying persons."
-msgstr ""
+msgstr "Vytvořte vstupenky pro každou z doprovázejících osob účastníka."
 
 #: indico/modules/events/registration/forms.py
 msgid "Ticket template"
@@ -21155,6 +21354,18 @@ msgstr "Šablona vstupenky"
 #: indico/modules/events/registration/forms.py
 msgid "Default category template"
 msgstr "Výchozí kategorie šablony"
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Create tickets for each of the users accompanying persons. This option is "
+"unavailable because anonymous accompanying person registration is enabled."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Tickets for accompanying persons cannot be enabled because the registration "
+"form contains anonymous accompanying person registrations."
+msgstr ""
 
 #: indico/modules/events/registration/forms.py
 #: indico/modules/events/registration/templates/management/regform_list.html
@@ -21368,8 +21579,26 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/registration/lists.py
-msgid "Registration Date"
+#: indico/modules/events/registration/util.py
+msgid "Registration date"
 msgstr "Datum registrace"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/requests/templates/event_request_details.html
+msgid "Created by"
+msgstr "Vytvořil/a"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#: indico/modules/events/registration/util.py
+msgid "Checked in"
+msgstr "Přihlášeno"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Check-in date"
+msgstr "Check-in datum"
 
 #: indico/modules/events/registration/lists.py
 msgid "Consent to publish"
@@ -21440,6 +21669,10 @@ msgstr "Řádka {}: e-mailová adresa není jedinečná"
 #, python-brace-format
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "Řádek {}: e-mailová adresa patří stejnému uživateli jako na řádku {}"
+
+#: indico/modules/events/registration/util.py
+msgid "Registration state"
+msgstr "Stav registrace"
 
 #: indico/modules/events/registration/util.py
 #, python-brace-format
@@ -21550,6 +21783,22 @@ msgstr ""
 "pole prázdné."
 
 #: indico/modules/events/registration/controllers/management/fields.py
+msgid "Changing internal name for personal data field is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{}\" on this form has the same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{field}\" with the same internal name on form \"{form}\" uses a "
+"different input type which is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid ""
 "This field depends on \"{field}\", which has a shorter retention period "
@@ -21568,6 +21817,13 @@ msgstr ""
 msgid ""
 "This field is a condition for \"{field}\", which has a longer retention "
 "period ({period})."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{}\" with the same internal name on form \"{}\" uses a different"
+" input type which is not allowed."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
@@ -21700,14 +21956,6 @@ msgstr "Registrace je zakázána z důvodu vypršení doby uchování dat"
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The registration was created."
 msgstr "Registrace vytvořena"
-
-#: indico/modules/events/registration/controllers/management/reglists.py
-msgid ""
-"Text too large to generate a PDF with table style. Please try again "
-"generating with book style."
-msgstr ""
-"Pro vygenerování PDF ve stylu tabulky je text je příliš velký. Zkuste místo "
-"toho vygenerovat PDF ve stylu knihy."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
@@ -21850,6 +22098,31 @@ msgid "Tag {} has been modified."
 msgstr "Značka {} byla upravena."
 
 #: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Cannot be switched back to named mode when anonymous accompanying persons "
+"are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Anonymous accompanying persons cannot be enabled while tickets for "
+"accompanying persons are enabled."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Cannot be enabled when accompanying persons are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+#, python-brace-format
+msgid "{count} person"
+msgid_plural "{count} persons"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/fields/accompanying.py
 #: indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
 msgstr "Pro tuto volbu nejsou dostupná místa."
@@ -21868,10 +22141,10 @@ msgstr "Pro možnost {0} nezbývají žádná místa"
 #, python-brace-format
 msgid "At most {max_choices} option can be selected"
 msgid_plural "At most {max_choices} options can be selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Lze vybrat maximálně {max_choices} možnost"
+msgstr[1] "Lze vybrat maximálně {max_choices} možnosti"
+msgstr[2] "Lze vybrat maximálně {max_choices} možností"
+msgstr[3] "Lze vybrat maximálně {max_choices} možností"
 
 #: indico/modules/events/registration/fields/choices.py
 msgid "Arrival/departure date is missing"
@@ -21893,6 +22166,15 @@ msgstr ""
 #, python-brace-format
 msgid "Not enough rooms in '{0}'"
 msgstr "V '{0}' není dostatek pokojů"
+
+#: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
+msgid "{n} night"
+msgid_plural "{n} nights"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: indico/modules/events/registration/fields/sessions.py
 #, python-brace-format
@@ -22347,43 +22629,6 @@ msgstr[3] "%(num)s dalších účastníků"
 msgid "See the full list"
 msgstr "Zobrazit celý seznam"
 
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "Participant List Preview"
-msgstr "Náhled seznamu účastníků"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-#, python-format
-msgid "1 participant"
-msgid_plural "%(num)s participants"
-msgstr[0] "Účastník: 1"
-msgstr[1] "Účastníků:%(num)s"
-msgstr[2] "Účastníků:%(num)s"
-msgstr[3] "Účastníků: %(num)s"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like an unregistered guest would see"
-" it."
-msgstr ""
-"Tento náhled zobrazuje seznam účastníků tak, jak by ho viděl neregistrovaný "
-"host."
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like a registered participant would "
-"see it."
-msgstr ""
-"Tento náhled zobrazuje seznam účastníků tak, jak by ho viděl registrovaný "
-"účastník."
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"The lists of participants grouped by the registration form they used to "
-"register for the event."
-msgstr ""
-"Seznam účastníků seřazených podle registračního formuláře, který použili k "
-"registraci do této události."
-
 #: indico/modules/events/registration/templates/display/regform_display.html
 #, python-format
 msgid "Add registration to \"%(title)s\""
@@ -22472,6 +22717,12 @@ msgstr "Dosaženo maximálního počtu registrací"
 #: indico/modules/events/registration/templates/display/regform_list.html
 msgid "No registration forms available for this event"
 msgstr "Pro tuto událost nejsou dostupné žádné registrační formuláře"
+
+#: indico/modules/events/registration/templates/display/registration_modify.html
+msgid ""
+"If you modify this registration, it needs to be approved again by the event "
+"organizer."
+msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_modify.html
 msgid "Skip to registration form"
@@ -23040,6 +23291,11 @@ msgstr "Odeslané: 1 %(submitted)s"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
+msgid "Modified: %(modified)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#, python-format
 msgid "This registration is %(state)s"
 msgstr "Registrace je %(state)s"
 
@@ -23149,6 +23405,8 @@ msgid ""
 "regardless of the modification settings or deadline configured in the "
 "registration form."
 msgstr ""
+"Tomuto účastníkovi můžete výjimečně povolit úpravu registrace bez ohledu na "
+"nastavení úprav nebo termín nastavený v registračním formuláři."
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 msgid "The participant can no longer exceptionally modify their registration"
@@ -23173,11 +23431,11 @@ msgstr "Účastník může svou registraci upravit až do: %(modification_end_dt
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 msgid "Set the modification deadline"
-msgstr ""
+msgstr "Nastavit uzávěrku změn"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 msgid "View all logs related to this registration."
-msgstr ""
+msgstr "Zobrazit všechny protokoly související s touto registrací."
 
 #: indico/modules/events/registration/templates/management/_reglist.html
 #, python-format
@@ -23247,6 +23505,10 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Phone Number"
 msgstr "Telefonní číslo"
+
+#: indico/modules/events/registration/templates/management/participant_list_preview.html
+msgid "Participant List Preview"
+msgstr "Náhled seznamu účastníků"
 
 #: indico/modules/events/registration/templates/management/participants.html
 msgid "The registration feature is disabled"
@@ -23786,6 +24048,37 @@ msgstr "Registrace jsou otevřeny"
 msgid "Reschedule registrations"
 msgstr "Přeplánovat registrace"
 
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants List"
+msgstr "Seznam přihlášených osob"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants Book"
+msgstr "Kniha účastníků"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Table of Contents"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
+msgid "Registration details"
+msgstr "Podrobnosti k registraci"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Personal details"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#, python-format
+msgid "Page %(page)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_table.html
+msgid "List of registrants"
+msgstr "Seznam přihlášených osob"
+
 #: indico/modules/events/registration/wallets/apple.py
 msgid "Ticket number"
 msgstr ""
@@ -23869,7 +24162,7 @@ msgstr "Jedna e-mailová adresa na řádek, žádné oddělovače."
 
 #: indico/modules/events/reminders/forms.py
 msgid "Send the reminder to participants/registrants of the event."
-msgstr ""
+msgstr "Poslat upozornění účastníkům/registrovaným v rámci události."
 
 #: indico/modules/events/reminders/forms.py
 msgid "Filter by forms"
@@ -24195,10 +24488,6 @@ msgstr ""
 #: indico/modules/events/requests/templates/event_request_details.html
 msgid "These are the details provided by the event manager."
 msgstr "Podrobnosti poskytnuté správcem události."
-
-#: indico/modules/events/requests/templates/event_request_details.html
-msgid "Created by"
-msgstr "Vytvořil/a"
 
 #: indico/modules/events/requests/templates/event_request_details.html
 msgid "Created at"
@@ -24547,10 +24836,6 @@ msgstr "Jedná se o sekci plakátových nebo ústních příspěvků?"
 msgid "A session type with this name already exists"
 msgstr "Typ sekce tohoto názvu již existuje"
 
-#: indico/modules/events/sessions/util.py
-msgid "List of sessions"
-msgstr "List sekcí"
-
 #: indico/modules/events/sessions/templates/display/session_display.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/timetable/templates/balloons/block.html
@@ -24689,6 +24974,10 @@ msgstr "Nový typ sekce"
 #: indico/modules/events/sessions/templates/management/types_dialog.html
 msgid "There are no session types yet."
 msgstr "Zatím tu nejsou žádné typy sekcí."
+
+#: indico/modules/events/sessions/templates/pdf/session_table.html
+msgid "List of sessions"
+msgstr "List sekcí"
 
 #: indico/modules/events/static/__init__.py
 #: indico/modules/events/static/templates/static_sites.html
@@ -25165,6 +25454,10 @@ msgid ""
 "up standalone."
 msgstr ""
 "Tato sekce se nezobrazí jako sekce (její obsah se zobrazí samostatně)."
+
+#: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
+msgid "Clone section"
+msgstr ""
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "Edit section"
@@ -25902,6 +26195,7 @@ msgid "Event privacy information"
 msgstr "Informace o ochraně soukromí"
 
 #: indico/modules/events/templates/display/conference/_util.html
+#: indico/modules/events/tracks/templates/pdf/program.html
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s až %(end)s"
@@ -26108,6 +26402,22 @@ msgid ""
 msgstr ""
 "Nezapomeňte si prosím před rozhodnutím přečíst %(link)sinstrukce pro "
 "rozhodující%(endlink)s."
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has ended."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open until the submission deadline."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open. No submission deadline is set."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has not yet opened."
+msgstr ""
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "Opening day"
@@ -26498,6 +26808,10 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
+
+#: indico/modules/events/timetable/templates/pdf/_toc.html
+msgid "Table of contents"
+msgstr "Obsah"
 
 #: indico/modules/events/tracks/__init__.py
 #: indico/modules/events/tracks/forms.py
@@ -28794,15 +29108,31 @@ msgid "Your events at hand"
 msgstr "Vaše události přehledně"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You do not have management rights"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You are a reviewer"
 msgstr "Můžete posuzovat"
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You are not a reviewer"
+msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are an attendee"
 msgstr "Jste účastníkem/účastnicí"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You are not an attendee"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You have favorited this event"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You have not favorited this event"
 msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
@@ -30139,6 +30469,10 @@ msgid "URL is required"
 msgstr "URL adresa je povinná"
 
 #: indico/web/forms/fields/simple.py
+msgid "Only URLs starting with https:// (or http://) are allowed"
+msgstr ""
+
+#: indico/web/forms/fields/simple.py
 msgid "Titles are required when more than one link is specified"
 msgstr "Názvy jsou povinné, pokud je uveden více něž jeden odkaz"
 
@@ -30372,6 +30706,10 @@ msgstr "Proveď akci"
 #, python-format
 msgid "Powered by %(indico)s"
 msgstr "Běží na %(indico)s"
+
+#: indico/web/templates/footer.html
+msgid "Site links"
+msgstr ""
 
 #: indico/web/templates/header.html
 msgid "Indico main page"
@@ -30937,7 +31275,7 @@ msgstr[3] "Opravdu chcete smazat {0} vybraných registrací?"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html
 msgid "Reminder preview"
-msgstr ""
+msgstr "Náhled upozornění"
 
 #: indico/modules/events/sessions/client/js/index.js
 msgid "Filter types"

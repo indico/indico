@@ -12,9 +12,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.12-dev\n"
+"Project-Id-Version: Indico 3.3.13-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-18 16:20+0100\n"
+"POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
 "Last-Translator: Anna Szabó, 2026\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
@@ -99,9 +99,10 @@ msgstr "Családi név"
 #: indico/modules/events/persons/client/js/PersonList.jsx
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/users/client/js/PersonalDataForm.jsx
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_merge.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -837,6 +838,243 @@ msgstr "Részletes"
 msgid "A detailed timetable containing all individual contributions."
 msgstr "Részletes ütemterv, amely tartalmazza az összes egyéni felszólalást."
 
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Enter an extension"
+msgstr "Bővítmény megadása"
+
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Add extension"
+msgstr "Bővítmény hozzáadása"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type has files attached"
+msgstr "Ez a típus csatolt fájlokat tartalmaz"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type is used in a review condition"
+msgstr "Ez a típus felülvizsgálati feltételként használatos"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Cannot delete the only publishable type"
+msgstr "Nem lehet törölni a csak közzétehető típust"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "There are no file types defined for this event"
+msgstr "Ehhez az eseményhez nincsenek fájltípusok definiálva"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"There are publishable file types that will not be displayed due to the 'Hide"
+" Accepted' setting being enabled."
+msgstr ""
+"Vannak olyan publikálható fájltípusok, amelyek nem jelennek meg, mert az "
+"\"Elfogadott elrejtése\" beállítás engedélyezve van."
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"No file types will be shown as there are no publishable file types and the "
+"'Hide Accepted' setting is disabled."
+msgstr ""
+"Semmilyen fájltípus nem jelenik meg, mivel nincsenek közzétehető "
+"fájltípusok, és a „Elfogadottak elrejtése” beállítás le van tiltva."
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "File required"
+msgstr "Fájl szükséges"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Multiple files allowed"
+msgstr "Több fájl engedélyezett"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "File publishable"
+msgstr "Fájl közzétehető"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "(no extension restrictions)"
+msgstr "(nincsenek kiterjesztési korlátozások)"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Add a new file type"
+msgstr "Új fájltípus hozzáadása"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Edit file type"
+msgstr "Fájltípus szerkesztése"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Create a new file type"
+msgstr "Új fájltípus létrehozása"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#, python-brace-format
+msgid "Are you sure you want to delete the file type {fileType}?"
+msgstr "Biztosan törli a(z) {fileType} fájltípust?"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Take into account that this file type has files attached to it."
+msgstr "Vegye figyelembe, hogy ez a fájltípus fájlokat csatolt hozzá."
+
+#: indico/core/celery/templates/celery_tasks.html
+#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
+#: indico/modules/designer/templates/template.html
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#: indico/modules/events/contributions/forms.py
+#: indico/modules/events/contributions/templates/management/types_dialog.html
+#: indico/modules/events/editing/templates/management/editor_list.html
+#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
+#: indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/payment/forms.py
+#: indico/modules/events/payment/plugins.py
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/events/roles/forms.py
+#: indico/modules/events/sessions/forms.py
+#: indico/modules/events/sessions/templates/management/types_dialog.html
+#: indico/modules/events/templates/admin/_reference_type_list.html
+#: indico/modules/groups/templates/_group_members.html
+#: indico/modules/groups/templates/groups.html
+#: indico/modules/networks/forms.py
+#: indico/modules/networks/templates/networks.html
+#: indico/modules/oauth/forms.py
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
+msgid "Name"
+msgstr "Név"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Filename template"
+msgstr "Fájlnév sablon"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#, python-brace-format
+msgid ""
+"Glob-style filename template that all files of this type have to conform to "
+"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
+"placeholder for the contribution program code."
+msgstr ""
+"Glob-stílusú fájlnév sablon, amelynek minden ilyen típusú fájlnak meg kell "
+"felelnie (pl. {example}). Pontok nem engedélyezettek. Lehetséges a "
+"{placeholder} használata a hozzájárulási programkód helyőrzőjeként."
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Extensions"
+msgstr "Kiterjesztések"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid ""
+"Allowed file extensions. If left empty, there are no extension restrictions"
+msgstr ""
+"Engedélyezett fájlkiterjesztések. Ha üresen marad, nincsenek kiterjesztési "
+"korlátozások"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type is mandatory"
+msgstr "Azt jelzi, hogy kötelező-e a fájltípus"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Multiple files"
+msgstr "Több fájl"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type allows uploading multiple files"
+msgstr "Azt jelzi, hogy a fájltípus lehetővé teszi-e több fájl feltöltését"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Publishable"
+msgstr "Közzétehető"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the files of this type can be published"
+msgstr "Az ilyen típusú fájlok közzétehetők-e"
+
+#: indico/modules/events/contributions/client/js/ContributionList.tsx
+msgid "Not Scheduled"
+msgstr "Nincs beütemezve"
+
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/controllers.py
+#: indico/modules/events/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/pdf/_program.html
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] "Előadó"
+msgstr[1] "Előadók"
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/persons/controllers.py
+msgid "Author"
+msgid_plural "Authors"
+msgstr[0] "Szerző"
+msgstr[1] "Szerzők"
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+msgid "Co-author"
+msgid_plural "Co-authors"
+msgstr[0] "Társszerző"
+msgstr[1] "Társszerzők"
+
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/abstracts/settings.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/fields.py
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+msgid "Submitter"
+msgstr "Beküldő"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
+msgid "Edit this contribution"
+msgstr "Felszólalás szerkesztése"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/contributions/templates/management/_contribution_list.html
+#: indico/modules/events/templates/display/common/_manage_button.html
+#: indico/modules/events/timetable/templates/balloons/contribution.html
+msgid "Edit contribution"
+msgstr "Felszólalás szerkesztése"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+msgid "There are no contributions linked to your Indico profile."
+msgstr "Az Indico-profilodhoz nincs hozzárendelve egyetlen felszólalás sem."
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "There are no contributions in your timetable."
+msgstr "Az ütemtervében nincsenek felszólalások."
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "You have not added any contributions to your timetable."
+msgstr "Még nem vett fel semmilyen felszólalást az ütemtervébe."
+
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
 msgid "Publish contributions"
@@ -943,6 +1181,15 @@ msgstr "Közzétéve"
 #: indico/modules/events/contributions/client/js/PublicationSwitch.jsx
 msgid "Draft"
 msgstr "Vázlat"
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "This contribution has been added to your timetable. Click to remove."
+msgstr ""
+"Ez a felszólalás bekerült az ütemtervébe. Kattintson ide az eltávolításához."
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "Add this contribution to your timetable."
+msgstr "Felszólalás felvétele az ütemtervbe."
 
 #: indico/core/db/sqlalchemy/links.py
 #: indico/modules/attachments/controllers/management/base.py
@@ -1143,6 +1390,11 @@ msgid "This file was added since the last revision."
 msgstr "Ez a fájl a legutóbbi felülvizsgálat óta került hozzáadásra."
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+#, python-brace-format
+msgid "{filename} (uploaded on {date})"
+msgstr "{filename}(feltöltve {date}-n)"
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "No files uploaded"
 msgstr "Nincs feltöltött fájl"
 
@@ -1161,64 +1413,6 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "Download anyway"
 msgstr "Letöltés mindenképpen"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Replace the existing file"
-msgstr "A meglévő fájl cseréje"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Delete the existing file"
-msgstr "A meglévő fájl törlése"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Revert to the existing file"
-msgstr "Visszaállítás a meglévő fájlra"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/Uploads.jsx
-msgid "An error occurred while uploading this file"
-msgstr "Hiba történt a fájl feltöltése közben"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "This file type is required"
-msgstr "Ez a fájltípus szükséges"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "This file does not conform to the filename template {template}"
-msgstr "Ez a fájl nem felel meg a(z) {template} fájlnévsablonnak"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "Use an existing file"
-msgstr "Meglévő fájl használata"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "Filename pattern: {pattern}"
-msgstr "Fájlnév minta: {pattern}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx
-msgid "Upload in progress"
-msgstr "Feltöltés folyamatban"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "No changes yet"
-msgstr "Még nincs változás"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Invalid file name: {files}"
-msgid_plural "Invalid file names: {files}"
-msgstr[0] "Érvénytelen fájl neve: {files}"
-msgstr[1] "Érvénytelen fájl nevek: {files}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Required file type missing: {types}"
-msgid_plural "Required file types missing: {types}"
-msgstr[0] "A szükséges fájltípus hiányzik: {types}"
-msgstr[1] "A szükséges fájltípusok hiányznak: {types}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
@@ -1400,6 +1594,22 @@ msgstr[1] ""
 msgid "There is no publishable file uploaded."
 msgstr "Nincs közzétehető fájl feltöltve."
 
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+#, python-brace-format
+msgid "Required files are missing. Please upload a {types} file."
+msgid_plural ""
+"Required files are missing. Please upload files of the following types: "
+"{types}"
+msgstr[0] ""
+"Hiányoznak a szükséges fájlok. Kérjük, töltsön fel egy {types} fájlt."
+msgstr[1] ""
+"Hiányoznak a szükséges fájlok. Kérjük, töltse fel a következő típusú "
+"fájlokat: {types}"
+
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+msgid "Required file types are missing."
+msgstr "Hiányoznak a szükséges fájltípusok."
+
 #: indico/modules/events/editing/client/js/editing/timeline/util.js
 #, python-brace-format
 msgid "{editorName} (editor) has made some changes to the paper"
@@ -1520,12 +1730,12 @@ msgstr "Szerkeszthető típusok listája"
 msgid "Toggle editable types"
 msgstr "Szerkeszthető típusok kiváltása"
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/tags/index.js
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Tags"
 msgstr "Címkék"
 
@@ -1724,7 +1934,7 @@ msgid_plural "{count} posters were skipped because of their current status."
 msgstr[0] "{count} poszter lett kihagyva a jelenlegi állapota miatt."
 msgstr[1] "{count} poszter lett kihagyva a jelenlegi állapotuk miatt."
 
-#: indico/legacy/pdfinterface/conference.py indico/modules/categories/forms.py
+#: indico/modules/categories/forms.py
 #: indico/modules/events/abstracts/settings.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -1732,8 +1942,9 @@ msgstr[1] "{count} poszter lett kihagyva a jelenlegi állapotuk miatt."
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
 #: indico/modules/events/registration/templates/management/_reglist.html
+#: indico/modules/events/registration/util.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "ID"
@@ -1746,7 +1957,7 @@ msgstr "Azonosító"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx
 #: indico/modules/events/payment/forms.py indico/modules/events/roles/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/tracks/forms.py
 msgid "Code"
 msgstr "Kód"
@@ -1775,7 +1986,7 @@ msgstr "Kód"
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
 #: indico/modules/events/sessions/templates/management/session_blocks.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/emails/event_creation.txt
@@ -1972,7 +2183,7 @@ msgid "Contributions without editables"
 msgstr "Hozzájárulások szerkeszthetőség nélkül"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/FileTypeManagement.jsx
 #: indico/modules/events/papers/templates/management/overview.html
 msgid "File types"
 msgstr "Fájltípusok"
@@ -2049,164 +2260,6 @@ msgstr "Szerkesztők beállítása"
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx
 msgid "Editors"
 msgstr "Szerkesztők"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Enter an extension"
-msgstr "Bővítmény megadása"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Add extension"
-msgstr "Bővítmény hozzáadása"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type has files attached"
-msgstr "Ez a típus csatolt fájlokat tartalmaz"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type is used in a review condition"
-msgstr "Ez a típus felülvizsgálati feltételként használatos"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Cannot delete the only publishable type"
-msgstr "Nem lehet törölni a csak közzétehető típust"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "There are no file types defined for this event"
-msgstr "Ehhez az eseményhez nincsenek fájltípusok definiálva"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"There are publishable file types that will not be displayed due to the 'Hide"
-" Accepted' setting being enabled."
-msgstr ""
-"Vannak olyan publikálható fájltípusok, amelyek nem jelennek meg, mert az "
-"\"Elfogadott elrejtése\" beállítás engedélyezve van."
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"No file types will be shown as there are no publishable file types and the "
-"'Hide Accepted' setting is disabled."
-msgstr ""
-"Semmilyen fájltípus nem jelenik meg, mivel nincsenek közzétehető "
-"fájltípusok, és a „Elfogadottak elrejtése” beállítás le van tiltva."
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "File required"
-msgstr "Fájl szükséges"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Multiple files allowed"
-msgstr "Több fájl engedélyezett"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "File publishable"
-msgstr "Fájl közzétehető"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "(no extension restrictions)"
-msgstr "(nincsenek kiterjesztési korlátozások)"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Add a new file type"
-msgstr "Új fájltípus hozzáadása"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Edit file type"
-msgstr "Fájltípus szerkesztése"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Create a new file type"
-msgstr "Új fájltípus létrehozása"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#, python-brace-format
-msgid "Are you sure you want to delete the file type {fileType}?"
-msgstr "Biztosan törli a(z) {fileType} fájltípust?"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Take into account that this file type has files attached to it."
-msgstr "Vegye figyelembe, hogy ez a fájltípus fájlokat csatolt hozzá."
-
-#: indico/core/celery/templates/celery_tasks.html
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
-#: indico/modules/designer/templates/template.html
-#: indico/modules/events/contributions/forms.py
-#: indico/modules/events/contributions/templates/management/types_dialog.html
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#: indico/modules/events/editing/templates/management/editor_list.html
-#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
-#: indico/modules/events/papers/templates/management/_templates.html
-#: indico/modules/events/payment/forms.py
-#: indico/modules/events/payment/plugins.py
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/events/roles/forms.py
-#: indico/modules/events/sessions/forms.py
-#: indico/modules/events/sessions/templates/management/types_dialog.html
-#: indico/modules/events/templates/admin/_reference_type_list.html
-#: indico/modules/groups/templates/_group_members.html
-#: indico/modules/groups/templates/groups.html
-#: indico/modules/networks/forms.py
-#: indico/modules/networks/templates/networks.html
-#: indico/modules/oauth/forms.py
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
-#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
-#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
-#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
-msgid "Name"
-msgstr "Név"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Filename template"
-msgstr "Fájlnév sablon"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#, python-brace-format
-msgid ""
-"Glob-style filename template that all files of this type have to conform to "
-"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
-"placeholder for the contribution program code."
-msgstr ""
-"Glob-stílusú fájlnév sablon, amelynek minden ilyen típusú fájlnak meg kell "
-"felelnie (pl. {example}). Pontok nem engedélyezettek. Lehetséges a "
-"{placeholder} használata a hozzájárulási programkód helyőrzőjeként."
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Extensions"
-msgstr "Kiterjesztések"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid ""
-"Allowed file extensions. If left empty, there are no extension restrictions"
-msgstr ""
-"Engedélyezett fájlkiterjesztések. Ha üresen marad, nincsenek kiterjesztési "
-"korlátozások"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type is mandatory"
-msgstr "Azt jelzi, hogy kötelező-e a fájltípus"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Multiple files"
-msgstr "Több fájl"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type allows uploading multiple files"
-msgstr "Azt jelzi, hogy a fájltípus lehetővé teszi-e több fájl feltöltését"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Publishable"
-msgstr "Közzétehető"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the files of this type can be published"
-msgstr "Az ilyen típusú fájlok közzétehetők-e"
 
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx
 msgid "AND"
@@ -2673,7 +2726,6 @@ msgid "The paper was {url}submitted{/url} for editing"
 msgstr "A papír {url}elküldve{/url} szerkesztésre"
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx
-#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
 msgid "Paper files"
 msgstr "Papírfájlok"
 
@@ -2900,56 +2952,6 @@ msgstr "Bezár"
 msgid "Edit person information"
 msgstr "Személyi adatok szerkesztése"
 
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/controllers.py
-#: indico/modules/events/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/pdf/_program.html
-msgid "Speaker"
-msgid_plural "Speakers"
-msgstr[0] "Előadó"
-msgstr[1] "Előadók"
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/persons/controllers.py
-msgid "Author"
-msgid_plural "Authors"
-msgstr[0] "Szerző"
-msgstr[1] "Szerzők"
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-msgid "Co-author"
-msgid_plural "Co-authors"
-msgstr[0] "Társszerző"
-msgstr[1] "Társszerzők"
-
-#: indico/modules/events/abstracts/forms.py
-#: indico/modules/events/abstracts/lists.py
-#: indico/modules/events/abstracts/settings.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/fields.py
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-msgid "Submitter"
-msgstr "Beküldő"
-
 #: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
 msgid "Send emails to these roles"
 msgstr "E-mailek küldése ezeknek a szerepköröknek"
@@ -2971,7 +2973,6 @@ msgid "Recipients"
 msgstr "Címzettek"
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
-#: indico/web/client/js/custom_elements/ind_share_widget.js
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx
 msgid "Copied!"
 msgstr "Lemásolva!"
@@ -3064,6 +3065,12 @@ msgstr "Minden e-mail másolatát küldje el a listán szereplő összes címre.
 msgid "Send a copy of each email to my mailbox"
 msgstr "Minden e-mail másolatának elküldése a postafiókomba"
 
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/persons/client/js/EmailDialog.jsx
+#: indico/modules/logs/templates/entry_email.html
+msgid "Attachments"
+msgstr "Csatolmányok"
+
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 #: indico/modules/events/registration/templates/management/email.html
@@ -3090,7 +3097,7 @@ msgstr "Ez a személy nem előadó"
 #: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/modules/groups/templates/_group_members.html
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Email"
 msgstr "E-mail"
@@ -3155,6 +3162,23 @@ msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
 msgstr[0] "{numInvitations} meghívót készül elküldeni."
 msgstr[1] "{numInvitations} meghívót készül elküldeni."
+
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+#, python-brace-format
+msgid ""
+"{count} imported invitation contains affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
+msgid_plural ""
+"{count} imported invitations contain affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
+msgstr[0] ""
+"{count} importált meghívó olyan intézményi hovatartozási adatokat tartalmaz,"
+" amelyek nem kerülnek automatikusan kitöltésre, mivel ez az űrlap csak előre"
+" meghatározott intézményi kapcsolatokat fogad el."
+msgstr[1] ""
+"A(z) {count} importált meghívó olyan intézményi hovatartozási adatokat "
+"tartalmaz, amelyek nem kerülnek automatikusan kitöltésre, mivel ez az űrlap "
+"csak előre meghatározott intézményi kapcsolatokat fogad el."
 
 #: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
 msgid "Please upload a valid CSV file."
@@ -3357,47 +3381,61 @@ msgstr "Nincsenek címkék hozzárendelve."
 msgid "Add tags"
 msgstr "Címke hozzáadása"
 
-#: indico/modules/events/registration/__init__.py
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/display/event_header.html
-#: indico/modules/events/registration/templates/management/participants.html
-#: indico/modules/events/reminders/forms.py
-#: indico/modules/events/surveys/forms.py
-#: indico/modules/logs/models/entries.py
-msgid "Participants"
-msgstr "Résztvevők"
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+msgid "No participants registered."
+msgstr "Nincs regisztrált résztvevő."
 
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-msgid "There are no published registrations."
-msgstr "Nincsenek közzétett regisztrációk."
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/management/_reglist.html
-msgid "There are no registrations yet."
-msgstr "Még nincsenek regisztrációk."
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show registered participant view instead"
-msgstr "Regisztrált résztvevő nézet megjelenítése inkább"
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show unregistered guest view instead"
-msgstr "Regisztrálatlan vendég nézet megjelenítése inkább"
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantSharedTranslations.tsx
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
 #, python-brace-format
 msgid "{count} participant registered anonymously."
 msgid_plural "{count} participants registered anonymously."
 msgstr[0] "{count} résztvevő regisztrált névtelenül."
 msgstr[1] "{count} résztvevő regisztrált névtelenül."
 
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+#, python-brace-format
+msgid "Total: {total}"
+msgstr "Összesen: {total}"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show registered participant view"
+msgstr "Regisztrált résztvevői nézet megjelenítése"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show unregistered guest view"
+msgstr "Regisztráció nélküli vendég nézet megjelenítése"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "There are no published registrations."
+msgstr "Nincsenek közzétett regisztrációk."
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#: indico/modules/events/registration/templates/management/_reglist.html
+msgid "There are no registrations yet."
+msgstr "Még nincsenek regisztrációk."
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+#, python-brace-format
+msgid "{count} participant"
+msgid_plural "{count} participants"
+msgstr[0] "{count} résztvevő"
+msgstr[1] "{count} résztvevő"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Rows per page:"
+msgstr "Sorok száma oldalonként:"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Search participants"
+msgstr "Résztvevők keresése"
+
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
 msgstr "Bejelentkezés státusza"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
-msgid "No participants registered."
-msgstr "Nincs regisztrált résztvevő."
+msgid "No participants to display."
+msgstr "Nincs megjeleníthető résztvevő."
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
 #: indico/modules/events/registration/forms.py
@@ -3548,6 +3586,16 @@ msgstr "Választások"
 msgid "You need to have at least one enabled option."
 msgstr "Legalább egy opciót engedélyeznie kell."
 
+#: indico/modules/designer/placeholders.py
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Number of accompanying persons"
+msgstr "Kísérő személyek száma"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+#, python-brace-format
+msgid "{price} (Total: {totalPrice})"
+msgstr "{price} (Összesen: {totalPrice})"
+
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
 msgstr "Nincs regisztrált kísérő személy"
@@ -3569,6 +3617,14 @@ msgid "Edit accompanying person"
 msgstr "Kísérő személy szerkesztése"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Disable tickets for accompanying persons to enable anonymous accompanying "
+"person registration."
+msgstr ""
+"Kapcsolja ki a kísérő személyeknek szóló jegyeket, hogy lehetővé váljon a "
+"kísérő személyek névtelen regisztrációja."
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
 msgstr "Maximum / regisztráló"
 
@@ -3583,12 +3639,56 @@ msgstr "Nincs felső határ"
 msgid "Accompanying persons count against registration limit"
 msgstr "A kísérő személyek beleszámítanak a regisztrációs korlátba"
 
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Anonymous accompanying persons"
+msgstr "Névtelen kísérő személyek"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Collect only the number of accompanying persons instead of their names."
+msgstr "A kísérők neve helyett csak a számuk kerüljön rögzítésre."
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Tickets and badge printing are not available for anonymous accompanying "
+"persons."
+msgstr ""
+"Névtelen kísérő személyek számára nem áll rendelkezésre jegy- és "
+"belépőkártya-nyomtatás."
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
 #: indico/web/client/js/react/forms/validators.js
 msgid "This field is required."
 msgstr "A mező kitöltése kötelező."
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Allowed affiliations"
+msgstr "Engedélyezett szervezetek"
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Predefined and custom affiliations"
+msgstr "Előre definiált és egyedi szervezeti tagságok"
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only predefined affiliations"
+msgstr "Csak előre definiált szervezeti tagságok"
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only custom affiliations"
+msgstr "Csak egyedi szervezeti tagságok"
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid ""
+"Affiliations specified in invitations are custom text and will not be pre-"
+"filled in the registration form when only predefined affiliations are "
+"allowed."
+msgstr ""
+"A meghívókban feltüntetett szervezeti tagságok egyedi szövegnek minősülnek, "
+"és nem kerülnek automatikusan kitöltésre a regisztrációs űrlapon, ha a "
+"\"Csak előre definiált szervezeti tagságok\" beállítás engedélyezett."
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
@@ -3780,6 +3880,7 @@ msgid "The domain used in the email address does not exist."
 msgstr "Az e-mail címben használt tartomány nem létezik."
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+#: indico/util/marshmallow.py
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "This email address is invalid."
 msgstr "Ez az e-mail cím érvénytelen."
@@ -4018,6 +4119,7 @@ msgstr "Igen/Nem"
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/registration/client/js/form/fields/registry.js
+#: indico/modules/users/templates/dashboard.html
 msgid "Phone"
 msgstr "Telefonszám"
 
@@ -4157,7 +4259,7 @@ msgstr "Kérjük, válasszon egy mezőtípust."
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/display/session_display.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/display/indico/_details.html
@@ -4176,10 +4278,10 @@ msgstr "Leírás"
 msgid "You may use Markdown for formatting."
 msgstr "A formázáshoz használhatja a Markdownt."
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 #: indico/modules/events/registration/lists.py
 #: indico/modules/events/registration/stats.py
+#: indico/modules/events/registration/util.py
 msgid "Price"
 msgstr "Ár"
 
@@ -4234,6 +4336,32 @@ msgid ""
 msgstr ""
 "Felhívjuk figyelmét, hogy a számlainformációk is elvesznek, amint egy mező "
 "megőrzési ideje lejár."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Advanced settings"
+msgstr "Speciális beállítások"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Internal name"
+msgstr "Belső név"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Only lowercase alphanumeric characters and dashes are allowed."
+msgstr "Csak kisbetűs alfanumerikus karakterek és kötőjelek megengedettek."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid ""
+"Used for identifying the same field across registration forms regardless of "
+"the title. This can also be used across events if you make sure to use the "
+"same internal name."
+msgstr ""
+"A regisztrációs űrlapokon a mezők azonosítására szolgál, függetlenül azok "
+"címétől. Ez eseményeken átívelően is használható, ha ügyel arra, hogy "
+"mindenhol ugyanazt a belső nevet használja."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "The internal name for a personal data field cannot be changed."
+msgstr "A személyes adatmező belső neve nem módosítható."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx
 msgid "Choose type"
@@ -5153,7 +5281,7 @@ msgstr "Nem található fotó."
 #: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
 #, python-brace-format
 msgid "Results: {count}"
-msgstr ""
+msgstr "Eredmények: {count}"
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
@@ -6492,27 +6620,27 @@ msgstr "Az elutasított/törölt foglalások megjelenítése"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Used"
-msgstr ""
+msgstr "Használt"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only used spaces"
-msgstr ""
+msgstr "Csak a használt helyeket mutassa"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "All"
-msgstr ""
+msgstr "Minden"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show all spaces"
-msgstr ""
+msgstr "Minden hely megjelenítése"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Unused"
-msgstr ""
+msgstr "Nem használt"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only unused spaces"
-msgstr ""
+msgstr "Csak a szabad helyeket mutassa"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -7373,10 +7501,6 @@ msgstr "Irányítószám"
 msgid "City"
 msgstr "Város"
 
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-msgid "Select a country"
-msgstr "Ország kiválaszatása"
-
 #: indico/modules/events/contributions/templates/forms/contribution.html
 #: indico/modules/events/contributions/templates/forms/subcontribution.html
 #: indico/modules/events/templates/forms/event_creation_form.html
@@ -7395,6 +7519,14 @@ msgstr "Szervezet szerkesztése"
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Add affiliation"
 msgstr "Szervezet hozzáadása"
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Short name"
+msgstr "Rövid név"
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Enter a short identifier for the affiliation"
+msgstr "Adjon meg egy rövid azonosítót a szervezethez"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Alternative names"
@@ -7441,8 +7573,29 @@ msgid "Please select an item in the list."
 msgstr "Kérjük, válasszon ki egy elemet a listából."
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
-msgid "Copy Link"
-msgstr "Link másolása"
+msgid "Link copied to clipboard"
+msgstr "A link a vágólapra másolva"
+
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/registration/templates/management/regform.html
+#: indico/modules/events/surveys/templates/management/survey.html
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#: indico/web/templates/overview/base.html
+msgid "Copy link to clipboard"
+msgstr "Link másolása a vágólapra"
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Download QR code"
+msgstr "QR-kód letöltése"
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#, python-brace-format
+msgid "{size} ({pixels}x{pixels} px)"
+msgstr "{size}({pixels}x{pixels} px)"
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Show QR code"
+msgstr "QR-kód megjelenítése"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Google Calendar"
@@ -7513,6 +7666,30 @@ msgstr "Biztosan el akarja menteni ezt az oldalt mentés nélkül?"
 msgid "Group"
 msgstr "Csoport"
 
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Use custom affiliation:"
+msgstr "Használjon egyéni intézményt:"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation or add your own"
+msgstr "Intézmény kiválasztási vagy saját megadása"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation"
+msgstr "Válasszon ki egy szervezetet"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation or enter one manually"
+msgstr "Intézmény keresése vagy kézi megadása"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation"
+msgstr "Szervezet keresése"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "You entered this option manually"
+msgstr "Ezt az opciót kézzel adta meg"
+
 #: indico/web/client/js/react/components/Captcha.jsx
 msgid "Pause"
 msgstr "Szünet"
@@ -7563,6 +7740,10 @@ msgstr "A kombinált mező törlése"
 #, python-brace-format
 msgid "Click again to confirm ({delay})"
 msgstr "Kattintson újra a megerősítéshez ({delay})"
+
+#: indico/web/client/js/react/components/CountryDropdown.jsx
+msgid "Select a country..."
+msgstr "Ország kiválasztása"
 
 #: indico/web/client/js/react/components/DatePicker.jsx
 #: indico/web/client/js/react/components/DateRangePicker.jsx
@@ -7759,36 +7940,6 @@ msgstr "Prof"
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Mx"
 msgstr "Mx"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Use custom affiliation:"
-msgstr "Használjon egyéni intézményt:"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation or add your own"
-msgstr "Intézmény kiválasztási vagy saját megadása"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation"
-msgstr "Válasszon ki egy szervezetet"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation or enter one manually"
-msgstr "Intézmény keresése vagy kézi megadása"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation"
-msgstr "Szervezet keresése"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "You entered this option manually"
-msgstr "Ezt az opciót kézzel adta meg"
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Edit Person"
@@ -8045,6 +8196,71 @@ msgstr "Húzza ide a fájlt"
 msgid "Choose new file from your computer"
 msgstr "Új fájl kiválasztása a számítógépről"
 
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Replace the existing file"
+msgstr "A meglévő fájl cseréje"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Delete the existing file"
+msgstr "A meglévő fájl törlése"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Revert to the existing file"
+msgstr "Visszaállítás a meglévő fájlra"
+
+#: indico/web/client/js/react/components/files/FileManager/Uploads.jsx
+msgid "An error occurred while uploading this file"
+msgstr "Hiba történt a fájl feltöltése közben"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "This file type is required"
+msgstr "Ez a fájltípus szükséges"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "This file does not conform to the filename template {template}"
+msgstr "Ez a fájl nem felel meg a(z) {template} fájlnévsablonnak"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "Use an existing file"
+msgstr "Meglévő fájl használata"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Filename pattern: {pattern}"
+msgstr "Fájlnév minta: {pattern}"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Total attachment size ({current} MB) exceeds the {limit} MB limit"
+msgstr ""
+"A mellékletek összmérete ({current}MB) meghaladja a(z) {limit} MB-os "
+"korlátot"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx
+msgid "Upload in progress"
+msgstr "Feltöltés folyamatban"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "No changes yet"
+msgstr "Még nincs változás"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Invalid file name: {files}"
+msgid_plural "Invalid file names: {files}"
+msgstr[0] "Érvénytelen fájl neve: {files}"
+msgstr[1] "Érvénytelen fájl nevek: {files}"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Required file type missing: {types}"
+msgid_plural "Required file types missing: {types}"
+msgstr[0] "A szükséges fájltípus hiányzik: {types}"
+msgstr[1] "A szükséges fájltípusok hiányznak: {types}"
+
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing the file failed."
 msgstr "A fájl feldolgozása sikertelen volt."
@@ -8192,7 +8408,7 @@ msgstr "Húzzon ide egy képet"
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Edit picture"
-msgstr ""
+msgstr "Kép szerkesztése"
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Rotate"
@@ -8909,6 +9125,11 @@ msgstr "A keresett oldal nem található."
 msgid "The request was invalid or contained invalid arguments."
 msgstr "A kérelem érvénytelen vagy érvénytelen argumentumokat tartalmazott."
 
+#: indico/core/notifications.py
+#, python-brace-format
+msgid "Total attachment size too large (max. {} MB)"
+msgstr "A mellékletek összmérete túl nagy (max. {} MB)"
+
 #: indico/core/permissions.py
 msgid "Unrestricted management access for the whole event"
 msgstr "Korlátlan menedzsment hozzáférés az egész eseményhez"
@@ -9121,79 +9342,6 @@ msgstr "Ennek a bővítménynek nincs beállítása."
 msgid "This plugin has no configurable options"
 msgstr "Ennek a bővítménynek nincsenek beállításai"
 
-#: indico/legacy/pdfinterface/base.py
-#: indico/modules/events/timetable/templates/pdf/_toc.html
-msgid "Table of contents"
-msgstr "Tartalomjegyzék"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
-#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
-#: indico/legacy/pdfinterface/latex_templates/report.tex
-#, python-brace-format
-msgid "Page {}"
-msgstr "Oldal {}"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrant"
-msgstr "Regisztráló"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/logs/models/entries.py
-msgid "Registration details"
-msgstr "Regisztráció részletei"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration date"
-msgstr "Regisztráció dátuma"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration state"
-msgstr "Regisztráció állapota"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/payment/templates/transaction_details.html
-#: indico/modules/events/registration/lists.py
-msgid "Payment date"
-msgstr "Fizetés dátuma"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-#: indico/modules/events/registration/templates/management/_registration_details.html
-msgid "Checked in"
-msgstr "Bejelentkezett"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-msgid "Check-in date"
-msgstr "Bejelentkezés dátuma"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Arrival date"
-msgstr "Érkezési idő"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Departure date"
-msgstr "Indulási idő"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants Book"
-msgstr "A regisztrálók könyve"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/layout/models/menu.py
-msgid "Page"
-msgstr "Oldal"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants List"
-msgstr "A regisztrálók listája"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "List of registrants"
-msgstr "A regisztrálók listája"
-
 #: indico/legacy/pdfinterface/latex.py
 #: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 msgid "Report of Abstracts"
@@ -9207,6 +9355,13 @@ msgstr "Másik sávba javasolt: {}"
 #: indico/legacy/pdfinterface/latex.py
 msgid "Report of Contributions"
 msgstr "Felszólalások jegyzőkönyve"
+
+#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
+#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
+#: indico/legacy/pdfinterface/latex_templates/report.tex
+#, python-brace-format
+msgid "Page {}"
+msgstr "Oldal {}"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
 msgid "Abstract ID"
@@ -9278,7 +9433,7 @@ msgstr "Felszólalás kódja"
 #: indico/modules/events/reminders/forms.py
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 msgid "Type"
 msgstr "Típus"
 
@@ -12250,6 +12405,10 @@ msgid ""
 " is no longer considered secure and thus discouraged. Please %(link)sconsult"
 " our documentation%(endlink)s on how to change this."
 msgstr ""
+"Ön a LaTeX szerveroldali funkcióit konténeresítés nélkül használja. Ez már "
+"nem tekinthető biztonságosnak, ezért nem javasoljuk. Kérjük, olvassa el a "
+"%(link)sdokumentációnkat%(endlink)s, hogy megtudja, hogyan állíthatja át "
+"ezt."
 
 #: indico/modules/core/templates/admin/settings.html
 msgid ""
@@ -12509,10 +12668,6 @@ msgstr "Ár (pénznem nélkül)"
 #: indico/modules/designer/placeholders.py
 msgid "Price (with currency)"
 msgstr "Ár (pénznemmel)"
-
-#: indico/modules/designer/placeholders.py
-msgid "Number of accompanying persons"
-msgstr "Kísérő személyek száma"
 
 #: indico/modules/designer/placeholders.py
 msgid "Accompanying persons"
@@ -13077,6 +13232,11 @@ msgstr "Érték"
 
 #: indico/modules/events/fields.py
 #, python-brace-format
+msgid "Validation of {email} failed: {error}"
+msgstr "A(z) {email} hitelesítése sikertelen volt: {error}"
+
+#: indico/modules/events/fields.py
+#, python-brace-format
 msgid "There is already a person with the email {email}"
 msgstr "Már van egy személy a {email} e-mail címmel"
 
@@ -13255,6 +13415,7 @@ msgstr "Az esemény kezdési ideje"
 msgid "Link to the event"
 msgstr "Link az eseményhez"
 
+#: indico/modules/events/persons/placeholders.py
 #: indico/modules/events/placeholders.py
 #: indico/modules/events/registration/placeholders/registrations.py
 #: indico/modules/events/surveys/placeholders.py
@@ -13983,11 +14144,6 @@ msgid "No type selected"
 msgstr "Nincs típus kiválasztva"
 
 #: indico/modules/events/abstracts/forms.py
-#: indico/modules/logs/templates/entry_email.html
-msgid "Attachments"
-msgstr "Csatolmányok"
-
-#: indico/modules/events/abstracts/forms.py
 msgid "No track selected"
 msgstr "Nincs kijelölt sáv"
 
@@ -14110,6 +14266,8 @@ msgid "Submission date"
 msgstr "Beküldés időpontja"
 
 #: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Modification date"
 msgstr "Módosítás időpontja"
 
@@ -14235,8 +14393,8 @@ msgid "The title of the submitter (Dr, Prof., etc...)"
 msgstr "A beküldő titulusa (Dr, Prof., stb...)"
 
 #: indico/modules/events/abstracts/placeholders.py
-msgid "Contribution URL"
-msgstr "Felszólalás URL-je"
+msgid "The URL of the contribution"
+msgstr "A felszólalás URL-címe"
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The ID of the target abstract (merge or duplicate)"
@@ -15546,10 +15704,6 @@ msgid "This operation is irreversible."
 msgstr "Ez a művelet visszafordíthatatlan."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "Withdraw abstract"
-msgstr "Absztrakt visszavonása"
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Withdraw Abstract"
 msgstr "Absztrakt visszavonása"
 
@@ -15561,6 +15715,10 @@ msgid "Withdraw"
 msgstr "Visszavonás"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Withdraw abstract"
+msgstr "Absztrakt visszavonása"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
@@ -15570,16 +15728,16 @@ msgstr ""
 "szeretné vonni azt."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "This abstract has been withdrawn but can be restored."
-msgstr "Az absztrakt visszavonásra került, de helyreállítható."
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Restore Abstract"
 msgstr "Absztrakt visszaállítása"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Do you really want to restore this abstract?"
 msgstr "Valóban vissza szeretné állítani ezt az absztraktot?"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "This abstract has been withdrawn but can be restored."
+msgstr "Az absztrakt visszavonásra került, de helyreállítható."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Edit abstract"
@@ -15605,6 +15763,10 @@ msgstr "Az absztrakt nem szerkeszthető, mert a módosítási határidő lejárt
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "You are not authorized to edit this abstract"
 msgstr "Nincs joga az előadási javaslat szerkesztéséhez"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Export PDF"
+msgstr "PDF exportálása"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "PDF with reviews"
@@ -16260,6 +16422,10 @@ msgstr "Kezelési jogokat biztosít a hozzájárulásokhoz."
 msgid "Grants management rights for materials and minutes."
 msgstr "Megadja az anyagok és jegyzőkönyvek kezelési jogait."
 
+#: indico/modules/events/contributions/__init__.py
+msgid "My Timetable"
+msgstr "Az Ütemtervem"
+
 #: indico/modules/events/contributions/clone.py
 msgid "The target event already has contribution types"
 msgstr "A célesemény már rendelkezik felszólalási típusokkal"
@@ -16429,6 +16595,10 @@ msgstr "Formátum"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "No session"
 msgstr "Nincs szekció"
+
+#: indico/modules/events/contributions/lists.py
+msgid "Interested"
+msgstr "Érdeklődők"
 
 #: indico/modules/events/contributions/lists.py
 msgid "Registered"
@@ -16611,12 +16781,16 @@ msgid "There are no contributions yet."
 msgstr "Még nincsenek felszólalások."
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
-msgid "Go to contribution page"
-msgstr ""
+#, python-format
+msgid "One person has added this contribution to their timetable."
+msgid_plural ""
+"%(count)s people have added this contribution to their timetable."
+msgstr[0] "Egy személy vette fel ezt a felszólalást az ütemtervébe."
+msgstr[1] "%(count)s személy  vette fel ezt a felszólalást az ütemtervébe."
 
-#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
-msgid "Edit this contribution"
-msgstr "Felszólalás szerkesztése"
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
+msgid "Go to contribution page"
+msgstr "Ugrás a hozzájárulási oldalra"
 
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -16653,13 +16827,6 @@ msgstr[1] "Szerző a következő felszólalásokban"
 #, python-format
 msgid "Board: %(board_number)s"
 msgstr "Tanács: %(board_number)s"
-
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/management/_contribution_list.html
-#: indico/modules/events/templates/display/common/_manage_button.html
-#: indico/modules/events/timetable/templates/balloons/contribution.html
-msgid "Edit contribution"
-msgstr "Felszólalás szerkesztése"
 
 #: indico/modules/events/contributions/templates/display/contribution_display.html
 msgid ""
@@ -16699,7 +16866,7 @@ msgstr "Alfelszólalás szerkesztése"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 msgid "Search contributions"
-msgstr ""
+msgstr "Felszólalások keresése"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/management/contributions.html
@@ -16717,7 +16884,6 @@ msgstr "URL-cím generálása a kiválasztott szűrőkhöz."
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
 #: indico/modules/events/registration/templates/display/regform_list.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/surveys/templates/display/survey_list.html
@@ -17808,6 +17974,10 @@ msgstr "Felhasználói link"
 msgid "Plugin Link"
 msgstr "Bővítmény link"
 
+#: indico/modules/events/layout/models/menu.py
+msgid "Page"
+msgstr "Oldal"
+
 #: indico/modules/events/layout/templates/_menu.html
 msgid "Toggle default event homepage"
 msgstr "Alapértelmezett esemény honlapjának váltása"
@@ -18729,13 +18899,6 @@ msgstr "Az alapvető eseményadatok szerkesztése"
 #: indico/modules/events/management/templates/_settings.html
 msgid "Short URL"
 msgstr "Rövid URL"
-
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/registration/templates/management/regform.html
-#: indico/modules/events/surveys/templates/management/survey.html
-#: indico/web/templates/overview/base.html
-msgid "Copy link to clipboard"
-msgstr "Link másolása a vágólapra"
 
 #: indico/modules/events/management/templates/_settings.html
 msgid "Edit event dates"
@@ -20555,6 +20718,12 @@ msgid "Amount"
 msgstr "Mennyiség"
 
 #: indico/modules/events/payment/templates/transaction_details.html
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Payment date"
+msgstr "Fizetés dátuma"
+
+#: indico/modules/events/payment/templates/transaction_details.html
 msgid "Paid with"
 msgstr "Fizetett"
 
@@ -20766,6 +20935,14 @@ msgid "The program code of the contribution"
 msgstr "A felszólalás programkódja"
 
 #: indico/modules/events/persons/placeholders.py
+msgid "The board number of the contribution"
+msgstr "A felszólalás sorszáma"
+
+#: indico/modules/events/persons/placeholders.py
+msgid "Link to the contribution"
+msgstr "Link a felszólaláshoz"
+
+#: indico/modules/events/persons/placeholders.py
 msgid "The duration of the contribution (e.g. \"20 minutes\")"
 msgstr "A felszólalás időtartama (pl. „20 perc”)"
 
@@ -20773,6 +20950,19 @@ msgstr "A felszólalás időtartama (pl. „20 perc”)"
 msgid "The scheduled date/time of the contribution, or \"n/a\" if unscheduled"
 msgstr ""
 "A felszólalás tervezett dátuma/időpontja, vagy „n/a”, ha nem tervezett."
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The scheduled date/time including the weekday, or \"n/a\" if unscheduled"
+msgstr ""
+"A tervezett dátum/időpont, beleértve a hétköznapot is, vagy „n/a”, ha nem "
+"tervezett"
+
+#: indico/modules/events/persons/placeholders.py
+msgid ""
+"Link to the contribution created from the abstract (empty if not accepted)"
+msgstr ""
+"Az absztraktból létrehozott cikkre mutató link (üres, ha a cikk nem került "
+"elfogadásra)"
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
 msgid "Not scheduled yet"
@@ -20983,6 +21173,15 @@ msgid "No persons"
 msgstr "Senki"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/display/event_header.html
+#: indico/modules/events/registration/templates/management/participants.html
+#: indico/modules/events/reminders/forms.py
+#: indico/modules/events/surveys/forms.py
+#: indico/modules/logs/models/entries.py
+msgid "Participants"
+msgstr "Résztvevők"
+
+#: indico/modules/events/registration/__init__.py
 #: indico/modules/events/registration/templates/display/_event_regform_base.html
 #: indico/modules/events/registration/templates/display/_meeting_registration_base.html
 #: indico/modules/events/registration/templates/display/conference_home.html
@@ -20998,6 +21197,7 @@ msgstr[0] "Regisztráció"
 msgstr[1] "Regisztrációk"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/pdf/participants_table.html
 msgid "Participant List"
 msgstr "Résztvevők listája"
 
@@ -21018,7 +21218,7 @@ msgstr ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (everything)"
-msgstr ""
+msgstr "Regisztráció (minden)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants management access to the registration form."
@@ -21026,19 +21226,33 @@ msgstr "Hozzáférést biztosít a menedzsment számára a regisztrációs űrla
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (moderation only)"
-msgstr ""
+msgstr "Regisztráció (csak moderálás)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view, approve, reject and withdraw registrations."
 msgstr ""
+"Lehetővé teszi a regisztrációk megtekintését, jóváhagyását, elutasítását és "
+"visszavonását."
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (check-in only)"
-msgstr ""
+msgstr "Regisztráció (csak bejelentkezés)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view and check-in registrations."
 msgstr ""
+"Hozzáférést biztosít a regisztrációk megtekintéséhez és "
+"bejelentkeztetéséhez."
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (manage participants only)"
+msgstr "Regisztráció (csak a résztvevők kezelése)"
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, create, edit and delete registrations."
+msgstr ""
+"Hozzáférést biztosít a regisztrációk megtekintéséhez, létrehozásához, "
+"szerkesztéséhez és törléséhez."
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -21105,6 +21319,20 @@ msgstr "Moderált"
 msgid "If enabled, registrations require manager approval"
 msgstr ""
 "Ha engedélyezve van, a regisztrációhoz manager jóváhagyást kell megadni"
+
+#: indico/modules/events/registration/forms.py
+msgid "Reset approval on modification"
+msgstr "Jóváhagyás visszaállítása módosítás esetén"
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"If enabled, modifying a registration resets its approval status back to "
+"pending. Only applies to modifications made by the registrant, not by a "
+"manager."
+msgstr ""
+"Ha ez az opció engedélyezve van, a regisztráció módosítása esetén a "
+"„jóváhagyott” állapot visszaáll „függőben” állapotra. Ez csak a regisztráló "
+"által végzett módosításokra vonatkozik, a kezelők által végzettekre nem."
 
 #: indico/modules/events/registration/forms.py
 msgid ""
@@ -21458,6 +21686,22 @@ msgid "Default category template"
 msgstr "Alapértelmezett kategória sablon"
 
 #: indico/modules/events/registration/forms.py
+msgid ""
+"Create tickets for each of the users accompanying persons. This option is "
+"unavailable because anonymous accompanying person registration is enabled."
+msgstr ""
+"Hozzon létre jegyeket a kísérő személyek mindegyikének. Ez az opció nem "
+"érhető el, mivel a névtelen kísérő regisztráció engedélyezve van."
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Tickets for accompanying persons cannot be enabled because the registration "
+"form contains anonymous accompanying person registrations."
+msgstr ""
+"A kísérő személyeknek szóló jegyek nem aktiválhatók, mivel a regisztrációs "
+"űrlapon névtelen kísérői regisztrációk szerepelnek."
+
+#: indico/modules/events/registration/forms.py
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Registration managers"
 msgstr "Regisztrációkezelők"
@@ -21679,8 +21923,26 @@ msgstr ""
 " regisztrációs űrlap közül választhat."
 
 #: indico/modules/events/registration/lists.py
-msgid "Registration Date"
-msgstr "Regisztráció ideje"
+#: indico/modules/events/registration/util.py
+msgid "Registration date"
+msgstr "Regisztráció dátuma"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/requests/templates/event_request_details.html
+msgid "Created by"
+msgstr "Létrehozó"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#: indico/modules/events/registration/util.py
+msgid "Checked in"
+msgstr "Bejelentkezett"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Check-in date"
+msgstr "Bejelentkezés dátuma"
 
 #: indico/modules/events/registration/lists.py
 msgid "Consent to publish"
@@ -21753,6 +22015,10 @@ msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr ""
 "{} sor: az e-mail cím ugyanahhoz a felhasználóhoz tartozik, aki a {} sorban "
 "található"
+
+#: indico/modules/events/registration/util.py
+msgid "Registration state"
+msgstr "Regisztráció állapota"
 
 #: indico/modules/events/registration/util.py
 #, python-brace-format
@@ -21859,6 +22125,24 @@ msgstr ""
 "mezőt üresen kell hagyni."
 
 #: indico/modules/events/registration/controllers/management/fields.py
+msgid "Changing internal name for personal data field is not allowed."
+msgstr "A személyes adatmezők belső nevének módosítása nem megengedett."
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{}\" on this form has the same internal name."
+msgstr "Az űrlap „{}” mezőjének ugyanaz a belső neve."
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{field}\" with the same internal name on form \"{form}\" uses a "
+"different input type which is not allowed."
+msgstr ""
+"A „{form}” űrlapon található, azonos belső nevű „{field}” mező egy olyan "
+"beviteli típust használ, amely nem megengedett."
+
+#: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid ""
 "This field depends on \"{field}\", which has a shorter retention period "
@@ -21884,6 +22168,15 @@ msgid ""
 msgstr ""
 "Ez a mező a hosszabb megőrzési idővel ({period}) rendelkező „{field}” "
 "feltétele."
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{}\" with the same internal name on form \"{}\" uses a different"
+" input type which is not allowed."
+msgstr ""
+"A „{}” űrlapon található, azonos belső nevű „{}” mező olyan beviteli típust "
+"használ, amely nem megengedett."
 
 #: indico/modules/events/registration/controllers/management/fields.py
 msgid "Fields used as conditional cannot be disabled"
@@ -22011,14 +22304,6 @@ msgstr "Regisztráció letiltva a lejárt megőrzési idő miatt"
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "The registration was created."
 msgstr "A regisztráció létrehozva."
-
-#: indico/modules/events/registration/controllers/management/reglists.py
-msgid ""
-"Text too large to generate a PDF with table style. Please try again "
-"generating with book style."
-msgstr ""
-"Túl nagy a szöveg ahhoz, hogy a táblázatstílusú PDF-fájlt létrehozhassa. "
-"Próbálkozzon újra a könyvstílus használatával."
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
@@ -22157,6 +22442,33 @@ msgid "Tag {} has been modified."
 msgstr "A {} címke módosult."
 
 #: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Cannot be switched back to named mode when anonymous accompanying persons "
+"are registered."
+msgstr ""
+"Nem lehet visszaváltani megnevezett módra, ha már névtelen kísérő "
+"személyeket regisztráltak."
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Anonymous accompanying persons cannot be enabled while tickets for "
+"accompanying persons are enabled."
+msgstr ""
+"Nem lehet engedélyezni a névtelen kísérőket, amíg a kísérőkre szóló jegyek "
+"engedélyezve vannak."
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Cannot be enabled when accompanying persons are registered."
+msgstr "Kísérő személyek regisztrációja esetén ez a funkció nem aktiválható."
+
+#: indico/modules/events/registration/fields/accompanying.py
+#, python-brace-format
+msgid "{count} person"
+msgid_plural "{count} persons"
+msgstr[0] "{count} személy"
+msgstr[1] "{count} személy"
+
+#: indico/modules/events/registration/fields/accompanying.py
 #: indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
 msgstr "Erre a lehetőségre már nem maradt hely."
@@ -22198,6 +22510,13 @@ msgstr "A távozás dátuma nem esik a megadott tartományba."
 #, python-brace-format
 msgid "Not enough rooms in '{0}'"
 msgstr "Nincs elég terem a '{0}'-ban"
+
+#: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
+msgid "{n} night"
+msgid_plural "{n} nights"
+msgstr[0] "{n} éjszaka"
+msgstr[1] "{n} éjszaka"
 
 #: indico/modules/events/registration/fields/sessions.py
 #, python-brace-format
@@ -22659,41 +22978,6 @@ msgstr[1] "%(num)s további résztvevő"
 msgid "See the full list"
 msgstr "A teljes lista megtekintése"
 
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "Participant List Preview"
-msgstr "Résztvevők listájának előnézete"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-#, python-format
-msgid "1 participant"
-msgid_plural "%(num)s participants"
-msgstr[0] "1 résztvevő"
-msgstr[1] "%(num)s résztvevő"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like an unregistered guest would see"
-" it."
-msgstr ""
-"Ez az előnézet úgy mutatja a résztvevők listáját, ahogy egy nem regisztrált "
-"vendég látná."
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like a registered participant would "
-"see it."
-msgstr ""
-"Ez az előnézet úgy mutatja a résztvevők listáját, ahogyan azt egy "
-"regisztrált résztvevő látja."
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"The lists of participants grouped by the registration form they used to "
-"register for the event."
-msgstr ""
-"A résztvevők listája a regisztrációs űrlap alapján csoportosítva, amelyet az"
-" eseményre regisztráltak."
-
 #: indico/modules/events/registration/templates/display/regform_display.html
 #, python-format
 msgid "Add registration to \"%(title)s\""
@@ -22782,6 +23066,14 @@ msgstr "A regisztrációk maximális száma elérve"
 #: indico/modules/events/registration/templates/display/regform_list.html
 msgid "No registration forms available for this event"
 msgstr "Ehhez az eseményhez nem állnak rendelkezésre regisztrációs űrlapok"
+
+#: indico/modules/events/registration/templates/display/registration_modify.html
+msgid ""
+"If you modify this registration, it needs to be approved again by the event "
+"organizer."
+msgstr ""
+"Ha módosítod ezt a regisztrációt, azt a rendezvény szervezőjének újra jóvá "
+"kell hagynia."
 
 #: indico/modules/events/registration/templates/display/registration_modify.html
 msgid "Skip to registration form"
@@ -23378,6 +23670,11 @@ msgstr "Beküldve: %(submitted)s"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
+msgid "Modified: %(modified)s"
+msgstr "Módosítva: %(modified)s"
+
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#, python-format
 msgid "This registration is %(state)s"
 msgstr "A regisztráció állapota: %(state)s"
 
@@ -23589,6 +23886,10 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Phone Number"
 msgstr "Telefonszám"
+
+#: indico/modules/events/registration/templates/management/participant_list_preview.html
+msgid "Participant List Preview"
+msgstr "Résztvevők listájának előnézete"
 
 #: indico/modules/events/registration/templates/management/participants.html
 msgid "The registration feature is disabled"
@@ -24138,6 +24439,37 @@ msgstr "A regisztráció nyitva van"
 msgid "Reschedule registrations"
 msgstr "Regisztrációk újraütemezése"
 
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants List"
+msgstr "A regisztrálók listája"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants Book"
+msgstr "A regisztrálók könyve"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Table of Contents"
+msgstr "Tartalomjegyzék"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
+msgid "Registration details"
+msgstr "Regisztráció részletei"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Personal details"
+msgstr "Személyes adatok"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#, python-format
+msgid "Page %(page)s"
+msgstr "%(page)s. oldal"
+
+#: indico/modules/events/registration/templates/pdf/participants_table.html
+msgid "List of registrants"
+msgstr "A regisztrálók listája"
+
 #: indico/modules/events/registration/wallets/apple.py
 msgid "Ticket number"
 msgstr "Jegy száma"
@@ -24560,10 +24892,6 @@ msgid "These are the details provided by the event manager."
 msgstr "Ezeket a részleteket a rendezvényszervező biztosította."
 
 #: indico/modules/events/requests/templates/event_request_details.html
-msgid "Created by"
-msgstr "Létrehozó"
-
-#: indico/modules/events/requests/templates/event_request_details.html
 msgid "Created at"
 msgstr "Létrehozva"
 
@@ -24802,6 +25130,7 @@ msgstr "Egy CSV vagy TXT fájlt kell feltöltenie, soronként egy e-mail címmel
 #: indico/modules/events/series/controllers.py
 msgid "You can only manage a series if you can manage all its events."
 msgstr ""
+"Csak akkor tud egy sorozatot kezelni, ha annak minden eseményét Ön kezeli."
 
 #: indico/modules/events/series/schemas.py
 msgid "At least one event is already in a series."
@@ -24911,10 +25240,6 @@ msgstr "A szekció poszter szekció-e vagy normál előadásokat tartalmaz"
 #: indico/modules/events/sessions/forms.py
 msgid "A session type with this name already exists"
 msgstr "Egy ilyen nevű szekciótípus már létezik"
-
-#: indico/modules/events/sessions/util.py
-msgid "List of sessions"
-msgstr "A szekciók listája"
 
 #: indico/modules/events/sessions/templates/display/session_display.html
 #: indico/modules/events/sessions/templates/display/session_list.html
@@ -25054,6 +25379,10 @@ msgstr "Új szekciótípus"
 #: indico/modules/events/sessions/templates/management/types_dialog.html
 msgid "There are no session types yet."
 msgstr "Még nincsenek szekciótípusok"
+
+#: indico/modules/events/sessions/templates/pdf/session_table.html
+msgid "List of sessions"
+msgstr "A szekciók listája"
 
 #: indico/modules/events/static/__init__.py
 #: indico/modules/events/static/templates/static_sites.html
@@ -25535,6 +25864,10 @@ msgid ""
 msgstr ""
 "Ez a szekció nem szekcióként jelenik meg, hanem a tartalma önállóan jelenik "
 "meg."
+
+#: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
+msgid "Clone section"
+msgstr "Szekció klónozása"
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "Edit section"
@@ -26289,6 +26622,7 @@ msgid "Event privacy information"
 msgstr "Esemény adatvédelmi információk"
 
 #: indico/modules/events/templates/display/conference/_util.html
+#: indico/modules/events/tracks/templates/pdf/program.html
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s-tól %(end)s-ig"
@@ -26499,6 +26833,23 @@ msgid ""
 msgstr ""
 "Kérjük, ne felejtse el elolvasni a %(link)sbírálati útmutatót%(endlink)s, "
 "mielőtt meghozza döntését."
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has ended."
+msgstr "A benyújtási határidő lejárt."
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open until the submission deadline."
+msgstr "A pályázati időszak a pályázati határidőig tart."
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open. No submission deadline is set."
+msgstr ""
+"A pályázati időszak megkezdődött. A pályázati határidő nincs meghatározva."
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has not yet opened."
+msgstr "A pályázati időszak még nem kezdődött meg."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "Opening day"
@@ -26896,6 +27247,10 @@ msgid "Convener:"
 msgid_plural "Conveners:"
 msgstr[0] "Szekcióelnök:"
 msgstr[1] "Szekcióelnökök:"
+
+#: indico/modules/events/timetable/templates/pdf/_toc.html
+msgid "Table of contents"
+msgstr "Tartalomjegyzék"
 
 #: indico/modules/events/tracks/__init__.py
 #: indico/modules/events/tracks/forms.py
@@ -27402,11 +27757,11 @@ msgstr "Admin"
 
 #: indico/modules/logs/models/entries.py
 msgid "Registration form details"
-msgstr ""
+msgstr "A regisztrációs űrlap adatai"
 
 #: indico/modules/logs/models/entries.py
 msgid "Abstract details"
-msgstr ""
+msgstr "Az absztrakt részletei"
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "From"
@@ -29333,16 +29688,32 @@ msgid "Your events at hand"
 msgstr "Saját események"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You do not have management rights"
+msgstr "Ön nem rendelkezik kezelési jogokkal"
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You are a reviewer"
 msgstr "Ön értékelő"
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You are not a reviewer"
+msgstr "Ön nem értékelő"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are an attendee"
 msgstr "Ön résztvevő"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You are not an attendee"
+msgstr "Ön nem résztvevő"
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You have favorited this event"
 msgstr "Ön kedvelte ezt az eseményt"
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You have not favorited this event"
+msgstr "Ezt az eseményt még nem kedvelted"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You have no events."
@@ -30686,6 +31057,10 @@ msgid "URL is required"
 msgstr "URL szükséges"
 
 #: indico/web/forms/fields/simple.py
+msgid "Only URLs starting with https:// (or http://) are allowed"
+msgstr "Csak a https:// (vagy http://) előtaggal kezdődő URL-ek megengedettek"
+
+#: indico/web/forms/fields/simple.py
 msgid "Titles are required when more than one link is specified"
 msgstr "A címekre akkor van szükség, ha egynél több link van megadva."
 
@@ -30927,6 +31302,10 @@ msgstr "Művelet végzés"
 #, python-format
 msgid "Powered by %(indico)s"
 msgstr "Működteti az %(indico)s"
+
+#: indico/web/templates/footer.html
+msgid "Site links"
+msgstr "Weboldal linkek"
 
 #: indico/web/templates/header.html
 msgid "Indico main page"

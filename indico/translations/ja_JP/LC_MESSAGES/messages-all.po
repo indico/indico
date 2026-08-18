@@ -5,21 +5,21 @@
 # 
 # Translators:
 # jlhollowell, 2024
+# Yoshikazu Asada <yoshikazu.ater@gmail.com>, 2024
 # Adam Jenkins, 2024
 # SAITO Jun, 2025
 # Ajob Kustra, 2025
 # Ken <ken.oyama.nagasaki@gmail.com>, 2025
 # Martin Meadows, 2025
-# Yoshikazu Asada <yoshikazu.ater@gmail.com>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.12-dev\n"
+"Project-Id-Version: Indico 3.3.13-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-18 16:20+0100\n"
+"POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
-"Last-Translator: Yoshikazu Asada <yoshikazu.ater@gmail.com>, 2026\n"
+"Last-Translator: Martin Meadows, 2025\n"
 "Language-Team: Japanese (Japan) (https://app.transifex.com/indico/teams/6478/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -96,9 +96,10 @@ msgstr "姓"
 #: indico/modules/events/persons/client/js/PersonList.jsx
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
+#: indico/modules/events/registration/client/js/form/fields/registry.js
 #: indico/modules/events/registration/templates/management/import_registrations.html
 #: indico/modules/users/client/js/PersonalDataForm.jsx
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_merge.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -804,6 +805,233 @@ msgstr "詳細"
 msgid "A detailed timetable containing all individual contributions."
 msgstr "すべての個人の提出物を含む詳細なタイムテーブル。"
 
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Enter an extension"
+msgstr "拡張子を入力"
+
+#: indico/modules/events/client/js/reviewing/file_types/ExtensionList.jsx
+msgid "Add extension"
+msgstr "拡張子を追加"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type has files attached"
+msgstr "このタイプはファイルが添付されています"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "This type is used in a review condition"
+msgstr "このタイプは審査条件の中で使用されます"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Cannot delete the only publishable type"
+msgstr "公開可能な形式が一つしかないため、削除できません"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "There are no file types defined for this event"
+msgstr "このイベントには、ファイルタイプの定義がありません"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"There are publishable file types that will not be displayed due to the 'Hide"
+" Accepted' setting being enabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid ""
+"No file types will be shown as there are no publishable file types and the "
+"'Hide Accepted' setting is disabled."
+msgstr ""
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "File required"
+msgstr "ファイルが必用です"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Multiple files allowed"
+msgstr "複数ファイル可"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "File publishable"
+msgstr "ファイル公開可能"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "(no extension restrictions)"
+msgstr "(拡張子制限なし)"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Add a new file type"
+msgstr "新しいタイプを追加"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Edit file type"
+msgstr "ファイルタイプを編集する"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+msgid "Create a new file type"
+msgstr "新しいファイルタイプを作成する"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeManager.tsx
+#, python-brace-format
+msgid "Are you sure you want to delete the file type {fileType}?"
+msgstr "本当にファイルタイプ{fileType}を削除してよいですか？"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Take into account that this file type has files attached to it."
+msgstr "このファイルタイプには、ファイルが添付されていることを考慮してください。"
+
+#: indico/core/celery/templates/celery_tasks.html
+#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
+#: indico/modules/designer/templates/template.html
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#: indico/modules/events/contributions/forms.py
+#: indico/modules/events/contributions/templates/management/types_dialog.html
+#: indico/modules/events/editing/templates/management/editor_list.html
+#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
+#: indico/modules/events/papers/templates/management/_templates.html
+#: indico/modules/events/payment/forms.py
+#: indico/modules/events/payment/plugins.py
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/events/roles/forms.py
+#: indico/modules/events/sessions/forms.py
+#: indico/modules/events/sessions/templates/management/types_dialog.html
+#: indico/modules/events/templates/admin/_reference_type_list.html
+#: indico/modules/groups/templates/_group_members.html
+#: indico/modules/groups/templates/groups.html
+#: indico/modules/networks/forms.py
+#: indico/modules/networks/templates/networks.html
+#: indico/modules/oauth/forms.py
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
+#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
+msgid "Name"
+msgstr "名前"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Filename template"
+msgstr "ファイル名テンプレート"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+#, python-brace-format
+msgid ""
+"Glob-style filename template that all files of this type have to conform to "
+"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
+"placeholder for the contribution program code."
+msgstr ""
+"この形式のすべてのファイルが従わなければならないワイルドカードを含むファイル名テンプレート（例：{example}）です。ドットは許可されません。投稿プログラムコードのプレースホルダーとして{placeholder}"
+" を使用することは可能です。"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Extensions"
+msgstr "拡張機能"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid ""
+"Allowed file extensions. If left empty, there are no extension restrictions"
+msgstr "可能なファイル拡張子。空欄の場合、拡張子の制限はありません"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type is mandatory"
+msgstr "ファイルタイプが必須かどうか"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Multiple files"
+msgstr "複数のファイル"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the file type allows uploading multiple files"
+msgstr "複数ファイルのアップロードが可能なファイルタイプかどうか"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Publishable"
+msgstr "公開可"
+
+#: indico/modules/events/client/js/reviewing/file_types/FileTypeModal.jsx
+msgid "Whether the files of this type can be published"
+msgstr "このタイプのファイルの公開の可否"
+
+#: indico/modules/events/contributions/client/js/ContributionList.tsx
+msgid "Not Scheduled"
+msgstr ""
+
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/controllers.py
+#: indico/modules/events/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/display/indico/_common.html
+#: indico/modules/events/timetable/templates/pdf/_program.html
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] "発表者"
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+#: indico/modules/events/persons/controllers.py
+msgid "Author"
+msgid_plural "Authors"
+msgstr[0] ""
+
+#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
+#: indico/modules/events/abstracts/fields.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
+msgid "Co-author"
+msgid_plural "Co-authors"
+msgstr[0] "共著者"
+
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/abstracts/settings.py
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/fields.py
+#: indico/modules/events/fields.py
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+msgid "Submitter"
+msgstr "投稿者"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
+msgid "Edit this contribution"
+msgstr "この投稿を編集"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+#: indico/modules/events/contributions/templates/display/contribution_display.html
+#: indico/modules/events/contributions/templates/management/_contribution_list.html
+#: indico/modules/events/templates/display/common/_manage_button.html
+#: indico/modules/events/timetable/templates/balloons/contribution.html
+msgid "Edit contribution"
+msgstr "投稿を編集"
+
+#: indico/modules/events/contributions/client/js/MyContributions.tsx
+msgid "There are no contributions linked to your Indico profile."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "There are no contributions in your timetable."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/MyTimetable.tsx
+msgid "You have not added any contributions to your timetable."
+msgstr ""
+
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
 msgid "Publish contributions"
@@ -909,6 +1137,14 @@ msgstr "公開済み"
 #: indico/modules/events/contributions/client/js/PublicationSwitch.jsx
 msgid "Draft"
 msgstr "下書き"
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "This contribution has been added to your timetable. Click to remove."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/ScheduleContributionIcon.tsx
+msgid "Add this contribution to your timetable."
+msgstr ""
 
 #: indico/core/db/sqlalchemy/links.py
 #: indico/modules/attachments/controllers/management/base.py
@@ -1106,6 +1342,11 @@ msgid "This file was added since the last revision."
 msgstr "このファイルは一つ前のバージョンから追加されています。"
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
+#, python-brace-format
+msgid "{filename} (uploaded on {date})"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "No files uploaded"
 msgstr "ファイルがアップロードされていません"
 
@@ -1122,62 +1363,6 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx
 msgid "Download anyway"
 msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Replace the existing file"
-msgstr "既存のファイルを置き換える"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Delete the existing file"
-msgstr "既存のファイルを削除する"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx
-msgid "Revert to the existing file"
-msgstr "既存のファイルに戻す"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/Uploads.jsx
-msgid "An error occurred while uploading this file"
-msgstr "このファイルのアップロード中にエラーが発生しました"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "This file type is required"
-msgstr "このファイルタイプは必須です"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "This file does not conform to the filename template {template}"
-msgstr "このファイルはファイル名テンプレート {template} に準拠していません"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "Use an existing file"
-msgstr "既存のファイルを使用する"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#, python-brace-format
-msgid "Filename pattern: {pattern}"
-msgstr "ファイル名パターン: {pattern}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx
-msgid "Upload in progress"
-msgstr "アップロード中"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx
-msgid "No changes yet"
-msgstr "まだ変更はありません"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Invalid file name: {files}"
-msgid_plural "Invalid file names: {files}"
-msgstr[0] "無効なファイル名: {files}"
-
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/selectors.js
-#, python-brace-format
-msgid "Required file type missing: {types}"
-msgid_plural "Required file types missing: {types}"
-msgstr[0] "必要なファイルタイプがありません: {types}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
@@ -1352,6 +1537,18 @@ msgstr[0] "公開可能なファイルがありません。少なくとも次の
 msgid "There is no publishable file uploaded."
 msgstr "公開可能なファイルがアップロードされていない。"
 
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+#, python-brace-format
+msgid "Required files are missing. Please upload a {types} file."
+msgid_plural ""
+"Required files are missing. Please upload files of the following types: "
+"{types}"
+msgstr[0] ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
+msgid "Required file types are missing."
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/util.js
 #, python-brace-format
 msgid "{editorName} (editor) has made some changes to the paper"
@@ -1470,12 +1667,12 @@ msgstr "原稿タイプのリスト"
 msgid "Toggle editable types"
 msgstr "原稿タイプを切り替え"
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/management/tags/index.js
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Tags"
 msgstr "タグ"
 
@@ -1654,7 +1851,7 @@ msgid "{count} poster was skipped because of its current status."
 msgid_plural "{count} posters were skipped because of their current status."
 msgstr[0] "{count} つのポスターが、現在の状態のためにスキップされました。"
 
-#: indico/legacy/pdfinterface/conference.py indico/modules/categories/forms.py
+#: indico/modules/categories/forms.py
 #: indico/modules/events/abstracts/settings.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -1662,8 +1859,9 @@ msgstr[0] "{count} つのポスターが、現在の状態のためにスキッ�
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/templates/_paper_list.html
 #: indico/modules/events/registration/templates/management/_reglist.html
+#: indico/modules/events/registration/util.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "ID"
@@ -1676,7 +1874,7 @@ msgstr "ID"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx
 #: indico/modules/events/payment/forms.py indico/modules/events/roles/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/tracks/forms.py
 msgid "Code"
 msgstr "コード"
@@ -1705,7 +1903,7 @@ msgstr "コード"
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
 #: indico/modules/events/sessions/templates/management/session_blocks.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/emails/event_creation.txt
@@ -1887,7 +2085,7 @@ msgid "Contributions without editables"
 msgstr "原稿のない投稿"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/FileTypeManagement.jsx
 #: indico/modules/events/papers/templates/management/overview.html
 msgid "File types"
 msgstr "ファイルの種類"
@@ -1962,157 +2160,6 @@ msgstr "エディターの設定"
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx
 msgid "Editors"
 msgstr "編集者"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Enter an extension"
-msgstr "拡張子を入力"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/ExtensionList.jsx
-msgid "Add extension"
-msgstr "拡張子を追加"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type has files attached"
-msgstr "このタイプはファイルが添付されています"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "This type is used in a review condition"
-msgstr "このタイプは審査条件の中で使用されます"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Cannot delete the only publishable type"
-msgstr "公開可能な形式が一つしかないため、削除できません"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "There are no file types defined for this event"
-msgstr "このイベントには、ファイルタイプの定義がありません"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"There are publishable file types that will not be displayed due to the 'Hide"
-" Accepted' setting being enabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid ""
-"No file types will be shown as there are no publishable file types and the "
-"'Hide Accepted' setting is disabled."
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "File required"
-msgstr "ファイルが必用です"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Multiple files allowed"
-msgstr "複数ファイル可"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "File publishable"
-msgstr "ファイル公開可能"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "(no extension restrictions)"
-msgstr "(拡張子制限なし)"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Add a new file type"
-msgstr "新しいタイプを追加"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Edit file type"
-msgstr "ファイルタイプを編集する"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-msgid "Create a new file type"
-msgstr "新しいファイルタイプを作成する"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.tsx
-#, python-brace-format
-msgid "Are you sure you want to delete the file type {fileType}?"
-msgstr "本当にファイルタイプ{fileType}を削除してよいですか？"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Take into account that this file type has files attached to it."
-msgstr "このファイルタイプには、ファイルが添付されていることを考慮してください。"
-
-#: indico/core/celery/templates/celery_tasks.html
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/attachments/forms.py indico/modules/categories/forms.py
-#: indico/modules/designer/templates/template.html
-#: indico/modules/events/contributions/forms.py
-#: indico/modules/events/contributions/templates/management/types_dialog.html
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#: indico/modules/events/editing/templates/management/editor_list.html
-#: indico/modules/events/forms.py indico/modules/events/papers/forms.py
-#: indico/modules/events/papers/templates/management/_templates.html
-#: indico/modules/events/payment/forms.py
-#: indico/modules/events/payment/plugins.py
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/events/roles/forms.py
-#: indico/modules/events/sessions/forms.py
-#: indico/modules/events/sessions/templates/management/types_dialog.html
-#: indico/modules/events/templates/admin/_reference_type_list.html
-#: indico/modules/groups/templates/_group_members.html
-#: indico/modules/groups/templates/groups.html
-#: indico/modules/networks/forms.py
-#: indico/modules/networks/templates/networks.html
-#: indico/modules/oauth/forms.py
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
-#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
-#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-#: indico/modules/users/client/js/affiliations/AffiliationsDashboard.tsx
-#: indico/modules/vc/forms.py indico/modules/vc/templates/manage_event.html
-msgid "Name"
-msgstr "名前"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Filename template"
-msgstr "ファイル名テンプレート"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-#, python-brace-format
-msgid ""
-"Glob-style filename template that all files of this type have to conform to "
-"(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
-"placeholder for the contribution program code."
-msgstr ""
-"この形式のすべてのファイルが従わなければならないワイルドカードを含むファイル名テンプレート（例：{example}）です。ドットは許可されません。投稿プログラムコードのプレースホルダーとして{placeholder}"
-" を使用することは可能です。"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Extensions"
-msgstr "拡張機能"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid ""
-"Allowed file extensions. If left empty, there are no extension restrictions"
-msgstr "可能なファイル拡張子。空欄の場合、拡張子の制限はありません"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type is mandatory"
-msgstr "ファイルタイプが必須かどうか"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Multiple files"
-msgstr "複数のファイル"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the file type allows uploading multiple files"
-msgstr "複数ファイルのアップロードが可能なファイルタイプかどうか"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Publishable"
-msgstr "公開可"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx
-msgid "Whether the files of this type can be published"
-msgstr "このタイプのファイルの公開の可否"
 
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx
 msgid "AND"
@@ -2559,7 +2606,6 @@ msgid "The paper was {url}submitted{/url} for editing"
 msgstr "論文が編集に {url}提出されました{/url}"
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx
-#: indico/modules/events/papers/client/js/components/PaperSubmissionButton.tsx
 msgid "Paper files"
 msgstr "論文ファイル"
 
@@ -2782,53 +2828,6 @@ msgstr "閉じる"
 msgid "Edit person information"
 msgstr "個人情報を編集する"
 
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/controllers.py
-#: indico/modules/events/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/display/indico/_common.html
-#: indico/modules/events/timetable/templates/pdf/_program.html
-msgid "Speaker"
-msgid_plural "Speakers"
-msgstr[0] "発表者"
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-#: indico/modules/events/persons/controllers.py
-msgid "Author"
-msgid_plural "Authors"
-msgstr[0] ""
-
-#: indico/legacy/pdfinterface/latex_templates/inc/person_list.tex
-#: indico/modules/events/abstracts/fields.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-#: indico/modules/events/persons/client/js/PersonList.jsx
-msgid "Co-author"
-msgid_plural "Co-authors"
-msgstr[0] "共著者"
-
-#: indico/modules/events/abstracts/forms.py
-#: indico/modules/events/abstracts/lists.py
-#: indico/modules/events/abstracts/settings.py
-#: indico/modules/events/contributions/fields.py
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
-#: indico/modules/events/fields.py
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
-msgid "Submitter"
-msgstr "投稿者"
-
 #: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
 msgid "Send emails to these roles"
 msgstr "このロールにメールを送信する"
@@ -2850,7 +2849,6 @@ msgid "Recipients"
 msgstr "受信者"
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
-#: indico/web/client/js/custom_elements/ind_share_widget.js
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx
 msgid "Copied!"
 msgstr "コピーしました!"
@@ -2939,6 +2937,12 @@ msgstr "このリストの全アドレスに、各メールのコピーを送信
 msgid "Send a copy of each email to my mailbox"
 msgstr "各メールのコピーを私のメールに送信"
 
+#: indico/modules/events/abstracts/forms.py
+#: indico/modules/events/persons/client/js/EmailDialog.jsx
+#: indico/modules/logs/templates/entry_email.html
+msgid "Attachments"
+msgstr "添付ファイル"
+
 #: indico/modules/events/agreements/templates/dialogs/agreement_email_form_send.html
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 #: indico/modules/events/registration/templates/management/email.html
@@ -2965,7 +2969,7 @@ msgstr "この方は発表者ではありません"
 #: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/modules/groups/templates/_group_members.html
-#: indico/modules/users/forms.py
+#: indico/modules/users/forms.py indico/modules/users/templates/dashboard.html
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Email"
 msgstr "メール"
@@ -3024,6 +3028,16 @@ msgstr "自分の参加を、このイベントを閲覧できるすべての人
 #, python-brace-format
 msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
+msgstr[0] ""
+
+#: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
+#, python-brace-format
+msgid ""
+"{count} imported invitation contains affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
+msgid_plural ""
+"{count} imported invitations contain affiliation data that will not be pre-"
+"filled because this form only allows predefined affiliations."
 msgstr[0] ""
 
 #: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
@@ -3215,46 +3229,59 @@ msgstr "タグは付与されていません。"
 msgid "Add tags"
 msgstr "タグを追加"
 
-#: indico/modules/events/registration/__init__.py
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
-#: indico/modules/events/registration/templates/display/event_header.html
-#: indico/modules/events/registration/templates/management/participants.html
-#: indico/modules/events/reminders/forms.py
-#: indico/modules/events/surveys/forms.py
-#: indico/modules/logs/models/entries.py
-msgid "Participants"
-msgstr "参加者"
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+msgid "No participants registered."
+msgstr "参加者が登録されませんでした。"
 
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+#, python-brace-format
+msgid "{count} participant registered anonymously."
+msgid_plural "{count} participants registered anonymously."
+msgstr[0] "{count} 名の参加者が匿名で登録されました。"
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantCountHidden.tsx
+#, python-brace-format
+msgid "Total: {total}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show registered participant view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
+msgid "Show unregistered guest view"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 msgid "There are no published registrations."
 msgstr "公開された登録がありません。"
 
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 #: indico/modules/events/registration/templates/management/_reglist.html
 msgid "There are no registrations yet."
 msgstr "参加登録はまだありません。"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show registered participant view instead"
-msgstr "代わりに登録参加者ビューを表示"
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
-msgid "Show unregistered guest view instead"
-msgstr "代わりに未登録ゲストビューを表示"
-
-#: indico/modules/events/registration/client/js/components/participant-list/ParticipantSharedTranslations.tsx
 #, python-brace-format
-msgid "{count} participant registered anonymously."
-msgid_plural "{count} participants registered anonymously."
-msgstr[0] "{count} 名の参加者が匿名で登録されました。"
+msgid "{count} participant"
+msgid_plural "{count} participants"
+msgstr[0] ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Rows per page:"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
+msgid "Search participants"
+msgstr ""
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
 msgstr "チェックインの状況"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
-msgid "No participants registered."
-msgstr "参加者が登録されませんでした。"
+msgid "No participants to display."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
 #: indico/modules/events/registration/forms.py
@@ -3396,6 +3423,16 @@ msgstr "選択肢"
 msgid "You need to have at least one enabled option."
 msgstr "少なくともオプションを１つ有効にしてください。"
 
+#: indico/modules/designer/placeholders.py
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Number of accompanying persons"
+msgstr "同伴者数"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+#, python-brace-format
+msgid "{price} (Total: {totalPrice})"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
 msgstr "同伴者登録なし"
@@ -3417,6 +3454,12 @@ msgid "Edit accompanying person"
 msgstr "同伴者を編集"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Disable tickets for accompanying persons to enable anonymous accompanying "
+"person registration."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
 msgstr "登録者1名あたりの上限"
 
@@ -3431,12 +3474,51 @@ msgstr "上限なし"
 msgid "Accompanying persons count against registration limit"
 msgstr "同伴者も登録人数上限にカウントされます"
 
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid "Anonymous accompanying persons"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Collect only the number of accompanying persons instead of their names."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
+msgid ""
+"Tickets and badge printing are not available for anonymous accompanying "
+"persons."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
 #: indico/web/client/js/react/forms/validators.js
 msgid "This field is required."
 msgstr "この項目は必須です。"
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Allowed affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Predefined and custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only predefined affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid "Only custom affiliations"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
+msgid ""
+"Affiliations specified in invitations are custom text and will not be pre-"
+"filled in the registration form when only predefined affiliations are "
+"allowed."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
@@ -3619,6 +3701,7 @@ msgid "The domain used in the email address does not exist."
 msgstr "メールアドレスに使用されているドメインが存在しません。"
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx
+#: indico/util/marshmallow.py
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "This email address is invalid."
 msgstr "このメールアドレスは無効です。"
@@ -3846,6 +3929,7 @@ msgstr "はい/いいえ"
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/registration/client/js/form/fields/registry.js
+#: indico/modules/users/templates/dashboard.html
 msgid "Phone"
 msgstr "電話"
 
@@ -3984,7 +4068,7 @@ msgstr "フィールドの種類を選択してください。"
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/display/session_display.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 #: indico/modules/events/surveys/fields/base.py
 #: indico/modules/events/surveys/forms.py
 #: indico/modules/events/templates/display/indico/_details.html
@@ -4003,10 +4087,10 @@ msgstr "説明"
 msgid "You may use Markdown for formatting."
 msgstr "フォーマットには Markdown を使用できます。"
 
-#: indico/legacy/pdfinterface/conference.py
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 #: indico/modules/events/registration/lists.py
 #: indico/modules/events/registration/stats.py
+#: indico/modules/events/registration/util.py
 msgid "Price"
 msgstr "価格"
 
@@ -4053,6 +4137,29 @@ msgid ""
 "Please note that invoice information will be lost as well once a field's "
 "retention period expires."
 msgstr "フィールドの保存期間が切れると、インボイス情報も失われることに注意してください。"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Advanced settings"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Internal name"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "Only lowercase alphanumeric characters and dashes are allowed."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid ""
+"Used for identifying the same field across registration forms regardless of "
+"the title. This can also be used across events if you make sure to use the "
+"same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
+msgid "The internal name for a personal data field cannot be changed."
+msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx
 msgid "Choose type"
@@ -7048,10 +7155,6 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
-msgid "Select a country"
-msgstr "国を選択"
-
 #: indico/modules/events/contributions/templates/forms/contribution.html
 #: indico/modules/events/contributions/templates/forms/subcontribution.html
 #: indico/modules/events/templates/forms/event_creation_form.html
@@ -7069,6 +7172,14 @@ msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Add affiliation"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Short name"
+msgstr ""
+
+#: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
+msgid "Enter a short identifier for the affiliation"
 msgstr ""
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
@@ -7115,8 +7226,29 @@ msgid "Please select an item in the list."
 msgstr "リストからアイテムを選択してください。"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
-msgid "Copy Link"
-msgstr "リンクをコピー"
+msgid "Link copied to clipboard"
+msgstr ""
+
+#: indico/modules/events/management/templates/_settings.html
+#: indico/modules/events/registration/templates/management/regform.html
+#: indico/modules/events/surveys/templates/management/survey.html
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#: indico/web/templates/overview/base.html
+msgid "Copy link to clipboard"
+msgstr "リンクをクリップボードにコピー"
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Download QR code"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+#, python-brace-format
+msgid "{size} ({pixels}x{pixels} px)"
+msgstr ""
+
+#: indico/web/client/js/custom_elements/ind_share_widget.js
+msgid "Show QR code"
+msgstr ""
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Google Calendar"
@@ -7183,6 +7315,30 @@ msgstr "本当に保存せずにこのページを終了しても良いですか
 msgid "Group"
 msgstr "グループ"
 
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Use custom affiliation:"
+msgstr "独自の所属を使用"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation or add your own"
+msgstr "所属を選択するか、自分で追加する"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Select an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation or enter one manually"
+msgstr "所属を検索する、または手動で入力する"
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "Search an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/AffiliationField.jsx
+msgid "You entered this option manually"
+msgstr "このオプションは手動で入力しました"
+
 #: indico/web/client/js/react/components/Captcha.jsx
 msgid "Pause"
 msgstr "一時停止"
@@ -7233,6 +7389,10 @@ msgstr "コンボボックスを解除"
 #, python-brace-format
 msgid "Click again to confirm ({delay})"
 msgstr "もう一度クリックして確認する（{delay}）。"
+
+#: indico/web/client/js/react/components/CountryDropdown.jsx
+msgid "Select a country..."
+msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx
 #: indico/web/client/js/react/components/DateRangePicker.jsx
@@ -7422,36 +7582,6 @@ msgstr "Prof"
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Mx"
 msgstr "Mx"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Use custom affiliation:"
-msgstr "独自の所属を使用"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation or add your own"
-msgstr "所属を選択するか、自分で追加する"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Select an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation or enter one manually"
-msgstr "所属を検索する、または手動で入力する"
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "Search an affiliation"
-msgstr ""
-
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-#: indico/web/client/js/react/components/syncedInputs.jsx
-msgid "You entered this option manually"
-msgstr "このオプションは手動で入力しました"
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgid "Edit Person"
@@ -7693,6 +7823,67 @@ msgstr "ここにファイルをドラッグ＆ドロップ"
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Choose new file from your computer"
 msgstr "コンピューターから新しいファイルを選択する"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Replace the existing file"
+msgstr "既存のファイルを置き換える"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Delete the existing file"
+msgstr "既存のファイルを削除する"
+
+#: indico/web/client/js/react/components/files/FileManager/FileList.jsx
+msgid "Revert to the existing file"
+msgstr "既存のファイルに戻す"
+
+#: indico/web/client/js/react/components/files/FileManager/Uploads.jsx
+msgid "An error occurred while uploading this file"
+msgstr "このファイルのアップロード中にエラーが発生しました"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "This file type is required"
+msgstr "このファイルタイプは必須です"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "This file does not conform to the filename template {template}"
+msgstr "このファイルはファイル名テンプレート {template} に準拠していません"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "Use an existing file"
+msgstr "既存のファイルを使用する"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Filename pattern: {pattern}"
+msgstr "ファイル名パターン: {pattern}"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#, python-brace-format
+msgid "Total attachment size ({current} MB) exceeds the {limit} MB limit"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx
+msgid "Upload in progress"
+msgstr "アップロード中"
+
+#: indico/web/client/js/react/components/files/FileManager/index.jsx
+msgid "No changes yet"
+msgstr "まだ変更はありません"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Invalid file name: {files}"
+msgid_plural "Invalid file names: {files}"
+msgstr[0] "無効なファイル名: {files}"
+
+#: indico/web/client/js/react/components/files/FileManager/selectors.js
+#, python-brace-format
+msgid "Required file type missing: {types}"
+msgid_plural "Required file types missing: {types}"
+msgstr[0] "必要なファイルタイプがありません: {types}"
 
 #: indico/web/client/js/react/components/files/SingleFileDrop.tsx
 msgid "Processing the file failed."
@@ -8530,6 +8721,11 @@ msgstr "お探しのページは存在しません。"
 msgid "The request was invalid or contained invalid arguments."
 msgstr "リクエストが無効であったか、無効な引数が含まれています。"
 
+#: indico/core/notifications.py
+#, python-brace-format
+msgid "Total attachment size too large (max. {} MB)"
+msgstr ""
+
 #: indico/core/permissions.py
 msgid "Unrestricted management access for the whole event"
 msgstr "イベント全般において、管理者のアクセスは無制限"
@@ -8738,79 +8934,6 @@ msgstr "このプラグインには設定項目がありません。"
 msgid "This plugin has no configurable options"
 msgstr "このプラグインには設定可能なオプションがありません。"
 
-#: indico/legacy/pdfinterface/base.py
-#: indico/modules/events/timetable/templates/pdf/_toc.html
-msgid "Table of contents"
-msgstr "目次"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
-#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
-#: indico/legacy/pdfinterface/latex_templates/report.tex
-#, python-brace-format
-msgid "Page {}"
-msgstr "ページ {} をご覧ください。"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrant"
-msgstr "登録者"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/wallets/apple.py
-#: indico/modules/logs/models/entries.py
-msgid "Registration details"
-msgstr "登録内容"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration date"
-msgstr "登録日"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registration state"
-msgstr "登録状況"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/payment/templates/transaction_details.html
-#: indico/modules/events/registration/lists.py
-msgid "Payment date"
-msgstr "支払日"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-#: indico/modules/events/registration/templates/management/_registration_details.html
-msgid "Checked in"
-msgstr "チェックイン済み"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/registration/lists.py
-msgid "Check-in date"
-msgstr "チェックイン日"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Arrival date"
-msgstr "到着日"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Departure date"
-msgstr "出発日"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants Book"
-msgstr "登録者用ブック"
-
-#: indico/legacy/pdfinterface/conference.py
-#: indico/modules/events/layout/models/menu.py
-msgid "Page"
-msgstr "ページ"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "Registrants List"
-msgstr "登録者リスト"
-
-#: indico/legacy/pdfinterface/conference.py
-msgid "List of registrants"
-msgstr "登録者リスト"
-
 #: indico/legacy/pdfinterface/latex.py
 #: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
 msgid "Report of Abstracts"
@@ -8824,6 +8947,13 @@ msgstr "他のトラックへ提案: {}"
 #: indico/legacy/pdfinterface/latex.py
 msgid "Report of Contributions"
 msgstr "提出物レポート"
+
+#: indico/legacy/pdfinterface/latex_templates/book_of_abstracts.tex
+#: indico/legacy/pdfinterface/latex_templates/contribution_list_book.tex
+#: indico/legacy/pdfinterface/latex_templates/report.tex
+#, python-brace-format
+msgid "Page {}"
+msgstr "ページ {} をご覧ください。"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/abstract.tex
 msgid "Abstract ID"
@@ -8895,7 +9025,7 @@ msgstr "投稿コード"
 #: indico/modules/events/reminders/forms.py
 #: indico/modules/events/sessions/forms.py
 #: indico/modules/events/sessions/templates/management/_session_list.html
-#: indico/modules/events/sessions/util.py
+#: indico/modules/events/sessions/templates/pdf/session_table.html
 msgid "Type"
 msgstr "タイプ"
 
@@ -11923,10 +12053,6 @@ msgid "Price (with currency)"
 msgstr "価格（通貨付き）"
 
 #: indico/modules/designer/placeholders.py
-msgid "Number of accompanying persons"
-msgstr "同伴者数"
-
-#: indico/modules/designer/placeholders.py
 msgid "Accompanying persons"
 msgstr "同伴者"
 
@@ -12470,6 +12596,11 @@ msgstr "値"
 
 #: indico/modules/events/fields.py
 #, python-brace-format
+msgid "Validation of {email} failed: {error}"
+msgstr ""
+
+#: indico/modules/events/fields.py
+#, python-brace-format
 msgid "There is already a person with the email {email}"
 msgstr "メール{email}を持つ人がすでにいます"
 
@@ -12636,6 +12767,7 @@ msgstr ""
 msgid "Link to the event"
 msgstr "イベントにリンク"
 
+#: indico/modules/events/persons/placeholders.py
 #: indico/modules/events/placeholders.py
 #: indico/modules/events/registration/placeholders/registrations.py
 #: indico/modules/events/surveys/placeholders.py
@@ -13319,11 +13451,6 @@ msgid "No type selected"
 msgstr "タイプ未選択"
 
 #: indico/modules/events/abstracts/forms.py
-#: indico/modules/logs/templates/entry_email.html
-msgid "Attachments"
-msgstr "添付ファイル"
-
-#: indico/modules/events/abstracts/forms.py
 msgid "No track selected"
 msgstr "トラックが選択されていない"
 
@@ -13443,6 +13570,8 @@ msgid "Submission date"
 msgstr "提出日"
 
 #: indico/modules/events/abstracts/lists.py
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
 msgid "Modification date"
 msgstr "修正日"
 
@@ -13567,8 +13696,8 @@ msgid "The title of the submitter (Dr, Prof., etc...)"
 msgstr "投稿者の肩書き（Dr.、Prof. 他）"
 
 #: indico/modules/events/abstracts/placeholders.py
-msgid "Contribution URL"
-msgstr "投稿のURL"
+msgid "The URL of the contribution"
+msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The ID of the target abstract (merge or duplicate)"
@@ -14791,10 +14920,6 @@ msgid "This operation is irreversible."
 msgstr "この操作は取り消せません。"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "Withdraw abstract"
-msgstr "アブストラクトの取り下げ"
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Withdraw Abstract"
 msgstr "アブストラクトの取り下げ"
 
@@ -14806,14 +14931,14 @@ msgid "Withdraw"
 msgstr "取り消す"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Withdraw abstract"
+msgstr "アブストラクトの取り下げ"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "このアブストラクトはすでに採択されているため、撤回できません。どうしても取り下げを希望される場合は、イベントの主催者までご連絡ください。"
-
-#: indico/modules/events/abstracts/templates/reviewing/public.html
-msgid "This abstract has been withdrawn but can be restored."
-msgstr "このアブストラクトは取り下げられましたが、復元できます。"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Restore Abstract"
@@ -14822,6 +14947,10 @@ msgstr "アブストラクトを復元"
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Do you really want to restore this abstract?"
 msgstr "このアブストラクトを本当に復元しますか？"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "This abstract has been withdrawn but can be restored."
+msgstr "このアブストラクトは取り下げられましたが、復元できます。"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Edit abstract"
@@ -14847,6 +14976,10 @@ msgstr "修正期限を過ぎているため、アブストラクトの編集は
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "You are not authorized to edit this abstract"
 msgstr "このアブストラクトの編集権限がありません"
+
+#: indico/modules/events/abstracts/templates/reviewing/public.html
+msgid "Export PDF"
+msgstr ""
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "PDF with reviews"
@@ -15468,6 +15601,10 @@ msgstr "投稿の管理権限を付与する。"
 msgid "Grants management rights for materials and minutes."
 msgstr "マテリアルや議事録の管理権限を付与する。"
 
+#: indico/modules/events/contributions/__init__.py
+msgid "My Timetable"
+msgstr ""
+
 #: indico/modules/events/contributions/clone.py
 msgid "The target event already has contribution types"
 msgstr "対象イベントには、すでに投稿タイプがあります"
@@ -15628,6 +15765,10 @@ msgstr "フォーマット"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "No session"
 msgstr "セッションなし"
+
+#: indico/modules/events/contributions/lists.py
+msgid "Interested"
+msgstr ""
 
 #: indico/modules/events/contributions/lists.py
 msgid "Registered"
@@ -15799,12 +15940,15 @@ msgid "There are no contributions yet."
 msgstr "まだ投稿はありません。"
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
+#, python-format
+msgid "One person has added this contribution to their timetable."
+msgid_plural ""
+"%(count)s people have added this contribution to their timetable."
+msgstr[0] ""
+
+#: indico/modules/events/contributions/templates/display/_contribution_list.html
 msgid "Go to contribution page"
 msgstr ""
-
-#: indico/modules/events/contributions/templates/display/_user_contribution_list.html
-msgid "Edit this contribution"
-msgstr "この投稿を編集"
 
 #: indico/modules/events/contributions/templates/display/_user_contribution_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -15840,13 +15984,6 @@ msgstr[0] "次の投稿内の著者"
 #, python-format
 msgid "Board: %(board_number)s"
 msgstr "ボード: %(board_number)s"
-
-#: indico/modules/events/contributions/templates/display/contribution_display.html
-#: indico/modules/events/contributions/templates/management/_contribution_list.html
-#: indico/modules/events/templates/display/common/_manage_button.html
-#: indico/modules/events/timetable/templates/balloons/contribution.html
-msgid "Edit contribution"
-msgstr "投稿を編集"
 
 #: indico/modules/events/contributions/templates/display/contribution_display.html
 msgid ""
@@ -15902,7 +16039,6 @@ msgstr "選択したフィルタのURLを生成する。"
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html
-#: indico/modules/events/contributions/templates/display/user_contribution_list.html
 #: indico/modules/events/registration/templates/display/regform_list.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/surveys/templates/display/survey_list.html
@@ -16920,6 +17056,10 @@ msgstr "ユーザーリンク"
 msgid "Plugin Link"
 msgstr "プラグインリンク"
 
+#: indico/modules/events/layout/models/menu.py
+msgid "Page"
+msgstr "ページ"
+
 #: indico/modules/events/layout/templates/_menu.html
 msgid "Toggle default event homepage"
 msgstr "デフォルトのイベントホームページを切り替え"
@@ -17771,13 +17911,6 @@ msgstr "イベントの基本データを編集"
 #: indico/modules/events/management/templates/_settings.html
 msgid "Short URL"
 msgstr "短縮URL"
-
-#: indico/modules/events/management/templates/_settings.html
-#: indico/modules/events/registration/templates/management/regform.html
-#: indico/modules/events/surveys/templates/management/survey.html
-#: indico/web/templates/overview/base.html
-msgid "Copy link to clipboard"
-msgstr "リンクをクリップボードにコピー"
 
 #: indico/modules/events/management/templates/_settings.html
 msgid "Edit event dates"
@@ -19455,6 +19588,12 @@ msgid "Amount"
 msgstr "金額"
 
 #: indico/modules/events/payment/templates/transaction_details.html
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Payment date"
+msgstr "支払日"
+
+#: indico/modules/events/payment/templates/transaction_details.html
 msgid "Paid with"
 msgstr "支払元"
 
@@ -19645,11 +19784,28 @@ msgid "The program code of the contribution"
 msgstr "投稿のプログラムコード"
 
 #: indico/modules/events/persons/placeholders.py
+msgid "The board number of the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "Link to the contribution"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
 msgid "The duration of the contribution (e.g. \"20 minutes\")"
 msgstr ""
 
 #: indico/modules/events/persons/placeholders.py
 msgid "The scheduled date/time of the contribution, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid "The scheduled date/time including the weekday, or \"n/a\" if unscheduled"
+msgstr ""
+
+#: indico/modules/events/persons/placeholders.py
+msgid ""
+"Link to the contribution created from the abstract (empty if not accepted)"
 msgstr ""
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
@@ -19848,6 +20004,15 @@ msgid "No persons"
 msgstr "ユーザーなし"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/display/event_header.html
+#: indico/modules/events/registration/templates/management/participants.html
+#: indico/modules/events/reminders/forms.py
+#: indico/modules/events/surveys/forms.py
+#: indico/modules/logs/models/entries.py
+msgid "Participants"
+msgstr "参加者"
+
+#: indico/modules/events/registration/__init__.py
 #: indico/modules/events/registration/templates/display/_event_regform_base.html
 #: indico/modules/events/registration/templates/display/_meeting_registration_base.html
 #: indico/modules/events/registration/templates/display/conference_home.html
@@ -19862,6 +20027,7 @@ msgid_plural "Registrations"
 msgstr[0] "登録"
 
 #: indico/modules/events/registration/__init__.py
+#: indico/modules/events/registration/templates/pdf/participants_table.html
 msgid "Participant List"
 msgstr "参加者一覧"
 
@@ -19899,6 +20065,14 @@ msgstr ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view and check-in registrations."
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Registration (manage participants only)"
+msgstr ""
+
+#: indico/modules/events/registration/__init__.py
+msgid "Grants access to view, create, edit and delete registrations."
 msgstr ""
 
 #: indico/modules/events/registration/badges.py
@@ -19963,6 +20137,17 @@ msgstr "受付管理"
 #: indico/modules/events/registration/forms.py
 msgid "If enabled, registrations require manager approval"
 msgstr "有効にすると、登録時に管理者の承認が必要になります"
+
+#: indico/modules/events/registration/forms.py
+msgid "Reset approval on modification"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"If enabled, modifying a registration resets its approval status back to "
+"pending. Only applies to modifications made by the registrant, not by a "
+"manager."
+msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid ""
@@ -20268,6 +20453,18 @@ msgid "Default category template"
 msgstr "デフォルトのカテゴリーテンプレート"
 
 #: indico/modules/events/registration/forms.py
+msgid ""
+"Create tickets for each of the users accompanying persons. This option is "
+"unavailable because anonymous accompanying person registration is enabled."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid ""
+"Tickets for accompanying persons cannot be enabled because the registration "
+"form contains anonymous accompanying person registrations."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
 #: indico/modules/events/registration/templates/management/regform_list.html
 msgid "Registration managers"
 msgstr "登録マネージャー"
@@ -20473,8 +20670,26 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/registration/lists.py
-msgid "Registration Date"
+#: indico/modules/events/registration/util.py
+msgid "Registration date"
 msgstr "登録日"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+#: indico/modules/events/requests/templates/event_request_details.html
+msgid "Created by"
+msgstr "作成者"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#: indico/modules/events/registration/util.py
+msgid "Checked in"
+msgstr "チェックイン済み"
+
+#: indico/modules/events/registration/lists.py
+#: indico/modules/events/registration/util.py
+msgid "Check-in date"
+msgstr "チェックイン日"
 
 #: indico/modules/events/registration/lists.py
 msgid "Consent to publish"
@@ -20545,6 +20760,10 @@ msgstr "行 {}: メールアドレスが固有のものではありません"
 #, python-brace-format
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "行 {}: メールアドレスが行 {} と同じユーザーのものです"
+
+#: indico/modules/events/registration/util.py
+msgid "Registration state"
+msgstr "登録状況"
 
 #: indico/modules/events/registration/util.py
 #, python-brace-format
@@ -20641,6 +20860,22 @@ msgid ""
 msgstr "保存期間は10年を越えることはできません。無期限の場合は空欄にしてください。"
 
 #: indico/modules/events/registration/controllers/management/fields.py
+msgid "Changing internal name for personal data field is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid "The field \"{}\" on this form has the same internal name."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{field}\" with the same internal name on form \"{form}\" uses a "
+"different input type which is not allowed."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid ""
 "This field depends on \"{field}\", which has a shorter retention period "
@@ -20659,6 +20894,13 @@ msgstr ""
 msgid ""
 "This field is a condition for \"{field}\", which has a longer retention "
 "period ({period})."
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/fields.py
+#, python-brace-format
+msgid ""
+"The field \"{}\" with the same internal name on form \"{}\" uses a different"
+" input type which is not allowed."
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/fields.py
@@ -20787,12 +21029,6 @@ msgid "The registration was created."
 msgstr "登録が作成されました。"
 
 #: indico/modules/events/registration/controllers/management/reglists.py
-msgid ""
-"Text too large to generate a PDF with table style. Please try again "
-"generating with book style."
-msgstr "テキストが大きすぎるため、テーブルスタイルでPDFを生成できません。ブックスタイルで再度生成してみてください。"
-
-#: indico/modules/events/registration/controllers/management/reglists.py
 #, python-brace-format
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
@@ -20912,6 +21148,28 @@ msgid "Tag {} has been modified."
 msgstr "タグ {} が変更されました。"
 
 #: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Cannot be switched back to named mode when anonymous accompanying persons "
+"are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid ""
+"Anonymous accompanying persons cannot be enabled while tickets for "
+"accompanying persons are enabled."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+msgid "Cannot be enabled when accompanying persons are registered."
+msgstr ""
+
+#: indico/modules/events/registration/fields/accompanying.py
+#, python-brace-format
+msgid "{count} person"
+msgid_plural "{count} persons"
+msgstr[0] ""
+
+#: indico/modules/events/registration/fields/accompanying.py
 #: indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
 msgstr "このオプションには空席が残っていません。"
@@ -20952,6 +21210,12 @@ msgstr ""
 #, python-brace-format
 msgid "Not enough rooms in '{0}'"
 msgstr "「{0}」の部屋数が足りません"
+
+#: indico/modules/events/registration/fields/choices.py
+#, python-brace-format
+msgid "{n} night"
+msgid_plural "{n} nights"
+msgstr[0] ""
 
 #: indico/modules/events/registration/fields/sessions.py
 #, python-brace-format
@@ -21393,34 +21657,6 @@ msgstr[0] "さらに%(num)s名の参加者 "
 msgid "See the full list"
 msgstr "完全な一覧を見る"
 
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid "Participant List Preview"
-msgstr "参加者リストのプレビュー"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-#, python-format
-msgid "1 participant"
-msgid_plural "%(num)s participants"
-msgstr[0] "%(num)s名の参加者"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like an unregistered guest would see"
-" it."
-msgstr "このプレビューでは、未登録のゲストが見られる参加者リストを表示します。"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"This preview shows the participant list like a registered participant would "
-"see it."
-msgstr "このプレビューでは、登録された参加者が見られる参加者リストを表示します。"
-
-#: indico/modules/events/registration/templates/display/participant_list.html
-msgid ""
-"The lists of participants grouped by the registration form they used to "
-"register for the event."
-msgstr "イベントへの登録に使用した登録フォームによってグループ分けされた参加者のリストです。"
-
 #: indico/modules/events/registration/templates/display/regform_display.html
 #, python-format
 msgid "Add registration to \"%(title)s\""
@@ -21508,6 +21744,12 @@ msgstr "最大登録者数に達しました"
 #: indico/modules/events/registration/templates/display/regform_list.html
 msgid "No registration forms available for this event"
 msgstr "このイベントには、登録フォームがありません"
+
+#: indico/modules/events/registration/templates/display/registration_modify.html
+msgid ""
+"If you modify this registration, it needs to be approved again by the event "
+"organizer."
+msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_modify.html
 msgid "Skip to registration form"
@@ -22070,6 +22312,11 @@ msgstr "提出されました：%(submitted)s"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
+msgid "Modified: %(modified)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/_registration_details.html
+#, python-format
 msgid "This registration is %(state)s"
 msgstr "この登録は%(state)sです。"
 
@@ -22256,6 +22503,10 @@ msgstr "次の順序で正確に6つ列を持つCSV (comma-separated values) フ
 #: indico/modules/events/registration/templates/management/import_registrations.html
 msgid "Phone Number"
 msgstr "電話番号"
+
+#: indico/modules/events/registration/templates/management/participant_list_preview.html
+msgid "Participant List Preview"
+msgstr "参加者リストのプレビュー"
 
 #: indico/modules/events/registration/templates/management/participants.html
 msgid "The registration feature is disabled"
@@ -22766,6 +23017,37 @@ msgstr "登録受付中"
 msgid "Reschedule registrations"
 msgstr "登録を再スケジュール"
 
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants List"
+msgstr "登録者リスト"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Registrants Book"
+msgstr "登録者用ブック"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Table of Contents"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#: indico/modules/events/registration/wallets/apple.py
+#: indico/modules/logs/models/entries.py
+msgid "Registration details"
+msgstr "登録内容"
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+msgid "Personal details"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_book.html
+#, python-format
+msgid "Page %(page)s"
+msgstr ""
+
+#: indico/modules/events/registration/templates/pdf/participants_table.html
+msgid "List of registrants"
+msgstr "登録者リスト"
+
 #: indico/modules/events/registration/wallets/apple.py
 msgid "Ticket number"
 msgstr "チケット番号"
@@ -23162,10 +23444,6 @@ msgid "These are the details provided by the event manager."
 msgstr "イベントマネージャーから提供される詳細情報です。"
 
 #: indico/modules/events/requests/templates/event_request_details.html
-msgid "Created by"
-msgstr "作成者"
-
-#: indico/modules/events/requests/templates/event_request_details.html
 msgid "Created at"
 msgstr "作成日時"
 
@@ -23504,10 +23782,6 @@ msgstr "ポスターセッションか通常の発表か"
 msgid "A session type with this name already exists"
 msgstr "この名前のセッションタイプはすでに存在します"
 
-#: indico/modules/events/sessions/util.py
-msgid "List of sessions"
-msgstr "セッション一覧"
-
 #: indico/modules/events/sessions/templates/display/session_display.html
 #: indico/modules/events/sessions/templates/display/session_list.html
 #: indico/modules/events/timetable/templates/balloons/block.html
@@ -23644,6 +23918,10 @@ msgstr "新規セッションタイプ"
 #: indico/modules/events/sessions/templates/management/types_dialog.html
 msgid "There are no session types yet."
 msgstr "セッションタイプはまだありません。"
+
+#: indico/modules/events/sessions/templates/pdf/session_table.html
+msgid "List of sessions"
+msgstr "セッション一覧"
 
 #: indico/modules/events/static/__init__.py
 #: indico/modules/events/static/templates/static_sites.html
@@ -24105,6 +24383,10 @@ msgid ""
 "This section will not be displayed as a section but its contents will show "
 "up standalone."
 msgstr "このセクションは一つのセクションとして表示されるのではなく、質問項目のみが単独で表示されます。"
+
+#: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
+msgid "Clone section"
+msgstr ""
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "Edit section"
@@ -24819,6 +25101,7 @@ msgid "Event privacy information"
 msgstr "イベントのプライバシー情報"
 
 #: indico/modules/events/templates/display/conference/_util.html
+#: indico/modules/events/tracks/templates/pdf/program.html
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s から %(end)s まで"
@@ -25022,6 +25305,22 @@ msgid ""
 "Please don't forget to read the %(link)sjudgment instructions%(endlink)s "
 "before taking your decision."
 msgstr "判断をする前に%(link)s判定要領%(endlink)sを忘れずに読んでください。"
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has ended."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open until the submission deadline."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period is open. No submission deadline is set."
+msgstr ""
+
+#: indico/modules/events/templates/reviews/_common.html
+msgid "The submission period has not yet opened."
+msgstr ""
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "Opening day"
@@ -25398,6 +25697,10 @@ msgstr ""
 msgid "Convener:"
 msgid_plural "Conveners:"
 msgstr[0] ""
+
+#: indico/modules/events/timetable/templates/pdf/_toc.html
+msgid "Table of contents"
+msgstr "目次"
 
 #: indico/modules/events/tracks/__init__.py
 #: indico/modules/events/tracks/forms.py
@@ -27671,16 +27974,32 @@ msgid "Your events at hand"
 msgstr "最近の関連するイベント"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You do not have management rights"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You are a reviewer"
 msgstr "あなたは審査員です"
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You are not a reviewer"
+msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are an attendee"
 msgstr "あなたは参加者です"
 
 #: indico/modules/users/templates/dashboard.html
+msgid "You are not an attendee"
+msgstr ""
+
+#: indico/modules/users/templates/dashboard.html
 msgid "You have favorited this event"
 msgstr "このイベントをお気に入りにしました"
+
+#: indico/modules/users/templates/dashboard.html
+msgid "You have not favorited this event"
+msgstr ""
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You have no events."
@@ -28945,6 +29264,10 @@ msgid "URL is required"
 msgstr "URL が必要です"
 
 #: indico/web/forms/fields/simple.py
+msgid "Only URLs starting with https:// (or http://) are allowed"
+msgstr ""
+
+#: indico/web/forms/fields/simple.py
 msgid "Titles are required when more than one link is specified"
 msgstr "複数のリンクを指定する場合はタイトルが必要です"
 
@@ -29167,6 +29490,10 @@ msgstr "操作を実行"
 #, python-format
 msgid "Powered by %(indico)s"
 msgstr "Powered by %(indico)s"
+
+#: indico/web/templates/footer.html
+msgid "Site links"
+msgstr ""
 
 #: indico/web/templates/header.html
 msgid "Indico main page"
