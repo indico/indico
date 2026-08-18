@@ -159,8 +159,10 @@ export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
 export type LayoutOverrides = Record<string, LayoutOverride>;
 
-export type ChildContribEntryWithoutLayout = Omit<ChildContribEntry, 'column' | 'maxColumn' | 'y'>;
-export type ToplevelContribEntryWithoutLayout = Omit<ContribEntry, 'column' | 'maxColumn' | 'y'>;
+export type WithoutLayout<T> = Omit<T, 'column' | 'maxColumn' | 'y'>;
+
+export type ChildContribEntryWithoutLayout = WithoutLayout<ChildContribEntry>;
+export type ToplevelContribEntryWithoutLayout = WithoutLayout<ContribEntry>;
 export type ContribEntryWithoutLayout =
   | ToplevelContribEntryWithoutLayout
   | ChildContribEntryWithoutLayout;
