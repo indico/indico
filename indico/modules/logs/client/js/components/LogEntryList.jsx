@@ -84,8 +84,11 @@ class LogEntry extends React.PureComponent {
           </span>
         </TooltipIfTruncated>
         <span className="log-entry-details">
-          <span className="logged-time" title={moment(entry.time).format('DD/MM/YYYY HH:mm')}>
-            <time dateTime={entry.time}>{moment(entry.time).fromNow()}</time>
+          <span
+            className="logged-time"
+            title={`${moment.parseZone(entry.time).format('DD/MM/YYYY HH:mm')} (${entry.timezone})`}
+          >
+            <time dateTime={entry.time}>{moment.parseZone(entry.time).fromNow()}</time>
           </span>
           {entry.user.avatarURL ? (
             <Image

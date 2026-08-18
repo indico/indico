@@ -97,6 +97,7 @@ export default class LogEntryModal extends React.Component {
       html,
       user: {fullName},
       time,
+      timezone,
       detailsLink,
     } = entries[currentViewIndex];
 
@@ -115,8 +116,10 @@ export default class LogEntryModal extends React.Component {
           <div className="text-superfluous log-modal-author-info flexrow f-j-end">
             <span>
               {fullName && <span className="log-modal-user">{fullName} </span>}
-              on
-              <span className="log-modal-time"> {moment(time).format('ddd, D/M/YYYY HH:mm')}</span>
+              on{' '}
+              <span className="log-modal-time">
+                {moment.parseZone(time).format('ddd, D/M/YYYY HH:mm')} ({timezone})
+              </span>
             </span>
           </div>
         </Slot>
