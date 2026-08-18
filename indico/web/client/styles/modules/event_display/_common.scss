@@ -76,6 +76,14 @@
       align-self: stretch;
       align-items: stretch;
       height: 100%;
+
+      // The theme selector is a legacy js-dropdown: its absolutely-positioned
+      // .i-dropdown menu takes this relative wrapper as its containing block, so
+      // without an explicit width it shrink-wraps to the wrapper and the theme
+      // names wrap. max-content sizes it to its contents instead.
+      .i-dropdown {
+        width: max-content;
+      }
     }
 
     .i-button {
