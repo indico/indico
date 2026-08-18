@@ -288,6 +288,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - log_entries (CategoryLogEntry.category)
     # - parent (Category.children)
     # - receipt_templates (ReceiptTemplate.category)
+    # - registration_forms (RegistrationForm.category)
     # - roles (CategoryRole.category)
     # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)

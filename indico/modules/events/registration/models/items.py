@@ -463,7 +463,7 @@ class RegistrationFormItem(db.Model):
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the item."""
         kwargs.setdefault('data', {}).update(self._get_default_log_data())
-        return self.registration_form.event.log(*args, meta={'registration_form_item_id': self.id}, **kwargs)
+        return self.registration_form.owner.log(*args, meta={'registration_form_item_id': self.id}, **kwargs)
 
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,

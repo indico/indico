@@ -21,7 +21,8 @@ import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({fieldId, htmlId, htmlName, disabled, isRequired}) {
-  const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
+  const {regformId, targetLocator, registrationUuid, fileData} = useSelector(getStaticData);
+  const isTemplateForm = 'category_id' in targetLocator;
   const isManagement = useSelector(getManagement);
   const [invitationToken, formToken] = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -31,7 +32,7 @@ export default function FileInput({fieldId, htmlId, htmlName, disabled, isRequir
   const initialFileDetails = fileData ? fileData[htmlName] || null : null;
 
   const urlParams = {
-    event_id: eventId,
+    ...targetLocator,
     reg_form_id: regformId,
     field_id: fieldId,
   };
@@ -51,7 +52,13 @@ export default function FileInput({fieldId, htmlId, htmlName, disabled, isRequir
         name={htmlName}
         disabled={disabled}
         required={isRequired}
-        uploadURL={isManagement ? managementUploadURL(urlParams) : participantUploadURL(urlParams)}
+        uploadURL={
+          isTemplateForm
+            ? ''
+            : isManagement
+              ? managementUploadURL(urlParams)
+              : participantUploadURL(urlParams)
+        }
         initialFileDetails={initialFileDetails}
       />
     </div>

@@ -31,6 +31,7 @@ from indico.modules.categories.controllers.management import (RHAddCategoryRole,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHRemoveCategoryRoleMember, RHSortSubcategories,
                                                               RHSplitCategory)
+from indico.modules.categories.registration.controllers import fields, privacy, regforms, sections
 from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -132,3 +133,54 @@ _compat_bp.add_url_rule('/category/<legacy_category_id>/', 'legacy_id', compat_c
 _compat_bp.add_url_rule('!/categoryDisplay.py', 'display_modpython',
                         make_compat_redirect_func(_compat_bp, 'legacy_id',
                                                   view_args_conv={'categId': 'legacy_category_id'}))
+
+
+# Registration form management
+_bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHCategoryManageRegistrationForms)
+_bp.add_url_rule('/manage/registration/create', 'create_regform', regforms.RHCategoryRegistrationFormCreate,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHCategoryRegistrationFormManage)
+
+# Single registration form management
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit', 'edit_regform', regforms.RHCategoryRegistrationFormEdit,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform',
+                 regforms.RHCategoryRegistrationFormDelete, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/clone', 'clone_regform',
+                 regforms.RHCategoryRegistrationFormClone, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform',
+                 regforms.RHCategoryRegistrationFormModify)
+
+# Privacy
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'manage_registration_privacy_settings',
+                 privacy.RHCategoryRegistrationPrivacy, methods=('GET', 'POST'))
+
+# Regform edition: sections
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',
+                 sections.RHCategoryRegistrationFormAddSection, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',
+                 sections.RHCategoryRegistrationFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/toggle', 'toggle_section',
+                 sections.RHCategoryRegistrationFormToggleSection, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/move', 'move_section',
+                 sections.RHCategoryRegistrationFormMoveSection, methods=('POST',))
+
+# Regform edition: Fields
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
+                 fields.RHCategoryRegistrationFormAddField, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>', 'modify_field',
+                 fields.RHCategoryRegistrationFormModifyField, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
+                 'toggle_field', fields.RHCategoryRegistrationFormToggleFieldState, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
+                 'move_field', fields.RHCategoryRegistrationFormMoveField, methods=('POST',))
+
+# Regform edition: Static text
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text', 'add_text',
+                 fields.RHCategoryRegistrationFormAddText, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>', 'modify_text',
+                 fields.RHCategoryRegistrationFormModifyText, methods=('DELETE', 'PATCH'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/toggle',
+                 'toggle_text', fields.RHCategoryRegistrationFormToggleTextState, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/move', 'move_text',
+                 fields.RHCategoryRegistrationFormMoveText, methods=('POST',))
