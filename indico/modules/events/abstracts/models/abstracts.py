@@ -80,6 +80,18 @@ class EditTrackMode(IndicoIntEnum):
     reviewed_for = 2
 
 
+class AbstractNotificationType(RichIntEnum):
+    __titles__ = [None, pgettext('Abstract', 'Submitted'), pgettext('Abstract', 'Withdrawn'),
+                  pgettext('Abstract', 'Accepted'), pgettext('Abstract', 'Rejected'), pgettext('Abstract', 'Merged'),
+                  pgettext('Abstract', 'Invited')]
+    submitted = 1
+    withdrawn = 2
+    accepted = 3
+    rejected = 4
+    merged = 5
+    invited = 6
+
+
 class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin,
                db.Model):
     """An abstract that can be associated to a Contribution."""

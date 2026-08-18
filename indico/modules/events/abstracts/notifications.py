@@ -165,7 +165,8 @@ def send_abstract_notifications(abstract):
                 if email_tpl.include_coauthors:
                     cc_recipients += [author.email for author in abstract.secondary_authors]
 
-                tpl = get_abstract_notification_tpl_module(email_tpl, abstract)
+                with abstract.event.force_event_locale():
+                    tpl = get_abstract_notification_tpl_module(email_tpl, abstract)
                 reply_address = abstract.event.get_verbose_email_sender(email_tpl.reply_to_address)
                 email = make_email(to_list=to_recipients, cc_list=cc_recipients, reply_address=reply_address,
                                    template=tpl)
