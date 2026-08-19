@@ -117,7 +117,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   id: ContribId;
   type: EntryType.Contribution;
   attachments?: Attachment[];
-  sessionId?: number;
+  sessionId?: number | null;
   boardNumber?: string;
   keywords?: string[];
 }
@@ -125,7 +125,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
 export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: BreakId;
   type: EntryType.Break;
-  sessionId?: number;
+  sessionId?: number | null;
 }
 
 export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
@@ -145,6 +145,11 @@ export interface ChildBaseEntry {
   sessionBlockId?: string;
 }
 
+interface LayoutOverride {
+  column: number | null;
+  maxColumn: number | null;
+}
+
 export type ChildContribEntry = ContribEntry & ChildBaseEntry;
 export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
@@ -152,8 +157,17 @@ export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
+export type LayoutOverrides = Record<string, LayoutOverride>;
 
-export function isChildEntry(entry: Entry): entry is ChildEntry {
+export type WithoutLayout<T> = Omit<T, 'column' | 'maxColumn' | 'y'>;
+
+export type ChildContribEntryWithoutLayout = WithoutLayout<ChildContribEntry>;
+export type ToplevelContribEntryWithoutLayout = WithoutLayout<ContribEntry>;
+export type ContribEntryWithoutLayout =
+  | ToplevelContribEntryWithoutLayout
+  | ChildContribEntryWithoutLayout;
+
+export function isChildEntry(entry: Entry | ContribEntryWithoutLayout): entry is ChildEntry {
   // TODO: (Ajob) This is bypassing the 'Entry' type check because 'sessionBlockId'
   //              is not in the 'Entry' type. Find cleaner solution
   return !!entry['sessionBlockId'];
@@ -172,7 +186,8 @@ export interface LocationParentObj {
 
 export interface Entries {
   draftEntry: any | null;
-  entries: DayEntries;
+  entries: Record<string, Entry>;
+  layoutOverrides: LayoutOverrides;
   unscheduled: any[];
   selectedId: string | null;
   draggedIds: Set<number>;
