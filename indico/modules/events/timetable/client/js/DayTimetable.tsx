@@ -14,9 +14,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 
 import {Translate, Param} from 'indico/react/i18n';
-import {localeUses24HourTime} from 'indico/utils/date';
-
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
@@ -501,13 +500,15 @@ export function DayTimetable({
         type === EntryType.SessionBlock
           ? sessionBlockURL({event_id: eventId, session_block_id: id})
           : contributionURL({event_id: eventId, contrib_id: id});
+      let entry;
       try {
-        const entry = await indicoAxios.get(url);
-        const attachments = entry.data.attachments;
-        dispatch(actions.setEntryAttachments(type, getEntryUniqueId(type, id), attachments));
+        entry = await indicoAxios.get(url);
       } catch (e) {
         handleAxiosError(e);
+        return;
       }
+      const attachments = entry.data.attachments;
+      dispatch(actions.setEntryAttachments(type, getEntryUniqueId(type, id), attachments));
     }
 
     document.addEventListener('indico:attachmentsUpdate', handleMaterialsChanged);
