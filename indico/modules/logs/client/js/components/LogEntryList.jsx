@@ -8,12 +8,29 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Image} from 'semantic-ui-react';
 
 import {Paginator, TooltipIfTruncated, MessageBox} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import LogEntryModal from '../containers/LogEntryModal';
+
+function LogEntryTime({time}) {
+  const timezone = useSelector(state => state.staticData.timezone);
+  return (
+    <span
+      className="logged-time"
+      title={`${moment.tz(time, timezone).format('DD/MM/YYYY HH:mm')} (${timezone})`}
+    >
+      <time dateTime={time}>{moment.tz(time, timezone).fromNow()}</time>
+    </span>
+  );
+}
+
+LogEntryTime.propTypes = {
+  time: PropTypes.string.isRequired,
+};
 
 class LogEntry extends React.PureComponent {
   static propTypes = {
@@ -84,12 +101,7 @@ class LogEntry extends React.PureComponent {
           </span>
         </TooltipIfTruncated>
         <span className="log-entry-details">
-          <span
-            className="logged-time"
-            title={`${moment.parseZone(entry.time).format('DD/MM/YYYY HH:mm')} (${entry.timezone})`}
-          >
-            <time dateTime={entry.time}>{moment.parseZone(entry.time).fromNow()}</time>
-          </span>
+          <LogEntryTime time={entry.time} />
           {entry.user.avatarURL ? (
             <Image
               avatar

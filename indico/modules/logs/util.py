@@ -180,7 +180,6 @@ def serialize_log_entry(entry, tzinfo):
         'description': entry.summary,
         'meta': entry.meta,
         'time': entry.logged_dt.astimezone(tzinfo).isoformat(),
-        'timezone': str(tzinfo),
         'payload': entry.data,
         'user': {
             'fullName': entry.user.full_name if entry.user else None,
