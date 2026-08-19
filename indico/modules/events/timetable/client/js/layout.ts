@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment, {Moment} from 'moment';
 
 import {DEFAULT_CONTRIB_COLORS} from './colors';
@@ -17,6 +18,8 @@ import {
   ChildContribEntry,
   ContribEntry,
   UnscheduledContribEntry,
+  LayoutOverrides,
+  ChildContribEntryWithoutLayout,
 } from './types';
 import {lcm, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
@@ -281,7 +284,7 @@ export function layoutAfterUnscheduledDrop(
   offset: MousePosition,
   minStartDt: Moment,
   maxEndDt: Moment
-): [TopLevelEntry[], UnscheduledContribEntry[], Moment] | undefined {
+): [TopLevelEntry, LayoutOverrides] | undefined {
   // TODO: add proper typing for unscheduled contribs
   const id = who.slice('unscheduled-'.length);
   const deltaMinutes = 0;
@@ -320,9 +323,10 @@ export function layoutAfterUnscheduledDrop(
   const groupIds = getGroup(entry, entries);
   let group = entries.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, entry, mousePositionX);
-
-  const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
-  return [layout([...otherEntries, ...group]), unscheduled.filter(e => e.id !== id), startDt];
+  const layoutOverrides = Object.fromEntries(
+    group.map(x => [x.id, {column: x.column, maxColumn: x.maxColumn}])
+  );
+  return [entry, layoutOverrides];
 }
 
 export function layoutAfterUnscheduledDropOnBlock(
@@ -337,10 +341,7 @@ export function layoutAfterUnscheduledDropOnBlock(
   calendar: Over,
   eventStartDt: Moment,
   eventEndDt: Moment
-):
-  | [TopLevelEntry[], UnscheduledContribEntry[], Moment, number]
-  | [TopLevelEntry[], UnscheduledContribEntry[], Moment]
-  | undefined {
+): [ChildContribEntryWithoutLayout, any] | undefined {
   const id = who.slice('unscheduled-'.length);
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -410,16 +411,9 @@ export function layoutAfterUnscheduledDropOnBlock(
   );
   let group = toBlock.children.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, draftEntry, mousePositionX);
-
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
-
-  return [
-    layout([
-      ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
-      {...toBlock, children: [...otherChildren, ...group]},
-    ]),
-    unscheduled.filter(e => e.id !== id),
-    startDt,
-    toBlock.objId,
-  ];
+  const layoutOverrides = Object.fromEntries(
+    group.map(x => [x.id, {column: x.column, maxColumn: x.maxColumn}])
+  );
+  const scheduledEntry = _.omit(draftEntry, ['column', 'maxColumn', 'y']);
+  return [scheduledEntry, layoutOverrides];
 }

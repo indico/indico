@@ -11,7 +11,6 @@ from sqlalchemy.orm import defaultload
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
-from indico.util.date_time import iterdays
 from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.web.flask.util import url_for
 
@@ -89,13 +88,9 @@ class TimetableSerializer:
         self.can_manage_event = self.event.can_manage(self.user)
         self.api = api
 
-    def serialize_timetable(self, strip_empty_days=False):
-        tzinfo = self.event.tzinfo
+    def serialize_timetable(self):
         self.event.preload_all_acl_entries()
         timetable = {}
-        for day in iterdays(self.event.start_dt.astimezone(tzinfo), self.event.end_dt.astimezone(tzinfo)):
-            date_str = day.strftime('%Y%m%d')
-            timetable[date_str] = {}
         contributions_strategy = defaultload('contribution')
         contributions_strategy.subqueryload('person_links')
         contributions_strategy.subqueryload('references')
@@ -105,42 +100,18 @@ class TimetableSerializer:
                  .options(*query_options)
                  .order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK))
         for entry in query:
-            day = entry.start_dt.astimezone(tzinfo).date()
-            date_str = day.strftime('%Y%m%d')
-            if date_str not in timetable:
-                continue
             if not entry.can_view(self.user):
                 continue
-            data = self.serialize_timetable_entry(entry, load_children=False)
+            data = self.serialize_timetable_entry(entry)
             key = get_unique_key(entry)
             if entry.parent:
-                parent_code = get_unique_key(entry.parent)
                 data['session_block_id'] = entry.parent.session_block.id
-                timetable[date_str][parent_code]['children'].append(data)
-            else:
-                if (entry.type == TimetableEntryType.SESSION_BLOCK and
-                        entry.start_dt.astimezone(tzinfo).date() != entry.end_dt.astimezone(tzinfo).date()):
-                    # (Ajob) TODO: Evaluate if comment below is actually something we want to do
-                    # If a session block lasts into another day we need to add it to that day, too
-                    timetable[entry.end_dt.astimezone(tzinfo).date().strftime('%Y%m%d')][key] = data
-                timetable[date_str][key] = data
-        if strip_empty_days:
-            timetable = self._strip_empty_days(timetable)
+            timetable[key] = data
         return timetable
 
-    @staticmethod
-    def _strip_empty_days(timetable):
-        """Return the timetable without the leading and trailing empty days."""
-        days = sorted(timetable)
-        first_non_empty = next((day for day in days if timetable[day]), None)
-        if first_non_empty is None:
-            return {}
-        last_non_empty = next((day for day in reversed(days) if timetable[day]), first_non_empty)
-        return {day: timetable[day] for day in days if first_non_empty <= day <= last_non_empty}
-
-    def serialize_timetable_entry(self, entry, **kwargs):
+    def serialize_timetable_entry(self, entry):
         if entry.type == TimetableEntryType.SESSION_BLOCK:
-            return self.serialize_session_block_entry(entry, kwargs.pop('load_children', True))
+            return self.serialize_session_block_entry(entry)
         elif entry.type == TimetableEntryType.CONTRIBUTION:
             return self.serialize_contribution_entry(entry)
         elif entry.type == TimetableEntryType.BREAK:
@@ -148,13 +119,9 @@ class TimetableSerializer:
         else:
             raise TypeError('Unknown timetable entry type.')
 
-    def serialize_session_block_entry(self, entry, load_children=True):
+    def serialize_session_block_entry(self, entry):
         block = entry.session_block
         data = {}
-        if not load_children:
-            children = []
-        else:
-            children = [self.serialize_timetable_entry(x) for x in entry.children]
         data.update({'id': block.id,
                      'type': get_entry_type(TimetableEntryType.SESSION_BLOCK),
                      'start_dt': self._get_start_dt(entry),
@@ -167,7 +134,6 @@ class TimetableSerializer:
                      'description': block.session.description,
                      'duration': block.duration.seconds,
                      'is_poster': block.session.is_poster,
-                     'children': children,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
                      'location_data': LocationDataSchema().dump(block),
