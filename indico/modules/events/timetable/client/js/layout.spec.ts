@@ -104,7 +104,7 @@ function childContrib({
   maxColumn = 0,
 }: {
   id?: ContribId;
-  sessionBlockId: string;
+  sessionBlockId: SessionBlockId;
   title?: string;
   time: string;
   duration: number;
