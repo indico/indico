@@ -19,10 +19,8 @@ CustomElementBase.defineWhenDomReady(
       const trigger = this.querySelector('button');
       const list = this.querySelector('menu');
 
-      console.assert(
-        trigger.nextElementSibling === list,
-        'The <menu> element must come after <button>'
-      );
+      console.assert(trigger, 'Must contain a <button> element');
+      console.assert(list, 'Must contain a <menu> element');
 
       trigger.setAttribute('aria-expanded', false);
 
