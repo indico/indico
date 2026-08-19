@@ -41,6 +41,7 @@ import {
   isChildEntry,
   EntryType,
   Session,
+  ContribEntry,
 } from './types';
 import {
   DAY_SIZE,
@@ -143,7 +144,7 @@ export function DayTimetable({
   const draftEntry = useSelector(selectors.getDraftEntry);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
-  const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const hasSelectedEntry = useSelector(selectors.getSelectedId) !== null;
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const [hoverGuideY, setHoverGuideY] = useState<number | null>(null);
@@ -169,7 +170,7 @@ export function DayTimetable({
       const offsetY = clientY - wrapperRef.current.offsetTop;
       const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
-      if (isDragging || selectedEntry || isWithinLimitsWithOffset) {
+      if (isDragging || hasSelectedEntry || isWithinLimitsWithOffset) {
         if (hoverGuideY !== null) {
           setHoverGuideY(null);
         }
@@ -306,7 +307,7 @@ export function DayTimetable({
         sbEndDt
       );
     } else {
-      const [newLayout, newUnscheduled, startDt] =
+      const [entry, layoutOverrides] =
         layoutAfterUnscheduledDrop(
           dt,
           unscheduled,
@@ -325,7 +326,7 @@ export function DayTimetable({
         c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
       );
       showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
-      dispatch(actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled));
+      dispatch(actions.scheduleEntry(eventId, entry as ContribEntry, layoutOverrides!));
     }
   }
 
@@ -339,7 +340,7 @@ export function DayTimetable({
     minStartDt: Moment = eventStartDt,
     maxEndDt: Moment = eventEndDt
   ) {
-    const [newLayout, newUnscheduled, startDt, blockId] =
+    const [entry, layoutOverrides] =
       layoutAfterUnscheduledDropOnBlock(
         dt,
         unscheduled,
@@ -353,7 +354,7 @@ export function DayTimetable({
         minStartDt,
         maxEndDt
       ) || [];
-    if (!newLayout) {
+    if (!entry) {
       return;
     }
     // TODO(tomas): use something better than 'unscheduled-' prefix
@@ -362,16 +363,14 @@ export function DayTimetable({
       c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
     );
     const targetBlock = currentDayEntries.find(
-      e => e.type === EntryType.SessionBlock && e.objId === blockId
+      e => e.type === EntryType.SessionBlock && e.id === entry.sessionBlockId
     ) as BlockEntry | undefined;
     showToastIfContribSessionChanged(
       fromContrib?.title,
       fromContrib?.sessionId,
       targetBlock?.sessionId
     );
-    dispatch(
-      actions.scheduleEntry(eventId, contribId, startDt, newLayout, newUnscheduled, blockId)
-    );
+    dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
   }
 
   function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
@@ -504,7 +503,7 @@ export function DayTimetable({
         event.button !== 0 ||
         !clickedOnCalendar ||
         isWithinLimitsWithOffset ||
-        selectedEntry?.id !== undefined
+        hasSelectedEntry
       ) {
         return;
       }
@@ -589,7 +588,7 @@ export function DayTimetable({
       wrapper.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, selectedEntry]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, hasSelectedEntry]);
 
   useEffect(() => {
     // We use a ref instead of scrollPosition directly to prevent jumping
