@@ -25,7 +25,7 @@ import {formatTimeRange} from './i18n';
 import {mapDataToEntry} from './mapperUtils';
 import {UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {ContribId, EntryType, ReduxState} from './types';
+import {ContribEntry, ContribId, EntryType, ReduxState} from './types';
 import {
   getEntryColors,
   minutesToPixels,
@@ -234,8 +234,14 @@ export function UnscheduledContributionEntry({
                     return handleSubmitError(err);
                   }
 
-                  const updatedContrib = {...contrib, ...mapDataToEntry(changedVals, true)};
-                  dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, updatedContrib));
+                  const changedEntryData = mapDataToEntry(changedVals, true);
+                  dispatch(
+                    actions.updateUnscheduledEntry(
+                      EntryType.Contribution,
+                      contrib.id,
+                      changedEntryData as Partial<ContribEntry>
+                    )
+                  );
                   e.stopPropagation();
                 },
               });
