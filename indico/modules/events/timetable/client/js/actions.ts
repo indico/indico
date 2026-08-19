@@ -146,7 +146,6 @@ interface UpdateEntryAction {
 
 interface SetEntryAttachments {
   type: typeof SET_ENTRY_ATTACHMENTS;
-  entryType: EntryType;
   attachments: Attachment[];
   id: EntryUniqueID;
 }
@@ -544,11 +543,10 @@ export function updateEntry(
 }
 
 export function setEntryAttachments(
-  entryType: EntryType,
   id: EntryUniqueID,
   attachments: Attachment[]
 ): SetEntryAttachments {
-  return {type: SET_ENTRY_ATTACHMENTS, entryType, id, attachments};
+  return {type: SET_ENTRY_ATTACHMENTS, id, attachments};
 }
 
 export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
