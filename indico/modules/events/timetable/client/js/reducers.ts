@@ -169,11 +169,19 @@ export default {
         };
       }
       case actions.SCHEDULE_ENTRY: {
-        const {entry, layoutOverrides} = action;
+        const {id, startDt, sessionId, sessionBlockId, layoutOverrides} = action;
+        const newEntry = {
+          ...state.unscheduled.find(u => u.id === id),
+          startDt,
+          sessionId,
+        };
+        if (sessionBlockId !== null) {
+          newEntry.sessionBlockId = sessionBlockId;
+        }
         return {
           ...state,
-          entries: {...state.entries, [entry.id]: entry},
-          unscheduled: state.unscheduled.filter(c => c.id !== entry.id),
+          entries: {...state.entries, [id]: newEntry},
+          unscheduled: state.unscheduled.filter(c => c.id !== id),
           layoutOverrides: {...state.layoutOverrides, ...layoutOverrides},
         };
       }

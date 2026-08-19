@@ -142,7 +142,7 @@ export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMix
 }
 
 export interface ChildBaseEntry {
-  sessionBlockId?: string;
+  sessionBlockId: SessionBlockId;
 }
 
 interface LayoutOverride {
