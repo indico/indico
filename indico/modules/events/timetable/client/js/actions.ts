@@ -41,6 +41,7 @@ import {
   isChildEntry,
   LayoutOverrides,
   ContribEntryWithoutLayout,
+  SessionBlockId,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -107,7 +108,10 @@ interface DeselectEntryAction {
 
 interface ScheduleEntryAction {
   type: typeof SCHEDULE_ENTRY;
-  entry: ContribEntryWithoutLayout;
+  id: ContribId;
+  startDt: Moment;
+  sessionId: number | null;
+  sessionBlockId: SessionBlockId | null;
   layoutOverrides: LayoutOverrides;
 }
 
@@ -438,7 +442,10 @@ export function scheduleEntry(
       }),
     {
       type: SCHEDULE_ENTRY,
-      entry,
+      id: entry.id,
+      startDt: entry.startDt,
+      sessionBlockId: isChildEntry(entry) ? entry.sessionBlockId! : null,
+      sessionId: entry.sessionId!,
       layoutOverrides,
     }
   );
