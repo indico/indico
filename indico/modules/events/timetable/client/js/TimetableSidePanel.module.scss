@@ -342,6 +342,7 @@ $content-pane-bg-color: $white;
   overflow: hidden;
   word-break: break-word;
   padding: 0.5rem;
+  user-select: none;
 }
 
 .session-actions {
