@@ -113,20 +113,31 @@ $toolbar-bg-color: $raincloud-gray;
 }
 
 .hover-guide {
-  font-weight: bold;
   position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed $teal;
+  pointer-events: none;
+  z-index: 1;
+  transition: top 0.05s;
+}
+
+.hover-guide-label {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: max-content;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  pointer-events: none;
-  z-index: 1;
-  background: $teal;
-  padding: 4px 6px;
   min-width: 60px;
+  padding: 4px 6px;
+  background: $teal;
+  color: #fff;
   font-size: 0.9rem;
+  font-weight: bold;
   line-height: 0.9rem;
   border-radius: 7px 0 0 7px;
-  transition: 0.05s;
-  transform: translate(-100%, -50%);
 }

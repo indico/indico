@@ -659,7 +659,7 @@ export function DayTimetable({
               <Lines minHour={minHour} maxHour={maxHour} />
               {hoverGuideY !== null && (
                 <div styleName="hover-guide" style={{top: hoverGuideY}}>
-                  {getCalendarTimeFromY(hoverGuideY)}
+                  <span styleName="hover-guide-label">{getCalendarTimeFromY(hoverGuideY)}</span>
                 </div>
               )}
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
