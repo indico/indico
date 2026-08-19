@@ -170,13 +170,6 @@ export function getCurrentDateLocalStorage(eventId: number) {
   return dt ? moment(dt, DATE_KEY_FORMAT) : null;
 }
 
-export function shiftEntries<T extends Entry>(entries: T[], deltaMinutes: number): T[] {
-  return entries.map(child => ({
-    ...child,
-    startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
-  }));
-}
-
 export function sortEntriesByStartDt(entries: Entry[]): Entry[] {
   return [...entries].sort((a, b) => moment(a.startDt).diff(moment(b.startDt)));
 }
