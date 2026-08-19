@@ -54,11 +54,13 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <ind-with-tooltip>
-        <button class="i-button text-color subtle icon-only icon-layout arrow js-dropdown" data-toggle="dropdown">
-            <span data-tip-content>{% trans %}Change theme{% endtrans %}</span>
-        </button>
-        <ul class="i-dropdown">
+    <ind-menu>
+        <ind-with-tooltip>
+            <button class="i-button text-color subtle icon-only icon-layout">
+                <span data-tip-content>{% trans %}Change theme{% endtrans %}</span>
+            </button>
+        </ind-with-tooltip>
+        <menu>
             {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
             {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
                if group.grouper or event.can_manage(session.user) %}
@@ -68,15 +70,15 @@
                 {% for id, data in group.list %}
                     <li>
                         {% if id == theme %}
-                            <a class="disabled"><strong>{{ data.name }}</strong></a>
+                            <a aria-current="true"><strong>{{ data.name }}</strong></a>
                         {% else %}
                             <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
                         {% endif %}
                     </li>
                 {% endfor %}
             {% endfor %}
-        </ul>
-    </ind-with-tooltip>
+        </menu>
+    </ind-menu>
 {%- endmacro -%}
 
 

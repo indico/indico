@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 @use 'partials/buttons' as *;
 @use 'partials/boxes' as *;
 
@@ -76,14 +77,6 @@
       align-self: stretch;
       align-items: stretch;
       height: 100%;
-
-      // The theme selector is a legacy js-dropdown: its absolutely-positioned
-      // .i-dropdown menu takes this relative wrapper as its containing block, so
-      // without an explicit width it shrink-wraps to the wrapper and the theme
-      // names wrap. max-content sizes it to its contents instead.
-      .i-dropdown {
-        width: max-content;
-      }
     }
 
     .i-button {
@@ -101,21 +94,8 @@
       border-right: 1px dotted $light-black;
     }
 
-    .i-dropdown {
-      @include border-all($color: $black);
-      @include single-box-shadow($color: $black);
-
-      background: $dark-black;
-
-      li {
-        a {
-          color: $dark-gray;
-        }
-
-        &:hover a:not(.disabled) {
-          color: $light-gray;
-        }
-      }
+    ind-menu > menu {
+      @extend %menu;
     }
 
     .filter-link {
@@ -127,9 +107,7 @@
     }
 
     .themes-separator {
-      @include border-bottom($black);
-      height: auto;
-      margin: 0 1em;
+      border-top: 1px solid var(--menu-border-color);
     }
   }
 
