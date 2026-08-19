@@ -326,6 +326,11 @@ function EntryPopupContent({
                 basic
                 icon="shield"
                 onClick={onClose}
+                data-title={
+                  type === EntryType.Contribution
+                    ? Translate.string('Manage contribution protection')
+                    : Translate.string('Manage session protection')
+                }
                 data-href={
                   type === EntryType.Contribution
                     ? contributionProtectionURL({event_id: eventId, contrib_id: objId})
