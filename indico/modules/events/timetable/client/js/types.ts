@@ -110,6 +110,7 @@ export interface ScheduledMixin {
 export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> {
   id: ContribId;
   type: EntryType.Contribution;
+  attachments: Attachment[];
   sessionId?: number;
 }
 

@@ -226,7 +226,7 @@ def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
     return {'id': contribution.id,
             'type': get_entry_type(TimetableEntryType.CONTRIBUTION),
             'contribution_id': contribution.id,
-            'attachments': [],
+            'attachments': TimetableSerializer.get_attachment_data(contribution),
             'description': contribution.description,
             'duration': contribution.duration_display.seconds,
             'pdf': url_for('contributions.export_pdf', contribution),
