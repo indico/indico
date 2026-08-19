@@ -24,6 +24,12 @@ import {getCurrentDateLocalStorage} from './utils';
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
     if (root) {
+      // Avoid browser-native dragging of text, which can happen whenever something is selected
+      // within the timetable area, and which breaks the timetable drag&drop functionality.
+      root.addEventListener('dragstart', evt => {
+        evt.preventDefault();
+      });
+
       const searchToken = root.dataset.searchToken;
       const timetableData = JSON.parse(root.dataset.timetableData);
       const eventInfo = JSON.parse(root.dataset.eventInfo);
