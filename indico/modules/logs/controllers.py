@@ -56,7 +56,7 @@ class RHAppLogs(RHAdminBase):
         realms = {realm.name: realm.title for realm in AppLogRealm}
         return WPAppLogs.render_template('logs.html', 'logs',
                                          realms=realms, metadata_query=metadata_query,
-                                         logs_api_url=url_for('.api_app_logs'), timezone=session.timezone)
+                                         logs_api_url=url_for('.api_app_logs'), timezone=session.tzinfo.zone)
 
 
 class RHCategoryLogs(RHManageCategoryBase):
@@ -99,8 +99,8 @@ class RHUserLogs(RHUserLogsBase):
         metadata_query = _get_metadata_query()
         realms = {realm.name: realm.title for realm in UserLogRealm}
         return WPUserLogs.render_template('logs.html', 'logs', user=self.user,
-                                          realms=realms, metadata_query=metadata_query,
-                                          logs_api_url=url_for('.api_user_logs', self.user), timezone=session.timezone)
+                                          realms=realms, metadata_query=metadata_query, timezone=session.tzinfo.zone,
+                                          logs_api_url=url_for('.api_user_logs', self.user))
 
 
 class LogsAPIMixin:
