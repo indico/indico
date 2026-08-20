@@ -39,6 +39,10 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: (v: number, data) => (v ? getEntryUniqueId(data.type as EntryType, v) : null),
     toTransform: (v: string) => +v.slice(1),
   },
+  {
+    from: 'attachments',
+    to: 'attachments',
+  },
   {from: 'title', to: 'title'},
   {from: 'description', to: 'description'},
   {from: 'board_number', to: 'boardNumber'},
