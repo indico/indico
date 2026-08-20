@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import request, session
 from sqlalchemy.orm import contains_eager, defaultload
 
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -53,6 +53,10 @@ class RHManageRegistrationBase(RHManageRegFormBase):
                              .options(defaultload(Registration.data)
                                       .joinedload('field_data'))
                              .one())
+
+    def _check_management_permission(self):
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        return any(self.registration.can_manage(session.user, p) for p in permissions)
 
 
 class RHManageRegistrationModerationBase(RHManageRegistrationBase):
