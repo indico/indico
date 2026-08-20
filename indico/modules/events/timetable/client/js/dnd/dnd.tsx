@@ -53,6 +53,10 @@ interface DnDContextType {
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const DnDContext = createContext<DnDContextType>(null!);
 
+function possibleChildEntryId(id: string) {
+  return /^(?:unscheduled-)?[cb]/.test(id);
+}
+
 function setBoundingRectAndScroll(draggableData: DraggableData, node: HTMLRef, id: string) {
   const draggable = draggableData[id];
   if (!node) {
@@ -424,12 +428,7 @@ export function useDroppable({id}: {id: string}) {
   const unregisterDroppable = useContextSelector(DnDContext, ctx => ctx.unregisterDroppable);
   const hasDraggableOver = useContextSelector(DnDContext, ctx => {
     for (const [draggableId, draggable] of Object.entries(ctx.draggableData)) {
-      // FIXME: !(draggableId.startsWith('c') || draggableId.startsWith('b')) is a huge hack
-      if (
-        draggableId === id ||
-        !(draggableId.startsWith('c') || draggableId.startsWith('b')) ||
-        !draggable.transform
-      ) {
+      if (draggableId === id || !draggable.transform || !possibleChildEntryId(draggableId)) {
         continue;
       }
       const overlapping = getOverlappingDroppables(ctx.droppables, draggable.mouse);
