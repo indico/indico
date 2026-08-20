@@ -69,6 +69,8 @@ Improvements
   registration (:pr:`7434`, thanks :user:`moliholy`)
 - Add support for anonymous accompanying persons (numeric count only) in registration form
   (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
+- Save rows of list widgets that are still being edited when the form is submitted instead
+  of dropping them (:pr:`7702`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
