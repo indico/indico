@@ -103,7 +103,21 @@ export default {
       case actions.SET_ENTRY_ATTACHMENTS: {
         const {id, attachments} = action;
         const updatedEntry = {...state.entries[id], attachments};
-        return {...state, entries: {...state.entries, [id]: updatedEntry}};
+        let updatedEntries: Record<string, Entry>;
+        if (state.entries[id].type === EntryType.SessionBlock) {
+          updatedEntries = Object.fromEntries(
+            Object.entries(state.entries)
+              .filter(
+                ([, entry]) =>
+                  entry.type === EntryType.SessionBlock &&
+                  entry.sessionId === updatedEntry.sessionId
+              )
+              .map(([id_, entry]) => [id_, {...entry, attachments}])
+          );
+        } else {
+          updatedEntries = {[id]: updatedEntry};
+        }
+        return {...state, entries: {...state.entries, ...updatedEntries}};
       }
       case actions.UPDATE_ENTRY: {
         const {entry, changes} = action;
