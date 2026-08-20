@@ -17,6 +17,7 @@
          data-fetch-logs-url="{{ logs_api_url }}"
          data-realms="{{ realms|tojson|forceescape }}"
          data-metadata-query="{{ metadata_query|tojson|forceescape }}"
+         data-timezone="{{ timezone }}"
          {{ 'data-require-filter' if require_filter|default(false) }}>
     </div>
 {% endblock %}

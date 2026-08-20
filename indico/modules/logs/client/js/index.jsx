@@ -25,6 +25,7 @@ window.addEventListener('load', () => {
       realms: JSON.parse(rootElement.dataset.realms),
       pageSize: 15,
       canRemoveFilter: rootElement.dataset.requireFilter === undefined,
+      timezone: rootElement.dataset.timezone,
     },
   };
   const store = createReduxStore(

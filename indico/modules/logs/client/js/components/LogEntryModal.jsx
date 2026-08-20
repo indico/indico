@@ -8,10 +8,24 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {useSelector} from 'react-redux';
 
 import {IButton, Modal} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
+
+function LogModalTime({time}) {
+  const timezone = useSelector(state => state.staticData.timezone);
+  return (
+    <span className="log-modal-time">
+      {moment.tz(time, timezone).format('L LTS')} ({timezone})
+    </span>
+  );
+}
+
+LogModalTime.propTypes = {
+  time: PropTypes.string.isRequired,
+};
 
 export default class LogEntryModal extends React.Component {
   static propTypes = {
@@ -115,8 +129,7 @@ export default class LogEntryModal extends React.Component {
           <div className="text-superfluous log-modal-author-info flexrow f-j-end">
             <span>
               {fullName && <span className="log-modal-user">{fullName} </span>}
-              on
-              <span className="log-modal-time"> {moment(time).format('ddd, D/M/YYYY HH:mm')}</span>
+              on <LogModalTime time={time} />
             </span>
           </div>
         </Slot>
