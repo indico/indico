@@ -65,20 +65,20 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const isClick = useRef<boolean>(true);
 
   function onClick(evt: React.MouseEvent<HTMLElement>) {
-    evt.stopPropagation();
     if (evt.target instanceof Node && !ref.current.contains(evt.target)) {
       return;
     }
+    evt.stopPropagation();
     if (isClick.current) {
       dispatch(actions.selectEntry(id));
     }
   }
 
   function onDoubleClick(evt: React.MouseEvent<HTMLElement>) {
-    evt.stopPropagation();
     if (evt.target instanceof Node && !ref.current.contains(evt.target)) {
       return;
     }
+    evt.stopPropagation();
     if (rest.type !== EntryType.SessionBlock || isPosterBlock) {
       return;
     }
