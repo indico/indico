@@ -274,6 +274,7 @@ describe('mapperUtils', () => {
         isPoster: false,
         colors: {backgroundColor: '#aabbcc', color: '#ddeeff'},
         defaultContribDurationMinutes: 10,
+        attachments: [],
       };
 
       const data = mapSessionToData(session);
@@ -283,6 +284,7 @@ describe('mapperUtils', () => {
       expect(data.is_poster).toBe(false);
       expect(data.colors).toEqual({background: '#aabbcc', text: '#ddeeff'});
       expect(data.default_contribution_duration).toBe(600);
+      expect(data.attachments).toEqual([]);
     });
   });
 });
