@@ -227,7 +227,7 @@ export default {
         // Remove the deleted session from all existing unscheduled contributions
         const oldUnscheduled = state.unscheduled.map(contrib => ({
           ...contrib,
-          sessionId: null,
+          sessionId: contrib.sessionId === action.sessionId ? null : contrib.sessionId,
         }));
         return {
           ...state,
