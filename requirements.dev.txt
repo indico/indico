@@ -44,7 +44,7 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.15.3
+coverage[toml]==7.15.3
     # via pytest-cov
 docker==7.2.0
     # via -r requirements.dev.in
@@ -123,7 +123,7 @@ psutil==7.2.2
     # via
     #   -c requirements.txt
     #   mirakuru
-psycopg==3.3.4
+psycopg[pool]==3.3.4
     # via results
 psycopg-pool==3.3.1
     # via psycopg
@@ -142,7 +142,7 @@ pytest==9.1.1
     #   pytest-snapshot
 pytest-cov==7.1.0
     # via -r requirements.dev.in
-pytest-localserver==0.10.0
+pytest-localserver[smtp]==0.10.0
     # via -r requirements.dev.in
 pytest-mock==3.15.1
     # via -r requirements.dev.in
@@ -219,7 +219,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via -r requirements.dev.in
 starlette==1.4.1
     # via sphinx-autobuild
