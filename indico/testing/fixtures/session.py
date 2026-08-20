@@ -48,4 +48,4 @@ def dummy_session(create_session, dummy_event):
 
 @pytest.fixture
 def dummy_session_block(create_session_block, dummy_session):
-    return create_session_block(dummy_session, 'Dummy block', timedelta(minutes=20), now_utc())
+    return create_session_block(dummy_session, 'Dummy block', timedelta(minutes=20), now_utc(False))

@@ -1,0 +1,223 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import {Moment} from 'moment';
+
+export enum EntryType {
+  Contribution = 'contrib',
+  SessionBlock = 'block',
+  Break = 'break',
+}
+
+export enum PersonLinkRole {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  SPEAKER = 'speaker',
+  SUBMITTER = 'submitter',
+}
+
+export enum SidePanelView {
+  None = 'none',
+  Sessions = 'sessions',
+  Unscheduled = 'unscheduled',
+}
+
+export type HexColor = `#${string}`;
+
+export type EventType = 'lecture' | 'meeting' | 'conference';
+
+export type SessionBlockId = `s${number}`;
+export type BreakId = `b${number}`;
+export type ContribId = `c${number}`;
+export type EntryUniqueID = SessionBlockId | BreakId | ContribId;
+
+export interface PersonLink {
+  affiliation: string;
+  email: string;
+  lastName: string;
+  firstName: string;
+  name: string;
+  address?: string;
+  affiliationId?: number;
+  avatarURL?: string;
+  displayOrder?: number;
+  personId?: number;
+  phone?: `+${number}`;
+  title?: string;
+  userId?: number;
+  userIdentifier?: `User:${string}`;
+  roles?: PersonLinkRole[];
+}
+
+export interface Colors {
+  color: HexColor;
+  backgroundColor: HexColor;
+}
+
+export interface LocationData {
+  address: string;
+  venueId?: number;
+  venueName: string;
+  roomId?: number;
+  roomName: string;
+  inheriting?: boolean;
+}
+export interface LocationParent {
+  location_data: LocationData;
+  type: string;
+  title: string;
+}
+
+export interface Attachment {
+  id: number;
+  title: string;
+  type: 'attachment';
+}
+
+export interface Session {
+  id: number; // XXX probably we need an id-less variant during creation, but that should be a separate type
+  title: string;
+  isPoster: boolean;
+  defaultContribDurationMinutes: number;
+  colors: Colors;
+  attachments: Attachment[];
+}
+
+export interface BaseEntry {
+  type: EntryType;
+  objId: number;
+  title: string;
+  duration: number;
+  description: string;
+  personLinks: PersonLink[];
+  colors?: Colors;
+  locationData?: LocationData;
+  locationParent?: LocationParent;
+}
+
+export interface ScheduledMixin {
+  startDt: Moment;
+  // position information
+  y: number;
+  column: number | null;
+  maxColumn: number | null;
+}
+
+export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> {
+  id: ContribId;
+  type: EntryType.Contribution;
+  attachments: Attachment[];
+  sessionId?: number;
+}
+
+export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
+  id: ContribId;
+  type: EntryType.Contribution;
+  attachments: Attachment[];
+  sessionId?: number | null;
+  boardNumber?: string;
+  keywords?: string[];
+}
+
+export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
+  id: BreakId;
+  type: EntryType.Break;
+  sessionId?: number | null;
+}
+
+export interface BlockEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
+  id: SessionBlockId;
+  type: EntryType.SessionBlock;
+  sessionId: number;
+  // eslint-disable-next-line no-use-before-define
+  children: ChildEntry[];
+  personLinks: PersonLink[];
+  childLocationParent: LocationParent;
+  attachments: Attachment[];
+  colors?: Colors;
+  code?: string;
+}
+
+export interface ChildBaseEntry {
+  sessionBlockId: SessionBlockId;
+}
+
+interface LayoutOverride {
+  column: number | null;
+  maxColumn: number | null;
+}
+
+export type ChildContribEntry = ContribEntry & ChildBaseEntry;
+export type ChildBreakEntry = BreakEntry & ChildBaseEntry;
+export type ChildEntry = ChildContribEntry | ChildBreakEntry;
+
+export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
+export type Entry = TopLevelEntry | ChildEntry;
+export type DayEntries = Record<string, TopLevelEntry[]>;
+export type LayoutOverrides = Record<string, LayoutOverride>;
+
+export type WithoutLayout<T> = Omit<T, 'column' | 'maxColumn' | 'y'>;
+
+export type ChildContribEntryWithoutLayout = WithoutLayout<ChildContribEntry>;
+export type ToplevelContribEntryWithoutLayout = WithoutLayout<ContribEntry>;
+export type ContribEntryWithoutLayout =
+  | ToplevelContribEntryWithoutLayout
+  | ChildContribEntryWithoutLayout;
+
+export function isChildEntry(entry: Entry | ContribEntryWithoutLayout): entry is ChildEntry {
+  // TODO: (Ajob) This is bypassing the 'Entry' type check because 'sessionBlockId'
+  //              is not in the 'Entry' type. Find cleaner solution
+  return !!entry['sessionBlockId'];
+}
+
+// Request objects (lowercase)
+
+export interface LocationParentObj {
+  venue: string;
+  room: string;
+  venue_name: string;
+  room_name: string;
+  address: string;
+  inheriting: boolean;
+}
+
+export interface Entries {
+  draftEntry: any | null;
+  entries: Record<string, Entry>;
+  layoutOverrides: LayoutOverrides;
+  unscheduled: any[];
+  selectedId: string | null;
+  draggedIds: Set<number>;
+}
+
+interface StaticData {
+  eventId: number;
+  startDt: Moment;
+  endDt: Moment;
+  defaultContribDurationMinutes: number;
+  eventLocationParent: LocationParent;
+  eventType: EventType;
+}
+
+export interface Navigation {
+  currentDate: Moment;
+  isExpanded: boolean;
+  expandedSessionBlockId: SessionBlockId;
+}
+
+export interface ReduxState {
+  entries: Entries;
+  sessions: Record<string, Session>;
+  navigation: Navigation;
+  staticData: StaticData;
+  display: {activePanel: SidePanelView};
+}
+
+export interface AttachmentUpdatedEventDetail {
+  type: EntryType;
+  id: number;
+}

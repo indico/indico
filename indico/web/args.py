@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
 from collections.abc import Mapping
 
 from flask import g
@@ -106,6 +107,17 @@ def use_args(schema_cls, **kwargs):
     return parser.use_args(factory, **webargs_kwargs)
 
 
+# TODO: This is just a convenience function for now. I'd like to come up with a nicer way to do this..
+def use_args_schema_context(schema_cls, context_fn, **use_args_kwargs):
+    def wrapper(func):
+        @functools.wraps(func)
+        def wrapped(self, *args, **kwargs):
+            w = use_args(schema_cls, context=context_fn(self), **use_args_kwargs)
+            return w(func)(self, *args, **kwargs)
+        return wrapped
+    return wrapper
+
+
 def use_kwargs(schema_cls, **kwargs):
     """Like ``use_args``, but using kwargs when calling the decorated function."""
     kwargs['as_kwargs'] = True
@@ -116,7 +128,9 @@ def use_rh_args(schema_cls, **kwargs):
     """Similar to ``use_args`` but populates the context from RH attributes.
 
     The Schema needs a Meta class with an ``rh_context`` attribute specifying
-    which attributes should be taken from the current RH.
+    which attributes should be taken from the current RH. The last value can
+    be a dict instead of a string to use RH attributes with names not matching
+    the context key.
 
     :param schema_cls: A marshmallow Schema or an argmap dict.
     :param rh_context: When using an argmap, this argument is required and behaves
@@ -137,9 +151,16 @@ def use_rh_args(schema_cls, **kwargs):
             raise TypeError('The `rh_context` kwarg is only supported when passing an argmap')
         rh_context_attrs = schema_cls.Meta.rh_context
 
+    mapped_attrs = {}
+    assert not any(isinstance(x, dict) for x in rh_context_attrs[:-1])
+    if isinstance(rh_context_attrs[-1], dict):
+        rh_context_attrs, mapped_attrs = rh_context_attrs[:-1], rh_context_attrs[-1]
+        assert not mapped_attrs.keys() & set(rh_context_attrs)
+
     def factory(req):
         context = dict(default_context)
         context.update((arg, getattr(g.rh, arg, None)) for arg in rh_context_attrs)
+        context.update((ctx_name, getattr(g.rh, rh_name, None)) for ctx_name, rh_name in mapped_attrs.items())
         return schema_cls(context=context, **schema_kwargs)
 
     return parser.use_args(factory, **webargs_kwargs)

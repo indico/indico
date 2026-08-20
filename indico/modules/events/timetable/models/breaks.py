@@ -61,6 +61,16 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
         return self.timetable_entry.event if self.timetable_entry else None
 
     @property
+    def session_block(self):
+        return self.timetable_entry.parent.session_block if self.timetable_entry.parent else None
+
+    @session_block.setter
+    def session_block(self, value):
+        from indico.modules.events.timetable.operations import update_timetable_entry
+        if value != self.session_block:
+            update_timetable_entry(self.timetable_entry, {'parent': value.timetable_entry if value else None})
+
+    @property
     def location_parent(self):
         return (self.event
                 if self.timetable_entry.parent_id is None
