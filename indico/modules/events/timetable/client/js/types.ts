@@ -76,7 +76,6 @@ export interface Attachment {
   id: number;
   title: string;
   type: 'attachment';
-  downloadUrl: string;
 }
 
 export interface Session {
@@ -85,6 +84,7 @@ export interface Session {
   isPoster: boolean;
   defaultContribDurationMinutes: number;
   colors: Colors;
+  attachments: Attachment[];
 }
 
 export interface BaseEntry {

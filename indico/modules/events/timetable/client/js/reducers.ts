@@ -15,7 +15,7 @@ import {
   preprocessTimetableEntries,
   preprocessUnscheduledContributions,
 } from './preprocess';
-import {Entries, EntryType, isChildEntry, SidePanelView, ChildEntry, Entry} from './types';
+import {Entries, EntryType, isChildEntry, SidePanelView, ChildEntry, Entry, Session} from './types';
 import {setCurrentDateLocalStorage} from './utils';
 
 export default {
@@ -101,23 +101,13 @@ export default {
         };
       }
       case actions.SET_ENTRY_ATTACHMENTS: {
-        const {id, attachments} = action;
-        const updatedEntry = {...state.entries[id], attachments};
-        let updatedEntries: Record<string, Entry>;
-        if (state.entries[id].type === EntryType.SessionBlock) {
-          updatedEntries = Object.fromEntries(
-            Object.entries(state.entries)
-              .filter(
-                ([, entry]) =>
-                  entry.type === EntryType.SessionBlock &&
-                  entry.sessionId === updatedEntry.sessionId
-              )
-              .map(([id_, entry]) => [id_, {...entry, attachments}])
-          );
-        } else {
-          updatedEntries = {[id]: updatedEntry};
+        const {id, sessionId, attachments} = action;
+        if (sessionId !== null) {
+          // Session attachments are stored in the sessions, so we do not need to touch any entries
+          return state;
         }
-        return {...state, entries: {...state.entries, ...updatedEntries}};
+        const updatedEntry = {...state.entries[id], attachments};
+        return {...state, entries: {...state.entries, [id]: updatedEntry}};
       }
       case actions.UPDATE_ENTRY: {
         const {entry, changes} = action;
@@ -237,7 +227,7 @@ export default {
         // Remove the deleted session from all existing unscheduled contributions
         const oldUnscheduled = state.unscheduled.map(contrib => ({
           ...contrib,
-          sessionId: null,
+          sessionId: contrib.sessionId === action.sessionId ? null : contrib.sessionId,
         }));
         return {
           ...state,
@@ -249,7 +239,7 @@ export default {
         return state;
     }
   },
-  sessions: (state = [], action: Action) => {
+  sessions: (state: Record<string, Session> = {}, action: Action) => {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
@@ -264,8 +254,18 @@ export default {
       case actions.CREATE_SESSION:
         return {
           ...state,
-          ...{[action.session.id]: {...action.session, isPoster: false}},
+          ...{[action.session.id]: {...action.session, attachments: [], isPoster: false}},
         };
+      case actions.SET_ENTRY_ATTACHMENTS: {
+        const {sessionId, attachments} = action;
+        if (sessionId === null) {
+          return state;
+        }
+        return {
+          ...state,
+          [sessionId]: {...state[sessionId], attachments},
+        };
+      }
       default:
         return state;
     }

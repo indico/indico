@@ -23,6 +23,7 @@ import {
   DayEntries,
   Entry,
   isChildEntry,
+  Entries,
 } from './types';
 import {
   DAY_SIZE,
@@ -35,15 +36,32 @@ import {
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
-const getEntries = (state: ReduxState) => state.entries;
+const _getEntries = (state: ReduxState) => state.entries;
 const getLayoutOverrides = (state: ReduxState) => state.entries.layoutOverrides;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
 
+const getEntries = createSelector(
+  _getEntries,
+  getSessions,
+  (entries, sessions): Entries => {
+    return {
+      ...entries,
+      entries: Object.fromEntries(
+        Object.entries(entries.entries).map(([id, entry]) => {
+          if (entry.type !== EntryType.SessionBlock) {
+            return [id, entry];
+          }
+          return [id, {...entry, attachments: sessions[entry.sessionId].attachments}];
+        })
+      ),
+    };
+  }
+);
+
 const getNestedEntries = createSelector(
   getEntries,
   getLayoutOverrides,
-
   ({entries}, layoutOverrides) => {
     const topLevelEntries: Entry[] = [];
     const entriesById = new Map();
@@ -93,7 +111,7 @@ export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
 
 export const getSelectedEntry = createSelector(
   [getEntries, getSelectedId],
-  (entries, selectedId) => (selectedId === null ? null : entries.entries[selectedId])
+  ({entries}, selectedId) => (selectedId === null ? null : entries[selectedId])
 );
 
 export const getCurrentDate = (state: ReduxState) => state.navigation.currentDate;

@@ -508,7 +508,8 @@ export function DayTimetable({
         return;
       }
       const attachments = entry.data.attachments;
-      dispatch(actions.setEntryAttachments(getEntryUniqueId(type, id), attachments));
+      const sessionId = type === EntryType.SessionBlock ? entry.data.session_id : null;
+      dispatch(actions.setEntryAttachments(getEntryUniqueId(type, id), sessionId, attachments));
     }
 
     document.addEventListener('indico:attachmentsUpdate', handleMaterialsChanged);

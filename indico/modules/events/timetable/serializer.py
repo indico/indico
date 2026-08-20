@@ -128,7 +128,6 @@ class TimetableSerializer:
                      'session_id': block.session_id,
                      'session_title': block.session.title,
                      'title': block.title,
-                     'attachments': self.get_attachment_data(block.session),
                      'code': block.session.code,
                      'person_links': [self._get_person_data(x) for x in block.person_links],
                      'description': block.session.description,
@@ -189,8 +188,7 @@ class TimetableSerializer:
         def serialize_attachment(attachment):
             return {'id': attachment.id,
                     'type': 'attachment',
-                    'title': attachment.title,
-                    'download_url': attachment.download_url}
+                    'title': attachment.title}
 
         def serialize_folder(folder):
             return {'id': folder.id,
@@ -268,5 +266,6 @@ def serialize_session(sess):
         'title': sess.title,
         'url': url_for('sessions.display_session', sess),
         'default_contribution_duration': sess.default_contribution_duration.total_seconds(),
+        'attachments': TimetableSerializer.get_attachment_data(sess),
         **get_color_data(sess)
     }

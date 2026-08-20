@@ -103,6 +103,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
 const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
   {from: 'id', to: 'id'},
   {from: 'title', to: 'title'},
+  {from: 'attachments', to: 'attachments'},
   {from: 'is_poster', to: 'isPoster'},
   {
     from: 'colors',
