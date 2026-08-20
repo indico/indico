@@ -42,6 +42,8 @@ import {
   LayoutOverrides,
   ContribEntryWithoutLayout,
   SessionBlockId,
+  EntryUniqueID,
+  Attachment,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -70,6 +72,7 @@ export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
 export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_UNSCHEDULED_ENTRY = 'Update unscheduled entry';
 export const UPDATE_ENTRY = 'Update entry';
+export const SET_ENTRY_ATTACHMENTS = 'Set entry attachments';
 
 interface SetTimetableDataAction {
   type: typeof SET_TIMETABLE_DATA;
@@ -139,6 +142,12 @@ interface UpdateEntryAction {
   entryType: string;
   changes: Partial<Entry>;
   currentDay: string;
+}
+
+interface SetEntryAttachments {
+  type: typeof SET_ENTRY_ATTACHMENTS;
+  attachments: Attachment[];
+  id: EntryUniqueID;
 }
 
 interface DeleteBreakAction {
@@ -216,6 +225,7 @@ export type Action =
   | UnscheduleEntryAction
   | CreateEntryAction
   | UpdateEntryAction
+  | SetEntryAttachments
   | DeleteBreakAction
   | DeleteUnscheduledContribAction
   | AddUnscheduledContribAction
@@ -530,6 +540,13 @@ export function updateEntry(
     );
     return dispatch(action);
   };
+}
+
+export function setEntryAttachments(
+  id: EntryUniqueID,
+  attachments: Attachment[]
+): SetEntryAttachments {
+  return {type: SET_ENTRY_ATTACHMENTS, id, attachments};
 }
 
 export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
