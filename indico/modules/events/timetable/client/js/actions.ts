@@ -148,6 +148,7 @@ interface SetEntryAttachments {
   type: typeof SET_ENTRY_ATTACHMENTS;
   attachments: Attachment[];
   id: EntryUniqueID;
+  sessionId: number | null;
 }
 
 interface DeleteBreakAction {
@@ -544,9 +545,10 @@ export function updateEntry(
 
 export function setEntryAttachments(
   id: EntryUniqueID,
+  sessionId: number | null,
   attachments: Attachment[]
 ): SetEntryAttachments {
-  return {type: SET_ENTRY_ATTACHMENTS, id, attachments};
+  return {type: SET_ENTRY_ATTACHMENTS, id, sessionId, attachments};
 }
 
 export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
