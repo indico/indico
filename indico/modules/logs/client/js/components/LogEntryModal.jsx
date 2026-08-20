@@ -18,7 +18,7 @@ function LogModalTime({time}) {
   const timezone = useSelector(state => state.staticData.timezone);
   return (
     <span className="log-modal-time">
-      {moment.tz(time, timezone).format('ddd, D/M/YYYY HH:mm')} ({timezone})
+      {moment.tz(time, timezone).format('L LTS')} ({timezone})
     </span>
   );
 }

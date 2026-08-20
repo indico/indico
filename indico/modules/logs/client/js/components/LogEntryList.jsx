@@ -21,7 +21,7 @@ function LogEntryTime({time}) {
   return (
     <span
       className="logged-time"
-      title={`${moment.tz(time, timezone).format('DD/MM/YYYY HH:mm')} (${timezone})`}
+      title={`${moment.tz(time, timezone).format('L LTS')} (${timezone})`}
     >
       <time dateTime={time}>{moment.tz(time, timezone).fromNow()}</time>
     </span>
