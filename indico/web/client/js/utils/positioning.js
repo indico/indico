@@ -130,11 +130,6 @@ const verticalPreferBelowPosition = {
   },
 };
 
-const unaligned = {
-  calculateAlignment() {},
-  setAlignment() {},
-};
-
 const verticalCenter = {
   calculateAlignment() {},
   setAlignment() {
@@ -145,7 +140,10 @@ const verticalCenter = {
 const horizontalCenter = {
   calculateAlignment() {},
   setAlignment() {
-    this.setLeft(this.anchorLeft + (this.anchorWidth - this.targetWidth) / 2);
+    const centered = this.anchorLeft + (this.anchorWidth - this.targetWidth) / 2;
+    const minLeft = this.visibleLeft + this.edgePadding;
+    const maxLeft = this.visibleRight - this.targetWidth - this.edgePadding;
+    this.setLeft(Math.max(minLeft, Math.min(centered, maxLeft)));
   },
 };
 
@@ -250,8 +248,9 @@ export const dropdownPositionStrategy = {
 export const popupPositionStrategy = {
   ...geometry,
   ...verticalPreferAbovePosition,
-  ...unaligned,
-  ...withoutArrow,
+  ...horizontalCenter,
+  ...withArrow,
+  ...verticalArrowPosition,
 };
 
 /**
@@ -320,6 +319,10 @@ export function position(
   strategy.getScrollLeft = () => windowObj.scrollX;
   strategy.getVisualY = y => y;
   strategy.getVisualX = x => x;
+  strategy.edgePadding =
+    documentElement && typeof windowObj?.getComputedStyle === 'function'
+      ? 0.2 * parseFloat(windowObj.getComputedStyle(documentElement).fontSize)
+      : 0;
 
   const positioningAbortController = new AbortController();
   const adjustPosition = () => {
