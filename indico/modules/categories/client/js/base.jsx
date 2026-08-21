@@ -25,7 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="categories.export_ical"
       params={{category_id: categoryId}}
       renderButton={classes => (
-        <IButton icon="calendar" title={Translate.string('Export')} classes={classes} />
+        <ind-with-tooltip>
+          <IButton icon="calendar" classes={classes}>
+            <span data-tip-content>{Translate.string('Export')}</span>
+          </IButton>
+        </ind-with-tooltip>
       )}
       options={[{key: 'category', text: Translate.string('Category'), extraParams: {}}]}
     />,
