@@ -94,8 +94,25 @@
       border-right: 1px dotted $light-black;
     }
 
+    ind-menu {
+      // Dark menu to fit the dark header bar — the same inverse override the
+      // global menu on the main page uses.
+      --menu-background-color: var(--surface-inverse-color);
+      --menu-text-color: var(--text-inverse-color);
+      --menu-text-hover-color: var(--text-inverse-color);
+      --menu-background-hover-color: var(--surface-highlight-inverse-color);
+      --menu-border: none;
+      --menu-shadow: none;
+    }
+
     ind-menu > menu {
       @extend %menu;
+
+      // With many themes (e.g. the themes_cern plugin) the menu can grow taller
+      // than the viewport; cap it and scroll internally so every theme stays
+      // reachable. --target-top is the menu's viewport offset set by positioning.
+      max-height: calc(100dvh - var(--target-top, 0px) - 1em);
+      overflow-y: auto;
     }
 
     .filter-link {
