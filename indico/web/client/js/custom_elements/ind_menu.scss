@@ -35,17 +35,19 @@ ind-menu {
     pointer-events: none;
   }
 
-  > button::after {
+  > button::after,
+  > ind-with-tooltip > button::after {
     @extend %icon;
     @extend %icon-arrow-down;
     display: block; // XXX: Required for transform to work
   }
 
-  > button[aria-expanded='true']::after {
+  > button[aria-expanded='true']::after,
+  > ind-with-tooltip > button[aria-expanded='true']::after {
     transform: rotateX(-180deg);
   }
 
-  &[open] > button[aria-expanded='true'] + menu {
+  &[open] > menu {
     animation: menu-slide-down var(--time-menu-animation);
   }
 }
