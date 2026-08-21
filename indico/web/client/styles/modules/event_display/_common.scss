@@ -108,6 +108,11 @@
     ind-menu > menu {
       @extend %menu;
 
+      // %menu paints the surface on each link, so an empty item (the group
+      // separator) would leave a see-through gap; give the panel its own
+      // background so the whole menu reads as one solid dark surface.
+      background: var(--menu-background-color);
+
       // With many themes (e.g. the themes_cern plugin) the menu can grow taller
       // than the viewport; cap it and scroll internally so every theme stays
       // reachable. --target-top is the menu's viewport offset set by positioning.
