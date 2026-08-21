@@ -142,6 +142,10 @@ Accessibility
 - Screen reader users now hear the affiliation, email and phone on their profile
   dashboard announced as labelled fields instead of bare values (:pr:`7593`,
   thanks :user:`foxbunny`)
+- The calendar export buttons on category, session and contribution pages now
+  show a tooltip on hover and keyboard focus and have a reliable accessible name,
+  instead of relying on the ``title`` attribute (:pr:`7718`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

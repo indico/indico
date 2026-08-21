@@ -33,7 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="sessions.export_ics"
       params={{event_id: eventId, session_id: sessionId}}
       renderButton={classes => (
-        <IButton icon="calendar" classes={classes} title={Translate.string('Export')} />
+        <ind-with-tooltip>
+          <IButton icon="calendar" classes={classes}>
+            <span data-tip-content>{Translate.string('Export')}</span>
+          </IButton>
+        </ind-with-tooltip>
       )}
       options={options}
     />,
