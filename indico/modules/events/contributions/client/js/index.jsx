@@ -68,7 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="contributions.export_ics"
       params={{event_id: eventId, contrib_id: contributionId}}
       renderButton={classes => (
-        <IButton icon="calendar" classes={classes} title={Translate.string('Export')} />
+        <ind-with-tooltip>
+          <IButton icon="calendar" classes={{'icon-only': true, ...classes}}>
+            <span data-tip-content>{Translate.string('Export')}</span>
+          </IButton>
+        </ind-with-tooltip>
       )}
       options={[{key: 'contribution', text: Translate.string('Contribution'), extraParams: {}}]}
     />,
