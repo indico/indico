@@ -69,7 +69,7 @@ def validateSignature(ak, signature, timestamp, path, query):
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
         raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
     digest = hmac.new(ak.secret.encode(), normalizeQuery(path, query).encode(), hashlib.sha1).hexdigest()
-    if signature != digest:
+    if not hmac.compare_digest(signature, digest):
         raise HTTPAPIError('Signature invalid', 403)
 
 
