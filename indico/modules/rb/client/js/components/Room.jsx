@@ -15,7 +15,7 @@ import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
 
 import {TooltipIfTruncated, ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {Markdown, Slot} from 'indico/react/util';
+import {Slot, RustyMarkdown} from 'indico/react/util';
 
 import {actions as userActions, selectors as userSelectors} from '../common/user';
 
@@ -173,11 +173,7 @@ class Room extends React.Component {
           <Card.Description styleName="room-description">
             {room.comments && (
               <TooltipIfTruncated>
-                <div styleName="room-comments">
-                  <Markdown allowedElements={['br']} unwrapDisallowed>
-                    {room.comments}
-                  </Markdown>
-                </div>
+                <RustyMarkdown styleName="room-comments" source={room.comments} unstyled />
               </TooltipIfTruncated>
             )}
           </Card.Description>
