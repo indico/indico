@@ -106,6 +106,9 @@ Bugfixes
 - Allow saving minutes after using the "Mark" formatting button in the editor (:pr:`7700`)
 - Fix room booking sprite image creation failing when there are many rooms (:pr:`7704`)
 - Use correct timezone information in log viewer (:pr:`7712`, thanks :user:`SegiNyn`)
+- Fix a small gap that could appear between a tooltip and its arrow when the
+  tooltip is attached to a control with a smaller font size (:pr:`7718`,
+  thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
