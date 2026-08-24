@@ -18,9 +18,9 @@
 # Jens Märtin, 2026
 # Lauritz Bussfeld, 2026
 # C Ager, 2026
-# cheese <cheese@nosuchhost.net>, 2026
 # Thorsten Hindermann, 2026
 # Adrian, 2026
+# cheese <cheese@nosuchhost.net>, 2026
 # 
 #, fuzzy
 msgid ""
@@ -29,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
-"Last-Translator: Adrian, 2026\n"
+"Last-Translator: cheese <cheese@nosuchhost.net>, 2026\n"
 "Language-Team: German (Germany) (https://app.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -13375,7 +13375,7 @@ msgstr "Wert"
 #: indico/modules/events/fields.py
 #, python-brace-format
 msgid "Validation of {email} failed: {error}"
-msgstr ""
+msgstr "Validierung der Mail-Adresse {email} schlug fehl: {error}"
 
 #: indico/modules/events/fields.py
 #, python-brace-format
@@ -27122,7 +27122,7 @@ msgstr ""
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period has ended."
-msgstr ""
+msgstr "Der Einreich-Zeitraum ist zu Ende gegangen."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period is open until the submission deadline."

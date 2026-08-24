@@ -2944,10 +2944,10 @@ msgstr "Zkopírovat do schránky"
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 msgid "Your email has been sent."
 msgid_plural "Your emails have been sent."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Váš e-mail byl odeslán."
+msgstr[1] "Vaše e-maily byly odeslány."
+msgstr[2] "Vaše e-maily byly odeslány."
+msgstr[3] "Vaše e-maily byly odeslány."
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 #, python-brace-format
@@ -3115,10 +3115,10 @@ msgstr "Zobrazit moji účast všem, kdo mají přístup k této události"
 #, python-brace-format
 msgid "You are about to send {numInvitations} invitation."
 msgid_plural "You are about to send {numInvitations} invitations."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Chystáte se odeslat {numInvitations} pozvánku."
+msgstr[1] "Chystáte se odeslat {numInvitations} pozvánky."
+msgstr[2] "Chystáte se odeslat {numInvitations} pozvánek."
+msgstr[3] "Chystáte se odeslat {numInvitations} pozvánek."
 
 #: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
 #, python-brace-format
@@ -3291,29 +3291,29 @@ msgstr "Pozvat lidi"
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Send invitation email?"
 msgid_plural "Send invitation emails?"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Poslat e-mail s pozvánkou?"
+msgstr[1] "Poslat e-maily s pozvánkou?"
+msgstr[2] "Poslat e-maily s pozvánkou?"
+msgstr[3] "Poslat e-maily s pozvánkou?"
 
 #: indico/modules/events/persons/templates/management/person_list.html
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 msgid "Send invitation"
 msgid_plural "Send invitations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Poslat pozvánku"
+msgstr[1] "Poslat pozvánky"
+msgstr[2] "Poslat pozvánky"
+msgstr[3] "Poslat pozvánky"
 
 #: indico/modules/events/registration/client/js/components/InviteDialog.jsx
 #, python-brace-format
 msgid "You are about to send {count} invitation. Do you want to proceed?"
 msgid_plural ""
 "You are about to send {count} invitations. Do you want to proceed?"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Chystáte se odeslat {count} pozvánku. Chcete pokračovat?"
+msgstr[1] "Chystáte se odeslat {count} pozvánky. Chcete pokračovat?"
+msgstr[2] "Chystáte se odeslat {count} pozvánek. Chcete pokračovat?"
+msgstr[3] "Chystáte se odeslat {count} pozvánek. Chcete pokračovat?"
 
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx
 #: indico/modules/events/registration/forms.py
@@ -4659,7 +4659,7 @@ msgstr "Zobrazit časovou osu"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 msgid "Accept booking"
-msgstr "Přijat rezevaci"
+msgstr "Potvrdit rezervaci"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 msgid "Booking Details"
@@ -4738,7 +4738,7 @@ msgstr "Nová rezervace"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx
 msgid "Booking after changes"
-msgstr "Rezervace po zmšnách"
+msgstr "Rezervace po změnách"
 
 #: indico/modules/categories/templates/display/overview/base.html
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx
@@ -5265,7 +5265,7 @@ msgstr "Nebyly nalezeny žádné fotografie."
 #: indico/modules/rb/client/js/common/timeline/WeeklyTimelineContent.jsx
 #, python-brace-format
 msgid "Results: {count}"
-msgstr ""
+msgstr "Výsledky: {count}"
 
 #: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx
 msgid "Please turn your device horizontally to view this page."
@@ -5356,7 +5356,7 @@ msgstr[3] "Opakuje se každých {count} měsíců"
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 #, python-brace-format
 msgid "From {startTime} to {endTime}"
-msgstr ""
+msgstr "Od {startTime} do {endTime}"
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 #, python-brace-format
@@ -5966,10 +5966,13 @@ msgid ""
 "By default only admins and location managers can modify rooms, but you can "
 "allow room owners and managers to modify them as well."
 msgstr ""
+"Ve výchozím nastavení mohou místnosti upravovat pouze administrátoři a "
+"správci lokalit, ale můžete povolit jejich úpravy i vlastníkům a správcům "
+"místností."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Hide booking details"
-msgstr ""
+msgstr "Skrýt detaily rezervace"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid ""
@@ -6023,7 +6026,7 @@ msgstr "Maximální délka rezervace ve dnech."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Booking reason required"
-msgstr ""
+msgstr "Důvod rezervace vyžadován"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Specify when a booking reason must be provided."
@@ -6064,13 +6067,16 @@ msgstr "Denní rezervace"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Enable internal booking notes"
-msgstr ""
+msgstr "Povolit interní poznámky k rezervaci"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid ""
 "Allow room owners/managers to add internal notes to bookings which are only "
 "visible to other room owners/managers."
 msgstr ""
+"Umožňuje vlastníkům/správcům místností přidávat k rezervacím interní "
+"poznámky, které budou viditelné pouze ostatním vlastníkům/správcům "
+"místností."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Disable booking during event creation"
@@ -6174,11 +6180,11 @@ msgstr "Čeká se na chválení manažerem místnosti"
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx
 #, python-brace-format
 msgid "Booking rejected by {rejectedBy}"
-msgstr "Rezervace by zamítnutá uživatelem {rejectedBy}"
+msgstr "Rezervace zamítnuta uživatelem {rejectedBy}"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx
 msgid "Accept blocking"
-msgstr "Přijat blokaci"
+msgstr "Potvrdit blokaci"
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx
 msgid "Update blocking"
@@ -6627,15 +6633,15 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only used spaces"
-msgstr ""
+msgstr "Zobrazit pouze použité prostory"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "All"
-msgstr ""
+msgstr "Vše"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show all spaces"
-msgstr ""
+msgstr "Zobrazit všechny prostory"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Unused"
@@ -6643,7 +6649,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show only unused spaces"
-msgstr ""
+msgstr "Zobrazit pouze nepoužité prostory"
 
 #: indico/modules/rb/client/js/modules/calendar/Calendar.jsx
 msgid "Show calendar view"
@@ -6804,7 +6810,7 @@ msgstr "Moje oblíbené místnosti"
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
 #: indico/modules/rb/settings.py
 msgid "Rooms I manage or moderate"
-msgstr ""
+msgstr "Místnosti, které spravuji nebo moderuji"
 
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
 msgid "Rooms I am authorized to book"
@@ -21695,7 +21701,7 @@ msgstr ""
 
 #: indico/modules/events/registration/controllers/display.py
 msgid "This registration form is private."
-msgstr ""
+msgstr "Tento registrační formulář je soukromý."
 
 #: indico/modules/events/registration/controllers/display.py
 msgid "Your invitation code is not valid."
@@ -23531,17 +23537,19 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "This form is private"
-msgstr ""
+msgstr "Tento formulář je soukromý"
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid ""
 "Share the secret link or send invitations to anyone you want to register."
 msgstr ""
+"Sdílejte tajný odkaz nebo pošlete pozvánky komukoli, koho chcete "
+"zaregistrovat."
 
 #: indico/modules/events/registration/templates/management/regform.html
 #: indico/modules/events/surveys/templates/management/survey.html
 msgid "Copy secret link"
-msgstr ""
+msgstr "Kopírovat tajný odkaz"
 
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Registrations have been deleted due to an expired retention period."
@@ -27867,11 +27875,11 @@ msgstr ""
 
 #: indico/modules/rb/__init__.py indico/modules/users/models/export.py
 msgid "Room booking"
-msgstr "Rezervace místností"
+msgstr "Rezervace místnosti"
 
 #: indico/modules/rb/__init__.py indico/modules/rb/templates/booking_list.html
 msgid "Room bookings"
-msgstr ""
+msgstr "Rezervace místností"
 
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
@@ -27932,7 +27940,7 @@ msgstr "Místnosti, které vlastním"
 
 #: indico/modules/rb/settings.py
 msgid "Rooms I own, manage or moderate"
-msgstr ""
+msgstr "Místnosti, které vlastním, spravuji nebo moderuji"
 
 #: indico/modules/rb/user_prefs.py
 msgid "Room notifications"
@@ -28088,17 +28096,18 @@ msgstr "S pozdravem,"
 
 #: indico/modules/rb/templates/emails/blockings/awaiting_confirmation_email_to_manager.txt
 msgid "Confirm room blockings"
-msgstr ""
+msgstr "Potvrdit blokování místností"
 
 #: indico/modules/rb/templates/emails/blockings/awaiting_confirmation_email_to_manager.txt
 #, python-format
 msgid "%(name)s has created a blocking for some rooms you manage."
 msgstr ""
+"%(name)s vytvořil(a) blokování pro některé místnosti, které spravujete."
 
 #: indico/modules/rb/templates/emails/blockings/awaiting_confirmation_email_to_manager.txt
 #, python-format
 msgid "%(name)s has created a blocking for a room you manage."
-msgstr ""
+msgstr "%(name)s vytvořil(a) blokování pro místnost, kterou spravujete."
 
 #: indico/modules/rb/templates/emails/blockings/awaiting_confirmation_email_to_manager.txt
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt
@@ -28122,7 +28131,7 @@ msgstr "Důvod:"
 
 #: indico/modules/rb/templates/emails/blockings/awaiting_confirmation_email_to_manager.txt
 msgid "You can approve or reject this blocking request here:"
-msgstr ""
+msgstr "Tuto žádost o blokování můžete schválit nebo zamítnout zde:"
 
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt
 msgid "Room blocking ACCEPTED"
@@ -28154,7 +28163,7 @@ msgstr ""
 
 #: indico/modules/rb/templates/emails/reservations/base_email_to_manager.txt
 msgid "You can check the details of the booking here:"
-msgstr ""
+msgstr "Podrobnosti rezervace si můžete ověřit zde:"
 
 #: indico/modules/rb/templates/emails/reservations/base_email_to_user.txt
 msgid "Booking details:"
@@ -28162,7 +28171,7 @@ msgstr "Detaily rezervace:"
 
 #: indico/modules/rb/templates/emails/reservations/base_email_to_user.txt
 msgid "Remember you can always check your bookings here:"
-msgstr ""
+msgstr "Nezapomeňte, že si své rezervace můžete kdykoli zkontrolovat zde:"
 
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_user.txt
@@ -28173,49 +28182,52 @@ msgstr "[%(room)s] Rezervace zrušena (%(start)s)"
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_manager.txt
 #, python-format
 msgid "A booking in your room '%(room)s' has been CANCELLED by the user."
-msgstr ""
+msgstr "Rezervace ve vaší místnosti '%(room)s' byla uživatelem ZRUŠENA."
 
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_user.txt
 msgid "You have CANCELLED your booking:"
-msgstr ""
+msgstr "ZRUŠILI jste svou rezervaci:"
 
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_user.txt
 #, python-format
 msgid "[%(room)s] Booking approval changed state (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Stav schválení rezervace změněn (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_manager.txt
 msgid ""
 "A booking in a room you manage has been MODIFIED and the changes require "
 "approval."
 msgstr ""
+"Rezervace místnosti, kterou spravujete, byla ZMĚNĚNA a změny vyžadují "
+"schválení."
 
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_user.txt
 msgid "Your booking has been MODIFIED and the changes require approval."
-msgstr ""
+msgstr "Vaše rezervace byla ZMĚNĚNA a změny vyžadují schválení."
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
 msgid "[%(room)s] Booking confirmed (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Rezervace potvrzena (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_manager.txt
 #, python-format
 msgid ""
 "A booking in your room '%(room)s' has been CONFIRMED by a room manager."
 msgstr ""
+"Rezervace ve vaší místnosti '%(room)s' byla správcem místnosti POTVRZENA."
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt
 msgid "The following message was provided by the room manager:"
-msgstr ""
+msgstr "Správce místnosti poskytl následující zprávu:"
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt
 msgid "Your booking has been ACCEPTED."
-msgstr ""
+msgstr "Vaše rezervace byla PŘIJATA."
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt
 msgid "This is the final confirmation."
@@ -28224,20 +28236,20 @@ msgstr ""
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt
 #, python-format
 msgid "[%(room)s] New Pre-Booking (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Nová předběžná rezervace (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt
 #, python-format
 msgid "[%(room)s] New booking (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Nová rezervace (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt
 msgid "There is a new pre-booking for your room."
-msgstr ""
+msgstr "Pro vaši místnost je nová předběžná rezervace."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt
 msgid "There is a new booking for your room."
-msgstr ""
+msgstr "Pro vaši místnost je nová rezervace."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
@@ -28250,6 +28262,8 @@ msgid ""
 "The conference room %(room)s%(linebreak)s has been pre-booked for "
 "%(name)s%(linebreak)s on %(date)s from %(from)s to %(to)s."
 msgstr ""
+"Konferenční místnost %(room)s%(linebreak)s byla předrezervována pro "
+"%(name)s%(linebreak)s v %(date)s od %(from)s do %(to)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
@@ -28258,6 +28272,9 @@ msgid ""
 "%(name)s%(linebreak)s %(map)s from %(from)s to %(to)s between %(start)s and "
 "%(end)s."
 msgstr ""
+"Konferenční místnost %(room)s%(linebreak)s byla předrezervována pro "
+"%(name)s%(linebreak)s %(map)s od %(from)s do %(to)s mezi %(start)s a "
+"%(end)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
@@ -28265,6 +28282,8 @@ msgid ""
 "The conference room %(room)s%(linebreak)s has been booked for "
 "%(name)s%(linebreak)s on %(date)s from %(from)s to %(to)s."
 msgstr ""
+"Konferenční místnost %(room)s%(linebreak)s byla rezervována pro "
+"%(name)s%(linebreak)s v %(date)s od %(from)s do %(to)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
@@ -28273,6 +28292,9 @@ msgid ""
 "%(name)s%(linebreak)s %(map)s from %(from)s to %(to)s between %(start)s and "
 "%(end)s."
 msgstr ""
+"Konferenční místnost %(room)s%(linebreak)s byla rezervována pro "
+"%(name)s%(linebreak)s %(map)s od %(from)s do %(to)s mezi %(start)s a "
+"%(end)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 #, python-format
@@ -28286,6 +28308,8 @@ msgid ""
 "If you end up not needing this room, please cancel the booking from the "
 "booking details so that the room can be booked by somebody else."
 msgstr ""
+"Pokud tuto místnost nebudete potřebovat, zrušte prosím její rezervaci, aby "
+"si místnost mohl rezervovat někdo jiný."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 msgid ""
@@ -28293,6 +28317,9 @@ msgid ""
 " room may reject your booking. Should that happen you will be instantly "
 "notified by e-mail."
 msgstr ""
+"Vezměte prosím na vědomí, že v mimořádných (výjimečných) případech může "
+"osoba zodpovědná za tuto místnost  vaši rezervaci odmítnout. Pokud k tomu "
+"dojde, budete o tom neprodleně informováni e-mailem."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt
 msgid "Note:"
@@ -28309,15 +28336,15 @@ msgstr ""
 #: indico/modules/rb/templates/emails/reservations/modification_email_to_user.txt
 #, python-format
 msgid "[%(room)s] Booking modified (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Rezervace upravena (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/modification_email_to_manager.txt
 msgid "A booking in a room you manage has been MODIFIED."
-msgstr ""
+msgstr "Rezervace místnosti, kterou spravujete, byla ZMĚNĚNA."
 
 #: indico/modules/rb/templates/emails/reservations/modification_email_to_user.txt
 msgid "Your booking has been MODIFIED."
-msgstr ""
+msgstr "Vaše rezervace byla ZMĚNĚNA."
 
 #: indico/modules/rb/templates/emails/reservations/occurrence_cancellation_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/occurrence_cancellation_email_to_user.txt
@@ -28354,22 +28381,22 @@ msgstr ""
 #, python-format
 msgid ""
 "Your booking has been REJECTED by the manager of the room for the %(date)s."
-msgstr ""
+msgstr "Vaše rezervace pro %(date)s byla správcem místnosti ZAMÍTNUTA."
 
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_user.txt
 #, python-format
 msgid "[%(room)s] Booking rejected (%(start)s)"
-msgstr ""
+msgstr "[%(room)s] Rezervace zamítnuta (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt
 #, python-format
 msgid "A booking has been REJECTED by the manager of the room '%(name)s'."
-msgstr ""
+msgstr "Rezervace byla ZAMÍTNUTA správcem místnosti '%(name)s'."
 
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_user.txt
 msgid "Your booking has been REJECTED by the manager of the room."
-msgstr ""
+msgstr "Vaše rezervace byla správcem místnosti ZAMÍTNUTA."
 
 #: indico/modules/rb/templates/emails/reservations/reservation_info.txt
 msgid "For:"
@@ -28377,7 +28404,7 @@ msgstr "Pro:"
 
 #: indico/modules/rb/templates/emails/reservations/reservation_info.txt
 msgid "Hours:"
-msgstr ""
+msgstr "Hodiny:"
 
 #: indico/modules/rb/templates/emails/reservations/reservation_key_info.txt
 msgid "How to find a key:"
@@ -28401,7 +28428,7 @@ msgstr ""
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html
 msgid "Reason of the booking:"
-msgstr ""
+msgstr "Důvod rezervace:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html
 msgid "Reservation reminder"
@@ -28409,7 +28436,7 @@ msgstr ""
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html
 msgid "This is a reminder about a booking under your name:"
-msgstr ""
+msgstr "Toto je připomenutí rezervace provedené na vaše jméno:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html
 msgid "This is a reminder about bookings under your name:"
@@ -28421,6 +28448,8 @@ msgid ""
 "If you do not need to use the room, please %(link)scancel the reservation in"
 " Indico%(endlink)s."
 msgstr ""
+"Pokud místnost nepotřebujete, prosím %(link)szrušte její rezervaci v "
+"Indico%(endlink)s."
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html
 #, python-format
@@ -28428,6 +28457,8 @@ msgid ""
 "If you do not need to use the room, please %(link)scancel the occurrence in "
 "Indico%(endlink)s."
 msgstr ""
+"Pokud místnost nepotřebujete, prosím %(link)szrušte její rezervaci v "
+"Indico%(endlink)s."
 
 #: indico/modules/receipts/__init__.py
 #: indico/modules/receipts/templates/admin_settings.html
@@ -29440,7 +29471,7 @@ msgstr ""
 #: indico/modules/vc/controllers.py
 #, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' created"
-msgstr ""
+msgstr "{plugin_name} videokonference '{room.name}' vytvořena"
 
 #: indico/modules/vc/controllers.py
 #, python-brace-format
@@ -29450,7 +29481,7 @@ msgstr ""
 #: indico/modules/vc/controllers.py
 #, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' updated"
-msgstr ""
+msgstr "{plugin_name} videokonference '{room.name}' aktualizována"
 
 #: indico/modules/vc/controllers.py
 #, python-brace-format
@@ -29462,7 +29493,7 @@ msgstr ""
 #: indico/modules/vc/controllers.py
 #, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' refreshed"
-msgstr ""
+msgstr "{plugin_name} videokonference '{room.name}' obnovena"
 
 #: indico/modules/vc/controllers.py
 #, python-brace-format
@@ -29472,7 +29503,7 @@ msgstr ""
 #: indico/modules/vc/controllers.py
 #, python-brace-format
 msgid "{plugin_name} videoconference '{room.name}' removed"
-msgstr ""
+msgstr "{plugin_name} videokonference '{room.name}' odstraněna"
 
 #: indico/modules/vc/controllers.py
 #, python-brace-format
@@ -30394,7 +30425,7 @@ msgstr ""
 
 #: indico/web/forms/fields/datetime.py
 msgid "Hours"
-msgstr ""
+msgstr "Hodiny"
 
 #: indico/web/forms/fields/datetime.py
 msgid "Weeks"

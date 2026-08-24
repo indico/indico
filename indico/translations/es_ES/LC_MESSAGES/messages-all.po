@@ -8,8 +8,8 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2024
 # José Manuel Macías, 2025
 # Ajob Kustra, 2025
-# Jesús Martín <jesusmartin@sallep.net>, 2026
 # Adrian, 2026
+# Jesús Martín <jesusmartin@sallep.net>, 2026
 # 
 #, fuzzy
 msgid ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-08-17 13:00+0200\n"
 "PO-Revision-Date: 2024-12-12 10:20+0000\n"
-"Last-Translator: Adrian, 2026\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2026\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1601,9 +1601,13 @@ msgid "Required files are missing. Please upload a {types} file."
 msgid_plural ""
 "Required files are missing. Please upload files of the following types: "
 "{types}"
-msgstr[0] ""
+msgstr[0] "Faltan los archivos necesarios. Sube un archivo « {types} »."
 msgstr[1] ""
+"Faltan algunos archivos obligatorios. Por favor, sube archivos de los "
+"siguientes tipos: {types}"
 msgstr[2] ""
+"Faltan algunos archivos obligatorios. Por favor, suba archivos de los "
+"siguientes tipos: {types}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesBox.jsx
 msgid "Required file types are missing."
@@ -3176,8 +3180,17 @@ msgid_plural ""
 "{count} imported invitations contain affiliation data that will not be pre-"
 "filled because this form only allows predefined affiliations."
 msgstr[0] ""
+"{count} La invitación importada contiene datos de afiliación que no se "
+"rellenarán automáticamente, ya que este formulario solo admite afiliaciones "
+"predefinidas."
 msgstr[1] ""
+"{count} Las invitaciones importadas contienen datos de afiliación que no se "
+"rellenarán automáticamente, ya que este formulario solo admite afiliaciones "
+"predefinidas."
 msgstr[2] ""
+" Las invitaciones importadas {count} contienen datos de afiliación que no se"
+" rellenarán automáticamente, ya que este formulario solo admite afiliaciones"
+" predefinidas."
 
 #: indico/modules/events/registration/client/js/components/ImportInvitationsField.tsx
 msgid "Please upload a valid CSV file."
@@ -3406,7 +3419,7 @@ msgstr "Mostrar la vista de participante registrado"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 msgid "Show unregistered guest view"
-msgstr ""
+msgstr "Mostrar la vista para visitantes no registrados"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 msgid "There are no published registrations."
@@ -3421,17 +3434,17 @@ msgstr "Aún no hay inscripciones."
 #, python-brace-format
 msgid "{count} participant"
 msgid_plural "{count} participants"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{count} participante"
+msgstr[1] "{count} participantes"
+msgstr[2] "{count} participantes"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Rows per page:"
-msgstr ""
+msgstr "Filas por página:"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Search participants"
-msgstr ""
+msgstr "Buscar participantes"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
@@ -3439,7 +3452,7 @@ msgstr "Estado de la facturación"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "No participants to display."
-msgstr ""
+msgstr "No hay participantes que mostrar."
 
 #: indico/modules/events/registration/client/js/form/FormErrorList.jsx
 #: indico/modules/events/registration/forms.py
@@ -3604,7 +3617,7 @@ msgstr "Número de acompañantes"
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 #, python-brace-format
 msgid "{price} (Total: {totalPrice})"
-msgstr ""
+msgstr "{price} (Total: {totalPrice})"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "No accompanying persons registered"
@@ -3631,6 +3644,8 @@ msgid ""
 "Disable tickets for accompanying persons to enable anonymous accompanying "
 "person registration."
 msgstr ""
+"Desactive los tiques para acompañantes para permitir el registro anónimo de "
+"acompañantes."
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Maximum per registrant"
@@ -3649,18 +3664,20 @@ msgstr "Los acompañantes cuentan para el límite de inscripción"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid "Anonymous accompanying persons"
-msgstr ""
+msgstr "Acompañantes anónimos"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid ""
 "Collect only the number of accompanying persons instead of their names."
 msgstr ""
+"Registrar únicamente el número de acompañantes, en lugar de sus nombres."
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx
 msgid ""
 "Tickets and badge printing are not available for anonymous accompanying "
 "persons."
 msgstr ""
+"No se pueden imprimir tiques ni acreditaciones para acompañantes anónimos."
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
@@ -3672,19 +3689,19 @@ msgstr "Este campo es obligatorio."
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 msgid "Allowed affiliations"
-msgstr ""
+msgstr "Afiliaciones permitidas"
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 msgid "Predefined and custom affiliations"
-msgstr ""
+msgstr "Afiliaciones predefinidas y personalizadas"
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 msgid "Only predefined affiliations"
-msgstr ""
+msgstr "Solo afiliaciones predefinidas"
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 msgid "Only custom affiliations"
-msgstr ""
+msgstr "Solo afiliaciones personalizadas"
 
 #: indico/modules/events/registration/client/js/form/fields/AffiliationInput.jsx
 msgid ""
@@ -3692,6 +3709,9 @@ msgid ""
 "filled in the registration form when only predefined affiliations are "
 "allowed."
 msgstr ""
+"Las afiliaciones indicadas en las invitaciones son texto personalizado y no "
+"aparecerán rellenadas automáticamente en el formulario de inscripción cuando"
+" solo se permitan afiliaciones predefinidas."
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
@@ -4353,15 +4373,15 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "Advanced settings"
-msgstr ""
+msgstr "Configuración avanzada"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "Internal name"
-msgstr ""
+msgstr "Nombre interno"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "Only lowercase alphanumeric characters and dashes are allowed."
-msgstr ""
+msgstr "Solo se permiten caracteres alfanuméricos en minúsculas y guiones."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid ""
@@ -4369,10 +4389,14 @@ msgid ""
 "the title. This can also be used across events if you make sure to use the "
 "same internal name."
 msgstr ""
+"Se utiliza para identificar el mismo campo en los formularios de "
+"inscripción, independientemente del título. También se puede utilizar en "
+"distintos eventos si se asegura de emplear el mismo nombre interno."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx
 msgid "The internal name for a personal data field cannot be changed."
 msgstr ""
+"El nombre interno de un campo de datos personales no se puede modificar."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx
 msgid "Choose type"
@@ -7609,11 +7633,11 @@ msgstr "añadir afiliación"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Short name"
-msgstr ""
+msgstr "Nombre abreviado"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Enter a short identifier for the affiliation"
-msgstr ""
+msgstr "Introduce un identificador breve para la afiliación"
 
 #: indico/modules/users/client/js/affiliations/AffiliationFormDialog.tsx
 msgid "Alternative names"
@@ -7660,7 +7684,7 @@ msgstr "Seleccione un ítem de la lista."
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Link copied to clipboard"
-msgstr ""
+msgstr "Enlace copiado en el portapapeles"
 
 #: indico/modules/events/management/templates/_settings.html
 #: indico/modules/events/registration/templates/management/regform.html
@@ -7672,16 +7696,16 @@ msgstr "Copiar enlace al portapapeles"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Download QR code"
-msgstr ""
+msgstr "Descargar código QR"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 #, python-brace-format
 msgid "{size} ({pixels}x{pixels} px)"
-msgstr ""
+msgstr "{size} ({pixels}x{pixels} píxeles)"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Show QR code"
-msgstr ""
+msgstr "Mostrar código QR"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js
 msgid "Google Calendar"
@@ -7830,7 +7854,7 @@ msgstr "Pulse de nuevo para confirmar ({delay})"
 
 #: indico/web/client/js/react/components/CountryDropdown.jsx
 msgid "Select a country..."
-msgstr ""
+msgstr "Selecciona un país..."
 
 #: indico/web/client/js/react/components/DatePicker.jsx
 #: indico/web/client/js/react/components/DateRangePicker.jsx
@@ -8325,6 +8349,8 @@ msgstr "Patrón de nombre de archivo: {pattern} "
 #, python-brace-format
 msgid "Total attachment size ({current} MB) exceeds the {limit} MB limit"
 msgstr ""
+"El tamaño total del archivo adjunto ({current} MB) supera el límite de "
+"{limit} MB."
 
 #: indico/web/client/js/react/components/files/FileManager/index.jsx
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx
@@ -9215,7 +9241,7 @@ msgstr "La solicitud no era válida o contenía argumentos no válidos."
 #: indico/core/notifications.py
 #, python-brace-format
 msgid "Total attachment size too large (max. {} MB)"
-msgstr ""
+msgstr "El tamaño total del archivo adjunto es demasiado grande (máx. {} MB)"
 
 #: indico/core/permissions.py
 msgid "Unrestricted management access for the whole event"
@@ -13377,7 +13403,7 @@ msgstr "Valor"
 #: indico/modules/events/fields.py
 #, python-brace-format
 msgid "Validation of {email} failed: {error}"
-msgstr ""
+msgstr "Validación de {email} ha fallado: {error}"
 
 #: indico/modules/events/fields.py
 #, python-brace-format
@@ -14544,7 +14570,7 @@ msgstr "El título del remitente (Dr., Prof., etc.)"
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The URL of the contribution"
-msgstr ""
+msgstr "La URL de la contribución"
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The ID of the target abstract (merge or duplicate)"
@@ -15932,7 +15958,7 @@ msgstr "No tiene autorización para editar este resumen."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "Export PDF"
-msgstr ""
+msgstr "Exportar a PDF"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html
 msgid "PDF with reviews"
@@ -16601,7 +16627,7 @@ msgstr "Otorgar derechos de administración de materiales y actas."
 
 #: indico/modules/events/contributions/__init__.py
 msgid "My Timetable"
-msgstr ""
+msgstr "Mi horario"
 
 #: indico/modules/events/contributions/clone.py
 msgid "The target event already has contribution types"
@@ -16782,7 +16808,7 @@ msgstr "Ninguna sesión"
 
 #: indico/modules/events/contributions/lists.py
 msgid "Interested"
-msgstr ""
+msgstr "Interesado"
 
 #: indico/modules/events/contributions/lists.py
 msgid "Registered"
@@ -16973,9 +16999,10 @@ msgstr "Aún no hay contribuciones."
 msgid "One person has added this contribution to their timetable."
 msgid_plural ""
 "%(count)s people have added this contribution to their timetable."
-msgstr[0] ""
+msgstr[0] "Una persona ha añadido esta aportación a su horario."
 msgstr[1] ""
-msgstr[2] ""
+"%(count)s Hay personas que han añadido esta aportación a su horario."
+msgstr[2] "%(count)s personas han añadido esta aportación a su horario."
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
 msgid "Go to contribution page"
@@ -21140,11 +21167,11 @@ msgstr "El código del programa de la contribución"
 
 #: indico/modules/events/persons/placeholders.py
 msgid "The board number of the contribution"
-msgstr ""
+msgstr "El número de tablero de la aportación"
 
 #: indico/modules/events/persons/placeholders.py
 msgid "Link to the contribution"
-msgstr ""
+msgstr "Enlace a la contribución"
 
 #: indico/modules/events/persons/placeholders.py
 msgid "The duration of the contribution (e.g. \"20 minutes\")"
@@ -21157,11 +21184,14 @@ msgstr "Fecha/hora prevista de la contribución, o \"n/a\" si no está prevista"
 #: indico/modules/events/persons/placeholders.py
 msgid "The scheduled date/time including the weekday, or \"n/a\" if unscheduled"
 msgstr ""
+"La fecha y la hora previstas, incluido el día de la semana, o «n/a» si no "
+"hay fecha prevista"
 
 #: indico/modules/events/persons/placeholders.py
 msgid ""
 "Link to the contribution created from the abstract (empty if not accepted)"
 msgstr ""
+"Enlace a la entrada creada a partir de resumen (vacío si no es aceptado)"
 
 #: indico/modules/events/persons/templates/emails/_contributions.html
 msgid "Not scheduled yet"
@@ -21447,11 +21477,12 @@ msgstr "Concede acceso para consultar y registrar las inscripciones."
 
 #: indico/modules/events/registration/__init__.py
 msgid "Registration (manage participants only)"
-msgstr ""
+msgstr "Inscripción (solo para la gestión de participantes)"
 
 #: indico/modules/events/registration/__init__.py
 msgid "Grants access to view, create, edit and delete registrations."
 msgstr ""
+"Otorga permisos para consultar, crear, modificar y eliminar inscripciones."
 
 #: indico/modules/events/registration/badges.py
 msgid "The template dimensions are too large for the page size you selected"
@@ -21524,7 +21555,7 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Reset approval on modification"
-msgstr ""
+msgstr "Restablecer la aprobación tras una modificación"
 
 #: indico/modules/events/registration/forms.py
 msgid ""
@@ -21532,6 +21563,9 @@ msgid ""
 "pending. Only applies to modifications made by the registrant, not by a "
 "manager."
 msgstr ""
+"Si se activa esta opción, al modificar un registro, su estado de aprobación "
+"volverá a ser «pendiente». Esto solo se aplica a las modificaciones "
+"realizadas por el titular del registro, no por un administrador."
 
 #: indico/modules/events/registration/forms.py
 msgid ""
@@ -21893,12 +21927,17 @@ msgid ""
 "Create tickets for each of the users accompanying persons. This option is "
 "unavailable because anonymous accompanying person registration is enabled."
 msgstr ""
+"Crea entradas para cada uno de los acompañantes de los usuarios. Esta opción"
+" no está disponible porque se ha activado el registro anónimo de "
+"acompañantes."
 
 #: indico/modules/events/registration/forms.py
 msgid ""
 "Tickets for accompanying persons cannot be enabled because the registration "
 "form contains anonymous accompanying person registrations."
 msgstr ""
+"No se pueden activar las entradas para acompañantes porque el formulario de "
+"inscripción contiene inscripciones anónimas de acompañantes."
 
 #: indico/modules/events/registration/forms.py
 #: indico/modules/events/registration/templates/management/regform_list.html
@@ -22331,11 +22370,12 @@ msgstr ""
 #: indico/modules/events/registration/controllers/management/fields.py
 msgid "Changing internal name for personal data field is not allowed."
 msgstr ""
+"No está permitido cambiar el nombre interno de un campo de datos personales."
 
 #: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
 msgid "The field \"{}\" on this form has the same internal name."
-msgstr ""
+msgstr "El campo «{}» de este formulario tiene el mismo nombre interno."
 
 #: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
@@ -22343,6 +22383,8 @@ msgid ""
 "The field \"{field}\" with the same internal name on form \"{form}\" uses a "
 "different input type which is not allowed."
 msgstr ""
+"El campo «{field} », que tiene el mismo nombre interno en el formulario "
+"«{form} », utiliza un tipo de entrada diferente que no está permitido."
 
 #: indico/modules/events/registration/controllers/management/fields.py
 #, python-brace-format
@@ -22377,6 +22419,8 @@ msgid ""
 "The field \"{}\" with the same internal name on form \"{}\" uses a different"
 " input type which is not allowed."
 msgstr ""
+"El campo «{}», que tiene el mismo nombre interno en el formulario «{}», "
+"utiliza un tipo de entrada diferente que no está permitido."
 
 #: indico/modules/events/registration/controllers/management/fields.py
 msgid "Fields used as conditional cannot be disabled"
@@ -22658,24 +22702,28 @@ msgid ""
 "Cannot be switched back to named mode when anonymous accompanying persons "
 "are registered."
 msgstr ""
+"No es posible volver al modo con nombre cuando hay acompañantes anónimos "
+"registrados."
 
 #: indico/modules/events/registration/fields/accompanying.py
 msgid ""
 "Anonymous accompanying persons cannot be enabled while tickets for "
 "accompanying persons are enabled."
 msgstr ""
+"No se pueden activar los acompañantes anónimos mientras estén activadas las "
+"entradas para acompañantes."
 
 #: indico/modules/events/registration/fields/accompanying.py
 msgid "Cannot be enabled when accompanying persons are registered."
-msgstr ""
+msgstr "No se puede activar si hay personas acompañantes registradas."
 
 #: indico/modules/events/registration/fields/accompanying.py
 #, python-brace-format
 msgid "{count} person"
 msgid_plural "{count} persons"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{count} persona"
+msgstr[1] "{count} personas"
+msgstr[2] "{count} personas"
 
 #: indico/modules/events/registration/fields/accompanying.py
 #: indico/modules/events/registration/fields/simple.py
@@ -22725,9 +22773,9 @@ msgstr "No hay suficientes salas en '{0}'"
 #, python-brace-format
 msgid "{n} night"
 msgid_plural "{n} nights"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{n} noche"
+msgstr[1] "{n} noches"
+msgstr[2] "{n} noches"
 
 #: indico/modules/events/registration/fields/sessions.py
 #, python-brace-format
@@ -23290,6 +23338,8 @@ msgid ""
 "If you modify this registration, it needs to be approved again by the event "
 "organizer."
 msgstr ""
+"Si modifica esta inscripción, deberá ser aprobada de nuevo por el "
+"organizador del evento."
 
 #: indico/modules/events/registration/templates/display/registration_modify.html
 msgid "Skip to registration form"
@@ -23889,7 +23939,7 @@ msgstr "Enviado: %(submitted)s"
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
 msgid "Modified: %(modified)s"
-msgstr ""
+msgstr "Modificado: %(modified)s"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html
 #, python-format
@@ -24686,7 +24736,7 @@ msgstr "Libro de inscritos"
 
 #: indico/modules/events/registration/templates/pdf/participants_book.html
 msgid "Table of Contents"
-msgstr ""
+msgstr "Índice"
 
 #: indico/modules/events/registration/templates/pdf/participants_book.html
 #: indico/modules/events/registration/wallets/apple.py
@@ -24696,12 +24746,12 @@ msgstr "Detalles de la inscripción"
 
 #: indico/modules/events/registration/templates/pdf/participants_book.html
 msgid "Personal details"
-msgstr ""
+msgstr "Datos personales"
 
 #: indico/modules/events/registration/templates/pdf/participants_book.html
 #, python-format
 msgid "Page %(page)s"
-msgstr ""
+msgstr "Página %(page)s"
 
 #: indico/modules/events/registration/templates/pdf/participants_table.html
 msgid "List of registrants"
@@ -26118,7 +26168,7 @@ msgstr ""
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "Clone section"
-msgstr ""
+msgstr "Clonar sección"
 
 #: indico/modules/events/surveys/templates/management/_questionnaire_preview.html
 msgid "Edit section"
@@ -26886,7 +26936,7 @@ msgstr "%(tz)s zona horaria"
 
 #: indico/modules/events/templates/display/conference/base.html
 msgid "Event menu"
-msgstr ""
+msgstr "Menú de eventos"
 
 #: indico/modules/events/templates/display/indico/_common.html
 msgid "Show room on map"
@@ -27090,19 +27140,23 @@ msgstr ""
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period has ended."
-msgstr ""
+msgstr "El plazo de presentación ha finalizado."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period is open until the submission deadline."
 msgstr ""
+"El plazo de presentación permanecerá abierto hasta la fecha límite de "
+"presentación."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period is open. No submission deadline is set."
 msgstr ""
+"El plazo de presentación está abierto. No hay fecha límite para la "
+"presentación."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "The submission period has not yet opened."
-msgstr ""
+msgstr "El plazo de presentación aún no se ha abierto."
 
 #: indico/modules/events/templates/reviews/_common.html
 msgid "Opening day"
@@ -28053,7 +28107,7 @@ msgstr "Reenviar correo electrónico"
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "Re-sending emails with attachments is not supported."
-msgstr ""
+msgstr "No es posible reenviar correos electrónicos con archivos adjuntos."
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "This email has not been sent yet."
@@ -29947,7 +30001,7 @@ msgstr "Eventos cercanos"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You do not have management rights"
-msgstr ""
+msgstr "No tiene permisos de administración"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are a reviewer"
@@ -29955,7 +30009,7 @@ msgstr "Usted es un revisor"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are not a reviewer"
-msgstr ""
+msgstr "Usted no es revisor"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are an attendee"
@@ -29963,7 +30017,7 @@ msgstr "Usted es un asistente"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You are not an attendee"
-msgstr ""
+msgstr "Usted no es un asistente"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You have favorited this event"
@@ -29971,7 +30025,7 @@ msgstr "Ha marcado este evento como favorito"
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You have not favorited this event"
-msgstr ""
+msgstr "No ha marcado este evento como favorito."
 
 #: indico/modules/users/templates/dashboard.html
 msgid "You have no events."
@@ -30056,7 +30110,7 @@ msgstr "Las cuentas de usuario eliminadas no se pueden restaurar."
 #: indico/modules/users/templates/personal_data.html
 #, python-format
 msgid "Yes, I want to delete %(name)s"
-msgstr ""
+msgstr "Sí, quiero borrarlo %(name)s"
 
 #: indico/modules/users/templates/personal_data.html
 msgid "Once deleted, the following will happen:"
@@ -30066,7 +30120,7 @@ msgstr "Una vez borrado, ocurrirá lo siguiente:"
 #, python-format
 msgid ""
 "<strong>%(first_name)s</strong> will no longer be able to access Indico."
-msgstr ""
+msgstr "<strong>%(first_name)s</strong> ya no podrá acceder a Indico"
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -30075,6 +30129,9 @@ msgid ""
 "this does not affect their presence in events as a speaker or other role; "
 "they will still be listed in such capacities where applicable."
 msgstr ""
+"<strong>%(first_name)s</strong> serán eliminados de todas las secciones de "
+"Indico; esto no afecta a su participación en eventos como ponentes o en "
+"otras funciones; seguirán apareciendo en dichas secciones cuando proceda."
 
 #: indico/modules/users/templates/personal_data.html
 #, python-format
@@ -30083,6 +30140,9 @@ msgid ""
 "will be anonymized and all personal data associated with the user will be "
 "removed from Indico."
 msgstr ""
+"En los casos en que no sea posible eliminarlos "
+"<strong>%(first_name)s</strong>, se anonimizarán y se eliminarán de Indico "
+"todos los datos personales asociados al usuario."
 
 #: indico/modules/users/templates/registration_requests.html
 #: indico/modules/users/templates/users_admin.html
@@ -31275,11 +31335,11 @@ msgstr "Años"
 
 #: indico/web/forms/fields/datetime.py
 msgid "Disabled day selected"
-msgstr ""
+msgstr "Se seleccionó un día no disponible"
 
 #: indico/web/forms/fields/datetime.py
 msgid "Disabled date selected"
-msgstr ""
+msgstr "Se seleccionó un día no disponible"
 
 #: indico/web/forms/fields/datetime.py
 msgid "Date must be specified"
@@ -31331,7 +31391,7 @@ msgstr "URL obligatoria"
 
 #: indico/web/forms/fields/simple.py
 msgid "Only URLs starting with https:// (or http://) are allowed"
-msgstr ""
+msgstr "Solo se admiten las URL que empiecen por https:// (o http://)"
 
 #: indico/web/forms/fields/simple.py
 msgid "Titles are required when more than one link is specified"
@@ -31579,7 +31639,7 @@ msgstr "Hecho con %(indico)s"
 
 #: indico/web/templates/footer.html
 msgid "Site links"
-msgstr ""
+msgstr "Enlaces del sitio web"
 
 #: indico/web/templates/header.html
 msgid "Indico main page"
