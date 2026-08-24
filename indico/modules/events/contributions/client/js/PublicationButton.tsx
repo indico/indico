@@ -7,16 +7,24 @@
 
 import publicationURL from 'indico-url:contributions.manage_publication';
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
+import {Button} from 'semantic-ui-react';
 
-import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import PublicationModal from './PublicationModal';
 
-export default function PublicationButton({eventId, onSuccess}) {
+interface PublicationButtonProps {
+  eventId: string;
+  onSuccess?: () => void;
+  [key: string]: any;
+}
+
+export default function PublicationButton({
+  eventId,
+  onSuccess = () => undefined,
+}: PublicationButtonProps) {
   const url = publicationURL({event_id: eventId});
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -26,14 +34,18 @@ export default function PublicationButton({eventId, onSuccess}) {
     } catch (error) {
       return handleAxiosError(error);
     }
+
     onSuccess();
     setModalOpen(false);
   };
 
   const trigger = (
-    <IButton onClick={() => setModalOpen(true)}>
+    <Button
+      onClick={() => setModalOpen(true)}
+      title={Translate.string('Publish timetable and contributions to event participants')}
+    >
       <Translate>Publish contributions</Translate>
-    </IButton>
+    </Button>
   );
 
   return (
@@ -46,8 +58,3 @@ export default function PublicationButton({eventId, onSuccess}) {
     />
   );
 }
-
-PublicationButton.propTypes = {
-  eventId: PropTypes.string.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-};

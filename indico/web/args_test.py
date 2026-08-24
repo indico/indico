@@ -234,13 +234,13 @@ def test_use_args_kwargs(decorator, partial, args, result):
 
 context_test_params = pytest.mark.parametrize(('partial', 'args', 'result'), (
     # regular
-    (False, {'a': '1', 'd': '4'}, {'a': 1, 'b': 'no-b', 'd': '4x'}),
+    (False, {'a': '1', 'd': '4', 'e': '5'}, {'a': 1, 'b': 'no-b', 'd': '4x', 'e': '5y'}),
     (False, {'a': '1', 'b': '2'}, {'a': 1, 'b': '2'}),
     (False, {'a': '1', 'xxx': 'wtf'}, {'a': 1, 'b': 'no-b'}),
     # partial
     (True, {}, {}),
-    (True, {'d': '4'}, {'d': '4x'}),
-    (True, {'d': '4', 'xxx': 'wtf'}, {'d': '4x'}),
+    (True, {'d': '4', 'e': '5'}, {'d': '4x', 'e': '5y'}),
+    (True, {'d': '4', 'e': '5', 'xxx': 'wtf'}, {'d': '4x', 'e': '5y'}),
 ))
 
 
@@ -252,7 +252,8 @@ def test_use_args_kwargs_context(decorator, partial, args, result):
         'b': fields.String(load_default='no-b'),
         'c': fields.String(),
         'd': ContextData('data'),
-    }, args, partial=partial, context={'data': 'x'})
+        'e': ContextData('data2'),
+    }, args, partial=partial, context={'data': 'x', 'data2': 'y'})
     assert fn() == result
 
 
@@ -260,32 +261,47 @@ def test_use_args_kwargs_context(decorator, partial, args, result):
 @context_test_params
 def test_use_args_kwargs_rh_context(monkeypatch, decorator, partial, args, result):
     fake_g = _AppCtxGlobals()
-    fake_g.rh = type('RH', (), {'data': 'x'})
+    fake_g.rh = type('RH', (), {'data': 'x', 'something': 'y'})
     monkeypatch.setattr('indico.web.args.g', fake_g)
     fn = make_decorated_func(decorator, {
         'a': fields.Integer(required=True),
         'b': fields.String(load_default='no-b'),
         'c': fields.String(),
         'd': ContextData('data'),
-    }, args, partial=partial, rh_context=('data',))
+        'e': ContextData('data2'),
+    }, args, partial=partial, rh_context=('data', {'data2': 'something'}))
     assert fn() == result
+
+
+@pytest.mark.parametrize('decorator', (use_rh_kwargs, use_rh_args))
+def test_use_args_kwargs_rh_context_invalid_mapping(decorator):
+    # same context key assigned directly + via mapping
+    with pytest.raises(AssertionError):
+        make_decorated_func(decorator, {}, {}, rh_context=('data', {'data': 'x'}))
+    # multiple mapping dicts
+    with pytest.raises(AssertionError):
+        make_decorated_func(decorator, {}, {}, rh_context=('data', {'data2': 'x'}, {'data3': 'y'}))
+    # dict not last element
+    with pytest.raises(AssertionError):
+        make_decorated_func(decorator, {}, {}, rh_context=('data', {'data2': 'x'}, 'data3'))
 
 
 class TestContextSchema(mm.Schema):
     class Meta:
-        rh_context = ('data',)
+        rh_context = ('data', {'data2': 'something'})
 
     a = fields.Integer(required=True)
     b = fields.String(load_default='no-b')
     c = fields.String()
     d = ContextData('data')
+    e = ContextData('data2')
 
 
 @pytest.mark.parametrize('decorator', (use_rh_kwargs, use_rh_args))
 @context_test_params
 def test_use_args_kwargs_rh_context_schema(monkeypatch, decorator, partial, args, result):
     fake_g = _AppCtxGlobals()
-    fake_g.rh = type('RH', (), {'data': 'x'})
+    fake_g.rh = type('RH', (), {'data': 'x', 'something': 'y'})
     monkeypatch.setattr('indico.web.args.g', fake_g)
 
     fn = make_decorated_func(decorator, TestContextSchema, args, partial=partial)

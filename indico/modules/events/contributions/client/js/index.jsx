@@ -27,6 +27,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import {CreateContributionButton, EditContributionButton} from './ContributionForm';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 import './MyContributions';
@@ -81,6 +82,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 (function(global) {
+  global.setupContributionForm = function setupContributionForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, contribId, eventTitle} = element.dataset;
+
+    ReactDOM.render(
+      <EditContributionButton
+        eventId={+eventId}
+        contribId={contribId && +contribId}
+        eventTitle={eventTitle}
+        triggerSelector={trigger}
+      />,
+      element
+    );
+  };
+
+  global.setupContributionCreateForm = function setupContributionCreateForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, eventType} = element.dataset;
+
+    ReactDOM.render(
+      <CreateContributionButton
+        eventId={+eventId}
+        eventType={eventType}
+        triggerSelector={trigger}
+      />,
+      element
+    );
+  };
+
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
     const editableSubmissionButton = document.querySelector('#editable-submission-button');
     if (!editableSubmissionButton) {

@@ -1,0 +1,45 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+// Separate variables to allow customization.
+$primary-color: $dark-blue;
+$bg-color: $white;
+$toolbar-bg-color: $raincloud-gray;
+
+.side-panel {
+  flex-shrink: 1;
+}
+
+:global(.ui.vertical.menu).tab-rail {
+  display: flex;
+  width: inherit;
+  gap: 10px;
+  height: calc(100% - 20px);
+  margin: 10px;
+
+  > :global(.item) {
+    margin: 0;
+    padding: 10px;
+
+    > :global(.icon) {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+  }
+
+  &::after {
+    display: none;
+  }
+
+  .publication-switch {
+    margin-top: auto;
+    // SUI uses important so we need to override
+    box-shadow: none !important;
+  }
+}
