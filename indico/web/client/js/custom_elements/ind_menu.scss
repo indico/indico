@@ -22,7 +22,7 @@ ind-menu {
     z-index: 1;
   }
 
-  > menu :is(li, a) {
+  > menu :is(li, a, button) {
     width: 100%;
   }
 
