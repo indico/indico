@@ -219,7 +219,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via -r requirements.dev.in
 starlette==1.4.1
     # via sphinx-autobuild
