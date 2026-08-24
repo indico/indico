@@ -177,7 +177,7 @@ results==2.0.1783086339
     # via -r requirements.dev.in
 roman-numerals==4.1.0
     # via sphinx
-ruff==0.16.2
+ruff==0.16.3
     # via -r requirements.dev.in
 six==1.17.0
     # via
@@ -242,7 +242,7 @@ urllib3==2.7.0
     #   docker
     #   requests
     #   responses
-uv==0.12.3
+uv==0.12.5
     # via -r requirements.dev.in
 uvicorn==0.52.1
     # via sphinx-autobuild
