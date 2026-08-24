@@ -132,7 +132,7 @@
                     data-reload-after></button>
         {%- endif %}
         {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
-                         classes='i-button icon-link') }}
+                         classes='i-button icon-link icon-only') }}
         {% if indico_config.LATEX_ENABLED or contribution.timetable_entry %}
             <div class="group">
                 {% if indico_config.LATEX_ENABLED %}
