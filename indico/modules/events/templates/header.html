@@ -83,17 +83,15 @@
 
 
 {%- macro _render_filters() -%}
-    {%- set filter_link_tooltip -%}
-        {%- if filters_active -%}
-            {%- trans %}Filtering is enabled{% endtrans -%}
-        {%- else -%}
-            {%- trans %}Add a filter{% endtrans -%}
-        {%- endif -%}
-    {%- endset -%}
-
     <ind-with-tooltip>
         <button class="i-button text-color subtle icon-only icon-filter filter-link {{ 'active' if filters_active }}">
-            <span data-tip-content>{{ filter_link_tooltip }}</span>
+            <span data-tip-content>
+                {%- if filters_active -%}
+                    {%- trans %}Filtering is enabled{% endtrans -%}
+                {%- else -%}
+                    {%- trans %}Add a filter{% endtrans -%}
+                {%- endif -%}
+            </span>
         </button>
     </ind-with-tooltip>
 
