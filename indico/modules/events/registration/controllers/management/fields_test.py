@@ -505,8 +505,7 @@ class TestRegistrationFormToggleFieldState:
     def test_same_title_in_other_section_on_enable(self, db, dummy_regform):
         other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
                                                 is_manager_only=False)
-        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False,
-                                               id=1337)
+        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False)
         _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Title'})
         db.session.flush()
         rh = RHRegistrationFormToggleFieldState()
@@ -559,8 +558,7 @@ class TestRegistrationFormToggleFieldState:
     def test_same_internal_name_in_other_section_on_enable(self, db, dummy_regform):
         other_section = RegistrationFormSection(registration_form=dummy_regform, title='Other Section',
                                                 is_manager_only=False)
-        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False,
-                                               id=1337)
+        disabled_field = RegistrationFormField(parent=other_section, registration_form=dummy_regform, is_enabled=False)
         _fill_form_field_with_data(disabled_field, {'input_type': 'text', 'title': 'Field Title',
                                                     'internal_name': 'title'})
         db.session.flush()
