@@ -11,7 +11,9 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Fix an XSS vulnerability when resolving conflicts between concurrent edits to minutes
+  (`GHSA-cw24-x4mj-fw3q <https://github.com/indico/indico/security/advisories/GHSA-cw24-x4mj-fw3q>`__)
 - Fix an XSS vulnerability in various places that allow entering custom links
+  (`GHSA-c4wc-ggrj-jg9v <https://github.com/indico/indico/security/advisories/GHSA-c4wc-ggrj-jg9v>`__)
 
 .. note::
 
@@ -19,6 +21,26 @@ Security fixes
     attacker and the victim would need to collaborate on the same minutes (ie have privileges
     to edit them), and the others require at least submitter or management access in an event
     and additionally an interaction (clicking the link) by the victim.
+
+- Fix a missing access check in the legacy session export API
+  (`GHSA-6p4f-j8j6-463q <https://github.com/indico/indico/security/advisories/GHSA-6p4f-j8j6-463q>`__)
+
+.. note::
+
+    This only affected sessions that were more protected than the surrounding event, and in this
+    case the API could have been misused to retrieve metadata (such as title, description and conveners)
+    of such a session.
+
+- Fix an incomplete SSRF check
+  (`GHSA-2v95-h47v-g4x9 <https://github.com/indico/indico/security/advisories/GHSA-2v95-h47v-g4x9>`__)
+
+.. note::
+
+    Just like for the previous SSRF fix, there was only one place where this would have allowed
+    returning data retrieved from such a URL to the client, and this was only accessible to
+    authenticated users with event management privileges. Also, this vulnerability is only
+    problematic if sensitive information is accessible via an unauthenticated HTTP GET request
+    (e.g. in AWS cloud environments).
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
