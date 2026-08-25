@@ -299,7 +299,7 @@ function PersonLinkField({
     values.forEach(p => {
       p.name = formatName(p);
       p.roles = roles.filter(x => x.default).map(x => x.name);
-      hooks.forEach(f => f(p));
+      hooks.forEach(f => f(p, {extraParams}));
     });
     onChange([...persons, ...values.filter(v => !existing.includes(v.email.toLowerCase()))]);
   };
