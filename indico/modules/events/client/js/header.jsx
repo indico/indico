@@ -54,12 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="events.export_event_ical"
       params={{event_id: eventId}}
       renderButton={classes => (
-        <IButton
-          icon="calendar"
-          dropdown
-          classes={{'height-full': true, 'text-color': true, subtle: true, ...classes}}
-          title={Translate.string('Export')}
-        />
+        <ind-with-tooltip>
+          <IButton
+            icon="calendar"
+            dropdown
+            classes={{
+              'height-full': true,
+              'text-color': true,
+              subtle: true,
+              'icon-only': true,
+              ...classes,
+            }}
+          >
+            <span data-tip-content>{Translate.string('Export')}</span>
+          </IButton>
+        </ind-with-tooltip>
       )}
       dropdownPosition="top left"
       popupPosition="bottom right"

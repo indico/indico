@@ -1,37 +1,50 @@
 {% from 'announcement/display.html' import render_announcements %}
 {% from 'core/impersonation.html' import render_impersonation %}
 
+{%- macro _toolbar_link(icon, href) -%}
+    <ind-with-tooltip>
+        <a class="i-button text-color subtle icon-only icon-{{ icon }}" href="{{ href }}">
+            <span data-tip-content>{{ caller() }}</span>
+        </a>
+    </ind-with-tooltip>
+{%- endmacro -%}
+
+
 {%- macro _render_nav_bar() -%}
     {% set rel = event.get_relative_event_ids() %}
 
-    <a class="i-button text-color subtle icon-home" href="{{ url_for_index() }}"
-       title="{% trans %}Go to the Indico Home Page{% endtrans %}"></a>
+    {% call _toolbar_link('home', url_for_index()) %}{% trans %}Go to the Indico Home Page{% endtrans %}{% endcall %}
 
     <span class="separator"></span>
 
     {% if rel.first is not none %}
-        <a class="i-button text-color subtle icon-first" href="{{ url_for('events.display', event_id=rel.first) }}"
-           title="{% trans %}Oldest event{% endtrans %}"></a>
+        {% call _toolbar_link('first', url_for('events.display', event_id=rel.first)) %}
+            {%- trans %}Oldest event{% endtrans -%}
+        {% endcall %}
     {% endif %}
 
     {% if rel.prev is not none %}
-        <a class="i-button text-color subtle icon-prev" href="{{ url_for('events.display', event_id=rel.prev) }}"
-           title="{% trans %}Older event{% endtrans %}"></a>
+        {% call _toolbar_link('prev', url_for('events.display', event_id=rel.prev)) %}
+            {%- trans %}Older event{% endtrans -%}
+        {% endcall %}
     {% endif %}
 
     {% if event.category %}
-        <a class="i-button text-color subtle icon-collapse" href="{{ event.category.url }}"
-           title="{% trans %}Up to category{% endtrans %}"></a>
+        {% call _toolbar_link('collapse', event.category.url) %}
+            {%- trans %}Up to category{% endtrans -%}
+        {% endcall %}
     {% endif %}
 
     {% if rel.next is not none %}
-        <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
-           title="{% trans %}Newer event{% endtrans %}"></a>
+        {% call _toolbar_link('next', url_for('events.display', event_id=rel.next)) %}
+            {%- trans %}Newer event{% endtrans -%}
+        {% endcall %}
     {% endif %}
 
     {% if rel.last is not none %}
-        <a class="i-button text-color subtle icon-last" href="{{ url_for('events.display', event_id=rel.last) }}"
-           title="{% trans %}Newest event{% endtrans %}"></a>
+        {% call _toolbar_link('last', url_for('events.display', event_id=rel.last)) %}
+            {%- trans %}Newest event{% endtrans -%}
+        {% endcall %}
     {% endif %}
 
     {% if event.category or rel.first or rel.prev or rel.next or rel.last %}
@@ -41,40 +54,46 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <button class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
-       title="{% trans %}Change theme{% endtrans %}"></button>
-    <ul class="i-dropdown">
-        {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
-        {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
-           if group.grouper or event.can_manage(session.user) %}
-            {% if not group.grouper %}
-                <li class="themes-separator"></li>
-            {% endif %}
-            {% for id, data in group.list %}
-                <li>
-                    {% if id == theme %}
-                        <a class="disabled"><strong>{{ data.name }}</strong></a>
-                    {% else %}
-                        <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
-                    {% endif %}
-                </li>
+    <ind-menu>
+        <ind-with-tooltip>
+            <button class="i-button text-color subtle icon-only icon-layout">
+                <span data-tip-content>{% trans %}Change theme{% endtrans %}</span>
+            </button>
+        </ind-with-tooltip>
+        <menu>
+            {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
+            {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
+               if group.grouper or event.can_manage(session.user) %}
+                {% if not group.grouper %}
+                    <li class="themes-separator"></li>
+                {% endif %}
+                {% for id, data in group.list %}
+                    <li>
+                        {% if id == theme %}
+                            <a aria-current="true"><strong>{{ data.name }}</strong></a>
+                        {% else %}
+                            <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-    </ul>
+        </menu>
+    </ind-menu>
 {%- endmacro -%}
 
 
 {%- macro _render_filters() -%}
-    {%- set filter_link_tooltip -%}
-        {%- if filters_active -%}
-            {%- trans %}Filtering is enabled{% endtrans -%}
-        {%- else -%}
-            {%- trans %}Add a filter{% endtrans -%}
-        {%- endif -%}
-    {%- endset -%}
-
-    <button class="i-button text-color subtle icon-filter filter-link {{ 'active' if filters_active }}"
-       title="{{ filter_link_tooltip|forceescape }}"></button>
+    <ind-with-tooltip>
+        <button class="i-button text-color subtle icon-only icon-filter filter-link {{ 'active' if filters_active }}">
+            <span data-tip-content>
+                {%- if filters_active -%}
+                    {%- trans %}Filtering is enabled{% endtrans -%}
+                {%- else -%}
+                    {%- trans %}Add a filter{% endtrans -%}
+                {%- endif -%}
+            </span>
+        </button>
+    </ind-with-tooltip>
 
     <div id="event-filters" class="event-filters">
         <form id="filterForm" style="margin: 0;">
@@ -197,8 +216,9 @@
 
             {% if event.can_access(session.user) %}
                 {% if print_url %}
-                    <a class="i-button text-color subtle icon-printer" href="{{ print_url }}"
-                       title="{% trans %}Printable version{% endtrans %}"></a>
+                    {% call _toolbar_link('printer', print_url) %}
+                        {%- trans %}Printable version{% endtrans -%}
+                    {% endcall %}
                 {% endif %}
 
                 {% if show_filter_button %}
@@ -211,14 +231,19 @@
                      {% if event.series %}data-event-in-series{% endif %}></div>
 
                 {% if event.type == 'meeting' %}
-                    <button class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
-                       data-href="{{ url_for('timetable.export_pdf', event) }}"
-                       data-ajax-dialog></button>
+                    <ind-with-tooltip>
+                        <button class="i-button text-color subtle icon-only icon-file-pdf"
+                           data-href="{{ url_for('timetable.export_pdf', event) }}"
+                           data-ajax-dialog>
+                            <span data-tip-content>{% trans %}Export to PDF{% endtrans %}</span>
+                        </button>
+                    </ind-with-tooltip>
                 {% endif %}
 
                 {% if event.can_generate_attachment_package(session.user) %}
-                    <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"
-                       title="{% trans %}Download material{% endtrans %}"></a>
+                    {% call _toolbar_link('package-download', url_for('attachments.package', event)) %}
+                        {%- trans %}Download material{% endtrans -%}
+                    {% endcall %}
                 {% endif %}
 
                 {{ _render_theme_selector() }}
@@ -232,13 +257,16 @@
                 <span class="separator"></span>
             {% endif %}
 
-            {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-link') }}
+            {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-only icon-link') }}
 
             {% block management_button %}
                 {% if show_management_button %}
-                    <a class="i-button text-color subtle icon-edit"
-                       href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}"
-                       title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+                    <ind-with-tooltip>
+                        <a class="i-button text-color subtle icon-only icon-edit"
+                           href="{% block management_button_url %}{{ url_for('event_management.settings', event) }}{% endblock %}">
+                            <span data-tip-content>{% trans %}Switch to the management area of this event{% endtrans %}</span>
+                        </a>
+                    </ind-with-tooltip>
                 {% endif %}
             {% endblock %}
 

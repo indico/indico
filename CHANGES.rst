@@ -149,6 +149,10 @@ Accessibility
   show a tooltip on hover and keyboard focus and have a reliable accessible name,
   instead of relying on the ``title`` attribute (:pr:`7718`, thanks
   :user:`foxbunny`)
+- Icon-only controls in the event header toolbar (home, event navigation, export,
+  download, theme, favourite and management) now have reliable accessible names
+  and tooltips that also appear on keyboard focus, instead of relying on the
+  ``title`` attribute (:issue:`7623`, :pr:`7689`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

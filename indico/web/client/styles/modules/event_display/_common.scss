@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 @use 'partials/buttons' as *;
 @use 'partials/boxes' as *;
 
@@ -72,6 +73,12 @@
   .button-bar {
     align-self: stretch;
 
+    ind-with-tooltip {
+      align-self: stretch;
+      align-items: stretch;
+      height: 100%;
+    }
+
     .i-button {
       @include i-button-states($black, transparent, transparent, $gray, white, false);
       border-radius: 0;
@@ -87,21 +94,30 @@
       border-right: 1px dotted $light-black;
     }
 
-    .i-dropdown {
-      @include border-all($color: $black);
-      @include single-box-shadow($color: $black);
+    ind-menu {
+      // Dark menu to fit the dark header bar — the same inverse override the
+      // global menu on the main page uses.
+      --menu-background-color: var(--surface-inverse-color);
+      --menu-text-color: var(--text-inverse-color);
+      --menu-text-hover-color: var(--text-inverse-color);
+      --menu-background-hover-color: var(--surface-highlight-inverse-color);
+      --menu-border: none;
+      --menu-shadow: none;
+    }
 
-      background: $dark-black;
+    ind-menu > menu {
+      @extend %menu;
 
-      li {
-        a {
-          color: $dark-gray;
-        }
+      // %menu paints the surface on each link, so an empty item (the group
+      // separator) would leave a see-through gap; give the panel its own
+      // background so the whole menu reads as one solid dark surface.
+      background: var(--menu-background-color);
 
-        &:hover a:not(.disabled) {
-          color: $light-gray;
-        }
-      }
+      // With many themes (e.g. the themes_cern plugin) the menu can grow taller
+      // than the viewport; cap it and scroll internally so every theme stays
+      // reachable. --target-top is the menu's viewport offset set by positioning.
+      max-height: calc(100dvh - var(--target-top, 0px) - 1em);
+      overflow-y: auto;
     }
 
     .filter-link {
@@ -113,9 +129,7 @@
     }
 
     .themes-separator {
-      @include border-bottom($black);
-      height: auto;
-      margin: 0 1em;
+      border-top: 1px solid var(--menu-border-color);
     }
   }
 

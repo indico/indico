@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {dropdownPositionStrategy, position} from './positioning';
+import {dropdownPositionStrategy, position, verticalTooltipPositionStrategy} from './positioning';
 
 function mockRect(el, {top, left, width, height}) {
   el.getBoundingClientRect = () => ({
@@ -490,6 +490,67 @@ describe('positioning', () => {
 
       // anchorBottom = 130 (no offset added)
       expect(parsePx(target.style.getPropertyValue('--target-top'))).toBe(130);
+    });
+  });
+
+  describe('verticalTooltipPositionStrategy — horizontal clamping', () => {
+    it('centers the tip over the anchor when it fits', () => {
+      mockRect(anchor, {top: 100, left: 500, width: 36, height: 50});
+      mockRect(target, {top: 0, left: 0, width: 200, height: 30});
+
+      abort = position(target, anchor, verticalTooltipPositionStrategy, undefined, makeViewport());
+
+      // 500 + (36 - 200) / 2 = 418, within the viewport so unchanged
+      expect(parsePx(target.style.getPropertyValue('--target-left'))).toBe(418);
+    });
+
+    it('clamps a wide tip inward when the anchor is near the left edge', () => {
+      mockRect(anchor, {top: 100, left: 0, width: 36, height: 50});
+      mockRect(target, {top: 0, left: 0, width: 200, height: 30});
+
+      abort = position(target, anchor, verticalTooltipPositionStrategy, undefined, makeViewport());
+
+      // centered would be (36 - 200) / 2 = -82 (clipped); clamped to the 8px gutter
+      expect(parsePx(target.style.getPropertyValue('--target-left'))).toBe(8);
+    });
+
+    it('clamps a wide tip inward when the anchor is near the right edge', () => {
+      mockRect(anchor, {top: 100, left: 1000, width: 36, height: 50});
+      mockRect(target, {top: 0, left: 0, width: 200, height: 30});
+
+      abort = position(
+        target,
+        anchor,
+        verticalTooltipPositionStrategy,
+        undefined,
+        makeViewport({width: 1024})
+      );
+
+      // centered would be 918 (right edge at 1118, past 1024); clamped to
+      // 1024 - 200 - 8 = 816
+      expect(parsePx(target.style.getPropertyValue('--target-left'))).toBe(816);
+    });
+
+    it('clamps against the visible viewport, not the layout viewport', () => {
+      // Anchor near the left edge of a narrow visible viewport that is offset
+      // inside a wider layout viewport (pinch-zoomed / panned).
+      mockRect(anchor, {top: 100, left: 300, width: 36, height: 50});
+      mockRect(target, {top: 0, left: 0, width: 200, height: 30});
+
+      abort = position(
+        target,
+        anchor,
+        verticalTooltipPositionStrategy,
+        undefined,
+        makeViewport({
+          width: 1024,
+          visualViewport: makeVisualViewport({offsetLeft: 290, width: 375, height: 600}),
+        })
+      );
+
+      // centered would be 300 + (36 - 200) / 2 = 218, left of the visible area
+      // (offsetLeft 290); clamped to visibleLeft + gutter = 290 + 8 = 298
+      expect(parsePx(target.style.getPropertyValue('--target-left'))).toBe(298);
     });
   });
 });

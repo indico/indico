@@ -142,10 +142,22 @@ const verticalCenter = {
   },
 };
 
+// Keep a centered target this many pixels clear of the visible edges when
+// clamping, so it never sits flush against the viewport (matches the ~0.5rem
+// breathing room the tip's max-width already reserves).
+const viewportGutter = 8;
+
 const horizontalCenter = {
   calculateAlignment() {},
   setAlignment() {
-    this.setLeft(this.anchorLeft + (this.anchorWidth - this.targetWidth) / 2);
+    // Center over the anchor, but clamp to the visible viewport so a wide tip
+    // on an anchor near the left/right edge (e.g. the leftmost toolbar button)
+    // is shifted inward instead of being clipped. The arrow stays on the anchor
+    // because it is positioned against the wrapper, not the tip.
+    const centered = this.anchorLeft + (this.anchorWidth - this.targetWidth) / 2;
+    const min = this.visibleLeft + viewportGutter;
+    const max = this.visibleRight - this.targetWidth - viewportGutter;
+    this.setLeft(Math.max(min, Math.min(centered, max)));
   },
 };
 

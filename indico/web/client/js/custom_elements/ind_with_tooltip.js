@@ -41,7 +41,6 @@ CustomElementBase.defineWhenDomReady(
       });
 
       this.addEventListener('focusin', () => {
-        this.removeEventListener('pointerleave', this.hide);
         this.show();
         this.addEventListener('focusout', this.hide);
       });

@@ -51,21 +51,33 @@ export default function Favorite({type, id, favorited, setFavText, deleteFavText
   };
 
   return fav ? (
-    <IButton
-      icon="star"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}}
-      style={type === 'event' ? {color: Palette.indicoBlue} : {}}
-      highlight
-      title={deleteFavText}
-      onClick={() => deleteFavorite(id)}
-    />
+    <ind-with-tooltip>
+      <IButton
+        icon="star"
+        classes={{
+          'icon-only': true,
+          ...(type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}),
+        }}
+        style={type === 'event' ? {color: Palette.indicoBlue} : {}}
+        highlight
+        onClick={() => deleteFavorite(id)}
+      >
+        <span data-tip-content>{deleteFavText}</span>
+      </IButton>
+    </ind-with-tooltip>
   ) : (
-    <IButton
-      icon="star-empty"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}}
-      title={setFavText}
-      onClick={() => putFavorite(id)}
-    />
+    <ind-with-tooltip>
+      <IButton
+        icon="star-empty"
+        classes={{
+          'icon-only': true,
+          ...(type === 'event' ? {'height-full': true, 'text-color': true, subtle: true} : {}),
+        }}
+        onClick={() => putFavorite(id)}
+      >
+        <span data-tip-content>{setFavText}</span>
+      </IButton>
+    </ind-with-tooltip>
   );
 }
 
