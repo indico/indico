@@ -100,6 +100,15 @@ API reference
 
     api/index.rst
 
+Security Risks
++++++++++++++
+
+.. include:: security/index.rst
+
+.. toctree::
+    :maxdepth: 2
+
+    security/index.rst
 
 What's New
 ++++++++++
