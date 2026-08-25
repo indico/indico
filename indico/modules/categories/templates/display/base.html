@@ -30,10 +30,14 @@
                 </div>
                 <div class="group">
                     {% block cat_navigate %}
-                        <button id="navigate-button" class="i-button icon-compass2"
-                                title="{% trans %}Navigate categories{% endtrans %}">
-                            {% trans %}Navigate{% endtrans %}
-                        </button>
+                        <ind-with-tooltip>
+                            <button id="navigate-button" class="i-button icon-compass2">
+                                <span data-tip-content>
+                                    {% trans %}Navigate categories{% endtrans %}
+                                </span>
+                                {% trans %}Navigate{% endtrans %}
+                            </button>
+                        </ind-with-tooltip>
                     {% endblock %}
                 </div>
                 <div class="group">
@@ -51,7 +55,7 @@
                         <ind-with-tooltip>
                             <ind-menu>
                                 <button class="i-button icon-eye arrow">
-                                    <span data-tip-content="{% trans %}View{% endtrans %}">{% trans %}View{% endtrans %}</span>
+                                    <span data-tip-content>{% trans %}View{% endtrans %}</span>
                                 </button>
                                 <menu>
                                     {% if category.is_flat_view_enabled and category.children %}
@@ -86,9 +90,14 @@
                     {% endblock %}
                     {% block cat_manage %}
                         {% if category.can_manage(session.user) %}
-                            <a href="{{ url_for('categories.manage_content', category) }}"
-                               class="i-button icon-edit"
-                               title="{% trans %}Manage category{% endtrans %}"></a>
+                            <ind-with-tooltip>
+                                <a href="{{ url_for('categories.manage_content', category) }}"
+                                   class="i-button icon-only icon-edit">
+                                    <span data-tip-content>
+                                        {% trans %}Manage category{% endtrans %}
+                                    </span>
+                                </a>
+                            </ind-with-tooltip>
                         {% endif %}
                     {% endblock %}
                 </div>
