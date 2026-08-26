@@ -92,10 +92,8 @@ class ContributionListGenerator(ListGeneratorBase):
     def _get_filters_from_request(self):
         filters = super()._get_filters_from_request()
         for field in self.event.contribution_fields:
-            if field.field_type in {'single_choice', 'multiselect'}:
-                options = [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]
-                if options:
-                    filters['fields'][str(field.id)] = options
+            if options := [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]:
+                filters['fields'][str(field.id)] = options
         # Ensure enum filters remain as integers
         for idx, value in enumerate(filters['items'].get('state', [])):
             filters['items']['state'][idx] = int(value)
@@ -143,12 +141,7 @@ class ContributionListGenerator(ListGeneratorBase):
         if field_filters:
             fields_by_id: dict[int, ContributionField] = {f.id: f for f in self.event.contribution_fields}
             for field_id, field_values in field_filters.items():
-                if not (field := fields_by_id.get(int(field_id))) or field.field_type not in (
-                    'multiselect',
-                    'single_choice',
-                ):
-                    continue
-
+                field = fields_by_id[int(field_id)]
                 field_values = set(field_values)
                 field_criteria = [
                     Contribution.field_values.any(

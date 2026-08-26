@@ -144,6 +144,7 @@ class BaseField:
         if None in data_list:
             data_list.discard(None)
             criteria.append(db_field.op('#>>')('{}').is_(None))
+            criteria.append(db_field.op('#>>')('{}') == '')  # noqa: PLC1901
         if data_list:
             criteria.append(db_field.op('#>>')('{}').in_(data_list))
         return db.or_(*criteria)
