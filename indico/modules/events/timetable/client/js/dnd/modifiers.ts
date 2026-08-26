@@ -114,6 +114,10 @@ export const createRestrictToCalendar =
       return transform;
     }
 
+    if (id.startsWith('c')) {
+      return transform;
+    }
+
     const boundingRect = containerRef.current.getBoundingClientRect();
     const scroll = getTotalScroll(containerRef.current);
     const rect = {

@@ -19,7 +19,7 @@ import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
-import {useDroppable, DnDProvider} from './dnd/dnd';
+import {useDroppable, DnDProvider, DragPlaceholder} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
@@ -272,6 +272,16 @@ export function DayTimetable({
           return handleUnscheduledDropOnBlock(who, block, delta, mouse, offset, calendar);
         }
       }
+    }
+
+    const sidepanel = over.find(o => o.id === 'sidepanel');
+    if (sidepanel && who.startsWith('c')) {
+      const entry = findEntryById(who);
+      if (entry === undefined) {
+        return;
+      }
+      dispatch(actions.unscheduleEntry(entry as ContribEntry, eventId));
+      return;
     }
 
     const calendar = over.find(o => o.id === 'calendar');
@@ -715,6 +725,7 @@ export function DayTimetable({
           </DnDCalendar>
         </div>
       </div>
+      <DragPlaceholder />
     </DnDProvider>
   );
 }
