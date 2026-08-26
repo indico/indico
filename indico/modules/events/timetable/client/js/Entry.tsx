@@ -31,7 +31,6 @@ import {
 import {
   minutesToPixels,
   pixelsToMinutes,
-  snapPixels,
   snapMinutes,
   formatBlockTitle,
   getIconByEntryType,
@@ -140,7 +139,8 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 interface _EntryProps {
   id: EntryUniqueID;
   isDragging: boolean;
-  transform: {x: number; y: number} | undefined;
+  isPlaceholder: boolean;
+  // transform: {x: number; y: number} | undefined;
   listeners: Record<string, unknown>;
   setNodeRef: (element: HTMLElement | null) => void;
   blockRef?: React.RefObject<HTMLDivElement>;
@@ -180,8 +180,8 @@ export default function Entry({
   y,
   listeners,
   setNodeRef,
-  transform,
   isDragging,
+  isPlaceholder,
   column,
   maxColumn,
   setDuration: _setDuration,
@@ -217,31 +217,24 @@ export default function Entry({
     return eventEndDt.diff(startDt, 'minutes');
   }, [parentEndDt, eventEndDt, startDt]);
 
-  let style: Record<string, string | number | undefined> = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
-        // zIndex: 70,
-      }
-    : {};
-
   const minHeight = minutesToPixels(5);
   const height = minutesToPixels(Math.max(duration, minHeight)) - V_SPACE_BETWEEN_ENTRIES_PX;
 
-  style = {
-    ...style,
-    position: 'absolute',
+  const style = {
+    opacity: isDragging && !isPlaceholder ? 0 : 1,
+    position: isPlaceholder ? 'relative' : 'absolute',
     top: y,
     left: offset,
     width: `calc(${width} - 5px)`,
     height,
     textAlign: 'left',
-    zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
+    zIndex: isDragging || isResizing ? 1000 : selected ? 1 : 0,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     boxShadow: selected || isDragging ? `0 0 0 4px rgba(0,0,0,0.1)` : undefined,
     ...colors,
   };
 
-  const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
+  const deltaMinutes = snapMinutes(pixelsToMinutes(0));
   const newStart = moment(startDt).add(deltaMinutes, 'minutes');
   const newEnd = moment(startDt).add(deltaMinutes + duration, 'minutes');
 

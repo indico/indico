@@ -11,6 +11,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Input, Dropdown, Icon, Popup} from 'semantic-ui-react';
 
+import {useDroppable} from 'indico/modules/events/timetable/dnd';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
@@ -25,9 +26,10 @@ import {
   useModal,
 } from './ModalContext';
 import * as selectors from './selectors';
-import './TimetableSidePanel.module.scss';
 import {EntryType, SidePanelView, UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
+
+import './TimetableSidePanel.module.scss';
 
 enum GenericFilterType {
   NO_SESSION = 'no-session',
@@ -43,19 +45,30 @@ function UnscheduledContributionList({
   contribs: UnscheduledContribEntry[];
 }) {
   const uniqueContribs = [...new Map(contribs.map(contrib => [contrib.id, contrib])).values()];
+  const {setNodeRef} = useDroppable({id: 'sidepanel'});
+
   return (
-    <div styleName="contributions-list">
-      {uniqueContribs.map(contrib => (
-        <DraggableUnscheduledContributionEntry
-          key={contrib.id}
-          dt={dt}
-          id={contrib.id}
-          objId={contrib.objId}
-          title={contrib.title}
-          duration={contrib.duration}
-          sessionId={contrib.sessionId}
-        />
-      ))}
+    <div ref={setNodeRef} styleName="contributions-list">
+      {contribs.length === 0 ? (
+        <div styleName="empty-state">
+          <Icon name="calendar times outline" />
+          <div styleName="empty-state-text">
+            <Translate>No contributions found</Translate>
+          </div>
+        </div>
+      ) : (
+        uniqueContribs.map(contrib => (
+          <DraggableUnscheduledContributionEntry
+            key={contrib.id}
+            dt={dt}
+            id={contrib.id}
+            objId={contrib.objId}
+            title={contrib.title}
+            duration={contrib.duration}
+            sessionId={contrib.sessionId}
+          />
+        ))
+      )}
     </div>
   );
 }
@@ -342,16 +355,7 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
                   })
                 }
               />
-              {filteredContribs.length > 0 ? (
-                <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
-              ) : (
-                <div styleName="empty-state">
-                  <Icon name="calendar times outline" />
-                  <div styleName="empty-state-text">
-                    <Translate>No contributions found</Translate>
-                  </div>
-                </div>
-              )}
+              <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
               <div styleName="gradient" />
             </div>
           </>
