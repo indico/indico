@@ -177,37 +177,7 @@ import {$T} from 'indico/utils/i18n';
           e.preventDefault();
           $(this).closest('tr').find('.js-cancel-edit').trigger('click');
         }
-      })
-      .on('change input', '.js-table-input', () => {
-        updatePendingRows();
       });
-
-    function editingRows() {
-      return widgetBody.children('tr').filter(function() {
-        return !!$(this).find('.js-table-input').length;
-      });
-    }
-
-    function isBlankRow(row) {
-      return !row.find('.js-table-input').filter(function() {
-        return this.type === 'checkbox' ? this.checked : !!$(this).val().trim();
-      }).length;
-    }
-
-    // a row being edited is not part of the form data, so the form has to be told about it
-    function updatePendingRows() {
-      let pending = false;
-      editingRows().each(function() {
-        const row = $(this);
-        const unsaved = !!row.data('hasItem') || !isBlankRow(row);
-        const input = row.find('.js-table-input')[0];
-        if ('setCustomValidity' in input) {
-          input.setCustomValidity(unsaved ? $T('Please save or cancel this row first.') : '');
-        }
-        pending = pending || unsaved;
-      });
-      widget.attr('data-pending-changes', pending ? '' : null);
-    }
 
     function fixWidths() {
       if (!options.sortable) {
@@ -231,8 +201,15 @@ import {$T} from 'indico/utils/i18n';
         widget.find('tbody.ui-sortable').sortable('refresh');
       }
       fixWidths();
-      updatePendingRows();
-      addButton.prop('disabled', !!widget.find('.js-table-input').length);
+      // a row being edited is not part of the form data, so the form has to be told about it
+      const editing = widget.find('.js-table-input');
+      editing.each(function() {
+        if ('setCustomValidity' in this) {
+          this.setCustomValidity($T('Please save or cancel this row first.'));
+        }
+      });
+      widget.attr('data-pending-changes', editing.length ? '' : null);
+      addButton.prop('disabled', !!editing.length);
       if (moveTooltips === undefined || moveTooltips) {
         repositionTooltips();
       }
