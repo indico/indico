@@ -32,10 +32,16 @@ import {$T} from 'indico/utils/i18n';
     const widgetBody = widget.children('table').children('tbody');
     const field = $(`#${options.fieldId}`);
     const data = JSON.parse(field.val());
+    const addButton = $(`#${options.fieldId}-add-button`);
     const deleteButton = $('<a>', {
       class: 'action-icon icon-remove js-remove-row',
       href: '#',
       title: $T('Delete'),
+    });
+    const saveButton = $('<a>', {
+      class: 'action-icon icon-floppy js-save-row',
+      href: '#',
+      title: $T('Save'),
     });
     const editButton = $('<a>', {
       class: 'action-icon icon-edit js-edit-row',
@@ -93,14 +99,61 @@ import {$T} from 'indico/utils/i18n';
         e.preventDefault();
         removeRow($(this).closest('tr'));
       })
+      .on('click', '.js-save-row', function(e) {
+        e.preventDefault();
+        const row = $(this).closest('tr');
+        const item = {};
+        let requiredFieldIsEmpty = false;
+        let invalidNumber = false;
+        if (options.uuidField && row.data('uuid')) {
+          item[options.uuidField] = row.data('uuid');
+        }
+        options.columns.forEach((col, i) => {
+          const inputField = row.find('.js-table-input').eq(i);
+          let value = inputField.val().trim();
+          if (!value && inputField.data('required')) {
+            requiredFieldIsEmpty = true;
+            inputField.addClass('hasError');
+          } else if (inputField.attr('type') === 'checkbox') {
+            item[col.id] = inputField.prop('checked');
+          } else {
+            item[col.id] = value;
+            inputField.removeClass('hasError');
+          }
+          if (inputField.attr('type') === 'number' && !requiredFieldIsEmpty) {
+            value = parseFloat(value);
+            if (
+              (inputField.attr('min') && value < parseFloat(inputField.attr('min'))) ||
+              (inputField.attr('max') && value > parseFloat(inputField.attr('max')))
+            ) {
+              invalidNumber = true;
+              inputField.addClass('hasError');
+              inputField.trigger('multipleItemsWidget:showNumberError');
+            } else {
+              inputField.removeClass('hasError');
+              inputField.trigger('multipleItemsWidget:hideNumberError');
+            }
+          }
+        });
+        if (requiredFieldIsEmpty) {
+          row.trigger('multipleItemsWidget:showRequiredError');
+        } else {
+          row.trigger('multipleItemsWidget:hideRequiredError');
+        }
+        if (!requiredFieldIsEmpty && !invalidNumber) {
+          if (row.data('hasItem')) {
+            data[row.index()] = item;
+          } else {
+            data.push(item);
+            row.data('hasItem', true);
+          }
+          updateField();
+          updateRow(row, false, false);
+        }
+      })
       .on('click', '.js-add-row', e => {
         e.preventDefault();
-        const emptyRow = blankRows().first();
-        if (emptyRow.length) {
-          emptyRow.find('.js-table-input').first().trigger('focus');
-        } else if (commitPendingRows()) {
-          createRow();
-        }
+        createRow();
       })
       .on('click', '.js-cancel-edit', function(e) {
         e.preventDefault();
@@ -116,131 +169,44 @@ import {$T} from 'indico/utils/i18n';
         const row = $(this).closest('tr');
         updateRow(row, true, false);
       })
-      .on('change input', '.js-table-input', () => {
-        updatePendingChanges();
-      })
       .on('keypress', 'input', function(e) {
         if (e.keyCode === 13) {
           e.preventDefault();
-          commitRow($(this).closest('tr'));
+          $(this).closest('tr').find('.js-save-row').trigger('click');
         } else if (e.keyCode === 27) {
           e.preventDefault();
           $(this).closest('tr').find('.js-cancel-edit').trigger('click');
         }
+      })
+      .on('change input', '.js-table-input', () => {
+        updatePendingRows();
       });
 
-    const form = widget.closest('form');
-
-    // ajax forms read the field before 'ajaxForm:validateBeforeSubmit', so commit even earlier
-    form.on('form-pre-serialize', (e, $form, formOptions, veto) => {
-      if (!commitPendingRows()) {
-        veto.veto = true;
-      }
-    });
-
-    form.on('submit', e => {
-      if (!commitPendingRows()) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-    });
-
-    // rows being edited hold no form data of their own, so the form cannot see them as a change
-    function updatePendingChanges() {
-      const pending = editingRows().not(blankRows());
-      widget.attr('data-pending-changes', pending.length ? '' : null);
-    }
-
     function editingRows() {
-      return widget.find('tbody > tr').filter(function() {
+      return widgetBody.children('tr').filter(function() {
         return !!$(this).find('.js-table-input').length;
       });
     }
 
-    function blankRows() {
-      return editingRows().filter(function() {
-        const row = $(this);
-        return !row.data('hasItem') && isBlankRow(row.find('.js-table-input'));
-      });
-    }
-
-    function isBlankRow(inputs) {
-      return !inputs.filter(function() {
+    function isBlankRow(row) {
+      return !row.find('.js-table-input').filter(function() {
         return this.type === 'checkbox' ? this.checked : !!$(this).val().trim();
       }).length;
     }
 
-    function commitRow(row) {
-      const item = {};
-      let requiredFieldIsEmpty = false;
-      let invalidNumber = false;
-      if (options.uuidField && row.data('uuid')) {
-        item[options.uuidField] = row.data('uuid');
-      }
-      options.columns.forEach((col, i) => {
-        const inputField = row.find('.js-table-input').eq(i);
-        let value = inputField.val().trim();
-        if (!value && inputField.data('required')) {
-          requiredFieldIsEmpty = true;
-          inputField.addClass('hasError');
-        } else if (inputField.attr('type') === 'checkbox') {
-          item[col.id] = inputField.prop('checked');
-        } else {
-          item[col.id] = value;
-          inputField.removeClass('hasError');
-        }
-        if (inputField.attr('type') === 'number' && !requiredFieldIsEmpty) {
-          value = parseFloat(value);
-          if (
-            (inputField.attr('min') && value < parseFloat(inputField.attr('min'))) ||
-            (inputField.attr('max') && value > parseFloat(inputField.attr('max')))
-          ) {
-            invalidNumber = true;
-            inputField.addClass('hasError');
-            inputField.trigger('multipleItemsWidget:showNumberError');
-          } else {
-            inputField.removeClass('hasError');
-            inputField.trigger('multipleItemsWidget:hideNumberError');
-          }
-        }
-      });
-      if (requiredFieldIsEmpty) {
-        row.trigger('multipleItemsWidget:showRequiredError');
-      } else {
-        row.trigger('multipleItemsWidget:hideRequiredError');
-      }
-      if (requiredFieldIsEmpty || invalidNumber) {
-        return false;
-      }
-      if (row.data('hasItem')) {
-        data[row.index()] = item;
-      } else {
-        data.push(item);
-        row.data('hasItem', true);
-      }
-      updateField();
-      updateRow(row, false, false);
-      return true;
-    }
-
-    // the main save button is expected to persist rows that are still being edited
-    function commitPendingRows() {
-      if (field.prop('disabled')) {
-        return true;
-      }
-      let valid = true;
-      blankRows().each(function() {
-        removeRow($(this));
-      });
+    // a row being edited is not part of the form data, so the form has to be told about it
+    function updatePendingRows() {
+      let pending = false;
       editingRows().each(function() {
-        if (!commitRow($(this))) {
-          valid = false;
+        const row = $(this);
+        const unsaved = !!row.data('hasItem') || !isBlankRow(row);
+        const input = row.find('.js-table-input')[0];
+        if ('setCustomValidity' in input) {
+          input.setCustomValidity(unsaved ? $T('Please save or cancel this row first.') : '');
         }
+        pending = pending || unsaved;
       });
-      if (!widget.find('tbody > tr').length) {
-        createRow();
-      }
-      return valid;
+      widget.attr('data-pending-changes', pending ? '' : null);
     }
 
     function fixWidths() {
@@ -254,7 +220,7 @@ import {$T} from 'indico/utils/i18n';
           $(this).width('');
         })
         .each(function() {
-          // fix the width to avoid ugly changes during sorting
+          // fix the iwdth to avoid ugly changes during sorting
           const $this = $(this);
           $this.width($this.width());
         });
@@ -265,7 +231,8 @@ import {$T} from 'indico/utils/i18n';
         widget.find('tbody.ui-sortable').sortable('refresh');
       }
       fixWidths();
-      updatePendingChanges();
+      updatePendingRows();
+      addButton.prop('disabled', !!widget.find('.js-table-input').length);
       if (moveTooltips === undefined || moveTooltips) {
         repositionTooltips();
       }
@@ -413,7 +380,9 @@ import {$T} from 'indico/utils/i18n';
         column.appendTo(row);
       });
       $('<td>', {
-        html: item ? deleteButton.clone().add(editButton.clone()) : cancelButton.clone(),
+        html: item
+          ? deleteButton.clone().add(editButton.clone())
+          : cancelButton.clone().add(saveButton.clone()),
         class: 'js-action-col',
       }).appendTo(row);
       widgetBody.append(row);
@@ -429,7 +398,7 @@ import {$T} from 'indico/utils/i18n';
         $(this).replaceWith(column);
       });
       if (editMode) {
-        row.children('.js-action-col').html(cancelButton.clone());
+        row.children('.js-action-col').html(cancelButton.clone().add(saveButton.clone()));
       } else {
         row.children('.js-action-col').html(deleteButton.clone().add(editButton.clone()));
       }
