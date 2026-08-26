@@ -220,7 +220,7 @@ export default function Entry({
 
   const style = {
     opacity: isDragging && !isPlaceholder ? 0 : 1,
-    position: isPlaceholder ? 'relative' : 'absolute',
+    position: 'absolute',
     top: y,
     left: offset,
     width: `calc(${width} - 5px)`,
@@ -355,11 +355,11 @@ export default function Entry({
                   selected={false}
                   setDuration={() => null}
                   setNodeRef={() => null}
+                  {...child}
                   blockRef={blockRef}
                   parentEndDt={moment(startDt)
                     .add(deltaMinutes + duration, 'minutes')
                     .format()}
-                  {...child}
                   sessionId={child.sessionId ?? undefined}
                 />
               ) : (
