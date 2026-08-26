@@ -113,7 +113,7 @@ class IndicoMultipass(Multipass):
         else:
             exc_str = str(exc)
             fn = logger.error
-            if exc_str.startswith('mismatching_state:'):
+            if exc_str.startswith(('mismatching_state:', 'invalid_grant:')):
                 fn = logger.debug
             fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
                exc.details)
