@@ -9,7 +9,6 @@ from datetime import timedelta
 from operator import attrgetter
 
 from flask import flash, request, session
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -144,33 +143,21 @@ class ContributionListGenerator(ListGeneratorBase):
         if field_filters:
             fields_by_id: dict[int, ContributionField] = {f.id: f for f in self.event.contribution_fields}
             for field_id, field_values in field_filters.items():
-                if not (field := fields_by_id.get(int(field_id))):
+                if not (field := fields_by_id.get(int(field_id))) or field.field_type not in (
+                    'multiselect',
+                    'single_choice',
+                ):
                     continue
 
                 field_values = set(field_values)
-
-                if field.field_type == 'multiselect':
-                    field_criteria = []
-                    if None in field_values:
-                        field_values.discard(None)
-                        field_criteria += [
-                            ~Contribution.field_values.any(ContributionFieldValue.contribution_field_id == field_id),
-                            Contribution.field_values.any(db.and_(
-                                ContributionFieldValue.contribution_field_id == field_id,
-                                ContributionFieldValue.data == [],
-                            ))
-                        ]
-
-                    if field_values:
-                        field_criteria.append(Contribution.field_values.any(db.and_(
+                field_criteria = [
+                    Contribution.field_values.any(
+                        db.and_(
                             ContributionFieldValue.contribution_field_id == field_id,
-                            ContributionFieldValue.data.has_any(db.func.cast(field_values, ARRAY(db.String))),
-                        )))
-
-                    criteria.append(db.or_(*field_criteria))
-                    continue
-
-                field_criteria = []
+                            field.field.create_sql_filter(ContributionFieldValue.data, field_values),
+                        )
+                    )
+                ]
                 if None in field_values:
                     # Handle the case when there is no value in
                     # 'Contribution.field_values' matching the 'field_id'.
@@ -178,20 +165,9 @@ class ContributionListGenerator(ListGeneratorBase):
                     # contribution had already been created or when the field is left
                     # empty.
                     # In these cases, we still want to show the contributions.
-                    field_values.discard(None)
-                    field_criteria += [
+                    field_criteria.append(
                         ~Contribution.field_values.any(ContributionFieldValue.contribution_field_id == field_id),
-                        Contribution.field_values.any(db.and_(
-                            ContributionFieldValue.contribution_field_id == field_id,
-                            ContributionFieldValue.data.op('#>>')('{}').is_(None)
-                        ))
-                    ]
-
-                if field_values:
-                    field_criteria.append(Contribution.field_values.any(db.and_(
-                        ContributionFieldValue.contribution_field_id == field_id,
-                        ContributionFieldValue.data.op('#>>')('{}').in_(field_values)
-                    )))
+                    )
 
                 criteria.append(db.or_(*field_criteria))
 
