@@ -7,13 +7,10 @@
 
 import _ from 'lodash';
 import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react';
-import {useSelector} from 'react-redux/es';
 import {createContext, useContextSelector} from 'use-context-selector';
 
-import Entry from 'indico/modules/events/timetable/Entry';
 import {snapPixels} from 'indico/modules/events/timetable/utils';
 
-import * as selectors from '../selectors';
 import {EntryUniqueID} from '../types';
 
 import {getScrollParent, getTotalScroll} from './modifiers';
@@ -199,23 +196,16 @@ function getOverlappingDroppables(droppables: Droppables, mouse: MousePosition):
   return overlapping;
 }
 
-export function DragPlaceholder() {
-  const dragged = useContextSelector(DnDContext, ctx => ctx.dragged);
+export function DragPlaceholder({children}: {children: React.ReactNode}) {
   const dragState = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggableData[ctx.dragged] : undefined
   );
   const draggedDraggable = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggables[ctx.dragged] : null
   );
-  const entries = useSelector(selectors.getEntries);
 
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
-
-  const entry = useMemo(
-    () => Object.values(entries.entries).find(e => e.id === dragged),
-    [dragged, entries]
-  );
 
   const transform = useMemo(
     () =>
@@ -234,7 +224,7 @@ export function DragPlaceholder() {
     setLeft(rect.x);
   }, [draggedDraggable, transform]);
 
-  if (entry === undefined || dragState === undefined) {
+  if (dragState === undefined) {
     return null;
   }
 
@@ -251,18 +241,7 @@ export function DragPlaceholder() {
         pointerEvents: 'none',
       }}
     >
-      <Entry
-        listeners={{}}
-        isDragging
-        isPlaceholder
-        selected={false}
-        setDuration={() => null}
-        setNodeRef={() => null}
-        {...entry}
-        sessionId={entry.sessionId ?? undefined}
-        column={0}
-        maxColumn={1}
-      />
+      {children}
     </div>
   );
 }
@@ -602,4 +581,9 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
     offset,
     ref,
   };
+}
+
+export function useDraggedData() {
+  const dragged = useContextSelector(DnDContext, ctx => ctx.dragged);
+  return dragged;
 }
