@@ -1,6 +1,17 @@
 \JINJA{from 'inc/person_list.tex' import render_person_lists}
 
 
+\JINJA{macro render_field_value(field_value)}
+    \JINJA{set field = field_value.contribution_field}
+    \JINJA{if field.field_type == 'text'}
+        \VAR{field_value.friendly_data}
+    \JINJA{elif field.field_type == 'single_choice'}
+        \VAR{field_value.friendly_data}
+    \JINJA{elif field.field_type == 'multiselect'}
+        \VAR{field_value.friendly_data|join(', ')}
+    \JINJA{endif}
+\JINJA{endmacro}
+
 \JINJA{macro render_contribution(contrib, tz)}
     {
         \small
@@ -66,7 +77,7 @@
                 \sectionfont{\normalsize\rmfamily}
                 \subsectionfont{\small\rmfamily}
                 \small
-                \VAR{field_value.friendly_data | markdown}
+                \VAR{render_field_value(field_value)|markdown}
             }
             \vspace{1.5em}
         \end{addmargin}
@@ -194,7 +205,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            \VAR{field_value.friendly_data | markdown}
+            \VAR{render_field_value(field_value)|markdown}
         }
         \vspace{1em}
         \newline
