@@ -47,180 +47,113 @@ function setupWidget(value = [], columns = COLUMNS) {
 
 function fillRow(widget, index, values) {
   const inputs = widget.find('tbody > tr').eq(index).find('.js-table-input');
-  values.forEach((value, i) => inputs.eq(i).val(value));
+  values.forEach((value, i) => inputs.eq(i).val(value).trigger('change'));
 }
 
-function pressEnter(widget, index) {
-  const input = widget.find('tbody > tr').eq(index).find('input.js-table-input').first();
-  input.trigger($.Event('keypress', {keyCode: 13}));
-}
-
-// mirrors how jquery-form announces a serialization it can still be told to skip
-function submitAjax(form) {
-  const veto = {};
-  form.trigger('form-pre-serialize', [form, {}, veto]);
-  return !veto.veto;
+function firstInput(widget, index = 0) {
+  return widget.find('tbody > tr').eq(index).find('.js-table-input')[0];
 }
 
 describe('multiple items widget', () => {
-  it('commits a filled pending row before the form is serialized', () => {
-    const {form, field, widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', 'en']);
-
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([{email: 'a@example.com', lang: 'en'}]);
-  });
-
-  it('commits a pending row that is being edited alongside committed ones', () => {
-    const {form, field, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
-    widget.find('.js-add-row').trigger('click');
-    fillRow(widget, 1, ['b@example.com', 'fr']);
-
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([
-      {email: 'a@example.com', lang: 'en'},
-      {email: 'b@example.com', lang: 'fr'},
-    ]);
-  });
-
-  it('commits a row that was reopened for editing', () => {
-    const {form, field, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
-    widget.find('.js-edit-row').trigger('click');
-    fillRow(widget, 0, ['changed@example.com', 'fr']);
-
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([{email: 'changed@example.com', lang: 'fr'}]);
-  });
-
-  it('drops the untouched empty row instead of blocking the submission', () => {
-    const {form, field, widget} = setupWidget();
-
-    expect(widget.find('tbody > tr')).toHaveLength(1);
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([]);
-  });
-
-  it('keeps an editable row when another field blocks the submission', () => {
+  it('lets the form be submitted while the initial row is untouched', () => {
     const {form, widget} = setupWidget();
 
-    submitAjax(form);
-    expect(widget.find('tbody > tr .js-table-input')).toHaveLength(2);
+    expect(widget.find('tbody > tr')).toHaveLength(1);
+    expect(form[0].checkValidity()).toBe(true);
   });
 
-  it('vetoes the serialization when a pending row is missing a required value', () => {
-    const {form, field, widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', '']);
-
-    expect(submitAjax(form)).toBe(false);
-    expect(JSON.parse(field.val())).toEqual([]);
-    expect(widget.find('tbody > tr .js-table-input')).toHaveLength(2);
-  });
-
-  it('ignores the widget when the field is disabled by a HiddenUnless toggle', () => {
-    const {form, field, widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', '']);
-    $('.form-group').find(':input').prop('disabled', true);
-
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([]);
-  });
-
-  it('commits a filled pending row on a plain form submission', () => {
-    const {form, field, widget} = setupWidget();
+  it('blocks the submission while a row is being filled', () => {
+    const {form, widget} = setupWidget();
     fillRow(widget, 0, ['a@example.com', 'en']);
 
-    form.trigger('submit');
-    expect(JSON.parse(field.val())).toEqual([{email: 'a@example.com', lang: 'en'}]);
+    expect(form[0].checkValidity()).toBe(false);
+    expect(firstInput(widget).validationMessage).not.toBe('');
   });
 
-  it('commits the pending row before adding another one', () => {
-    const {field, widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', 'en']);
-    widget.find('.js-add-row').trigger('click');
-
-    expect(JSON.parse(field.val())).toEqual([{email: 'a@example.com', lang: 'en'}]);
-    expect(widget.find('tbody > tr')).toHaveLength(2);
-  });
-
-  it('refuses to add another row while the pending one is incomplete', () => {
-    const {widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', '']);
-    widget.find('.js-add-row').trigger('click');
-
-    expect(widget.find('tbody > tr')).toHaveLength(1);
-  });
-
-  it('never accumulates blank rows when adding repeatedly', () => {
-    const {widget} = setupWidget();
-    widget.find('.js-add-row').trigger('click');
-    widget.find('.js-add-row').trigger('click');
-
-    expect(widget.find('tbody > tr')).toHaveLength(1);
-  });
-
-  it('flags pending changes while a row is being filled', () => {
-    const {widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', '']);
-    widget.find('.js-table-input').eq(0).trigger('change');
-
-    expect(widget.is('[data-pending-changes]')).toBe(true);
-  });
-
-  it('flags pending changes while a committed row is reopened', () => {
-    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+  it('blocks the submission while a saved row is reopened for editing', () => {
+    const {form, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
     widget.find('.js-edit-row').trigger('click');
 
-    expect(widget.is('[data-pending-changes]')).toBe(true);
+    expect(form[0].checkValidity()).toBe(false);
   });
 
-  it('clears the pending flag once the row is committed', () => {
-    const {widget} = setupWidget();
-    fillRow(widget, 0, ['a@example.com', 'en']);
-    widget.find('.js-table-input').eq(0).trigger('change');
-    pressEnter(widget, 0);
-
-    expect(widget.is('[data-pending-changes]')).toBe(false);
-  });
-
-  it('offers no per-row save button', () => {
-    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+  it('keeps blocking the submission when a reopened row is emptied', () => {
+    const {form, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
     widget.find('.js-edit-row').trigger('click');
+    fillRow(widget, 0, ['', '']);
 
-    expect(widget.find('.js-save-row')).toHaveLength(0);
-    expect(widget.find('.js-cancel-edit')).toHaveLength(1);
+    expect(form[0].checkValidity()).toBe(false);
   });
 
-  it('commits a row when enter is pressed in it', () => {
-    const {field, widget} = setupWidget();
+  it('lets the form be submitted once the row is saved', () => {
+    const {form, field, widget} = setupWidget();
     fillRow(widget, 0, ['a@example.com', 'en']);
-    pressEnter(widget, 0);
+    widget.find('.js-save-row').trigger('click');
 
+    expect(form[0].checkValidity()).toBe(true);
     expect(JSON.parse(field.val())).toEqual([{email: 'a@example.com', lang: 'en'}]);
   });
 
-  it('clears the pending flag when the edit is cancelled', () => {
-    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+  it('lets the form be submitted once the edit is cancelled', () => {
+    const {form, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
     widget.find('.js-edit-row').trigger('click');
     widget.find('.js-cancel-edit').trigger('click');
 
-    expect(widget.is('[data-pending-changes]')).toBe(false);
+    expect(form[0].checkValidity()).toBe(true);
   });
 
-  it('does not flag pending changes for the untouched empty row', () => {
-    const {widget} = setupWidget();
+  it('lets the form be submitted once the unsaved row is discarded', () => {
+    const {form, widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
+    widget.find('.js-cancel-edit').trigger('click');
 
-    expect(widget.is('[data-pending-changes]')).toBe(false);
+    expect(form[0].checkValidity()).toBe(true);
   });
 
-  it('keeps a row holding only a checked checkbox', () => {
+  it('blocks the submission while a row holding only a checked checkbox is unsaved', () => {
     const columns = [
       {id: 'name', caption: 'Name', type: 'text'},
       {id: 'enabled', caption: 'Enabled', type: 'checkbox'},
     ];
-    const {form, field, widget} = setupWidget([], columns);
-    widget.find('tbody > tr .js-table-input').eq(1).prop('checked', true);
+    const {form, widget} = setupWidget([], columns);
+    widget.find('.js-table-input').eq(1).prop('checked', true).trigger('change');
 
-    expect(submitAjax(form)).toBe(true);
-    expect(JSON.parse(field.val())).toEqual([{name: '', enabled: true}]);
+    expect(form[0].checkValidity()).toBe(false);
+  });
+
+  it('ignores a row whose inputs are disabled by a HiddenUnless toggle', () => {
+    const {form, widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
+    $('.form-group').find(':input').prop('disabled', true);
+
+    expect(form[0].checkValidity()).toBe(true);
+  });
+
+  it('flags pending changes while a row is being filled', () => {
+    const {widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
+
+    expect(widget.is('[data-pending-changes]')).toBe(true);
+  });
+
+  it('flags pending changes while a saved row is reopened', () => {
+    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+    widget.find('.js-edit-row').trigger('click');
+
+    expect(widget.is('[data-pending-changes]')).toBe(true);
+  });
+
+  it('clears the pending flag once the row is saved', () => {
+    const {widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
+    widget.find('.js-save-row').trigger('click');
+
+    expect(widget.is('[data-pending-changes]')).toBe(false);
+  });
+
+  it('does not flag pending changes for the untouched initial row', () => {
+    const {widget} = setupWidget();
+
+    expect(widget.is('[data-pending-changes]')).toBe(false);
   });
 });
