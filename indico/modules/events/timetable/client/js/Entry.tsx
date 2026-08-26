@@ -52,7 +52,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {listeners: _listeners, setNodeRef, transform, isDragging, ref} = useDraggable({id});
+  const {listeners: _listeners, setNodeRef, isDragging, ref} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -116,7 +116,6 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
-      transform={transform}
       isDragging={isDragging}
       selected={isSelected}
       setDuration={setDuration}
@@ -138,9 +137,8 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
 interface _EntryProps {
   id: EntryUniqueID;
-  isDragging: boolean;
-  isPlaceholder: boolean;
-  // transform: {x: number; y: number} | undefined;
+  isDragging?: boolean;
+  isPlaceholder?: boolean;
   listeners: Record<string, unknown>;
   setNodeRef: (element: HTMLElement | null) => void;
   blockRef?: React.RefObject<HTMLDivElement>;
@@ -180,8 +178,8 @@ export default function Entry({
   y,
   listeners,
   setNodeRef,
-  isDragging,
-  isPlaceholder,
+  isDragging = false,
+  isPlaceholder = false,
   column,
   maxColumn,
   setDuration: _setDuration,
@@ -348,26 +346,45 @@ export default function Entry({
               backgroundColor: `${colors.color}11`,
             }}
           >
-            {children.map(child => (
-              <DraggableEntry
-                key={child.id}
-                setDuration={_children ? setChildDurations[child.id] : null}
-                blockRef={blockRef}
-                parentEndDt={moment(startDt)
-                  .add(deltaMinutes + duration, 'minutes')
-                  .format()}
-                {...child}
-              />
-            ))}
-            {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'partial' && (
-              <DroppableArea id={id} />
+            {children.map(child =>
+              isPlaceholder ? (
+                <Entry
+                  key={child.id}
+                  listeners={{}}
+                  isPlaceholder
+                  selected={false}
+                  setDuration={() => null}
+                  setNodeRef={() => null}
+                  blockRef={blockRef}
+                  parentEndDt={moment(startDt)
+                    .add(deltaMinutes + duration, 'minutes')
+                    .format()}
+                  {...child}
+                  sessionId={child.sessionId ?? undefined}
+                />
+              ) : (
+                <DraggableEntry
+                  key={child.id}
+                  setDuration={_children ? setChildDurations[child.id] : null}
+                  blockRef={blockRef}
+                  parentEndDt={moment(startDt)
+                    .add(deltaMinutes + duration, 'minutes')
+                    .format()}
+                  {...child}
+                />
+              )
             )}
+            {!isPlaceholder &&
+              type === EntryType.SessionBlock &&
+              !isPosterBlock &&
+              droppableArea === 'partial' && <DroppableArea id={id} />}
           </div>
         )}
       </div>
-      {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'full' && (
-        <DroppableArea id={id} horizontalPadding="15px" />
-      )}
+      {!isPlaceholder &&
+        type === EntryType.SessionBlock &&
+        !isPosterBlock &&
+        droppableArea === 'full' && <DroppableArea id={id} horizontalPadding="15px" />}
       {!draftEntry && (
         <EntryMoveButtons
           id={id}
