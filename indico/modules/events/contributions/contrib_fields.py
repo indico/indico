@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired, Optional
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldVisibility
 from indico.util.i18n import _
 from indico.web.fields import BaseField, get_field_definitions
-from indico.web.fields.choices import SingleChoiceField
+from indico.web.fields.choices import MultiSelectField, SingleChoiceField
 from indico.web.fields.simple import TextField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumRadioField
@@ -59,3 +59,7 @@ class ContribTextField(TextField, ContribField):
 
 class ContribSingleChoiceField(SingleChoiceField, ContribField):
     pass
+
+
+class ContribMultiChoiceField(MultiSelectField, ContribField):
+    friendly_name = _('Multiple Choice')
