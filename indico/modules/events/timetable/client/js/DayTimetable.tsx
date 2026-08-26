@@ -19,9 +19,9 @@ import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
-import {useDroppable, DnDProvider, DragPlaceholder} from './dnd/dnd';
+import {useDroppable, DnDProvider, DragPlaceholder, useDraggedData} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
-import {DraggableEntry} from './Entry';
+import EntryComponent, {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
@@ -123,6 +123,37 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 }
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
+
+function DragPlaceholderContainer({
+  findEntryById,
+}: {
+  findEntryById: (id: string) => Entry | undefined;
+}) {
+  const dragged = useDraggedData();
+  const draggedEntry = useMemo(
+    () => (dragged ? findEntryById(dragged) : undefined),
+    [dragged, findEntryById]
+  );
+
+  return (
+    <DragPlaceholder>
+      {draggedEntry ? (
+        <EntryComponent
+          listeners={{}}
+          isDragging
+          isPlaceholder
+          selected={false}
+          setDuration={() => null}
+          setNodeRef={() => null}
+          {...draggedEntry}
+          sessionId={draggedEntry.sessionId ?? undefined}
+          column={0}
+          maxColumn={1}
+        />
+      ) : null}
+    </DragPlaceholder>
+  );
+}
 
 export function DayTimetable({
   dt,
@@ -725,7 +756,7 @@ export function DayTimetable({
           </DnDCalendar>
         </div>
       </div>
-      <DragPlaceholder />
+      <DragPlaceholderContainer findEntryById={findEntryById} />
     </DnDProvider>
   );
 }
