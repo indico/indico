@@ -131,16 +131,24 @@ const TopLevelEntries = React.memo(function TopLevelEntries({
   );
 });
 
-function DragPlaceholderContainer({
-  findEntryById,
-}: {
-  findEntryById: (id: string) => Entry | undefined;
-}) {
+function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
   const dragged = useDraggedData();
-  const draggedEntry = useMemo(
-    () => (dragged ? findEntryById(dragged) : undefined),
-    [dragged, findEntryById]
-  );
+  const draggedEntry = useMemo(() => {
+    if (!dragged) {
+      return undefined;
+    }
+    for (const entry of entries) {
+      if (entry.id === dragged) {
+        return entry;
+      }
+      if (entry.id.startsWith('s')) {
+        const childEntry = (entry as BlockEntry).children.find(c => c.id === dragged);
+        if (childEntry) {
+          return childEntry;
+        }
+      }
+    }
+  }, [dragged, entries]);
 
   return (
     <DragPlaceholder>
@@ -153,6 +161,7 @@ function DragPlaceholderContainer({
           setDuration={() => null}
           setNodeRef={() => null}
           {...draggedEntry}
+          y={0}
           sessionId={draggedEntry.sessionId ?? undefined}
           column={0}
           maxColumn={1}
@@ -767,7 +776,7 @@ export function DayTimetable({
           </div>
         </div>
       </div>
-      <DragPlaceholderContainer findEntryById={findEntryById} />
+      <DragPlaceholderContainer entries={entries} />
     </DnDProvider>
   );
 }
