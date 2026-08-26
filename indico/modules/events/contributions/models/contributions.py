@@ -559,7 +559,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         if super().can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
                               explicit_permission=explicit_permission):
             return True
-        if check_parent and self.event.can_manage(session.user, permission='contributions'):
+        if check_parent and self.event.can_manage(user, permission='contributions'):
             return True
         if (check_parent and self.session_id is not None and
                 self.session.can_manage(user, 'coordinate', allow_admin=allow_admin,
