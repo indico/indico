@@ -4,7 +4,7 @@ url: https://github.com/indico/indico
 landingURL: https://getindico.io
 softwareVersion: 3.3.13
 releaseDate: '2026-08-25'
-logo: indico/web/static/images/logo_indico.png
+logo: indico/web/static/images/logo_indico.svg
 platforms:
   - web
 categories:
