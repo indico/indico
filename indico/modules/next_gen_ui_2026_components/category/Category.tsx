@@ -5,15 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-// import apiEventListURL from 'indico-url:categories.api_event_list';
-
 import apiCategoryChildrenURL from 'indico-url:categories.api_category_children';
 import apiCategoryInfoURL from 'indico-url:categories.api_category_info';
 import apiEventListWithMetaDataURL from 'indico-url:categories.api_event_list_with_meta_data';
 
 import React from 'react';
+import remarkRehype from 'remark-rehype';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
+import {Markdown} from 'indico/react/util';
 
 import {CategoryCardList} from '../card/CategoryCardList';
 import {EventList} from '../list/EventList';
@@ -72,8 +72,13 @@ export function Category({categoryId, isFlat}: CategoryProps) {
         <h1 styleName="category-title">{category.title}</h1>
       )}
       <div styleName="category-info">
-        {category.logoURL && <img src={category.logoURL} alt={category.title} />}
-        <p styleName="category-description">{category.description}</p>
+        {category.logoURL && (
+          <img styleName="category-logo" src={category.logoURL} alt={category.title} />
+        )}
+        <div styleName="category-description">
+          {/* Markdown will be replaced by custom solution */}
+          <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
+        </div>
       </div>
       <CategoryCardList data={categoryChildren.categories} columns={2} />
 
