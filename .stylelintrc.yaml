@@ -85,5 +85,6 @@ rules:
   stylistic/declaration-colon-newline-after: null
   stylistic/selector-combinator-space-before: null
   stylistic/block-closing-brace-newline-after: null
+  stylistic/block-opening-brace-space-before: null
   stylistic/value-list-comma-newline-after: null
   stylistic/selector-pseudo-class-parentheses-space-inside: null
