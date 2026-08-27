@@ -269,8 +269,8 @@ def _update_security_md(*, dry_run: bool = False):
 
 
 def _get_available_languages() -> list[str]:
-    """Get the list of officially supported languages"""
-    translations_dir = Path("indico/translations")
+    """Get the list of officially supported languages."""
+    translations_dir = Path('indico/translations')
     babel_locales = [p.name for p in translations_dir.iterdir() if p.is_dir()]
     # This skips canonicalization, but it should be good enough for our needs
     bcp47_locales = [locale.replace('_', '-') for locale in babel_locales]
@@ -278,7 +278,7 @@ def _get_available_languages() -> list[str]:
 
 
 def _update_publiccode_yml(new_version: str, release_date: date, *, dry_run: bool = False):
-    """Update publiccode.yml"""
+    """Update publiccode.yml."""
     class Dumper(yaml.Dumper):
         def increase_indent(self, flow=False, indentless=False):
             return super().increase_indent(flow, indentless=False)
