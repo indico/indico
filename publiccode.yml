@@ -111,24 +111,23 @@ maintenance:
       email: indico-team@cern.ch
 localisation:
   localisationReady: true
-  availableLanguages: []
-availableLanguages:
-  - cs-CZ
-  - de-DE
-  - en-CA
-  - en-GB
-  - en-US
-  - es-ES
-  - fi-FI
-  - fr-FR
-  - hu-HU
-  - it-IT
-  - ja-JP
-  - ko-KR
-  - mn-MN
-  - pl-PL
-  - pt-BR
-  - sv-SE
-  - tr-TR
-  - uk-UA
-  - zh-Hans-CN
+  availableLanguages:
+    - cs-CZ
+    - de-DE
+    - en-CA
+    - en-GB
+    - en-US
+    - es-ES
+    - fi-FI
+    - fr-FR
+    - hu-HU
+    - it-IT
+    - ja-JP
+    - ko-KR
+    - mn-MN
+    - pl-PL
+    - pt-BR
+    - sv-SE
+    - tr-TR
+    - uk-UA
+    - zh-Hans-CN

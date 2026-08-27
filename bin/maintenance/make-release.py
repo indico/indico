@@ -286,9 +286,9 @@ def _update_publiccode_yml(new_version: str, release_date: date, *, dry_run: boo
     publiccode_yml = Path('publiccode.yml')
     content = publiccode_yml.read_text()
     updated_yaml = yaml.safe_load(content)
-    updated_yaml["softwareVersion"] = new_version
-    updated_yaml["releaseDate"] = release_date.isoformat()
-    updated_yaml["availableLanguages"] = _get_available_languages()
+    updated_yaml['softwareVersion'] = new_version
+    updated_yaml['releaseDate'] = release_date.isoformat()
+    updated_yaml['localisation']['availableLanguages'] = _get_available_languages()
     updated_content = yaml.dump(updated_yaml, Dumper=Dumper, sort_keys=False, allow_unicode=True)
     if dry_run:
         _show_diff(content, updated_content, publiccode_yml.name)
