@@ -4,26 +4,7 @@
         <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
             {%- trans %}Categories in {{ category_title }}{% endtrans -%}
         </h2>
-        <ul class="category-list" data-subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
-            {% for category in parent_category.children %}
-                <li>
-                    <a href="{{ url_for('.display', category) }}" class="name"
-                       aria-describedby="category-description-{{ category.id }}">{{ category.title }}</a>
-                    <span class="category-description" id="category-description-{{ category.id }}">
-                        <span class="number-events" id="category-event-count-{{ category.id }}"></span>
-                        {% if category.is_self_protected %}
-                            <span class="protection">
-                                <span>{% trans %}Protected category{% endtrans %}</span>
-                            </span>
-                        {% else %}
-                            <span class="protection not-protected">
-                                <span>{% trans %}Public category{% endtrans %}</span>
-                            </span>
-                        {% endif %}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+        <div id="category-cards-root" data-category-id="{{ parent_category.id }}"></div>
         <script>
             setupCategoryDisplaySubcatList();
         </script>

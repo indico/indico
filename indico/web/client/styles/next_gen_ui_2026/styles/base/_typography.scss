@@ -1,0 +1,70 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:root {
+  // Font family
+  // --font-family-base: 'Noto Sans', sans-serif;
+  --font-family-base: 'Inter', sans-serif;
+
+  // Font weights
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  // Display 2xl
+  --font-size-display-2xl: 5.143rem; // 72px
+  --line-height-display-2xl: 6.429rem; // 90px
+  --letter-spacing-display-2xl: -0.02em;
+
+  // Display xl
+  --font-size-display-xl: 4.286rem; // 60px
+  --line-height-display-xl: 5.143rem; // 72px
+  --letter-spacing-display-xl: -0.02em;
+
+  // Display lg
+  --font-size-display-lg: 3.429rem; // 48px
+  --line-height-display-lg: 4.286rem; // 60px
+  --letter-spacing-display-lg: -0.02em;
+
+  // Display md
+  --font-size-display-md: 2.571rem; // 36px
+  --line-height-display-md: 3.143rem; // 44px
+  --letter-spacing-display-md: -0.02em;
+
+  // Display sm
+  --font-size-display-sm: 2.143rem; // 30px
+  --line-height-display-sm: 2.714rem; // 38px
+
+  // Display xs
+  --font-size-display-xs: 1.714rem; // 24px
+  --line-height-display-xs: 2.286rem; // 32px
+
+  // Text xl
+  --font-size-text-xl: 1.429rem; // 20px
+  --line-height-text-xl: 2.143rem; // 30px
+
+  // Text lg
+  --font-size-text-lg: 1.286rem; // 18px
+  --line-height-text-lg: 2rem; // 28px
+
+  // Text md
+  --font-size-text-md: 1.143rem; // 16px
+  --line-height-text-md: 1.714rem; // 24px
+
+  // Text sm
+  --font-size-text-sm: 1rem; // 14px
+  --line-height-text-sm: 1.429rem; // 20px
+
+  // Text xs
+  --font-size-text-xs: 0.857rem; // 12px
+  --line-height-text-xs: 1.286rem; // 18px
+
+  // Text xxs
+  --font-size-text-xxs: 0.714rem; // 10px
+  --line-height-text-xxs: 1.071rem; // 15px
+}

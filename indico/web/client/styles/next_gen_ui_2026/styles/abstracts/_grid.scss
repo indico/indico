@@ -1,0 +1,70 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './tokens' as *;
+
+[class^='grid-'] {
+  display: grid;
+  gap: var(--space-3);
+}
+
+// Grid layouts
+.grid-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.grid-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.grid-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@mixin responsive-grid($columns) {
+  grid-template-columns: 1fr;
+
+  @if $columns >= 2 {
+    @media (min-width: $viewport-tablet) {
+      grid-template-columns: repeat(min(2, $columns), 1fr);
+    }
+  }
+
+  @if $columns >= 3 {
+    @media (min-width: $viewport-desktop) {
+      grid-template-columns: repeat($columns, 1fr);
+    }
+  }
+}
+
+.grid-2-responsive {
+  @include responsive-grid(2);
+}
+
+.grid-3-responsive {
+  @include responsive-grid(3);
+}
+
+.grid-5-responsive {
+  @include responsive-grid(5);
+}
+
+.grid-6-responsive {
+  @include responsive-grid(6);
+}
+
+.grid-12-responsive {
+  @include responsive-grid(12);
+}
