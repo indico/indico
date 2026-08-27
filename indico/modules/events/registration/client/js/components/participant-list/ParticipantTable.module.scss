@@ -41,7 +41,8 @@
   }
 }
 
-:global(.ui.sortable.table) .participant-table-header:not(.unsortable):not(:global(.sorted))::after {
+:global(.ui.sortable.table)
+  .participant-table-header:not(.unsortable):not(:global(.sorted))::after {
   display: inline-block;
   content: '\f0dc';
   opacity: 0.4;

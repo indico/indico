@@ -21,7 +21,9 @@
 }
 
 .sidebar-button {
-  transition: color 0.25s ease-in, transform 0.25s ease-in;
+  transition:
+    color 0.25s ease-in,
+    transform 0.25s ease-in;
   color: $white;
   cursor: pointer;
 

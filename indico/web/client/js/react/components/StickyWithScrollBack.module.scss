@@ -22,6 +22,8 @@
   :global(.ui.sticky.fixed.top) {
     padding-top: 30px;
     box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
-    transition: all, 0.25s ease-in;
+    transition:
+      all,
+      0.25s ease-in;
   }
 }

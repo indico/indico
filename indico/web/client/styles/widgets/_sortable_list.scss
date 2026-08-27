@@ -33,7 +33,9 @@
       &.i-label {
         text-align: left;
         border-color: transparent;
-        transition: color 0s, background-color 0.4s;
+        transition:
+          color 0s,
+          background-color 0.4s;
 
         > .title {
           flex-grow: 1;
@@ -61,7 +63,9 @@
       &.ui-sortable-helper {
         &.i-label {
           background-color: lighten($i-label-color, 50%);
-          transition: color 0s, background-color 0s;
+          transition:
+            color 0s,
+            background-color 0s;
         }
 
         .actions,
