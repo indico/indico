@@ -3,10 +3,14 @@ extends:
   - stylelint-config-recommended-scss
   - stylelint-stylistic/config
 
+plugins:
+  - stylelint-prettier
+
 ignoreFiles:
   - indico/web/static/dist/**/*.css
 
 rules:
+  prettier/prettier: true
   # this rule is too noisy
   no-descending-specificity: null
 
@@ -82,3 +86,4 @@ rules:
   stylistic/selector-combinator-space-before: null
   stylistic/block-closing-brace-newline-after: null
   stylistic/value-list-comma-newline-after: null
+  stylistic/selector-pseudo-class-parentheses-space-inside: null
