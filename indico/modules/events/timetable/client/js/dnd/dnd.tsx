@@ -9,10 +9,6 @@ import _ from 'lodash';
 import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react';
 import {createContext, useContextSelector} from 'use-context-selector';
 
-import {snapPixels} from 'indico/modules/events/timetable/utils';
-
-import {EntryUniqueID} from '../types';
-
 import {getScrollParent, getTotalScroll} from './modifiers';
 import {ScrollBounds, useScrollIntent} from './scroll';
 import {
@@ -48,7 +44,7 @@ interface DnDContextType {
   droppables: Droppables;
   draggableData: DraggableData;
   onDrop: OnDrop;
-  dragged: EntryUniqueID | null;
+  dragged: string | null;
   registerDroppable: (id: string, node: HTMLRef) => void;
   unregisterDroppable: (id: string) => void;
   registerDraggable: (id: string, fixed: boolean, node: HTMLRef) => void;
@@ -208,8 +204,7 @@ export function DragPlaceholder({children}: {children: React.ReactNode}) {
   const [left, setLeft] = useState(0);
 
   const transform = useMemo(
-    () =>
-      `translate3d(${dragState?.transform?.x ?? 0}px, ${snapPixels(dragState?.transform?.y ?? 0)}px, 10px)`,
+    () => `translate3d(${dragState?.transform?.x ?? 0}px, ${dragState?.transform?.y ?? 0}px, 10px)`,
     [dragState]
   );
 
@@ -260,7 +255,7 @@ export function DnDProvider({
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
   const [draggableData, setDraggableData] = useState<DraggableData>({});
-  const [dragged, setDragged] = useState<EntryUniqueID | null>(null);
+  const [dragged, setDragged] = useState<string | null>(null);
   const state = useRef<DnDState>({
     state: 'idle',
     initialMousePosition: {x: 0, y: 0},
@@ -339,7 +334,7 @@ export function DnDProvider({
       if (state.current.state === 'mousedown' || state.current.state === 'dragging') {
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
-          setDragged(state.current.activeDraggable as EntryUniqueID);
+          setDragged(state.current.activeDraggable);
         }
         const mousePosition = {
           x: e.pageX + state.current.scrollPosition.x,
