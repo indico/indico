@@ -585,5 +585,21 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
 
 export function useDraggedData() {
   const dragged = useContextSelector(DnDContext, ctx => ctx.dragged);
-  return dragged;
+  const transform = useContextSelector(DnDContext, ctx =>
+    ctx.dragged ? ctx.draggableData[ctx.dragged]?.transform : undefined
+  );
+
+  return useMemo(
+    () => ({
+      dragged,
+      transform:
+        transform?.x === undefined && transform?.y === undefined
+          ? undefined
+          : {
+              x: transform?.x,
+              y: transform?.y,
+            },
+    }),
+    [dragged, transform?.x, transform?.y]
+  );
 }
