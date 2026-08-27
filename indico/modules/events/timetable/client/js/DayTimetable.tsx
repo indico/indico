@@ -125,9 +125,9 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
 function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
-  const dragged = useDraggedData();
+  const {dragged, transform} = useDraggedData();
   const draggedEntry = useMemo(() => {
-    if (!dragged) {
+    if (!dragged || dragged.startsWith('unscheduled')) {
       return undefined;
     }
     for (const entry of entries) {
@@ -153,6 +153,7 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
           selected={false}
           setDuration={() => null}
           setNodeRef={() => null}
+          transform={transform}
           {...draggedEntry}
           y={0}
           sessionId={draggedEntry.sessionId ?? undefined}
