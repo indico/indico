@@ -137,6 +137,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
 interface _EntryProps {
   id: EntryUniqueID;
+  transform: {x: number; y: number} | undefined;
   isDragging?: boolean;
   isPlaceholder?: boolean;
   listeners: Record<string, unknown>;
@@ -178,6 +179,7 @@ export default function Entry({
   y,
   listeners,
   setNodeRef,
+  transform,
   isDragging = false,
   isPlaceholder = false,
   column,
@@ -232,7 +234,7 @@ export default function Entry({
     ...colors,
   };
 
-  const deltaMinutes = snapMinutes(pixelsToMinutes(0));
+  const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
   const newStart = moment(startDt).add(deltaMinutes, 'minutes');
   const newEnd = moment(startDt).add(deltaMinutes + duration, 'minutes');
 
@@ -355,6 +357,7 @@ export default function Entry({
                   selected={false}
                   setDuration={() => null}
                   setNodeRef={() => null}
+                  transform={undefined}
                   {...child}
                   blockRef={blockRef}
                   parentEndDt={moment(startDt)
