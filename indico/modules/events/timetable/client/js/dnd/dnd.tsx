@@ -325,7 +325,6 @@ export function DnDProvider({
         initialOffset: {x: offsetX, y: offsetY},
         activeDraggable: id,
       };
-      setDragged(id as EntryUniqueID);
       setDraggableData(d =>
         setInitialOffset(setBoundingRectAndScroll(d, draggable.node, id), id, {
           x: offsetX,
@@ -340,6 +339,7 @@ export function DnDProvider({
       if (state.current.state === 'mousedown' || state.current.state === 'dragging') {
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
+          setDragged(state.current.activeDraggable as EntryUniqueID);
         }
         const mousePosition = {
           x: e.pageX + state.current.scrollPosition.x,
