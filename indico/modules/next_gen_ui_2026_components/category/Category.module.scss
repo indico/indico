@@ -11,18 +11,33 @@
     .category-title {
         margin-top: var(--space-6);
         margin-bottom: var(--space-12);
+
+        @media (max-width: $viewport-mobile) {
+            margin-top: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
     }
 
     .category-info {
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        gap: var(--space-1);
+        gap: var(--space-4);
         margin-bottom: var(--space-6);
 
         .category-description {
-            margin-left: var(--space-4);
             @include typography('text-md', 'regular');
+            color: var(--color-text);
+            word-break: normal;
+            white-space: pre-line;
+        }
+
+        .category-logo {
+            border-radius: var(--radius-lg);
+        }
+
+        @media (max-width: $viewport-mobile) {
+            flex-direction: column;
         }
     }
 }
