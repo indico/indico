@@ -6,10 +6,9 @@
 // LICENSE file for more details.
 
 :root {
+  // PRIMARY COLORS
 
-    // PRIMARY COLORS
-
-    // Indico Gray
+  // Indico Gray
   --indico-gray-50: #f5f5f6;
   --indico-gray-100: #e5e6e8;
   --indico-gray-200: #ced0d3;
@@ -133,84 +132,32 @@
   // Gray gradients
   --indico-gradient-gray-600: #575a63;
 
-  --indico-gradient-gray-600-500-90: linear-gradient(
-    90deg,
-    #575a63 0%,
-    #717680 100%
-  );
+  --indico-gradient-gray-600-500-90: linear-gradient(90deg, #575a63 0%, #717680 100%);
 
-  --indico-gradient-gray-700-600-45: linear-gradient(
-    45deg,
-    #414651 0%,
-    #535862 100%
-  );
+  --indico-gradient-gray-700-600-45: linear-gradient(45deg, #414651 0%, #535862 100%);
 
-  --indico-gradient-gray-800-600-45: linear-gradient(
-    45deg,
-    #252b37 0%,
-    #535862 100%
-  );
+  --indico-gradient-gray-800-600-45: linear-gradient(45deg, #252b37 0%, #535862 100%);
 
-  --indico-gradient-gray-800-600-90: linear-gradient(
-    90deg,
-    #252b37 0%,
-    #535862 100%
-  );
+  --indico-gradient-gray-800-600-90: linear-gradient(90deg, #252b37 0%, #535862 100%);
 
-  --indico-gradient-gray-800-700-26: linear-gradient(
-    26.5deg,
-    #252b37 0%,
-    #414651 100%
-  );
+  --indico-gradient-gray-800-700-26: linear-gradient(26.5deg, #252b37 0%, #414651 100%);
 
-  --indico-gradient-gray-900-600-45: linear-gradient(
-    45deg,
-    #101828 0%,
-    #535862 100%
-  );
+  --indico-gradient-gray-900-600-45: linear-gradient(45deg, #101828 0%, #535862 100%);
 
   // Brand gradients
   --indico-gradient-brand-600: #7f56d9;
 
-  --indico-gradient-brand-600-500-90: linear-gradient(
-    90deg,
-    #7f56d9 0%,
-    #9e77ed 100%
-  );
+  --indico-gradient-brand-600-500-90: linear-gradient(90deg, #7f56d9 0%, #9e77ed 100%);
 
-  --indico-gradient-brand-700-600-45: linear-gradient(
-    45deg,
-    #6941c6 0%,
-    #7f56d9 100%
-  );
+  --indico-gradient-brand-700-600-45: linear-gradient(45deg, #6941c6 0%, #7f56d9 100%);
 
-  --indico-gradient-brand-800-600-45: linear-gradient(
-    45deg,
-    #53389e 0%,
-    #7f56d9 100%
-  );
+  --indico-gradient-brand-800-600-45: linear-gradient(45deg, #53389e 0%, #7f56d9 100%);
 
-  --indico-gradient-brand-800-600-90: linear-gradient(
-    90deg,
-    #53389e 0%,
-    #7f56d9 100%
-  );
+  --indico-gradient-brand-800-600-90: linear-gradient(90deg, #53389e 0%, #7f56d9 100%);
 
-  --indico-gradient-brand-800-700-26: linear-gradient(
-    26.5deg,
-    #53389e 0%,
-    #6941c6 100%
-  );
+  --indico-gradient-brand-800-700-26: linear-gradient(26.5deg, #53389e 0%, #6941c6 100%);
 
-  --indico-gradient-brand-900-600-45: linear-gradient(
-    45deg,
-    #42307d 0%,
-    #7f56d9 100%
-  );
+  --indico-gradient-brand-900-600-45: linear-gradient(45deg, #42307d 0%, #7f56d9 100%);
 
-  --indico-gradient-indigo-500-blue-500-45: linear-gradient(
-    45deg,
-    #ab49ff  0%,
-    #0ba5ec 100%
-  );
+  --indico-gradient-indigo-500-blue-500-45: linear-gradient(45deg, #ab49ff 0%, #0ba5ec 100%);
 }

@@ -8,56 +8,56 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 :global(.indico-ui) {
-    .year-picker {
-        background-color: var(--color-surface-soft);
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        width: 100%;
-        overflow: hidden;
+  .year-picker {
+    background-color: var(--color-surface-soft);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .year-list {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
     }
 
-    .year-list {
-        display: flex;
-        flex-direction: row;
-        flex: 1 1 auto;
-        width: 100%;
-        align-items: center;
-        justify-content: flex-start;
-        min-width: 0;
+    scroll-behavior: smooth;
 
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none;
+    @media (max-width: $viewport-mobile) {
+      min-width: 0;
+    }
+  }
 
-        &::-webkit-scrollbar {
-            display: none;
-        }
+  .year-picker-year-button {
+    @include focus-ring();
+    flex-shrink: 0;
+    color: var(--color-text-muted);
 
-        scroll-behavior: smooth;
-
-        @media (max-width: $viewport-mobile) {
-            min-width: 0;
-        }
+    &:hover {
+      color: var(--color-text-heading);
     }
 
-    .year-picker-year-button {
-        @include focus-ring();
-        flex-shrink: 0;
-        color: var(--color-text-muted);
-
-        &:hover {
-            color: var(--color-text-heading);
-        }
-
-        &[data-active] {
-            color: var(--color-text-heading);
-            --button-font-weight: var(--font-weight-bold);
-        }
+    &[data-active] {
+      color: var(--color-text-heading);
+      --button-font-weight: var(--font-weight-bold);
     }
+  }
 
-    .year-picker-chevron-button {
-        @include focus-ring();
-        color: var(--color-text-heading);
-    }
+  .year-picker-chevron-button {
+    @include focus-ring();
+    color: var(--color-text-heading);
+  }
 }

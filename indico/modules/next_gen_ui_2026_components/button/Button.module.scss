@@ -57,7 +57,10 @@
     align-items: center;
     justify-content: center;
     border: none;
-    transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast);
+    transition:
+      background var(--transition-fast),
+      color var(--transition-fast),
+      border var(--transition-fast);
 
     background-color: var(--btn-bg, transparent);
     color: var(--btn-text);

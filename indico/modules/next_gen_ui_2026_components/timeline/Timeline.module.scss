@@ -8,28 +8,28 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 :global(.indico-ui) {
-    .timeline-item {
-        display: block;
-    }
+  .timeline-item {
+    display: block;
+  }
 
-    .timeline-content-wrapper {
-        position: relative;
-        border: 1px solid transparent;
-    }
+  .timeline-content-wrapper {
+    position: relative;
+    border: 1px solid transparent;
+  }
 
-    .line {
-        background-color: var(--color-surface-soft-accent);
-        width: 0.143rem; // 2px
-        height: 100%;
-        margin-left: calc((var(--space-3) / 2) - (0.143rem));
-        position: absolute;
+  .line {
+    background-color: var(--color-surface-soft-accent);
+    width: 0.143rem; // 2px
+    height: 100%;
+    margin-left: calc((var(--space-3) / 2) - (0.143rem));
+    position: absolute;
 
-        @media (max-width: $viewport-mobile) {
-            height: 0;
-        }
+    @media (max-width: $viewport-mobile) {
+      height: 0;
     }
+  }
 
-    .dot {
-        margin-right: var(--space-2);
-    }
+  .dot {
+    margin-right: var(--space-2);
+  }
 }

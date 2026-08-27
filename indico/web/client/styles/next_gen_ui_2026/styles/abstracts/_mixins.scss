@@ -13,7 +13,15 @@
   line-height: var(--line-height-#{$size});
   font-weight: var(--font-weight-#{$weight});
 
-  @if $size == 'display-2xl' or $size == 'display-xl' or $size == 'display-lg' or $size == 'display-md' {
+  @if $size ==
+    'display-2xl' or
+    $size ==
+    'display-xl' or
+    $size ==
+    'display-lg' or
+    $size ==
+    'display-md'
+  {
     letter-spacing: var(--letter-spacing-#{$size});
   }
 }

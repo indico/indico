@@ -9,118 +9,118 @@
 @use 'next_gen_ui_2026/styles/base' as *;
 
 :global(.indico-ui) {
-    .event-list {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        margin-bottom: var(--space-6);
+  .event-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-bottom: var(--space-6);
 
-        .event-list-month {
-            margin-left: var(--space-6);
+    .event-list-month {
+      margin-left: var(--space-6);
 
-            @media (max-width: $viewport-mobile) {
-                margin-left: 0;
-            }
-        }
+      @media (max-width: $viewport-mobile) {
+        margin-left: 0;
+      }
+    }
+  }
+
+  .event-list-year-picker {
+    margin-bottom: var(--space-6);
+  }
+
+  .event-list-show-more {
+    align-self: center;
+  }
+
+  .event-list-item-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: var(--space-8);
+    position: relative;
+
+    > span {
+      --x-translate: -35%;
+      --y-translate: 35%;
     }
 
-    .event-list-year-picker {
-        margin-bottom: var(--space-6);
+    &:nth-child(2) {
+      margin-top: var(--space-5);
     }
 
-    .event-list-show-more {
-        align-self: center;
+    &:last-child {
+      margin-bottom: var(--space-5);
     }
 
-    .event-list-item-wrapper {
+    @media (max-width: $viewport-mobile) {
+      margin-left: 0;
+
+      .event-list-item-favorite-icon {
+        top: 0;
+        left: 0;
+        transform: translate(5%, 8%);
+        position: absolute;
+        z-index: 1;
+      }
+    }
+
+    .event-list-item {
+      margin: var(--space-2);
+      margin-left: var(--space-2);
+      width: 100%;
+
+      @media (max-width: $viewport-mobile) {
+        margin-left: 0;
+        padding-left: var(--space-4);
+        gap: var(--space-2);
+      }
+
+      .event-list-item-start-section {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        margin-left: var(--space-8);
-        position: relative;
+        gap: var(--space-1);
 
-        >span {
-            --x-translate: -35%;
-            --y-translate: 35%;
-        }
+        min-width: 0;
 
-        &:nth-child(2) {
-            margin-top: var(--space-5);
-        }
-
-        &:last-child {
-            margin-bottom: var(--space-5);
+        .event-list-item-date-tag {
+          min-width: 145px;
+          justify-content: start;
+          align-items: center;
+          padding-left: var(--space-2);
         }
 
         @media (max-width: $viewport-mobile) {
-            margin-left: 0;
+          gap: var(--space-2);
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-start;
 
-            .event-list-item-favorite-icon {
-                top: 0;
-                left: 0;
-                transform: translate(5%, 8%);
-                position: absolute;
-                z-index: 1;
-            }
+          min-width: 0;
+          flex: 1 1 auto;
+
+          .event-list-item-date-tag {
+            padding-left: var(--space-8);
+          }
         }
+      }
 
-        .event-list-item {
-            margin: var(--space-2);
-            margin-left: var(--space-2);
-            width: 100%;
+      .event-list-item-tag-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-1);
 
-            @media (max-width: $viewport-mobile) {
-                margin-left: 0;
-                padding-left: var(--space-4);
-                gap: var(--space-2);
-            }
+        margin-left: var(--space-2);
 
-            .event-list-item-start-section {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                gap: var(--space-1);
-
-                min-width: 0;
-
-                .event-list-item-date-tag {
-                    min-width: 145px;
-                    justify-content: start;
-                    align-items: center;
-                    padding-left: var(--space-2);
-                }
-
-                @media (max-width: $viewport-mobile) {
-                    gap: var(--space-2);
-                    flex-direction: column;
-                    align-items: flex-start;
-                    justify-content: flex-start;
-
-                    min-width: 0;
-                    flex: 1 1 auto;
-
-                    .event-list-item-date-tag {
-                        padding-left: var(--space-8);
-                    }
-                }
-            }
-
-            .event-list-item-tag-section {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-end;
-                gap: var(--space-1);
-
-                margin-left: var(--space-2);
-
-                .event-list-item-label {
-                    text-transform: uppercase;
-                    font-weight: var(--font-weight-bold);
-                }
-            }
+        .event-list-item-label {
+          text-transform: uppercase;
+          font-weight: var(--font-weight-bold);
         }
+      }
     }
+  }
 }
