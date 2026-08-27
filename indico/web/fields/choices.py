@@ -147,6 +147,8 @@ class MultiSelectField(_ChoiceFieldBase):
                 'coerce': lambda x: x}
 
     def get_friendly_value(self, value):
+        if not value:
+            return []
         option_map = {option_dict['id']: option_dict['option'] for option_dict in self.object.field_data['options']}
         return [option_map[id_] for id_ in value if id_ in option_map]
 
