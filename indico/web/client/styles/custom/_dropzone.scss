@@ -20,7 +20,8 @@ $dropzone-border-width: 2;
   width: (
       ($dropzone-padding + $dropzone-border-width) * 2 +
         ($image-preview-width + ($image-preview-margin * 2)) * 5
-    ) * 1px;
+    ) *
+    1px;
   cursor: pointer;
 
   .dz-preview.dz-file-preview .dz-image,

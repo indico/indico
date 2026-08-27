@@ -180,7 +180,10 @@ $editor-preview-bg-color: $light-gray;
 
 .wmd-prompt-dialog > form > input[type='button'] {
   border: 1px solid #888;
-  font-family: trebuchet MS, helvetica, sans-serif;
+  font-family:
+    trebuchet MS,
+    helvetica,
+    sans-serif;
   font-size: 0.8em;
   font-weight: bold;
 }

@@ -17,7 +17,8 @@ using the `bin/maintenance/generate_icons.py` script.
 
 @font-face {
   font-family: 'icomoon-ultimate';
-  src: url('static:fonts/icomoon/icomoon.svg#icomoon-ultimate') format('svg'),
+  src:
+    url('static:fonts/icomoon/icomoon.svg#icomoon-ultimate') format('svg'),
     url('static:fonts/icomoon/icomoon.woff') format('woff'),
     url('static:fonts/icomoon/icomoon.ttf') format('truetype');
   font-weight: normal;

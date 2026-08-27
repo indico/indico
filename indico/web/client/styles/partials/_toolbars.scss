@@ -29,7 +29,9 @@ $toolbar-spacing: 10px;
     margin: 0;
 
     // i-button flavors don't change border color on hover
-    &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
+    &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(
+        :disabled
+      ) {
       &:hover + .i-button {
         border-left-color: $gray;
       }

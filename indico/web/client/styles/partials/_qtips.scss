@@ -121,7 +121,9 @@
 
   &.informational {
     @include qtip-light();
-    box-shadow: rgba($dark-gray, 0.2) 0 0 3px 3px, lighten($light-gray, 20%) 0 1px 0 0 inset;
+    box-shadow:
+      rgba($dark-gray, 0.2) 0 0 3px 3px,
+      lighten($light-gray, 20%) 0 1px 0 0 inset;
     @include border-all(#add9ed);
     background-color: #edf3fd;
     color: $light-black;
