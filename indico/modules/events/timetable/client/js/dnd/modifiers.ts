@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {snapPixels} from 'indico/modules/events/timetable/utils';
+
 import {Rect, Transform, Modifier} from './types';
 
 /**
@@ -110,12 +112,19 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
 export const createRestrictToCalendar =
   (containerRef, limits: [number, number] = [0, 0]): Modifier =>
   ({id, draggingNodeRect, transform}) => {
+    function snapTransform(t: Transform) {
+      return {
+        x: t.x,
+        y: snapPixels(t.y),
+      };
+    }
+
     if (id.startsWith('unscheduled')) {
-      return transform;
+      return snapTransform(transform);
     }
 
     if (id.startsWith('c')) {
-      return transform;
+      return snapTransform(transform);
     }
 
     const boundingRect = containerRef.current.getBoundingClientRect();
@@ -129,5 +138,5 @@ export const createRestrictToCalendar =
       height: boundingRect.height - limits[0] - limits[1],
     };
 
-    return restrictToBoundingRect(transform, draggingNodeRect, rect);
+    return snapTransform(restrictToBoundingRect(transform, draggingNodeRect, rect));
   };
