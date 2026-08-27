@@ -18,7 +18,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
-import {Transform, Over, MousePosition} from './dnd';
+import {Transform, Over, MousePosition, Rect, Coords} from './dnd';
 import {useDroppable, DnDProvider, DragPlaceholder, useDraggedData} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import EntryComponent, {DraggableEntry} from './Entry';
@@ -60,6 +60,7 @@ import {
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
+  snapMinutes,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -286,12 +287,26 @@ export function DayTimetable({
     });
   }
 
+  function isValidEntryTime(
+    mouse: MousePosition,
+    calendarRect: Rect,
+    offset: Coords,
+    duration: number
+  ) {
+    const mousePositionY = mouse.y - calendarRect.top - window.scrollY;
+    const startDt = moment(dt)
+      .startOf('day')
+      .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
+    const endDt = startDt.clone().add(duration, 'minutes');
+    return startDt.isSameOrAfter(eventStartDt) && endDt.isSameOrBefore(eventEndDt);
+  }
+
   function handleDragEnd(
     who: string,
     over: Over[],
     delta: Transform,
     mouse: MousePosition,
-    offset
+    offset: Coords
   ) {
     if (over.length === 0) {
       return;
@@ -331,7 +346,7 @@ export function DayTimetable({
     }
 
     if (over.length === 1) {
-      return handleDropOnCalendar(who, calendar, delta, mouse);
+      return handleDropOnCalendar(who, calendar, delta, mouse, offset);
     } else {
       const block = over.find(o => o.id !== 'calendar');
       if (block) {
@@ -345,7 +360,7 @@ export function DayTimetable({
     over: Over,
     delta: Transform,
     mouse: MousePosition,
-    offset
+    offset: Coords
   ) {
     const sessionBlockId = expandedSessionBlock?.id;
 
@@ -363,6 +378,19 @@ export function DayTimetable({
         sbEndDt
       );
     } else {
+      // TODO(tomas): use something better than 'unscheduled-' prefix
+      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      const fromContrib: ContribEntry | undefined = unscheduled.find(
+        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+      );
+
+      if (
+        fromContrib === undefined ||
+        !isValidEntryTime(mouse, over.rect, offset, fromContrib.duration)
+      ) {
+        return;
+      }
+
       const [entry, layoutOverrides] =
         layoutAfterUnscheduledDrop(
           dt,
@@ -376,12 +404,7 @@ export function DayTimetable({
           eventStartDt,
           eventEndDt
         ) || [];
-      // TODO(tomas): use something better than 'unscheduled-' prefix
-      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-      const fromContrib = unscheduled.find(
-        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
-      );
-      showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
+      showToastIfContribSessionChanged(fromContrib.title, fromContrib.sessionId ?? undefined);
       dispatch(actions.scheduleEntry(eventId, entry as ContribEntry, layoutOverrides!));
     }
   }
@@ -391,7 +414,7 @@ export function DayTimetable({
     over: Over,
     delta: Transform,
     mouse: MousePosition,
-    offset,
+    offset: Coords,
     calendar: Over,
     minStartDt: Moment = eventStartDt,
     maxEndDt: Moment = eventEndDt
@@ -429,8 +452,21 @@ export function DayTimetable({
     dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
   }
 
-  function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
+  function handleDropOnCalendar(
+    who: string,
+    over: Over,
+    delta: Transform,
+    mouse: MousePosition,
+    offset: Coords
+  ) {
     const originalEntry = findEntryById(who);
+    if (
+      originalEntry === undefined ||
+      !isValidEntryTime(mouse, over.rect, offset, originalEntry.duration)
+    ) {
+      return;
+    }
+
     const sessionBlockId = expandedSessionBlock?.id;
     if (sessionBlockId) {
       const [newLayout, movedEntry] = layoutAfterDropOnBlock(
