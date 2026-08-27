@@ -1,0 +1,134 @@
+publiccodeYmlVersion: '0.7'
+name: Indico
+url: https://github.com/indico/indico
+landingURL: https://getindico.io
+softwareVersion: 3.3.13
+releaseDate: '2026-08-25'
+logo: src/indico/web/static/images/logo_indico.png
+platforms:
+  - web
+categories:
+  - event-management
+  - collaboration
+usedBy:
+  - European Organization for Nuclear Research (CERN)
+fundedBy:
+  - name: European Organization for Nuclear Research (CERN)
+    uri: https://home.cern/
+roadmap: https://getindico.io/roadmap/
+developmentStatus: stable
+softwareType: standalone/web
+intendedAudience:
+  scope:
+    - research
+    - science-and-technology
+    - education
+description:
+  en:
+    localisedName: Indico
+    shortDescription: Indico is a general-purpose, web-based event management tool
+      for conferences, meetings and lectures, built and used at CERN.
+    longDescription: 'Indico is a general-purpose, fully web-based event management
+      system originally developed at CERN, the European Organization for Nuclear Research.
+      It supports the full lifecycle of conferences, meetings and lectures, from the
+      initial call for abstracts through registration, scheduling, paper reviewing
+      and archival of materials.
+
+
+      Key capabilities include a hierarchical content management system for organizing
+      events of any size, from single meetings to multi-week international conferences;
+      a call for abstracts and abstract reviewing workflow; flexible, configurable
+      registration forms with integration for external payment systems; a paper reviewing
+      workflow for peer-reviewed contributions; a drag-and-drop timetable management
+      interface for scheduling sessions and contributions; a badge and ticket editor
+      for printing participant badges; a powerful room booking system for managing
+      shared meeting spaces; and integration with common video conferencing solutions.
+
+
+      Indico is released under the MIT license and is developed as a community project,
+      with contributions from more than 100 developers, translators and usability
+      specialists worldwide. It is extensible through a plugin system, allowing institutions
+      to adapt it to their own workflows and integrate it with existing infrastructure.'
+    documentation: https://learn.getindico.io/
+    apiDocumentation: https://docs.getindico.io/en/stable/
+    features:
+      - Hierarchical event content management
+      - Call for Abstracts and abstract reviewing
+      - Flexible, configurable registration forms
+      - Payment system integration
+      - Paper reviewing workflow
+      - Drag-and-drop timetable management
+      - Badge and ticket editor
+      - Room booking system
+      - Video conferencing integration
+      - Plugin-based extensibility
+  de:
+    localisedName: Indico
+    shortDescription: Indico ist ein universelles, webbasiertes Event-Management-Tool
+      für Konferenzen, Meetings und Vorträge, entwickelt und eingesetzt am CERN.
+    longDescription: 'Indico ist ein universelles, vollständig webbasiertes System
+      zur Veranstaltungsverwaltung, das ursprünglich am CERN, der Europäischen Organisation
+      für Kernforschung, entwickelt wurde. Es unterstützt den gesamten Lebenszyklus
+      von Konferenzen, Meetings und Vorträgen – vom Call for Abstracts über die Registrierung
+      und Zeitplanung bis hin zum Paper-Review und der Archivierung von Materialien.
+
+
+      Zu den zentralen Funktionen gehören ein hierarchisches Content-Management-System
+      zur Organisation von Veranstaltungen jeder Größe, von einzelnen Meetings bis
+      zu mehrwöchigen internationalen Konferenzen; ein Call-for-Abstracts- und Abstract-Review-Workflow;
+      flexibel konfigurierbare Anmeldeformulare mit Anbindung an externe Zahlungssysteme;
+      ein Paper-Review-Workflow für begutachtete Beiträge; eine Drag-and-Drop-Zeitplanoberfläche
+      zur Planung von Sitzungen und Beiträgen; ein Badge- und Ticket-Editor zum Drucken
+      von Teilnehmerausweisen; ein leistungsfähiges Raumbuchungssystem zur Verwaltung
+      gemeinsam genutzter Besprechungsräume sowie die Integration gängiger Videokonferenzlösungen.
+
+
+      Indico steht unter der MIT-Lizenz und wird als Community-Projekt entwickelt,
+      mit Beiträgen von mehr als 100 Entwicklerinnen, Entwicklern, Übersetzerinnen
+      und Usability-Spezialistinnen weltweit. Durch ein Plugin-System ist es erweiterbar,
+      sodass Institutionen es an eigene Arbeitsabläufe anpassen und in bestehende
+      Infrastrukturen integrieren können.'
+    documentation: https://learn.getindico.io/
+    apiDocumentation: https://docs.getindico.io/en/stable/
+    features:
+      - Hierarchisches Content-Management für Veranstaltungen
+      - Call for Abstracts und Abstract-Review
+      - Flexible, konfigurierbare Anmeldeformulare
+      - Integration von Zahlungssystemen
+      - Paper-Review-Workflow
+      - Drag-and-Drop-Zeitplanung
+      - Badge- und Ticket-Editor
+      - Raumbuchungssystem
+      - Integration von Videokonferenzlösungen
+      - Erweiterbar durch Plugins
+legal:
+  license: MIT
+  mainCopyrightOwner: European Organization for Nuclear Research (CERN)
+maintenance:
+  type: community
+  contacts:
+    - name: Indico Team
+      email: indico-team@cern.ch
+localisation:
+  localisationReady: true
+  availableLanguages: []
+availableLanguages:
+  - cs-CZ
+  - de-DE
+  - en-CA
+  - en-GB
+  - en-US
+  - es-ES
+  - fi-FI
+  - fr-FR
+  - hu-HU
+  - it-IT
+  - ja-JP
+  - ko-KR
+  - mn-MN
+  - pl-PL
+  - pt-BR
+  - sv-SE
+  - tr-TR
+  - uk-UA
+  - zh-Hans-CN
