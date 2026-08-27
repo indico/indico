@@ -10,6 +10,7 @@ from copy import deepcopy
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
+from indico.core.db import db
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
@@ -130,3 +131,20 @@ class BaseField:
         elif self.not_required_validator:
             validators.append(self.not_required_validator())
         return field_cls(self.object.title, validators, description=self.object.description, **kwargs)
+
+    def create_sql_filter(self, db_field, data_list: set[str | None]):
+        """
+        Create an SQL criterion to check whether the field's value is
+        in `data_list`.  The function is expected to return an
+        operation on the provided `db_field` which must be a JSONB
+        column.
+        """
+        data_list = set(data_list)
+        criteria = []
+        if None in data_list:
+            data_list.discard(None)
+            criteria.append(db_field.op('#>>')('{}').is_(None))
+            criteria.append(db_field.op('#>>')('{}') == '')  # noqa: PLC1901
+        if data_list:
+            criteria.append(db_field.op('#>>')('{}').in_(data_list))
+        return db.or_(*criteria)

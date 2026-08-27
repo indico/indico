@@ -258,6 +258,9 @@
                                 {% set data = abstract.data_by_field %}
                                 {% for item in dynamic_columns %}
                                     {% set friendly_data = data[item.id].friendly_data if item.id in data else '' %}
+                                    {% if friendly_data is sequence and friendly_data is not string %}
+                                        {% set friendly_data = friendly_data | join(', ') %}
+                                    {% endif %}
                                     <td class="i-table" data-text="{{ friendly_data }}"
                                         data-searchable="{{ friendly_data | lower }}">
                                         {{- friendly_data if friendly_data else '-' -}}

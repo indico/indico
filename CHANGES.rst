@@ -10,12 +10,12 @@ Version 3.3.14
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Support multi-choice abstract/contribution fields (:pr:`7725`)
 
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix "No value" filter for text-based abstract/contribution fields (:pr:`7725`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -92,10 +92,8 @@ class ContributionListGenerator(ListGeneratorBase):
     def _get_filters_from_request(self):
         filters = super()._get_filters_from_request()
         for field in self.event.contribution_fields:
-            if field.field_type == 'single_choice':
-                options = [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]
-                if options:
-                    filters['fields'][str(field.id)] = options
+            if options := [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]:
+                filters['fields'][str(field.id)] = options
         # Ensure enum filters remain as integers
         for idx, value in enumerate(filters['items'].get('state', [])):
             filters['items']['state'][idx] = int(value)
@@ -141,10 +139,18 @@ class ContributionListGenerator(ListGeneratorBase):
             return query
 
         if field_filters:
+            fields_by_id: dict[int, ContributionField] = {f.id: f for f in self.event.contribution_fields}
             for field_id, field_values in field_filters.items():
+                field = fields_by_id[int(field_id)]
                 field_values = set(field_values)
-
-                field_criteria = []
+                field_criteria = [
+                    Contribution.field_values.any(
+                        db.and_(
+                            ContributionFieldValue.contribution_field_id == field_id,
+                            field.field.create_sql_filter(ContributionFieldValue.data, field_values),
+                        )
+                    )
+                ]
                 if None in field_values:
                     # Handle the case when there is no value in
                     # 'Contribution.field_values' matching the 'field_id'.
@@ -152,20 +158,9 @@ class ContributionListGenerator(ListGeneratorBase):
                     # contribution had already been created or when the field is left
                     # empty.
                     # In these cases, we still want to show the contributions.
-                    field_values.discard(None)
-                    field_criteria += [
+                    field_criteria.append(
                         ~Contribution.field_values.any(ContributionFieldValue.contribution_field_id == field_id),
-                        Contribution.field_values.any(db.and_(
-                            ContributionFieldValue.contribution_field_id == field_id,
-                            ContributionFieldValue.data.op('#>>')('{}').is_(None)
-                        ))
-                    ]
-
-                if field_values:
-                    field_criteria.append(Contribution.field_values.any(db.and_(
-                        ContributionFieldValue.contribution_field_id == field_id,
-                        ContributionFieldValue.data.op('#>>')('{}').in_(field_values)
-                    )))
+                    )
 
                 criteria.append(db.or_(*field_criteria))
 

@@ -18,6 +18,8 @@
                 {{ field_value.data }}
             {% elif field.field_type == 'single_choice' %}
                 {{ field_value.friendly_data }}
+            {% elif field.field_type == 'multiselect' %}
+                {{ field_value.friendly_data|join(', ') }}
             {% endif %}
         </td>
     </tr>
@@ -193,7 +195,7 @@
     <table class="other-fields">
         {% for field_value in field_values|sort(attribute='contribution_field.position') %}
             {% set field = field_value.contribution_field %}
-            {% if (field.field_type == 'single_choice' or not field.field_data.multiline) and field_value.data and field.is_active %}
+            {% if (field.field_type in ('single_choice', 'multiselect') or not field.field_data.multiline) and field_value.data and field.is_active %}
                 {{ _render_field_value(field_value) }}
             {% endif %}
         {% endfor %}

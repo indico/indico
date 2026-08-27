@@ -5,9 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.fields import IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 
+from indico.core.db import db
 from indico.util.i18n import _, ngettext
 from indico.web.fields.base import BaseField
 from indico.web.forms.fields import IndicoRadioField, IndicoSelectMultipleCheckboxField, MultiStringField
@@ -145,5 +147,17 @@ class MultiSelectField(_ChoiceFieldBase):
                 'coerce': lambda x: x}
 
     def get_friendly_value(self, value):
+        if not value:
+            return []
         option_map = {option_dict['id']: option_dict['option'] for option_dict in self.object.field_data['options']}
         return [option_map[id_] for id_ in value if id_ in option_map]
+
+    def create_sql_filter(self, db_field, data_list):
+        data_list = set(data_list)
+        criteria = []
+        if None in data_list:
+            data_list.discard(None)
+            criteria.append(db_field == [])
+        if data_list:
+            criteria.append(db_field.has_any(db.func.cast(data_list, ARRAY(db.String))))
+        return db.or_(*criteria)

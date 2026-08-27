@@ -62,6 +62,7 @@ def _get_fields(sender, **kwargs):
     from . import contrib_fields
     yield contrib_fields.ContribTextField
     yield contrib_fields.ContribSingleChoiceField
+    yield contrib_fields.ContribMultiChoiceField
 
 
 @signals.core.app_created.connect
