@@ -131,3 +131,7 @@ localisation:
     - tr-TR
     - uk-UA
     - zh-Hans-CN
+dependsOn:
+  open:
+    - name: PostgreSQL
+    - name: Redis
