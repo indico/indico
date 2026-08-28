@@ -66,8 +66,11 @@ $toolbar-bg-color: $raincloud-gray;
   pointer-events: none;
   color: $white;
   // Creates outline effect for better readability
-  text-shadow: -1px -1px 2px $teal-shadow, 1px -1px 2px $teal-shadow,
-    -1px 1px 2px $teal-shadow, 1px 1px 2px $teal-shadow;
+  text-shadow:
+    -1px -1px 2px $teal-shadow,
+    1px -1px 2px $teal-shadow,
+    -1px 1px 2px $teal-shadow,
+    1px 1px 2px $teal-shadow;
   background: rgba($teal, 0.8);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
