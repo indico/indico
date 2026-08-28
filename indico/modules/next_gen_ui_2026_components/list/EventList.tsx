@@ -7,7 +7,7 @@
 
 import apiEventListURL from 'indico-url:categories.api_event_list';
 
-import React from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -30,56 +30,41 @@ interface EventListProps {
 }
 export function EventList({categoryId, isFlat, viewData}: EventListProps) {
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
+  const eventListURL = apiEventListURL({
+    category_id: String(categoryId),
+    year: String(selectedYear),
+    flat: isFlat ? 1 : 0,
+  });
 
   const {
     data: eventListData,
     loading: fetchingList,
     reFetch: fetchEventList,
-  } = useIndicoAxios(
-    apiEventListURL({
-      category_id: String(categoryId),
-      year: String(selectedYear),
-      flat: isFlat ? 1 : 0,
-    }),
-    {
-      camelize: true,
-      manual: true,
-    }
-  );
+  } = useIndicoAxios(eventListURL, {camelize: true, manual: true});
 
-  const isFirstRender = React.useRef(true);
+  const isFirstRender = useRef(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
 
-    fetchEventList({
-      url: apiEventListURL({
-        category_id: String(categoryId),
-        year: String(selectedYear),
-        flat: isFlat ? 1 : 0,
-      }),
-    }).catch((err: {code?: string}) => {
-      if (err?.code !== 'ERR_CANCELED') {
-        console.error('Failed to fetch event list', err);
-      }
-    });
-  }, [selectedYear, categoryId, isFlat, fetchEventList]);
+    fetchEventList({url: eventListURL});
+  }, [isFlat, fetchEventList, eventListURL]);
 
-  const activeData = eventListData ?? viewData?.eventListData;
+  const [userFutureExpanded, setUserFutureExpanded] = useState<boolean | null>(null);
+  const [userPastExpanded, setUserPastExpanded] = useState<boolean | null>(null);
 
-  const [userFutureExpanded, setUserFutureExpanded] = React.useState<boolean | null>(null);
-  const [userPastExpanded, setUserPastExpanded] = React.useState<boolean | null>(null);
+  const futureEventsExpanded = userFutureExpanded ?? viewData.showFutureEvents;
+  const pastEventsExpanded = userPastExpanded ?? viewData.showPastEvents;
 
-  const futureEventsExpanded = userFutureExpanded ?? viewData?.showFutureEvents ?? false;
-  const pastEventsExpanded = userPastExpanded ?? viewData?.showPastEvents ?? false;
+  const activeData = eventListData ?? viewData.eventListData;
 
   const futureEventsCount = activeData?.futureEventCount ?? 0;
   const pastEventsCount = activeData?.pastEventCount ?? 0;
 
-  const events = React.useMemo(() => {
+  const events = useMemo(() => {
     if (!activeData) {
       return [];
     }
@@ -112,7 +97,6 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
           {event.date}
         </ListItem.Tag>
         <ListItem.Header title={event.verbosedTitle}>{event.verbosedTitle}</ListItem.Header>
-
         {event.seriesLabel && <ListItem.Details>{event.seriesLabel}</ListItem.Details>}
       </div>
       <div styleName="event-list-item-tag-section">
@@ -146,19 +130,28 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
     </ListItem>
   );
 
-  const expandButton = (expanded: boolean, count: number, onClick: () => void) => (
+  const expandButton = (
+    wasExpanded: boolean,
+    count: number,
+    onClick: () => void,
+    reversedChevron = false
+  ) => (
     <Button
       styleName="event-list-show-more"
       variant="transparent"
       color="primary"
       size="sm"
       disabled={fetchingList}
-      icon={expanded ? 'fas:chevron-up' : 'fas:chevron-down'}
+      icon={
+        (!wasExpanded && reversedChevron) || (wasExpanded && !reversedChevron)
+          ? 'fas:chevron-up'
+          : 'fas:chevron-down'
+      }
       iconPosition="right"
       onClick={onClick}
     >
       <span>
-        {expanded
+        {wasExpanded
           ? Translate.string('Show less ({0})', [count])
           : Translate.string('Show more ({0})', [count])}
       </span>
@@ -174,8 +167,11 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
       />
 
       {futureEventsCount > 0 &&
-        expandButton(futureEventsExpanded, futureEventsCount, () =>
-          setUserFutureExpanded(!futureEventsExpanded)
+        expandButton(
+          futureEventsExpanded,
+          futureEventsCount,
+          () => setUserFutureExpanded(!futureEventsExpanded),
+          true
         )}
 
       {events.map(month => (
@@ -185,7 +181,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
             {month.events.map((event: Event) =>
               event.isRecent ? (
                 <Indicator
-                  key={event.id + event.date}
+                  key={event.id}
                   styleName="event-list-item-wrapper"
                   size="sm"
                   title={Translate.string('New')}
@@ -199,7 +195,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                   {listItem(event, month)}
                 </Indicator>
               ) : (
-                <div key={event.id + event.date} styleName="event-list-item-wrapper">
+                <div key={event.id} styleName="event-list-item-wrapper">
                   <FavoriteButton
                     type="event"
                     id={event.id}
