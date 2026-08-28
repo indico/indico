@@ -237,7 +237,7 @@ $content-pane-bg-color: $white;
   > :global(i.icons) {
     padding: 1px;
     border-radius: 100%;
-      border: 2px solid lightgray;
+    border: 2px solid lightgray;
 
     > :global(.icon.circle) {
       margin: 0;
@@ -296,11 +296,7 @@ $content-pane-bg-color: $white;
     transition:
       opacity 0.2s ease,
       transform 0.2s ease;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 32%,
-      rgba(255, 255, 255, 1) 66%
-    );
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 32%, rgba(255, 255, 255, 1) 66%);
 
     button {
       pointer-events: all;
