@@ -28,8 +28,7 @@ def group_by_month(events, now, tzinfo):
         (year, month), events = x
         return {'name': format_skeleton(date(year, month, 1), 'MMMMyyyy'),
                 'events': list(events),
-                'is_current': year == now.year and month == now.month,
-          }
+                'is_current': year == now.year and month == now.month}
 
     def _key(event):
         start_dt = event.start_dt.astimezone(tzinfo)
@@ -93,8 +92,13 @@ def make_format_event_date_func(category, omit_year=False):
         tzinfo = category.display_tzinfo
         start_dt = event.start_dt.astimezone(tzinfo)
         end_dt = event.end_dt.astimezone(tzinfo)
-        show_full_year = (start_dt.year != end_dt.year) and (
-            not omit_year or start_dt.month <= end_dt.month or end_dt.year > start_dt.year + 1
+
+        is_same_year = start_dt.year == end_dt.year
+        is_month_before = start_dt.month <= end_dt.month
+        is_after_next_year = end_dt.year > start_dt.year + 1
+
+        show_full_year = (not is_same_year) and (
+            not omit_year or is_month_before or is_after_next_year
         )
 
         if show_full_year:
