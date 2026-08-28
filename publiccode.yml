@@ -115,6 +115,7 @@ maintenance:
   contacts:
     - name: Indico Team
       email: indico-team@cern.ch
+      affiliation: European Organization for Nuclear Research (CERN)
 localisation:
   localisationReady: true
   availableLanguages:
