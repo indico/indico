@@ -22,7 +22,7 @@ $toolbar-bg-color: $raincloud-gray;
   z-index: 100;
   border-bottom: 2px solid rgba($raincloud-gray, 0.8);
   padding: 15px 10px 0 10px;
-   // Makes sure there is spacing when there is no timetable bar (e.g. single day)
+  // Makes sure there is spacing when there is no timetable bar (e.g. single day)
   min-height: 64px;
 
   > .actions-bar {
