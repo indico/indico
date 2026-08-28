@@ -26,7 +26,9 @@
   }
 }
 
-:global(div:not(.main-breadcrumb) > .full-width-content-wrapper > div > div.layout-side-menu:last-child) {
+:global(
+  div:not(.main-breadcrumb) > .full-width-content-wrapper > div > div.layout-side-menu:last-child
+) {
   > :global(div.content-column > div.management-page > div.page-content > #timetable-container) {
     > div.timetable.expanded {
       height: auto;
