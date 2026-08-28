@@ -23,7 +23,7 @@ interface CategoryCardListProps {
 export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
   const categories = data ?? [];
 
-  const gridClass = `${columns > 1 ? `grid-${columns}-responsive` : ''}`;
+  const gridClass = columns > 1 ? `grid-${columns}-responsive` : '';
 
   return (
     <div className={gridClass} role="group" styleName="category-card-list">
@@ -44,7 +44,10 @@ export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
               ) : (
                 <>
                   {category.deepCategoryCount > 0 && (
-                    <>
+                    <span
+                      styleName="category-card-meta-category-count"
+                      data-has-events={category.deepEventCount > 0}
+                    >
                       <PluralTranslate count={category.deepCategoryCount}>
                         <Singular>
                           <Param name="count" value={category.deepCategoryCount} /> Category
@@ -53,12 +56,7 @@ export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
                           <Param name="count" value={category.deepCategoryCount} /> Categories
                         </Plural>
                       </PluralTranslate>
-                      {category.deepEventCount > 0 && (
-                        <span styleName="category-card-dot-divider" aria-hidden="true">
-                          •
-                        </span>
-                      )}
-                    </>
+                    </span>
                   )}
                   {category.deepEventCount > 0 && (
                     <PluralTranslate count={category.deepEventCount}>

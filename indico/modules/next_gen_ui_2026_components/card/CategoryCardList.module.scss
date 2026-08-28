@@ -50,14 +50,18 @@
 
   .category-card-meta {
     line-height: var(--line-height-text-xs);
-  }
-
-  .category-card-dot-divider {
-    margin-right: var(--space-2);
-    margin-left: var(--space-2);
-    color: var(--color-text-disabled);
-    font-size: var(--font-size-text-lg);
     display: inline-block;
-    vertical-align: top;
+
+    .category-card-meta-category-count {
+      &[data-has-events='true']::after {
+        content: '•';
+        margin-right: var(--space-2);
+        margin-left: var(--space-2);
+        color: var(--color-text-disabled);
+        font-size: var(--font-size-text-lg);
+        display: inline-block;
+        vertical-align: top;
+      }
+    }
   }
 }
