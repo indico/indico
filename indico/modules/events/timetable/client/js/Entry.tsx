@@ -20,14 +20,7 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {
-  ReduxState,
-  ContribEntry,
-  EntryType,
-  BaseEntry,
-  ScheduledMixin,
-  EntryUniqueID,
-} from './types';
+import {ReduxState, EntryType, BaseEntry, ScheduledMixin, EntryUniqueID, ChildEntry} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
@@ -137,7 +130,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
 interface _EntryProps {
   id: EntryUniqueID;
-  transform: {x: number; y: number} | undefined;
+  transform?: {x: number; y: number};
   isDragging?: boolean;
   isPlaceholder?: boolean;
   listeners: Record<string, unknown>;
@@ -147,7 +140,7 @@ interface _EntryProps {
   setDuration: (duration: number) => void;
   onMouseUp?: () => void;
   setChildDuration?: (id: string) => (duration: number) => void;
-  children?: ContribEntry[];
+  children?: ChildEntry[];
   parentEndDt?: string;
   sessionId?: number;
   sessionBlockId?: string;
@@ -241,7 +234,7 @@ export default function Entry({
   const locale = moment.locale().replace('_', '-');
   const timeRange = formatTimeRange(locale, newStart, newEnd);
   // shift children startDt by deltaMinutes
-  const children: ContribEntry[] = _children.map(child => ({
+  const children = _children.map(child => ({
     ...child,
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
@@ -357,7 +350,6 @@ export default function Entry({
                   selected={false}
                   setDuration={() => null}
                   setNodeRef={() => null}
-                  transform={undefined}
                   {...child}
                   blockRef={blockRef}
                   parentEndDt={moment(startDt)
