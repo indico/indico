@@ -154,7 +154,7 @@ export const getSessionById = createSelector(
 export const getCurrentDayEntries = createSelector(
   getDayEntries,
   getCurrentDate,
-  (entries, currentDate) => entries[getDateKey(currentDate)]
+  (entries, currentDate) => entries[getDateKey(currentDate)] ?? []
 );
 
 export const isPosterSessionBlock = createSelector(
