@@ -64,9 +64,9 @@ export interface EventsMonth {
 export interface EventListData {
   isFlat: boolean;
   eventCount: number;
-  eventsByMonth: EventsMonth;
-  futureEventsByMonth: EventsMonth;
-  pastEventsByMonth: EventsMonth;
+  eventsByMonth: EventsMonth[];
+  futureEventsByMonth: EventsMonth[];
+  pastEventsByMonth: EventsMonth[];
   futureEventCount: number;
   pastEventCount: number;
 }
