@@ -28,14 +28,14 @@ interface CategoryProps {
 
 export function Category({categoryId, isFlat}: CategoryProps) {
   const {data: categoryInfo, loading: categoryLoading} = useIndicoAxios(
-    {url: apiCategoryInfoURL({category_id: String(categoryId)})},
+    {url: apiCategoryInfoURL({category_id: categoryId})},
     {camelize: true}
   );
 
   const category = categoryInfo as CategoryType;
 
   const {data: categoryChildrenData, loading: childrenLoading} = useIndicoAxios(
-    {url: apiCategoryChildrenURL({category_id: String(categoryId)})},
+    {url: apiCategoryChildrenURL({category_id: categoryId})},
     {camelize: true}
   );
 
@@ -45,7 +45,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
     useIndicoAxios(
       {
         url: apiEventListWithMetaDataURL({
-          category_id: String(categoryId),
+          category_id: categoryId,
           flat: isFlat ? 1 : 0,
         }),
       },

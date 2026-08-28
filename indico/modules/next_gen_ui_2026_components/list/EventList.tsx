@@ -31,8 +31,8 @@ interface EventListProps {
 export function EventList({categoryId, isFlat, viewData}: EventListProps) {
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
   const eventListURL = apiEventListURL({
-    category_id: String(categoryId),
-    year: String(selectedYear),
+    category_id: categoryId,
+    year: selectedYear,
     flat: isFlat ? 1 : 0,
   });
 

@@ -40,9 +40,7 @@ export function FavoriteButton({type, id, favorited, className, size = 'lg'}: Fa
     }
 
     const url =
-      type === 'event'
-        ? eventFavoriteURL({event_id: String(id)})
-        : categoryFavoriteURL({category_id: String(id)});
+      type === 'event' ? eventFavoriteURL({event_id: id}) : categoryFavoriteURL({category_id: id});
 
     setSubmitting(true);
     try {
