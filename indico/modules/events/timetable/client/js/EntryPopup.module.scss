@@ -28,11 +28,11 @@
   max-width: 400px;
   min-width: 250px;
 
-  >.header-wrapper {
+  > .header-wrapper {
     display: flex;
     justify-content: space-between;
 
-    >.header-wrapper-content {
+    > .header-wrapper-content {
       display: flex;
       flex-direction: column;
       gap: 10px;

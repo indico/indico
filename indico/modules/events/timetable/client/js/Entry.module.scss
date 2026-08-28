@@ -108,7 +108,9 @@ $title-row-line-height: 1.2rem;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 
   > :global(.ui.basic.button) {
     color: var(--session-color);
@@ -212,7 +214,7 @@ $title-row-line-height: 1.2rem;
   top: 0;
   right: 0;
   height: 100%;
-   // Minimum height of every entry, with additional room for bigger entries
+  // Minimum height of every entry, with additional room for bigger entries
   max-height: 40px;
   padding-inline: 10px;
   display: flex;
