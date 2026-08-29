@@ -10,7 +10,7 @@ import {TipBase} from 'indico/custom_elements/TipBase';
 
 const liveRegionUpdateDelay = 100;
 
-CustomElementBase.define(
+CustomElementBase.defineWhenDomReady(
   'ind-with-toggletip',
   class extends TipBase {
     show() {

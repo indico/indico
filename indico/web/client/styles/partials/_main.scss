@@ -324,10 +324,27 @@ div.impersonation-header {
   }
 }
 
+.location-info-details {
+  @include default-border-radius();
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.2em;
+  vertical-align: middle;
+  color: inherit;
+  font-size: 0.9em;
+  opacity: 0.8;
+
+  > span {
+    @extend %visually-hidden;
+  }
+}
+
 .location-info-tip {
   .location-address {
     color: $gray;
-    white-space: pre;
+    white-space: pre-wrap;
   }
 
   .map-link {
@@ -335,10 +352,10 @@ div.impersonation-header {
     margin-top: 0.5em;
   }
 
-  h3,
-  h4 {
+  .room-name,
+  .venue-name {
     line-height: 1.2em;
-    margin-top: 0 !important;
+    margin-top: 0;
     margin-bottom: 0;
 
     &:not(:last-child) {
