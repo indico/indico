@@ -14,6 +14,6 @@
 
 {% if registrations %}
     {% block show_badge_printer_settings_form scoped %}
-        {{ render_badge_print_settings_form(settings_form, templates=templates, registrations=registrations) }}
+        {{ render_badge_print_settings_form(settings_form, templates=templates, registrations=registrations, form_action=form_action) }}
     {% endblock %}
 {% endif %}
