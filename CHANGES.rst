@@ -20,7 +20,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Timetable blocks (sessions, contributions, breaks) can now be reached and activated using the keyboard (:pr:`7380`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
