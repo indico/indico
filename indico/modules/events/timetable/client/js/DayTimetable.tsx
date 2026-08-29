@@ -18,10 +18,10 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
-import {Transform, Over, MousePosition} from './dnd';
-import {useDroppable, DnDProvider} from './dnd/dnd';
+import {Transform, Over, MousePosition, Rect, Coords} from './dnd';
+import {useDroppable, DnDProvider, DragPlaceholder, useDraggedData} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
-import {DraggableEntry} from './Entry';
+import EntryComponent, {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
@@ -60,6 +60,7 @@ import {
   isWithinLimits,
   minutesToPixels,
   pixelsToMinutes,
+  snapMinutes,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -123,6 +124,47 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 }
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
+
+function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
+  const {dragged, transform} = useDraggedData();
+  const draggedEntry = useMemo(() => {
+    if (!dragged || dragged.startsWith('unscheduled')) {
+      return undefined;
+    }
+    for (const entry of entries) {
+      if (entry.id === dragged) {
+        return entry;
+      }
+      if (entry.id.startsWith('s')) {
+        const childEntry = (entry as BlockEntry).children.find(c => c.id === dragged);
+        if (childEntry) {
+          return childEntry;
+        }
+      }
+    }
+  }, [dragged, entries]);
+
+  return (
+    <DragPlaceholder>
+      {draggedEntry ? (
+        <EntryComponent
+          listeners={{}}
+          isDragging
+          isPlaceholder
+          selected={false}
+          setDuration={() => null}
+          setNodeRef={() => null}
+          transform={transform}
+          {...draggedEntry}
+          y={0}
+          sessionId={draggedEntry.sessionId ?? undefined}
+          column={0}
+          maxColumn={1}
+        />
+      ) : null}
+    </DragPlaceholder>
+  );
+}
 
 export function DayTimetable({
   dt,
@@ -245,12 +287,26 @@ export function DayTimetable({
     });
   }
 
+  function isValidEntryTime(
+    mouse: MousePosition,
+    calendarRect: Rect,
+    offset: Coords,
+    duration: number
+  ) {
+    const mousePositionY = mouse.y - calendarRect.top - window.scrollY;
+    const startDt = moment(dt)
+      .startOf('day')
+      .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
+    const endDt = startDt.clone().add(duration, 'minutes');
+    return startDt.isSameOrAfter(eventStartDt) && endDt.isSameOrBefore(eventEndDt);
+  }
+
   function handleDragEnd(
     who: string,
     over: Over[],
     delta: Transform,
     mouse: MousePosition,
-    offset
+    offset: Coords
   ) {
     if (over.length === 0) {
       return;
@@ -274,13 +330,23 @@ export function DayTimetable({
       }
     }
 
+    const sidepanel = over.find(o => o.id === 'sidepanel');
+    if (sidepanel && who.startsWith('c')) {
+      const entry = findEntryById(who);
+      if (entry === undefined) {
+        return;
+      }
+      dispatch(actions.unscheduleEntry(entry as ContribEntry, eventId));
+      return;
+    }
+
     const calendar = over.find(o => o.id === 'calendar');
     if (!calendar) {
       return;
     }
 
     if (over.length === 1) {
-      return handleDropOnCalendar(who, calendar, delta, mouse);
+      return handleDropOnCalendar(who, calendar, delta, mouse, offset);
     } else {
       const block = over.find(o => o.id !== 'calendar');
       if (block) {
@@ -294,7 +360,7 @@ export function DayTimetable({
     over: Over,
     delta: Transform,
     mouse: MousePosition,
-    offset
+    offset: Coords
   ) {
     const sessionBlockId = expandedSessionBlock?.id;
 
@@ -312,6 +378,19 @@ export function DayTimetable({
         sbEndDt
       );
     } else {
+      // TODO(tomas): use something better than 'unscheduled-' prefix
+      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
+      const fromContrib: ContribEntry | undefined = unscheduled.find(
+        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
+      );
+
+      if (
+        fromContrib === undefined ||
+        !isValidEntryTime(mouse, over.rect, offset, fromContrib.duration)
+      ) {
+        return;
+      }
+
       const [entry, layoutOverrides] =
         layoutAfterUnscheduledDrop(
           dt,
@@ -325,12 +404,7 @@ export function DayTimetable({
           eventStartDt,
           eventEndDt
         ) || [];
-      // TODO(tomas): use something better than 'unscheduled-' prefix
-      const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-      const fromContrib = unscheduled.find(
-        c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
-      );
-      showToastIfContribSessionChanged(fromContrib?.title, fromContrib?.sessionId, null);
+      showToastIfContribSessionChanged(fromContrib.title, fromContrib.sessionId ?? undefined);
       dispatch(actions.scheduleEntry(eventId, entry as ContribEntry, layoutOverrides!));
     }
   }
@@ -340,7 +414,7 @@ export function DayTimetable({
     over: Over,
     delta: Transform,
     mouse: MousePosition,
-    offset,
+    offset: Coords,
     calendar: Over,
     minStartDt: Moment = eventStartDt,
     maxEndDt: Moment = eventEndDt
@@ -378,8 +452,21 @@ export function DayTimetable({
     dispatch(actions.scheduleEntry(eventId, entry, layoutOverrides));
   }
 
-  function handleDropOnCalendar(who: string, over: Over, delta: Transform, mouse: MousePosition) {
+  function handleDropOnCalendar(
+    who: string,
+    over: Over,
+    delta: Transform,
+    mouse: MousePosition,
+    offset: Coords
+  ) {
     const originalEntry = findEntryById(who);
+    if (
+      originalEntry === undefined ||
+      !isValidEntryTime(mouse, over.rect, offset, originalEntry.duration)
+    ) {
+      return;
+    }
+
     const sessionBlockId = expandedSessionBlock?.id;
     if (sessionBlockId) {
       const [newLayout, movedEntry] = layoutAfterDropOnBlock(
@@ -715,6 +802,7 @@ export function DayTimetable({
           </DnDCalendar>
         </div>
       </div>
+      <DragPlaceholderContainer entries={entries} />
     </DnDProvider>
   );
 }

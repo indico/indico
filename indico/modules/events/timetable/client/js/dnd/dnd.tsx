@@ -44,6 +44,7 @@ interface DnDContextType {
   droppables: Droppables;
   draggableData: DraggableData;
   onDrop: OnDrop;
+  dragged: string | null;
   registerDroppable: (id: string, node: HTMLRef) => void;
   unregisterDroppable: (id: string) => void;
   registerDraggable: (id: string, fixed: boolean, node: HTMLRef) => void;
@@ -191,6 +192,55 @@ function getOverlappingDroppables(droppables: Droppables, mouse: MousePosition):
   return overlapping;
 }
 
+export function DragPlaceholder({children}: {children: React.ReactNode}) {
+  const dragState = useContextSelector(DnDContext, ctx =>
+    ctx.dragged ? ctx.draggableData[ctx.dragged] : undefined
+  );
+  const draggedDraggable = useContextSelector(DnDContext, ctx =>
+    ctx.dragged ? ctx.draggables[ctx.dragged] : null
+  );
+
+  const [top, setTop] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  const transform = useMemo(
+    () => `translate3d(${dragState?.transform?.x ?? 0}px, ${dragState?.transform?.y ?? 0}px, 10px)`,
+    [dragState]
+  );
+
+  useEffect(() => {
+    const draggedRef = draggedDraggable?.node?.current;
+    if (!draggedRef) {
+      return;
+    }
+
+    const rect = draggedRef.getBoundingClientRect();
+    setTop(rect.y);
+    setLeft(rect.x);
+  }, [draggedDraggable, transform]);
+
+  if (dragState === undefined) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        width: '100%',
+        transform,
+        top,
+        left,
+        zIndex: 1000,
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function DnDProvider({
   children,
   onDrop,
@@ -205,6 +255,7 @@ export function DnDProvider({
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
   const [draggableData, setDraggableData] = useState<DraggableData>({});
+  const [dragged, setDragged] = useState<string | null>(null);
   const state = useRef<DnDState>({
     state: 'idle',
     initialMousePosition: {x: 0, y: 0},
@@ -247,6 +298,7 @@ export function DnDProvider({
         initialOffset: {x: 0, y: 0},
         activeDraggable: null,
       };
+      setDragged(null);
     }
     setDraggableData(d => _.omit(d, id));
     setDraggables(d => _.omit(d, id));
@@ -282,6 +334,7 @@ export function DnDProvider({
       if (state.current.state === 'mousedown' || state.current.state === 'dragging') {
         if (state.current.state === 'mousedown') {
           state.current.state = 'dragging';
+          setDragged(state.current.activeDraggable);
         }
         const mousePosition = {
           x: e.pageX + state.current.scrollPosition.x,
@@ -334,6 +387,7 @@ export function DnDProvider({
       }
       setDraggableData(d => resetDraggableState(d, state.current.activeDraggable));
       state.current.activeDraggable = null;
+      setDragged(null);
     },
     [droppables, draggableData, onDrop, modifier]
   );
@@ -377,6 +431,7 @@ export function DnDProvider({
       state.current.state = 'idle';
       setDraggableData(d => resetDraggableState(d, state.current.activeDraggable));
       state.current.activeDraggable = null;
+      setDragged(null);
     }
   }, []);
 
@@ -405,6 +460,7 @@ export function DnDProvider({
       registerDraggable,
       unregisterDraggable,
       onMouseDown,
+      dragged,
     }),
     [
       draggables,
@@ -416,6 +472,7 @@ export function DnDProvider({
       unregisterDroppable,
       unregisterDraggable,
       onMouseDown,
+      dragged,
     ]
   );
 
@@ -519,4 +576,25 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
     offset,
     ref,
   };
+}
+
+export function useDraggedData() {
+  const dragged = useContextSelector(DnDContext, ctx => ctx.dragged);
+  const transform = useContextSelector(DnDContext, ctx =>
+    ctx.dragged ? ctx.draggableData[ctx.dragged]?.transform : undefined
+  );
+
+  return useMemo(
+    () => ({
+      dragged,
+      transform:
+        transform?.x === undefined && transform?.y === undefined
+          ? undefined
+          : {
+              x: transform?.x,
+              y: transform?.y,
+            },
+    }),
+    [dragged, transform?.x, transform?.y]
+  );
 }
