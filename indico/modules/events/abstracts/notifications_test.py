@@ -11,12 +11,13 @@ import pytest
 from babel.support import Translations
 from flask_babel import get_domain, get_locale
 
-from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractNotificationType, AbstractState
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.abstracts.util import build_default_email_template
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.date_time import now_utc
+from indico.util.i18n import force_locale
 
 
 def assert_text_equal(v1, v2):
@@ -69,7 +70,8 @@ def test_abstract_notification(mocker, abstract_objects, create_email_template, 
     event, abstract, _track, contrib_type = abstract_objects
 
     event.abstract_email_templates.append(
-        create_email_template(event, 0, 'accept', 'accepted', [{'state': [AbstractState.accepted.value]}], True))
+        create_email_template(event, 0, AbstractNotificationType.accepted, 'accepted',
+                              [{'state': [AbstractState.accepted.value]}], True))
 
     send_abstract_notifications(abstract)
     assert send_email.call_count == 0
@@ -88,7 +90,7 @@ def test_notification_rules(mocker, abstract_objects, create_email_template, dum
 
     event, abstract, track = abstract_objects[:3]
     event.abstract_email_templates.append(
-        create_email_template(event, 0, 'merge', 'merged poster for track', [
+        create_email_template(event, 0, AbstractNotificationType.merged, 'merged poster for track', [
             {'state': [AbstractState.merged.value], 'track': [track.id]}
         ], True))
 
@@ -115,7 +117,7 @@ def test_notification_several_conditions(db, mocker, abstract_objects, create_em
                                          create_dummy_contrib_type, dummy_user):
     event, abstract, track, contrib_type = abstract_objects
     event.abstract_email_templates = [
-        create_email_template(event, 0, 'accept', 'accepted', [
+        create_email_template(event, 0, AbstractNotificationType.accepted, 'accepted', [
             {'state': [AbstractState.accepted.value], 'track': [track.id], 'contribution_type': [contrib_type.id]},
             {'state': [AbstractState.accepted.value], 'contribution_type': []}
         ], True)
@@ -146,7 +148,7 @@ def test_notification_several_conditions(db, mocker, abstract_objects, create_em
 def test_notification_any_conditions(mocker, abstract_objects, create_email_template, dummy_user):
     event, abstract, track = abstract_objects[:3]
     event.abstract_email_templates = [
-        create_email_template(event, 0, 'accept', 'accepted', [
+        create_email_template(event, 0, AbstractNotificationType.accepted, 'accepted', [
             {'state': [AbstractState.accepted.value]}
         ], True)
     ]
@@ -164,10 +166,10 @@ def test_notification_any_conditions(mocker, abstract_objects, create_email_temp
 def test_notification_stop_on_match(mocker, abstract_objects, create_email_template, dummy_user):
     event, abstract = abstract_objects[:2]
     event.abstract_email_templates = [
-        create_email_template(event, 0, 'accept', 'accepted poster', [
+        create_email_template(event, 0, AbstractNotificationType.accepted, 'accepted poster', [
             {'state': [AbstractState.accepted.value]}
         ], False),
-        create_email_template(event, 0, 'accept', 'accepted poster 2', [
+        create_email_template(event, 0, AbstractNotificationType.accepted, 'accepted poster 2', [
             {'state': [AbstractState.accepted.value]}
         ], True)
     ]
@@ -221,7 +223,8 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
     monkeypatch.setattr('indico.modules.events.abstracts.notifications.send_email', _mock_send_email)
 
     ev.abstract_email_templates.append(
-        create_email_template(ev, 0, 'accept', 'accept', [{'state': [AbstractState.accepted.value]}], True))
+        create_email_template(ev, 0, AbstractNotificationType.accepted, 'accept',
+                              [{'state': [AbstractState.accepted.value]}], True))
 
     abstract.accepted_contrib_type = contrib_type
     abstract.accepted_track = track
@@ -231,8 +234,27 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
     send_abstract_notifications(abstract)
 
 
+def test_abstract_email_template_is_default(db, dummy_event):
+    tpl = build_default_email_template(dummy_event, AbstractNotificationType.accepted)
+    tpl.title = 'Accepted'
+    tpl.rules = [{'state': [AbstractState.accepted.value]}]
+    dummy_event.abstract_email_templates.append(tpl)
+    db.session.flush()
+    assert tpl.notification_type == AbstractNotificationType.accepted
+    assert tpl.is_default
+
+    # Invoke the setters with the same values
+    tpl.body = tpl.body
+    tpl.subject = tpl.subject
+    assert tpl.is_default
+
+    # Invoke the setter with a different value
+    tpl.subject = 'New subject'
+    assert not tpl.is_default
+
+
 @pytest.mark.usefixtures('request_context')
-def test_build_default_email_template_uses_event_locale(dummy_event, monkeypatch):
+def test_abstract_email_template_correctly_translated(dummy_event, monkeypatch):
     class MockTranslations(Translations):
         def __init__(self):
             super().__init__()
@@ -241,10 +263,9 @@ def test_build_default_email_template_uses_event_locale(dummy_event, monkeypatch
                 'Abstract Acceptance notification (#{abstract_id})': 'Yarr abstract was accepted (#{abstract_id})'
             }
 
+    tpl = build_default_email_template(dummy_event, AbstractNotificationType.accepted)
     domain = get_domain()
     monkeypatch.setattr(domain, 'get_translations', MockTranslations)
 
-    dummy_event.default_locale = 'en_AU'
-    tpl = build_default_email_template(dummy_event, 'accept')
-
-    assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
+    with force_locale('en_AU'):
+        assert tpl.subject == 'Yarr abstract was accepted (#{abstract_id})'
