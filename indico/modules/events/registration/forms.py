@@ -23,11 +23,13 @@ from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
+from indico.modules.events.models.events import Event
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
+from indico.modules.events.registration.simple_fields import RegformField
 from indico.modules.events.settings import data_retention_settings
 from indico.util.date_time import format_currency
 from indico.util.i18n import _, ngettext
@@ -138,11 +140,13 @@ class RegistrationFormEditForm(IndicoForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+        target = kwargs.pop('target')
+        self.event = target if isinstance(target, Event) else None
         self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         self._set_currencies()
-        self._set_links()
+        if self.event:
+            self._set_links()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
                                                          'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
@@ -152,7 +156,7 @@ class RegistrationFormEditForm(IndicoForm):
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
     def _set_links(self):
-        url = url_for('.notification_preview', self.regform)
+        url = url_for('event_registration.notification_preview', self.regform)
         self.message_pending.description = _generate_preview_link(
             _('Text included in emails sent to pending registrations (Markdown syntax).'),
             '#message_pending', 'pending', url, _('Pending Registration Preview')
@@ -700,3 +704,14 @@ class MultiFormsAnnouncementForm(IndicoForm):
     message = IndicoMarkdownField('Message', render_kw={'rows': 10},
                                   description=_('You can enter an announcement text that is displayed when there are '
                                                 'multiple registration forms for the user to choose from.'))
+
+
+class RegistrationFormCreateFromTemplateForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+    create_from = RegformField(_('Registration form'), [DataRequired()],
+                               description=_('Available template registration forms'),
+                               ajax_endpoint='event_registration.api_regform_templates')
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')  # Is used by the RegformField
+        super().__init__(*args, **kwargs)

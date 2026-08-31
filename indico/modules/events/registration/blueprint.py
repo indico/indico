@@ -33,6 +33,8 @@ _bp.add_url_rule('/manage/registration/api/participant-list-preview', 'manage_pa
                  regforms.RHParticipantListPreviewREST)
 _bp.add_url_rule('/manage/registration/description', 'manage_registration_multi_forms_announcement',
                  regforms.RHManageRegistrationMultiFormsAnnouncement, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/create-from-template', 'create_regform_from_template',
+                 regforms.RHRegistrationFormCreateFromTemplate, methods=('GET', 'POST'))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
@@ -270,6 +272,8 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registr
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
                  privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
 _bp.add_url_rule('/api/registrations/participants', 'api_participant_list', display.RHParticipantListREST)
+_bp.add_url_rule('/api/regform-templates', 'api_regform_templates', regforms.RHAPIListTemplateRegistrationForms,
+                 methods=('POST',))
 
 
 # Check-in app API

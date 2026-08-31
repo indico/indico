@@ -89,6 +89,16 @@ class RegistrationFormPrincipalSchema(mm.SQLAlchemyAutoSchema):
     identifier = String()
 
 
+class RegistrationFormTemplateSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = RegistrationForm
+        fields = ('id', 'friendly_id', 'title', 'full_title')
+
+    friendly_id = fields.Int(attribute='id', dump_only=True)
+    full_title = fields.Function(lambda regform: f'#{regform.id}: {regform.title} ({regform.owner.title})',
+                                 dump_only=True)
+
+
 class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RegistrationTag
