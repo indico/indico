@@ -25,7 +25,6 @@ import {FileTypeManager} from 'indico/modules/events/reviewing/file_types';
 
 import 'indico/modules/events/reviews';
 
-
 (function(global) {
   global.setupPaperAssignmentList = function setupPaperAssignmentList() {
     const filterConfig = {
