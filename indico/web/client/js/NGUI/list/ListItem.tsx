@@ -7,11 +7,11 @@
 
 import React, {forwardRef, ReactElement} from 'react';
 
-import {Button, ButtonProps} from '../button/Button';
-import {Icon, IconProps} from '../icon/Icon';
-import {Tag, TagProps} from '../tag/Tag';
+import {Button, ButtonProps} from 'indico/NGUI/button/Button';
+import {Icon, IconProps} from 'indico/NGUI/icon/Icon';
+import {Tag, TagProps} from 'indico/NGUI/tag/Tag';
 import './ListItem.module.scss';
-import {sharedClassName, NativeProps} from '../utils';
+import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
 
 export type ListItemHeaderProps = NativeProps<'h6'>;
 

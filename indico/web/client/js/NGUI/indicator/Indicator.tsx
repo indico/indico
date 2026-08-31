@@ -7,9 +7,9 @@
 
 import React, {forwardRef} from 'react';
 
-import {Dot} from '../dot/Dot';
-import {IndicoPaletteColor, LegacyColor, Size, TextWeight, Variant} from '../tokens';
-import {sharedClassName, NativeProps} from '../utils';
+import {Dot} from 'indico/NGUI/dot/Dot';
+import {IndicoPaletteColor, LegacyColor, Size, TextWeight, Variant} from 'indico/NGUI/tokens';
+import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
 
 import './Indicator.module.scss';
 

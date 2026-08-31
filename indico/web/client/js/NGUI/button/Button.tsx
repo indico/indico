@@ -7,7 +7,8 @@
 
 import React, {forwardRef} from 'react';
 
-import {Icon, IconSource} from '../icon/Icon';
+import {Icon, IconSource} from 'indico/NGUI/icon/Icon';
+
 import './Button.module.scss';
 import {
   ExtendedIndicoPaletteColor,

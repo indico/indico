@@ -7,9 +7,9 @@
 
 import React, {forwardRef, ReactElement} from 'react';
 
-import {Icon, IconProps} from '../icon/Icon';
+import {Icon, IconProps} from 'indico/NGUI/icon/Icon';
 import './Card.module.scss';
-import {NativeProps, sharedClassName} from '../utils';
+import {NativeProps, sharedClassName} from 'indico/NGUI/utils';
 
 export type CardHeaderProps = NativeProps<'h6'>;
 

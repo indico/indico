@@ -7,9 +7,16 @@
 
 import React, {forwardRef} from 'react';
 
-import {Icon, IconSource} from '../icon/Icon';
-import {IconPosition, IndicoPaletteColor, LegacyColor, Size, TextWeight, Variant} from '../tokens';
-import {NativeProps, sharedClassName} from '../utils';
+import {Icon, IconSource} from 'indico/NGUI/icon/Icon';
+import {
+  IconPosition,
+  IndicoPaletteColor,
+  LegacyColor,
+  Size,
+  TextWeight,
+  Variant,
+} from 'indico/NGUI/tokens';
+import {NativeProps, sharedClassName} from 'indico/NGUI/utils';
 
 import './Tag.module.scss';
 

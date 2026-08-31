@@ -13,8 +13,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React, {forwardRef} from 'react';
 
 import './Icon.module.scss';
-import {ExtendedIndicoPaletteColor, Size, Variant} from '../tokens';
-import {NativeProps, sharedClassName} from '../utils';
+import {ExtendedIndicoPaletteColor, Size, Variant} from 'indico/NGUI/tokens';
+import {NativeProps, sharedClassName} from 'indico/NGUI/utils';
 
 library.add(fas, far, fab);
 

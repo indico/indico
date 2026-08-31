@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {IndicoPaletteColor, LegacyColor} from './tokens';
+import {IndicoPaletteColor, LegacyColor} from 'indico/NGUI/tokens';
 
 export interface CategorySimple {
   id: number;
