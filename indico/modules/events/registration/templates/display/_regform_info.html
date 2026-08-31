@@ -56,17 +56,19 @@
                 </div>
             </div>
         {%- endif %}
-        {% if regform.contact_info %}
-            <div class="infoline">
-                <i class="icon icon-phone"></i>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Contact info{% endtrans %}
+        {% block regform_contact_info scoped %}
+            {% if regform.contact_info %}
+                <div class="infoline">
+                    <i class="icon icon-phone"></i>
+                    <div class="text">
+                        <div class="label">
+                            {% trans %}Contact info{% endtrans %}
+                        </div>
+                        <div>{{ regform.contact_info }}</div>
                     </div>
-                    <div>{{ regform.contact_info }}</div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        {% endblock %}
     </div>
 
     {% if regform.introduction %}
