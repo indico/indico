@@ -34,6 +34,6 @@
     "indico/**/client/**/*",
     "indico/web/client/js/types",
     "indico/global.d.ts",
-    "indico/modules/next_gen_ui_2026_components/**/*"
+    "indico/web/client/js/next_gen_ui_2026_components/**/*"
   ]
 }
