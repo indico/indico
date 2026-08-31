@@ -10,10 +10,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Category} from 'indico/NGUI/category/Category';
+import {IndicoUIProvider} from 'indico/NGUI/IndicoUIProvider';
 import {$T} from 'indico/utils/i18n';
-
-import {Category} from '../../../../web/client/js/next_gen_ui_2026_components/category/Category';
-import {IndicoUIProvider} from '../../../../web/client/js/next_gen_ui_2026_components/IndicoUIProvider';
 
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {

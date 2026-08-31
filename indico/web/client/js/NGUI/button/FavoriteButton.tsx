@@ -10,10 +10,9 @@ import eventFavoriteURL from 'indico-url:users.user_favorites_event_api';
 
 import React from 'react';
 
+import {Button, ButtonSize} from 'indico/NGUI/button/Button';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-
-import {Button, ButtonSize} from '../button/Button';
 
 interface FavoriteButtonProps {
   type: 'event' | 'category';

@@ -7,9 +7,9 @@
 
 import React from 'react';
 
-import {Button} from '../button/Button';
+import {Button} from 'indico/NGUI/button/Button';
 import './YearPicker.module.scss';
-import {sharedClassName} from '../utils';
+import {sharedClassName} from 'indico/NGUI/utils';
 
 interface CustomYearPickerProps {
   yearList: number[];

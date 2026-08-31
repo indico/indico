@@ -8,8 +8,8 @@
 import React, {forwardRef} from 'react';
 
 import './Timeline.module.scss';
-import {Dot} from '../dot/Dot';
-import {IndicoPaletteColor} from '../tokens';
+import {Dot} from 'indico/NGUI/dot/Dot';
+import {IndicoPaletteColor} from 'indico/NGUI/tokens';
 
 interface TimelineTitleProps {
   dotColor?: IndicoPaletteColor;

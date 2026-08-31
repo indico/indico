@@ -7,8 +7,8 @@
 
 import React, {forwardRef} from 'react';
 
-import {IndicoPaletteColor, LegacyColor} from '../tokens';
-import {sharedClassName, NativeProps} from '../utils';
+import {IndicoPaletteColor, LegacyColor} from 'indico/NGUI/tokens';
+import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
 import './Dot.module.scss';
 
 export type DotColor = IndicoPaletteColor | LegacyColor;
