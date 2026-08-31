@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -58,6 +58,7 @@ export default function ListFilter({
   const [internalSearchText, setInternalSearchText] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(-1);
   const [optionSearchText, setOptionSearchText] = useState('');
+  const lastNotifiedIds = useRef(null);
   const filters = onChangeFilters ? externalFilters : internalFilters;
   const searchText = onChangeSearchText ? externalSearchText : internalSearchText;
   const optionsMap = new Map(filterOptions.map(o => [o.key, o]));
@@ -83,6 +84,15 @@ export default function ListFilter({
     );
   };
 
+  const notifyFilteredListChange = filtered => {
+    const ids = filtered.map(e => e.id);
+    if (_.isEqual(ids, lastNotifiedIds.current)) {
+      return;
+    }
+    lastNotifiedIds.current = ids;
+    onChangeList(new Set(ids));
+  };
+
   const setFilters = value => {
     if (name) {
       localStorage.setItem(name, JSON.stringify(value));
@@ -93,7 +103,7 @@ export default function ListFilter({
     }
     setInternalFilters(value);
     const filtered = list.filter(e => matchFilters(value, e) && matchSearch(searchText, e));
-    onChangeList(new Set(filtered.map(e => e.id)));
+    notifyFilteredListChange(filtered);
   };
 
   const getLabelOpts = color => {
@@ -113,7 +123,7 @@ export default function ListFilter({
     setInternalSearchText(value);
     value = value.toLowerCase().trim();
     const filtered = list.filter(e => matchFilters(filters, e) && matchSearch(value, e));
-    onChangeList(new Set(filtered.map(e => e.id)));
+    notifyFilteredListChange(filtered);
   };
 
   const toggleFilter = (filterKey, optionValue) => {
@@ -134,6 +144,17 @@ export default function ListFilter({
     }
     setFilters({...filters, [filterKey]: selectedOptions});
   };
+
+  useEffect(() => {
+    if (!onChangeList) {
+      return;
+    }
+    const filtered = list.filter(
+      e => matchFilters(filters, e) && matchSearch(searchText.toLowerCase().trim(), e)
+    );
+    notifyFilteredListChange(filtered);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list]);
 
   // get filters from the local storage
   useEffect(() => {

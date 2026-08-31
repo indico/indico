@@ -18,7 +18,7 @@ import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useMemo, useEffect, useRef} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import {
@@ -62,6 +62,8 @@ import CommentButton from './CommentButton';
 import NextEditable from './NextEditable';
 
 import './EditableList.module.scss';
+
+const POLLING_SECONDS = 10;
 
 export default function EditableList({management}) {
   const eventId = useNumericParam('event_id');
@@ -115,6 +117,9 @@ const processContribList = contribList =>
     };
   });
 
+const serializeContribList = contribList =>
+  contribList.map(({hasUpdates, ...contribution}) => contribution);
+
 function EditableListDisplay({
   initialContribList,
   codePresent,
@@ -129,6 +134,9 @@ function EditableListDisplay({
 
   const [contribList, setContribList] = useState(processContribList(initialContribList));
   const [sortedList, setSortedList] = useState(contribList);
+  const [isOutdated, setIsOutdated] = useState(false);
+  const [updatedContribList, setUpdatedContribList] = useState(null);
+  const contribListRef = useRef(contribList);
   const contribsWithEditables = contribList.filter(x => x.editable);
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
   const [filteredSet, setFilteredSet] = useState(new Set(contribList.map(e => e.id)));
@@ -364,10 +372,10 @@ function EditableListDisplay({
   };
 
   // eslint-disable-next-line no-shadow
-  const _sortList = (sortBy, sortDirection, filteredResults) => {
+  const _sortList = (sortBy, sortDirection, filteredResults, list = contribList) => {
     const sortKey = sortKeys[sortBy] || (x => x[sortBy]);
     const sortFn = sortFuncs[sortBy] || ((arr, key) => _.sortBy(arr, key));
-    const newList = sortFn(contribList, sortKey);
+    const newList = sortFn(list, sortKey);
     if (sortDirection === SortDirection.DESC) {
       newList.reverse();
     }
@@ -381,6 +389,19 @@ function EditableListDisplay({
     setSortBy(sortBy);
     setSortDirection(sortDirection);
     setSortedList(_sortList(sortBy, sortDirection, filteredSet));
+  };
+
+  const refreshList = () => {
+    if (!updatedContribList) {
+      return;
+    }
+    const newContribList = processContribList(updatedContribList);
+    contribListRef.current = newContribList;
+    setContribList(newContribList);
+    setSortedList(_sortList(sortBy, sortDirection, filteredSet, newContribList));
+    setChecked([]);
+    setIsOutdated(false);
+    setUpdatedContribList(null);
   };
 
   const patchList = updatedEditables => {
@@ -651,6 +672,29 @@ function EditableListDisplay({
     };
   }, []);
 
+  useEffect(() => {
+    contribListRef.current = contribList;
+  }, [contribList]);
+
+  useEffect(() => {
+    const task = setInterval(async () => {
+      let response;
+      try {
+        response = await indicoAxios.get(editableListURL({event_id: eventId, type: editableType}));
+      } catch (error) {
+        handleAxiosError(error);
+        return;
+      }
+      const newContribList = camelizeKeys(response.data);
+      const listChanged = !_.isEqual(serializeContribList(contribListRef.current), newContribList);
+      setIsOutdated(listChanged);
+      setUpdatedContribList(listChanged ? newContribList : null);
+    }, POLLING_SECONDS * 1000);
+    return () => {
+      clearInterval(task);
+    };
+  }, [editableType, eventId]);
+
   return (
     <>
       {management && <ManagementPageSubTitle title={title} />}
@@ -760,6 +804,32 @@ function EditableListDisplay({
           <Icon name="warning sign" />
           {skippedEditablesWarning}
         </Message>
+      )}
+      {isOutdated && (
+        <div styleName="sticky-message">
+          <Message
+            warning
+            header={Translate.string('This editable list has been updated')}
+            content={
+              <>
+                <Translate>
+                  Some information displayed on this page may no longer be up to date.
+                </Translate>{' '}
+                <a onClick={refreshList}>
+                  <Translate>Refresh list</Translate>
+                </a>
+                {hasCheckedContribs && (
+                  <>
+                    {' '}
+                    <strong>
+                      (<Translate>current selection will be cleared</Translate>)
+                    </strong>
+                  </>
+                )}
+              </>
+            }
+          />
+        </div>
       )}
       {sortedList.length ? (
         <div styleName="editable-list">

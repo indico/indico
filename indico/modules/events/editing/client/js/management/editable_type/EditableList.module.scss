@@ -9,6 +9,17 @@
 
 $border: 1px solid $pastel-gray;
 
+.sticky-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+  border-radius: 5px;
+  box-shadow:
+    0 0.25em 0.75em rgba(0, 0, 0, 0.15),
+    0 0.125em 0.25em rgba(0, 0, 0, 0.1);
+}
+
 .editable-topbar {
   display: flex;
   justify-content: space-between;
