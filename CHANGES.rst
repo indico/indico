@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Support multi-choice abstract/contribution fields (:pr:`7725`)
+- Warn editors when the editable list is outdated (:pr:`7732`)
 
 Bugfixes
 ^^^^^^^^
