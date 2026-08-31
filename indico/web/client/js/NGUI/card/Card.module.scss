@@ -10,7 +10,11 @@
 :global(.indico-ui) {
   .card-root {
     @include focus-ring();
-    @include centered();
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     min-width: 0;
     max-width: var(--container-md);
     padding: var(--space-3);
