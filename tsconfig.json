@@ -30,9 +30,5 @@
     },
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": [
-    "indico/**/client/**/*",
-    "indico/web/client/js/types",
-    "indico/global.d.ts",
-  ]
+  "include": ["indico/**/client/**/*", "indico/web/client/js/types", "indico/global.d.ts"]
 }
