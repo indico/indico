@@ -1,0 +1,61 @@
+{% macro render_check_types(check_types, event) %}
+    {% if check_types %}
+        <div class="i-box-content">
+        <table class="i-table-widget">
+            <tr>
+                <th>{% trans -%}Title{%- endtrans %}</th>
+                <th>{% trans -%}Rule{%- endtrans %}</th>
+                <th>{% trans -%}Can check out{%- endtrans %}</th>
+                <th></th>
+            </tr>
+            {% for check_type in check_types|sort(attribute='title', case_sensitive=false) %}
+                <tr>
+                    <td>
+                        {{ check_type.title }}
+                    </td>
+                    <td>
+                        {{ check_type.rule.title }}
+                    </td>
+                    <td>
+                        {{ check_type.check_out_allowed }}
+                    </td>
+                    <td>
+                        <span class="right hide-if-locked">
+                            <button class="icon-bookmark i-button text-color borderless" style="{{ 'opacity: 0.3;' if event.default_check_type_id != check_type.id }}"
+                                    data-href="{{ url_for('.manage_registration_check_types_toggle', event, check_type_id=check_type.id) }}"
+                                    {% if event.default_check_type_id == check_type.id %}
+                                        title="{% trans %}This is the default check type for this event{% endtrans %}"
+                                    {% else %}
+                                        title="{% trans %}Make default check type for this event{% endtrans %}"
+                                        data-confirm="{% trans %}Do you really want to make this the default check type of this event?
+                                                                 It will be used to calculate the checked-in state of the registration
+                                                                 on the registration list, participant list and other places in indico.
+                                                    {% endtrans %}"
+                                        data-method="POST"
+                                        data-reload-after
+                                    {% endif %}
+                                    ></button>
+                            {% if not check_type.is_system_defined %}
+                                <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_check_types_edit', check_type) }}"
+                                        data-title
+                                        title="{% trans %}Edit check type{% endtrans %}"
+                                        data-update="#check-types"
+                                        data-ajax-dialog></button>
+                                <button class="icon-remove i-button text-color borderless danger {{ 'disabled' if event.default_check_type_id == check_type.id }}"
+                                        data-href="{{ url_for('.manage_registration_check_types_delete', check_type) }}"
+                                        data-title
+                                        data-update="#check-types"
+                                        title="{% trans %}Delete check type{% endtrans %}"
+                                        data-confirm="{% trans %}Do you really want to delete this check type?
+                                                                This will delete all previously performed checks of this type on registrations
+                                                    {% endtrans %}"
+                                        data-method="POST">
+                                </button>
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endmacro %}

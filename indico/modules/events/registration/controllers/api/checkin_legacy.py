@@ -9,10 +9,10 @@ from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
 
-from indico.core import signals
 from indico.modules.events import Event
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
+from indico.modules.events.registration.util import (build_registration_api_data, build_registrations_api_data,
+                                                     create_registration_check)
 from indico.web.rh import RH, oauth_scope
 
 
@@ -49,8 +49,11 @@ class RHAPIRegistrant(RH):
         if 'checked_in' in request.json:
             if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
                 raise BadRequest('This registration cannot be marked as checked-in')
-            self._registration.checked_in = bool(request.json['checked_in'])
-            signals.event.registration_checkin_updated.send(self._registration)
+            try:
+                create_registration_check(self.registration, is_check_out=not bool(request.json['checked_in']),
+                                          checked_by_user=session.user)
+            except ValueError:
+                pass
 
         return jsonify(build_registration_api_data(self._registration))
 
