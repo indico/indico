@@ -32,18 +32,6 @@
   white-space: nowrap;
 }
 
-@mixin container($size: 'xl') {
-  width: 100%;
-  max-width: var(--container-#{$size});
-  margin-inline: auto;
-}
-
-@mixin centered {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @mixin focus-ring($ring-color: var(--color-focus-ring)) {
   &:focus-visible {
     outline: 2px solid $ring-color;
