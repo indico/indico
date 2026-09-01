@@ -79,8 +79,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
           <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
         </div>
       </div>
-      <CategoryCardList data={categoryChildren.categories} columns={2} />
-
+      {!isFlat && <CategoryCardList data={categoryChildren.categories} columns={2} />}
       {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
         <EventList viewData={categoryEventListWithMeta} categoryId={categoryId} isFlat={isFlat} />
       )}
