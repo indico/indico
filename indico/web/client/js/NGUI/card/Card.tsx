@@ -14,7 +14,7 @@ import {NativeProps, sharedClassName} from 'indico/NGUI/utils';
 export type CardHeaderProps = NativeProps<'h6'>;
 
 export const CardHeader = ({...nativeProps}: CardHeaderProps) => (
-  <h6 styleName="card-header" className={`indico-ui ${nativeProps.className || ''}`}>
+  <h6 styleName="card-header" className={sharedClassName(nativeProps.className)}>
     {nativeProps.children}
   </h6>
 );
@@ -22,7 +22,7 @@ export const CardHeader = ({...nativeProps}: CardHeaderProps) => (
 export type CardMetaProps = NativeProps<'p'>;
 
 export const CardMeta = ({...nativeProps}: CardMetaProps) => (
-  <p styleName="card-meta" className={`indico-ui ${nativeProps.className || ''}`}>
+  <p styleName="card-meta" className={sharedClassName(nativeProps.className)}>
     {nativeProps.children}
   </p>
 );
@@ -30,7 +30,7 @@ export const CardMeta = ({...nativeProps}: CardMetaProps) => (
 export type CardDescriptionProps = NativeProps<'p'>;
 
 export const CardDescription = ({...nativeProps}: CardDescriptionProps) => (
-  <p styleName="card-description" className={`indico-ui ${nativeProps.className || ''}`}>
+  <p styleName="card-description" className={sharedClassName(nativeProps.className)}>
     {nativeProps.children}
   </p>
 );

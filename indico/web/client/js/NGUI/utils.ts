@@ -27,25 +27,4 @@ export function guardDisabledClick<E extends HTMLElement>(
   };
 }
 
-export function disabledLoadingAnchorProps(
-  disabled: boolean | undefined,
-  href?: string,
-  tabIndex?: number,
-  loading?: boolean | undefined
-) {
-  if (href === undefined) {
-    return {
-      disabled: disabled || loading || undefined,
-      'aria-disabled': disabled || loading || undefined,
-      tabIndex: disabled || loading ? -1 : tabIndex,
-      'aria-busy': loading || undefined,
-    };
-  }
-  return {
-    href: disabled || loading ? undefined : href,
-    'aria-disabled': disabled || loading || undefined,
-    tabIndex: disabled || loading ? -1 : tabIndex,
-  };
-}
-
 export const sharedClassName = (className?: string) => `indico-ui ${className || ''}`;
