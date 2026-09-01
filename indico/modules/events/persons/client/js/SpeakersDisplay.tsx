@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import speakerLinksURL from 'indico-url:persons.api_speaker_links';
 import speakersURL from 'indico-url:persons.api_speakers_list';
 
 import React, {useEffect, useMemo, useState} from 'react';
@@ -13,21 +14,30 @@ import {Icon, Divider, SemanticICONS} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 
-import {Speaker} from './types';
+import {Speaker, SpeakerLink} from './types';
 
 import './SpeakersDisplay.module.scss';
 
-function SpeakerProfile({speaker}: {speaker: Speaker}) {
+function SpeakerProfile({speaker, speakerLinks}: {speaker: Speaker; speakerLinks: SpeakerLink[]}) {
+  const speakerLinkValues = useMemo(() => {
+    return speakerLinks
+      .map(link => {
+        const linkWithValue = speaker.speaker_links.find(l => l.id === link.id);
+        return {...link, url: linkWithValue?.value};
+      })
+      .filter(link => link.url);
+  }, [speakerLinks, speaker.speaker_links]);
+
   return (
     <div styleName="profile-container">
       <div styleName="profile-header">
         <h4>
           {speaker.name} {speaker.affiliation ? ` | ${speaker.affiliation}` : ''}
         </h4>
-        <div styleName="socials">
-          {Object.entries(speaker.speaker_socials ?? {}).map(([socialName, socialInfo]) => (
-            <a href={socialInfo.url} rel="noreferrer" key={socialName}>
-              <Icon name={socialInfo.icon as SemanticICONS} size="large" title={socialName} />
+        <div styleName="speaker-links">
+          {speakerLinkValues.map(socialInfo => (
+            <a href={socialInfo.url} rel="noreferrer" key={socialInfo.id}>
+              <Icon name={socialInfo.icon as SemanticICONS} size="large" title={socialInfo.name} />
             </a>
           ))}
         </div>
@@ -52,6 +62,9 @@ export function SpeakersDisplay({eventId}: {eventId: number}) {
       event_id: eventId,
     })
   );
+  const {data: speakerLinks} = useIndicoAxios({
+    url: speakerLinksURL({event_id: eventId}),
+  });
   const speakersWithProfile = useMemo(
     () => (speakers ? speakers.filter(speaker => speaker.has_speaker_profile) : []),
     [speakers]
@@ -65,7 +78,7 @@ export function SpeakersDisplay({eventId}: {eventId: number}) {
     <div>
       {speakersWithProfile.map((speaker, index) => (
         <div key={speaker.id}>
-          <SpeakerProfile key={speaker.id} speaker={speaker} />
+          <SpeakerProfile key={speaker.id} speaker={speaker} speakerLinks={speakerLinks} />
           {index < speakersWithProfile.length - 1 && <Divider />}
         </div>
       ))}

@@ -7,11 +7,11 @@
 
 from operator import attrgetter
 
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
@@ -177,17 +177,22 @@ class EventPerson(PersonMixin, db.Model):
         db.Text,
         nullable=True,
     )
-    speaker_socials = db.Column(
-        JSONB,
-        nullable=True,
-    )
 
     speaker_photo = db.relationship(
         'File',
         lazy=False,
         backref=db.backref(
             'speaker_photos',
-            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+    speaker_links = db.relationship(
+        'EventSpeakerLinkData',
+        lazy=False,
+        cascade='all, delete-orphan',
+        collection_class=attribute_mapped_collection('speaker_link_id'),
+        backref=db.backref(
+            'event_person',
             lazy=True
         )
     )
@@ -260,7 +265,6 @@ class EventPerson(PersonMixin, db.Model):
         return (
             self.speaker_photo_file_id is not None
             or self.speaker_description is not None
-            or self.speaker_socials is not None
         )
 
     @classmethod

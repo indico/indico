@@ -5,6 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {SemanticICONS} from 'semantic-ui-react';
+
+export interface SpeakerLink {
+  id: number;
+  name: string;
+  icon: SemanticICONS;
+}
+
 export interface Speaker {
   id: number;
   email: string;
@@ -14,12 +22,9 @@ export interface Speaker {
   speaker_photo_url: string;
   speaker_description: string | null;
   has_speaker_profile: boolean;
-  speaker_socials: Record<
-    string,
-    {
-      url: string;
-      icon?: string;
-    }
-  >;
+  speaker_links: {
+    id: number;
+    value: string;
+  }[];
   affiliation: string;
 }

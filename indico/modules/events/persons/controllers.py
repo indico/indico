@@ -35,11 +35,13 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
+from indico.modules.events.models.speaker_links import EventSpeakerLink, EventSpeakerLinkData
 from indico.modules.events.persons import logger, persons_settings
 from indico.modules.events.persons.constants import MAX_SPEAKER_PHOTO_SIZE
 from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema, SpeakerProfileSchema
+from indico.modules.events.persons.schemas import (EventPersonSchema, EventPersonUpdateSchema, SpeakerLinksSchema,
+                                                   SpeakerProfileSchema)
 from indico.modules.events.persons.views import WPDisplaySpeakers, WPManagePersons, WPManageSpeakers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
@@ -51,11 +53,11 @@ from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import (FileField, FilesField, LowercaseString, file_extension, no_relative_urls,
-                                     not_empty, validate_with_message)
+from indico.util.marshmallow import (FileField, FilesField, LowercaseString, ModelField, file_extension,
+                                     no_relative_urls, not_empty, validate_with_message)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.user import principal_from_identifier, validate_search_token
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 
@@ -362,18 +364,17 @@ class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
 
 
 class RHAPISpeaker(RHManageSpeakerProfileBase):
-    @use_args({
+    @use_rh_args({
         'photo': FileField(allow_none=True, validate=file_extension('png', 'jpg', 'jpeg'),
                            require_file_metadata='speaker_picture_checked'),
         'description': fields.String(validate=validate.Length(max=1000), required=False),
-        'socials': fields.Dict(
-            keys=fields.String(validate=validate.Length(max=100)),
-            values=fields.Nested({
-                'url': fields.String(required=True, validate=validate.Length(max=500)),
-                'icon': fields.String(required=True, validate=validate.Length(max=100)),
+        'speaker_links': fields.List(
+            fields.Nested({
+                'link': ModelField(EventSpeakerLink, required=True, with_parent='event', data_key='id'),
+                'url': fields.Url(required=True),
             })
         ),
-    })
+    }, rh_context=('event',))
     def _process_POST(self, args):
         if 'description' in args:
             self.person.speaker_description = args['description']
@@ -384,16 +385,60 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
             elif self.person.speaker_photo is not None:
                 self.person.speaker_photo.claimed = False
                 self.person.speaker_photo_file_id = None
-        if 'socials' in args:
-            self.person.speaker_socials = args['socials']
+        if 'speaker_links' in args:
+            new_fields = {}
+            for speaker_link in args['speaker_links']:
+                speaker_link_data = self.person.speaker_links.get(
+                    speaker_link['link'].id,
+                    EventSpeakerLinkData(speaker_link_id=speaker_link['link'].id, event_person_id=self.person.id)
+                )
+                speaker_link_data.data = speaker_link['url']
+                new_fields[speaker_link_data.speaker_link_id] = speaker_link_data
+            self.person.speaker_links = new_fields
         return SpeakerProfileSchema().jsonify(self.person)
 
     def _process_DELETE(self):
         self.person.speaker_description = None
-        self.person.speaker_socials = None
+        self.person.speaker_links = {}
         if self.person.speaker_photo is not None:
             self.person.speaker_photo.claimed = False
             self.person.speaker_photo_file_id = None
+        return jsonify(success=True)
+
+
+class RHAPISpeakerLinks(RHManageEventBase):
+    def _process_GET(self):
+        return SpeakerLinksSchema(many=True).jsonify(
+            EventSpeakerLink.query.with_parent(self.event).all()
+        )
+
+    @use_kwargs({
+        'name': fields.String(required=True, validate=validate.Length(max=200)),
+        'icon': fields.String(required=True, validate=validate.Length(max=200)),
+    })
+    def _process_PUT(self, name, icon):
+        db.session.add(
+            EventSpeakerLink(name=name, icon=icon, event=self.event)
+        )
+        return jsonify(success=True)
+
+    @use_rh_kwargs({
+        'link': ModelField(EventSpeakerLink, with_parent='event', required=True, data_key='speaker_link_id')
+    }, location='view_args', rh_context=('event',))
+    def _process_DELETE(self, link):
+        db.session.delete(link)
+        return jsonify(success=True)
+
+    @use_kwargs({
+        'name': fields.String(required=True, validate=validate.Length(max=200)),
+        'icon': fields.String(required=True, validate=validate.Length(max=200)),
+    })
+    @use_rh_kwargs({
+        'link': ModelField(EventSpeakerLink, with_parent='event', required=True, data_key='speaker_link_id')
+    }, location='view_args', rh_context=('event',))
+    def _process_PATCH(self, link, name, icon):
+        link.name = name
+        link.icon = icon
         return jsonify(success=True)
 
 

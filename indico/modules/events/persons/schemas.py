@@ -9,6 +9,7 @@ from marshmallow import ValidationError, fields, post_dump, post_load, pre_load,
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.speaker_links import EventSpeakerLink, EventSpeakerLinkData
 from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
@@ -125,14 +126,33 @@ class EventPersonUpdateSchema(EventPersonSchema):
             raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')
 
 
+class SpeakerLinksSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventSpeakerLink
+        fields = ('id', 'name', 'icon')
+
+
+class SpeakerLinkDataSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventSpeakerLinkData
+        fields = ('id', 'value')
+
+    id = fields.Integer(attribute='speaker_link_id')
+    value = fields.String(attribute='data')
+
+
 class SpeakerProfileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
         fields = ('id', 'email', 'name', 'first_name', 'last_name', 'speaker_description',
-                  'speaker_photo_url', 'speaker_socials', 'affiliation', 'has_speaker_profile')
+                  'speaker_photo_url', 'affiliation', 'has_speaker_profile', 'speaker_links')
 
     def _get_speaker_photo_url(self, person):
         return (url_for('persons.speaker_photo', person.event, person) if person.speaker_photo_file_id is not None
                 else person.user.avatar_url)
 
+    def _get_speaker_link(self, person):
+        return SpeakerLinkDataSchema(many=True).dump(person.speaker_links.values())
+
     speaker_photo_url = fields.Method('_get_speaker_photo_url')
+    speaker_links = fields.Method('_get_speaker_link')

@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import speakerLinksURL from 'indico-url:persons.api_speaker_links';
 import updateSpeakerProfileURL from 'indico-url:persons.api_speaker_profile';
 import speakersURL from 'indico-url:persons.api_speakers_list';
 
@@ -20,9 +21,9 @@ import {SpeakerSearch} from 'indico/modules/events/persons/SpeakerSearch';
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import {Speaker} from './types';
+import {Speaker, SpeakerLink} from './types';
 
 import './Speakers.module.scss';
 
@@ -35,6 +36,9 @@ export function Speakers({eventId}: {eventId: number}) {
       event_id: eventId,
     })
   );
+  const {data: speakerLinksData} = useIndicoAxios({
+    url: speakerLinksURL({event_id: eventId}),
+  });
   const speakersWithProfile = useMemo(
     () => (speakers ? speakers.filter(speaker => speaker.has_speaker_profile) : []),
     [speakers]
@@ -48,6 +52,7 @@ export function Speakers({eventId}: {eventId: number}) {
   }, [speakers, speakerIDsWithProfile]);
 
   const [openedModal, setOpenedModal] = useState<SpeakersModalName | null>(null);
+  const [speakerLinks, setSpeakerLinks] = useState<SpeakerLink[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker>();
   const lowerCaseSearchTerm = useMemo(() => searchTerm.toLocaleLowerCase(), [searchTerm]);
@@ -69,7 +74,7 @@ export function Speakers({eventId}: {eventId: number}) {
           updateSpeakerProfileURL({event_id: eventId, person_id: selectedSpeaker.id}),
           {
             description: formData.description,
-            socials: formData.socials ?? {},
+            speaker_links: (formData.speaker_links ?? []).filter(link => link.url),
             ...(formData.photo !== undefined ? {photo: formData.photo} : {}),
           }
         );
@@ -88,13 +93,19 @@ export function Speakers({eventId}: {eventId: number}) {
 
   const handleDeleteSpeaker = useCallback(
     async (speakerId: number) => {
-      await indicoAxios.delete(updateSpeakerProfileURL({event_id: eventId, person_id: speakerId}));
-      setSpeakers(old =>
-        old.map(speaker =>
-          speaker.id === speakerId ? {...speaker, speaker_description: null} : speaker
-        )
-      );
-      reFetch();
+      try {
+        await indicoAxios.delete(
+          updateSpeakerProfileURL({event_id: eventId, person_id: speakerId})
+        );
+        setSpeakers(old =>
+          old.map(speaker =>
+            speaker.id === speakerId ? {...speaker, speaker_description: null} : speaker
+          )
+        );
+        reFetch();
+      } catch (e) {
+        return handleAxiosError(e);
+      }
     },
     [reFetch, eventId]
   );
@@ -102,6 +113,25 @@ export function Speakers({eventId}: {eventId: number}) {
   useEffect(() => {
     setSpeakers(data);
   }, [data]);
+
+  useEffect(() => {
+    if (speakerLinksData !== null) {
+      setSpeakerLinks(speakerLinksData);
+    }
+  }, [speakerLinksData]);
+
+  useEffect(() => {
+    // If speaker links are added/removed, a custom event is fired
+    function handleSpeakerLinksUpdate(event: Event) {
+      const links: SpeakerLink[] = (event as CustomEvent).detail;
+      setSpeakerLinks(links);
+    }
+
+    document.addEventListener('indico:speakerLinksUpdate', handleSpeakerLinksUpdate);
+    return () => {
+      document.removeEventListener('indico:speakerLinksUpdate', handleSpeakerLinksUpdate);
+    };
+  }, []);
 
   return (
     <>
@@ -154,7 +184,6 @@ export function Speakers({eventId}: {eventId: number}) {
                           <Icon
                             name="edit"
                             link
-                            color="black"
                             onClick={() => {
                               setSelectedSpeaker(speaker);
                               setOpenedModal('EDIT_SPEAKER');
@@ -169,7 +198,7 @@ export function Speakers({eventId}: {eventId: number}) {
                           <Icon
                             name="trash"
                             link
-                            color="black"
+                            color="red"
                             onClick={() => handleDeleteSpeaker(speaker.id)}
                           />
                         }
@@ -201,6 +230,7 @@ export function Speakers({eventId}: {eventId: number}) {
           onSubmit={handleEditSpeaker}
           speaker={selectedSpeaker}
           eventId={eventId}
+          speakerLinks={speakerLinks}
         />
       )}
       {openedModal === 'SEARCH_SPEAKER' && (

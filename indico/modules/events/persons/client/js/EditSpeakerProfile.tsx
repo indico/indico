@@ -7,17 +7,15 @@
 
 import uploadSpeakerPhoto from 'indico-url:persons.upload_speaker_photo';
 
-import React, {useCallback, useEffect, useState} from 'react';
-import {useForm} from 'react-final-form';
-import {Dropdown, Icon, Popup, SemanticICONS} from 'semantic-ui-react';
-import * as SUI from 'semantic-ui-react/dist/es/lib/SUI';
+import React, {useMemo, useState} from 'react';
+import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import {FinalPictureManager} from 'indico/react/components';
-import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
-import {Speaker} from './types';
+import {Speaker, SpeakerLink} from './types';
 
 import './EditSpeakerProfile.module.scss';
 
@@ -28,17 +26,9 @@ export const DEFAULT_SOCIAL_ICONS: Record<string, SemanticICONS> = {
   Webpage: 'world',
 };
 
-export const DEFAULT_SOCIAL_TITLES = ['Facebook', 'LinkedIn', 'GitHub', 'Webpage'];
-
 export interface EditSpeakerFormData {
   description?: string;
-  socials?: Record<
-    string,
-    {
-      url: string;
-      icon?: string;
-    }
-  >;
+  speaker_links?: {id: number; url: string}[];
   photo?: string;
 }
 
@@ -47,70 +37,25 @@ interface EditSpeakerProfileProps {
   eventId: number;
   onClose: () => void;
   onSubmit: (formData: EditSpeakerFormData) => void;
+  speakerLinks: SpeakerLink[];
 }
 
-interface AddSocialFormData {
-  title: string;
-  icon?: string;
-}
-
-function makeTitle(s: string) {
-  return s
-    .split(' ')
-    .map(word =>
-      word.length === 0 ? word : word.charAt(0).toLocaleUpperCase() + word.substring(1)
-    )
-    .join(' ');
-}
-
-const ICON_OPTIONS = SUI.ICONS_AND_ALIASES.map((iconName: string) => ({
-  key: iconName,
-  value: iconName,
-  icon: iconName,
-  text: makeTitle(iconName),
-}));
-
-function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: number}) {
-  const [speakerSocials, setSpeakerSocials] = useState(speaker.speaker_socials ?? {});
-  const [customSocialModalOpened, setCustomSocialModalOpened] = useState(false);
+function EditSpeakerProfileForm({
+  speaker,
+  eventId,
+  speakerLinks,
+}: {
+  speaker: Speaker;
+  eventId: number;
+  speakerLinks: SpeakerLink[];
+}) {
   const [displayInitialPicture, setDisplayInitialPicture] = useState(true);
-
-  const form = useForm();
-
-  const openCustomSocialModal = useCallback(() => setCustomSocialModalOpened(true), []);
-  const closeCustomSocialModal = useCallback(() => setCustomSocialModalOpened(false), []);
-
-  const addSpeakerSocial = useCallback((name: string, icon?: string) => {
-    setSpeakerSocials(old => ({...old, [name]: {url: '', icon}}));
-  }, []);
-
-  const addSocial = useCallback(
-    (formData: AddSocialFormData) => {
-      addSpeakerSocial(formData.title, formData.icon);
-      closeCustomSocialModal();
-    },
-    [closeCustomSocialModal, addSpeakerSocial]
-  );
-
-  useEffect(() => {
-    // Keep `icon` property in sync
-    const unsubscribe = form.subscribe(
-      formState => {
-        const socials: {url: string; icon?: string}[] | undefined = formState.values.socials;
-        if (socials === undefined) {
-          return;
-        }
-        for (const [name, value] of Object.entries(socials)) {
-          if (value.icon === undefined && speakerSocials[name].icon !== undefined) {
-            form.change(`socials.${name}.icon`, speakerSocials[name].icon);
-          }
-        }
-      },
-      {values: true}
-    );
-
-    return () => unsubscribe();
-  }, [form, speakerSocials]);
+  const speakerLinkValues = useMemo(() => {
+    return speakerLinks.map(link => {
+      const linkWithValue = speaker.speaker_links.find(l => l.id === link.id);
+      return {...link, url: linkWithValue?.value ?? ''};
+    });
+  }, [speakerLinks, speaker.speaker_links]);
 
   return (
     <>
@@ -136,87 +81,31 @@ function EditSpeakerProfileForm({speaker, eventId}: {speaker: Speaker; eventId: 
         label={Translate.string('Description')}
         initialValue={speaker.speaker_description}
       />
-      {Object.entries(speakerSocials).map(([name, properties]) => (
-        <div styleName="row" key={name}>
+      {speakerLinkValues.map((link, index) => (
+        <div styleName="row" key={link.id}>
           <FinalInput
-            name={`socials.${name}.url`}
+            name={`speaker_links.${index}.url`}
             label={
               <p>
-                {name} {properties.icon && <Icon name={properties.icon as SemanticICONS} />}
+                {link.name} {link.icon && <Icon name={link.icon as SemanticICONS} />}
               </p>
             }
-            initialValue={speaker.speaker_socials?.[name]?.url ?? ''}
+            initialValue={link.url}
           />
-          <Popup
-            content={Translate.string('Remove social')}
-            position="right center"
-            trigger={
-              <Icon
-                name="trash"
-                link
-                color="black"
-                onClick={() => {
-                  form.change(`socials.${name}`, undefined);
-                  setSpeakerSocials(old =>
-                    Object.fromEntries(Object.entries(old).filter(entry => entry[0] !== name))
-                  );
-                }}
-              />
-            }
-          />
+          <br />
         </div>
       ))}
-      <div styleName="centered-field">
-        <Dropdown
-          text={Translate.string('Add socials')}
-          icon="add"
-          floating
-          labeled
-          button
-          className="icon"
-        >
-          <Dropdown.Menu>
-            {DEFAULT_SOCIAL_TITLES.filter(entry => !speaker.speaker_socials?.[entry[0]]).map(
-              name => (
-                <Dropdown.Item
-                  key={name}
-                  icon={DEFAULT_SOCIAL_ICONS[name]}
-                  text={name}
-                  onClick={() => addSpeakerSocial(name, DEFAULT_SOCIAL_ICONS[name])}
-                />
-              )
-            )}
-            <Dropdown.Item text={Translate.string('Custom...')} onClick={openCustomSocialModal} />
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
-      {customSocialModalOpened && (
-        <FinalModalForm
-          id="add-social-form"
-          onClose={closeCustomSocialModal}
-          onSubmit={addSocial}
-          header={Translate.string('Add Social')}
-          size="tiny"
-        >
-          <FinalInput name="title" required fluid label={Translate.string('Title')} />
-          <FinalDropdown
-            name="icon"
-            required
-            label={Translate.string('Icon')}
-            placeholder={Translate.string('Select Icon')}
-            labeled
-            fluid
-            search
-            selection
-            options={ICON_OPTIONS}
-          />
-        </FinalModalForm>
-      )}
     </>
   );
 }
 
-export function EditSpeakerProfile({onClose, onSubmit, speaker, eventId}: EditSpeakerProfileProps) {
+export function EditSpeakerProfile({
+  onClose,
+  onSubmit,
+  speaker,
+  eventId,
+  speakerLinks,
+}: EditSpeakerProfileProps) {
   return (
     <FinalModalForm
       id="edit-speaker-form"
@@ -224,13 +113,14 @@ export function EditSpeakerProfile({onClose, onSubmit, speaker, eventId}: EditSp
       onSubmit={onSubmit}
       disabledUntilChange={false}
       size="large"
+      initialValues={{speaker_links: speakerLinks.map(link => ({id: link.id}))}}
       header={
-        speaker
+        speaker.has_speaker_profile
           ? Translate.string('Edit Speaker Profile')
           : Translate.string('Create Speaker Profile')
       }
     >
-      <EditSpeakerProfileForm speaker={speaker} eventId={eventId} />
+      <EditSpeakerProfileForm speaker={speaker} eventId={eventId} speakerLinks={speakerLinks} />
     </FinalModalForm>
   );
 }

@@ -4,6 +4,10 @@
     {% trans %}Speakers{% endtrans %}
 {% endblock %}
 
+{% block title_actions %}
+    <ind-manage-speaker-links event-id="{{event.id}}" />
+{% endblock %}
+
 {% block content %}
     <ind-speakers event-id="{{event.id}}"></ind-speakers>
 {% endblock %}
