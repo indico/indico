@@ -168,8 +168,8 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           styleName="button"
           className={sharedClassName(className)}
           href={disabled || loading ? undefined : rest.href}
-          aria-disabled={disabled || loading || undefined}
-          aria-busy={loading || undefined}
+          aria-disabled={disabled || loading}
+          aria-busy={loading}
           onClick={handleClick}
           role={disabled || loading ? undefined : 'button'}
         >
@@ -189,8 +189,8 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         className={sharedClassName(className)}
         disabled={disabled || loading}
         onClick={handleClick}
-        aria-disabled={disabled || loading || undefined}
-        aria-busy={loading || undefined}
+        aria-disabled={disabled || loading}
+        aria-busy={loading}
       >
         {content}
       </button>
