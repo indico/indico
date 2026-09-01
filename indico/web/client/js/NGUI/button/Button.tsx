@@ -169,7 +169,6 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           className={sharedClassName(className)}
           href={disabled || loading ? undefined : rest.href}
           aria-disabled={disabled || loading || undefined}
-          tabIndex={disabled || loading ? -1 : rest.tabIndex}
           aria-busy={loading || undefined}
           onClick={handleClick}
           role={disabled || loading ? undefined : 'button'}
@@ -191,7 +190,6 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         disabled={disabled || loading}
         onClick={handleClick}
         aria-disabled={disabled || loading || undefined}
-        tabIndex={disabled || loading ? -1 : rest.tabIndex}
         aria-busy={loading || undefined}
       >
         {content}

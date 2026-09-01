@@ -10,6 +10,7 @@ import React, {forwardRef} from 'react';
 import './Timeline.module.scss';
 import {Dot} from 'indico/NGUI/dot/Dot';
 import {IndicoPaletteColor} from 'indico/NGUI/tokens';
+import {sharedClassName} from 'indico/NGUI/utils';
 
 interface TimelineTitleProps {
   dotColor?: IndicoPaletteColor;
@@ -30,7 +31,7 @@ interface TimelineContentProps {
 }
 
 export const TimelineContent = ({children, className}: TimelineContentProps) => (
-  <div styleName="timeline-content-wrapper" className={className ?? ''}>
+  <div styleName="timeline-content-wrapper" className={sharedClassName(className)}>
     <div styleName="line" />
     {children}
   </div>
@@ -43,12 +44,7 @@ interface TimelineItemProps {
 
 const TimelineItemRoot = forwardRef<HTMLDivElement, TimelineItemProps>(
   ({className, children}, ref) => (
-    <div
-      ref={ref}
-      styleName="timeline-item"
-      className={`indico-ui ${className || ''}`}
-      role="group"
-    >
+    <div ref={ref} styleName="timeline-item" className={sharedClassName(className)} role="group">
       {children}
     </div>
   )
