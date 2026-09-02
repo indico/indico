@@ -4,7 +4,7 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
-RUFF_CMD='ruff check'
+RUFF_CMD='ruff check --output-format concise'
 ESLINT_CMD='npx eslint'
 BIOME_CMD='npx @biomejs/biome format --colors=force'
 STYLELINT_CMD='npx stylelint'
