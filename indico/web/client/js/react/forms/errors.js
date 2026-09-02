@@ -8,13 +8,25 @@
 import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 
-function flatten(value) {
+function flatten(value, joinErrors, preserveNested) {
+  if (preserveNested) {
+    // When using a nested schema that's populated by individual final-form fields (ie field names
+    // whose name contains a dot, e.g. `custom_fields.custom_123`), we want to preserve this
+    // structure in order to show errors on the actual fields.
+    // XXX this only supports one level of nesting, ie not `foo.bar.baz` etc
+    return Object.fromEntries(
+      Object.entries(value).map(([field, errors]) => {
+        return [field, joinErrors ? errors.join(' / ') : errors];
+      })
+    );
+  }
   // marshmallow's List returns an object with the index as the key
   if (_.isPlainObject(value)) {
     value = Object.values(value);
   }
   // Nested returns an object mapping the inner field name to its error(s)
-  return _.uniq(_.flattenDeep(value.map(x => (_.isPlainObject(x) ? Object.values(x) : x))));
+  const res = _.uniq(_.flattenDeep(value.map(x => (_.isPlainObject(x) ? Object.values(x) : x))));
+  return joinErrors ? res.join(' / ') : res;
 }
 
 /**
@@ -29,7 +41,8 @@ export function handleSubmissionError(
   error,
   defaultMessage = null,
   fieldErrorMap = {},
-  joinErrors = true
+  joinErrors = true,
+  preserveNested = []
 ) {
   const webargsErrors = _.get(error, 'response.data.webargs_errors');
   if (webargsErrors && error.response.status === 422) {
@@ -38,11 +51,11 @@ export function handleSubmissionError(
       return {[FORM_ERROR]: joinErrors ? webargsErrors.join(' / ') : webargsErrors};
     }
     // flatten errors in case there's more than one
-    return _.fromPairs(
+    return Object.fromEntries(
       Object.entries(webargsErrors).map(([field, errors]) => {
         return [
           fieldErrorMap[field] || field,
-          joinErrors ? flatten(errors).join(' / ') : flatten(errors),
+          flatten(errors, joinErrors, preserveNested.includes(field)),
         ];
       })
     );

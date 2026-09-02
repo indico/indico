@@ -267,7 +267,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
             if data['location_data'].get('inheriting')
             else data['location_data']
         )
-        contrib = create_contribution(self.event, data, session_block=session_block)
+        contrib = create_contribution(self.event, data, data.pop('custom_fields', None), session_block=session_block)
         return ContributionSchema(context={'event': self.event}).jsonify(contrib)
 
     @no_autoflush
@@ -304,7 +304,7 @@ class RHTimetableContribution(RHManageContributionBase):
             self._change_parent(session_block_id)
 
         with (track_time_changes(), track_location_changes()):
-            update_contribution(self.contrib, data)
+            update_contribution(self.contrib, data, data.pop('custom_fields', None))
 
         return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 

@@ -8,9 +8,7 @@
 from marshmallow import EXCLUDE, fields
 
 from indico.core.marshmallow import mm
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import (ContribFieldValueSchema, ContributionReferenceSchema,
-                                                         TimezoneAwareSessionBlockSchema)
+from indico.modules.events.contributions.schemas import ContributionRESTSchema, TimezoneAwareSessionBlockSchema
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -62,29 +60,25 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     session_id = fields.Function(_get_break_session_id, dump_only=True)
 
 
-class ContributionSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Contribution
-        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data', 'location_parent',
-                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block',
-                  'session_block_id', 'session_id', 'parent_id', 'attachments')
-        rh_context = ('event', {'object': 'contrib'})
+class ContributionSchema(ContributionRESTSchema):
+    class Meta(ContributionRESTSchema.Meta):
+        fields = (
+            *ContributionRESTSchema.Meta.fields,
+            'location_parent',
+            'session_block',
+            'session_block_id',
+            'session_id',
+            'event_id',
+            'parent_id',
+            'attachments',
+        )
 
-    def _get_attachments(self, contribution):
-        return len(contribution.attached_items.get('files', []))
-
-    start_dt = EventTimezoneDateTimeField()
-    _description = fields.String(attribute='description')
-    # TODO: filter inactive and restricted contrib fields
-    custom_fields = fields.List(NonPartialNested(ContribFieldValueSchema), attribute='field_values')
+    # TODO sync person_links code with parent schema and remove here
     person_links = NonPartialNested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
-    references = fields.List(NonPartialNested(ContributionReferenceSchema))
-    location_data = NonPartialNested(LocationDataSchema)
     location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
-    event_id = fields.Integer(dump_only=True)
-    session_id = fields.Integer(dump_only=True)
-    duration = fields.TimeDelta(required=True)
-    parent_id = fields.Integer(allow_none=True, load_only=True)
     session_block_id = fields.Integer(allow_none=True)
+    session_id = fields.Integer(dump_only=True)
+    event_id = fields.Integer(dump_only=True)  # XXX needed?
+    parent_id = fields.Integer(allow_none=True, load_only=True)
     attachments = fields.Function(TimetableSerializer.get_attachment_data)
