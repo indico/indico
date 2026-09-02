@@ -74,6 +74,7 @@ interface DraftEntry {
   session_block_id?: number;
   code?: string;
   board_number?: string;
+  custom_fields?: any;
 }
 
 // Prop interface
@@ -152,6 +153,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         background: entry.colors.backgroundColor,
       },
     }),
+    custom_fields: entry.customFields,
   };
 
   const typeLongNames = {
@@ -160,6 +162,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     [EntryType.Break]: Translate.string('Break'),
   };
 
+  const customFields = useSelector(selectors.getCustomContribFields);
   const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
   const sessionsObj = useSelector(selectors.getSessions);
   const sessions: Session[] = Object.values(sessionsObj);
@@ -174,6 +177,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         extraOptions={extraOptions}
         locationParent={snakifyKeys(entry.locationParent)}
         sessionBlock={parent}
+        customFields={customFields}
       />
     ),
     ...(!isCreatingChild
@@ -247,9 +251,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
-        dispatch(
-          actions.updateEntry(activeType, updatedEntry, currentDay, getChangedValues(data, form))
-        );
+        const updatePayload = getChangedValues(data, form);
+        dispatch(actions.updateEntry(activeType, updatedEntry, currentDay, updatePayload));
         if (
           (activeType === EntryType.SessionBlock || activeType === EntryType.Contribution) &&
           oldDayKey !== newDayKey

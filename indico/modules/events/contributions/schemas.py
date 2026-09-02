@@ -8,10 +8,9 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import EXCLUDE, ValidationError, fields, post_dump, post_load, validates
+from marshmallow import EXCLUDE, fields, post_dump
 from marshmallow_sqlalchemy import column2field
 
-from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -26,7 +25,7 @@ from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, Basi
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested, SortedList
 from indico.web.flask.util import url_for
 
 
@@ -143,31 +142,6 @@ contribution_type_schema = ContributionTypeSchema()
 contribution_type_schema_basic = ContributionTypeSchema(only=('id', 'name'))
 
 
-class ContribFieldSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = ContributionField
-        fields = ('title', 'description', 'is_required', 'field_data')
-
-
-class ContribFieldValueSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = ContributionFieldValue
-        fields = ('id', 'data')
-
-    id = fields.Integer(attribute='contribution_field_id', required=True)
-    data = fields.Raw(load_default=None)
-
-    @validates('id')
-    def _check_contribution_field(self, id, **kwargs):
-        if not ContributionField.get(id):
-            raise ValidationError('Invalid contribution field')
-
-    @post_load()
-    @no_autoflush
-    def make_instance(self, data, **kwargs):
-        return ContributionFieldValue(contribution_field_id=data['contribution_field_id'], data=data['data'])
-
-
 class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
@@ -177,22 +151,47 @@ class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
     end_dt = EventTimezoneDateTimeField()
 
 
-# TODO: (Ajob) Evaluate this schema vs timetable one
-class ContributionSchema(mm.SQLAlchemyAutoSchema):
+class CustomFieldsMixin:
+    # TODO: filter inactive and restricted contrib fields
+    custom_fields = fields.Method('_dump_custom_fields', '_load_custom_fields')
+
+    def _make_custom_fields_schema(self):
+        schema = {}
+        for field in self.context['event'].contribution_fields:
+            # TODO handle is_active and restricted fields
+            # TODO generate proper field (type) from field definition, with validation where needed
+            schema[f'custom_{field.id}'] = fields.Raw()
+        return mm.Schema.from_dict(schema, name='CustomFieldsSchema')
+
+    def _load_custom_fields(self, value):
+        schema_cls = self._make_custom_fields_schema()
+        schema = schema_cls(partial=bool(self.partial))
+        return schema.load(value)
+
+    def _dump_custom_fields(self, contrib):
+        schema_cls = self._make_custom_fields_schema()
+        schema = schema_cls()
+        return schema.dump({f'custom_{k}': v.data for k, v in contrib.data_by_field.items()})
+
+
+class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
+    """Schema for RESTful operations on contributions."""
+
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'event_id', 'references', 'custom_fields', 'person_links')
+                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links')
+        rh_context = ('event', {'object': 'contrib'})
 
+    id = fields.Int(dump_only=True)
     start_dt = EventTimezoneDateTimeField()
-    # TODO: filter inactive and resitricted contrib fields
-    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
+    # TODO use List+NonPartialNested
     person_links = fields.Nested(
         _ContributionPersonLinkSchema(many=True, partial=False),
         unknown=EXCLUDE
     )
-    references = fields.List(fields.Nested(ContributionReferenceSchema))
-    location_data = fields.Nested(LocationDataSchema)
-    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
+    references = fields.List(NonPartialNested(ContributionReferenceSchema))
+    location_data = NonPartialNested(LocationDataSchema)
+    session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
     _description = fields.String(attribute='description')
