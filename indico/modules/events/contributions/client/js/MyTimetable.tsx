@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contributionFavoriteURL from 'indico-url:contributions.favorite_contributions_api';
+import favoriteContributionURL from 'indico-url:contributions.favorite_contribution_api';
+import favoriteContributionListURL from 'indico-url:contributions.favorite_contribution_list_api';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -32,13 +33,13 @@ export function MyTimetable({eventId, timezone}: MyTimetableProps) {
     mutate,
     mutating,
   } = useIndicoAxiosWithMutation<Contribution[]>({
-    url: contributionFavoriteURL({event_id: eventId}),
+    url: favoriteContributionListURL({event_id: eventId}),
   });
 
   const removeScheduledContribution = async (id: number) => {
     try {
       await mutate(
-        indicoAxios.delete(contributionFavoriteURL({contrib_id: id, event_id: eventId})),
+        indicoAxios.delete(favoriteContributionURL({contrib_id: id, event_id: eventId})),
         oldData => oldData.filter(c => c.id !== id)
       );
     } catch (error) {

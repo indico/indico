@@ -16,6 +16,8 @@ Bugfixes
 ^^^^^^^^
 
 - Fix "No value" filter for text-based abstract/contribution fields (:pr:`7725`)
+- Fix error when loading favorite contribution state when viewing a contribution in
+  a restricted event the user cannot access (:pr:`7740`)
 
 Accessibility
 ^^^^^^^^^^^^^

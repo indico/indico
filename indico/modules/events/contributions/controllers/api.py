@@ -13,16 +13,15 @@ from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.modules.events.contributions.controllers.display import RHDisplayProtectionBase
+from indico.modules.events.contributions.controllers.display import (RHAuthenticatedContributionDisplayBase,
+                                                                     RHDisplayProtectionBase)
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import UserContributionSchema
 from indico.modules.events.contributions.util import get_contributions_for_user
 from indico.modules.events.controllers.base import RHAuthenticatedEventBase
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.marshmallow import ModelField
 from indico.util.string import natural_sort_key
-from indico.web.args import use_rh_kwargs
 
 
 class RHAPIMyContributions(RHDisplayProtectionBase):
@@ -57,38 +56,38 @@ class RHAPIMyContributions(RHDisplayProtectionBase):
         })
 
 
-class RHFavoriteContributionsAPI(RHAuthenticatedEventBase):
-    @use_rh_kwargs({
-        'contribution': ModelField(Contribution, with_parent='event', data_key='contrib_id')
-    }, location='view_args', rh_context=('event',))
-    def _process(self, contribution=None):
-        self.contribution = contribution
-        return super()._process()
+class RHFavoriteContributionListAPI(RHAuthenticatedEventBase):
+    """RESTful API to get the user's list of favorite contributions in an event."""
 
     def _process_GET(self):
-        if self.contribution is None:
-            favorites = (
-                Contribution.query
-                .with_parent(session.user)
-                .with_parent(self.event)
-                .outerjoin(Contribution.timetable_entry)
-                .options(contains_eager(Contribution.timetable_entry).lazyload('*'))
-                .order_by(TimetableEntry.start_dt.is_(None), TimetableEntry.start_dt, Contribution.friendly_id)
-                .all()
-            )
-            return UserContributionSchema(exclude=('edit_url',), many=True).jsonify(favorites)
-        return jsonify(self.contribution in session.user.favorite_contributions)
+        favorites = (
+            Contribution.query
+            .with_parent(session.user)
+            .with_parent(self.event)
+            .outerjoin(Contribution.timetable_entry)
+            .options(contains_eager(Contribution.timetable_entry).lazyload('*'))
+            .order_by(TimetableEntry.start_dt.is_(None), TimetableEntry.start_dt, Contribution.friendly_id)
+            .all()
+        )
+        return UserContributionSchema(exclude=('edit_url',), many=True).jsonify(favorites)
+
+
+class RHFavoriteContributionAPI(RHAuthenticatedContributionDisplayBase):
+    """RESTful API to manage the favorite state of a contribution."""
+
+    def _process_GET(self):
+        return jsonify(self.contrib in session.user.favorite_contributions)
 
     def _process_PUT(self):
-        if self.contribution not in session.user.favorite_contributions:
-            if not self.contribution.can_access(session.user):
+        if self.contrib not in session.user.favorite_contributions:
+            if not self.contrib.can_access(session.user):
                 raise Forbidden
-            session.user.favorite_contributions.add(self.contribution)
+            session.user.favorite_contributions.add(self.contrib)
         return jsonify(success=True)
 
     def _process_DELETE(self):
-        if self.contribution in session.user.favorite_contributions:
-            session.user.favorite_contributions.discard(self.contribution)
+        if self.contrib in session.user.favorite_contributions:
+            session.user.favorite_contributions.discard(self.contrib)
             try:
                 db.session.flush()
             except StaleDataError:
