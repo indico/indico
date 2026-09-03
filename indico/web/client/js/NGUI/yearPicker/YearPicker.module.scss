@@ -1,0 +1,63 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'NGUI/styles/base' as *;
+
+:global(.indico-ui) {
+  .year-picker {
+    background-color: var(--color-surface-soft);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .year-list {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    scroll-behavior: smooth;
+
+    @media (max-width: $viewport-mobile) {
+      min-width: 0;
+    }
+  }
+
+  .year-picker-year-button {
+    @include focus-ring();
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+
+    &:hover {
+      color: var(--color-text-heading);
+    }
+
+    &[data-active] {
+      color: var(--color-text-heading);
+      --button-font-weight: var(--font-weight-bold);
+    }
+  }
+
+  .year-picker-chevron-button {
+    @include focus-ring();
+    color: var(--color-text-heading);
+  }
+}

@@ -1,0 +1,246 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'NGUI/styles/base' as *;
+@use '../button/Button.module.scss' as *;
+
+// ----------------------------------------------------------------
+// MIXINS
+// ----------------------------------------------------------------
+
+@mixin tag-size-spacing($size, $space) {
+  height: var(--tag-height-#{$size});
+  padding-right: var(--tag-padding-#{$size});
+  padding-left: var(--tag-padding-#{$size});
+  border-radius: var(--radius-#{$size});
+
+  &[data-icon] {
+    --icon-margin: var(--space-#{$space});
+  }
+}
+
+// ----------------------------------------------------------------
+// CORE
+// ----------------------------------------------------------------
+
+:global(.indico-ui) {
+  .tag {
+    @include focus-ring();
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+
+    overflow: hidden;
+    white-space: nowrap;
+
+    background-color: var(--tag-bg, transparent);
+    color: var(--tag-text);
+
+    &[data-outlined] {
+      border: 1px solid var(--tag-border, currentColor);
+
+      &:hover:not([data-disabled]) {
+        border-color: var(--tag-border-hover, var(--tag-border, currentColor));
+      }
+
+      &:active:not([data-disabled]) {
+        border-color: var(--tag-border-active, var(--tag-border, currentColor));
+      }
+    }
+
+    &[data-rounded] {
+      border-radius: var(--radius-pill);
+    }
+
+    // --------- Layout ---------
+    &[data-size='xs'] {
+      @include tag-size-spacing('xs', '1');
+      @include button-typography('text-xs');
+    }
+
+    &[data-size='sm'] {
+      @include tag-size-spacing('sm', '2');
+      @include button-typography('text-sm');
+    }
+
+    &[data-size='md'] {
+      @include tag-size-spacing('md', '3');
+      @include button-typography('text-md');
+    }
+
+    &[data-size='lg'] {
+      @include tag-size-spacing('lg', '4');
+      @include button-typography('text-lg');
+    }
+
+    &[data-size='xl'] {
+      @include tag-size-spacing('xl', '5');
+      @include button-typography('text-xl');
+    }
+
+    &[data-text-weight='regular'] {
+      @include button-text-weight('regular');
+    }
+
+    &[data-text-weight='bold'] {
+      @include button-text-weight('bold');
+    }
+
+    &[data-color='primary'] {
+      @include color('primary');
+    }
+
+    &[data-color='gray'] {
+      @include color('gray');
+    }
+
+    &[data-color='success'] {
+      @include color('success');
+    }
+
+    &[data-color='warning'] {
+      @include color('warning');
+    }
+
+    &[data-color='error'] {
+      @include color('error');
+    }
+
+    &[data-color='red'] {
+      --intensity-500: var(--color-tag-red);
+      --intensity-600: var(--color-tag-red);
+    }
+
+    &[data-color='orange'] {
+      --intensity-500: var(--color-tag-orange);
+      --intensity-600: var(--color-tag-orange);
+    }
+
+    &[data-color='yellow'] {
+      --intensity-500: var(--color-tag-yellow);
+      --intensity-600: var(--color-tag-yellow);
+    }
+
+    &[data-color='olive'] {
+      --intensity-500: var(--color-tag-olive);
+      --intensity-600: var(--color-tag-olive);
+    }
+
+    &[data-color='green'] {
+      --intensity-500: var(--color-tag-green);
+      --intensity-600: var(--color-tag-green);
+    }
+
+    &[data-color='teal'] {
+      --intensity-500: var(--color-tag-teal);
+      --intensity-600: var(--color-tag-teal);
+    }
+
+    &[data-color='blue'] {
+      --intensity-500: var(--color-tag-blue);
+      --intensity-600: var(--color-tag-blue);
+    }
+
+    &[data-color='violet'] {
+      --intensity-500: var(--color-tag-violet);
+      --intensity-600: var(--color-tag-violet);
+    }
+
+    &[data-color='purple'] {
+      --intensity-500: var(--color-tag-purple);
+      --intensity-600: var(--color-tag-purple);
+    }
+
+    &[data-color='pink'] {
+      --intensity-500: var(--color-tag-pink);
+      --intensity-600: var(--color-tag-pink);
+    }
+
+    &[data-color='grey'] {
+      // Semantic UI uses "grey" instead of "gray"
+      --intensity-500: var(--color-tag-gray);
+      --intensity-600: var(--color-tag-gray);
+    }
+
+    &[data-color='brown'] {
+      --intensity-500: var(--color-tag-brown);
+      --intensity-600: var(--color-tag-brown);
+    }
+
+    &[data-color='black'] {
+      --intensity-500: var(--color-tag-black);
+      --intensity-600: var(--color-tag-black);
+    }
+
+    // --------- Icons ---------
+    .tag-icon {
+      color: inherit;
+    }
+
+    &[data-icon-position='left'] .tag-icon {
+      margin-right: var(--icon-margin);
+    }
+
+    &[data-icon-position='right'] .tag-icon {
+      margin-left: var(--icon-margin);
+    }
+
+    // ----------------------------------------------------------------
+    // VARIANTS
+    // ----------------------------------------------------------------
+
+    // --------- Solid ----------
+    &[data-variant='solid'] {
+      --tag-bg: var(--intensity-500);
+      --tag-text: var(--color-accent-buttons);
+
+      &[data-opaque] {
+        --tag-bg: color-mix(in srgb, var(--intensity-500) 20%);
+      }
+    }
+
+    // ---------- Light ---------
+    &[data-variant='light'] {
+      --tag-bg: var(--intensity-100);
+      --tag-text: var(--intensity-600);
+
+      &[data-opaque] {
+        --tag-bg: color-mix(in srgb, var(--intensity-100) 20%);
+        --tag-text: var(--intensity-600);
+      }
+    }
+
+    // --------- White ---------
+    &[data-variant='white'] {
+      --tag-bg: var(--color-accent-buttons);
+      --tag-text: var(--intensity-500);
+
+      &[data-opaque] {
+        --tag-bg: color-mix(in srgb, var(--color-accent-buttons) 20%);
+        --tag-text: var(--color-accent-buttons);
+      }
+
+      &[data-outlined] {
+        --tag-border: var(--intensity-600);
+        --tag-border-active: var(--intensity-700);
+      }
+    }
+
+    // --------- Transparent ----------
+    &[data-variant='transparent'] {
+      --tag-bg: transparent;
+      --tag-text: var(--intensity-600);
+      --tag-border: var(--intensity-600);
+
+      &[data-color='white'] {
+        --tag-text: var(--color-accent-buttons);
+        --tag-border: var(--color-accent-buttons);
+      }
+    }
+  }
+}
