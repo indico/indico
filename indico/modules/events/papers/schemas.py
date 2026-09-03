@@ -238,7 +238,7 @@ class PaperFileTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFileType
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
-                  'filename_template', 'url')
+                  'filename_template', 'url', 'source_editing_file_type_id')
 
     is_used = fields.Function(lambda ft: PaperFile.query.with_parent(ft).has_rows())
     url = Function(lambda ft: url_for('.api_edit_file_type', ft.event, file_type_id=ft.id, _external=True))

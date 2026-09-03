@@ -14,6 +14,22 @@ from indico.modules.events.editing.models.file_types import BaseFileType
 class PaperFileType(BaseFileType):
     event_backref_name = 'paper_file_types'
 
+    source_editing_file_type_id = db.Column(
+        db.ForeignKey('event_editing.file_types.id'),
+        index=True,
+        nullable=True
+    )
+    source_editing_file_type = db.relationship(
+        'EditingFileType',
+        backref=db.backref(
+            'paper_file_type',
+            cascade='all, delete-orphan',
+            lazy=True,
+            uselist=False,
+            single_parent=True,
+        ),
+    )
+
     @declared_attr
     def __table_args__(cls):
         return (
@@ -22,6 +38,14 @@ class PaperFileType(BaseFileType):
                 cls.event_id,
                 db.func.lower(cls.name),
                 unique=True,
+                postgresql_where=cls.source_editing_file_type_id.is_(None)
+            ),
+            db.Index(
+                'ix_uq_file_types_event_id_source_editing_file_type_id',
+                cls.event_id,
+                cls.source_editing_file_type_id,
+                unique=True,
+                postgresql_where=cls.source_editing_file_type_id.isnot(None)
             ),
             {'schema': 'event_paper_reviewing'},
         )

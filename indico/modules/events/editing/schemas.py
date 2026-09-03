@@ -23,6 +23,7 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
@@ -75,7 +76,13 @@ class EditingFileTypeSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'is_used',
                   'filename_template', 'is_used_in_condition', 'url')
 
-    is_used = fields.Function(lambda ft: EditingRevisionFile.query.with_parent(ft).has_rows())
+    is_used = fields.Function(
+        lambda ft: (
+            EditingRevisionFile.query.with_parent(ft).has_rows() or
+            (ft.paper_file_type is not None and
+             PaperFile.query.filter(PaperFile.file_type_id == ft.paper_file_type.id).has_rows())
+        )
+    )
     is_used_in_condition = fields.Function(lambda ft: EditingReviewCondition.query.with_parent(ft).has_rows())
     url = fields.Function(lambda ft: url_for('.api_edit_file_type',
                                              ft.event, type=ft.type.name,

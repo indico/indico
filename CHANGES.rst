@@ -117,6 +117,7 @@ Improvements
   registration (:pr:`7434`, thanks :user:`moliholy`)
 - Add support for anonymous accompanying persons (numeric count only) in registration form
   (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
+- Auto submit paper for editing after peer review is accepted (:pr:`7444`)
 
 Bugfixes
 ^^^^^^^^

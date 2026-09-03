@@ -1,0 +1,37 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+@use 'base/typography' as *;
+
+.toolbar-checkbox {
+  @include font-family-body();
+  color: $dark-gray !important;
+
+  margin-top: 0.4rem;
+  padding-right: 1rem;
+
+  align-self: center;
+}
+
+.toolbar-checkbox--no-padding {
+  padding-right: 0;
+}
+
+.informative-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-right: 1rem;
+}
+
+.informative-icon {
+  color: $pastel-red;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}

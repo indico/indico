@@ -12,8 +12,12 @@ from indico.core.db import db
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.editing.clone import EditingSettingsCloner
+from indico.modules.events.editing.models.editable import EditableType
+from indico.modules.events.editing.models.revisions import RevisionType
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
+from indico.modules.files.models.files import File
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -112,6 +116,45 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(title=_('Posters'), name='editing_posters', parent='editing',
                         endpoint='event_editing.editable_type_list', position=2,
                         visible=_make_visible(EditableType.poster), url_kwargs={'type': 'poster'})
+
+
+@signals.event.core.paper_accepted.connect
+def _create_editable_on_paper_accept(event, contribution, files, **kwargs):
+    from indico.modules.events.editing.operations import create_new_editable
+
+    if contribution.get_editable(EditableType.paper):
+        return
+
+    files_by_type = {}
+    for paper_file in files:
+        if not paper_file.file_type or not (editing_file_type := paper_file.file_type.source_editing_file_type):
+            continue
+
+        with paper_file.open() as f:
+            editing_file = File.create_from_stream(
+                f,
+                filename=paper_file.filename,
+                content_type=paper_file.content_type,
+                context=('event', event.id, 'editing', contribution.id, editing_file_type.name)
+            )
+
+        files_by_type.setdefault(editing_file_type, []).append(editing_file)
+
+    if not files_by_type:
+        return
+
+    user = User.get_system_user()
+    try:
+        create_new_editable(
+            contribution,
+            EditableType.paper,
+            user,
+            files_by_type,
+            RevisionType.ready_for_review
+        )
+    except Exception:
+        logger.exception('Failed to create editable for accepted paper, in contribution %r',
+                         contribution.verbose_title)
 
 
 class EditingManagerPermission(ManagementPermission):

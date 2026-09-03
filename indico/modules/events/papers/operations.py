@@ -10,9 +10,11 @@ from operator import attrgetter
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.operations import FILE_TYPE_ATTRS
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.file_types import PaperFileType
@@ -29,7 +31,8 @@ from indico.modules.events.papers.notifications import (notify_added_to_reviewin
                                                         notify_paper_review_submission,
                                                         notify_paper_revision_submission,
                                                         notify_removed_from_reviewing_team)
-from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
+from indico.modules.events.papers.settings import (PaperReviewingRole, paper_reviewing_settings,
+                                                   paper_submission_settings)
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
@@ -193,12 +196,17 @@ def judge_paper(paper, judgment, comment, judge):
     paper.last_revision.judge = judge
     paper.last_revision.judgment_dt = now_utc()
     db.session.flush()
+
     log_data = {'New state': orig_string(judgment.title)}
     notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event.log(EventLogRealm.reviewing, LogKind.change, 'Papers',
                     f'Paper "{orig_string(paper.verbose_title)}" was judged', judge,
                     data=log_data)
+    if judgment == PaperAction.accept and paper_submission_settings.get(paper.event, 'auto_submission_to_editing'):
+        signals.event.paper_accepted.send(
+            paper.event, contribution=paper.contribution, files=paper.last_revision.files
+        )
 
 
 def reset_paper_state(paper):
@@ -411,3 +419,32 @@ def delete_file_type(file_type):
     file_type.log(EventLogRealm.management, LogKind.negative, 'Papers', f'File type {file_type.name} deleted',
                   session.user)
     db.session.delete(file_type)
+
+
+def sync_file_types_with_editing(event):
+    editing_paper_file_types = [
+        editable_ft for editable_ft in event.editing_file_types if editable_ft.type == EditableType.paper
+    ]
+    existing_synced_file_types = {
+        paper_ft.source_editing_file_type_id: paper_ft
+        for paper_ft in event.paper_file_types
+        if paper_ft.source_editing_file_type_id is not None
+    }
+
+    for editing_ft in editing_paper_file_types:
+        editing_ft_dict = editing_ft.to_dict()
+        if editing_ft.id in existing_synced_file_types:
+            synced_paper_ft = existing_synced_file_types.pop(editing_ft.id)
+            update_file_type(synced_paper_ft, **editing_ft_dict)
+        else:
+            new_paper_ft = create_new_file_type(event, **editing_ft_dict)
+            new_paper_ft.source_editing_file_type_id = editing_ft.id
+
+    for orphan in existing_synced_file_types.values():
+        delete_file_type(orphan)
+
+
+@signals.event.core.editing_file_types_changed.connect
+def sync_file_types_on_editing_file_types_changed(event, **kwargs):
+    if paper_submission_settings.get(event, 'auto_submission_to_editing'):
+        sync_file_types_with_editing(event)

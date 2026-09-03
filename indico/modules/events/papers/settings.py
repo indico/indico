@@ -74,3 +74,8 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
 }, acls={
     'authorized_submitters'
 })
+
+
+paper_submission_settings = EventSettingsProxy('paper_submission', {
+    'auto_submission_to_editing': False,
+})
