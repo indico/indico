@@ -95,16 +95,16 @@ def test_unknown_non_plugin_key_warns_at_load(write_config):
 
 def test_unclaimed_plugin_key_warns(write_config):
     write_config("PLUGINS = {'demo'}\nPLUGIN_DEMO_BOGUS = 'x'\n")
-    data = load_config()
+    cfg = IndicoConfig(load_config())
     with pytest.warns(UserWarning, match='PLUGIN_DEMO_BOGUS'):
-        config_module._warn_unclaimed_plugin_config(data)
+        cfg.validate()
 
 
 def test_claimed_plugin_key_not_warned(write_config, recwarn):
     write_config("PLUGINS = {'demo'}\nPLUGIN_DEMO_API_KEY = 'secret'\n")
     cfg = IndicoConfig(load_config())
     cfg.register_plugin_config(_FakePlugin('demo', {'API_KEY': None}))
-    config_module._warn_unclaimed_plugin_config(cfg.data)
+    cfg.validate()
     assert not any('PLUGIN_DEMO_API_KEY' in str(w.message) for w in recwarn.list)
 
 
