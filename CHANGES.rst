@@ -117,6 +117,7 @@ Improvements
   registration (:pr:`7434`, thanks :user:`moliholy`)
 - Add support for anonymous accompanying persons (numeric count only) in registration form
   (:issue:`7383`, :pr:`7427`, thanks :user:`mkreuzmayr, andi1479`)
+- Add option to limit the number of review rounds in Paper Reviewing (:pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
