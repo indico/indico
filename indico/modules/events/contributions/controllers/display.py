@@ -51,6 +51,12 @@ def _author_page_active(event):
 
 
 class RHContributionDisplayBase(RHDisplayEventBase):
+    """Base class for contribution-related endpoints.
+
+    This requires the user to have access to see the contribution, but not necessarily
+    to be logged in.
+    """
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
@@ -73,6 +79,19 @@ class RHContributionDisplayBase(RHDisplayEventBase):
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
         self.contrib = Contribution.get_or_404(request.view_args['contrib_id'], is_deleted=False)
+
+
+class RHAuthenticatedContributionDisplayBase(RHContributionDisplayBase):
+    """Base class for contribution-related endpoints that require the user to be logged in.
+
+    Like :class:`RHContributionDisplayBase this requires the user to have access to see
+    the contribution, but they also need to be authenticated.
+    """
+
+    def _check_access(self):
+        RHContributionDisplayBase._check_access(self)
+        if not session.user:
+            raise Forbidden
 
 
 class RHDisplayProtectionBase(RHDisplayEventBase):
