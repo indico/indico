@@ -1204,10 +1204,8 @@ applied when omitted, unknown ``PLUGIN_*`` keys produce an "Ignoring unknown
 config key" warning, and ``INDICO_CONF_OVERRIDE`` can override them. The
 ``PLUGIN_*`` namespace is reserved for plugins; core config keys never use it.
 
-If a plugin declares a key that collides with a core config key, the plugin
-default is ignored and a warning is emitted; the core default stays
-authoritative. If two plugins declare the same prefixed key, starting Indico
-raises a ``RuntimeError``.
+If two plugins declare the same prefixed key, starting Indico raises a
+``RuntimeError``.
 
 
 .. data:: CATEGORY_CLEANUP
