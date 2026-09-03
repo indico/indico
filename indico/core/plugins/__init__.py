@@ -156,8 +156,8 @@ class IndicoPlugin(Plugin):
 
         ``self.plugin_config.API_KEY`` reads ``config.PLUGIN_<NAME>_API_KEY``.
         """
-        from indico.core.config import config
-        return PluginConfigProxy(config, f'PLUGIN_{self.name.upper()}')
+        from indico.core.config import PLUGIN_CONFIG_PREFIX, config
+        return PluginConfigProxy(config, f'{PLUGIN_CONFIG_PREFIX}{self.name.upper()}')
 
     @cached_property
     def translation_path(self):
