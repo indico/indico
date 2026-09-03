@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'next_gen_ui_2026/styles/base/reset';
-@use 'next_gen_ui_2026/styles/base' as *;
+@use 'NGUI/styles/base/reset';
+@use 'NGUI/styles/base' as *;
 
 .indico-ui {
   @include typography('text-sm', 'regular'); // 14 px
