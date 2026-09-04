@@ -16,6 +16,7 @@ from pathlib import Path
 
 import click
 import dateutil.parser
+import yaml
 from babel.dates import format_date
 from dateutil.relativedelta import relativedelta
 from packaging.version import Version
@@ -105,18 +106,18 @@ def _set_version(version, dry_run=False):
         init_py.write_text(content)
 
 
-def _set_changelog_date(new_version, dry_run=False):
+def _set_changelog_date(new_version: str, release_date: date, dry_run=False):
     changes_rst = Path('CHANGES.rst')
     orig = content = changes_rst.read_text()
     version_line = f'Version {new_version}'
     underline = '-' * len(version_line)
     unreleased = re.escape('Unreleased')
-    release_date = format_date(format='MMMM dd, yyyy', locale='en')
+    formatted_date = format_date(release_date, format='MMMM dd, yyyy', locale='en')
     content = re.sub(fr'(?<={re.escape(version_line)}\n{underline}\n\n\*){unreleased}(?=\*\n)',
-                     f'Released on {release_date}',
+                     f'Released on {formatted_date}',
                      content,
                      flags=re.DOTALL)
-    step('Setting release date to {}', release_date, dry_run=dry_run)
+    step('Setting release date to {}', formatted_date, dry_run=dry_run)
     if content == orig:
         fail('Could not update changelog - is there an entry for {}?', new_version)
     if not dry_run:
@@ -267,16 +268,46 @@ def _update_security_md(*, dry_run: bool = False):
         security_md.write_text(updated_content)
 
 
+def _get_available_languages() -> list[str]:
+    """Get the list of officially supported languages."""
+    translations_dir = Path('indico/translations')
+    babel_locales = [p.name for p in translations_dir.iterdir() if p.is_dir()]
+    # This skips canonicalization, but it should be good enough for our needs
+    bcp47_locales = [locale.replace('_', '-') for locale in babel_locales]
+    return sorted(bcp47_locales)
+
+
+def _update_publiccode_yml(new_version: str, release_date: date, *, dry_run: bool = False):
+    """Update publiccode.yml."""
+    class Dumper(yaml.Dumper):
+        def increase_indent(self, flow=False, indentless=False):
+            return super().increase_indent(flow, indentless=False)
+
+    publiccode_yml = Path('publiccode.yml')
+    content = publiccode_yml.read_text()
+    updated_yaml = yaml.safe_load(content)
+    updated_yaml['softwareVersion'] = new_version
+    updated_yaml['releaseDate'] = release_date.isoformat()
+    updated_yaml['localisation']['availableLanguages'] = _get_available_languages()
+    updated_content = yaml.dump(updated_yaml, Dumper=Dumper, sort_keys=False, allow_unicode=True)
+    if dry_run:
+        _show_diff(content, updated_content, publiccode_yml.name)
+    else:
+        publiccode_yml.write_text(updated_content)
+
+
 @click.command()
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
 @click.option('--sign', '-s', is_flag=True, help='Sign the Git commit/tag with GPG')
 @click.option('--no-assets', '-D', is_flag=True, help='Skip building assets when building the wheel')
 @click.option('--no-changelog', '-C', is_flag=True, help='Do not update the date in the changelog')
+@click.option('--no-publiccode', '-P', is_flag=True, help='Do not update publiccode.yml')
 @click.option('--next-changelog', '-N', is_flag=True, help='Add changelog stub for next version')
-def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
+def cli(version, dry_run, sign, no_assets, no_changelog, no_publiccode, next_changelog):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     cur_version, new_version, next_version = _get_versions(version)
+    release_date = date.today()
     _check_tag(new_version)
     if next_version:
         _check_tag(next_version)
@@ -288,7 +319,9 @@ def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
     if next_version:
         info('Next version will be {}', next_version)
     if not no_changelog:
-        _set_changelog_date(new_version, dry_run=dry_run)
+        _set_changelog_date(new_version, release_date, dry_run=dry_run)
+    if not no_publiccode:
+        _update_publiccode_yml(new_version, release_date, dry_run=dry_run)
     _update_security_md(dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
     release_msg = f'Release {new_version}'
