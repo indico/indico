@@ -34,6 +34,40 @@
 //
 // Note that the calculations do not account for elastic scroll.
 
+// `position: fixed` resolves `top`/`left` against the layout viewport — UNLESS an
+// ancestor establishes a containing block for fixed descendants (a `transform`,
+// `filter`, `perspective`, a `will-change` naming one of those, or paint/layout
+// containment). When that happens — e.g. a tooltip rendered inside a Popper-
+// positioned popup, which is placed with a transform — the target's `top`/`left`
+// are measured from that ancestor's padding box instead of the viewport, so the
+// viewport coordinates the strategies compute land in the wrong place. We shift
+// them back by the ancestor's position. With no such ancestor (every normal
+// tooltip/dropdown) the offset is zero and behavior is unchanged.
+//
+// This compensates for the ancestor's translation, which covers the real cases
+// (popups, dropdowns, animated containers). A scaled or rotated container would
+// need full transform-matrix inversion, which we don't attempt here.
+function getFixedContainingBlockOffset(target) {
+  for (let node = target.parentElement; node; node = node.parentElement) {
+    const styles = getComputedStyle(node);
+    const establishesContainingBlock =
+      styles.transform !== 'none' ||
+      styles.perspective !== 'none' ||
+      (styles.filter !== undefined && styles.filter !== 'none') ||
+      styles.willChange
+        .split(',')
+        .some(p => ['transform', 'perspective', 'filter'].includes(p.trim())) ||
+      /\b(paint|layout|strict|content)\b/.test(styles.contain);
+    if (establishesContainingBlock) {
+      const rect = node.getBoundingClientRect();
+      // The containing block for fixed/absolute is the padding box, so step in
+      // past the border.
+      return {top: rect.top + node.clientTop, left: rect.left + node.clientLeft};
+    }
+  }
+  return {top: 0, left: 0};
+}
+
 const geometry = {
   setAnchorGeometry() {
     this.anchorRect ??= this.anchor.getBoundingClientRect();
@@ -65,6 +99,9 @@ const geometry = {
     // without forced reflow.
     this.initialScrollTop = this.getScrollTop();
     this.initialScrollLeft = this.getScrollLeft();
+    // Offset of the target's fixed containing block (zero unless a transformed
+    // ancestor is in play); see getFixedContainingBlockOffset.
+    this.containingBlockOffset ??= getFixedContainingBlockOffset(this.target);
   },
   resetGeometry(callback) {
     delete this.anchorRect;
@@ -79,6 +116,7 @@ const geometry = {
     delete this.targetHeight;
     delete this.initialScrollTop;
     delete this.initialScrollLeft;
+    delete this.containingBlockOffset;
 
     this.setAnchorGeometry();
     requestAnimationFrame(() => {
@@ -88,11 +126,17 @@ const geometry = {
   },
   setTop(top) {
     const scrollOffset = this.getScrollTop() - this.initialScrollTop;
-    this.target.style.setProperty('--target-top', `${top - scrollOffset}px`);
+    this.target.style.setProperty(
+      '--target-top',
+      `${top - scrollOffset - this.containingBlockOffset.top}px`
+    );
   },
   setLeft(left) {
     const scrollOffset = this.getScrollLeft() - this.initialScrollLeft;
-    this.target.style.setProperty('--target-left', `${left - scrollOffset}px`);
+    this.target.style.setProperty(
+      '--target-left',
+      `${left - scrollOffset - this.containingBlockOffset.left}px`
+    );
   },
 };
 

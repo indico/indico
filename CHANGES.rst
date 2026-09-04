@@ -203,6 +203,10 @@ Accessibility
   download, theme, favourite and management) now have reliable accessible names
   and tooltips that also appear on keyboard focus, instead of relying on the
   ``title`` attribute (:issue:`7623`, :pr:`7689`, thanks :user:`foxbunny`)
+- The calendar export button on the dashboard, and the copy and download buttons
+  in the export popup, now have accessible names and show a tooltip on keyboard
+  focus instead of relying on the ``title`` attribute (:pr:`7609`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
