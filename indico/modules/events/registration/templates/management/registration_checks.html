@@ -1,0 +1,70 @@
+{% macro render_registration_checks(checks) %}
+    {% set time_zone = registration.event.tzinfo %}
+    <table class="i-table-widget">
+        <tr>
+            <th>{% trans -%}Check type{%- endtrans %}</th>
+            <th>{% trans -%}Check frequency{%- endtrans %}</th>
+            <th>{% trans -%}Action{%- endtrans %}</th>
+            <th>{% trans -%}Date{%- endtrans %}</th>
+            <th>{% trans -%}Performed by{%- endtrans %}</th>
+            <th></th>
+        </tr>
+        {% for check in checks %}
+            <tr>
+                <td>
+                    {{ check.check_type.title }}
+                </td>
+                <td>
+                    {{check.check_type.rule.title}}
+                </td>
+                <td>
+                    {{ 'Checked-out' if check.is_check_out else 'Checked-in' }}
+                </td>
+                <td>
+                    {% trans checked_dt=check.timestamp|format_datetime(timezone=time_zone) -%}
+                        {{ checked_dt }}
+                    {%- endtrans %}
+                </td>
+                <td>
+                    {{ check.checked_by_user.name if check.checked_by_user }}
+                </td>
+                <td>
+                    <button class="icon-remove i-button text-color borderless warning"
+                            data-method="POST"
+                            data-href="{{ url_for('.delete_registration_check', check) }}"
+                            data-reload-after
+                            title="{% trans %}Delete check{% endtrans %}"
+                            data-confirm="{% trans %}Do you really want to delete this check? Once deleted, this record cannot be recovered{% endtrans %}">
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endmacro %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width">
+        <div class="i-box">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Registration Checks for{% endtrans %}
+                    {{ registration.full_name }}
+                </div>
+            </div>
+            <div class="i-box-content">
+                {{ render_registration_checks(registration.checks) }}
+            </div>
+            <div class="i-box-content" style="margin-top: 10px">
+                <span>{% trans %}You may additionally reset the registration checked state by deleting all past checks{%endtrans%}</span>
+                <button class="i-button danger"
+                        data-method="POST"
+                        data-href="{{ url_for('.reset_registration_checks', registration) }}"
+                        data-reload-after
+                        title="{% trans %}Delete all checks{% endtrans %}"
+                        data-confirm="{% trans %}Do you really want to delete all checks for this registration? Once reset, the checks cannot be recovered{% endtrans %}">
+                    {% trans %}Reset checks{% endtrans %}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
