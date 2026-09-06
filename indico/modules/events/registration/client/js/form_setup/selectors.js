@@ -83,3 +83,24 @@ export const isFieldConditionFor = createSelector(
   getItemById,
   item => !!item.showIfConditionForTransitive.length
 );
+
+/** Get the IDs of the sections containing fields that are used as conditions for other fields */
+const getSectionIdsWithConditionalFields = createSelector(
+  getItems,
+  items =>
+    new Set(
+      Object.values(items)
+        .filter(item => item.showIfConditionForTransitive.length > 0)
+        .map(item => item.sectionId)
+    )
+);
+
+/** Return whether a section contains any fields that are used as conditions for other fields. */
+export const sectionHasConditionalFields = (state, sectionId) =>
+  getSectionIdsWithConditionalFields(state).has(sectionId);
+
+/** Return whether a field's show_if_field is disabled. */
+export const showIfFieldDisabled = createSelector(
+  getItemById,
+  item => !!item && item.isShowIfFieldDisabled
+);

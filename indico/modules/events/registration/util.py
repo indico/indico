@@ -175,6 +175,12 @@ def get_flat_section_positions_setup_data(regform):
     return {'sections': section_data, 'items': item_data}
 
 
+def get_condition_items_view_data(items):
+    for item in items:
+        db.session.expire(item, ['show_if_field', 'condition_for'])
+    return [item.view_data for item in items]
+
+
 @make_interceptable
 def get_flat_section_submission_data(regform, *, management=False, registration=None):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.active_sections
@@ -1255,6 +1261,9 @@ def process_registration_picture(source, *, thumbnail=False, target_format='JPEG
 def is_conditional_field_shown(field, data, *, is_db_data=False):
     # not conditional
     if not field.show_if_field:
+        return True
+    # condition field (or its section) is disabled, so the condition is not in effect
+    if field.is_show_if_field_disabled:
         return True
     # condition field has no data
     if (show_if_data := data.get(field.show_if_id)) is None:
