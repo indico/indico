@@ -218,10 +218,11 @@ export default function TimetableSessionsInput({
   minimum,
   maximum,
 }) {
-  const {eventId} = useSelector(getStaticData);
+  const {targetLocator} = useSelector(getStaticData);
+  const isTemplateForm = 'category_id' in targetLocator;
   const management = useSelector(getManagement);
   const {data: sessionData} = useIndicoAxios(
-    {url: sessionBlocksURL({event_id: eventId, force_event_tz: management})},
+    {url: isTemplateForm ? '' : sessionBlocksURL({...targetLocator, force_event_tz: management})},
     {camelize: true}
   );
 

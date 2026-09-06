@@ -10,7 +10,6 @@ from flask.helpers import flash
 from marshmallow import fields
 
 from indico.core.db import db
-from indico.modules.events import EventLogRealm
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import RegistrationPrivacyForm
@@ -24,9 +23,10 @@ from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 
 
-class RHRegistrationPrivacy(RHManageRegFormBase):
+class RegistrationPrivacyMixin:
     """Change privacy settings of a registration form."""
 
+    view_class = None
     _log_fields = {
         'publish_registrations_participants': {'title': 'Visibility to participants'},
         'publish_registrations_public': {'title': 'Visibility to everyone'},
@@ -37,7 +37,6 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
 
     def _process(self):
         form = RegistrationPrivacyForm(
-            event=self.event,
             regform=self.regform,
             retention_period=self.regform.retention_period,
             require_privacy_policy_agreement=self.regform.require_privacy_policy_agreement,
@@ -51,14 +50,20 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
         if form.validate_on_submit():
             changes = self.regform.populate_from_dict(form.data)
             db.session.flush()
-            self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
-                           f'Privacy settings for "{self.regform.title}" modified', session.user,
-                           data={'Changes': make_diff_log(changes, self._log_fields)})
+            self.regform.log(self.log_realm, LogKind.change, 'Privacy',
+                             f'Privacy settings for "{self.regform.title}" modified', session.user,
+                             data={'Changes': make_diff_log(changes, self._log_fields)})
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.manage_registration_privacy_settings', self.regform))
 
-        return WPManageRegistration.render_template('management/regform_privacy.html', self.event,
-                                                    regform=self.regform, form=form)
+        return self.view_class.render_template('management/regform_privacy.html', self.target,
+                                               regform=self.regform, form=form)
+
+
+class RHRegistrationPrivacy(RegistrationPrivacyMixin, RHManageRegFormBase):
+    """Change privacy settings of a registration form in an event."""
+
+    view_class = WPManageRegistration
 
 
 class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):

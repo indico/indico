@@ -11,7 +11,7 @@ from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import UUID as pg_UUID  # noqa: N811
 from sqlalchemy.event import listens_for
-from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
@@ -51,6 +51,9 @@ class RegistrationForm(db.Model):
                       db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
                       db.CheckConstraint('publish_registrations_public <= publish_registrations_participants',
                                          name='publish_registrations_more_restrictive_to_public'),
+                      db.CheckConstraint('(event_id IS NULL) != (category_id IS NULL)',
+                                         name='event_xor_category_id_null'),
+                      db.CheckConstraint('template_id != id', name='not_created_from_self'),
                       {'schema': 'event_registration'})
 
     #: The ID of the object
@@ -63,7 +66,21 @@ class RegistrationForm(db.Model):
         db.Integer,
         db.ForeignKey('events.events.id'),
         index=True,
-        nullable=False
+        nullable=True
+    )
+    #: The ID of the category
+    category_id = db.Column(
+        db.Integer,
+        db.ForeignKey('categories.categories.id'),
+        index=True,
+        nullable=True
+    )
+    #: The id of the parent form
+    template_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.forms.id', ondelete='SET NULL'),
+        nullable=True,
+        index=True,
     )
     #: The title of the registration form
     title = db.Column(
@@ -323,6 +340,29 @@ class RegistrationForm(db.Model):
             lazy=True
         )
     )
+    #: The Category containing this registration form
+    category = db.relationship(
+        'Category',
+        lazy=True,
+        backref=db.backref(
+            'registration_forms',
+            primaryjoin='(RegistrationForm.category_id == Category.id) & ~RegistrationForm.is_deleted',
+            cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+    #: The template form this one was created from
+    template = db.relationship(
+        'RegistrationForm',
+        lazy=True,
+        remote_side='RegistrationForm.id',
+        backref=db.backref(
+            'instances',
+            lazy=True,
+            passive_deletes=True,
+            order_by=start_dt
+        )
+    )
     #: The template used to generate tickets
     ticket_template = db.relationship(
         'DesignerTemplate',
@@ -374,6 +414,7 @@ class RegistrationForm(db.Model):
     # - in_event_acls (EventPrincipal.registration_form)
     # - in_menu_entry_acls (MenuEntryPrincipal.registration_form)
     # - in_session_acls (SessionPrincipal.registration_form)
+    # - instances (RegistrationForm.template)
     # - reminders (EventReminder.forms)
 
     def __contains__(self, user):
@@ -461,9 +502,25 @@ class RegistrationForm(db.Model):
     def is_scheduled(cls):
         return ~cls.is_deleted & cls.start_dt.isnot(None)
 
+    @hybrid_property
+    def is_template(self):
+        return self.event_id is None
+
+    @is_template.expression
+    def is_template(cls):
+        return cls.event_id.is_(None)
+
+    @hybrid_property
+    def owner(self):
+        return self.event or self.category
+
+    @owner.comparator
+    def owner(cls):
+        return _OwnerComparator(cls)
+
     @locator_property
     def locator(self):
-        return dict(self.event.locator, reg_form_id=self.id)
+        return dict(self.owner.locator, reg_form_id=self.id)
 
     @locator.token
     def locator(self):
@@ -542,7 +599,7 @@ class RegistrationForm(db.Model):
         return ~cls.is_deleted & (cls.publish_registrations_public != PublishRegistrationsMode.hide_all)
 
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', is_deleted=False, _text=self.title)
+        return format_repr(self, 'id', 'event_id', 'category_id', is_deleted=False, _text=self.title)
 
     def is_modification_allowed(self, registration):
         """Check whether a registration may be modified."""
@@ -633,7 +690,7 @@ class RegistrationForm(db.Model):
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the regform."""
-        return self.event.log(*args, meta={'registration_form_id': self.id}, **kwargs)
+        return self.owner.log(*args, meta={'registration_form_id': self.id}, **kwargs)
 
 
 @listens_for(orm.mapper, 'after_configured', once=True)
@@ -657,3 +714,20 @@ def _mappers_configured():
              .correlate_except(Registration)
              .scalar_subquery())
     RegistrationForm.checked_in_registrations_count = column_property(query, deferred=True)
+
+
+class _OwnerComparator(Comparator):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __clause_element__(self):
+        # just in case
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        if isinstance(other, db.m.Event):
+            return self.cls.event == other
+        elif isinstance(other, db.m.Category):
+            return self.cls.category == other
+        else:
+            raise TypeError(f'Unexpected object type {type(other)}: {other}')

@@ -21,7 +21,7 @@ from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
 
-class RHManageRegFormSectionBase(RHManageRegFormBase):
+class ManageRegFormSectionBaseMixin:
     """Base class for a specific registration form section."""
 
     normalize_url_spec = {
@@ -31,11 +31,10 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
     }
 
     def _process_args(self):
-        RHManageRegFormBase._process_args(self)
         self.section = RegistrationFormSection.get_or_404(request.view_args['section_id'])
 
 
-class RHRegistrationFormAddSection(RHManageRegFormBase):
+class RegistrationFormAddSectionMixin:
     """Add a section to the registration form."""
 
     def _process(self):
@@ -54,7 +53,7 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
         return jsonify(section.view_data)
 
 
-class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
+class RegistrationFormModifySectionMixin:
     """Delete/modify a section."""
 
     def _process_DELETE(self):
@@ -107,7 +106,7 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         return jsonify(self.section.view_data)
 
 
-class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
+class RegistrationFormToggleSectionMixin:
     """Enable/disable a section."""
 
     def _process_POST(self):
@@ -138,7 +137,7 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
                             positions=get_flat_section_positions_setup_data(self.regform))
 
 
-class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
+class RegistrationFormMoveSectionMixin:
     """Move a section within the registration form."""
 
     def _process(self):
@@ -166,3 +165,27 @@ class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):
             section.position = pos
         db.session.flush()
         return jsonify(success=True)
+
+
+class RHManageRegFormSectionBase(ManageRegFormSectionBaseMixin, RHManageRegFormBase):
+    """Base class for a specific registration form section in an event."""
+
+    def _process_args(self):
+        RHManageRegFormBase._process_args(self)
+        ManageRegFormSectionBaseMixin._process_args(self)
+
+
+class RHRegistrationFormAddSection(RegistrationFormAddSectionMixin, RHManageRegFormBase):
+    """Add a section to the registration form inside an event."""
+
+
+class RHRegistrationFormModifySection(RegistrationFormModifySectionMixin, RHManageRegFormSectionBase):
+    """Delete/modify a section inside an event."""
+
+
+class RHRegistrationFormToggleSection(RegistrationFormToggleSectionMixin, RHManageRegFormSectionBase):
+    """Enable/disable a section inside an event."""
+
+
+class RHRegistrationFormMoveSection(RegistrationFormMoveSectionMixin, RHManageRegFormSectionBase):
+    """Move a section within the registration form inside an event."""

@@ -161,6 +161,14 @@ def get_country_field(regform):
                      x.personal_data_type == PersonalDataType.country)), None)
 
 
+def get_regform_templates_for_event(event):
+    """Get all template regforms for an event."""
+    return (RegistrationForm.query
+            .filter(~RegistrationForm.is_deleted,
+                    RegistrationForm.category_id.in_(event.category_chain))
+            .order_by(db.func.lower(RegistrationForm.title), RegistrationForm.id))
+
+
 def get_flat_section_setup_data(regform):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
     item_data = {f.id: f.view_data for f in regform.form_items

@@ -52,10 +52,10 @@ export const pickItemURL = createSelector(
 export const getURLParams = createSelector(
   getStaticData,
   staticData => {
-    const {eventId, regformId} = staticData;
+    const {targetLocator, regformId} = staticData;
     return (sectionId = null, itemId = null) => {
       const params = {
-        event_id: eventId,
+        ...targetLocator,
         reg_form_id: regformId,
       };
 
@@ -82,4 +82,18 @@ export const getDataRetentionRange = createSelector(
 export const isFieldConditionFor = createSelector(
   getItemById,
   item => !!item.showIfConditionForTransitive.length
+);
+
+export const getURLFromTarget = createSelector(
+  getStaticData,
+  staticData => (eventEndpoint, categoryEndpoint) => {
+    const {targetLocator} = staticData;
+    if (targetLocator.event_id) {
+      return eventEndpoint;
+    }
+    if (targetLocator.category_id) {
+      return categoryEndpoint;
+    }
+    throw new Error(`Cannot resolve url from target locator: ${JSON.stringify(targetLocator)}`);
+  }
 );

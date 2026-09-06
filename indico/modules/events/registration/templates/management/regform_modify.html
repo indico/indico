@@ -12,9 +12,9 @@
 
 {% block content %}
     <div id="registration-form-setup-container"
-         data-event-id="{{ event.id }}"
-         data-event-start-date="{{ event.start_dt_local.date() }}"
-         data-event-end-date="{{ event.end_dt_local.date() }}"
+         data-target-locator="{{ target_locator | tojson | forceescape }}"
+         data-event-start-date="{{ regform.event.start_dt_local.date() if not regform.is_template else none }}"
+         data-event-end-date="{{ regform.event.end_dt_local.date() if not regform.is_template else none }}"
          data-regform-id="{{ regform.id }}"
          data-currency="{{ regform.currency }}"
          data-tickets-for-accompanying-persons="{{ regform.tickets_for_accompanying_persons | tojson | forceescape }}"

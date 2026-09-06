@@ -14,12 +14,25 @@ from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.logs.models.entries import EventLogRealm
 
 
 class RHManageRegFormsBase(RHManageEventBase):
     """Base class for all registration management RHs."""
 
     PERMISSION = 'registration'
+
+    @property
+    def target(self):
+        return self.event
+
+    @property
+    def target_dict(self):
+        return {'event': self.event}
+
+    @property
+    def log_realm(self):
+        return EventLogRealm.management
 
 
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
