@@ -222,6 +222,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const handleSubmit = async (data: any, form: any) => {
+    data = {...data};
     const sessionObj = data.session_object;
     delete data.session_object;
 
