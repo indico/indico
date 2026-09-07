@@ -9,7 +9,6 @@ from marshmallow import EXCLUDE, fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionRESTSchema, TimezoneAwareSessionBlockSchema
-from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import SessionColorSchema
@@ -73,8 +72,6 @@ class ContributionSchema(ContributionRESTSchema):
             'attachments',
         )
 
-    # TODO sync person_links code with parent schema and remove here
-    person_links = NonPartialNested(_ContributionPersonLinkSchema(many=True, unknown=EXCLUDE))
     location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
     session_block_id = fields.Integer(allow_none=True)

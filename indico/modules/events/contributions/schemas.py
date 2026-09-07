@@ -187,11 +187,7 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
 
     id = fields.Int(dump_only=True)
     start_dt = EventTimezoneDateTimeField()
-    # TODO use List+NonPartialNested
-    person_links = fields.Nested(
-        _ContributionPersonLinkSchema(many=True, partial=False),
-        unknown=EXCLUDE
-    )
+    person_links = fields.List(NonPartialNested(_ContributionPersonLinkSchema, unknown=EXCLUDE))
     references = fields.List(NonPartialNested(ContributionReferenceSchema))
     location_data = NonPartialNested(LocationDataSchema)
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)

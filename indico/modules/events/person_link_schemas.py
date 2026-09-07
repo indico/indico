@@ -233,16 +233,10 @@ class ContributionPersonLinkSchema(PersonLinkBaseSchema):
             data['roles'].append('submitter')
         return data
 
-    @post_load(pass_many=True, pass_original=True)
-    def add_submitter_info(self, data, orig, many, **kwargs):
-        if not many:
-            data = [data]
-            orig = [orig]
-        person_links = []
-        for person_link, original_data in zip(data, orig, strict=True):
-            roles = original_data['roles']
-            person_links.append({'person_link': person_link, 'is_submitter': is_submitter(roles)})
-        return person_links
+    @post_load(pass_original=True)
+    def add_submitter_info(self, data, orig, **kwargs):
+        roles = orig['roles']
+        return {'person_link': data, 'is_submitter': is_submitter(roles)}
 
 
 class SubContributionPersonLinkSchema(PersonLinkBaseSchema):
