@@ -224,7 +224,9 @@ class ContributionPersonLinkSchema(PersonLinkBaseSchema):
 
     @post_dump(pass_original=True)
     def add_roles(self, data, orig, **kwargs):
-        data['roles'] = [orig.author_type.name]
+        data['roles'] = []
+        if orig.author_type:
+            data['roles'].append(orig.author_type.name)
         if orig.is_speaker:
             data['roles'].append('speaker')
         if orig.is_submitter:

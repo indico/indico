@@ -61,7 +61,9 @@ class ContributionFieldValueSchema(mm.Schema):
 
 
 def _get_principal_roles(principal):
-    roles = [principal.author_type.name]
+    roles = []
+    if principal.author_type:
+        roles.append(principal.author_type.name)
     if principal.is_speaker:
         roles.append('speaker')
     if principal.contribution and principal.is_submitter:
