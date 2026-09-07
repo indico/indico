@@ -252,7 +252,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
         const updatePayload = getChangedValues(data, form);
-        dispatch(actions.updateEntry(activeType, updatedEntry, currentDay, updatePayload));
+        await dispatch(
+          actions.updateEntry(activeType, updatedEntry, currentDay, updatePayload, false)
+        );
         if (
           (activeType === EntryType.SessionBlock || activeType === EntryType.Contribution) &&
           oldDayKey !== newDayKey
@@ -276,10 +278,10 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           });
         }
       } else {
-        dispatch(actions.createEntry(activeType, data));
+        await dispatch(actions.createEntry(activeType, data));
       }
     } catch (exc) {
-      return handleSubmitError(exc);
+      return handleSubmitError(exc, {}, ['custom_fields']);
     }
 
     onSubmit();
