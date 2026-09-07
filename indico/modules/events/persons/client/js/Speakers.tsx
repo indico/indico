@@ -69,8 +69,9 @@ export function Speakers({eventId}: {eventId: number}) {
       if (selectedSpeaker === undefined) {
         return;
       }
+      let response;
       try {
-        const response = await indicoAxios.post(
+        response = await indicoAxios.post(
           updateSpeakerProfileURL({event_id: eventId, person_id: selectedSpeaker.id}),
           {
             description: formData.description,
@@ -78,15 +79,15 @@ export function Speakers({eventId}: {eventId: number}) {
             ...(formData.photo !== undefined ? {photo: formData.photo} : {}),
           }
         );
-        setOpenedModal(null);
-        setSpeakers(oldSpeakers => [
-          ...oldSpeakers.filter(speaker => speaker.id !== selectedSpeaker.id),
-          response.data,
-        ]);
-        reFetch();
       } catch (e) {
         return handleSubmitError(e);
       }
+      setOpenedModal(null);
+      setSpeakers(oldSpeakers => [
+        ...oldSpeakers.filter(speaker => speaker.id !== selectedSpeaker.id),
+        response.data,
+      ]);
+      reFetch();
     },
     [selectedSpeaker, eventId, reFetch]
   );

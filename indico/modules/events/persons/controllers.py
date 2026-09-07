@@ -366,7 +366,7 @@ class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
 class RHAPISpeaker(RHManageSpeakerProfileBase):
     @use_rh_args({
         'photo': FileField(allow_none=True, validate=file_extension('png', 'jpg', 'jpeg'),
-                           require_file_metadata='speaker_picture_checked'),
+                           metadata={'speaker_picture_checked': True}),
         'description': fields.String(validate=validate.Length(max=1000), required=False),
         'speaker_links': fields.List(
             fields.Nested({
@@ -384,14 +384,13 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
                 args['photo'].claim()
             elif self.person.speaker_photo is not None:
                 self.person.speaker_photo.claimed = False
-                self.person.speaker_photo_file_id = None
+                self.person.speaker_photo = None
         if 'speaker_links' in args:
             new_fields = {}
             for speaker_link in args['speaker_links']:
-                speaker_link_data = self.person.speaker_links.get(
-                    speaker_link['link'].id,
-                    EventSpeakerLinkData(speaker_link_id=speaker_link['link'].id, event_person_id=self.person.id)
-                )
+                speaker_link_data = self.person.speaker_links.get(speaker_link['link'].id)
+                if speaker_link_data is None:
+                    speaker_link_data = EventSpeakerLinkData(speaker_link_id=speaker_link['link'].id)
                 speaker_link_data.data = speaker_link['url']
                 new_fields[speaker_link_data.speaker_link_id] = speaker_link_data
             self.person.speaker_links = new_fields
@@ -402,7 +401,7 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
         self.person.speaker_links = {}
         if self.person.speaker_photo is not None:
             self.person.speaker_photo.claimed = False
-            self.person.speaker_photo_file_id = None
+            self.person.speaker_photo = None
         return jsonify(success=True)
 
 
