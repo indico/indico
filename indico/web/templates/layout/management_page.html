@@ -15,7 +15,12 @@
                 <div class="content-column">
                     <div class="banner {% block banner_class %}{% endblock %}">
                         {% if self.banner_title()|trim %}
-                            <h1 class="title">
+                            {# When the page has no title block, base.html's
+                               <h2 id="main-content"> is not rendered via super(),
+                               so make this banner heading the bypass target. #}
+                            <h1 class="title"
+                                {%- if not self.title()|trim %} id="main-content"
+                                data-bypass-target="{% trans %}Skip to main content{% endtrans %}"{% endif %}>
                                 {% block banner_title %}{% endblock %}
                             </h1>
                         {% endif %}
