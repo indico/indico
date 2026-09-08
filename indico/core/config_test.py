@@ -141,10 +141,10 @@ def test_plugin_config_proxy_reads_prefixed():
     from indico.core.plugins import PluginConfigProxy
 
     class FakeConfig:
-        UN_MFA_ENABLED = True
-        UN_TIMEOUT = 5
+        FOO_MFA_ENABLED = True
+        FOO_TIMEOUT = 5
 
-    proxy = PluginConfigProxy(FakeConfig(), prefix='UN')
+    proxy = PluginConfigProxy(FakeConfig(), prefix='FOO')
     assert proxy.MFA_ENABLED is True
     assert proxy.TIMEOUT == 5
 
@@ -155,6 +155,6 @@ def test_plugin_config_proxy_missing_attr_raises():
     class FakeConfig:
         pass
 
-    proxy = PluginConfigProxy(FakeConfig(), prefix='UN')
+    proxy = PluginConfigProxy(FakeConfig(), prefix='FOO')
     with pytest.raises(AttributeError):
         proxy.NOPE  # noqa: B018
