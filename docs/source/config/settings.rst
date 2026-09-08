@@ -1177,9 +1177,9 @@ System
     Keys are written **unprefixed** in the plugin and exposed in ``indico.conf`` with
     the ``PLUGIN_<NAME>_`` prefix, where ``<NAME>`` is the plugin's entry-point name
     uppercased. For example, plugin ``zoom`` declaring ``API_KEY`` becomes
-    ``PLUGIN_ZOOM_API_KEY``::
+    ``PLUGIN_FOO_API_KEY``::
 
-        class ZoomPlugin(IndicoPlugin):
+        class FooPlugin(IndicoPlugin):
             plugin_config_defaults = {
                 'API_KEY': None,
                 'API_SECRET': None,
@@ -1189,13 +1189,13 @@ System
     In ``indico.conf``::
 
         PLUGINS = {'zoom'}
-        PLUGIN_ZOOM_API_KEY = 'xxxxxxxx'
-        PLUGIN_ZOOM_API_SECRET = 'yyyyyyyy'
+        PLUGIN_FOO_API_KEY = 'xxxxxxxx'
+        PLUGIN_FOO_API_SECRET = 'yyyyyyyy'
 
     Plugin code reads these via the ``plugin_config`` proxy on the plugin
     instance, which strips the prefix::
 
-        self.plugin_config.API_KEY  # reads PLUGIN_ZOOM_API_KEY
+        FooPlugin.plugin_config.API_KEY  # reads PLUGIN_FOO_API_KEY
 
     These keys participate in the same machinery as core settings: defaults are
     applied when omitted, unknown ``PLUGIN_*`` keys produce an "Ignoring unknown
@@ -1203,7 +1203,7 @@ System
     ``PLUGIN_*`` namespace is reserved for plugins; core config keys never use it.
 
     If two plugins declare the same prefixed key, starting Indico raises a
-    ``RuntimeError``.
+    :exc:`RuntimeError`.
 
 .. data:: CATEGORY_CLEANUP
 
