@@ -1192,8 +1192,8 @@ System
         PLUGIN_FOO_API_KEY = 'xxxxxxxx'
         PLUGIN_FOO_API_SECRET = 'yyyyyyyy'
 
-    Plugin code reads these via the ``plugin_config`` proxy on the plugin
-    instance, which strips the prefix::
+    Plugin code reads these via the ``plugin_config`` proxy on the plugin class
+    which strips the prefix::
 
         FooPlugin.plugin_config.API_KEY  # reads PLUGIN_FOO_API_KEY
 
