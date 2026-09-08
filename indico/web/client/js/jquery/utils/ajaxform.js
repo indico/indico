@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showFormErrors, initForms, confirmPrompt, updateHtml, getDropzoneFiles, setDropzoneFiles,
+/* global initForms, confirmPrompt, updateHtml, getDropzoneFiles, setDropzoneFiles,
           handleAjaxError, handleFlashes */
 
 import _ from 'lodash';
@@ -221,7 +221,6 @@ import {$T} from 'indico/utils/i18n';
     function ajaxifyForms(noInit) {
       const forms = formContainer.find('form');
       if (!noInit) {
-        showFormErrors(formContainer);
         initForms(forms);
       }
       forms.each(function() {
