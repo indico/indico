@@ -150,14 +150,15 @@ class IndicoPlugin(Plugin):
         """Return a dictionary with variables to be added to vars.js file."""
         return None
 
-    @property
-    def plugin_config(self):
+    @cached_classproperty
+    @classmethod
+    def plugin_config(cls):
         """Read-only proxy over file-backed config scoped to this plugin.
 
-        ``self.plugin_config.API_KEY`` reads ``config.PLUGIN_<NAME>_API_KEY``.
+        ``cls.plugin_config.API_KEY`` reads ``config.PLUGIN_<NAME>_API_KEY``.
         """
         from indico.core.config import PLUGIN_CONFIG_PREFIX, config
-        return PluginConfigProxy(config, f'{PLUGIN_CONFIG_PREFIX}{self.name.upper()}')
+        return PluginConfigProxy(config, f'{PLUGIN_CONFIG_PREFIX}{cls.name.upper()}')
 
     @cached_property
     def translation_path(self):
