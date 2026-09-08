@@ -121,6 +121,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   sessionId?: number | null;
   boardNumber?: string;
   keywords?: string[];
+  customFields: any;
 }
 
 export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
@@ -194,6 +195,21 @@ export interface Entries {
   draggedIds: Set<number>;
 }
 
+// TODO: merge with the interface in the contribs module, and maybe remove unnecessary
+// stuff from both the interface and the schema used to serialize it
+interface CustomField {
+  id: number;
+  fieldType: 'text' | 'single_choice';
+  fieldData: object;
+  title: string;
+  description: string;
+  isActive: boolean;
+  isRequired: boolean;
+  isUserEditable: boolean;
+  position: number;
+  visibility: 'public' | 'managers_and_submitters' | 'managers_only';
+}
+
 interface StaticData {
   eventId: number;
   startDt: Moment;
@@ -201,6 +217,7 @@ interface StaticData {
   defaultContribDurationMinutes: number;
   eventLocationParent: LocationParent;
   eventType: EventType;
+  customFields: CustomField[];
 }
 
 export interface Navigation {

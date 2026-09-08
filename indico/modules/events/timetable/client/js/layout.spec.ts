@@ -88,6 +88,7 @@ function contrib({
     description: '',
     personLinks: [],
     attachments: [],
+    customFields: {},
     type: EntryType.Contribution,
     duration,
     ...scheduleMixin({time, column, maxColumn}),

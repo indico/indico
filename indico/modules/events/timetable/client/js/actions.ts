@@ -523,9 +523,13 @@ export function updateEntry(
   entryType: EntryType,
   entry: Entry,
   currentDay: string,
-  customPayload: any
+  customPayload: any,
+  optimistic = true
 ) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return async (
+    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
+    getState: () => ReduxState
+  ) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -535,11 +539,18 @@ export function updateEntry(
       [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
     }[entryType];
 
-    const action = synchronizedAjaxAction(
-      () => indicoAxios.patch(updateURL, customPayload),
-      _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
-    );
-    return dispatch(action);
+    if (optimistic) {
+      const action = synchronizedAjaxAction(
+        () => indicoAxios.patch(updateURL, customPayload),
+        _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
+      );
+      return dispatch(action);
+    } else {
+      // eslint-disable-next-line no-use-before-define
+      await requestQueue.ensureEmpty();
+      await indicoAxios.patch(updateURL, customPayload);
+      return dispatch(_updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload)));
+    }
   };
 }
 
@@ -576,6 +587,12 @@ class RequestQueue {
       this._processRequests().catch(error => {
         console.error('Error processing request queue:', error);
       });
+    }
+  }
+
+  async ensureEmpty() {
+    while (this.requests.length) {
+      await new Promise(r => setTimeout(r, 0));
     }
   }
 

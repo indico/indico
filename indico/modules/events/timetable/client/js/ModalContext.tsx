@@ -43,7 +43,7 @@ type ModalState =
         eventId: number;
         contribId: number;
         onClose?: () => void;
-        onSubmit?: (formData: any, form: any) => void;
+        onSubmit?: (formData: any, form: any) => any | undefined;
       };
     };
 
@@ -104,8 +104,6 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
             payload?.onClose?.();
           }}
           onCreate={payload?.onCreate}
-          customFields={{}}
-          customInitialValues={{}}
         />
       );
     case UNSCHEDULED_CONTRIB_EDIT_MODAL:
@@ -117,9 +115,12 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
             closeModal();
             payload?.onClose?.();
           }}
-          onSubmit={(formData, form) => {
+          onSubmit={async (formData, form) => {
+            const err = await payload?.onSubmit?.(formData, form);
+            if (err) {
+              return err;
+            }
             closeModal();
-            payload?.onSubmit?.(formData, form);
           }}
         />
       );
