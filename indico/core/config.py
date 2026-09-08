@@ -260,16 +260,13 @@ def load_config(only_defaults=False, override=None):
                      the configuration.  Any values provided here
                      will override values from the config file.
     """
-    raw_config = {}
-    path = None
-    if not only_defaults:
-        path = get_config_path()
-        raw_config = _parse_config(path)
-
     data = DEFAULTS | INTERNAL_DEFAULTS
     # Plugin keys are held here until the owning plugin claims them during its init.
     plugin_pending = {}
+
     if not only_defaults:
+        path = get_config_path()
+        raw_config = _parse_config(path)
         config, plugin = _sanitize_data(raw_config)
         data.update(config)
         plugin_pending.update(plugin)
