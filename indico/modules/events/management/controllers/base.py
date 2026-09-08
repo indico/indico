@@ -29,13 +29,14 @@ class ManageEventMixin:
 
     def _check_access(self):
         self._require_user()
-        if isinstance(self.PERMISSION, (tuple, set, list)):
-            allowed = any(self.event.can_manage(session.user, permission=p) for p in self.PERMISSION)
-        else:
-            allowed = self.event.can_manage(session.user, permission=self.PERMISSION)
-        if not allowed:
+        if not self._check_management_permission():
             raise Forbidden(_('You are not authorized to manage this event.'))
         check_event_locked(self, self.event)
+
+    def _check_management_permission(self):
+        if isinstance(self.PERMISSION, (tuple, set, list)):
+            return any(self.event.can_manage(session.user, permission=p) for p in self.PERMISSION)
+        return self.event.can_manage(session.user, permission=self.PERMISSION)
 
 
 class RHManageEventBase(RHEventBase, ManageEventMixin):
