@@ -1173,9 +1173,9 @@ System
     not be editable at runtime (e.g. credentials managed by infrastructure tooling).
 
     A plugin declares its file-backed config keys via the ``plugin_config_defaults``
-    class attribute on its :class:`IndicoPlugin` subclass. Keys are written
-    **unprefixed** in the plugin and exposed in ``indico.conf`` with the
-    ``PLUGIN_<NAME>_`` prefix, where ``<NAME>`` is the plugin's entry-point name
+    class attribute on its :class:`~indico.core.plugins.IndicoPlugin` subclass.
+    Keys are written **unprefixed** in the plugin and exposed in ``indico.conf`` with
+    the ``PLUGIN_<NAME>_`` prefix, where ``<NAME>`` is the plugin's entry-point name
     uppercased. For example, plugin ``zoom`` declaring ``API_KEY`` becomes
     ``PLUGIN_ZOOM_API_KEY``::
 
