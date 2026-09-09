@@ -587,11 +587,22 @@ export function useDraggedData() {
   const ref = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggables[ctx.dragged]?.node : undefined
   );
+  const overlappingDroppables = useContextSelector(DnDContext, ctx => {
+    if (ctx.dragged === null) {
+      return [];
+    }
+    const mouse = ctx.draggableData[ctx.dragged].mouse;
+    if (mouse === undefined) {
+      return [];
+    }
+    return getOverlappingDroppables(ctx.droppables, mouse);
+  });
 
   return useMemo(
     () => ({
       dragged,
       ref,
+      overlappingDroppables,
       transform:
         transform?.x === undefined && transform?.y === undefined
           ? undefined
@@ -600,6 +611,6 @@ export function useDraggedData() {
               y: transform?.y,
             },
     }),
-    [dragged, transform?.x, transform?.y, ref]
+    [dragged, transform?.x, transform?.y, ref, overlappingDroppables]
   );
 }
