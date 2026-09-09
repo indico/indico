@@ -192,7 +192,7 @@ function getOverlappingDroppables(droppables: Droppables, mouse: MousePosition):
   return overlapping;
 }
 
-export function DragPlaceholder({children}: {children: React.ReactNode}) {
+export function DragPlaceholder({children, width}: {children: React.ReactNode; width?: string}) {
   const dragState = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggableData[ctx.dragged] : undefined
   );
@@ -227,13 +227,14 @@ export function DragPlaceholder({children}: {children: React.ReactNode}) {
     <div
       style={{
         position: 'absolute',
-        width: '100%',
+        width: width ?? '100%',
         transform,
         top,
         left,
         zIndex: 1000,
         userSelect: 'none',
         pointerEvents: 'none',
+        transition: 'width 0.25s ease-in-out',
       }}
     >
       {children}
@@ -583,10 +584,14 @@ export function useDraggedData() {
   const transform = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggableData[ctx.dragged]?.transform : undefined
   );
+  const ref = useContextSelector(DnDContext, ctx =>
+    ctx.dragged ? ctx.draggables[ctx.dragged]?.node : undefined
+  );
 
   return useMemo(
     () => ({
       dragged,
+      ref,
       transform:
         transform?.x === undefined && transform?.y === undefined
           ? undefined
@@ -595,6 +600,6 @@ export function useDraggedData() {
               y: transform?.y,
             },
     }),
-    [dragged, transform?.x, transform?.y]
+    [dragged, transform?.x, transform?.y, ref]
   );
 }
