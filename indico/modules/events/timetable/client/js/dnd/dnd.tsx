@@ -226,7 +226,7 @@ export function DragPlaceholder({children, width}: {children: React.ReactNode; w
   return (
     <div
       style={{
-        position: 'absolute',
+        position: 'fixed',
         width: width ?? '100%',
         transform,
         top,
