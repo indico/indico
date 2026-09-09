@@ -429,13 +429,18 @@ export function deleteUnscheduledContrib(id: number, eventId: number) {
   });
 }
 
-export function deleteScheduledContrib(id: number, eventId: number) {
-  const contribURL = contributionURL({event_id: eventId, contrib_id: id});
-  return synchronizedAjaxAction(() => indicoAxios.delete(contribURL), {
-    type: DELETE_SCHEDULED_CONTRIB,
-    id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
-    eventId,
-  });
+export function deleteScheduledContrib(id: number) {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const contribURL = contributionURL({event_id: eventId, contrib_id: id});
+    const action = synchronizedAjaxAction(() => indicoAxios.delete(contribURL), {
+      type: DELETE_SCHEDULED_CONTRIB,
+      id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
+      eventId,
+    });
+    return dispatch(action);
+  };
 }
 
 export function addUnscheduledContrib(entry: UnscheduledContribEntry) {

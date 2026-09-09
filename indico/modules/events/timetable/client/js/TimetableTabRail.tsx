@@ -24,6 +24,7 @@ export default function TimetableTabRail() {
   const activePanel = useSelector(selectors.getActivePanel);
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
+  const unscheduled = useSelector(selectors.getUnscheduled);
 
   return (
     // TODO: (Marina) Rename to 'show draft entries' or something like that
@@ -44,7 +45,7 @@ export default function TimetableTabRail() {
         >
           <Icon name="bookmark outline" size="large" />
         </Menu.Item>
-        {eventType !== 'meeting' && (
+        {(eventType !== 'meeting' || unscheduled.length > 0) && (
           <Menu.Item
             name="unscheduled"
             active={showUnscheduled}

@@ -180,7 +180,7 @@ function EntryPopupContent({
         break;
       case EntryType.Contribution:
         if (eventType === 'meeting') {
-          dispatch(actions.deleteScheduledContrib(entry.objId, eventId));
+          dispatch(actions.deleteScheduledContrib(entry.objId));
         } else {
           dispatch(actions.unscheduleEntry(entry, eventId));
         }
