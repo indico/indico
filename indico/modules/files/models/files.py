@@ -57,6 +57,7 @@ class File(StoredFileMixin, db.Model):
     # - data_export_of (DataExportRequest.file)
     # - editing_revision_files (EditingRevisionFile.file)
     # - receipt_file (ReceiptFile.file)
+    # - speaker_photos (EventPerson.speaker_photo)
 
     @classmethod
     def create_from_stream(cls, stream, filename, content_type, context):

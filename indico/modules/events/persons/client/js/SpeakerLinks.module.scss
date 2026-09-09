@@ -1,0 +1,22 @@
+.speaker-link-item {
+    display: flex !important;
+    flex-direction: row;
+    gap: 1em;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.speaker-link-item-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
+}
+
+.speaker-link-item-group.expand {
+    flex: 1;
+}
+
+.borderless {
+  border-left: none !important;
+}
