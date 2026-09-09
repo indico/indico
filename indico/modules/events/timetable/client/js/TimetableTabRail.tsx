@@ -23,6 +23,7 @@ export default function TimetableTabRail() {
   const showSessions = useSelector(selectors.showSessions);
   const activePanel = useSelector(selectors.getActivePanel);
   const eventId = useSelector(selectors.getEventId);
+  const eventType = useSelector(selectors.getEventType);
 
   return (
     // TODO: (Marina) Rename to 'show draft entries' or something like that
@@ -43,22 +44,24 @@ export default function TimetableTabRail() {
         >
           <Icon name="bookmark outline" size="large" />
         </Menu.Item>
-        <Menu.Item
-          name="unscheduled"
-          active={showUnscheduled}
-          title={Translate.string('Unscheduled contributions')}
-          onClick={() =>
-            dispatch(
-              actions.setActivePanel(
-                activePanel === SidePanelView.Unscheduled
-                  ? SidePanelView.None
-                  : SidePanelView.Unscheduled
+        {eventType !== 'meeting' && (
+          <Menu.Item
+            name="unscheduled"
+            active={showUnscheduled}
+            title={Translate.string('Unscheduled contributions')}
+            onClick={() =>
+              dispatch(
+                actions.setActivePanel(
+                  activePanel === SidePanelView.Unscheduled
+                    ? SidePanelView.None
+                    : SidePanelView.Unscheduled
+                )
               )
-            )
-          }
-        >
-          <Icon name="file outline" size="large" />
-        </Menu.Item>
+            }
+          >
+            <Icon name="file outline" size="large" />
+          </Menu.Item>
+        )}
         <PublicationStateSwitch
           as={Menu.Item}
           styleName="publication-switch"

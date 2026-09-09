@@ -64,6 +64,7 @@ function EntryPopupContent({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const {objId, type, title, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
+  const eventType = useSelector(selectors.getEventType);
   const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const isPosterBlock = useSelector((state: ReduxState) =>
@@ -178,7 +179,11 @@ function EntryPopupContent({
         dispatch(actions.deleteBlock(entry, eventId));
         break;
       case EntryType.Contribution:
-        dispatch(actions.unscheduleEntry(entry, eventId));
+        if (eventType === 'meeting') {
+          dispatch(actions.deleteScheduledContrib(entry.objId, eventId));
+        } else {
+          dispatch(actions.unscheduleEntry(entry, eventId));
+        }
         break;
     }
   };
@@ -389,8 +394,20 @@ function EntryPopupContent({
         />
         {type === EntryType.Contribution ? (
           <ActionPopup
-            content={<Translate>Unschedule contribution</Translate>}
-            trigger={<Button basic icon="calendar times" onClick={onDelete} />}
+            content={
+              eventType === 'meeting' ? (
+                <Translate>Delete contribution</Translate>
+              ) : (
+                <Translate>Unschedule contribution</Translate>
+              )
+            }
+            trigger={
+              <Button
+                basic
+                icon={eventType === 'meeting' ? 'trash' : 'calendar times'}
+                onClick={onDelete}
+              />
+            }
           />
         ) : (
           <ActionPopup
