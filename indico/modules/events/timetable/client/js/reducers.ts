@@ -148,6 +148,13 @@ export default {
           unscheduled: state.unscheduled.filter(e => e.id !== id),
         };
       }
+      case actions.DELETE_SCHEDULED_CONTRIB: {
+        const {id} = action;
+        return {
+          ...state,
+          entries: _.omit(state.entries, id),
+        };
+      }
       case actions.ADD_UNSCHEDULED_CONTRIB: {
         const {entry} = action;
         return {
@@ -164,8 +171,8 @@ export default {
         };
       }
       case actions.DELETE_BLOCK: {
-        const {entry} = action;
-        const newUnscheduled = Object.values(state.entries)
+        const {entry, unscheduleChildContribs} = action;
+        const removedEntries = Object.values(state.entries)
           .filter(
             x =>
               x.type === EntryType.Contribution && isChildEntry(x) && x.sessionBlockId === entry.id
@@ -173,8 +180,10 @@ export default {
           .map(x => _.omit(x, ['startDt', 'sessionBlockId']));
         return {
           ...state,
-          entries: _.omit(state.entries, [entry.id, ...newUnscheduled.map(c => c.id)]),
-          unscheduled: [...state.unscheduled, ...newUnscheduled],
+          entries: _.omit(state.entries, [entry.id, ...removedEntries.map(c => c.id)]),
+          ...(unscheduleChildContribs
+            ? {unscheduled: [...state.unscheduled, ...removedEntries]}
+            : undefined),
         };
       }
       case actions.SCHEDULE_ENTRY: {
