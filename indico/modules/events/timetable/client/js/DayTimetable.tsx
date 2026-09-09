@@ -133,7 +133,7 @@ const TopLevelEntries = React.memo(function TopLevelEntries({
 });
 
 function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
-  const {dragged, transform} = useDraggedData();
+  const {dragged, transform, ref} = useDraggedData();
   const draggedEntry = useMemo(() => {
     if (!dragged || dragged.startsWith('unscheduled')) {
       return undefined;
@@ -152,7 +152,7 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
   }, [dragged, entries]);
 
   return (
-    <DragPlaceholder>
+    <DragPlaceholder width={`${ref?.current?.clientWidth ?? 0}px`}>
       {draggedEntry ? (
         <EntryComponent
           listeners={{}}
@@ -166,7 +166,7 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
           y={0}
           sessionId={draggedEntry.sessionId ?? undefined}
           column={0}
-          maxColumn={1}
+          maxColumn={0}
         />
       ) : null}
     </DragPlaceholder>
