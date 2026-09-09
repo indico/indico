@@ -126,7 +126,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
 function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
-  const {dragged, transform, ref} = useDraggedData();
+  const {dragged, transform, ref, overlappingDroppables} = useDraggedData();
   const draggedEntry = useMemo(() => {
     if (!dragged || dragged.startsWith('unscheduled')) {
       return undefined;
@@ -143,9 +143,20 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
       }
     }
   }, [dragged, entries]);
+  const overSidepanel = useMemo(
+    () => overlappingDroppables.find(over => over.id === 'sidepanel'),
+    [overlappingDroppables]
+  );
+  const width = useMemo(
+    () =>
+      overSidepanel && dragged && dragged.startsWith('c')
+        ? `${overSidepanel.rect.width}px`
+        : `${ref?.current?.clientWidth ?? 0}px`,
+    [ref, overSidepanel, dragged]
+  );
 
   return (
-    <DragPlaceholder width={`${ref?.current?.clientWidth ?? 0}px`}>
+    <DragPlaceholder width={width}>
       {draggedEntry ? (
         <EntryComponent
           listeners={{}}
