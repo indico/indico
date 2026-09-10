@@ -8,6 +8,7 @@
 @use 'base/palette' as *;
 @use 'base/utilities' as *;
 @use 'base/defaults' as *;
+@use 'design_system';
 @use './buttons' as buttons;
 
 $toolbar-height: 2.2em;
@@ -214,6 +215,10 @@ $toolbar-spacing: 10px;
   align-items: center;
   gap: 0.5em;
   min-height: $toolbar-height;
+
+  .select-rows-label {
+    @extend %visually-hidden;
+  }
 
   &.fixed-height {
     max-height: 1.75rem;
