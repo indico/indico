@@ -12,6 +12,7 @@ from webargs import validate
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
@@ -31,6 +32,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
+from indico.util.signals import values_from_signal
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -159,8 +161,13 @@ class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
             affiliation_field.input_type == 'affiliation' and
             affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
         )
+        plugin_extra_senders = values_from_signal(signals.core.get_email_senders.send(
+            event=self.regform.event, regform=self.regform), as_list=True)
+        allowed_senders = self.event.get_allowed_sender_emails()
+        for email, name in plugin_extra_senders:
+            allowed_senders.setdefault(email, name)
         return jsonify({
-            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'senders': list(allowed_senders.items()),
             'default_subject': default_subject,
             'default_body': default_body,
             'moderation_enabled': self.regform.moderation_enabled,

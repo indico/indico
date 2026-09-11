@@ -32,6 +32,7 @@ from indico.modules.events.settings import data_retention_settings
 from indico.util.date_time import format_currency
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
+from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
@@ -273,7 +274,12 @@ class EmailRegistrantsForm(IndicoForm):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
         super().__init__(*args, **kwargs)
-        self.sender_address.choices = list(event.get_allowed_sender_emails().items())
+        plugin_extra_senders = values_from_signal(signals.core.get_email_senders.send(
+            event=event, regform=self.regform), as_list=True)
+        allowed_senders = event.get_allowed_sender_emails()
+        for email, name in plugin_extra_senders:
+            allowed_senders.setdefault(email, name)
+        self.sender_address.choices = list(allowed_senders.items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):

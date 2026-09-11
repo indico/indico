@@ -11,6 +11,7 @@ from wtforms.fields import BooleanField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 from wtforms.widgets import TextArea
 
+from indico.core import signals
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -20,6 +21,7 @@ from indico.modules.events.reminders.placeholders import RecipientFirstNamePlace
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
+from indico.util.signals import values_from_signal
 from indico.util.string import natural_sort_key
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoQuerySelectMultipleCheckboxField,
@@ -92,8 +94,11 @@ class ReminderForm(IndicoForm):
         if self._reminder_type == ReminderType.custom:
             inject_validators(self, 'message', [DataRequired()])
         super().__init__(*args, **kwargs)
+        plugin_extra_senders = values_from_signal(signals.core.get_email_senders.send(event=event), as_list=True)
         allowed_senders = self.event.get_allowed_sender_emails(include_noreply=True,
                                                                extra=self.reply_to_address.object_data)
+        for email, name in plugin_extra_senders:
+            allowed_senders.setdefault(email, name)
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary

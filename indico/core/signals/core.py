@@ -121,3 +121,7 @@ get_csp_script_sources = _signals.signal('get-csp-script-sources', '''
 Return additional values for the `script-src` CSP, in case additional (external)
 hosts need to be added.
 ''')
+
+get_email_senders = _signals.signal('get_email_senders', '''
+Return additional senders for the emails in reminders, invitations, etc
+''')
