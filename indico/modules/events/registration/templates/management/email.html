@@ -26,16 +26,26 @@
     </button>
 {% endcall %}
 
-{% if form.attach_ticket is not none and registrations_without_ticket_count %}
     <script>
-        (function() {
-            'use strict';
+        {% if form.attach_ticket is not none and registrations_without_ticket_count %}
+            (function() {
+                'use strict';
 
-            const warningMessage = $('.attach-ticket-warning');
+                const warningMessage = $('.attach-ticket-warning');
 
-            $('#{{ form.attach_ticket.id }}').on('change', (e) => {
-                warningMessage.toggle(e.target.checked);
-            });
-        })();
+                $('#{{ form.attach_ticket.id }}').on('change', (e) => {
+                    warningMessage.toggle(e.target.checked);
+                });
+            })();
+        {% endif %}
+
+        function applyTemplate() {
+            let templates = document.getElementById('templates');
+            const val = templates.value
+            const subject = val.slice(0, val.indexOf('\n'))
+            const body = val.slice(val.indexOf('\n'))
+            document.getElementById('subject').value = subject
+            let tinymceEditor = _.last(Object.values(tinymce.get()));
+            tinymceEditor.setContent(body);
+        }
     </script>
-{% endif %}
