@@ -22,7 +22,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Fix several accessibility issues on lecture event pages related to heading structure, semantic markup, and keyboard-accessible location details (:pr:`7430`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
