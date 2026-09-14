@@ -9,7 +9,7 @@ export {default as Preloader} from './Preloader';
 export {default as Slot} from './Slot';
 export {toClasses, injectModal} from './html';
 export {default as IndicoPropTypes} from './propTypes';
-export {default as Markdown} from './Markdown';
+export {default as Markdown, RustyMarkdown} from './Markdown';
 export {default as ConditionalRoute} from './ConditionalRoute';
 export {default as Responsive, useResponsive} from './Responsive';
 export {default as AutoLinkerPlugin} from './autolinker';
