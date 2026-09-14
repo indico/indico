@@ -82,7 +82,8 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     """Generate spreadsheet data from a given survey.
 
     :param survey: `Survey` for which the user wants to export submissions
-    :param submission_ids: The list of submissions to include in the file
+    :param submission_ids: The list of submissions to include in the file,
+                           or None to include all submissions
     """
     field_names = ['Submitter', 'Submitter Email', 'Submission Date']
     sorted_questions = sorted(survey.questions, key=attrgetter('parent.position', 'position'))
@@ -113,12 +114,12 @@ def _format_title(question):
 
 
 def _filter_submissions(survey, submission_ids):
-    if submission_ids:
-        return (SurveySubmission.query
-                .filter(SurveySubmission.id.in_(submission_ids),
-                        SurveySubmission.survey == survey)
-                .all())
-    return [x for x in survey.submissions if x.is_submitted]
+    query = (SurveySubmission.query
+             .with_parent(survey)
+             .filter(SurveySubmission.is_submitted))
+    if submission_ids is not None:
+        query = query.filter(SurveySubmission.id.in_(submission_ids))
+    return query.all()
 
 
 def get_events_with_submitted_surveys(user, dt=None):

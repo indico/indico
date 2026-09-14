@@ -7,6 +7,7 @@
 
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import defaultload, joinedload
+from webargs import fields
 
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
@@ -18,6 +19,7 @@ from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 
 
@@ -42,12 +44,17 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
     CSRF_ENABLED = False
     ALLOW_LOCKED = True
 
-    def _process(self):
+    @use_kwargs({
+        # XXX this needs to default to None, because the frontend allows exporting with nothing selected,
+        # which should return everything even though it's POST (which is different from all the other
+        # places doing this, where you have to explicitly select everything so you'll never have a
+        # POST with no IDs)
+        'submission_ids': fields.List(fields.Int(), data_key='submission_ids', load_default=None)
+    })
+    def _process(self, submission_ids):
         if not self.survey.submissions:
             flash(_('There are no submissions in this survey'))
             return redirect(url_for('.manage_survey', self.survey))
-
-        submission_ids = set(map(int, request.form.getlist('submission_ids')))
         headers, rows = generate_spreadsheet_from_survey(self.survey, submission_ids)
         filename = f'submissions-{self.survey.id}'
         return self._export(filename, headers, rows)
