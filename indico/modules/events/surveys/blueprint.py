@@ -57,9 +57,9 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/schedule', 'schedule_survey', 
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/open', 'open_survey', RHOpenSurvey, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/close', 'close_survey', RHCloseSurvey, methods=('POST',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.csv', 'export_submissions_csv', RHExportSubmissionsCSV,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions.xlsx', 'export_submissions_excel',
-                 RHExportSubmissionsExcel, methods=('POST',))
+                 RHExportSubmissionsExcel, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions', 'delete_submissions', RHDeleteSubmissions,
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>', 'display_submission',
