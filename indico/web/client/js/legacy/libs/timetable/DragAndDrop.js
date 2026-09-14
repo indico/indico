@@ -301,6 +301,7 @@ type('DraggableBlockMixin', [], {
 
     var draggable = this.element.super_draggable({
       //Center the mouse in the middle of the block while dragging
+      cancel: false,
       containment: $('#timetable'),
       revert: 'invalid',
       refreshPositions: true,

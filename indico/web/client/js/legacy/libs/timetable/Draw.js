@@ -160,7 +160,7 @@ type(
       this.headerBlock = Html.div({className: 'timetableBlockWrapper'}, this.titleDiv);
       this.footerBlock = Html.div({className: 'timetableBlockWrapper', style: {marginTop: 'auto'}});
 
-      this.div = Html.div(
+      this.content = Html.button(
         {className: 'entry-content', style: {width: '100%', height: '100%'}},
         this.headerBlock
       );
@@ -172,7 +172,7 @@ type(
             ' - ' +
             this.eventData.endDate.time.substring(0, 5)
         );
-        this.div.insert(this.timeDiv);
+        this.content.insert(this.timeDiv);
       } else {
         if (this.eventData.startDate.time == this.eventData.endDate.time) {
           this.timeDiv = Html.div(
@@ -235,10 +235,10 @@ type(
         }
         this.footerBlock.append(this.locationDiv);
         this.footerBlock.append(this.timeDiv);
-        this.div.append(this.footerBlock);
+        this.content.append(this.footerBlock);
       }
 
-      return this.div;
+      return this.content;
     },
 
     redraw: function() {
@@ -319,12 +319,20 @@ type(
       }
 
       if (!self.printableVersion) {
-        $(this.block.dom).on('click', '.entry-content', function(e) {
+        var wasDragged = false;
+        $(this.block.dom).on('dragstart.ttblock', function() {
+          wasDragged = true;
+        });
+        $(this.content.dom).on('click', function(e) {
+          if (wasDragged) {
+            wasDragged = false;
+            return;
+          }
           if (!self.timetable.getTimetableDrawer().eventsDisabled) {
-            $(this).trigger('tt_block.balloon', e);
+            $(self.block.dom).trigger('tt_block.balloon', e);
           }
         });
-        highlightWithMouse(this.div, this.block);
+        highlightWithMouse(this.content, this.block);
       }
       return this.block;
     },
@@ -332,9 +340,9 @@ type(
     _postDraw: function() {},
 
     postDraw: function(hook) {
-      const parentDivHeight = this.div.dom.parentNode.offsetHeight;
+      const parentDivHeight = this.content.dom.parentNode.offsetHeight;
       const contentHeight = () =>
-        Array.from(this.div.dom.childNodes).reduce((acc, x) => acc + x.offsetHeight, 0);
+        Array.from(this.content.dom.childNodes).reduce((acc, x) => acc + x.offsetHeight, 0);
 
       // If nothing has been drawn do nothing
       if (!parentDivHeight) {
@@ -372,7 +380,7 @@ type(
         )
       );
 
-      this.div.insert(pileEffect);
+      this.content.insert(pileEffect);
       this.headerBlock.dom.style.paddingTop = '15px';
       if (this.compactMode) {
         this.timeDiv.dom.style.paddingTop = '15px';
@@ -400,6 +408,24 @@ type(
     $(this.block.dom).bind('tt_block.balloon', function(event, originalEvent) {
       if (!self.popupActive) {
         self.openPopup(originalEvent);
+      } else {
+        var api = $(self.content.dom).qtip('api');
+        if (api) {
+          if (api.tooltip.is(':visible')) {
+            api.hide();
+          } else {
+            if (originalEvent.detail > 0) {
+              api.set('position.target', [originalEvent.pageX, originalEvent.pageY]);
+            } else {
+              var rect = self.content.dom.getBoundingClientRect();
+              api.set('position.target', [
+                rect.left + rect.width / 2 + window.pageXOffset,
+                rect.top + rect.height / 2 + window.pageYOffset,
+              ]);
+            }
+            $(self.content.dom).qtip('show');
+          }
+        }
       }
     });
   }
@@ -418,7 +444,7 @@ type(
       );
       this.headerBlock = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
-      this.div = Html.div({style: {width: '100%', height: '100%'}}, this.headerBlock);
+      this.content = Html.div({style: {width: '100%', height: '100%'}}, this.headerBlock);
 
       this.timeDiv = Html.div(
         'timetableBlockTimeDiscreet',
@@ -426,14 +452,14 @@ type(
           ' - ' +
           this.eventData.endDate.time.substring(0, 5)
       );
-      this.div.insert(this.timeDiv);
+      this.content.insert(this.timeDiv);
 
       // Add material menu
       if (self.eventData.attachments && self.eventData.attachments.files) {
         this.headerBlock.insert(this.createMaterialButton(this.eventData.attachments));
       }
 
-      return this.div;
+      return this.content;
     },
 
     draw: function() {
@@ -445,7 +471,7 @@ type(
         Break: 'timetableBreak ',
       };
 
-      var block = Html.div(
+      var block = Html.button(
         {
           style: {
             backgroundColor: this.eventData.color,
@@ -464,7 +490,7 @@ type(
         block.observeClick(function(e) {
           self.openPopup(e);
         });
-        highlightWithMouse(this.div, block);
+        highlightWithMouse(this.content, block);
       }
 
       return block;
@@ -682,7 +708,7 @@ function handleErrorResponse(xhr) {
 }
 
 function drawBalloon(self, evt, editable) {
-  var timetableBlock = $(self.div.dom);
+  var timetableBlock = $(self.content.dom);
   var entryId = self.eventData.scheduleEntryId
     ? self.eventData.scheduleEntryId
     : self.eventData.id.substring(1);
@@ -714,6 +740,7 @@ function drawBalloon(self, evt, editable) {
         },
       },
       show: {
+        event: false,
         ready: true,
       },
       hide: {
@@ -726,16 +753,20 @@ function drawBalloon(self, evt, editable) {
             evt.preventDefault();
           }
         },
-        render: function(e, api) {
-          api.elements.target.on('click', function() {
-            api.hide();
-          });
-        },
       },
       position: {
         at: 'top center',
         my: 'bottom center',
-        target: [evt.pageX, evt.pageY],
+        target: (function() {
+          if (evt.detail > 0) {
+            return [evt.pageX, evt.pageY];
+          }
+          var rect = timetableBlock[0].getBoundingClientRect();
+          return [
+            rect.left + rect.width / 2 + window.pageXOffset,
+            rect.top + rect.height / 2 + window.pageYOffset,
+          ];
+        })(),
         adjust: {
           mouse: false,
         },
