@@ -11,7 +11,7 @@ import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mas
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form as FinalForm} from 'react-final-form';
 import {
@@ -27,6 +27,7 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
+  Ref,
 } from 'semantic-ui-react';
 
 import {WithPopup} from 'indico/react/components';
@@ -255,6 +256,8 @@ MastodonButton.propTypes = {
 function SetupMastodonServer({button, shareText}) {
   const [serverURL, setServerURL] = useState(null);
   const [mastodonServerName, setMastodonServerName] = useState(null);
+  const [mountNode, setMountNode] = useState(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     if (serverURL) {
@@ -266,102 +269,113 @@ function SetupMastodonServer({button, shareText}) {
     }
   }, [serverURL, mastodonServerName]);
 
+  useEffect(() => {
+    // Render the setup popup inside the share dialog rather than letting it
+    // portal to <body>. Outside the dialog, focusing the form would register as
+    // focus leaving the dialog and close the whole share panel out from under it.
+    setMountNode(triggerRef.current?.closest('[data-dialog]') ?? null);
+  }, []);
+
   if (Indico.User.mastodonServerURL && Indico.User.mastodonServerName) {
     return button;
   }
 
   return (
-    <Popup wide pinned position="top right" trigger={button} on="click">
-      <Popup.Content>
-        {!serverURL ? (
-          <>
-            <Message icon info styleName="empty-mastodon-server-notice">
-              <Icon name="star" />
-              <Translate>
-                You have not added a preferred Mastodon server on your profile yet. Please add one
-                below.
-              </Translate>
-            </Message>
-            <FinalForm
-              onSubmit={async data => {
-                let resp;
-                try {
-                  resp = await indicoAxios.post(userPreferencesMastodonServer(), data);
-                } catch (e) {
-                  return handleSubmitError(e);
-                }
-                setServerURL(resp.data.url);
-                setMastodonServerName(resp.data.name);
-              }}
-              subscription={{
-                pristine: true,
-                submitting: true,
-                submitError: true,
-                submitFailed: true,
-                dirtySinceLastSubmit: true,
-              }}
-            >
-              {({
-                handleSubmit,
-                pristine,
-                submitting,
-                submitError,
-                submitFailed,
-                dirtySinceLastSubmit,
-              }) => (
-                <form onSubmit={handleSubmit}>
-                  <FinalInput
-                    name="server_url"
-                    required
-                    labelPosition="right"
-                    placeholder="https://mastodon.social"
-                    fluid
-                    error={!!submitError && !dirtySinceLastSubmit}
-                    componentLabel={
-                      <Button
-                        icon="save"
-                        positive
-                        type="submit"
-                        disabled={pristine || submitting || (submitFailed && !dirtySinceLastSubmit)}
-                        loading={submitting}
-                        content={Translate.string('Save')}
-                      />
-                    }
-                  />
-                  {submitError && !dirtySinceLastSubmit && (
-                    <div styleName="error-message">
-                      <Icon name="times" />
-                      {submitError}
-                    </div>
-                  )}
-                </form>
-              )}
-            </FinalForm>
-          </>
-        ) : (
-          <>
-            <Message icon positive styleName="saved-mastodon-server-notice">
-              <Icon name="check circle outline" />
-              <Translate>
-                Preferred Mastodon server added! You can now share this event below.
-              </Translate>
-            </Message>
+    <Ref innerRef={triggerRef}>
+      <Popup wide pinned position="top right" trigger={button} on="click" mountNode={mountNode}>
+        <Popup.Content>
+          {!serverURL ? (
+            <>
+              <Message icon info styleName="empty-mastodon-server-notice">
+                <Icon name="star" />
+                <Translate>
+                  You have not added a preferred Mastodon server on your profile yet. Please add one
+                  below.
+                </Translate>
+              </Message>
+              <FinalForm
+                onSubmit={async data => {
+                  let resp;
+                  try {
+                    resp = await indicoAxios.post(userPreferencesMastodonServer(), data);
+                  } catch (e) {
+                    return handleSubmitError(e);
+                  }
+                  setServerURL(resp.data.url);
+                  setMastodonServerName(resp.data.name);
+                }}
+                subscription={{
+                  pristine: true,
+                  submitting: true,
+                  submitError: true,
+                  submitFailed: true,
+                  dirtySinceLastSubmit: true,
+                }}
+              >
+                {({
+                  handleSubmit,
+                  pristine,
+                  submitting,
+                  submitError,
+                  submitFailed,
+                  dirtySinceLastSubmit,
+                }) => (
+                  <form onSubmit={handleSubmit}>
+                    <FinalInput
+                      name="server_url"
+                      required
+                      labelPosition="right"
+                      placeholder="https://mastodon.social"
+                      fluid
+                      error={!!submitError && !dirtySinceLastSubmit}
+                      componentLabel={
+                        <Button
+                          icon="save"
+                          positive
+                          type="submit"
+                          disabled={
+                            pristine || submitting || (submitFailed && !dirtySinceLastSubmit)
+                          }
+                          loading={submitting}
+                          content={Translate.string('Save')}
+                        />
+                      }
+                    />
+                    {submitError && !dirtySinceLastSubmit && (
+                      <div styleName="error-message">
+                        <Icon name="times" />
+                        {submitError}
+                      </div>
+                    )}
+                  </form>
+                )}
+              </FinalForm>
+            </>
+          ) : (
+            <>
+              <Message icon positive styleName="saved-mastodon-server-notice">
+                <Icon name="check circle outline" />
+                <Translate>
+                  Preferred Mastodon server added! You can now share this event below.
+                </Translate>
+              </Message>
 
-            <Button
-              as="a"
-              target="_blank"
-              href={`${serverURL}/share?text=${encodeURIComponent(shareText)}`}
-              icon="share square"
-              content={Translate.string('Share on {mastodonServerName}', {
-                mastodonServerName,
-              })}
-              positive
-              fluid
-            />
-          </>
-        )}
-      </Popup.Content>
-    </Popup>
+              <Button
+                as="a"
+                target="_blank"
+                href={`${serverURL}/share?text=${encodeURIComponent(shareText)}`}
+                icon="share square"
+                content={Translate.string('Share on {mastodonServerName}', {
+                  mastodonServerName,
+                })}
+                positive
+                fluid
+              />
+            </>
+          )}
+        </Popup.Content>
+      </Popup>
+    </Ref>
   );
 }
 
