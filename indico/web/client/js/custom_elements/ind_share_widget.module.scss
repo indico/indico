@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system';
 
 ind-share-widget ind-with-popup {
   display: inline-flex;
@@ -81,6 +82,10 @@ ind-with-popup .share-content * {
 
   .share-button {
     margin-right: 0;
+
+    &:focus-visible {
+      @extend %default-focus-ring;
+    }
 
     img {
       width: 20px;
