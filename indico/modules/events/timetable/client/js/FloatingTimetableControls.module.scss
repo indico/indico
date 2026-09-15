@@ -1,0 +1,187 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+// Separate variables to allow customization.
+$primary-color: $dark-blue;
+$bg-color: $white;
+$toolbar-bg-color: $raincloud-gray;
+
+.floating-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.floating-controls-content {
+  pointer-events: initial;
+  background-color: $bg-color;
+  padding: 5px 10px;
+  border-radius: 10px;
+  max-width: 75%;
+
+  display: flex;
+  align-items: center;
+
+  box-shadow: 0 6px 15px 2px rgba(0, 0, 0, 0.3);
+
+  height: 3.8rem;
+  overflow-y: hidden;
+
+  &.block {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0 10px;
+
+    > :is(.header, .session) {
+      margin: 0;
+      max-width: min(800px, 100%);
+    }
+
+    > .header {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.05rem;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    > .session {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.7rem;
+      letter-spacing: 0.05rem;
+      padding: 4px 8px;
+      border-radius: 100vh;
+    }
+  }
+
+  .days-wrapper {
+    flex-shrink: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: hidden;
+    box-sizing: content-box;
+    position: relative;
+
+    .days {
+      display: flex;
+      overflow-x: auto;
+      box-sizing: content-box;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      // This padding in combination with fixed height
+      // and overflow-y hidden above,it hides the scrollbar
+      padding: 18px 0;
+
+      .day {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        border: 0;
+        font-weight: normal;
+        margin-bottom: 0;
+        background: none;
+        padding: 0;
+
+        // Instead of gap we use this as the gradients also trigger a gap
+        &:not(:last-of-type) {
+          margin-right: 15px;
+        }
+
+        &.active {
+          .day-badge {
+            > .day-number {
+              color: $bg-color;
+              background-color: $primary-color;
+              opacity: 1;
+            }
+          }
+
+          > .day-month {
+            visibility: visible;
+          }
+        }
+
+        &:not(.active) {
+          > .day-badge {
+            > .day-number {
+              opacity: 0.7;
+            }
+          }
+
+          &:hover {
+            > .day-badge {
+              > .day-number {
+                background-color: rgba($black, 0.1);
+              }
+            }
+          }
+        }
+
+        > .day-badge {
+          font-weight: bold;
+          // Needs to be px value for better calculations
+          width: 60px;
+          margin: 0.5rem 0;
+          padding: 0.5rem 0;
+          border-radius: 4px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: 0.3rem;
+
+          > .day-number {
+            transition: 0.1s;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            padding: 0.2rem 0.2rem;
+            margin-top: -0.2rem;
+            border-radius: 3px;
+          }
+
+          > .day-name {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+          }
+        }
+      }
+    }
+  }
+}
+
+.nav-button {
+  background: none !important;
+  color: black !important;
+  margin: 0 !important;
+
+  :global(.divider.text) {
+    display: none !important;
+  }
+}
