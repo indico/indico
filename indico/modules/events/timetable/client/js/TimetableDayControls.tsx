@@ -17,9 +17,9 @@ import * as selectors from './selectors';
 import {ReduxState} from './types';
 import {getEntryColors} from './utils';
 
-import './FloatingTimetableControls.module.scss';
+import './TimetableDayControls.module.scss';
 
-interface FloatingControlsProps {
+interface TimetableDayControlsProps {
   onNavigate: (dt: Moment) => void;
   isSessionBlockExpanded: boolean;
   numDays: number;
@@ -66,13 +66,13 @@ function SessionBlockToolbar() {
   );
 }
 
-export function FloatingControls({
+export function TimetableDayControls({
   isSessionBlockExpanded,
   onNavigate,
   numDays,
   currentDayIdx,
   eventStart,
-}: FloatingControlsProps) {
+}: TimetableDayControlsProps) {
   const daysBarRef = useRef<HTMLDivElement | null>(null);
   const currentDayIdxRef = useRef<number>(currentDayIdx);
 
@@ -119,7 +119,7 @@ export function FloatingControls({
   }, [currentDayIdxRef]);
 
   return (
-    <div styleName="floating-controls">
+    <div styleName="day-controls">
       {isSessionBlockExpanded && <SessionBlockToolbar />}
       {!isSessionBlockExpanded && numDays > 1 && (
         <>
