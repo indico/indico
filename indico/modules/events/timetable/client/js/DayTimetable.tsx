@@ -22,6 +22,7 @@ import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableEntry} from './Entry';
+import {FloatingControls} from './FloatingTimetableControls';
 import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
@@ -56,6 +57,7 @@ import {
   V_SPACE_BETWEEN_ENTRIES_PX,
   flattenEntries,
   getDateKey,
+  getDiffInDays,
   getEntryUniqueId,
   isWithinLimits,
   minutesToPixels,
@@ -150,10 +152,13 @@ export function DayTimetable({
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const currentDayEntries = useSelector(selectors.getCurrentDayEntries);
   const hasSelectedEntry = useSelector(selectors.getSelectedId) !== null;
+  const eventNumDays = useSelector(selectors.getEventNumDays);
+  const currentDate = useSelector(selectors.getCurrentDate);
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const [hoverGuideY, setHoverGuideY] = useState<number | null>(null);
   const isDragging = draggingStartPos !== null;
+  const currentDayIdx = getDiffInDays(eventStartDt, currentDate);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -669,50 +674,62 @@ export function DayTimetable({
         <TimetableTabRail />
         <TimetableSidePanel dt={dt} />
       </div>
-      {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
-      <div
-        ref={wrapperRef}
-        className="wrapper timetable-popup-boundary"
-        onScroll={() => setHoverGuideY(null)}
-      >
+      <div styleName="controls-container">
+        <FloatingControls
+          onNavigate={d => {
+            dispatch(actions.setCurrentDate(d, eventId));
+          }}
+          isSessionBlockExpanded={!!expandedSessionBlock}
+          currentDayIdx={currentDayIdx}
+          eventStart={eventStartDt}
+          numDays={eventNumDays}
+        />
+        {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
         <div
-          ref={innerWrapperRef}
-          styleName="wrapper"
-          style={{background: limitsGradient}}
-          onMouseMove={handleCalendarMouseMove}
-          onMouseLeave={() => setHoverGuideY(null)}
+          ref={wrapperRef}
+          styleName="scroll-wrapper"
+          className="timetable-popup-boundary"
+          onScroll={() => setHoverGuideY(null)}
         >
-          <TimeGutter minHour={minHour} maxHour={maxHour} />
-          <DnDCalendar>
-            <div ref={calendarRef}>
-              <Lines minHour={minHour} maxHour={maxHour} />
-              {hoverGuideY !== null && (
-                <div styleName="hover-guide" style={{top: hoverGuideY}}>
-                  {getCalendarTimeFromY(hoverGuideY)}
+          <div
+            ref={innerWrapperRef}
+            styleName="wrapper"
+            style={{background: limitsGradient}}
+            onMouseMove={handleCalendarMouseMove}
+            onMouseLeave={() => setHoverGuideY(null)}
+          >
+            <TimeGutter minHour={minHour} maxHour={maxHour} />
+            <DnDCalendar>
+              <div ref={calendarRef}>
+                <Lines minHour={minHour} maxHour={maxHour} />
+                {hoverGuideY !== null && (
+                  <div styleName="hover-guide" style={{top: hoverGuideY}}>
+                    {getCalendarTimeFromY(hoverGuideY)}
+                  </div>
+                )}
+                <MemoizedTopLevelEntries dt={dt} entries={entries} />
+                <div
+                  styleName="draft"
+                  style={{
+                    ...(draftEntry
+                      ? {
+                          top: draftEntry.y,
+                          height: minutesToPixels(draftEntry.duration),
+                        }
+                      : {display: 'none'}),
+                  }}
+                >
+                  {draftEntry
+                    ? formatTimeRange(
+                        moment.locale().replace('_', '-'),
+                        draftEntry.startDt,
+                        moment(draftEntry.startDt).add(draftEntry.duration, 'minutes')
+                      )
+                    : null}
                 </div>
-              )}
-              <MemoizedTopLevelEntries dt={dt} entries={entries} />
-              <div
-                styleName="draft"
-                style={{
-                  ...(draftEntry
-                    ? {
-                        top: draftEntry.y,
-                        height: minutesToPixels(draftEntry.duration),
-                      }
-                    : {display: 'none'}),
-                }}
-              >
-                {draftEntry
-                  ? formatTimeRange(
-                      moment.locale().replace('_', '-'),
-                      draftEntry.startDt,
-                      moment(draftEntry.startDt).add(draftEntry.duration, 'minutes')
-                    )
-                  : null}
               </div>
-            </div>
-          </DnDCalendar>
+            </DnDCalendar>
+          </div>
         </div>
       </div>
     </DnDProvider>

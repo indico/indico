@@ -12,26 +12,20 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
-import {NavigationController} from './NavigationController';
-import {FloatingControls} from './FloatingTimetableControls';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {EntryType, ReduxState} from './types';
-import {getDiffInDays, minutesToPixels} from './utils';
+import {minutesToPixels} from './utils';
 
 import './timetable.scss';
 import './Timetable.module.scss';
 
 export default function Timetable() {
-  const dispatch = useDispatch();
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
-  const eventNumDays = useSelector(selectors.getEventNumDays);
   const isExpanded = useSelector(selectors.getIsExpanded);
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentEntries = useSelector(selectors.getCurrentEntries);
-  const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
-  const currentDayIdx = getDiffInDays(eventStartDt, currentDate);
   const minScrollHour = 8;
   const minHour = 0;
   const maxHour = 23;
@@ -68,32 +62,20 @@ export default function Timetable() {
   const initialScrollPosition = _getScrollOffset();
 
   return (
-    <>
-      <NavigationController />
-      <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
-        <GlobalEvents />
-        <Toolbar />
-        <div styleName="content">
-          <DayTimetable
-            dt={currentDate}
-            eventId={eventId}
-            minHour={minHour}
-            maxHour={maxHour}
-            entries={currentEntries}
-            scrollPosition={initialScrollPosition}
-          />
-          <FloatingControls
-            onNavigate={d => {
-              dispatch(actions.setCurrentDate(d, eventId));
-            }}
-            isSessionBlockExpanded={!!expandedSessionBlock}
-            currentDayIdx={currentDayIdx}
-            eventStart={eventStartDt}
-            numDays={eventNumDays}
-          />
-        </div>
+    <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
+      <GlobalEvents />
+      <Toolbar />
+      <div styleName="content">
+        <DayTimetable
+          dt={currentDate}
+          eventId={eventId}
+          minHour={minHour}
+          maxHour={maxHour}
+          entries={currentEntries}
+          scrollPosition={initialScrollPosition}
+        />
       </div>
-    </>
+    </div>
   );
 }
 
