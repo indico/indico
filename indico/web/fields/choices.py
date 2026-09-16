@@ -5,6 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
+
+from marshmallow import ValidationError as MMValidationError
+from marshmallow import fields, validate
 from wtforms.fields import IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 
@@ -61,6 +65,15 @@ class SingleChoiceField(_ChoiceFieldBase):
     friendly_name = _('Single Choice')
     config_form = SingleChoiceConfigForm
     log_type = 'string'
+    mm_field_class = fields.String
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.object.is_required}
+
+    @property
+    def mm_validators(self):
+        return validate.OneOf([x['id'] for x in self.object.field_data['options']])
 
     def create_wtf_field(self):
         field_options = {'coerce': lambda x: x}
@@ -118,9 +131,10 @@ class MultiSelectField(_ChoiceFieldBase):
     config_form = MultiSelectConfigForm
     wtf_field_class = IndicoSelectMultipleCheckboxField
     log_type = 'list'
+    mm_field_class = fields.List
+    mm_field_args = (fields.String,)
 
-    @property
-    def validators(self):
+    def _get_choices_validator_data(self):
         min_choices = self.object.field_data.get('min_choices')
         max_choices = self.object.field_data.get('max_choices')
         if min_choices is None and max_choices is None:
@@ -137,7 +151,30 @@ class MultiSelectField(_ChoiceFieldBase):
                                'Please select no more than %(max)d options.', max_choices)
         else:
             message = _('Please select between %(min)d and %(max)d options.')
+        return min_choices, max_choices, message
+
+    @property
+    def validators(self):
+        min_choices, max_choices, message = self._get_choices_validator_data()
         return [Length(min=min_choices, max=max_choices, message=message)]
+
+    @property
+    def mm_validators(self):
+        min_choices, max_choices, message = self._get_choices_validator_data()
+        count_validator = validate.Length(min=min_choices, max=max_choices)
+        count_validator.message_min = count_validator.message_max = count_validator.message_all = re.sub(
+            r'%\(([^)]+)\)d', r'{\1}', message
+        )
+
+        def unique_validator(v):
+            if len(set(v)) != len(v):
+                raise MMValidationError('Items must be unique')
+
+        def choices_validator(v):
+            if invalid := set(v) - {x['id'] for x in self.object.field_data['options']}:
+                raise MMValidationError(f'Invalid choices: {', '.join(invalid)}')
+
+        return [count_validator, unique_validator, choices_validator]
 
     @property
     def wtf_field_kwargs(self):

@@ -11,6 +11,7 @@ from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
 from indico.util.i18n import _
+from indico.util.marshmallow import not_empty
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -39,6 +40,14 @@ class BaseField:
     friendly_name = None
     #: wtform field class for this field
     wtf_field_class = None
+    #: the marshmallow field class for this field
+    mm_field_class = None
+    #: positional arguments for the marshmallow field
+    mm_field_args = ()
+    #: additional options for the marshmallow field
+    mm_field_kwargs = {}
+    #: whether this field must not be "empty" (falsy value) if required
+    not_empty_if_required = True
     #: the base class for the config form
     config_form_base = FieldConfigForm
     #: the WTForm used to configure the field. this must not be an
@@ -60,7 +69,12 @@ class BaseField:
 
     @property
     def validators(self):
-        """A list of validators for this field."""
+        """A list of WTForms validators for this field."""
+        return None
+
+    @property
+    def mm_validators(self):
+        """A list of marshmallow validators for this field."""
         return None
 
     @property
@@ -130,3 +144,21 @@ class BaseField:
         elif self.not_required_validator:
             validators.append(self.not_required_validator())
         return field_cls(self.object.title, validators, description=self.object.description, **kwargs)
+
+    def create_mm_field(self, *, override_required=False):
+        validators = self.mm_validators or []
+        if not isinstance(validators, list):
+            validators = [validators]
+
+        if self.object.is_required and self.not_empty_if_required and not override_required:
+            validators.append(not_empty)
+
+        mm_field_kwargs = dict(self.mm_field_kwargs)
+        if override_required:
+            # XXX do we actually need this? todo check during creation
+            mm_field_kwargs['allow_none'] = True
+
+        return self.mm_field_class(*self.mm_field_args,
+                                   required=(self.object.is_required and not override_required),
+                                   validate=validators,
+                                   **mm_field_kwargs)

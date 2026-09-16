@@ -5,10 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from marshmallow import fields, validate
 from wtforms.fields import BooleanField, IntegerField, StringField, TextAreaField
 from wtforms.validators import InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.util.i18n import _
+from indico.util.marshmallow import max_words as max_words_validator
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import WordCount
 from indico.web.forms.widgets import SwitchWidget
@@ -26,6 +28,7 @@ class TextField:
     name = 'text'
     friendly_name = _('Text')
     config_form = TextConfigForm
+    mm_field_class = fields.String
 
     @property
     def log_type(self):
@@ -44,6 +47,17 @@ class TextField:
             validators.append(Length(max=max_length))
         if max_words:
             validators.append(WordCount(max=max_words))
+        return validators
+
+    @property
+    def mm_validators(self):
+        max_length = self.object.field_data.get('max_length')
+        max_words = self.object.field_data.get('max_words')
+        validators = []
+        if max_length:
+            validators.append(validate.Length(max=max_length))
+        if max_words:
+            validators.append(max_words_validator(max=max_words))
         return validators
 
     def is_value_empty(self, value):
@@ -69,6 +83,12 @@ class NumberField:
     config_form = NumberConfigForm
     wtf_field_class = IntegerField
     required_validator = InputRequired
+    mm_field_class = fields.Integer
+    not_empty_if_required = False
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.object.is_required}
 
     @property
     def validators(self):
@@ -78,18 +98,32 @@ class NumberField:
             return
         return [NumberRange(min=min_value, max=max_value)]
 
+    @property
+    def mm_validators(self):
+        min_value = self.object.field_data.get('min_value')
+        max_value = self.object.field_data.get('max_value')
+        if min_value is None and max_value is None:
+            return
+        return [validate.Range(min=min_value, max=max_value)]
+
 
 class BoolField:
     name = 'bool'
     friendly_name = _('Yes/No')
     wtf_field_class = IndicoRadioField
     required_validator = InputRequired
+    mm_field_class = fields.Boolean
+    not_empty_if_required = False
 
     @property
     def wtf_field_kwargs(self):
         return {'orientation': 'horizontal',
                 'choices': [(1, _('Yes')), (0, _('No'))],
                 'coerce': lambda x: bool(int(x))}
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.object.is_required}
 
     def get_friendly_value(self, value):
         if value is None:
