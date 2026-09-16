@@ -9,6 +9,7 @@ from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.contributions.schemas import ContributionFieldSchema
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.locations import LocationDataSchema, LocationParentSchema
@@ -243,6 +244,7 @@ def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
 def serialize_event_info(event, *, user=None):
     from indico.modules.events.contributions import Contribution, contribution_settings
     can_manage_event = event.can_manage(user)
+    custom_fields = ContributionFieldSchema(many=True).dump(event.contribution_fields.filter_by(is_active=True))
 
     return {'id': str(event.id),
             'title': event.title,
@@ -254,7 +256,8 @@ def serialize_event_info(event, *, user=None):
             'default_contribution_duration': contribution_settings.get(event, 'default_duration').total_seconds(),
             'location_parent': LocationParentSchema().dump(event),
             'contributions': [serialize_unscheduled_contribution(c, can_manage_event=can_manage_event)
-                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
+                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)],
+            'customFields': custom_fields}
 
 
 def serialize_session(sess):

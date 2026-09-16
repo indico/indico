@@ -41,7 +41,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             delete_contribution, delete_subcontribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
-from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
+from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionRESTSchema,
                                                          FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, get_contribution_person_link_field_params,
@@ -66,7 +66,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.locations import LocationParentSchema
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
-from indico.web.args import use_args, use_args_schema_context, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -355,26 +355,19 @@ class RHContributionREST(RHManageContributionBase):
 
 class RHAPIContribution(RHManageContributionBase):
     def _process_GET(self):
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionRESTSchema(context={'event': self.event}).jsonify(self.contrib)
 
-    @use_args_schema_context(
-        ContributionSchema,
-        lambda self: {'event': self.event, 'object': self.contrib},
-        partial=True,
-    )
+    @use_rh_args(ContributionRESTSchema, partial=True)
     def _process_PATCH(self, data):
-        # from indico.web.args import parser
-        # data = parser.parse(ContributionSchema(context={'event': self.event, 'object': self.contrib}))
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
 
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         with (track_time_changes(), track_location_changes()):
-            # TODO: custom fields logs
-            update_contribution(self.contrib, data)
+            update_contribution(self.contrib, data, data.pop('custom_fields', None))
 
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionRESTSchema(context={'event': self.event}).jsonify(self.contrib)
 
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
@@ -389,16 +382,14 @@ class RHAPIContribution(RHManageContributionBase):
 
 
 class RHAPIContributionCreate(RHManageContributionsBase):
-    # @use_args(ContributionSchema)
-    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
+    @use_rh_args(ContributionRESTSchema)
     def _process_POST(self, data):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-
-        contrib = create_contribution(self.event, data)
-        return ContributionSchema(context={'event': self.event}).jsonify(contrib)
+        contrib = create_contribution(self.event, data, data.pop('custom_fields', None))
+        return ContributionRESTSchema(context={'event': self.event}).jsonify(contrib)
 
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
@@ -437,6 +428,8 @@ class RHAPIContributionDefaultDuration(RHManageContributionsBase):
 
 class RHAPIContributionFields(RHManageContributionsBase):
     def _process(self):
+        # TODO: Skip restricted fields when using this outside management (e.g. editing a contribution as a speaker)
+        # TODO: Check if we really need all the fields on the client side.
         return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
 
 
