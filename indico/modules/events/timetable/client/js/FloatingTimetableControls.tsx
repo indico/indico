@@ -120,72 +120,70 @@ export function FloatingControls({
 
   return (
     <div styleName="floating-controls">
-      <div styleName="floating-controls-content">
-        {isSessionBlockExpanded && <SessionBlockToolbar />}
-        {!isSessionBlockExpanded && numDays > 1 && (
-          <>
-            {numDays > 2 && (
-              <Button
-                onClick={() => scrollByPage(-1)}
-                disabled={currentDayIdx === 0}
-                title={Translate.string('Previous page')}
-                icon="angle double left"
-                styleName="nav-button"
-              />
-            )}
+      {isSessionBlockExpanded && <SessionBlockToolbar />}
+      {!isSessionBlockExpanded && numDays > 1 && (
+        <>
+          {numDays > 2 && (
             <Button
-              onClick={() => scrollByDay(-1)}
+              onClick={() => scrollByPage(-1)}
               disabled={currentDayIdx === 0}
-              title={Translate.string('Previous day')}
-              icon="angle left"
+              title={Translate.string('Previous page')}
+              icon="angle double left"
               styleName="nav-button"
             />
-            <div styleName="days-wrapper">
-              <div ref={daysBarRef} styleName="days">
-                {[...Array(numDays).keys()].map(n => {
-                  const d = getDateFromIdx(n);
-                  const isActive = n === currentDayIdx;
+          )}
+          <Button
+            onClick={() => scrollByDay(-1)}
+            disabled={currentDayIdx === 0}
+            title={Translate.string('Previous day')}
+            icon="angle left"
+            styleName="nav-button"
+          />
+          <div styleName="days-wrapper">
+            <div ref={daysBarRef} styleName="days">
+              {[...Array(numDays).keys()].map(n => {
+                const d = getDateFromIdx(n);
+                const isActive = n === currentDayIdx;
 
-                  return (
-                    <Button
-                      key={n}
-                      onClick={() => navigateToDayNumber(n)}
-                      styleName={`day ${isActive ? 'active' : ''}`}
-                    >
-                      <div styleName="day-badge">
-                        <div styleName="day-number">
-                          {new Intl.DateTimeFormat(moment.locale(), {
-                            month: 'short',
-                            day: 'numeric',
-                          }).format(d.toDate())}
-                        </div>
-                        <div styleName="day-name">{d.format('ddd')}</div>
+                return (
+                  <Button
+                    key={n}
+                    onClick={() => navigateToDayNumber(n)}
+                    styleName={`day ${isActive ? 'active' : ''}`}
+                  >
+                    <div styleName="day-badge">
+                      <div styleName="day-number">
+                        {new Intl.DateTimeFormat(moment.locale(), {
+                          month: 'short',
+                          day: 'numeric',
+                        }).format(d.toDate())}
                       </div>
-                    </Button>
-                  );
-                })}
-              </div>
+                      <div styleName="day-name">{d.format('ddd')}</div>
+                    </div>
+                  </Button>
+                );
+              })}
             </div>
+          </div>
+          <Button
+            onClick={() => scrollByDay(1)}
+            disabled={reachedLastDay}
+            title={Translate.string('Next day')}
+            icon="angle right"
+            position="right"
+            styleName="nav-button"
+          />
+          {numDays > 2 && (
             <Button
-              onClick={() => scrollByDay(1)}
+              onClick={() => scrollByPage(1)}
               disabled={reachedLastDay}
-              title={Translate.string('Next day')}
-              icon="angle right"
-              position="right"
+              title={Translate.string('Next page')}
+              icon="angle double right"
               styleName="nav-button"
             />
-            {numDays > 2 && (
-              <Button
-                onClick={() => scrollByPage(1)}
-                disabled={reachedLastDay}
-                title={Translate.string('Next page')}
-                icon="angle double right"
-                styleName="nav-button"
-              />
-            )}
-          </>
-        )}
-      </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
