@@ -13,27 +13,13 @@ $bg-color: $white;
 $toolbar-bg-color: $raincloud-gray;
 
 .floating-controls {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 10px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  pointer-events: none;
-}
-
-.floating-controls-content {
-  pointer-events: initial;
   background-color: $bg-color;
   padding: 5px 10px;
-  border-radius: 10px;
-  max-width: 75%;
+  border-bottom: 1px solid $raincloud-gray;
+  width: 100%;
 
   display: flex;
   align-items: center;
-
-  box-shadow: 0 6px 15px 2px rgba(0, 0, 0, 0.3);
 
   height: 3.8rem;
   overflow-y: hidden;
