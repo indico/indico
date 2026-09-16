@@ -177,15 +177,7 @@ export function BreakEditForm({
   );
 }
 
-export function BreakCreateForm({
-  eventId,
-  onClose,
-  customInitialValues = {},
-}: {
-  eventId: number;
-  onClose: () => void;
-  customInitialValues?: Record<string, any>;
-}) {
+export function BreakCreateForm({eventId, onClose}: {eventId: number; onClose: () => void}) {
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentURL({event_id: eventId})
   );
@@ -212,7 +204,6 @@ export function BreakCreateForm({
     : {
         duration: '',
         location_data: locationData,
-        ...customInitialValues,
       };
 
   return (
@@ -289,13 +280,7 @@ export function CreateBreakButton({
           <Translate>Create break</Translate>
         </Button>
       )}
-      {open && (
-        <BreakCreateForm
-          eventId={eventId}
-          onClose={() => setOpen(false)}
-          customInitialValues={{}}
-        />
-      )}
+      {open && <BreakCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
     </>
   );
 }
