@@ -171,7 +171,7 @@ export default {
         };
       }
       case actions.DELETE_BLOCK: {
-        const {entry, unscheduleChildContribs} = action;
+        const {entry, eventType} = action;
         const removedEntries = Object.values(state.entries)
           .filter(
             x =>
@@ -181,7 +181,7 @@ export default {
         return {
           ...state,
           entries: _.omit(state.entries, [entry.id, ...removedEntries.map(c => c.id)]),
-          ...(unscheduleChildContribs
+          ...(eventType !== 'meeting'
             ? {unscheduled: [...state.unscheduled, ...removedEntries]}
             : undefined),
         };
@@ -257,6 +257,13 @@ export default {
           ...state,
           ...{[action.session.id]: {...action.session}},
         };
+      case actions.DELETE_BLOCK: {
+        const {entry, deleteParentSession} = action;
+        if (deleteParentSession) {
+          return _.omit(state, entry.sessionId);
+        }
+        return state;
+      }
       case actions.DELETE_SESSION: {
         return _.omit(state, action.sessionId);
       }

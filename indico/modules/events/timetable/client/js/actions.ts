@@ -44,6 +44,7 @@ import {
   SessionBlockId,
   EntryUniqueID,
   Attachment,
+  EventType,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -160,7 +161,8 @@ interface DeleteBreakAction {
 interface DeleteBlockAction {
   type: typeof DELETE_BLOCK;
   entry: BlockEntry;
-  unscheduleChildContribs: boolean;
+  eventType: EventType;
+  deleteParentSession: boolean;
 }
 
 interface DeleteUnscheduledContribAction {
@@ -452,13 +454,19 @@ export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
 
 export function deleteBlock(entry: BlockEntry, eventId: number) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
-    const {staticData} = getState();
+    const {staticData, entries} = getState();
     const eventType = staticData.eventType;
     const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+    const deleteParentSession =
+      eventType === 'meeting' &&
+      !Object.values(entries.entries).find(
+        e => e.sessionId === entry.sessionId && e.id !== entry.id
+      );
     const action = synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
       type: DELETE_BLOCK,
-      unscheduleChildContribs: eventType !== 'meeting',
+      eventType,
       entry,
+      deleteParentSession,
     });
     return dispatch(action);
   };
