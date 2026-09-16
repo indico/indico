@@ -43,7 +43,7 @@ type ModalState =
         eventId: number;
         contribId: number;
         onClose?: () => void;
-        onSubmit?: (formData: any, form: any) => any | undefined;
+        onSubmit?: (formData: any, form: any) => any;
       };
     };
 
