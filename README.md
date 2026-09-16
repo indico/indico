@@ -10,7 +10,7 @@
  * 🌍 fully **web-based**;
  * 🧩 **feature-rich** but also **extensible** through the use of [plugins](https://docs.getindico.io/en/stable/plugins/);
  * ⚖️ **Open-Source** Software under the MIT License;
- * <img src="https://raw.githubusercontent.com/indico/assets/master/cern_badge.png" width="20"> **made at CERN**, [the place where the web was born](https://home.cern/science/computing/birth-web)!
+ * <img src="https://raw.githubusercontent.com/indico/assets/master/cern_badge.png" width="20"> **made at CERN**, [the place where the web was born](https://home.cern/science/computing/the-birth-of-the-web/)!
 
 ![A sneak peek of Indico](https://raw.githubusercontent.com/indico/indico/master/sneakpeek.gif)
 
