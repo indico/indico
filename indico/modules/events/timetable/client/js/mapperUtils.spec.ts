@@ -166,6 +166,7 @@ describe('mapperUtils', () => {
         column: 0,
         maxColumn: 0,
         attachments: [],
+        customFields: {},
       };
       const data = mapEntryToData(entry);
 
@@ -181,6 +182,7 @@ describe('mapperUtils', () => {
       expect(data.session_id).toBe(5);
       expect(data.duration).toBe(90);
       expect(data.start_dt).toBe('2024-01-01T09:00:00.000Z');
+      expect(data.custom_fields).toEqual({});
     });
 
     it('should map Session Block entry to API data', () => {

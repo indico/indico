@@ -98,6 +98,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: v => moment(v),
     toTransform: v => v.toISOString(),
   },
+  {from: 'custom_fields', to: 'customFields'},
 ];
 
 const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [

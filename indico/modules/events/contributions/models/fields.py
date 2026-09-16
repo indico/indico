@@ -175,7 +175,9 @@ class ContributionFieldValueBase(db.Model):
 
     @property
     def friendly_data(self):
-        return self.contribution_field.field.get_friendly_value(self.data)
+        if field_impl := self.contribution_field.field:
+            return field_impl.get_friendly_value(self.data)
+        return '<missing field impl>'
 
 
 class ContributionFieldValue(ContributionFieldValueBase):
