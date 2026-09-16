@@ -591,7 +591,7 @@ class RequestQueue {
   }
 
   async ensureEmpty() {
-    while (this.requests.length) {
+    while (this.requests.length || this.working) {
       await new Promise(r => setTimeout(r, 0));
     }
   }
