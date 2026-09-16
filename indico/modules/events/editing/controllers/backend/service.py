@@ -31,6 +31,8 @@ class RHCheckServiceURL(RHEditingManagementBase):
         'url': fields.URL(schemes={'http', 'https'}, required=True),
     }, location='query')
     def _process(self, url):
+        if not config.EXPERIMENTAL_EDITING_SERVICE:
+            raise ServiceUnavailable('This functionality is not available yet')
         url = url.rstrip('/')
         return jsonify(check_service_url(url))
 
