@@ -11,6 +11,7 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
 import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
+import {camelizeKeys} from 'indico/utils/case';
 import createReduxStore from 'indico/utils/redux';
 
 import {setSessionData, setTimetableData} from './actions';
@@ -44,6 +45,7 @@ import {getCurrentDateLocalStorage} from './utils';
           endDt: moment(eventInfo.end_dt_local),
           defaultContribDurationMinutes: eventInfo.default_contribution_duration / 60,
           eventLocationParent: eventInfo.location_parent,
+          customFields: camelizeKeys(eventInfo.customFields),
         },
         navigation: {
           isDraft: eventInfo.is_draft,

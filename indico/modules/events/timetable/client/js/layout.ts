@@ -318,6 +318,7 @@ export function layoutAfterUnscheduledDrop(
     column: null,
     maxColumn: null,
     attachments: [],
+    customFields: {},
   };
   delete entry.sessionId;
 
@@ -386,6 +387,7 @@ export function layoutAfterUnscheduledDropOnBlock(
     column: null,
     maxColumn: null,
     attachments: [],
+    customFields: {},
   };
 
   if ('backgroundColor' in draftEntry) {

@@ -13,7 +13,7 @@ import {createPortal} from 'react-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
-import {getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
+import {handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -220,21 +220,20 @@ export function UnscheduledContributionEntry({
               openModal(UNSCHEDULED_CONTRIB_EDIT_MODAL, {
                 eventId,
                 contribId: objId,
-                onSubmit: async (formData, form) => {
+                onSubmit: async formData => {
                   // TODO: (Ajob) Instead, maybe create a separate timetable contrib form
                   //              that disregards scheduling info like startdt. Or modify
                   //              the existing timetable manage form to allow for this use case.
-                  const changedVals = getChangedValues(formData, form);
                   try {
                     await indicoAxios.patch(
                       contributionURL({event_id: eventId, contrib_id: objId}),
-                      changedVals
+                      formData
                     );
                   } catch (err) {
-                    return handleSubmitError(err);
+                    return handleSubmitError(err, {}, ['custom_fields']);
                   }
 
-                  const changedEntryData = mapDataToEntry(changedVals, true);
+                  const changedEntryData = mapDataToEntry(formData, true);
                   dispatch(
                     actions.updateUnscheduledEntry(
                       EntryType.Contribution,
