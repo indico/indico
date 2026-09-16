@@ -22,7 +22,6 @@ import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableEntry} from './Entry';
-import {FloatingControls} from './FloatingTimetableControls';
 import {formatTimeRange} from './i18n';
 import {
   computeYoffset,
@@ -35,6 +34,7 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
+import {TimetableDayControls} from './TimetableDayControls';
 import TimetableSidePanel from './TimetableSidePanel';
 import TimetableTabRail from './TimetableTabRail';
 import {useToast} from './ToastContext';
@@ -675,7 +675,7 @@ export function DayTimetable({
         <TimetableSidePanel dt={dt} />
       </div>
       <div styleName="controls-container">
-        <FloatingControls
+        <TimetableDayControls
           onNavigate={d => {
             dispatch(actions.setCurrentDate(d, eventId));
           }}
