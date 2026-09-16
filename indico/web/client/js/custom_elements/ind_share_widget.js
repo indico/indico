@@ -207,44 +207,62 @@ TwitterButton.propTypes = {
 };
 
 function MastodonButton({shareText}) {
-  const href = Indico.User.mastodonServerURL
-    ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
-    : null;
   const isLoggedIn = !_.isEmpty(Indico.User);
   const hasMastodonServer = !_.isEmpty(Indico.User.mastodonServerName);
-  const button = (
-    <Button
-      basic
-      color={isLoggedIn ? 'violet' : 'grey'}
-      styleName="share-button mastodon-button"
-      as="a"
-      target="_blank"
-      href={href}
-      title={
-        isLoggedIn && hasMastodonServer
-          ? `${Indico.User.mastodonServerName} (${Indico.User.mastodonServerURL})`
-          : null
-      }
-    >
-      <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
-      <span>
-        {hasMastodonServer ? Indico.User.mastodonServerName : Translate.string('Mastodon')}
-      </span>
-    </Button>
-  );
+  const shareHref = Indico.User.mastodonServerURL
+    ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
+    : null;
 
+  // Anonymous users cannot share on Mastodon (it needs a logged-in account with a
+  // preferred server), so the button is disabled. aria-disabled rather than the
+  // native disabled attribute keeps it in the tab order, so keyboard and screen
+  // reader users can still reach it and hear why it is unavailable.
+  if (!isLoggedIn) {
+    return (
+      <GridColumn styleName="share-button-column">
+        <ind-with-tooltip>
+          <Button basic color="grey" styleName="share-button mastodon-button" aria-disabled="true">
+            <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+            <span>{Translate.string('Mastodon')}</span>
+            <span data-tip-content>{Translate.string('Please login to share on Mastodon')}</span>
+          </Button>
+        </ind-with-tooltip>
+      </GridColumn>
+    );
+  }
+
+  if (hasMastodonServer) {
+    return (
+      <GridColumn styleName="share-button-column">
+        <Button
+          basic
+          color="violet"
+          styleName="share-button mastodon-button"
+          as="a"
+          target="_blank"
+          href={shareHref}
+          title={`${Indico.User.mastodonServerName} (${Indico.User.mastodonServerURL})`}
+        >
+          <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+          <span>{Indico.User.mastodonServerName}</span>
+        </Button>
+      </GridColumn>
+    );
+  }
+
+  // Logged in but no server configured yet: a real button (not an unfocusable
+  // anchor) that opens the setup popup, so it is operable by keyboard.
   return (
     <GridColumn styleName="share-button-column">
-      {isLoggedIn ? (
-        <SetupMastodonServer button={button} shareText={shareText} />
-      ) : (
-        <Popup
-          trigger={button}
-          content={Translate.string('Please login to share on Mastodon')}
-          position="top right"
-          wide
-        />
-      )}
+      <SetupMastodonServer
+        button={
+          <Button basic color="violet" styleName="share-button mastodon-button" type="button">
+            <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+            <span>{Translate.string('Mastodon')}</span>
+          </Button>
+        }
+        shareText={shareText}
+      />
     </GridColumn>
   );
 }
