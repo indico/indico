@@ -18,6 +18,7 @@ interface SharedFieldProps {
   initialValue?: any;
   className?: string;
   formatOnBlur?: boolean;
+  allowNull?: boolean;
   parse?: (value: any) => any;
   format?: (value: any) => any;
   validate?: (value: any) => string | undefined;

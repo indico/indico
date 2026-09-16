@@ -22,10 +22,6 @@ import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
-  UNSCHEDULED_CONTRIB_EDIT_MODAL,
-  useModal,
-} from 'indico/modules/events/timetable/ModalContext';
-import {
   CollapsibleContainer,
   FinalLocationField,
   FinalReferences,
@@ -61,6 +57,7 @@ interface ContributionFormProps {
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
   loading: boolean;
+  editing?: boolean;
   [key: string]: any; // Allow additional props
 }
 
@@ -85,7 +82,7 @@ export function ContributionFormFields({
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
-      const name = `custom_fields.field_${id}`;
+      const name = `custom_fields.custom_${id}`;
       if (fieldType === 'text') {
         if (fieldData.multiline) {
           return (
@@ -124,6 +121,8 @@ export function ContributionFormFields({
             required={isRequired}
             options={options}
             selection
+            allowNull
+            nullIfEmpty
           />
         );
       } else {
@@ -182,8 +181,8 @@ export function ContributionFormFields({
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
       />
-      {customFieldsSection}
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
+        {customFieldsSection}
         <FinalReferences
           name="references"
           label={Translate.string('External IDs')}
@@ -198,7 +197,7 @@ export function ContributionFormFields({
   );
 }
 
-export function ContributionForm({
+function ContributionForm({
   eventId,
   personLinkFieldParams = {},
   locationParent = {},
@@ -207,13 +206,10 @@ export function ContributionForm({
   initialValues = {},
   sessionBlock = null,
   loading,
+  editing = false,
   ...rest
 }: ContributionFormProps) {
-  const handleSubmit = (formData: any, form: FormApi) => {
-    const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
-      id: parseInt(key.replace('field_', ''), 10),
-      data,
-    }));
+  const handleSubmit = async (formData: any, form: FormApi) => {
     const personLinks = formData.person_links.map(
       ({
         affiliationMeta,
@@ -236,16 +232,11 @@ export function ContributionForm({
     );
     formData = {
       ...formData,
-      custom_fields: customFieldsData,
       person_links: personLinks,
+      references: formData.references.map(({id, ...refs}: any) => refs),
     };
-    onSubmit(
-      {
-        ...formData,
-        references: formData.references.map(({id, ...refs}: any) => refs),
-      },
-      form
-    );
+    const submitPayload = editing ? getChangedValues(formData, form) : formData;
+    return await onSubmit(submitPayload);
   };
 
   if (loading) {
@@ -297,11 +288,11 @@ export function ContributionEditForm({
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading: contribLoading} = useIndicoAxios(contribURL);
 
-  const handleSubmit = async (formData: any, form) => {
+  const handleSubmit = async (formData: any) => {
     try {
-      await indicoAxios.patch(contribURL, getChangedValues(formData, form));
+      await indicoAxios.patch(contribURL, formData);
     } catch (e) {
-      return handleSubmitError(e);
+      return handleSubmitError(e, {}, ['custom_fields']);
     }
 
     location.reload();
@@ -327,14 +318,12 @@ export function ContributionEditForm({
           ? {}
           : {
               ..._.omit(contrib, 'session_block'),
-              custom_fields: Object.fromEntries(
-                contrib.custom_fields.map((field: any) => [`field_${field.id}`, field.data])
-              ),
               person_links: camelizeKeys(contrib.person_links),
             }
       }
       sessionBlock={camelizeKeys(contrib?.session_block)}
       loading={loading}
+      editing
     />
   );
 }
@@ -343,14 +332,10 @@ export function ContributionCreateForm({
   eventId,
   onClose,
   onCreate,
-  customFields = {},
-  customInitialValues = {},
 }: {
   eventId: number;
   onClose: () => void;
   onCreate?: (contrib: any) => void;
-  customFields?: Record<string, any>;
-  customInitialValues?: Record<string, any>;
 }) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     personLinkFieldParamsURL({event_id: eventId}),
@@ -369,18 +354,17 @@ export function ContributionCreateForm({
 
   const handleSubmit = async (formData: any) => {
     try {
-      const response = await indicoAxios.post(contributionCreateURL({event_id: eventId}), {
-        ...formData,
-        event_id: eventId,
-      });
-
-      if (response.data) {
-        onCreate?.(response.data);
+      const response = await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
+      if (onCreate) {
+        onCreate(response.data);
       } else {
         location.reload();
+        // never finish submitting to avoid fields being re-enabled
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        await new Promise(() => {});
       }
     } catch (e) {
-      return handleSubmitError(e);
+      return handleSubmitError(e, {}, ['custom_fields']);
     }
 
     onClose();
@@ -403,11 +387,9 @@ export function ContributionCreateForm({
         keywords: [],
         references: [],
         location_data: locationData,
-        custom_fields: {
-          ...Object.fromEntries(fields.map((field: any) => [`field_${field.id}`, ''])),
-          ...customFields,
-        },
-        ...customInitialValues,
+        custom_fields: Object.fromEntries(
+          fields.map((field: any) => [`custom_${field.id}`, field.fieldType === 'text' ? '' : null])
+        ),
       };
 
   return (
@@ -415,7 +397,7 @@ export function ContributionCreateForm({
       eventId={eventId}
       personLinkFieldParams={personLinkFieldParams}
       locationParent={locationParent}
-      customFields={(fields ?? []).concat(Object.values(customFields))}
+      customFields={fields ?? []}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}
       onClose={onClose}
@@ -440,18 +422,10 @@ export function EditContributionButton({
   trigger?: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
-  const modalContext = useModal();
 
   const openEditModal = React.useCallback(() => {
-    if (modalContext) {
-      modalContext.openModal(UNSCHEDULED_CONTRIB_EDIT_MODAL, {
-        eventId,
-        contribId,
-      });
-    } else {
-      setOpen(true);
-    }
-  }, [modalContext, eventId, contribId]);
+    setOpen(true);
+  }, []);
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -465,8 +439,13 @@ export function EditContributionButton({
       return;
     }
 
-    element.addEventListener('click', openEditModal);
-    return () => element.removeEventListener('click', openEditModal);
+    const handleClick = (evt: any) => {
+      evt.preventDefault();
+      openEditModal();
+    };
+
+    element.addEventListener('click', handleClick);
+    return () => element.removeEventListener('click', handleClick);
   }, [triggerSelector, openEditModal]);
 
   return (
@@ -487,7 +466,7 @@ export function EditContributionButton({
           </Button>
         ))}
 
-      {!modalContext && open && (
+      {open && (
         <ContributionEditForm
           eventId={eventId}
           contribId={contribId}
@@ -530,14 +509,7 @@ export function CreateContributionButton({
           <Translate>Create contribution</Translate>
         </Button>
       )}
-      {open && (
-        <ContributionCreateForm
-          eventId={eventId}
-          onClose={() => setOpen(false)}
-          customFields={{}}
-          customInitialValues={{}}
-        />
-      )}
+      {open && <ContributionCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
     </>
   );
 }
