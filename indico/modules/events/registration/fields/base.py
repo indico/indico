@@ -182,7 +182,7 @@ class RegistrationFormFieldBase:
         if self.form_item.is_required and self.not_empty_if_required and not skip_required:
             validators.append(not_empty)
 
-        mm_field_kwargs = self.mm_field_kwargs
+        mm_field_kwargs = dict(self.mm_field_kwargs)
         if skip_required:
             mm_field_kwargs['allow_none'] = True
 
