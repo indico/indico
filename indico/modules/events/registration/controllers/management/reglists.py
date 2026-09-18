@@ -251,6 +251,10 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
+    def _check_management_permission(self):
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        return any(self.field_data.registration.can_manage(session.user, p) for p in permissions)
+
     def _process(self):
         return self.field_data.send()
 
@@ -297,6 +301,15 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             # the user wants everything (e.g. API-like usage via personal token)
             query = query.filter(Registration.id.in_(registration_ids))
         self.registrations = query.all()
+
+    @property
+    def manageable_registrations(self):
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        return [r for r in self.registrations if any(r.can_manage(session.user, p) for p in permissions)]
+
+    def _check_download_blocked(self):
+        if self.regform.is_download_blocked(session.user):
+            raise Forbidden
 
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
@@ -393,14 +406,15 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
     PERMISSION = ('registration', 'registration_edit')
 
     def _process(self):
-        for registration in self.registrations:
+        registrations = self.manageable_registrations
+        for registration in registrations:
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration, permanent=False)
             logger.info('Registration %s deleted by %s', registration, session.user)
             registration.log(EventLogRealm.management, LogKind.negative, 'Registration',
                              f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
-        num_reg_deleted = len(self.registrations)
+        num_reg_deleted = len(registrations)
         flash(ngettext('Registration was deleted.',
                        '{num} registrations were deleted.', num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
@@ -502,6 +516,10 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     ALLOW_LOCKED = True
     _allow_get_all = True
     registration_query_options = (subqueryload('data'),)
+
+    def _check_access(self):
+        RHRegistrationsActionBase._check_access(self)
+        self._check_download_blocked()
 
     def _process_args(self):
         RHRegistrationsActionBase._process_args(self)
@@ -617,6 +635,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
     def _check_access(self):
         RHRegistrationsActionBase._check_access(self)
+        self._check_download_blocked()
 
         # Check that template belongs to this event or a category that is a parent
         if self.template.owner == self.event:
@@ -655,6 +674,10 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
     ALLOW_LOCKED = True
     TICKET_BADGES = False
+
+    def _check_access(self):
+        RHRegistrationsActionBase._check_access(self)
+        self._check_download_blocked()
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
@@ -920,7 +943,7 @@ class RHRegistrationsApprove(RHRegistrationsActionModerationBase):
     """Accept selected registrations from registration list."""
 
     def _process(self):
-        num_approved, num_skipped = _bulk_modify_registration_status(self.registrations, approve=True)
+        num_approved, num_skipped = _bulk_modify_registration_status(self.manageable_registrations, approve=True)
         if num_approved:
             flash(ngettext('{num} registration was successfully approved.',
                            '{num} registrations were successfully approved.',
@@ -938,11 +961,12 @@ class RHRegistrationsReject(RHRegistrationsActionModerationBase):
     """Reject selected registrations from registration list."""
 
     def _process(self):
-        form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
+        registrations = self.manageable_registrations
+        form = RejectRegistrantsForm(registration_id=[r.id for r in registrations])
         message = _('Rejecting these registrations will trigger a notification email for each registrant.')
         if form.validate_on_submit():
             num_rejected, num_skipped = _bulk_modify_registration_status(
-                self.registrations,
+                registrations,
                 approve=False,
                 rejection_reason=form.rejection_reason.data,
                 attach_rejection_reason=form.attach_rejection_reason.data
@@ -965,7 +989,7 @@ class RHRegistrationsReset(RHRegistrationsActionModerationBase):
     """Reset selected registration from registration list."""
 
     def _process(self):
-        for registration in self.registrations:
+        for registration in self.manageable_registrations:
             registration.reset_state()
         db.session.flush()
         flash(_('The selected registrations were successfully reset.'), 'success')
@@ -1107,6 +1131,10 @@ class RHRegistrationsExportReceipts(ZipGeneratorMixin, RHRegistrationsActionBase
     """Export registration receipts in a zip file."""
 
     ALLOW_LOCKED = True
+
+    def _check_access(self):
+        RHRegistrationsActionBase._check_access(self)
+        self._check_download_blocked()
 
     def _prepare_folder_structure(self, data):
         if isinstance(data, _FileWrapper):

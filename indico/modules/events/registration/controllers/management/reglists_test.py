@@ -8,16 +8,19 @@
 from decimal import Decimal
 
 import pytest
-from flask import request
-from werkzeug.exceptions import UnprocessableEntity
+from flask import request, session
+from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
+from indico.core import signals
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCreate,
                                                                                 RHRegistrationEdit,
-                                                                                RHRegistrationsBasePrice)
+                                                                                RHRegistrationsApprove,
+                                                                                RHRegistrationsBasePrice,
+                                                                                RHRegistrationsExportCSV)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import create_registration
 
 
@@ -159,3 +162,56 @@ def test_registration_update_base_price(dummy_regform, dummy_user, app_context, 
 
     assert reg.base_price == Decimal(expected_price)
     assert reg.state == expected_state
+
+
+def test_export_download_blocked(db, dummy_regform, dummy_user, app_context):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    db.session.flush()
+
+    with app_context.test_request_context(method='POST'):
+        request.view_args = {
+            'reg_form_id': dummy_regform.id,
+            'event_id': dummy_regform.event_id,
+        }
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationsExportCSV()
+        rh.event = dummy_regform.event
+        rh.regform = dummy_regform
+
+        # No handler vetoes the download.
+        rh._check_access()
+
+        def _block(sender, user, **kwargs):
+            return True
+
+        with signals.event.is_registration_download_blocked.connected_to(_block):
+            with pytest.raises(Forbidden):
+                rh._check_access()
+
+
+@pytest.mark.usefixtures('smtp')
+def test_bulk_approve_skips_unmanageable_registrations(db, dummy_regform, dummy_user, app_context):
+    dummy_regform.moderation_enabled = True
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
+                                        invitation=None, management=True, notify_user=False)
+                    for email, last_name in (('mine@example.test', 'Mine'), ('theirs@example.test', 'Theirs')))
+    mine.state = theirs.state = RegistrationState.pending
+    db.session.flush()
+
+    def _only_mine(sender, user, **kwargs):
+        return Registration.id == mine.id
+
+    form_data = {'registration_id': [mine.id, theirs.id], 'csrf_token': '00000000-0000-0000-0000-000000000000'}
+    with app_context.test_request_context(method='POST', data=form_data):
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationsApprove()
+        rh._process_args()
+        with signals.event.filter_registration_list.connected_to(_only_mine):
+            rh._process()
+
+    assert mine.state == RegistrationState.complete
+    assert theirs.state == RegistrationState.pending
