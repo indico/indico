@@ -250,6 +250,7 @@ function ContributionForm({
   return (
     <FinalModalForm
       id="contribution-form"
+      style={{overflowWrap: 'break-word'}}
       onSubmit={handleSubmit}
       initialValues={initialValues}
       size="small"
