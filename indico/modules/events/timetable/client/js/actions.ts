@@ -44,6 +44,7 @@ import {
   SessionBlockId,
   EntryUniqueID,
   Attachment,
+  EventType,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -60,7 +61,8 @@ export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DESELECT_ENTRY = 'Deselect entry';
 export const DELETE_BREAK = 'Delete break';
-export const DELETE_UNSCHEDULED_CONTRIB = 'Delete contrib';
+export const DELETE_UNSCHEDULED_CONTRIB = 'Delete unscheduled contrib';
+export const DELETE_SCHEDULED_CONTRIB = 'Delete scheduled contrib';
 export const ADD_UNSCHEDULED_CONTRIB = 'Add unscheduled contrib';
 export const DELETE_BLOCK = 'Delete block';
 export const SCHEDULE_ENTRY = 'Schedule entry';
@@ -159,10 +161,18 @@ interface DeleteBreakAction {
 interface DeleteBlockAction {
   type: typeof DELETE_BLOCK;
   entry: BlockEntry;
+  eventType: EventType;
+  deleteParentSession: boolean;
 }
 
 interface DeleteUnscheduledContribAction {
   type: typeof DELETE_UNSCHEDULED_CONTRIB;
+  id: ContribId;
+  eventId: number;
+}
+
+interface DeleteScheduledContribAction {
+  type: typeof DELETE_SCHEDULED_CONTRIB;
   id: ContribId;
   eventId: number;
 }
@@ -229,6 +239,7 @@ export type Action =
   | SetEntryAttachments
   | DeleteBreakAction
   | DeleteUnscheduledContribAction
+  | DeleteScheduledContribAction
   | AddUnscheduledContribAction
   | DeleteBlockAction
   | SetDraftEntryAction
@@ -420,6 +431,20 @@ export function deleteUnscheduledContrib(id: number, eventId: number) {
   });
 }
 
+export function deleteScheduledContrib(id: number) {
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const contribURL = contributionURL({event_id: eventId, contrib_id: id});
+    const action = synchronizedAjaxAction(() => indicoAxios.delete(contribURL), {
+      type: DELETE_SCHEDULED_CONTRIB,
+      id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
+      eventId,
+    });
+    return dispatch(action);
+  };
+}
+
 export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
   return {
     type: ADD_UNSCHEDULED_CONTRIB,
@@ -428,11 +453,23 @@ export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
 }
 
 export function deleteBlock(entry: BlockEntry, eventId: number) {
-  const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
-  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
-    type: DELETE_BLOCK,
-    entry,
-  });
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+    const {staticData, entries} = getState();
+    const eventType = staticData.eventType;
+    const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+    const deleteParentSession =
+      eventType === 'meeting' &&
+      !Object.values(entries.entries).find(
+        e => e.sessionId === entry.sessionId && e.id !== entry.id
+      );
+    const action = synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
+      type: DELETE_BLOCK,
+      eventType,
+      entry,
+      deleteParentSession,
+    });
+    return dispatch(action);
+  };
 }
 
 export function scheduleEntry(
