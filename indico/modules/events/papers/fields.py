@@ -9,10 +9,12 @@ import fnmatch
 import json
 import os
 
+from flask import session
 from marshmallow import ValidationError
-from marshmallow.fields import Dict
+from marshmallow.fields import Dict, Enum
 
 from indico.modules.events.papers.file_types import PaperFileType
+from indico.modules.events.papers.models.reviews import PaperAction
 from indico.modules.events.papers.settings import RoleConverter
 from indico.modules.events.papers.settings import paper_reviewing_settings as settings
 from indico.util.marshmallow import FilesField, ModelField
@@ -116,3 +118,16 @@ class PaperFilesField(Dict):
                 raise ValidationError(f'Duplicate filenames found in file type "{file_type.name}"')
 
             seen |= set(files)
+
+
+class PaperActionField(Enum):
+    def __init__(self, **kwargs):
+        super().__init__(PaperAction, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        rv = super()._deserialize(value, attr, data, **kwargs)
+        paper = self.context['paper']
+        if rv == PaperAction.to_be_corrected and not paper.can_ask_corrections(session.user):
+            raise ValidationError(
+                'You cannot ask for corrections, this paper has reached the limited number of revisions'
+            )
