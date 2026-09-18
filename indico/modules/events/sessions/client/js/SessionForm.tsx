@@ -96,6 +96,7 @@ export function SessionForm({
   return (
     <FinalModalForm
       id="session-form"
+      style={{overflowWrap: 'break-word'}}
       header={header}
       onSubmit={onSubmit}
       onClose={onClose}
