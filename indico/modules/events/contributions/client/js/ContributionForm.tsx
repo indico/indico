@@ -81,6 +81,7 @@ export function ContributionFormFields({
 }: ContributionFormFieldsProps) {
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
+      // TODO: adjust isRequired in management (where all fields are optional)
       const key = `custom_field_${id}`;
       const name = `custom_fields.custom_${id}`;
       if (fieldType === 'text') {
