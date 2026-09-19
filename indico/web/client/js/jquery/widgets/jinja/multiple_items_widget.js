@@ -201,7 +201,15 @@ import {$T} from 'indico/utils/i18n';
         widget.find('tbody.ui-sortable').sortable('refresh');
       }
       fixWidths();
-      addButton.prop('disabled', !!widget.find('.js-table-input').length);
+      // a row being edited is not part of the form data, so the form has to be told about it
+      const editing = widget.find('.js-table-input');
+      editing.each(function() {
+        if ('setCustomValidity' in this) {
+          this.setCustomValidity($T('Please save or cancel this row first.'));
+        }
+      });
+      widget.attr('data-pending-changes', editing.length ? '' : null);
+      addButton.prop('disabled', !!editing.length);
       if (moveTooltips === undefined || moveTooltips) {
         repositionTooltips();
       }
