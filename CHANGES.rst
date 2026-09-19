@@ -22,7 +22,11 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Management list toolbars (such as the list of abstracts, contributions or
+  registrations) now tell screen reader users when an action button is
+  unavailable because no rows are selected, and no longer let keyboard focus
+  land on those buttons; the row-selection button now has a name
+  (:pr:`7747`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
