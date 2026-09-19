@@ -22,7 +22,12 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Screen readers now announce form validation errors and tie each error to the
+  field it belongs to, so the error is read out whenever that field is focused
+  (:pr:`7743`, thanks :user:`foxbunny`)
+- The red "required" asterisk next to form labels is no longer read out as a
+  stray symbol by screen readers; a field's required state is conveyed by the
+  field itself (:pr:`7743`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
