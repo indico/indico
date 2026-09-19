@@ -22,7 +22,10 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Keyboard and screen reader users can now open and use the event footer "Share
+  this page" widget, which previously could not be opened with the keyboard and
+  whose controls had no accessible names (:issue:`7623`, :pr:`7706`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

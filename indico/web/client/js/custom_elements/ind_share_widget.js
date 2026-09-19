@@ -11,7 +11,7 @@ import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mas
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form as FinalForm} from 'react-final-form';
 import {
@@ -27,8 +27,10 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
+  Ref,
 } from 'semantic-ui-react';
 
+import {WithPopup} from 'indico/react/components';
 import {FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -59,20 +61,25 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
     <div styleName="copy-to-clipboard-container">
       <div styleName="input-copy-qr-container">
         <Input
+          aria-label={Translate.string('Event URL')}
           label={
-            <Button
-              icon={isCopied ? 'check' : 'copy'}
-              title={
-                isCopied
-                  ? Translate.string('Link copied to clipboard')
-                  : Translate.string('Copy link to clipboard')
-              }
-              positive={isCopied}
-              onClick={() => {
-                navigator.clipboard.writeText(eventShortUrl);
-                setCopied(true);
-              }}
-            />
+            <ind-with-tooltip>
+              <Button
+                icon
+                positive={isCopied}
+                onClick={() => {
+                  navigator.clipboard.writeText(eventShortUrl);
+                  setCopied(true);
+                }}
+              >
+                <Icon name={isCopied ? 'check' : 'copy'} />
+                <span data-tip-content>
+                  {isCopied
+                    ? Translate.string('Link copied to clipboard')
+                    : Translate.string('Copy link to clipboard')}
+                </span>
+              </Button>
+            </ind-with-tooltip>
           }
           labelPosition="right"
           defaultValue={eventShortUrl}
@@ -85,7 +92,7 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
             floating
             className="ui primary icon"
             icon="download"
-            title={Translate.string('Download QR code')}
+            aria-label={Translate.string('Download QR code')}
             direction="left"
           >
             <DropdownMenu>
@@ -106,11 +113,12 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
             </DropdownMenu>
           </Dropdown>
         ) : (
-          <Button
-            icon="qrcode"
-            title={Translate.string('Show QR code')}
-            onClick={() => showQR(true)}
-          />
+          <ind-with-tooltip>
+            <Button icon onClick={() => showQR(true)}>
+              <Icon name="qrcode" />
+              <span data-tip-content>{Translate.string('Show QR code')}</span>
+            </Button>
+          </ind-with-tooltip>
         )}
       </div>
       {isQrShown && (
@@ -118,6 +126,7 @@ function ShareURLDisplayQR({eventShortUrl, eventQrUrl}) {
           <img
             styleName="qr-code-img"
             src={qrData?.imageSourceURL}
+            alt=""
             onLoad={() => setIsImageLoaded(true)}
             style={{display: isImageLoaded ? 'block' : 'none'}}
           />
@@ -161,7 +170,7 @@ function CalendarButtons({googleCalParams, outlookCalParams}) {
             color={calendar.color}
             styleName="share-button"
           >
-            <img src={calendar.logo} alt={calendar.name} />
+            <img src={calendar.logo} alt="" />
             <span>{calendar.name}</span>
           </Button>
         </GridColumn>
@@ -186,7 +195,7 @@ function TwitterButton({shareText}) {
         color="blue"
         styleName="share-button"
       >
-        <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt={Translate.string('Twitter')} />
+        <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt="" />
         <Translate as="span">Twitter</Translate>
       </Button>
     </GridColumn>
@@ -197,61 +206,76 @@ TwitterButton.propTypes = {
   shareText: PropTypes.string.isRequired,
 };
 
-function MastodonButton({shareText, setMastodonOpen}) {
-  const href = Indico.User.mastodonServerURL
-    ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
-    : null;
+function MastodonButton({shareText}) {
   const isLoggedIn = !_.isEmpty(Indico.User);
   const hasMastodonServer = !_.isEmpty(Indico.User.mastodonServerName);
-  const button = (
-    <Button
-      basic
-      color={isLoggedIn ? 'violet' : 'grey'}
-      styleName="share-button mastodon-button"
-      as="a"
-      target="_blank"
-      href={href}
-      title={
-        isLoggedIn && hasMastodonServer
-          ? `${Indico.User.mastodonServerName} (${Indico.User.mastodonServerURL})`
-          : null
-      }
-    >
-      <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt={Translate.string('Mastodon')} />
-      <span>
-        {hasMastodonServer ? Indico.User.mastodonServerName : Translate.string('Mastodon')}
-      </span>
-    </Button>
-  );
+  const shareHref = Indico.User.mastodonServerURL
+    ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
+    : null;
 
+  // Anonymous users cannot share on Mastodon (it needs a logged-in account with a
+  // preferred server), so the button is disabled. aria-disabled rather than the
+  // native disabled attribute keeps it in the tab order, so keyboard and screen
+  // reader users can still reach it and hear why it is unavailable.
+  if (!isLoggedIn) {
+    return (
+      <GridColumn styleName="share-button-column">
+        <ind-with-tooltip>
+          <Button basic color="grey" styleName="share-button mastodon-button" aria-disabled="true">
+            <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+            <span>{Translate.string('Mastodon')}</span>
+            <span data-tip-content>{Translate.string('Please login to share on Mastodon')}</span>
+          </Button>
+        </ind-with-tooltip>
+      </GridColumn>
+    );
+  }
+
+  if (hasMastodonServer) {
+    return (
+      <GridColumn styleName="share-button-column">
+        <Button
+          basic
+          color="violet"
+          styleName="share-button mastodon-button"
+          as="a"
+          target="_blank"
+          href={shareHref}
+          title={`${Indico.User.mastodonServerName} (${Indico.User.mastodonServerURL})`}
+        >
+          <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+          <span>{Indico.User.mastodonServerName}</span>
+        </Button>
+      </GridColumn>
+    );
+  }
+
+  // Logged in but no server configured yet: a real button (not an unfocusable
+  // anchor) that opens the setup popup, so it is operable by keyboard.
   return (
     <GridColumn styleName="share-button-column">
-      {isLoggedIn ? (
-        <SetupMastodonServer
-          button={button}
-          setMastodonOpen={setMastodonOpen}
-          shareText={shareText}
-        />
-      ) : (
-        <Popup
-          trigger={button}
-          content={Translate.string('Please login to share on Mastodon')}
-          position="top right"
-          wide
-        />
-      )}
+      <SetupMastodonServer
+        button={
+          <Button basic color="violet" styleName="share-button mastodon-button" type="button">
+            <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt="" />
+            <span>{Translate.string('Mastodon')}</span>
+          </Button>
+        }
+        shareText={shareText}
+      />
     </GridColumn>
   );
 }
 
 MastodonButton.propTypes = {
   shareText: PropTypes.string.isRequired,
-  setMastodonOpen: PropTypes.func.isRequired,
 };
 
-function SetupMastodonServer({setMastodonOpen, button, shareText}) {
+function SetupMastodonServer({button, shareText}) {
   const [serverURL, setServerURL] = useState(null);
   const [mastodonServerName, setMastodonServerName] = useState(null);
+  const [mountNode, setMountNode] = useState(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     if (serverURL) {
@@ -263,118 +287,117 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
     }
   }, [serverURL, mastodonServerName]);
 
+  useEffect(() => {
+    // Render the setup popup inside the share dialog rather than letting it
+    // portal to <body>. Outside the dialog, focusing the form would register as
+    // focus leaving the dialog and close the whole share panel out from under it.
+    setMountNode(triggerRef.current?.closest('[data-dialog]') ?? null);
+  }, []);
+
   if (Indico.User.mastodonServerURL && Indico.User.mastodonServerName) {
     return button;
   }
 
   return (
-    <Popup
-      wide
-      pinned
-      position="top right"
-      onOpen={() => setMastodonOpen(true)}
-      onClose={() => {
-        setMastodonOpen(false);
-      }}
-      trigger={button}
-      on="click"
-    >
-      <Popup.Content>
-        {!serverURL ? (
-          <>
-            <Message icon info styleName="empty-mastodon-server-notice">
-              <Icon name="star" />
-              <Translate>
-                You have not added a preferred Mastodon server on your profile yet. Please add one
-                below.
-              </Translate>
-            </Message>
-            <FinalForm
-              onSubmit={async data => {
-                let resp;
-                try {
-                  resp = await indicoAxios.post(userPreferencesMastodonServer(), data);
-                } catch (e) {
-                  return handleSubmitError(e);
-                }
-                setServerURL(resp.data.url);
-                setMastodonServerName(resp.data.name);
-              }}
-              subscription={{
-                pristine: true,
-                submitting: true,
-                submitError: true,
-                submitFailed: true,
-                dirtySinceLastSubmit: true,
-              }}
-            >
-              {({
-                handleSubmit,
-                pristine,
-                submitting,
-                submitError,
-                submitFailed,
-                dirtySinceLastSubmit,
-              }) => (
-                <form onSubmit={handleSubmit}>
-                  <FinalInput
-                    name="server_url"
-                    required
-                    labelPosition="right"
-                    placeholder="https://mastodon.social"
-                    fluid
-                    error={!!submitError && !dirtySinceLastSubmit}
-                    componentLabel={
-                      <Button
-                        icon="save"
-                        positive
-                        type="submit"
-                        disabled={pristine || submitting || (submitFailed && !dirtySinceLastSubmit)}
-                        loading={submitting}
-                        content={Translate.string('Save')}
-                      />
-                    }
-                  />
-                  {submitError && !dirtySinceLastSubmit && (
-                    <div styleName="error-message">
-                      <Icon name="times" />
-                      {submitError}
-                    </div>
-                  )}
-                </form>
-              )}
-            </FinalForm>
-          </>
-        ) : (
-          <>
-            <Message icon positive styleName="saved-mastodon-server-notice">
-              <Icon name="check circle outline" />
-              <Translate>
-                Preferred Mastodon server added! You can now share this event below.
-              </Translate>
-            </Message>
+    <Ref innerRef={triggerRef}>
+      <Popup wide pinned position="top right" trigger={button} on="click" mountNode={mountNode}>
+        <Popup.Content>
+          {!serverURL ? (
+            <>
+              <Message icon info styleName="empty-mastodon-server-notice">
+                <Icon name="star" />
+                <Translate>
+                  You have not added a preferred Mastodon server on your profile yet. Please add one
+                  below.
+                </Translate>
+              </Message>
+              <FinalForm
+                onSubmit={async data => {
+                  let resp;
+                  try {
+                    resp = await indicoAxios.post(userPreferencesMastodonServer(), data);
+                  } catch (e) {
+                    return handleSubmitError(e);
+                  }
+                  setServerURL(resp.data.url);
+                  setMastodonServerName(resp.data.name);
+                }}
+                subscription={{
+                  pristine: true,
+                  submitting: true,
+                  submitError: true,
+                  submitFailed: true,
+                  dirtySinceLastSubmit: true,
+                }}
+              >
+                {({
+                  handleSubmit,
+                  pristine,
+                  submitting,
+                  submitError,
+                  submitFailed,
+                  dirtySinceLastSubmit,
+                }) => (
+                  <form onSubmit={handleSubmit}>
+                    <FinalInput
+                      name="server_url"
+                      required
+                      labelPosition="right"
+                      placeholder="https://mastodon.social"
+                      fluid
+                      error={!!submitError && !dirtySinceLastSubmit}
+                      componentLabel={
+                        <Button
+                          icon="save"
+                          positive
+                          type="submit"
+                          disabled={
+                            pristine || submitting || (submitFailed && !dirtySinceLastSubmit)
+                          }
+                          loading={submitting}
+                          content={Translate.string('Save')}
+                        />
+                      }
+                    />
+                    {submitError && !dirtySinceLastSubmit && (
+                      <div styleName="error-message">
+                        <Icon name="times" />
+                        {submitError}
+                      </div>
+                    )}
+                  </form>
+                )}
+              </FinalForm>
+            </>
+          ) : (
+            <>
+              <Message icon positive styleName="saved-mastodon-server-notice">
+                <Icon name="check circle outline" />
+                <Translate>
+                  Preferred Mastodon server added! You can now share this event below.
+                </Translate>
+              </Message>
 
-            <Button
-              as="a"
-              target="_blank"
-              href={`${serverURL}/share?text=${encodeURIComponent(shareText)}`}
-              icon="share square"
-              content={Translate.string('Share on {mastodonServerName}', {
-                mastodonServerName,
-              })}
-              positive
-              fluid
-              onClick={() => setMastodonOpen(false)}
-            />
-          </>
-        )}
-      </Popup.Content>
-    </Popup>
+              <Button
+                as="a"
+                target="_blank"
+                href={`${serverURL}/share?text=${encodeURIComponent(shareText)}`}
+                icon="share square"
+                content={Translate.string('Share on {mastodonServerName}', {
+                  mastodonServerName,
+                })}
+                positive
+                fluid
+              />
+            </>
+          )}
+        </Popup.Content>
+      </Popup>
+    </Ref>
   );
 }
 
 SetupMastodonServer.propTypes = {
-  setMastodonOpen: PropTypes.func.isRequired,
   button: PropTypes.element.isRequired,
   shareText: PropTypes.string.isRequired,
 };
@@ -388,62 +411,49 @@ function ShareWidget({
   googleCalParams,
   outlookCalParams,
 }) {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isMastodonOpen, setMastodonOpen] = useState(false);
   const shareText = `${eventName} (${eventStartDt}) · Indico (${eventShortUrl})`;
   return (
-    <Popup
+    <WithPopup
       trigger={
-        <img
-          src={shareIcon}
-          styleName={isPopupOpen ? 'share-widget show' : 'share-widget'}
-          tabIndex={0}
-          aria-label={Translate.string('Share this page')}
-          aria-modal
-          alt={Translate.string('Share widget icon')}
-        />
+        <ind-with-tooltip>
+          <button type="button" styleName="share-widget" data-trigger>
+            <img src={shareIcon} alt="" />
+            <span data-tip-content>{Translate.string('Share this page')}</span>
+          </button>
+        </ind-with-tooltip>
       }
-      content={
-        <>
-          <div styleName="share-header-title">
-            <Icon name="share alternate" styleName="icon" />
-            <Translate as="strong">Share this page</Translate>
-          </div>
-          <Header styleName="share-section-header">
-            <Icon name="linkify" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Direct link</Translate>
-            </HeaderContent>
-          </Header>
-          <ShareURLDisplayQR eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
-          <Header styleName="share-section-header">
-            <Icon name="calendar alternate outline" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Add to calendar</Translate>
-            </HeaderContent>
-          </Header>
-          <CalendarButtons googleCalParams={googleCalParams} outlookCalParams={outlookCalParams} />
-          <Header styleName="share-section-header">
-            <Icon name="share square" styleName="icon" />
-            <HeaderContent styleName="title">
-              <Translate>Share on social media</Translate>
-            </HeaderContent>
-          </Header>
-          <Grid columns={2} stretched>
-            <MastodonButton shareText={shareText} setMastodonOpen={setMastodonOpen} />
-            <TwitterButton shareText={shareText} />
-          </Grid>
-        </>
-      }
-      on="click"
-      onOpen={() => setIsPopupOpen(true)}
-      onClose={() => !isMastodonOpen && setIsPopupOpen(false)}
-      position="top right"
-      pinned
-      open={isPopupOpen}
-      wide="very"
-      style={{width: '450px'}}
-    />
+    >
+      <div styleName="share-content">
+        <div styleName="share-header-title">
+          <Icon name="share alternate" styleName="icon" />
+          <Translate as="strong">Share this page</Translate>
+        </div>
+        <Header styleName="share-section-header">
+          <Icon name="linkify" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Direct link</Translate>
+          </HeaderContent>
+        </Header>
+        <ShareURLDisplayQR eventShortUrl={eventShortUrl} eventQrUrl={eventQrUrl} />
+        <Header styleName="share-section-header">
+          <Icon name="calendar alternate outline" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Add to calendar</Translate>
+          </HeaderContent>
+        </Header>
+        <CalendarButtons googleCalParams={googleCalParams} outlookCalParams={outlookCalParams} />
+        <Header styleName="share-section-header">
+          <Icon name="share square" styleName="icon" />
+          <HeaderContent styleName="title">
+            <Translate>Share on social media</Translate>
+          </HeaderContent>
+        </Header>
+        <Grid columns={2} stretched>
+          <MastodonButton shareText={shareText} />
+          <TwitterButton shareText={shareText} />
+        </Grid>
+      </div>
+    </WithPopup>
   );
 }
 
