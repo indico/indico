@@ -121,3 +121,9 @@ get_csp_script_sources = _signals.signal('get-csp-script-sources', '''
 Return additional values for the `script-src` CSP, in case additional (external)
 hosts need to be added.
 ''')
+
+get_email_senders = _signals.signal('get-email-senders', '''
+Return additional senders for emails sent from within an event. The *sender*
+is the event. The registration form, when applicable, is passed in the
+``regform`` kwarg.
+''')

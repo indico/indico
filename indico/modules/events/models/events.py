@@ -53,6 +53,7 @@ from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale, get_all_locales
 from indico.util.iterables import materialize_iterable
+from indico.util.signals import values_from_signal
 from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
@@ -865,7 +866,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     def get_allowed_sender_emails(self, *, include_current_user=True, include_creator=True, include_managers=True,
                                   include_contact=True, include_chairs=True, include_noreply=False, extra=None,
-                                  _for_sending=False):
+                                  _for_sending=False, plugin_ctx=None):
         """
         Return the emails of people who can be used as senders (or
         rather Reply-to contacts) in emails sent from within an event.
@@ -887,6 +888,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         :param: _for_sending: Internal use only; formats the value in a
                               way suitable for sending an email to it,
                               instead of in a human-friendly way.
+        :param: plugin_ctx: Additional context to provide to plugins as
+                            keyword arguments.
         :return: A dictionary mapping emails to pretty names
         """
         emails = {}
@@ -923,6 +926,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             for email, name in emails.items()
             if email and email.strip()
         }
+        plugin_extra_senders = values_from_signal(
+            signals.core.get_email_senders.send(self, **(plugin_ctx or {})),
+            as_list=True,
+        )
+        for email, name in plugin_extra_senders:
+            emails.setdefault(email, name)
         own_email = session.user.email if has_request_context() and session.user else None
         return dict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
 
