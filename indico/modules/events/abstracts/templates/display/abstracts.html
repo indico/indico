@@ -25,12 +25,15 @@
         <div class="list abstracts">
             <div class="toolbars space-after">
                 <div class="toolbar">
-                    <button class="icon-checkbox-checked i-button arrow left icon-only"
-                            aria-hidden="true" data-toggle="dropdown"></button>
-                    <ul class="i-dropdown">
-                        <li><a href="#" id="select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
-                        <li><a href="#" id="select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
-                    </ul>
+                    <ind-menu>
+                        <button class="icon-checkbox-checked i-button left icon-only">
+                            <span class="select-rows-label">{% trans %}Select rows{% endtrans %}</span>
+                        </button>
+                        <menu>
+                            <li><a href="#" id="select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
+                            <li><a href="#" id="select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
+                        </menu>
+                    </ind-menu>
                     <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
                             data-href="{{ url_for('.display_customize_abstract_list', event, track) }}"
                             data-title="{% trans %}Abstract list configuration{% endtrans %}"
@@ -45,35 +48,36 @@
                             {%- trans %}Download attachments{%- endtrans %}
                         </button>
                     {% endif %}
-                    <button class="i-button arrow button js-requires-selected-row disabled"
-                            data-toggle="dropdown">
-                        {%- trans %}Export{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        {% if indico_config.LATEX_ENABLED %}
+                    <ind-menu>
+                        <button class="i-button button js-requires-selected-row disabled">
+                            {%- trans %}Export{% endtrans -%}
+                        </button>
+                        <menu>
+                            {% if indico_config.LATEX_ENABLED %}
+                                <li>
+                                    <a href="#"
+                                       class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                       data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">
+                                        PDF
+                                    </a>
+                                </li>
+                            {% endif %}
                             <li>
                                 <a href="#"
-                                   class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                                   data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">
-                                    PDF
+                                   class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_csv_export', track) }}">
+                                    CSV
                                 </a>
                             </li>
-                        {% endif %}
-                        <li>
-                            <a href="#"
-                               class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.display_abstracts_csv_export', track) }}">
-                                CSV
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.display_abstracts_xlsx_export', track) }}">
-                                XLSX (Excel)
-                            </a>
-                        </li>
-                    </ul>
+                            <li>
+                                <a href="#"
+                                   class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_xlsx_export', track) }}">
+                                    XLSX (Excel)
+                                </a>
+                            </li>
+                        </menu>
+                    </ind-menu>
                     <div class="group">
                         <button class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></button>
                     </div>
