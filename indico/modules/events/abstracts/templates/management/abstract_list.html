@@ -23,12 +23,15 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <button class="icon-checkbox-checked i-button arrow left icon-only"
-                            aria-hidden="true" data-toggle="dropdown"></button>
-                    <ul class="i-dropdown">
-                        <li><a href="#" id="select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
-                        <li><a href="#" id="select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
-                    </ul>
+                    <ind-menu>
+                        <button class="icon-checkbox-checked i-button left icon-only">
+                            <span class="select-rows-label">{% trans %}Select rows{% endtrans %}</span>
+                        </button>
+                        <menu>
+                            <li><a href="#" id="select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
+                            <li><a href="#" id="select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
+                        </menu>
+                    </ind-menu>
                 </div>
                 <div class="group">
                     <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
@@ -41,125 +44,134 @@
                     </button>
                 </div>
                 <div class="group">
-                    <button class="i-button arrow icon-plus hide-if-locked"
-                            data-toggle="dropdown">
-                        {% trans 'Abstract' %}New{% endtrans %}
-                    </button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a class="js-dialog-action"
-                               title="{% trans %}Add new abstract{% endtrans %}"
-                               data-title="{% trans %}Add new abstract{% endtrans %}"
-                               data-href="{{ url_for('.manage_create_abstract', event) }}"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm-close-unsaved
-                               data-ajax-dialog>
-                                {% trans %}Abstract{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            {%- if can_create_invited_abstracts -%}
-                                {%- set message = _("Add new invited abstract") %}
-                            {%- else -%}
-                                {%- set message = _("You first need to create a notification template for invited abstracts") %}
-                            {%- endif -%}
-                            <a class="js-dialog-action {{ 'disabled' if not can_create_invited_abstracts }}"
-                               title="{{ message }}"
-                               data-title="{% trans %}Add new invited abstract{% endtrans %}"
-                               data-href="{{ url_for('.manage_create_abstract', event, invited=true) }}"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm-close-unsaved
-                               data-ajax-dialog>
-                                {% trans %}Invited abstract{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
+                    <ind-menu class="hide-if-locked">
+                        <button class="i-button icon-plus">
+                            {% trans 'Abstract' %}New{% endtrans %}
+                        </button>
+                        <menu>
+                            <li>
+                                <a href="#"
+                                   class="js-dialog-action"
+                                   title="{% trans %}Add new abstract{% endtrans %}"
+                                   data-title="{% trans %}Add new abstract{% endtrans %}"
+                                   data-href="{{ url_for('.manage_create_abstract', event) }}"
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-confirm-close-unsaved
+                                   data-ajax-dialog>
+                                    {% trans %}Abstract{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                {%- if can_create_invited_abstracts -%}
+                                    {%- set message = _("Add new invited abstract") %}
+                                {%- else -%}
+                                    {%- set message = _("You first need to create a notification template for invited abstracts") %}
+                                {%- endif -%}
+                                <a href="#"
+                                   class="js-dialog-action {{ 'disabled' if not can_create_invited_abstracts }}"
+                                   title="{{ message }}"
+                                   data-title="{% trans %}Add new invited abstract{% endtrans %}"
+                                   data-href="{{ url_for('.manage_create_abstract', event, invited=true) }}"
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-confirm-close-unsaved
+                                   data-ajax-dialog>
+                                    {% trans %}Invited abstract{% endtrans %}
+                                </a>
+                            </li>
+                        </menu>
+                    </ind-menu>
                 </div>
                 <div class="group hide-if-locked">
-                    <button class="i-button arrow icon-remove js-requires-selected-row disabled"
-                            data-toggle="dropdown">
-                        {%- trans %}Remove{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a href="#" class="js-requires-selected-row"
-                               data-href="{{ url_for('.manage_delete_abstracts', event) }}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}"
-                               data-title="{% trans %}Confirm deletion{% endtrans %}"
-                               data-method="POST">
-                                {% trans %}Abstracts{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="js-requires-selected-row"
-                               data-href="{{ url_for('.manage_delete_abstracts', event, delete_contribs=1) }}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm="{% trans %}Do you really want to delete the selected abstracts and their linked contributions?{% endtrans %}"
-                               data-title="{% trans %}Confirm deletion{% endtrans %}"
-                               data-method="POST">
-                                {% trans %}Abstracts & linked contributions{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
+                    <ind-menu>
+                        <button class="i-button icon-remove js-requires-selected-row disabled">
+                            {%- trans %}Remove{% endtrans -%}
+                        </button>
+                        <menu>
+                            <li>
+                                <a href="#" class="js-requires-selected-row"
+                                   data-href="{{ url_for('.manage_delete_abstracts', event) }}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-confirm="{% trans %}Do you really want to delete the selected abstracts?{% endtrans %}"
+                                   data-title="{% trans %}Confirm deletion{% endtrans %}"
+                                   data-method="POST">
+                                    {% trans %}Abstracts{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="js-requires-selected-row"
+                                   data-href="{{ url_for('.manage_delete_abstracts', event, delete_contribs=1) }}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-confirm="{% trans %}Do you really want to delete the selected abstracts and their linked contributions?{% endtrans %}"
+                                   data-title="{% trans %}Confirm deletion{% endtrans %}"
+                                   data-method="POST">
+                                    {% trans %}Abstracts & linked contributions{% endtrans %}
+                                </a>
+                            </li>
+                        </menu>
+                    </ind-menu>
                 </div>
                 <div class="group hide-if-locked">
-                    <button class="i-button arrow icon-hammer js-requires-selected-row disabled"
-                            data-toggle="dropdown">
-                        {%- trans %}Judge{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a class="accept js-requires-selected-row"
-                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
-                               data-title="{% trans %}Accept selected abstracts{% endtrans %}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-params='{"judgment": "accept"}'
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-method="POST"
-                               data-ajax-dialog>
-                                {%- trans %}Accept{% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="js-requires-selected-row js-dialog-action danger"
-                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
-                               data-title="{% trans %}Reject selected abstracts{% endtrans %}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-params='{"judgment": "reject"}'
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-method="POST"
-                               data-ajax-dialog>
-                                {%- trans %}Reject{% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="js-requires-selected-row js-dialog-action"
-                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
-                               data-title="{% trans %}Merge selected abstracts{% endtrans %}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-params='{"judgment": "merge"}'
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-method="POST"
-                               data-ajax-dialog>
-                                {%- trans %}Merge{% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="js-requires-selected-row js-dialog-action"
-                               data-href="{{ url_for('.manage_judge_abstracts', event) }}"
-                               data-title="{% trans %}Mark selected abstracts as duplicate{% endtrans %}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-params='{"judgment": "mark_as_duplicate"}'
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-method="POST"
-                               data-ajax-dialog>
-                                {%- trans %}Mark as duplicate{% endtrans -%}
-                            </a>
-                        </li>
-                    </ul>
+                    <ind-menu>
+                        <button class="i-button icon-hammer js-requires-selected-row disabled">
+                            {%- trans %}Judge{% endtrans -%}
+                        </button>
+                        <menu>
+                            <li>
+                                <a href="#"
+                                   class="accept js-requires-selected-row"
+                                   data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                                   data-title="{% trans %}Accept selected abstracts{% endtrans %}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-params='{"judgment": "accept"}'
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-method="POST"
+                                   data-ajax-dialog>
+                                    {%- trans %}Accept{% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="js-requires-selected-row js-dialog-action danger"
+                                   data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                                   data-title="{% trans %}Reject selected abstracts{% endtrans %}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-params='{"judgment": "reject"}'
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-method="POST"
+                                   data-ajax-dialog>
+                                    {%- trans %}Reject{% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="js-requires-selected-row js-dialog-action"
+                                   data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                                   data-title="{% trans %}Merge selected abstracts{% endtrans %}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-params='{"judgment": "merge"}'
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-method="POST"
+                                   data-ajax-dialog>
+                                    {%- trans %}Merge{% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="js-requires-selected-row js-dialog-action"
+                                   data-href="{{ url_for('.manage_judge_abstracts', event) }}"
+                                   data-title="{% trans %}Mark selected abstracts as duplicate{% endtrans %}"
+                                   data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                   data-params='{"judgment": "mark_as_duplicate"}'
+                                   data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                   data-method="POST"
+                                   data-ajax-dialog>
+                                    {%- trans %}Mark as duplicate{% endtrans -%}
+                                </a>
+                            </li>
+                        </menu>
+                    </ind-menu>
                 </div>
                 <div class="group">
                     <div id="email-authors-container"
@@ -186,34 +198,35 @@
                     </div>
                 {% endif %}
                 <div class="group">
-                    <button class="i-button arrow button js-requires-selected-row disabled"
-                            data-toggle="dropdown">
-                        {%- trans %}Export{% endtrans -%}
-                    </button>
-                    <ul class="i-dropdown">
-                        {% if indico_config.LATEX_ENABLED %}
+                    <ind-menu>
+                        <button class="i-button button js-requires-selected-row disabled">
+                            {%- trans %}Export{% endtrans -%}
+                        </button>
+                        <menu>
+                            {% if indico_config.LATEX_ENABLED %}
+                                <li>
+                                    <a href="#"
+                                       class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                       data-href="{{ url_for('.abstracts_pdf_export', event) }}">PDF</a>
+                                </li>
+                            {% endif %}
                             <li>
                                 <a href="#"
-                                   class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                                   data-href="{{ url_for('.abstracts_pdf_export', event) }}">PDF</a>
+                                   class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.abstracts_csv_export', event) }}">CSV</a>
                             </li>
-                        {% endif %}
-                        <li>
-                            <a href="#"
-                               class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.abstracts_csv_export', event) }}">CSV</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.abstracts_xlsx_export', event) }}">XLSX (Excel)</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               class="icon-file-css js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.abstracts_json_export', event) }}">JSON</a>
-                        </li>
-                    </ul>
+                            <li>
+                                <a href="#"
+                                   class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.abstracts_xlsx_export', event) }}">XLSX (Excel)</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="icon-file-css js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.abstracts_json_export', event) }}">JSON</a>
+                            </li>
+                        </menu>
+                    </ind-menu>
                 </div>
                 {{ template_hook('abstract-list-options', event=event) }}
                 <div class="group">
