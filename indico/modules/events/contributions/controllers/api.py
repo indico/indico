@@ -13,21 +13,23 @@ from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.modules.events.contributions.controllers.display import (RHAuthenticatedContributionDisplayBase,
-                                                                     RHDisplayProtectionBase)
+from indico.modules.events.contributions.controllers.display import RHAuthenticatedContributionDisplayBase
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import UserContributionSchema
 from indico.modules.events.contributions.util import get_contributions_for_user
-from indico.modules.events.controllers.base import RHAuthenticatedEventBase
+from indico.modules.events.controllers.base import RHAuthenticatedEventBase, RHDisplayEventBase
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.string import natural_sort_key
 
 
-class RHAPIMyContributions(RHDisplayProtectionBase):
+class RHAPIMyContributions(RHDisplayEventBase):
     """API endpoint to get a user's contributions."""
 
-    MENU_ENTRY_NAME = 'my_timetable'
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHDisplayEventBase._check_access(self)
 
     def _process(self):
         contribs = get_contributions_for_user(self.event, session.user)
