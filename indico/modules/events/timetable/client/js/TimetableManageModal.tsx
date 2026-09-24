@@ -249,7 +249,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
     try {
       if (isEditing) {
-        const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
+        const updatedEntry = {...entry, ...mapDataToEntry(data, {eventTimezone}, true)};
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
         const updatePayload = getChangedValues(data, form);

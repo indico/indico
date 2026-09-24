@@ -114,7 +114,7 @@ function EntryPopupContent({
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapDataToEntry(data);
+    const draftEntry = mapDataToEntry(data, {eventTimezone});
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;

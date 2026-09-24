@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import 'moment-timezone';
 
 import {Entry, EntryType, LocationData, PersonLink, Session} from './types';
 import {getEntryUniqueId} from './utils';
@@ -15,11 +16,15 @@ import {getEntryUniqueId} from './utils';
 //        a recursive union of both types and deeper nested ones.
 type AllKeys<T> = T extends unknown ? keyof T : never;
 
+interface MapperContext {
+  eventTimezone?: string;
+}
+
 interface MapperEntry<From, To> {
   from: AllKeys<From>;
   to: AllKeys<To>;
-  fromTransform?: (value: any, data: From) => any;
-  toTransform?: (value: any, data: To) => any;
+  fromTransform?: (value: any, data: From, context: MapperContext) => any;
+  toTransform?: (value: any, data: To, context: MapperContext) => any;
 }
 
 type MapperConfig<From, To> = MapperEntry<From, To>[];
@@ -95,7 +100,12 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
   {
     from: 'start_dt',
     to: 'startDt',
-    fromTransform: v => moment.tz(v.dt, v.tzinfo),
+    fromTransform: (v, _data, {eventTimezone}) => {
+      if (!eventTimezone) {
+        throw new Error('eventTimezone is required to map timetable start_dt');
+      }
+      return moment.tz(v, eventTimezone);
+    },
     toTransform: v => v.toISOString(),
   },
   {from: 'custom_fields', to: 'customFields'},
@@ -154,7 +164,11 @@ const locationDataMapperConfig: MapperConfig<Record<string, unknown>, LocationDa
 ];
 
 // Generic mapper
-function createMapper<From, To>(config: MapperConfig<From, To>, defaults?: Partial<To>) {
+function createMapper<From, To>(
+  config: MapperConfig<From, To>,
+  defaults?: Partial<To>,
+  context: MapperContext = {}
+) {
   function mapDataToObj(data: From, partial: true): Partial<To>;
   function mapDataToObj(data: From, partial?: false): To;
   function mapDataToObj(data: From, partial = false): To | Partial<To> {
@@ -168,7 +182,7 @@ function createMapper<From, To>(config: MapperConfig<From, To>, defaults?: Parti
       if (rawValue === undefined) {
         continue;
       }
-      const value = fromTransform ? fromTransform(rawValue, data) : rawValue;
+      const value = fromTransform ? fromTransform(rawValue, data, context) : rawValue;
       if (value !== undefined) {
         result[to] = value;
       }
@@ -188,7 +202,7 @@ function createMapper<From, To>(config: MapperConfig<From, To>, defaults?: Parti
       if (value === undefined) {
         continue;
       }
-      const rawValue = toTransform ? toTransform(value, obj as To) : value;
+      const rawValue = toTransform ? toTransform(value, obj as To, context) : value;
       result[from] = rawValue;
     }
     return partial ? result : (result as From);
@@ -216,13 +230,33 @@ const {mapObjToData: mapEntryToData} = createMapper<Record<string, unknown>, Ent
 );
 function mapDataToEntry(data: Record<string, unknown>, partial: true): Partial<Entry>;
 function mapDataToEntry(data: Record<string, unknown>, partial?: false): Entry;
-function mapDataToEntry(data: Record<string, unknown>, partial = false): Entry | Partial<Entry> {
+function mapDataToEntry(
+  data: Record<string, unknown>,
+  context: MapperContext,
+  partial: true
+): Partial<Entry>;
+function mapDataToEntry(
+  data: Record<string, unknown>,
+  context?: MapperContext,
+  partial?: false
+): Entry;
+function mapDataToEntry(
+  data: Record<string, unknown>,
+  contextOrPartial: MapperContext | boolean = {},
+  partial = false
+): Entry | Partial<Entry> {
+  const context = typeof contextOrPartial === 'boolean' ? {} : contextOrPartial;
+  partial = typeof contextOrPartial === 'boolean' ? contextOrPartial : partial;
   // TODO get rid of entryDefaults?
   const entryDefaults: Partial<Record<EntryType, Partial<Entry>>> = {
     [EntryType.SessionBlock]: {},
   };
   const defaults = entryDefaults[data.type as EntryType] ?? {};
-  const {mapDataToObj} = createMapper<Record<string, unknown>, Entry>(entryMapperConfig, defaults);
+  const {mapDataToObj} = createMapper<Record<string, unknown>, Entry>(
+    entryMapperConfig,
+    defaults,
+    context
+  );
 
   // (Ajob) Had to do this otherwise type complains (boolean is not specific enough)
   return partial ? mapDataToObj(data, true) : mapDataToObj(data, false);
