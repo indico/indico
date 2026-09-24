@@ -41,6 +41,7 @@
       "{bin,indico,webpack}/**/*.{js,jsx,mjs,ts,tsx}",
       "indico/**/*.{css,scss}",
       "{.github,indico}/**/*.json",
+      "jest.config.js",
       "*.json",
       // Test snapshots
       "!indico/**/tests/*.json",

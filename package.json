@@ -25,6 +25,7 @@
     "final-form-arrays": "^3.0.2",
     "final-form-calculate": "^1.3.2",
     "flask-urls": "^0.2.0",
+    "flat": "^6.0.1",
     "fullcalendar": "^6.1.8",
     "geodesy": "^2.4.0",
     "glob-to-regexp": "^0.4.1",

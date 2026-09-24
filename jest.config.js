@@ -39,6 +39,7 @@ const esModules = [
   'markdown-table',
   'trim-lines',
   'axios',
+  'flat',
 ].join('|');
 
 module.exports = {
