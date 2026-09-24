@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import dateutil.parser
-from flask import jsonify, request, session
+from flask import jsonify, redirect, request, session
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -52,7 +52,11 @@ class RHManageTimetable(RHManageTimetableBase):
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process(self):
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', False)
+            return redirect(request.base_url)
         event_info = serialize_event_info_new(self.event, user=session.user)
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event).serialize_timetable()
@@ -70,7 +74,11 @@ class RHManageTimetableLegacy(RHManageTimetableBase):
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process(self):
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', True)
+            return redirect(request.base_url)
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
         return WPManageTimetableOld.render_template(
