@@ -11,6 +11,7 @@ from itertools import groupby
 from flask import render_template, request
 
 from indico.core import signals
+from indico.core.config import config
 from indico.modules.events.layout import get_theme_global_settings, theme_settings
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
@@ -44,7 +45,7 @@ class WPManageTimetable(MathjaxMixin, WPEventManagement):
 
 
 class WPManageTimetableOld(WPManageTimetable):
-    sidemenu_option = 'old-timetable'
+    sidemenu_option = 'timetable-legacy' if config.DEBUG else 'timetable'
 
 
 class WPDisplayTimetable(WPConferenceDisplayBase):

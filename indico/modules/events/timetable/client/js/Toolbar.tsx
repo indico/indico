@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import legacyTimetableURL from 'indico-url:timetable.management-legacy';
+
 import moment from 'moment';
 import React, {useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -76,6 +78,15 @@ export default function Toolbar() {
   return (
     <div styleName="toolbar" ref={ref}>
       <div styleName="actions-bar">
+        <Button
+          basic
+          onClick={() => window.location.replace(legacyTimetableURL({event_id: eventId}))}
+          title={Translate.string('Switch to the legacy timetable')}
+          size="tiny"
+        >
+          <Icon name="undo" />
+          <Translate>Switch to legacy timetable</Translate>
+        </Button>
         <Button basic onClick={addNewEntry} title={Translate.string('Add new entry')} size="tiny">
           <Icon name="plus" />
           <Translate>Add entry</Translate>

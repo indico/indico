@@ -55,7 +55,7 @@ class RHManageTimetable(RHManageTimetableBase):
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event).serialize_timetable()
         return WPManageTimetable.render_template(
-            'management_new.html',
+            'management.html',
             self.event,
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
@@ -63,7 +63,7 @@ class RHManageTimetable(RHManageTimetableBase):
         )
 
 
-class RHManageTimetableOld(RHManageTimetableBase):
+class RHManageTimetableLegacy(RHManageTimetableBase):
     """Display timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
@@ -72,7 +72,7 @@ class RHManageTimetableOld(RHManageTimetableBase):
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
         return WPManageTimetableOld.render_template(
-            'management.html',
+            'management_legacy.html',
             self.event,
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
