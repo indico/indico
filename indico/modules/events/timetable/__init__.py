@@ -8,6 +8,7 @@
 from flask import render_template, session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import now_utc
@@ -37,15 +38,18 @@ def _extend_event_management_menu(sender, event, **kwargs):
     from indico.modules.events.sessions.util import can_manage_sessions
     if not can_manage_sessions(session.user, event, 'ANY'):
         return
-    if event.type != 'lecture':
+    if event.type == 'lecture':
+        return
+
+    prefer_legacy_timetable = session.user.settings.get('prefer_legacy_timetable')
+    if prefer_legacy_timetable or config.DEBUG:
+        name = 'timetable-legacy' if config.DEBUG else 'timetable'
+        title = _('Timetable (legacy)') if config.DEBUG else _('Timetable')
+        yield SideMenuItem(name, title, url_for('timetable.management-legacy', event), weight=80, icon='calendar')
+
+    if not prefer_legacy_timetable or config.DEBUG:
         yield SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80,
                             icon='calendar')
-
-
-@signals.menu.items.connect_via('event-management-sidemenu')
-def _extend_event_management_menu_old_timetable(sender, event, **kwargs):
-    yield SideMenuItem('old-timetable', _('Timetable (old)'), url_for('timetable.management-old', event),
-                       weight=79, icon='calendar')
 
 
 @signals.event_management.get_cloners.connect
