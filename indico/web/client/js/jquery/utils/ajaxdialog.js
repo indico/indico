@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global ExclusivePopup, showFormErrors, initForms, confirmPrompt, getDropzoneFiles,
+/* global ExclusivePopup, initForms, confirmPrompt, getDropzoneFiles,
    setDropzoneFiles, handleAjaxError, handleFlashes, ajaxDialog */
 
 import _ from 'lodash';
@@ -302,7 +302,6 @@ import {$T} from 'indico/utils/i18n';
         closeDialog();
       });
       const forms = popup.contentContainer.find('form');
-      showFormErrors(popup.resultContainer);
       initForms(forms);
       forms.filter(':not([data-no-ajax])').each(function() {
         const $this = $(this);

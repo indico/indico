@@ -86,6 +86,9 @@ def render_field(field, widget_attrs, disabled=None):
     args['required'] = (bool(field.flags.required) and not field.flags.conditional and
                         not isinstance(field, (IndicoSelectMultipleCheckboxField,
                                                IndicoQuerySelectMultipleCheckboxField)))
+    if field.errors:
+        args['aria-invalid'] = 'true'
+        args['aria-describedby'] = f'error-{field.id}'
     args.update(widget_attrs)
     if disabled is not None:
         args['disabled'] = disabled
