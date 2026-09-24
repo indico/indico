@@ -24,7 +24,7 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableSwapEntries)
 from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
-                                                                RHManageTimetableOld, RHTimetableBreak,
+                                                                RHManageTimetableLegacy, RHTimetableBreak,
                                                                 RHTimetableBreakCreate, RHTimetableContribution,
                                                                 RHTimetableContributionCreate, RHTimetableREST,
                                                                 RHTimetableScheduleContribution,
@@ -39,7 +39,7 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
-_bp.add_url_rule('/manage/old-timetable/', 'management-old', RHManageTimetableOld)
+_bp.add_url_rule('/manage/timetable-legacy/', 'management-legacy', RHManageTimetableLegacy)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
