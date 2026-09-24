@@ -163,9 +163,9 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
     <div styleName="toolbar" ref={ref}>
       <div styleName="actions-bar">
         <Button
+          as="a"
           basic
-          onClick={() => window.location.replace(legacyTimetableURL({event_id: eventId}))}
-          title={Translate.string('Switch to the legacy timetable')}
+          href={legacyTimetableURL({event_id: eventId, set_preference: true})}
           size="tiny"
         >
           <Icon name="undo" />

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block title_actions %}
-    <a class="icon-new ui right" href="{{ url_for('.management', event) }}" style="font-size: 1.25em;">
+    <a class="icon-new ui right" href="{{ url_for('.management', event, set_preference=True) }}" style="font-size: 1.25em;">
         {% trans %} Try out the new timetable{%- endtrans -%}
     </a>
 {% endblock %}
