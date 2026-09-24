@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import {FORM_ERROR} from 'final-form';
+import {flatten} from 'flat';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
-import {Field, Form as FinalForm, FormSpy, useField} from 'react-final-form';
-import {Button, Form, Modal} from 'semantic-ui-react';
+import {Field, Form as FinalForm, FormSpy, useField, useFormState} from 'react-final-form';
+import {Button, Form, Modal, Icon} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -323,4 +324,19 @@ export function DebugFormSpy({subscription = {values: true}}) {
 
 DebugFormSpy.propTypes = {
   subscription: PropTypes.object,
+};
+
+export function ErrorMarker({fields, ...rest}) {
+  const {errors, submitErrors} = useFormState({errors: true, submitErrors: true});
+
+  const errorFields = new Set(Object.keys(flatten({...errors, ...submitErrors})));
+  if (!errorFields.intersection(new Set(fields)).size) {
+    return null;
+  }
+
+  return <Icon circular inverted name="warning" color="red" {...rest} />;
+}
+
+ErrorMarker.propTypes = {
+  fields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

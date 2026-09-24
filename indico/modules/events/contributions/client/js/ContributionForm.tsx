@@ -23,14 +23,19 @@ import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
   CollapsibleContainer,
+  FinalContributionPersonLinkField,
   FinalLocationField,
   FinalReferences,
   FinalTagList,
-  FinalContributionPersonLinkField,
 } from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalDateTimePicker, FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
-import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
+import {
+  ErrorMarker,
+  FinalModalForm,
+  getChangedValues,
+  handleSubmitError,
+} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -79,6 +84,7 @@ export function ContributionFormFields({
   customFields = [],
   extraOptions = {},
 }: ContributionFormFieldsProps) {
+  const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       // TODO: adjust isRequired in management (where all fields are optional)
@@ -182,7 +188,17 @@ export function ContributionFormFields({
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
       />
-      <CollapsibleContainer title={Translate.string('Advanced')} dividing>
+      <CollapsibleContainer
+        title={
+          <>
+            <Translate>Advanced</Translate>{' '}
+            <span>
+              <ErrorMarker fields={[...customFieldNames, 'references']} size="small" />
+            </span>
+          </>
+        }
+        dividing
+      >
         {customFieldsSection}
         <FinalReferences
           name="references"

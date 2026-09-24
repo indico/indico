@@ -27,6 +27,7 @@ import {Button, Dimmer, Form, Grid, Loader, Menu, Message, Modal, Tab} from 'sem
 
 import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
+import {ErrorMarker} from 'indico/react/forms/final-form';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -42,7 +43,6 @@ import RoomEditNotifications from './RoomEditNotifications';
 import RoomEditOptions from './RoomEditOptions';
 import RoomEditPermissions from './RoomEditPermissions';
 import RoomPhoto from './RoomPhoto';
-import TabPaneError from './TabPaneError';
 
 import './RoomEditModal.module.scss';
 
@@ -185,7 +185,10 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         ...pane,
         menuItem: (
           <Menu.Item key={pane.key}>
-            {pane.menuItem} {pane.key !== activeTab && <TabPaneError fields={pane.fields} />}
+            {pane.menuItem}{' '}
+            {pane.key !== activeTab && (
+              <ErrorMarker fields={pane.fields} size="small" style={{margin: '0 0 0 10px'}} />
+            )}
           </Menu.Item>
         ),
       })),
