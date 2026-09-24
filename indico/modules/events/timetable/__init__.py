@@ -43,7 +43,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
     prefer_legacy_timetable = session.user.settings.get('prefer_legacy_timetable')
     if prefer_legacy_timetable or config.DEBUG:
-        name = 'timetable-legacy' if config.DEBUG else 'timetable'
+        name = 'timetable-legacy'
         title = _('Timetable (legacy)') if config.DEBUG else _('Timetable')
         yield SideMenuItem(name, title, url_for('timetable.management-legacy', event), weight=80, icon='calendar')
 
