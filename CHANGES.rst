@@ -11,6 +11,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Support multi-choice abstract/contribution fields (:pr:`7725`)
+- Block the submission of a form that has a list widget row still being edited, instead of
+  silently dropping the row (:pr:`7702`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
