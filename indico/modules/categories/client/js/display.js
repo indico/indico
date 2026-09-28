@@ -7,6 +7,11 @@
 
 /* global handleAjaxError:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {Category} from 'indico/NGUI/category/Category';
+import {IndicoUIProvider} from 'indico/NGUI/IndicoUIProvider';
 import {$T} from 'indico/utils/i18n';
 
 (function(global) {
@@ -129,4 +134,20 @@ import {$T} from 'indico/utils/i18n';
       });
     }
   };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('category-cards-root');
+
+    if (root) {
+      ReactDOM.render(
+        <IndicoUIProvider>
+          <Category
+            categoryId={Number(root.dataset.categoryId)}
+            isFlatInit={root.dataset.isFlat === 'True'}
+          />
+        </IndicoUIProvider>,
+        root
+      );
+    }
+  });
 })(window);

@@ -1,0 +1,52 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/reset';
+@use 'NGUI/styles/base' as *;
+
+@mixin indicator-position($top, $right, $bottom, $left, $x-translate: 0, $y-translate: 0) {
+  --top: #{$top};
+  --right: #{$right};
+  --bottom: #{$bottom};
+  --left: #{$left};
+  --x-translate: #{$x-translate};
+  --y-translate: #{$y-translate};
+}
+
+:global(.indico-ui) {
+  .indicator-root {
+    position: relative;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    &[data-position='top-right'] {
+      @include indicator-position(0, 0, auto, auto, 50%, -50%);
+    }
+
+    &[data-position='top-left'] {
+      @include indicator-position(0, auto, auto, 0, -50%, -50%);
+    }
+
+    &[data-position='bottom-right'] {
+      @include indicator-position(auto, 0, 0, auto, 50%, 50%);
+    }
+
+    &[data-position='bottom-left'] {
+      @include indicator-position(auto, auto, 0, 0, -50%, 50%);
+    }
+
+    .indicator-dot {
+      position: absolute;
+      z-index: 1;
+      top: var(--top);
+      right: var(--right);
+      bottom: var(--bottom);
+      left: var(--left);
+      transform: translate(var(--x-translate), var(--y-translate));
+    }
+  }
+}
