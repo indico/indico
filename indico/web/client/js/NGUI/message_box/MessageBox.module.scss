@@ -1,0 +1,66 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'NGUI/styles/base' as *;
+@use 'design_system/link' as *;
+
+.message-box {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  background-color: var(--intensity-50);
+  border: 1px solid var(--intensity-200);
+  border-radius: var(--radius-md);
+
+  &[data-type='info'] {
+    @include color('gray');
+  }
+
+  &[data-type='warning'] {
+    @include color('warning');
+  }
+
+  &[data-type='error'],
+  &[data-type='danger'] {
+    @include color('error');
+  }
+
+  &[data-type='success'] {
+    @include color('success');
+  }
+
+  &[data-type='highlight'] {
+    @include color('primary');
+  }
+
+  &[data-no-border='true'] {
+    border: none;
+  }
+
+  a {
+    --color-text-link: var(--intensity-500);
+    --color-text-link-hover: var(--intensity-400);
+    --color-text-link-active: var(--intensity-300);
+    --color-text-link-visited: var(--intensity-600);
+    text-decoration: underline;
+  }
+
+  .message-box-content {
+    word-break: break-word;
+    align-self: center;
+    color: var(--intensity-700);
+  }
+
+  .message-box-icon {
+    flex-shrink: 0;
+    margin-right: var(--space-4);
+    color: var(--intensity-700);
+  }
+}
