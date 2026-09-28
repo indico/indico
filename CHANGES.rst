@@ -20,6 +20,7 @@ Bugfixes
   a restricted event the user cannot access (:pr:`7740`)
 - Fix "My contributions" page not working when "My timetable" menu entry is disabled
   (:pr:`7759`)
+- Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
 
 Accessibility
 ^^^^^^^^^^^^^
