@@ -7,9 +7,11 @@
 
 import itertools
 from collections import defaultdict
+from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
+from PIL import Image, ImageOps
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
 from webargs import validate
@@ -27,16 +29,20 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.controllers.base import EditEventSettingsMixin, RHAuthenticatedEventBase
+from indico.modules.events.controllers.base import (EditEventSettingsMixin, RHAuthenticatedEventBase,
+                                                    RHProtectedEventBase)
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
+from indico.modules.events.models.speaker_links import EventSpeakerLink, EventSpeakerLinkData
 from indico.modules.events.persons import logger, persons_settings
+from indico.modules.events.persons.constants import MAX_SPEAKER_PHOTO_SIZE
 from indico.modules.events.persons.forms import ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
-from indico.modules.events.persons.views import WPManagePersons
+from indico.modules.events.persons.schemas import (EventPersonSchema, EventPersonUpdateSchema, SpeakerLinksSchema,
+                                                   SpeakerProfileSchema)
+from indico.modules.events.persons.views import WPDisplaySpeakers, WPManagePersons, WPManageSpeakers
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -47,10 +53,11 @@ from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import FilesField, LowercaseString, no_relative_urls, not_empty, validate_with_message
+from indico.util.marshmallow import (FileField, FilesField, LowercaseString, ModelField, file_extension,
+                                     no_relative_urls, not_empty, validate_with_message)
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.util.user import principal_from_identifier, validate_search_token
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 
@@ -225,6 +232,24 @@ class RHPersonsBase(RHManageEventBase):
         return persons
 
 
+class RHSpeakerBase(RHProtectedEventBase):
+    def _process_args(self):
+        RHProtectedEventBase._process_args(self)
+        self.person = (EventPerson.query
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
+                       .first())
+
+
+class RHManageSpeakerProfileBase(RHManageEventBase):
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.person = (EventPerson.query
+                       .with_parent(self.event)
+                       .filter(EventPerson.id == request.view_args['person_id'])
+                       .first())
+
+
 class RHPersonsList(RHPersonsBase):
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event)
@@ -276,6 +301,144 @@ class RHAPIEmailEventPersonsUpload(UploadFileMixin, RHManageEventBase):
 
     def get_file_context(self):
         return 'event', self.event.id, 'email-attachments'
+
+
+class RHSpeakerProfiles(RHPersonsBase):
+    def _process(self):
+        return WPManageSpeakers.render_template('management/speakers.html', self.event)
+
+
+class RHDisplaySpeakerProfiles(RHProtectedEventBase):
+    def _process(self):
+        return WPDisplaySpeakers.render_template('display/speakers.html', self.event)
+
+
+class RHSpeakerPhoto(RHProtectedEventBase):
+    def _process(self):
+        person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
+        if person.speaker_photo is not None:
+            return person.speaker_photo.send()
+
+
+class RHAPISpeakersList(RHProtectedEventBase):
+    def _process(self):
+        matches = self.event.persons.filter(
+            EventPerson.contribution_links.any(and_(
+                ContributionPersonLink.is_speaker,
+                ContributionPersonLink.contribution.has(Contribution.is_deleted.is_(False))
+        ))).all()
+        return SpeakerProfileSchema(many=True).jsonify(matches)
+
+
+class RHSpeakerPhotoUpload(UploadFileMixin, RHManageSpeakerProfileBase):
+    def get_file_context(self):
+        return 'event', self.event.id, 'speaker', self.person.id
+
+    @staticmethod
+    def process_speaker_photo(stream):
+        try:
+            picture = Image.open(stream)
+        except (OSError, Image.DecompressionBombError):
+            return False
+
+        picture = ImageOps.exif_transpose(picture)
+        if picture.mode != 'RGB':
+            picture = picture.convert('RGB')
+        size_x, size_y = picture.size
+        if max(size_x, size_y) > MAX_SPEAKER_PHOTO_SIZE:
+            ratio = MAX_SPEAKER_PHOTO_SIZE / max(size_x, size_y)
+            picture = picture.resize((max(1, int(ratio * size_x)), max(1, int(ratio * size_y))),
+                                     Image.Resampling.BICUBIC)
+        image_bytes = BytesIO()
+        picture.save(image_bytes, 'JPEG')
+        image_bytes.seek(0)
+        return image_bytes
+
+    def _save_file(self, file, stream):
+        if not (resized_image_stream := self.process_speaker_photo(stream)):
+            abort(422, messages={'file': [_('Could not process image, it may be corrupted or too big')]})
+        return super()._save_file(file, resized_image_stream)
+
+    def get_file_metadata(self):
+        return {'speaker_picture_checked': True}
+
+
+class RHAPISpeaker(RHManageSpeakerProfileBase):
+    @use_rh_args({
+        'photo': FileField(allow_none=True, validate=file_extension('png', 'jpg', 'jpeg'),
+                           metadata={'speaker_picture_checked': True}),
+        'description': fields.String(validate=validate.Length(max=1000), required=False),
+        'speaker_links': fields.List(
+            fields.Nested({
+                'link': ModelField(EventSpeakerLink, required=True, with_parent='event', data_key='id'),
+                'url': fields.Url(required=True),
+            })
+        ),
+    }, rh_context=('event',))
+    def _process_POST(self, args):
+        if 'description' in args:
+            self.person.speaker_description = args['description']
+        if 'photo' in args:
+            if args['photo'] is not None:
+                self.person.speaker_photo = args['photo']
+                args['photo'].claim()
+            elif self.person.speaker_photo is not None:
+                self.person.speaker_photo.claimed = False
+                self.person.speaker_photo = None
+        if 'speaker_links' in args:
+            new_fields = {}
+            for speaker_link in args['speaker_links']:
+                speaker_link_data = self.person.speaker_links.get(speaker_link['link'].id)
+                if speaker_link_data is None:
+                    speaker_link_data = EventSpeakerLinkData(speaker_link_id=speaker_link['link'].id)
+                speaker_link_data.data = speaker_link['url']
+                new_fields[speaker_link_data.speaker_link_id] = speaker_link_data
+            self.person.speaker_links = new_fields
+        return SpeakerProfileSchema().jsonify(self.person)
+
+    def _process_DELETE(self):
+        self.person.speaker_description = None
+        self.person.speaker_links = {}
+        if self.person.speaker_photo is not None:
+            self.person.speaker_photo.claimed = False
+            self.person.speaker_photo = None
+        return jsonify(success=True)
+
+
+class RHAPISpeakerLinks(RHManageEventBase):
+    def _process_GET(self):
+        return SpeakerLinksSchema(many=True).jsonify(
+            EventSpeakerLink.query.with_parent(self.event).all()
+        )
+
+    @use_kwargs({
+        'name': fields.String(required=True, validate=validate.Length(max=200)),
+        'icon': fields.String(required=True, validate=validate.Length(max=200)),
+    })
+    def _process_PUT(self, name, icon):
+        db.session.add(
+            EventSpeakerLink(name=name, icon=icon, event=self.event)
+        )
+        return jsonify(success=True)
+
+    @use_rh_kwargs({
+        'link': ModelField(EventSpeakerLink, with_parent='event', required=True, data_key='speaker_link_id')
+    }, location='view_args', rh_context=('event',))
+    def _process_DELETE(self, link):
+        db.session.delete(link)
+        return jsonify(success=True)
+
+    @use_kwargs({
+        'name': fields.String(required=True, validate=validate.Length(max=200)),
+        'icon': fields.String(required=True, validate=validate.Length(max=200)),
+    })
+    @use_rh_kwargs({
+        'link': ModelField(EventSpeakerLink, with_parent='event', required=True, data_key='speaker_link_id')
+    }, location='view_args', rh_context=('event',))
+    def _process_PATCH(self, link, name, icon):
+        link.name = name
+        link.icon = icon
+        return jsonify(success=True)
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):
@@ -534,7 +697,7 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
     def _process(self, exact, **criteria):
         matches, total = self._search_event_persons(exact=exact, **criteria)
         return jsonify(
-            users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields).dump(matches, many=True),
+            users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields, many=True).dump(matches),
             total=total
         )
 
