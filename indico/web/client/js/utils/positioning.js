@@ -130,11 +130,6 @@ const verticalPreferBelowPosition = {
   },
 };
 
-const unaligned = {
-  calculateAlignment() {},
-  setAlignment() {},
-};
-
 const verticalCenter = {
   calculateAlignment() {},
   setAlignment() {
@@ -262,8 +257,9 @@ export const dropdownPositionStrategy = {
 export const popupPositionStrategy = {
   ...geometry,
   ...verticalPreferAbovePosition,
-  ...unaligned,
-  ...withoutArrow,
+  ...horizontalCenter,
+  ...withArrow,
+  ...verticalArrowPosition,
 };
 
 /**
