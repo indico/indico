@@ -12,7 +12,24 @@
   @include typography('text-sm', 'regular'); // 14 px
 
   & a {
-    color: inherit;
+    color: var(--color-text-link);
+
+    &:visited {
+      color: var(--color-text-link);
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-text-link-hover);
+    }
+
+    &:active {
+      color: var(--color-text-link-active);
+    }
+
+    &[aria-disabled='true'] {
+      color: var(--color-text-disabled);
+    }
   }
 
   & p {

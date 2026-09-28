@@ -137,16 +137,17 @@ import {$T} from 'indico/utils/i18n';
 
   document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById('category-cards-root');
-    if (!root) {
-      return;
+
+    if (root) {
+      ReactDOM.render(
+        <IndicoUIProvider>
+          <Category
+            categoryId={Number(root.dataset.categoryId)}
+            isFlatInit={root.dataset.isFlat === 'True'}
+          />
+        </IndicoUIProvider>,
+        root
+      );
     }
-    const categoryId = Number(root.dataset.categoryId);
-    const isFlat = Boolean(root.dataset.isFlat);
-    ReactDOM.render(
-      <IndicoUIProvider>
-        <Category categoryId={categoryId} isFlat={isFlat} />
-      </IndicoUIProvider>,
-      root
-    );
   });
 })(window);

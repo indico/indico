@@ -4,22 +4,6 @@
 
 {% block content %}
     {% block category_content %}
-        {% if not is_flat %}
-            {% if category.children %}
-                {% set category_title = category.title %}
-                <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
-                    {%- trans %}Categories in {{ category_title }}{% endtrans -%}
-                </h2>
-                <div id="category-cards-root" data-category-id="{{ category.id }}"></div>
-            {% endif %}
-        {% else %}
-            {% call message_box('info', icon=false) %}
-                {% trans %}Displaying all the events from subcategories.{% endtrans %}
-                <a href="{{ url_for('.display', category) }}">
-                    {% trans %}Go back to single category view.{% endtrans %}
-                </a>
-            {% endcall %}
-        {% endif %}
         <div id="category-cards-root" data-category-id="{{ category.id }}" data-is-flat="{{ is_flat }}"></div>
     {% endblock %}
 {% endblock %}
