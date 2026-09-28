@@ -9,7 +9,7 @@
     {% set can_view_hidden_paper = paper and contribution.event.cfp.hide_accepted and permitted_hidden_paper_viewers %}
     {% set show_paper = paper and paper.accepted_revision and not contribution.event.cfp.hide_accepted %}
     {% set show_paper_status = paper and can_submit %}
-    {% set show_paper_submission = contribution.event.cfp.is_open and can_submit %}
+    {% set show_paper_submission = contribution.event.cfp.can_submit_proceedings(session.user) and can_submit %}
 
     {% if show_paper or show_paper_status or show_paper_submission or can_view_hidden_paper %}
         <section>
