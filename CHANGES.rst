@@ -25,7 +25,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Convert abstract management action toolbar dropdowns to accessible
+  ``<ind-menu>`` (:issue:`7625`, :pr:`7757`).
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
