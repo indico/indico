@@ -10,7 +10,7 @@
 :global(.indico-ui) {
   .category-title {
     margin-top: var(--space-6);
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-6);
 
     @media (max-width: $viewport-mobile) {
       margin-top: var(--space-3);
@@ -22,7 +22,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: var(--space-4);
+    gap: var(--space-6);
     margin-bottom: var(--space-6);
 
     .category-description {
