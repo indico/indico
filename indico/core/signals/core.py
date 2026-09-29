@@ -123,7 +123,8 @@ hosts need to be added.
 ''')
 
 get_email_senders = _signals.signal('get-email-senders', '''
-Return additional senders for emails sent from within an event. The *sender*
-is the event. The registration form, when applicable, is passed in the
-``regform`` kwarg.
+Return additional senders for emails sent from within an event in the form of
+``(email, name)`` tuples. The *sender* is the event. Other kwargs may be present
+to indicate additional context. For example, when sending emails in the context of
+a registration form, it is passed in the ``regform`` kwarg.
 ''')

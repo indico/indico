@@ -917,6 +917,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         # Extra email (e.g. the current value in an object from the DB)
         if extra:
             emails.setdefault(extra, None)
+        # Additional emails from plugins
+        plugin_extra_senders = values_from_signal(signals.core.get_email_senders.send(self, **(plugin_ctx or {})))
+        for email, name in plugin_extra_senders:
+            emails.setdefault(email, name)
         # Sanitize and format emails
         emails = {
             email.strip().lower(): (
@@ -926,12 +930,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             for email, name in emails.items()
             if email and email.strip()
         }
-        plugin_extra_senders = values_from_signal(
-            signals.core.get_email_senders.send(self, **(plugin_ctx or {})),
-            as_list=True,
-        )
-        for email, name in plugin_extra_senders:
-            emails.setdefault(email, name)
         own_email = session.user.email if has_request_context() and session.user else None
         return dict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
 
