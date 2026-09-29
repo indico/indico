@@ -12,8 +12,8 @@ import apiEventListWithMetaDataURL from 'indico-url:categories.api_event_list_wi
 import React from 'react';
 import remarkRehype from 'remark-rehype';
 
-import {CategoryCardList} from 'indico/NGUI/card/CategoryCardList';
-import {EventList} from 'indico/NGUI/list/EventList';
+import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
+import {EventList} from 'indico/NGUI/category/EventList';
 import {CategoryEventListWithMetaData, CategoryMetaData, CategoryType} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Markdown} from 'indico/react/util';

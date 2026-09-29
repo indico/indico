@@ -76,3 +76,5 @@ export function FavoriteButton({type, id, favorited, className, size = 'lg'}: Fa
     />
   );
 }
+
+FavoriteButton.displayName = 'FavoriteButton';

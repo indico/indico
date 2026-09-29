@@ -9,13 +9,8 @@ import apiEventListURL from 'indico-url:categories.api_event_list';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {Button} from 'indico/NGUI/button/Button';
-import {FavoriteButton} from 'indico/NGUI/button/FavoriteButton';
-import {Indicator} from 'indico/NGUI/indicator/Indicator';
-import {ListItem} from 'indico/NGUI/list/ListItem';
-import {TimelineItem} from 'indico/NGUI/timeline/Timeline';
+import {Button, FavoriteButton, Indicator, ListItem, TimelineItem, YearPicker} from 'indico/NGUI';
 import {CategoryEventListWithMetaData, Event, EventsMonth} from 'indico/NGUI/types';
-import {YearPicker} from 'indico/NGUI/yearPicker/YearPicker';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
