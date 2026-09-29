@@ -7,7 +7,7 @@
 
 import React from 'react';
 
-import {Card} from 'indico/NGUI/card/Card';
+import {Card} from 'indico/NGUI';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import {CategoryMetaData} from '../types';
