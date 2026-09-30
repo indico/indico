@@ -14,11 +14,14 @@ export function preprocessSessionData(
   return Object.fromEntries(Object.entries(data).map(([, s]) => [s.id, mapDataToSession(s)]));
 }
 
-export function preprocessTimetableEntries(data: Record<string, unknown>): Record<string, Entry> {
+export function preprocessTimetableEntries(
+  data: Record<string, unknown>,
+  eventTimezone: string
+): Record<string, Entry> {
   return Object.fromEntries(
     Object.entries(data).map(([id, entryData]) => [
       id,
-      mapDataToEntry(entryData as Record<string, unknown>),
+      mapDataToEntry(entryData as Record<string, unknown>, {eventTimezone}),
     ])
   );
 }

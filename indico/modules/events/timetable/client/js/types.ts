@@ -212,6 +212,7 @@ interface CustomField {
 
 interface StaticData {
   eventId: number;
+  timezone: string;
   startDt: Moment;
   endDt: Moment;
   defaultContribDurationMinutes: number;

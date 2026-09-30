@@ -37,6 +37,7 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const {openModal} = useModal();
   const eventId = useSelector(selectors.getEventId);
+  const eventTimezone = useSelector(selectors.getEventTimezone);
 
   const onEdit = async e => {
     e.stopPropagation();
@@ -44,7 +45,7 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
     const {data} = await indicoAxios.get(editURL);
     data.type = EntryType.Contribution;
 
-    const draftEntry = mapDataToEntry(data, true) as ContribEntry;
+    const draftEntry = mapDataToEntry(data, {eventTimezone}, true) as ContribEntry;
     dispatch(actions.setDraftEntry(draftEntry));
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,

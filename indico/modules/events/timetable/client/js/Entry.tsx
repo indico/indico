@@ -196,6 +196,7 @@ export default function Entry({
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   setChildDuration = (_: string) => (_: number) => {},
 }: EntryProps) {
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const isPosterBlock = useSelector((state: ReduxState) =>
     selectors.isPosterSessionBlock(state, id)
   );
@@ -246,7 +247,7 @@ export default function Entry({
   const newEnd = moment(startDt).add(deltaMinutes + duration, 'minutes');
 
   const locale = moment.locale().replace('_', '-');
-  const timeRange = formatTimeRange(locale, newStart, newEnd);
+  const timeRange = formatTimeRange(locale, newStart, newEnd, eventTimezone);
   // shift children startDt by deltaMinutes
   const children: ContribEntry[] = _children.map(child => ({
     ...child,

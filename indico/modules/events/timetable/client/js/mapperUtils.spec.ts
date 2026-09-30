@@ -62,6 +62,8 @@ const entryPersonLink: PersonLink = {
   userIdentifier: 'User:1:xxx',
 };
 
+const mapperContext = {eventTimezone: 'Europe/Zurich'};
+
 describe('mapperUtils', () => {
   describe('mapDataToEntry', () => {
     it('should map Contribution fields correctly', () => {
@@ -76,10 +78,10 @@ describe('mapperUtils', () => {
         keywords: ['physics'],
         session_id: 5,
         duration: 120,
-        start_dt: '2024-01-01T09:00:00Z',
+        start_dt: '2024-01-01T09:00:00+01:00',
       };
 
-      const entry = mapDataToEntry(data) as ContribEntry;
+      const entry = mapDataToEntry(data, mapperContext) as ContribEntry;
 
       expect(entry.id).toBe('c101');
       expect(entry.objId).toBe(101);
@@ -93,6 +95,8 @@ describe('mapperUtils', () => {
       expect(entry.sessionId).toBe(5);
       expect(entry.duration).toBe(2);
       expect(moment.isMoment(entry.startDt)).toBe(true);
+      expect(entry.startDt.format()).toBe('2024-01-01T09:00:00+01:00');
+      expect(entry.startDt.clone().add(6, 'months').format('Z')).toBe('+02:00');
     });
 
     it('should map Session Block fields correctly', () => {
@@ -104,10 +108,10 @@ describe('mapperUtils', () => {
         session_id: 7,
         location_data: dataLocationData,
         duration: 120,
-        start_dt: '2024-01-02T10:00:00Z',
+        start_dt: '2024-01-02T10:00:00+01:00',
       };
 
-      const entry = mapDataToEntry(data) as BlockEntry;
+      const entry = mapDataToEntry(data, mapperContext) as BlockEntry;
 
       expect(entry.id).toBe('s202');
       expect(entry.objId).toBe(202);
@@ -132,7 +136,7 @@ describe('mapperUtils', () => {
         colors: {background: '#eeeeee', text: '#ffffff'},
       };
 
-      const entry = mapDataToEntry(data);
+      const entry = mapDataToEntry(data, mapperContext);
 
       expect(entry.id).toBe('b303');
       expect(entry.objId).toBe(303);
@@ -143,6 +147,16 @@ describe('mapperUtils', () => {
       expect(moment.isMoment(entry.startDt)).toBe(true);
       expect(entry.locationData).toEqual(entryLocationData);
       expect(entry.colors).toEqual({backgroundColor: '#eeeeee', color: '#ffffff'});
+    });
+
+    it('should require event timezone context when mapping start_dt', () => {
+      expect(() =>
+        mapDataToEntry({
+          id: 303,
+          type: EntryType.Break,
+          start_dt: '2024-01-03T11:00:00Z',
+        })
+      ).toThrow('eventTimezone is required to map timetable start_dt');
     });
   });
 

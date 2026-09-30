@@ -16,7 +16,8 @@ import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
-import {Moment} from 'moment';
+import moment, {Moment} from 'moment';
+import 'moment-timezone';
 import {Dispatch} from 'redux';
 import {ThunkDispatch} from 'redux-thunk/es';
 
@@ -477,26 +478,36 @@ export function scheduleEntry(
   entry: ContribEntryWithoutLayout,
   layoutOverrides: LayoutOverrides
 ) {
-  const scheduleURL = scheduleContribURL(
-    isChildEntry(entry)
-      ? {event_id: eventId, block_id: entry.sessionBlockId?.slice(1)}
-      : {event_id: eventId}
-  );
-  // TODO only pass contribId and none of the other stuff here?!
-  return synchronizedAjaxAction(
-    () =>
-      indicoAxios.post(scheduleURL, {
-        contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
-      }),
-    {
-      type: SCHEDULE_ENTRY,
-      id: entry.id,
-      startDt: entry.startDt,
-      sessionBlockId: isChildEntry(entry) ? entry.sessionBlockId! : null,
-      sessionId: entry.sessionId!,
-      layoutOverrides,
-    }
-  );
+  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+    const {
+      staticData: {timezone: eventTimezone},
+    } = getState();
+    const startDt = moment.tz(entry.startDt, eventTimezone);
+    const scheduledEntry = {...entry, startDt};
+    const scheduleURL = scheduleContribURL(
+      isChildEntry(scheduledEntry)
+        ? {event_id: eventId, block_id: scheduledEntry.sessionBlockId?.slice(1)}
+        : {event_id: eventId}
+    );
+
+    // TODO only pass contribId and none of the other stuff here?!
+    return dispatch(
+      synchronizedAjaxAction(
+        () =>
+          indicoAxios.post(scheduleURL, {
+            contribs: [{contrib_id: scheduledEntry.objId, start_dt: startDt.format()}],
+          }),
+        {
+          type: SCHEDULE_ENTRY,
+          id: scheduledEntry.id,
+          startDt,
+          sessionBlockId: isChildEntry(scheduledEntry) ? scheduledEntry.sessionBlockId! : null,
+          sessionId: scheduledEntry.sessionId!,
+          layoutOverrides,
+        }
+      )
+    );
+  };
 }
 
 export function unscheduleEntry(entry: ContribEntry, eventId: number) {
@@ -524,7 +535,7 @@ export function createEntry(entryType: EntryType, payload: any) {
     getState: () => ReduxState
   ) => {
     const {
-      staticData: {eventId},
+      staticData: {eventId, timezone: eventTimezone},
     } = getState();
     const createURL = {
       [EntryType.Contribution]: contributionCreateURL({event_id: eventId}),
@@ -534,7 +545,7 @@ export function createEntry(entryType: EntryType, payload: any) {
 
     const data = (await indicoAxios.post(createURL, payload))?.data;
     data.type = entryType;
-    const resEntry = mapDataToEntry(data);
+    const resEntry = mapDataToEntry(data, {eventTimezone});
     return dispatch(_createEntry(resEntry.type, resEntry as Entry));
   };
 }
@@ -568,7 +579,7 @@ export function updateEntry(
     getState: () => ReduxState
   ) => {
     const {
-      staticData: {eventId},
+      staticData: {eventId, timezone: eventTimezone},
     } = getState();
     const updateURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
@@ -577,18 +588,27 @@ export function updateEntry(
     }[entryType];
 
     if (optimistic) {
+      const changes = mapDataToEntry(customPayload, {eventTimezone}, true);
       const action = synchronizedAjaxAction(
-        () => indicoAxios.patch(updateURL, customPayload),
-        _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
+        () => indicoAxios.patch(updateURL, serializeEntryPayload(customPayload)),
+        _updateEntry(entryType, entry, currentDay, changes)
       );
       return dispatch(action);
     } else {
       // eslint-disable-next-line no-use-before-define
       await requestQueue.ensureEmpty();
-      await indicoAxios.patch(updateURL, customPayload);
-      return dispatch(_updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload)));
+      await indicoAxios.patch(updateURL, serializeEntryPayload(customPayload));
+      const changes = mapDataToEntry(customPayload, {eventTimezone}, true);
+      return dispatch(_updateEntry(entryType, entry, currentDay, changes));
     }
   };
+}
+
+function serializeEntryPayload(payload: any) {
+  if (!payload?.start_dt?.format) {
+    return payload;
+  }
+  return {...payload, start_dt: payload.start_dt.format()};
 }
 
 export function setEntryAttachments(
