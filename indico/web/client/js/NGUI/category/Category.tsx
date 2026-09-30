@@ -16,8 +16,8 @@ import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
 import {EventList} from 'indico/NGUI/category/EventList';
 import {CategoryEventListWithMetaData, CategoryMetaData, CategoryType} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
+import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
-
 import './Category.module.scss';
 
 interface CategoryProps {
@@ -63,9 +63,13 @@ export function Category({categoryId, isFlat}: CategoryProps) {
     <div>
       {category.title === 'Home' && category.isRoot ? (
         category.hasChildren ? (
-          <h1 styleName="category-title">Main categories</h1>
+          <h1 styleName="category-title">
+            <Translate>Main categories</Translate>
+          </h1>
         ) : (
-          <h1 styleName="category-title">All events</h1>
+          <h1 styleName="category-title">
+            <Translate>All events</Translate>
+          </h1>
         )
       ) : (
         <h1 styleName="category-title">{category.title}</h1>
@@ -75,7 +79,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
           <img styleName="category-logo" src={category.logoURL} alt={category.title} />
         )}
         <div styleName="category-description">
-          {/* Markdown will be replaced by custom solution */}
+          {/* TODO: Markdown is planned to be replaced by custom solution */}
           <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
         </div>
       </div>
