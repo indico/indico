@@ -52,3 +52,7 @@ export const canCommentPaper = createSelector(
   getPaperEvent,
   ({isInFinalState, canComment}, {isLocked}) => !isLocked && !isInFinalState && canComment
 );
+export const disableContributorVisibility = createSelector(
+  getPaperEvent,
+  ({cfp}) => cfp.disableContributorVisibility
+);

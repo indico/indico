@@ -55,6 +55,7 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'scale_lower': -3,
     'scale_upper': 3,
     'hide_accepted': False,
+    'disable_contributor_visibility': False,
 
     # Notifications
     'notify_on_added_to_event': set(),
