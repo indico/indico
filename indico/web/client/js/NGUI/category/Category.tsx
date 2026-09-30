@@ -12,6 +12,7 @@ import apiEventListWithMetadataURL from 'indico-url:categories.api_event_list_wi
 import React from 'react';
 import remarkRehype from 'remark-rehype';
 
+import {Card} from 'indico/NGUI/card/Card';
 import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
 import {EventList} from 'indico/NGUI/category/EventList';
 import {
@@ -22,7 +23,9 @@ import {
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
+
 import './Category.module.scss';
+import {CategorySidebar} from '../category_sidebar/CategorySidebar';
 
 interface CategoryProps {
   categoryId: number;
@@ -63,31 +66,35 @@ export function Category({categoryId, isFlat}: CategoryProps) {
     return null;
   }
 
+  const isUntitledRoot = category.title === 'Home' && category.isRoot;
+
+  // (Ajob) Honestly, I think the whole idea of checking the string for 'Home' is very hacky
+  let title = <h1>{category.title}</h1>;
+  if (isUntitledRoot) {
+    title = (
+      // @ts-expect-error A string for 'as' is possible, just not typed properly
+      <Translate as="h1">{category.hasChildren ? 'Main categories' : 'All events'}</Translate>
+    );
+  }
+
   return (
     <div styleName="category-wrapper">
-      {category.title === 'Home' && category.isRoot ? (
-        category.hasChildren ? (
-          <h1>
-            <Translate>Main categories</Translate>
-          </h1>
-        ) : (
-          <h1>
-            <Translate>All events</Translate>
-          </h1>
-        )
-      ) : (
-        <h1>{category.title}</h1>
-      )}
-      <div styleName="category-info">
-        {category.logoURL && (
-          <img styleName="category-logo" src={category.logoURL} alt={category.title} />
-        )}
-        <div styleName="category-description">
-          {/* TODO: Markdown is planned to be replaced by custom solution */}
-          <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
-        </div>
-      </div>
-      {!isFlat && <CategoryCardList data={categoryChildren} columns={2} />}
+      <section styleName="category">
+        <section styleName="category-main">
+          {title}
+          <Card styleName="category-info">
+            {category.logoURL && (
+              <img styleName="category-logo" src={category.logoURL} alt={category.title} />
+            )}
+            <div styleName="category-description">
+              {/* Markdown will be replaced by custom solution */}
+              <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
+            </div>
+          </Card>
+          {!isFlat && <CategoryCardList data={categoryChildren} />}
+        </section>
+        <CategorySidebar categoryId={categoryId} isFlat={isFlat} />
+      </section>
       {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
         <EventList viewData={categoryEventListWithMeta} categoryId={categoryId} isFlat={isFlat} />
       )}

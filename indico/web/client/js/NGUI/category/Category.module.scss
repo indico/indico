@@ -13,6 +13,19 @@
     flex-direction: column;
     justify-content: flex-start;
     gap: var(--space-6);
+  }
+
+  .category {
+    width: 100%;
+    display: flex;
+    gap: var(--space-6);
+  }
+
+  .category-main {
+    flex-grow: 1;
+  }
+
+  .category-title {
     margin-top: var(--space-6);
     @media (max-width: $viewport-mobile) {
       margin-top: var(--space-3);
