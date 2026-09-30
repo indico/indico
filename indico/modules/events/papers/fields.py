@@ -131,3 +131,4 @@ class PaperActionField(Enum):
             raise ValidationError(
                 'You cannot ask for corrections, this paper has reached the limited number of revisions'
             )
+        return rv
