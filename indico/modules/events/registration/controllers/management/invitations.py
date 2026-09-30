@@ -160,7 +160,7 @@ class RHRegistrationFormInviteMetadata(RHManageRegFormBase):
             affiliation_field.data.get('affiliation_mode') == AffiliationMode.predefined
         )
         return jsonify({
-            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'senders': list(self.event.get_allowed_sender_emails(plugin_ctx={'regform': self.regform}).items()),
             'default_subject': default_subject,
             'default_body': default_body,
             'moderation_enabled': self.regform.moderation_enabled,
