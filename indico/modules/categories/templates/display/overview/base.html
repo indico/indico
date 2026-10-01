@@ -107,13 +107,17 @@
 {% block content %}
     <div class="category-overview">
         <div class="title flexrow f-j-center f-a-center">
-            <div class="navigation">
-                {% block overview_navigation_left %}{% endblock %}
-            </div>
+            {% if session.user %}
+                <div class="navigation">
+                    {% block overview_navigation_left %}{% endblock %}
+                </div>
+            {% endif %}
             <div class="text">{% block overview_title %}{% endblock %}</div>
-            <div class="navigation">
-                {% block overview_navigation_right %}{% endblock %}
-            </div>
+            {% if session.user %}
+                <div class="navigation">
+                    {% block overview_navigation_right %}{% endblock %}
+                </div>
+            {% endif %}
         </div>
         <div class="category-table">
             {% block overview %}{% endblock %}
