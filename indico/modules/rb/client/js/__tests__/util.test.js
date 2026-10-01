@@ -99,7 +99,7 @@ describe('can render the recurrence weekdays whilst taking the locale into accou
     ['tr', 'Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi ve Pazar'],
     ['pl', 'poniedziałek, wtorek, środa, czwartek, piątek, sobota i niedziela'],
     ['mn', 'Даваа, Мягмар, Лхагва, Пүрэв, Баасан, Бямба, Ням'],
-    ['uk', 'понеділок, вівторок, середа, четвер, п’ятниця, субота і неділя'],
+    ['uk', 'понеділок, вівторок, середа, четвер, пʼятниця, субота і неділя'],
     ['hu', 'hétfő, kedd, szerda, csütörtök, péntek, szombat és vasárnap'],
     ['zh-cn', '星期一、星期二、星期三、星期四、星期五、星期六和星期日'],
   ];
@@ -165,7 +165,7 @@ describe('can render the recurrence weekdays with support for repetitions whilst
     ['tr', 'Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi ve Pazar'],
     ['pl', 'poniedziałek, wtorek, środa, czwartek, piątek, sobota i niedziela'],
     ['mn', 'Даваа, Мягмар, Лхагва, Пүрэв, Баасан, Бямба, Ням'],
-    ['uk', 'понеділок, вівторок, середа, четвер, п’ятниця, субота і неділя'],
+    ['uk', 'понеділок, вівторок, середа, четвер, пʼятниця, субота і неділя'],
     ['hu', 'hétfő, kedd, szerda, csütörtök, péntek, szombat és vasárnap'],
     ['zh-cn', '星期一、星期二、星期三、星期四、星期五、星期六和星期日'],
   ];
