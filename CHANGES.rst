@@ -13,6 +13,8 @@ Improvements
 - Support multi-choice abstract/contribution fields (:pr:`7725`)
 - Add option to limit the number of review rounds in Paper Reviewing (:issue:`6600`,
   :pr:`7187`)
+- Add new regform setting to allow withdrawing a registration outside the modification
+  period (enabled by default for new forms) (:pr:`7769`)
 
 Bugfixes
 ^^^^^^^^
