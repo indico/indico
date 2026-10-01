@@ -11,6 +11,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Support multi-choice abstract/contribution fields (:pr:`7725`)
+- Add option to limit the number of review rounds in Paper Reviewing (:issue:`6600`,
+  :pr:`7187`)
 
 Bugfixes
 ^^^^^^^^
