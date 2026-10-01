@@ -1,5 +1,6 @@
 {
   "name": "indico",
+  "private": true,
   "version": "2.0.0",
   "description": "Indico",
   "main": "indico/web/client/js/index.js",
