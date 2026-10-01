@@ -109,6 +109,12 @@ class RegistrationForm(db.Model):
         UTCDateTime,
         nullable=True
     )
+    #: Whether to allow withdrawing the registration outside the modification period
+    withdraw_outside_modification = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     #: Whether the registration has been marked as deleted
     is_deleted = db.Column(
         db.Boolean,

@@ -28,6 +28,7 @@ def _log_registration_form_update(regform, changes, extra_log_fields):
         'require_captcha': 'Require CAPTCHA',
         'registration_limit': 'Limit',
         'modification_mode': 'Modification allowed',
+        'withdraw_outside_modification': 'Withdrawal allowed',
         'publish_registration_count': 'Publish registration count',
         'publish_checkin_enabled': 'Publish check-in status',
         'notification_sender_address': {'title': 'Notification sender address', 'type': 'string'},

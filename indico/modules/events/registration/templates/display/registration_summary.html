@@ -58,9 +58,9 @@
             {% endif %}
         </div>
         <div class="toolbar">
-            {% if registration.is_active and (regform.modification_mode.name != 'not_allowed' or
-                                              not registration.modification_deadline_passed) %}
-                <div class="group">
+            <div class="group">
+                {% if registration.is_active and (regform.modification_mode.name != 'not_allowed' or
+                                                  not registration.modification_deadline_passed) %}
                     <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                        class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
                         {% if not registration.can_be_modified %}
@@ -74,22 +74,22 @@
                         {% endif %}>
                         {% trans %}Modify{% endtrans %}
                     </a>
-                    {% if registration.can_be_withdrawn %}
-                        <button class="i-button icon-exit"
-                                data-href="{{ url_for('.withdraw_registration', registration.locator.registrant) }}"
-                                data-method="POST"
-                                data-title="{% trans %}Withdraw{% endtrans %}"
-                                data-confirm="{% trans %}Are you sure that you want to withdraw your registration? This action cannot be undone.{% endtrans %}">
-                            {% trans %}Withdraw{% endtrans %}
-                        </button>
-                    {% else %}
-                        <button class="i-button icon-exit disabled"
-                                title="{% trans %}The registration can no longer be withdrawn. Please contact an organizer.{% endtrans %}">
-                            {% trans %}Withdraw{% endtrans %}
-                        </button>
-                    {% endif %}
-                </div>
-            {% endif %}
+                {% endif %}
+                {% if registration.can_be_withdrawn %}
+                    <button class="i-button icon-exit"
+                            data-href="{{ url_for('.withdraw_registration', registration.locator.registrant) }}"
+                            data-method="POST"
+                            data-title="{% trans %}Withdraw{% endtrans %}"
+                            data-confirm="{% trans %}Are you sure that you want to withdraw your registration? This action cannot be undone.{% endtrans %}">
+                        {% trans %}Withdraw{% endtrans %}
+                    </button>
+                {% else %}
+                    <button class="i-button icon-exit disabled"
+                            title="{% trans %}The registration can no longer be withdrawn. Please contact an organizer.{% endtrans %}">
+                        {% trans %}Withdraw{% endtrans %}
+                    </button>
+                {% endif %}
+            </div>
             {% set ticket_template = regform.get_ticket_template() %}
             {% if registration.state.name == 'complete' and regform.tickets_enabled and
                   regform.ticket_on_summary_page and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}

@@ -106,6 +106,12 @@ class RegistrationFormEditForm(IndicoForm):
                                       description=_('Maximum number of registrations'))
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
+    withdraw_outside_modification = BooleanField(_('Withdrawal allowed'),
+                                                 widget=SwitchWidget(),
+                                                 description=_('Allow withdrawing a registration outside the '
+                                                               'configured modification period. Note that paid '
+                                                               'registrations can never be withdrawn by a '
+                                                               'participant.'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
                                               description=_('Number of registered participants will be displayed on '
                                                             'the event page'))

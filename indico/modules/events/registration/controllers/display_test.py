@@ -58,7 +58,8 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
 
 
 @pytest.mark.usefixtures('request_context')
-def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
+@pytest.mark.parametrize('withdraw_outside_modification', (True, False))
+def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user, withdraw_outside_modification):
     # Register the user and enable manager notifications
     dummy_regform.start_dt = now_utc(False)
     dummy_regform.organizer_notifications_enabled = True
@@ -75,10 +76,15 @@ def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
 
     # Throw forbidden if no modification allowed
     dummy_regform.modification_mode = ModificationMode.not_allowed
+    dummy_regform.withdraw_outside_modification = False
     assert not dummy_reg.can_be_withdrawn
     with pytest.raises(Forbidden):
         rh._check_access()
-    dummy_regform.modification_mode = ModificationMode.allowed_always
+
+    if withdraw_outside_modification:
+        dummy_regform.withdraw_outside_modification = True
+    else:
+        dummy_regform.modification_mode = ModificationMode.allowed_always
 
     # Check if an email is sent, one to the user, one to the manager
     assert not smtp.outbox

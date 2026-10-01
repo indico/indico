@@ -472,6 +472,8 @@ class Registration(db.Model):
             return False
         elif self.event.end_dt < now_utc():
             return False
+        elif self.registration_form.withdraw_outside_modification:
+            return True
         elif self.registration_form.modification_mode == ModificationMode.not_allowed:
             return False
         elif self.registration_form.modification_end_dt and self.registration_form.modification_end_dt < now_utc():
