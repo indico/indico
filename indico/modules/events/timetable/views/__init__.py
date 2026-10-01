@@ -44,7 +44,7 @@ class WPManageTimetable(MathjaxMixin, WPEventManagement):
 
 
 class WPManageTimetableOld(WPManageTimetable):
-    sidemenu_option = 'old-timetable'
+    sidemenu_option = 'timetable-legacy'
 
 
 class WPDisplayTimetable(WPConferenceDisplayBase):
