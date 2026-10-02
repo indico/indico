@@ -47,7 +47,7 @@ export default function CollapsibleContainer({
 }
 
 CollapsibleContainer.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   titleSize: PropTypes.string,
   defaultOpen: PropTypes.bool,
   styled: PropTypes.bool,
