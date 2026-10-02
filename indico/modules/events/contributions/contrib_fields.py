@@ -48,6 +48,9 @@ class ContribField(BaseField):
         super().__init__(obj)
         self.management = management
 
+    def create_mm_field(self):
+        return super().create_mm_field(override_required=self.management)
+
     @property
     def required_validator(self):
         return Optional if self.management else DataRequired

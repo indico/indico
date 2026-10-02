@@ -8,7 +8,7 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import fields, post_dump
+from marshmallow import EXCLUDE, fields, post_dump
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.marshmallow import mm
@@ -17,11 +17,15 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.fields import (ContributionField, ContributionFieldValue,
                                                                ContributionFieldVisibility)
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
+from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import SortedList
+from indico.util.locations import LocationDataSchema
+from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested, SortedList
 from indico.web.flask.util import url_for
 
 
@@ -56,14 +60,26 @@ class ContributionFieldValueSchema(mm.Schema):
         fields = ('id', 'name', 'value')
 
 
+def _get_principal_roles(principal):
+    roles = []
+    if principal.author_type:
+        roles.append(principal.author_type.name)
+    if principal.is_speaker:
+        roles.append('speaker')
+    if principal.contribution and principal.is_submitter:
+        roles.append('submitter')
+    return roles
+
+
 class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
     affiliation_link = fields.Nested(AffiliationSchema)
     email_hash = fields.Function(lambda x: hashlib.md5(x.email.encode()).hexdigest() if x.email else None)
+    roles = fields.Function(_get_principal_roles, load_only=True)
 
     class Meta:
         model = ContributionPersonLink
         fields = ('id', 'person_id', 'email', 'email_hash', 'first_name', 'last_name', 'full_name', 'title',
-                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type')
+                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type', 'roles')
 
     @post_dump
     def _hide_sensitive_data(self, data, **kwargs):
@@ -89,6 +105,14 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
     edit_url = fields.Method('_get_edit_url')
 
 
+class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionReference
+        fields = ('id', 'type', 'value')
+
+    type = fields.Integer(attribute='reference_type_id')
+
+
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
@@ -98,7 +122,7 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
                   'session', 'session_block', 'track', 'type', 'custom_fields', 'persons')
 
     session = fields.Nested(BasicSessionSchema, only=('id', 'title', 'friendly_id', 'code'))
-    session_block = fields.Nested(SessionBlockSchema, only=('id', 'title', 'code'))
+    session_block = fields.Nested(BasicSessionBlockSchema, only=('id', 'title', 'code'))
     track = fields.Nested(TrackSchema, only=('id', 'title', 'code'))
     type = fields.Nested(ContributionTypeSchema, only=('id', 'name'))
     custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
@@ -118,3 +142,55 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
 
 contribution_type_schema = ContributionTypeSchema()
 contribution_type_schema_basic = ContributionTypeSchema(only=('id', 'name'))
+
+
+class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = SessionBlock
+        fields = ('start_dt', 'end_dt')
+
+    start_dt = EventTimezoneDateTimeField()
+    end_dt = EventTimezoneDateTimeField()
+
+
+class CustomFieldsMixin:
+    # TODO: filter inactive and restricted contrib fields
+    custom_fields = fields.Method('_dump_custom_fields', '_load_custom_fields')
+
+    def _make_custom_fields_schema(self):
+        schema = {}
+        for field in self.context['event'].contribution_fields:
+            # TODO handle is_active and restricted fields
+            # TODO pick field impl depending on whether we're in management
+            impl = field.field if True else field.mgmt_field
+            schema[f'custom_{field.id}'] = impl.create_mm_field()
+        return mm.Schema.from_dict(schema, name='CustomFieldsSchema')
+
+    def _load_custom_fields(self, value):
+        schema_cls = self._make_custom_fields_schema()
+        schema = schema_cls(partial=bool(self.partial))
+        return schema.load(value)
+
+    def _dump_custom_fields(self, contrib):
+        schema_cls = self._make_custom_fields_schema()
+        schema = schema_cls()
+        return schema.dump({f'custom_{k}': v.data for k, v in contrib.data_by_field.items()})
+
+
+class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
+    """Schema for RESTful operations on contributions."""
+
+    class Meta:
+        model = Contribution
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
+                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links')
+        rh_context = ('event', {'object': 'contrib'})
+
+    id = fields.Int(dump_only=True)
+    start_dt = EventTimezoneDateTimeField()
+    person_links = fields.List(NonPartialNested(_ContributionPersonLinkSchema, unknown=EXCLUDE))
+    references = fields.List(NonPartialNested(ContributionReferenceSchema))
+    location_data = NonPartialNested(LocationDataSchema)
+    session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
+    duration = fields.TimeDelta(required=True)
+    _description = fields.String(attribute='description')
