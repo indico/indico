@@ -8,7 +8,7 @@
 import {ComponentType} from 'react';
 
 interface CollapsibleContainerProps {
-  title: string;
+  title: React.ReactNode;
   titleSize?: 'tiny' | 'small' | 'medium' | 'large' | 'huge';
   defaultOpen?: boolean;
   styled?: boolean;
