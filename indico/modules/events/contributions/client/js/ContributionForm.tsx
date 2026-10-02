@@ -190,12 +190,10 @@ export function ContributionFormFields({
       />
       <CollapsibleContainer
         title={
-          <>
-            <Translate>Advanced</Translate>{' '}
-            <span>
-              <ErrorMarker fields={[...customFieldNames, 'references']} size="small" />
-            </span>
-          </>
+          <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
+            <Translate>Advanced</Translate>
+            <ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />
+          </span>
         }
         dividing
       >
