@@ -302,18 +302,11 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             # if it's POST we filter by registration ids; otherwise we assume
             # the user wants everything (e.g. API-like usage via personal token)
             query = query.filter(Registration.id.in_(registration_ids))
-        self.registrations = query.all()
-
-    def _check_access(self):
-        RHManageRegFormBase._check_access(self)
-        criteria = values_from_signal(
+        if extra_criteria := values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
-        )
-        if not criteria or not self.registrations:
-            return
-        ids = {r.id for r in self.registrations}
-        if Registration.query.filter(Registration.id.in_(ids), *criteria).count() != len(ids):
-            raise Forbidden(_('You are not authorized to manage these registrations.'))
+        ):
+            query = query.filter(*extra_criteria)
+        self.registrations = query.all()
 
     def _check_download_blocked(self):
         if self.regform.is_download_blocked(session.user):

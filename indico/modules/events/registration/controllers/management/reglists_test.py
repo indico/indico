@@ -191,12 +191,12 @@ def test_export_download_blocked(db, dummy_regform, dummy_user, app_context):
                 rh._check_access()
 
 
-@pytest.mark.parametrize(('select_theirs', 'allowed'), (
-    (False, True),
-    (True, False),
+@pytest.mark.parametrize(('rh_class', 'method'), (
+    (RHRegistrationsApprove, 'POST'),
+    (RHRegistrationsExportCSV, 'GET'),
 ))
-def test_bulk_action_requires_all_registrations_manageable(db, dummy_regform, dummy_user, app_context,
-                                                            select_theirs, allowed):
+def test_bulk_action_filtered_by_registration_list_criteria(db, dummy_regform, dummy_user, app_context, rh_class,
+                                                            method):
     dummy_regform.event.update_principal(dummy_user, full_access=True)
     mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
                                         invitation=None, management=True, notify_user=False)
@@ -206,19 +206,16 @@ def test_bulk_action_requires_all_registrations_manageable(db, dummy_regform, du
     def _only_mine(sender, user, **kwargs):
         return Registration.id == mine.id
 
-    selected = [mine.id, theirs.id] if select_theirs else [mine.id]
-    with app_context.test_request_context(method='POST', data={'registration_id': selected}):
+    data = {'registration_id': [mine.id, theirs.id]} if method == 'POST' else None
+    with app_context.test_request_context(method=method, data=data):
         request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
         session.set_session_user(dummy_user)
 
-        rh = RHRegistrationsApprove()
-        rh._process_args()
+        rh = rh_class()
         with signals.event.filter_registration_list.connected_to(_only_mine):
-            if allowed:
-                rh._check_access()
-            else:
-                with pytest.raises(Forbidden, match='these registrations'):
-                    rh._check_access()
+            rh._process_args()
+            rh._check_access()
+        assert rh.registrations == [mine]
 
 
 @pytest.mark.parametrize(('scoped_in', 'allowed'), (
