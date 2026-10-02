@@ -309,10 +309,6 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
         )
 
-    def _check_download_blocked(self):
-        if self.regform.is_download_blocked(session.user):
-            raise Forbidden
-
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
     """Base class for moderating multiple registrations."""
@@ -518,10 +514,6 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     _allow_get_all = True
     registration_query_options = (subqueryload('data'),)
 
-    def _check_access(self):
-        RHRegistrationsActionBase._check_access(self)
-        self._check_download_blocked()
-
     def _process_args(self):
         RHRegistrationsActionBase._process_args(self)
         self.export_config = self.list_generator.get_list_export_config()
@@ -636,7 +628,6 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
     def _check_access(self):
         RHRegistrationsActionBase._check_access(self)
-        self._check_download_blocked()
 
         # Check that template belongs to this event or a category that is a parent
         if self.template.owner == self.event:
@@ -675,10 +666,6 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
     ALLOW_LOCKED = True
     TICKET_BADGES = False
-
-    def _check_access(self):
-        RHRegistrationsActionBase._check_access(self)
-        self._check_download_blocked()
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
@@ -1132,10 +1119,6 @@ class RHRegistrationsExportReceipts(ZipGeneratorMixin, RHRegistrationsActionBase
     """Export registration receipts in a zip file."""
 
     ALLOW_LOCKED = True
-
-    def _check_access(self):
-        RHRegistrationsActionBase._check_access(self)
-        self._check_download_blocked()
 
     def _prepare_folder_structure(self, data):
         if isinstance(data, _FileWrapper):

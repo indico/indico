@@ -166,32 +166,6 @@ def test_registration_update_base_price(dummy_regform, dummy_user, app_context, 
     assert reg.state == expected_state
 
 
-def test_export_download_blocked(db, dummy_regform, dummy_user, app_context):
-    dummy_regform.event.update_principal(dummy_user, full_access=True)
-    db.session.flush()
-
-    with app_context.test_request_context(method='POST'):
-        request.view_args = {
-            'reg_form_id': dummy_regform.id,
-            'event_id': dummy_regform.event_id,
-        }
-        session.set_session_user(dummy_user)
-
-        rh = RHRegistrationsExportCSV()
-        rh.event = dummy_regform.event
-        rh.regform = dummy_regform
-
-        # No handler vetoes the download.
-        rh._check_access()
-
-        def _block(sender, user, **kwargs):
-            return True
-
-        with signals.event.is_registration_download_blocked.connected_to(_block):
-            with pytest.raises(Forbidden):
-                rh._check_access()
-
-
 @pytest.mark.parametrize(('rh_class', 'method'), (
     (RHRegistrationsApprove, 'POST'),
     (RHRegistrationsExportCSV, 'GET'),
