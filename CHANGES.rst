@@ -39,6 +39,8 @@ Internal Changes
   under the reserved ``PLUGIN_<NAME>_`` namespace, with parity for defaults,
   sanitization and ``INDICO_CONF_OVERRIDE``
   (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
+- Add new signals to allow restricting which registrations someone can manage
+  (:pr:`7611`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.13
