@@ -466,9 +466,9 @@ class Registration(db.Model):
     def can_manage(self, user, permission, allow_admin=True):
         if not self.event.can_manage(user, permission=permission, allow_admin=allow_admin):
             return False
-        criteria = [c for c in values_from_signal(
+        criteria = values_from_signal(
             signals.event.filter_registration_list.send(self.registration_form, user=user), as_list=True
-        ) if c is not None]
+        )
         if not criteria:
             return True
         return Registration.query.filter(Registration.id == self.id, *criteria).has_rows()

@@ -578,9 +578,9 @@ class RegistrationForm(db.Model):
     def get_managed_registration_count(self, user):
         """Number of active registrations ``user`` may manage on this form."""
         from indico.modules.events.registration.models.registrations import Registration
-        criteria = [c for c in values_from_signal(
+        criteria = values_from_signal(
             signals.event.filter_registration_list.send(self, user=user), as_list=True
-        ) if c is not None]
+        )
         if not criteria:
             return self.active_registration_count
         return (db.session.query(db.func.coalesce(db.func.sum(Registration.occupied_slots), 0))

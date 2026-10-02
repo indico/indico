@@ -168,9 +168,9 @@ class RegistrationListGenerator(ListGeneratorBase):
         return filters
 
     def _build_query(self):
-        extra_criteria = [c for c in values_from_signal(
+        extra_criteria = values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
-        ) if c is not None]
+        )
         return (Registration.query
                 .with_parent(self.regform)
                 .filter(~Registration.is_deleted, *extra_criteria)
