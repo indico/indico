@@ -164,7 +164,7 @@ Expected to return `CustomRegistrationListItem` subclasses. The `sender` is the
 
 filter_registration_list = _signals.signal('filter-registration-list', '''
 Called to scope which registrations a user may manage. The `sender` is the `RegistrationForm`;
-the `user` kwarg identifies the user. Return a SQLAlchemy filter criterion selecting the
+the `user` kwarg identifies the user. Return an SQLAlchemy filter criterion selecting the
 registrations `user` may manage (an empty result set is acceptable), or ``None`` for "no
 opinion". This only scopes access on top of the regular ACL; it never grants it. Criteria from
 multiple handlers are AND-combined and applied to the management list, the managed-registration
