@@ -115,10 +115,8 @@ filter_user_search_results = _signals.signal('filter-user-search-results', '''
 Called to let a plugin restrict the results of a user search. The *sender* is the
 ``RHUserSearch`` request handler. The user performing the search is passed in the ``user``
 kwarg and the serialized result entries (each a dict with keys such as ``id``, ``identifier``,
-``email``, ``affiliation``, ``affiliation_id`` and ``full_name``) in the ``results`` kwarg. A
-handler should return a filtered list of those entries, or ``None`` for "no opinion". Each
-non-``None`` returned list is applied in turn, so a handler only ever sees the entries left by
-the previous ones.
+``email``, ``affiliation``, ``affiliation_id`` and ``full_name``) in the ``results`` kwarg.
+The signal handler is expected to mutate the list, removing the entries the user may not see.
 ''')
 
 extra_linked_events = _signals.signal('extra-linked-events', '''
