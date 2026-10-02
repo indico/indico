@@ -302,10 +302,16 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             query = query.filter(Registration.id.in_(registration_ids))
         self.registrations = query.all()
 
-    @property
-    def manageable_registrations(self):
-        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
-        return [r for r in self.registrations if any(r.can_manage(session.user, p) for p in permissions)]
+    def _check_management_permission(self):
+        if not RHManageRegFormBase._check_management_permission(self):
+            return False
+        criteria = values_from_signal(
+            signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
+        )
+        if not criteria or not self.registrations:
+            return True
+        ids = {r.id for r in self.registrations}
+        return Registration.query.filter(Registration.id.in_(ids), *criteria).count() == len(ids)
 
     def _check_download_blocked(self):
         if self.regform.is_download_blocked(session.user):
@@ -406,15 +412,14 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
     PERMISSION = ('registration', 'registration_edit')
 
     def _process(self):
-        registrations = self.manageable_registrations
-        for registration in registrations:
+        for registration in self.registrations:
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration, permanent=False)
             logger.info('Registration %s deleted by %s', registration, session.user)
             registration.log(EventLogRealm.management, LogKind.negative, 'Registration',
                              f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
-        num_reg_deleted = len(registrations)
+        num_reg_deleted = len(self.registrations)
         flash(ngettext('Registration was deleted.',
                        '{num} registrations were deleted.', num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
@@ -943,7 +948,7 @@ class RHRegistrationsApprove(RHRegistrationsActionModerationBase):
     """Accept selected registrations from registration list."""
 
     def _process(self):
-        num_approved, num_skipped = _bulk_modify_registration_status(self.manageable_registrations, approve=True)
+        num_approved, num_skipped = _bulk_modify_registration_status(self.registrations, approve=True)
         if num_approved:
             flash(ngettext('{num} registration was successfully approved.',
                            '{num} registrations were successfully approved.',
@@ -961,12 +966,11 @@ class RHRegistrationsReject(RHRegistrationsActionModerationBase):
     """Reject selected registrations from registration list."""
 
     def _process(self):
-        registrations = self.manageable_registrations
-        form = RejectRegistrantsForm(registration_id=[r.id for r in registrations])
+        form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
         message = _('Rejecting these registrations will trigger a notification email for each registrant.')
         if form.validate_on_submit():
             num_rejected, num_skipped = _bulk_modify_registration_status(
-                registrations,
+                self.registrations,
                 approve=False,
                 rejection_reason=form.rejection_reason.data,
                 attach_rejection_reason=form.attach_rejection_reason.data
@@ -989,7 +993,7 @@ class RHRegistrationsReset(RHRegistrationsActionModerationBase):
     """Reset selected registration from registration list."""
 
     def _process(self):
-        for registration in self.manageable_registrations:
+        for registration in self.registrations:
             registration.reset_state()
         db.session.flush()
         flash(_('The selected registrations were successfully reset.'), 'success')

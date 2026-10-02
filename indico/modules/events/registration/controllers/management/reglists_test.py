@@ -190,28 +190,31 @@ def test_export_download_blocked(db, dummy_regform, dummy_user, app_context):
                 rh._check_access()
 
 
-@pytest.mark.usefixtures('smtp')
-def test_bulk_approve_skips_unmanageable_registrations(db, dummy_regform, dummy_user, app_context):
-    dummy_regform.moderation_enabled = True
+@pytest.mark.parametrize(('select_theirs', 'allowed'), (
+    (False, True),
+    (True, False),
+))
+def test_bulk_action_requires_all_registrations_manageable(db, dummy_regform, dummy_user, app_context,
+                                                            select_theirs, allowed):
     dummy_regform.event.update_principal(dummy_user, full_access=True)
     mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
                                         invitation=None, management=True, notify_user=False)
                     for email, last_name in (('mine@example.test', 'Mine'), ('theirs@example.test', 'Theirs')))
-    mine.state = theirs.state = RegistrationState.pending
     db.session.flush()
 
     def _only_mine(sender, user, **kwargs):
         return Registration.id == mine.id
 
-    form_data = {'registration_id': [mine.id, theirs.id], 'csrf_token': '00000000-0000-0000-0000-000000000000'}
-    with app_context.test_request_context(method='POST', data=form_data):
+    selected = [mine.id, theirs.id] if select_theirs else [mine.id]
+    with app_context.test_request_context(method='POST', data={'registration_id': selected}):
         request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
         session.set_session_user(dummy_user)
 
         rh = RHRegistrationsApprove()
         rh._process_args()
         with signals.event.filter_registration_list.connected_to(_only_mine):
-            rh._process()
-
-    assert mine.state == RegistrationState.complete
-    assert theirs.state == RegistrationState.pending
+            if allowed:
+                rh._check_access()
+            else:
+                with pytest.raises(Forbidden):
+                    rh._check_access()
