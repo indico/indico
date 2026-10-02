@@ -302,12 +302,10 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             # if it's POST we filter by registration ids; otherwise we assume
             # the user wants everything (e.g. API-like usage via personal token)
             query = query.filter(Registration.id.in_(registration_ids))
-        self.registrations = query.filter(*self._registration_list_criteria()).all()
-
-    def _registration_list_criteria(self):
-        return values_from_signal(
+        criteria = values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
         )
+        self.registrations = query.filter(*criteria).all()
 
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
@@ -670,8 +668,11 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
         ids = set(request.form.getlist('registration_id'))
+        criteria = values_from_signal(
+            signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
+        )
         query = (Registration.query.with_parent(self.regform)
-                 .filter(~Registration.is_deleted, *self._registration_list_criteria())
+                 .filter(~Registration.is_deleted, *criteria)
                  .order_by(*Registration.order_by_name))
         if ids:
             query = query.filter(Registration.id.in_(ids))
