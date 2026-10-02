@@ -575,16 +575,17 @@ class RegistrationForm(db.Model):
     def can_submit(self, user):
         return self.is_active and (not self.require_login or user)
 
-    def get_managed_registration_count(self, user):
-        """Number of active registrations ``user`` may manage on this form."""
+    def get_managed_registration_count(self, user, include_inactive=False):
+        """Number of registrations ``user`` may manage on this form."""
         from indico.modules.events.registration.models.registrations import Registration
         criteria = values_from_signal(
             signals.event.filter_registration_list.send(self, user=user), as_list=True
         )
         if not criteria:
-            return self.active_registration_count
+            return self.existing_registrations_count if include_inactive else self.active_registration_count
+        state_criterion = ~Registration.is_deleted if include_inactive else Registration.is_active
         return (db.session.query(db.func.coalesce(db.func.sum(Registration.occupied_slots), 0))
-                .filter(Registration.registration_form_id == self.id, Registration.is_active, *criteria)
+                .filter(Registration.registration_form_id == self.id, state_criterion, *criteria)
                 .scalar())
 
     def is_download_blocked(self, user):
