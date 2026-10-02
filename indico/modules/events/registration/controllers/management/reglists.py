@@ -251,9 +251,11 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
-    def _check_management_permission(self):
+    def _check_access(self):
+        RHManageRegFormsBase._check_access(self)
         permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
-        return any(self.field_data.registration.can_manage(session.user, p) for p in permissions)
+        if not any(self.field_data.registration.can_manage(session.user, p) for p in permissions):
+            raise Forbidden(_('You are not authorized to manage this registration.'))
 
     def _process(self):
         return self.field_data.send()
@@ -302,16 +304,16 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             query = query.filter(Registration.id.in_(registration_ids))
         self.registrations = query.all()
 
-    def _check_management_permission(self):
-        if not RHManageRegFormBase._check_management_permission(self):
-            return False
+    def _check_access(self):
+        RHManageRegFormBase._check_access(self)
         criteria = values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
         )
         if not criteria or not self.registrations:
-            return True
+            return
         ids = {r.id for r in self.registrations}
-        return Registration.query.filter(Registration.id.in_(ids), *criteria).count() == len(ids)
+        if Registration.query.filter(Registration.id.in_(ids), *criteria).count() != len(ids):
+            raise Forbidden(_('You are not authorized to manage these registrations.'))
 
     def _check_download_blocked(self):
         if self.regform.is_download_blocked(session.user):

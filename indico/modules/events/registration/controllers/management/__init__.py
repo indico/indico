@@ -7,6 +7,7 @@
 
 from flask import request, session
 from sqlalchemy.orm import contains_eager, defaultload
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.controllers import RegistrationFormMixin
@@ -14,6 +15,7 @@ from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.util.i18n import _
 
 
 class RHManageRegFormsBase(RHManageEventBase):
@@ -54,9 +56,11 @@ class RHManageRegistrationBase(RHManageRegFormBase):
                                       .joinedload('field_data'))
                              .one())
 
-    def _check_management_permission(self):
+    def _check_access(self):
+        RHManageRegFormBase._check_access(self)
         permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
-        return any(self.registration.can_manage(session.user, p) for p in permissions)
+        if not any(self.registration.can_manage(session.user, p) for p in permissions):
+            raise Forbidden(_('You are not authorized to manage this registration.'))
 
 
 class RHManageRegistrationModerationBase(RHManageRegistrationBase):

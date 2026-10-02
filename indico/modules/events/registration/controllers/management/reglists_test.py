@@ -14,6 +14,7 @@ from werkzeug.exceptions import Forbidden, UnprocessableEntity
 from indico.core import signals
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCreate,
+                                                                                RHRegistrationDetails,
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationsApprove,
                                                                                 RHRegistrationsBasePrice,
@@ -216,5 +217,34 @@ def test_bulk_action_requires_all_registrations_manageable(db, dummy_regform, du
             if allowed:
                 rh._check_access()
             else:
-                with pytest.raises(Forbidden):
+                with pytest.raises(Forbidden, match='these registrations'):
+                    rh._check_access()
+
+
+@pytest.mark.parametrize(('scoped_in', 'allowed'), (
+    (True, True),
+    (False, False),
+))
+def test_registration_management_requires_manageable_registration(db, dummy_regform, dummy_user, app_context,
+                                                                   scoped_in, allowed):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    registration = create_registration(dummy_regform, {'email': 'a@example.test', 'first_name': 'A', 'last_name': 'B'},
+                                       invitation=None, management=True, notify_user=False)
+    db.session.flush()
+
+    def _scope(sender, user, **kwargs):
+        return Registration.id == (registration.id if scoped_in else -1)
+
+    with app_context.test_request_context():
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id,
+                             'registration_id': registration.id}
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationDetails()
+        rh._process_args()
+        with signals.event.filter_registration_list.connected_to(_scope):
+            if allowed:
+                rh._check_access()
+            else:
+                with pytest.raises(Forbidden, match='this registration'):
                     rh._check_access()
