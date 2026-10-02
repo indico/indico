@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
 
 import {
   CollapsibleContainer,
@@ -192,7 +192,11 @@ export function ContributionFormFields({
         title={
           <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
             <Translate>Advanced</Translate>
-            <ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />
+            <Popup
+              trigger={<ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />}
+            >
+              <Translate>Please expand this section and correct the invalid fields.</Translate>
+            </Popup>
           </span>
         }
         dividing
