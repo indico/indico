@@ -32,8 +32,10 @@ interface FileTypeManagerProps {
   getAllURLFn: (params?) => string;
   createURLFn: (params?) => string;
   editURLFn: (params?) => string;
+  autoSubmissionFromPeerReviewURLFn: (params?) => string;
   hideAccepted?: boolean;
   allowDeleteLastType?: boolean;
+  source: 'editing' | 'peer-review';
 }
 
 interface FileTypeManagerState {
@@ -72,8 +74,10 @@ export default function FileTypeManager({
   getAllURLFn,
   createURLFn,
   editURLFn,
+  autoSubmissionFromPeerReviewURLFn,
   hideAccepted = false,
   allowDeleteLastType = false,
+  source,
 }: FileTypeManagerProps) {
   const [state, dispatch] = useReducer(fileTypesReducer, initialState);
   const {
@@ -82,7 +86,10 @@ export default function FileTypeManager({
     reFetch,
     lastData,
   } = useIndicoAxios(getAllURLFn({event_id: eventId}), {camelize: true});
-
+  const {data: autoSubmissionFromPeerReview} = useIndicoAxios(
+    autoSubmissionFromPeerReviewURLFn({event_id: eventId}),
+    {camelize: true}
+  );
   const createFileType = async formData => {
     try {
       await indicoAxios.post(createURLFn({event_id: eventId}), formData);
@@ -130,10 +137,10 @@ export default function FileTypeManager({
     const publishable = fileTypes.filter(ft => ft.publishable);
     return publishable.length === 1 && publishable[0].id === fileTypeId;
   };
-
   const canDelete = fileType =>
     !fileType.isUsedInCondition &&
     !fileType.isUsed &&
+    !fileType.sourceEditingFileTypeId &&
     (allowDeleteLastType || !isLastPublishable(fileType.id));
 
   const renderPopupContent = fileType => {
@@ -145,10 +152,31 @@ export default function FileTypeManager({
       return <Translate>This type has files attached</Translate>;
     } else if (fileType.isUsedInCondition) {
       return <Translate>This type is used in a review condition</Translate>;
+    } else if (fileType.sourceEditingFileTypeId) {
+      return (
+        <Translate>
+          This file type is synced from editing file types and cannot be deleted directly
+        </Translate>
+      );
     } else {
       return <Translate>Cannot delete the only publishable type</Translate>;
     }
   };
+
+  const canEdit = fileType => !fileType.sourceEditingFileTypeId;
+
+  const renderEditPopupContent = fileType => {
+    if (canEdit(fileType)) {
+      return null;
+    }
+
+    return (
+      <Translate>
+        This file type is synced from editing file types and cannot be edited directly
+      </Translate>
+    );
+  };
+
   const {operation, fileType: currentFileType} = state;
   return (
     <div styleName="file-types-container">
@@ -175,59 +203,85 @@ export default function FileTypeManager({
       )}
       {fileTypes.map(fileType => (
         <Segment key={fileType.id} styleName="filetype-segment">
-          <Label ribbon>
-            <StatusIcon
-              active={fileType.required}
-              icon="asterisk"
-              text={Translate.string('File required')}
-            />
-            <StatusIcon
-              active={fileType.allowMultipleFiles}
-              icon="copy outline"
-              text={Translate.string('Multiple files allowed')}
-            />
-            <StatusIcon
-              active={fileType.publishable}
-              icon="eye"
-              text={Translate.string('File publishable')}
-            />
-          </Label>
-          <Popup
-            on="hover"
-            disabled={canDelete(fileType)}
-            position="right center"
-            content={renderPopupContent(fileType)}
-            trigger={
-              <Icon
-                style={canDelete(fileType) ? {cursor: 'pointer'} : {}}
-                color="red"
-                name="trash"
-                corner="top right"
-                disabled={!canDelete(fileType)}
-                onClick={() =>
-                  canDelete(fileType) && dispatch({type: 'DELETE_FILE_TYPE', fileType})
-                }
-              />
+          <div
+            styleName={
+              fileType.sourceEditingFileTypeId && source !== 'editing' ? 'filetype-striped' : ''
             }
-          />
-          <Icon
-            style={{cursor: 'pointer'}}
-            color="blue"
-            name="pencil"
-            corner="top right"
-            onClick={() => dispatch({type: 'EDIT_FILE_TYPE', fileType})}
-          />
-          <div styleName="filetype-header">
-            <h3>
-              <TooltipIfTruncated>
-                <span styleName="name">{fileType.name}</span>
-              </TooltipIfTruncated>
-            </h3>
-            <ul styleName="file-extensions">
-              {fileType.extensions.length !== 0
-                ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
-                : Translate.string('(no extension restrictions)')}
-            </ul>
+          >
+            <Label ribbon>
+              <StatusIcon
+                active={fileType.required}
+                icon="asterisk"
+                text={Translate.string('File required')}
+              />
+              <StatusIcon
+                active={fileType.allowMultipleFiles}
+                icon="copy outline"
+                text={Translate.string('Multiple files allowed')}
+              />
+              <StatusIcon
+                active={fileType.publishable}
+                icon="eye"
+                text={Translate.string('File publishable')}
+              />
+              {fileType.sourceEditingFileTypeId && (
+                <Icon
+                  disabled={!autoSubmissionFromPeerReview}
+                  size="small"
+                  name="sync"
+                  color="red"
+                  title={Translate.string(
+                    'This is a synchronized file type, it should be managed in the editing module and cannot be modified here.'
+                  )}
+                />
+              )}
+            </Label>
+            <Popup
+              on="hover"
+              disabled={canDelete(fileType)}
+              position="right center"
+              content={renderPopupContent(fileType)}
+              trigger={
+                <Icon
+                  style={canDelete(fileType) ? {cursor: 'pointer'} : {}}
+                  color="red"
+                  name="trash"
+                  corner="top right"
+                  disabled={!canDelete(fileType)}
+                  onClick={() =>
+                    canDelete(fileType) && dispatch({type: 'DELETE_FILE_TYPE', fileType})
+                  }
+                />
+              }
+            />
+            <Popup
+              on="hover"
+              disabled={canEdit(fileType)}
+              position="right center"
+              content={renderEditPopupContent(fileType)}
+              trigger={
+                <Icon
+                  style={canEdit(fileType) ? {cursor: 'pointer'} : {}}
+                  color="blue"
+                  name="pencil"
+                  corner="top right"
+                  disabled={!canEdit(fileType)}
+                  onClick={() => canEdit(fileType) && dispatch({type: 'EDIT_FILE_TYPE', fileType})}
+                />
+              }
+            />
+            <div styleName="filetype-header">
+              <h3>
+                <TooltipIfTruncated>
+                  <span styleName="name">{fileType.name}</span>
+                </TooltipIfTruncated>
+              </h3>
+              <ul styleName="file-extensions">
+                {fileType.extensions.length !== 0
+                  ? fileType.extensions.map(ext => <li key={ext}>{ext}</li>)
+                  : Translate.string('(no extension restrictions)')}
+              </ul>
+            </div>
           </div>
         </Segment>
       ))}

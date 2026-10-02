@@ -12,6 +12,7 @@ from zipfile import ZipFile
 from flask import jsonify, session
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing import logger
@@ -354,6 +355,7 @@ def create_new_file_type(event, editable_type, **data):
     logger.info('File type %r for %s created by %r', file_type, editable_type.name, session.user)
     file_type.log(EventLogRealm.management, LogKind.positive, 'Editing', f'File type {file_type.name} created',
                   session.user)
+    signals.event.core.editing_file_types_changed.send(event)
     return file_type
 
 
@@ -363,6 +365,7 @@ def update_file_type(file_type, **data):
     logger.info('File type %r updated by %r', file_type, session.user)
     file_type.log(EventLogRealm.management, LogKind.change, 'Editing', f'File type {file_type.name} updated',
                   session.user, data={'Changes': make_diff_log(changes, FILE_TYPE_ATTRS)})
+    signals.event.core.editing_file_types_changed.send(file_type.event)
 
 
 def delete_file_type(file_type):
