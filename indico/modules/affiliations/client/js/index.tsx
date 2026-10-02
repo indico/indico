@@ -9,12 +9,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AffiliationsDashboard from './AffiliationsDashboard';
+import AffiliationsMapping from './AffiliationsMapping';
 
 customElements.define(
   'ind-affiliations-dashboard',
   class extends HTMLElement {
     connectedCallback() {
       ReactDOM.render(<AffiliationsDashboard />, this);
+    }
+  }
+);
+
+customElements.define(
+  'ind-affiliations-mapping',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(<AffiliationsMapping />, this);
     }
   }
 );

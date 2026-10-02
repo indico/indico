@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import adminAffiliationURL from 'indico-url:users.api_admin_affiliation';
-import adminAffiliationsURL from 'indico-url:users.api_admin_affiliations';
+import adminAffiliationURL from 'indico-url:affiliations.api_admin_affiliation';
+import adminAffiliationsURL from 'indico-url:affiliations.api_admin_affiliations';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {AutoSizer, Column, Table, TableCellRenderer} from 'react-virtualized';
