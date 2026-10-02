@@ -161,8 +161,9 @@ class CustomFieldsMixin:
         schema = {}
         for field in self.context['event'].contribution_fields:
             # TODO handle is_active and restricted fields
-            # TODO generate proper field (type) from field definition, with validation where needed
-            schema[f'custom_{field.id}'] = fields.Raw()
+            # TODO pick field impl depending on whether we're in management
+            impl = field.field if True else field.mgmt_field
+            schema[f'custom_{field.id}'] = impl.create_mm_field()
         return mm.Schema.from_dict(schema, name='CustomFieldsSchema')
 
     def _load_custom_fields(self, value):
