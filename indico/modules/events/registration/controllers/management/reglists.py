@@ -302,11 +302,12 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             # if it's POST we filter by registration ids; otherwise we assume
             # the user wants everything (e.g. API-like usage via personal token)
             query = query.filter(Registration.id.in_(registration_ids))
-        if extra_criteria := values_from_signal(
+        self.registrations = query.filter(*self._registration_list_criteria()).all()
+
+    def _registration_list_criteria(self):
+        return values_from_signal(
             signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
-        ):
-            query = query.filter(*extra_criteria)
-        self.registrations = query.all()
+        )
 
     def _check_download_blocked(self):
         if self.regform.is_download_blocked(session.user):
@@ -682,11 +683,12 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
         ids = set(request.form.getlist('registration_id'))
-        self.registrations = (Registration.query.with_parent(self.regform)
-                              .filter(Registration.id.in_(ids),
-                                      ~Registration.is_deleted)
-                              .order_by(*Registration.order_by_name)
-                              .all()) if ids else []
+        query = (Registration.query.with_parent(self.regform)
+                 .filter(~Registration.is_deleted, *self._registration_list_criteria())
+                 .order_by(*Registration.order_by_name))
+        if ids:
+            query = query.filter(Registration.id.in_(ids))
+        self.registrations = query.all()
         self.template_id = request.args.get('template_id', self._default_template_id)
 
     @property
@@ -712,7 +714,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = self._get_event_badge_settings(self.event)
         form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
-        all_registrations = [r for r in (self.registrations or self.regform.registrations) if r.is_active]
+        all_registrations = [r for r in self.registrations if r.is_active]
         registrations = self._filter_registrations(all_registrations)
         if self.event.is_locked:
             del form.save_values

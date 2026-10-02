@@ -18,6 +18,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationEdit,
                                                                                 RHRegistrationsApprove,
                                                                                 RHRegistrationsBasePrice,
+                                                                                RHRegistrationsConfigBadges,
                                                                                 RHRegistrationsExportCSV)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormSection
@@ -216,6 +217,29 @@ def test_bulk_action_filtered_by_registration_list_criteria(db, dummy_regform, d
             rh._process_args()
             rh._check_access()
         assert rh.registrations == [mine]
+
+
+@pytest.mark.parametrize('select_theirs', (False, True))
+def test_badge_config_filtered_by_registration_list_criteria(db, dummy_regform, dummy_user, app_context,
+                                                             select_theirs):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
+                                        invitation=None, management=True, notify_user=False)
+                    for email, last_name in (('mine@example.test', 'Mine'), ('theirs@example.test', 'Theirs')))
+    db.session.flush()
+
+    def _only_mine(sender, user, **kwargs):
+        return Registration.id == mine.id
+
+    data = {'registration_id': [theirs.id]} if select_theirs else {}
+    with app_context.test_request_context(method='POST', data=data):
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationsConfigBadges()
+        with signals.event.filter_registration_list.connected_to(_only_mine):
+            rh._process_args()
+        assert rh.registrations == ([] if select_theirs else [mine])
 
 
 @pytest.mark.parametrize(('scoped_in', 'allowed'), (
