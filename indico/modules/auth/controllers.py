@@ -24,7 +24,7 @@ from indico.core.db import db
 from indico.core.marshmallow import mm
 from indico.core.notifications import make_email, send_email
 from indico.modules.admin import RHAdminBase
-from indico.modules.auth import Identity, logger, login_user
+from indico.modules.auth import Identity, delete_old_user_sessions, logger, login_user
 from indico.modules.auth.forms import (AddLocalIdentityForm, EditLocalIdentityForm, RegistrationEmailForm,
                                        ResetPasswordEmailForm, ResetPasswordForm, SelectEmailForm)
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -393,6 +393,8 @@ class RHAccounts(RHUserBase):
         if form.data['new_password']:
             self.user.local_identity.password = form.new_password.data
             session.pop('insecure_password_error', None)
+            if form.data['force_logout']:
+                delete_old_user_sessions(self.user, session.sid)
             logger.info('User %s (%s) changed their password', self.user, self.user.local_identity.identifier)
             self.user.log(UserLogRealm.user, LogKind.change, 'Accounts', 'Password changed', session.user)
         flash(_('Your local account credentials have been updated successfully'), 'success')
@@ -839,6 +841,8 @@ class RHResetPassword(RH):
         if form.validate_on_submit():
             identity.password = form.password.data
             flash(_('Your password has been changed successfully.'), 'success')
+            if form.force_logout.data:
+                delete_old_user_sessions(identity.user)
             login_user(identity.user, identity)
             identity.user.log(UserLogRealm.user, LogKind.change, 'Accounts', 'Password reset', session.user,
                               data={'IP': request.remote_addr})
