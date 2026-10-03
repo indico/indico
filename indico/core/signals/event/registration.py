@@ -21,9 +21,9 @@ Called when the state of a registration changes. The `sender` is the
 kwarg; the `silent` kwarg can be set to `True` to skip logging.
 ''')
 
-registration_checkin_updated = _signals.signal('registration-checkin-updated', '''
-Called when the checkin state of a registration changes. The `sender` is the
-`Registration` object.
+registration_check_added = _signals.signal('registration-check-added', '''
+Called when a check is performed on a registration. The `sender` is the
+`RegistrationCheck` object.
 ''')
 
 registration_created = _signals.signal('registration-created', '''
