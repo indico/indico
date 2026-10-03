@@ -6,13 +6,13 @@ Create Date: 2019-10-02 18:20:33.866458
 """
 
 import bisect
+from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.core.db.sqlalchemy.principals import PrincipalType
 
 
 # revision identifiers, used by Alembic.
@@ -20,6 +20,15 @@ revision = '2496c4adc7e9'
 down_revision = '4e459d27adab'
 branch_labels = None
 depends_on = None
+
+
+class _PrincipalType(int, Enum):
+    user = 1
+    local_group = 2
+    multipass_group = 3
+    email = 4
+    network = 5
+    event_role = 6
 
 
 def _update_event_acl_entry(conn, user_id, event_id, permissions):
@@ -35,7 +44,7 @@ def _create_track_acl_entry(conn, user_id, track_id, permissions):
         INSERT INTO events.track_principals
         (track_id, user_id, type, read_access, full_access, permissions) VALUES
         (%s,       %s,      %s,   false,       false,       %s)
-    ''', (track_id, user_id, PrincipalType.user.value, permissions))
+    ''', (track_id, user_id, _PrincipalType.user.value, permissions))
 
 
 def _upgrade_permissions():
@@ -119,7 +128,7 @@ def upgrade():
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
         sa.Column(
             'type',
-            PyIntEnum(PrincipalType, exclude_values={PrincipalType.network}),
+            PyIntEnum(_PrincipalType, exclude_values={_PrincipalType.network}),
             nullable=False,
         ),
         sa.Column('email', sa.String(), nullable=True, index=True),
