@@ -110,3 +110,20 @@ The *sender* is the email address the user is trying to use. If this signal retu
 a string, the signup will be refused with the returned message; otherwise (``None``
 return value) the signup can continue as normal.
 ''')
+
+filter_user_search_results = _signals.signal('filter-user-search-results', '''
+Called to let a plugin restrict the results of a user search. The *sender* is the
+``RHUserSearch`` request handler. The user performing the search is passed in the ``user``
+kwarg and the serialized result entries (each a dict with keys such as ``id``, ``identifier``,
+``email``, ``affiliation``, ``affiliation_id`` and ``full_name``) in the ``results`` kwarg.
+The signal handler is expected to mutate the list, removing the entries the user may not see.
+''')
+
+extra_linked_events = _signals.signal('extra-linked-events', '''
+Called to let a plugin add events to the set a user is linked to (the events shown on the
+user's dashboard and exported to their personal calendar feed). The *sender* is the ``User``;
+when the ``dt`` kwarg is set, handlers should only include events taking place on/after that
+date. A handler should return a dict mapping event IDs to a set of role tokens (the same tokens
+the dashboard uses to flag an event as managed, reviewing, attendance or favorited), or ``None``
+for "no opinion". The returned events are merged with the ones Indico finds itself.
+''')

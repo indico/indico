@@ -251,6 +251,12 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
+    def _check_access(self):
+        RHManageRegFormsBase._check_access(self)
+        permissions = self.PERMISSION if isinstance(self.PERMISSION, (tuple, set, list)) else (self.PERMISSION,)
+        if not any(self.field_data.registration.can_manage(session.user, p) for p in permissions):
+            raise Forbidden(_('You are not authorized to manage this registration.'))
+
     def _process(self):
         return self.field_data.send()
 
@@ -296,7 +302,10 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
             # if it's POST we filter by registration ids; otherwise we assume
             # the user wants everything (e.g. API-like usage via personal token)
             query = query.filter(Registration.id.in_(registration_ids))
-        self.registrations = query.all()
+        criteria = values_from_signal(
+            signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
+        )
+        self.registrations = query.filter(*criteria).all()
 
 
 class RHRegistrationsActionModerationBase(RHRegistrationsActionBase):
@@ -659,11 +668,15 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
         ids = set(request.form.getlist('registration_id'))
-        self.registrations = (Registration.query.with_parent(self.regform)
-                              .filter(Registration.id.in_(ids),
-                                      ~Registration.is_deleted)
-                              .order_by(*Registration.order_by_name)
-                              .all()) if ids else []
+        criteria = values_from_signal(
+            signals.event.filter_registration_list.send(self.regform, user=session.user), as_list=True
+        )
+        query = (Registration.query.with_parent(self.regform)
+                 .filter(~Registration.is_deleted, *criteria)
+                 .order_by(*Registration.order_by_name))
+        if ids:
+            query = query.filter(Registration.id.in_(ids))
+        self.registrations = query.all()
         self.template_id = request.args.get('template_id', self._default_template_id)
 
     @property
@@ -689,7 +702,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = self._get_event_badge_settings(self.event)
         form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
-        all_registrations = [r for r in (self.registrations or self.regform.registrations) if r.is_active]
+        all_registrations = [r for r in self.registrations if r.is_active]
         registrations = self._filter_registrations(all_registrations)
         if self.event.is_locked:
             del form.save_values
