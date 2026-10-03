@@ -64,6 +64,8 @@ def _sidemenu_items(sender, category, **kwargs):
                            60, icon='user-reading', badge=count)
     yield SideMenuItem('roles', _('Roles'), url_for('categories.manage_roles', category),
                        50, icon='users')
+    yield SideMenuItem('registration', _('Registration'), url_for('categories.manage_regform_list', category),
+                       40, icon='list')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
                        0, icon='stack')
 

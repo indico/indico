@@ -18,7 +18,9 @@ from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
+from indico.modules.events.registration.controllers.management import RHManageRegFormBase
+from indico.modules.events.registration.controllers.management.sections import (ManageRegFormSectionBaseMixin,
+                                                                                RHManageRegFormSectionBase)
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -283,7 +285,7 @@ def _fill_form_field_with_data(field, field_data, *, is_static_text=False):
     return changes
 
 
-class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
+class ManageRegFormFieldBaseMixin(ManageRegFormSectionBaseMixin):
     """Base class for a specific field within a registration form."""
 
     field_class = RegistrationFormField
@@ -294,11 +296,11 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
     }
 
     def _process_args(self):
-        RHManageRegFormSectionBase._process_args(self)
+        ManageRegFormSectionBaseMixin._process_args(self)
         self.field = self.field_class.get_or_404(request.view_args['field_id'])
 
 
-class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
+class RegistrationFormToggleFieldStateMixin:
     """Enable/Disable a field."""
 
     def _check_unique_title_in_section(self):
@@ -381,7 +383,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         return jsonify(view_data=self.field.view_data, positions=get_flat_section_positions_setup_data(self.regform))
 
 
-class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
+class RegistrationFormModifyFieldMixin:
     """Remove/Modify a field."""
 
     def _process_DELETE(self):
@@ -426,7 +428,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         return jsonify(view_data=self.field.view_data)
 
 
-class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
+class RegistrationFormMoveFieldMixin:
     """Change position of a field within the section."""
 
     def _process(self):
@@ -452,7 +454,7 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
         return jsonify()
 
 
-class RHRegistrationFormAddField(RHManageRegFormSectionBase):
+class RegistrationFormAddFieldMixin:
     """Add a field to the section."""
 
     def _process(self):
@@ -470,13 +472,13 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         return jsonify(view_data=form_field.view_data)
 
 
-class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
+class RegistrationFormToggleTextStateMixin(RegistrationFormToggleFieldStateMixin):
     """Enable/Disable a static text field."""
 
     field_class = RegistrationFormText
 
 
-class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
+class RegistrationFormModifyTextMixin(RegistrationFormModifyFieldMixin):
     """Remove/Modify a static text field."""
 
     field_class = RegistrationFormText
@@ -497,13 +499,13 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
         return jsonify(view_data=self.field.view_data)
 
 
-class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
+class RegistrationFormMoveTextMixin(RegistrationFormMoveFieldMixin):
     """Change position of a static text field within the section."""
 
     field_class = RegistrationFormText
 
 
-class RHRegistrationFormAddText(RHManageRegFormSectionBase):
+class RegistrationFormAddTextMixin:
     """Add a static text field to a section."""
 
     def _process(self):
@@ -520,3 +522,43 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
             data={'Type': 'label'}
         )
         return jsonify(view_data=form_field.view_data)
+
+
+class RHManageRegformFieldBase(ManageRegFormFieldBaseMixin, RHManageRegFormBase):
+    """Base class for a specific field within a registration form in an event."""
+
+    def _process_args(self):
+        RHManageRegFormBase._process_args(self)
+        ManageRegFormFieldBaseMixin._process_args(self)
+
+
+class RHRegistrationFormToggleFieldState(RegistrationFormToggleFieldStateMixin, RHManageRegformFieldBase):
+    """Enable/Disable a field inside an event."""
+
+
+class RHRegistrationFormModifyField(RegistrationFormModifyFieldMixin, RHManageRegformFieldBase):
+    """Remove/Modify a field inside an event."""
+
+
+class RHRegistrationFormMoveField(RegistrationFormMoveFieldMixin, RHManageRegformFieldBase):
+    """Change position of a field within the section in an event."""
+
+
+class RHRegistrationFormAddField(RegistrationFormAddFieldMixin, RHManageRegFormSectionBase):
+    """Add a field to the section inside an event."""
+
+
+class RHRegistrationFormToggleTextState(RegistrationFormToggleTextStateMixin, RHManageRegformFieldBase):
+    """Enable/Disable a static text field inside an event."""
+
+
+class RHRegistrationFormModifyText(RegistrationFormModifyTextMixin, RHManageRegformFieldBase):
+    """Remove/Modify a static text field inside an event."""
+
+
+class RHRegistrationFormMoveText(RegistrationFormMoveTextMixin, RHManageRegformFieldBase):
+    """Change position of a static text field within the section of an event."""
+
+
+class RHRegistrationFormAddText(RegistrationFormAddTextMixin, RHManageRegFormSectionBase):
+    """Add a static text field to a section inside an event."""

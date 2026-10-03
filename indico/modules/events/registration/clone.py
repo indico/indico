@@ -84,6 +84,7 @@ class RegistrationFormCloner(EventCloner):
                                          'is_participation'})
         new_form = RegistrationForm(
             event=old_form.event,
+            category=old_form.category,
             title=title,
             **{attr: getattr(old_form, attr) for attr in attrs}
         )
@@ -139,6 +140,7 @@ class RegistrationFormCloner(EventCloner):
                 new_section.children.append(new_item)
                 self._item_map[old_item] = new_item
             new_form.form_items.append(new_section)
+        db.session.flush()
         # link conditional fields to the new fields
         for old_item, new_item in self._item_map.items():
             if old_item.show_if_field:
@@ -152,6 +154,29 @@ class RegistrationFormCloner(EventCloner):
                 new_item.current_data = new_version
             new_item.data_versions.append(new_version)
             self._field_data_map[old_version] = new_version
+
+    @classmethod
+    @no_autoflush
+    def create_from_template(cls, event, regform, title):
+        """Create a regform from one in a category to the given event.
+
+        :param event: The `Event` into which the regform will be created
+        :param regform: The `RegistrationForm` to copy from
+        :param title: The title of the new RegistrationForm
+        :return: The newly created RegistrationForm
+        """
+        attrs = get_attrs_to_clone(RegistrationForm,
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid', 'title',
+                                         'is_participation'})
+        cloner = cls(None)
+        cloner._field_data_map = {}
+        cloner._item_map = {}
+        new_form = RegistrationForm(event=event, title=title, template=regform,
+                                    **{attr: getattr(regform, attr) for attr in attrs})
+        cloner._clone_form_items(regform, new_form, False)
+        db.session.flush()
+        signals.event.registration.after_registration_form_clone.send(regform, new_form=new_form)
+        return new_form
 
 
 class RegistrationCloner(EventCloner):
