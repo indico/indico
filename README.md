@@ -76,7 +76,7 @@ We follow [CERN's Values](https://hr.web.cern.ch/cerns-values) and the principle
 
 ## History
 
-This software project was initially funded by the European Union's FP5 programme🇪🇺, in what was called the [**In**tegrated **Di**gital **Co**nferencing Project](https://cordis.europa.eu/project/rcn/61849/factsheet/en), or just **InDiCo**. CERN was responsible for the development of the "Make-a-Confererence" workpackage (inspired by an already existing system called **CDS Agenda**, also developed at the Organization) which would then become what we nowadays know as **Indico**.
+This software project was initially funded by the European Union's FP5 programme🇪🇺, in what was called the [**In**tegrated **Di**gital **Co**nferencing Project](https://cordis.europa.eu/project/rcn/61849/factsheet/en), or just **InDiCo**. CERN was responsible for the development of the "Make-a-Conference" workpackage (inspired by an already existing system called **CDS Agenda**, also developed at the Organization) which would then become what we nowadays know as **Indico**.
 
 We have since stopped using the ~~*InDiCo*~~ acronym, as it no longer reflects accurately the nature of the project. The word *Indico* now has no particular meaning other than the product's name.
 
