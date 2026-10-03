@@ -98,7 +98,7 @@ export default function ParticipantTable({
       } else if (comparedVals.every(el => typeof el === 'boolean')) {
         sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
       } else {
-        sortResult = comparedVals[0].localeCompare(comparedVals[1]);
+        sortResult = comparedVals[0].localeCompare(comparedVals[1], undefined, {numeric: true});
       }
       return sortResult * (direction === 'ascending' ? 1 : -1);
     });
