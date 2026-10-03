@@ -9,6 +9,7 @@ import principalsURL from 'indico-url:core.principals';
 import favoriteUsersURL from 'indico-url:users.favorites_api';
 
 import {makeUseAxios} from 'axios-hooks';
+import initRustyMarkdown, {toHtml} from 'indico-md-wasm';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -365,4 +366,20 @@ export function useNativeEvent(ref, eventType, callback, options = {}) {
     node.addEventListener(eventType, callback, options);
     return () => node.removeEventListener(eventType, callback);
   }, [ref, eventType, callback, options]);
+}
+
+/**
+ * A hook that provides access to the Rust-based markdown renderer
+ */
+export function useRustyMarkdown() {
+  const [ready, setReady] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      await initRustyMarkdown();
+      setReady(true);
+    })();
+  }, []);
+
+  return ready ? toHtml : null;
 }
