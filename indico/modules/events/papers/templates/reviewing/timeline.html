@@ -83,6 +83,7 @@
                 </a>
             {% endif %}
         {% endset %}
+        <span>
         {% if contribution_page %}
             {%- trans judge=paper.last_revision.judge.full_name -%}
                 Accepted on {{ date_time }} by {{ judge }}
@@ -92,5 +93,6 @@
                 Submitted on {{ date_time }} by {{ submitter }}
             {%- endtrans -%}
         {% endif %}
+        </span>
     </div>
 {% endmacro %}

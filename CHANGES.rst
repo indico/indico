@@ -25,6 +25,8 @@ Bugfixes
 - Fix "My contributions" page not working when "My timetable" menu entry is disabled
   (:pr:`7759`)
 - Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
+- Fix missing spaces around the date in the "Accepted on ... by ..." line of the paper
+  peer reviewing section (:issue:`6878`, thanks :user:`GoldenEmperor1177`)
 
 Accessibility
 ^^^^^^^^^^^^^
