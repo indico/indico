@@ -25,6 +25,7 @@ Bugfixes
 - Fix "My contributions" page not working when "My timetable" menu entry is disabled
   (:pr:`7759`)
 - Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
+- Fix shift-click bulk selection in data tables misbehaving after sorting (:pr:`7777`)
 
 Accessibility
 ^^^^^^^^^^^^^
