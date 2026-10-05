@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Message} from 'semantic-ui-react';
 
-import {Markdown} from 'indico/react/util';
+import {RustyMarkdown} from 'indico/react/util';
 
 import './RoomKeyLocation.module.scss';
 
@@ -19,7 +19,7 @@ export default function RoomKeyLocation({room}) {
       <Message styleName="message-icon" icon>
         <Icon name="key" />
         <Message.Content>
-          <Markdown targetBlank>{room.keyLocation}</Markdown>
+          <RustyMarkdown source={room.keyLocation} />
         </Message.Content>
       </Message>
     )
