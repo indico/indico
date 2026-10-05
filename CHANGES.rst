@@ -30,7 +30,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make Markdown editor toolbar accessible to keyboard and screen readers
+  (:issue:`7620`, :pr:`7755`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
