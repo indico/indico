@@ -20,18 +20,10 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import * as selectors from './selectors';
-import {
-  ReduxState,
-  ContribEntry,
-  EntryType,
-  BaseEntry,
-  ScheduledMixin,
-  EntryUniqueID,
-} from './types';
+import {ReduxState, EntryType, BaseEntry, ScheduledMixin, EntryUniqueID, ChildEntry} from './types';
 import {
   minutesToPixels,
   pixelsToMinutes,
-  snapPixels,
   snapMinutes,
   formatBlockTitle,
   getIconByEntryType,
@@ -53,7 +45,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
   const dispatch = useDispatch();
-  const {listeners: _listeners, setNodeRef, transform, isDragging, ref} = useDraggable({id});
+  const {listeners: _listeners, setNodeRef, isDragging, ref} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
@@ -117,7 +109,6 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
-      transform={transform}
       isDragging={isDragging}
       selected={isSelected}
       setDuration={setDuration}
@@ -139,8 +130,9 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
 interface _EntryProps {
   id: EntryUniqueID;
-  isDragging: boolean;
-  transform: {x: number; y: number} | undefined;
+  transform?: {x: number; y: number};
+  isDragging?: boolean;
+  isPlaceholder?: boolean;
   listeners: Record<string, unknown>;
   setNodeRef: (element: HTMLElement | null) => void;
   blockRef?: React.RefObject<HTMLDivElement>;
@@ -148,7 +140,7 @@ interface _EntryProps {
   setDuration: (duration: number) => void;
   onMouseUp?: () => void;
   setChildDuration?: (id: string) => (duration: number) => void;
-  children?: ContribEntry[];
+  children?: ChildEntry[];
   parentEndDt?: string;
   sessionId?: number;
   sessionBlockId?: string;
@@ -181,7 +173,8 @@ export default function Entry({
   listeners,
   setNodeRef,
   transform,
-  isDragging,
+  isDragging = false,
+  isPlaceholder = false,
   column,
   maxColumn,
   setDuration: _setDuration,
@@ -217,25 +210,18 @@ export default function Entry({
     return eventEndDt.diff(startDt, 'minutes');
   }, [parentEndDt, eventEndDt, startDt]);
 
-  let style: Record<string, string | number | undefined> = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,
-        // zIndex: 70,
-      }
-    : {};
-
   const minHeight = minutesToPixels(5);
   const height = minutesToPixels(Math.max(duration, minHeight)) - V_SPACE_BETWEEN_ENTRIES_PX;
 
-  style = {
-    ...style,
+  const style = {
+    opacity: isDragging && !isPlaceholder ? 0 : 1,
     position: 'absolute',
     top: y,
     left: offset,
     width: `calc(${width} - 5px)`,
     height,
     textAlign: 'left',
-    zIndex: isDragging || isResizing ? 1000 : selected ? 1 : style.zIndex,
+    zIndex: isDragging || isResizing ? 1000 : selected ? 1 : 0,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     boxShadow: selected || isDragging ? `0 0 0 4px rgba(0,0,0,0.1)` : undefined,
     ...colors,
@@ -248,7 +234,7 @@ export default function Entry({
   const locale = moment.locale().replace('_', '-');
   const timeRange = formatTimeRange(locale, newStart, newEnd);
   // shift children startDt by deltaMinutes
-  const children: ContribEntry[] = _children.map(child => ({
+  const children = _children.map(child => ({
     ...child,
     startDt: moment(child.startDt).add(deltaMinutes, 'minutes'),
   }));
@@ -355,26 +341,45 @@ export default function Entry({
               backgroundColor: `${colors.color}11`,
             }}
           >
-            {children.map(child => (
-              <DraggableEntry
-                key={child.id}
-                setDuration={_children ? setChildDurations[child.id] : null}
-                blockRef={blockRef}
-                parentEndDt={moment(startDt)
-                  .add(deltaMinutes + duration, 'minutes')
-                  .format()}
-                {...child}
-              />
-            ))}
-            {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'partial' && (
-              <DroppableArea id={id} />
+            {children.map(child =>
+              isPlaceholder ? (
+                <Entry
+                  key={child.id}
+                  listeners={{}}
+                  isPlaceholder
+                  selected={false}
+                  setDuration={() => null}
+                  setNodeRef={() => null}
+                  {...child}
+                  blockRef={blockRef}
+                  parentEndDt={moment(startDt)
+                    .add(deltaMinutes + duration, 'minutes')
+                    .format()}
+                  sessionId={child.sessionId ?? undefined}
+                />
+              ) : (
+                <DraggableEntry
+                  key={child.id}
+                  setDuration={_children ? setChildDurations[child.id] : null}
+                  blockRef={blockRef}
+                  parentEndDt={moment(startDt)
+                    .add(deltaMinutes + duration, 'minutes')
+                    .format()}
+                  {...child}
+                />
+              )
             )}
+            {!isPlaceholder &&
+              type === EntryType.SessionBlock &&
+              !isPosterBlock &&
+              droppableArea === 'partial' && <DroppableArea id={id} />}
           </div>
         )}
       </div>
-      {type === EntryType.SessionBlock && !isPosterBlock && droppableArea === 'full' && (
-        <DroppableArea id={id} horizontalPadding="15px" />
-      )}
+      {!isPlaceholder &&
+        type === EntryType.SessionBlock &&
+        !isPosterBlock &&
+        droppableArea === 'full' && <DroppableArea id={id} horizontalPadding="15px" />}
       {!draftEntry && (
         <EntryMoveButtons
           id={id}
