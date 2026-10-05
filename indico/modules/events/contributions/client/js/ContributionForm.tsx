@@ -87,6 +87,7 @@ export function ContributionFormFields({
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
+      // TODO: add client-side validation for max length, choices, etc at some point
       // TODO: adjust isRequired in management (where all fields are optional)
       const key = `custom_field_${id}`;
       const name = `custom_fields.custom_${id}`;
@@ -112,8 +113,29 @@ export function ContributionFormFields({
             />
           );
         }
-      } else if (fieldType === 'single_choice' && fieldData.options) {
-        const options = fieldData.options.map(opt => ({
+      } else if (fieldType === 'single_choice') {
+        const options = fieldData.options!.map(opt => ({
+          key: opt.id,
+          text: opt.option,
+          value: opt.id,
+        }));
+
+        // TODO: take alternative display settings into account (vertical/horizontal radio buttons)
+        return (
+          <FinalDropdown
+            key={key}
+            name={name}
+            label={title}
+            description={description}
+            required={isRequired}
+            options={options}
+            selection
+            allowNull
+            nullIfEmpty
+          />
+        );
+      } else if (fieldType === 'multiselect') {
+        const options = fieldData.options!.map(opt => ({
           key: opt.id,
           text: opt.option,
           value: opt.id,
@@ -128,8 +150,7 @@ export function ContributionFormFields({
             required={isRequired}
             options={options}
             selection
-            allowNull
-            nullIfEmpty
+            multiple
           />
         );
       } else {
@@ -399,6 +420,12 @@ export function ContributionCreateForm({
     fieldsLoading ||
     personLinkFieldParamsLoading;
 
+  const defaultValuesByType = {
+    text: '',
+    single_choice: null,
+    multiselect: [],
+  };
+
   const initialValues = loading
     ? {}
     : {
@@ -408,7 +435,7 @@ export function ContributionCreateForm({
         references: [],
         location_data: locationData,
         custom_fields: Object.fromEntries(
-          fields.map((field: any) => [`custom_${field.id}`, field.fieldType === 'text' ? '' : null])
+          fields.map((field: any) => [`custom_${field.id}`, defaultValuesByType[field.fieldType]])
         ),
       };
 
