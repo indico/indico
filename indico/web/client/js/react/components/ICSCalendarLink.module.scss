@@ -78,3 +78,16 @@
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+// The copy button is the action button of a Semantic input, which squares the
+// button's inner corners and stretches it to the input height using direct-child
+// selectors. Wrapping the button in ind-with-tooltip breaks those matches, so
+// restore the join here.
+.content :global(.ui.action.input) > ind-with-tooltip {
+  align-self: stretch;
+  align-items: stretch;
+}
+
+.content :global(.ui.action.input) > ind-with-tooltip > :global(.ui.button) {
+  border-radius: 0 0.28571429rem 0.28571429rem 0;
+}
