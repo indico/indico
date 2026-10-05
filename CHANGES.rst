@@ -25,6 +25,8 @@ Bugfixes
 - Fix "My contributions" page not working when "My timetable" menu entry is disabled
   (:pr:`7759`)
 - Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
+- Fix dollar signs in Markdown link targets being treated as LaTeX math and breaking the link
+  (:issue:`6157`, thanks :user:`GoldenEmperor1177`)
 
 Accessibility
 ^^^^^^^^^^^^^

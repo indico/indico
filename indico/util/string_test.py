@@ -228,7 +228,10 @@ def test_html_to_plaintext(input, output):
     ('Escaping works just fine! $ *a* $', '<p>Escaping works just fine! $ *a* $</p>'),
     ('![Just a cat](http://myserver.example.com/cat.png)', '<p><img alt="Just a cat" '
      'src="http://myserver.example.com/cat.png"></p>'),
-    ('<https://getindico.io>', '<p><a href="https://getindico.io">https://getindico.io</a></p>')
+    ('<https://getindico.io>', '<p><a href="https://getindico.io">https://getindico.io</a></p>'),
+    ('[First](https://$.com)\nText\n[Second](https://$.com)',
+     '<p><a href="https://$.com">First</a>\nText\n<a href="https://$.com">Second</a></p>'),
+    ('[Link](https://example.com/$x) and $y + z$', '<p><a href="https://example.com/$x">Link</a> and $y + z$</p>'),
 ))
 def test_markdown(input, output):
     assert render_markdown(input, extensions=('tables',)) == output

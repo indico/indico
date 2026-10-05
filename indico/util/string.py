@@ -268,6 +268,9 @@ def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, 
 
         def _math_replace(m):
             segment = m.group(0)
+            if segment.startswith(']('):
+                # a link target such as `[text](https://example.com/$x)`; dollar signs in it are not math
+                return segment
             if callable(escape_latex_math):
                 segment = escape_latex_math(segment)
             else:
@@ -278,7 +281,7 @@ def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, 
             math_segments.append(segment)
             return LATEX_MATH_PLACEHOLDER
 
-        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, text)
+        text = re.sub(r'\]\([^)\n]*\)|\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, text)
 
     if md is None:
         extensions = set(kwargs.pop('extensions', ()))
