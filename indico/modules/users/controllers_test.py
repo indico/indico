@@ -6,9 +6,11 @@
 # LICENSE file for more details.
 
 import pytest
-from flask import request
+from flask import request, session
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import UnprocessableEntity
+
+from indico.core import signals
 
 
 @pytest.mark.usefixtures('request_context')
@@ -38,3 +40,24 @@ def test_user_data_request(mocker, dummy_user):
     response = rh._process()
     task.assert_called()
     assert response == {'state': DataExportRequestState.running.name}
+
+
+def test_user_search_results_filtered_by_all_handlers(app_context, create_user, dummy_user):
+    from indico.modules.users.controllers import RHUserSearch
+    alice = create_user(1, first_name='Alice', last_name='Searchable')
+    bob = create_user(2, first_name='Bob', last_name='Searchable')
+    create_user(3, first_name='Carol', last_name='Searchable')
+
+    def _hide_alice(sender, results, **kwargs):
+        results[:] = [r for r in results if r['id'] != alice.id]
+
+    def _hide_bob(sender, results, **kwargs):
+        results[:] = [r for r in results if r['id'] != bob.id]
+
+    with app_context.test_request_context(query_string={'last_name': 'Searchable'}):
+        session.set_session_user(dummy_user)
+        with (signals.users.filter_user_search_results.connected_to(_hide_alice),
+              signals.users.filter_user_search_results.connected_to(_hide_bob)):
+            response = RHUserSearch()._process()
+
+    assert [u['full_name'] for u in response.json['users']] == ['Carol Searchable']

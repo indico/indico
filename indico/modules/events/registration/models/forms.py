@@ -15,6 +15,7 @@ from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -28,6 +29,7 @@ from indico.util.date_time import format_currency, now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
+from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
 
 
@@ -572,6 +574,19 @@ class RegistrationForm(db.Model):
 
     def can_submit(self, user):
         return self.is_active and (not self.require_login or user)
+
+    def get_managed_registration_count(self, user, include_inactive=False):
+        """Number of registrations ``user`` may manage on this form."""
+        from indico.modules.events.registration.models.registrations import Registration
+        criteria = values_from_signal(
+            signals.event.filter_registration_list.send(self, user=user), as_list=True
+        )
+        if not criteria:
+            return self.existing_registrations_count if include_inactive else self.active_registration_count
+        state_criterion = ~Registration.is_deleted if include_inactive else Registration.is_active
+        return (db.session.query(db.func.coalesce(db.func.sum(Registration.occupied_slots), 0))
+                .filter(Registration.registration_form_id == self.id, state_criterion, *criteria)
+                .scalar())
 
     @memoize_request
     def get_registration(self, user=None, uuid=None, email=None):

@@ -8,16 +8,21 @@
 from decimal import Decimal
 
 import pytest
-from flask import request
-from werkzeug.exceptions import UnprocessableEntity
+from flask import request, session
+from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
+from indico.core import signals
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCreate,
+                                                                                RHRegistrationDetails,
                                                                                 RHRegistrationEdit,
-                                                                                RHRegistrationsBasePrice)
+                                                                                RHRegistrationsApprove,
+                                                                                RHRegistrationsBasePrice,
+                                                                                RHRegistrationsConfigBadges,
+                                                                                RHRegistrationsExportCSV)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import create_registration
 
 
@@ -159,3 +164,82 @@ def test_registration_update_base_price(dummy_regform, dummy_user, app_context, 
 
     assert reg.base_price == Decimal(expected_price)
     assert reg.state == expected_state
+
+
+@pytest.mark.parametrize(('rh_class', 'method'), (
+    (RHRegistrationsApprove, 'POST'),
+    (RHRegistrationsExportCSV, 'GET'),
+))
+def test_bulk_action_filtered_by_registration_list_criteria(db, dummy_regform, dummy_user, app_context, rh_class,
+                                                            method):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
+                                        invitation=None, management=True, notify_user=False)
+                    for email, last_name in (('mine@example.test', 'Mine'), ('theirs@example.test', 'Theirs')))
+    db.session.flush()
+
+    def _only_mine(sender, user, **kwargs):
+        return Registration.id == mine.id
+
+    data = {'registration_id': [mine.id, theirs.id]} if method == 'POST' else None
+    with app_context.test_request_context(method=method, data=data):
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
+        session.set_session_user(dummy_user)
+
+        rh = rh_class()
+        with signals.event.filter_registration_list.connected_to(_only_mine):
+            rh._process_args()
+            rh._check_access()
+        assert rh.registrations == [mine]
+
+
+@pytest.mark.parametrize('select_theirs', (False, True))
+def test_badge_config_filtered_by_registration_list_criteria(db, dummy_regform, dummy_user, app_context,
+                                                             select_theirs):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    mine, theirs = (create_registration(dummy_regform, {'email': email, 'first_name': 'A', 'last_name': last_name},
+                                        invitation=None, management=True, notify_user=False)
+                    for email, last_name in (('mine@example.test', 'Mine'), ('theirs@example.test', 'Theirs')))
+    db.session.flush()
+
+    def _only_mine(sender, user, **kwargs):
+        return Registration.id == mine.id
+
+    data = {'registration_id': [theirs.id]} if select_theirs else {}
+    with app_context.test_request_context(method='POST', data=data):
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id}
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationsConfigBadges()
+        with signals.event.filter_registration_list.connected_to(_only_mine):
+            rh._process_args()
+        assert rh.registrations == ([] if select_theirs else [mine])
+
+
+@pytest.mark.parametrize(('scoped_in', 'allowed'), (
+    (True, True),
+    (False, False),
+))
+def test_registration_management_requires_manageable_registration(db, dummy_regform, dummy_user, app_context,
+                                                                   scoped_in, allowed):
+    dummy_regform.event.update_principal(dummy_user, full_access=True)
+    registration = create_registration(dummy_regform, {'email': 'a@example.test', 'first_name': 'A', 'last_name': 'B'},
+                                       invitation=None, management=True, notify_user=False)
+    db.session.flush()
+
+    def _scope(sender, user, **kwargs):
+        return Registration.id == (registration.id if scoped_in else -1)
+
+    with app_context.test_request_context():
+        request.view_args = {'reg_form_id': dummy_regform.id, 'event_id': dummy_regform.event_id,
+                             'registration_id': registration.id}
+        session.set_session_user(dummy_user)
+
+        rh = RHRegistrationDetails()
+        rh._process_args()
+        with signals.event.filter_registration_list.connected_to(_scope):
+            if allowed:
+                rh._check_access()
+            else:
+                with pytest.raises(Forbidden, match='this registration'):
+                    rh._check_access()

@@ -160,6 +160,10 @@ def get_linked_events(user, dt=None, limit=None, load_also=(), extra_options=())
         if event.ends_after(dt):
             links.setdefault(event.id, set()).add('favorited')
 
+    for extra in values_from_signal(signals.users.extra_linked_events.send(user, dt=dt), as_list=True):
+        for event_id, roles in extra.items():
+            links.setdefault(event_id, set()).update(roles)
+
     if not links:
         return {}
 
