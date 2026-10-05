@@ -39,11 +39,11 @@
     let lastClickedIndex;
     const $obj = $('table.i-table input.select-row');
     $obj.on('click', function(e) {
-      const currentIndex = $obj.index(this);
+      const currentIndex = $('table.i-table input.select-row').index(this);
       if (e.shiftKey) {
         const start = Math.min(lastClickedIndex, currentIndex);
         const end = Math.max(lastClickedIndex, currentIndex);
-        $obj
+        $('table.i-table input.select-row')
           .slice(start, end + 1)
           .prop('checked', this.checked)
           .trigger('change');
