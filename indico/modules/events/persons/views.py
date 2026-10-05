@@ -17,11 +17,11 @@ class WPManagePersons(WPEventManagement):
 
 class WPManageSpeakers(WPEventManagement):
     template_prefix = 'events/persons/'
-    sidemenu_option = 'speakers'
+    sidemenu_option = 'speakers_profiles'
     bundles = ('module_events.persons.js', 'module_events.persons.css')
 
 
 class WPDisplaySpeakers(WPConferenceDisplayBase):
     template_prefix = 'events/persons/'
-    menu_entry_name = 'speakers'
+    menu_entry_name = 'speakers_profiles'
     bundles = ('module_events.persons.js', 'module_events.persons.css')

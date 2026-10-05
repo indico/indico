@@ -18,6 +18,7 @@ import {
   EditSpeakerProfile,
 } from 'indico/modules/events/persons/EditSpeakerProfile';
 import {SpeakerSearch} from 'indico/modules/events/persons/SpeakerSearch';
+import {RequestConfirmDelete} from 'indico/react/components';
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -27,7 +28,7 @@ import {Speaker, SpeakerLink} from './types';
 
 import './Speakers.module.scss';
 
-type SpeakersModalName = 'SEARCH_SPEAKER' | 'EDIT_SPEAKER';
+type SpeakersModalName = 'SEARCH_SPEAKER' | 'EDIT_SPEAKER' | 'CONFIRM_DELETE_SPEAKER';
 
 export function Speakers({eventId}: {eventId: number}) {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
@@ -92,24 +93,24 @@ export function Speakers({eventId}: {eventId: number}) {
     [selectedSpeaker, eventId, reFetch]
   );
 
-  const handleDeleteSpeaker = useCallback(
-    async (speakerId: number) => {
-      try {
-        await indicoAxios.delete(
-          updateSpeakerProfileURL({event_id: eventId, person_id: speakerId})
-        );
-        setSpeakers(old =>
-          old.map(speaker =>
-            speaker.id === speakerId ? {...speaker, speaker_description: null} : speaker
-          )
-        );
-        reFetch();
-      } catch (e) {
-        return handleAxiosError(e);
-      }
-    },
-    [reFetch, eventId]
-  );
+  const handleDeleteSpeaker = useCallback(async () => {
+    if (selectedSpeaker === undefined) {
+      return;
+    }
+    try {
+      await indicoAxios.delete(
+        updateSpeakerProfileURL({event_id: eventId, person_id: selectedSpeaker.id})
+      );
+      setSpeakers(old =>
+        old.map(speaker =>
+          speaker.id === selectedSpeaker.id ? {...speaker, speaker_description: null} : speaker
+        )
+      );
+      reFetch();
+    } catch (e) {
+      return handleAxiosError(e);
+    }
+  }, [reFetch, eventId, selectedSpeaker]);
 
   useEffect(() => {
     setSpeakers(data);
@@ -200,7 +201,10 @@ export function Speakers({eventId}: {eventId: number}) {
                             name="trash"
                             link
                             color="red"
-                            onClick={() => handleDeleteSpeaker(speaker.id)}
+                            onClick={() => {
+                              setSelectedSpeaker(speaker);
+                              setOpenedModal('CONFIRM_DELETE_SPEAKER');
+                            }}
                           />
                         }
                       />
@@ -246,6 +250,13 @@ export function Speakers({eventId}: {eventId: number}) {
           speakers={speakersWithoutProfile}
         />
       )}
+      <RequestConfirmDelete
+        onClose={() => setOpenedModal(null)}
+        requestFunc={handleDeleteSpeaker}
+        open={openedModal === 'CONFIRM_DELETE_SPEAKER'}
+      >
+        <Translate>Are you sure you want to delete this speaker profile?</Translate>
+      </RequestConfirmDelete>
     </>
   );
 }

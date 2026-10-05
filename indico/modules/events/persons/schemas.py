@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from marshmallow import ValidationError, fields, post_dump, post_load, pre_load, validates_schema
+from webargs import validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.persons import EventPerson
@@ -130,6 +131,10 @@ class SpeakerLinksSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventSpeakerLink
         fields = ('id', 'name', 'icon')
+
+    id = fields.Integer(dump_only=True)
+    name = fields.String(validate=validate.Length(max=200))
+    icon = fields.String(validate=validate.Length(max=200))
 
 
 class SpeakerLinkDataSchema(mm.SQLAlchemyAutoSchema):

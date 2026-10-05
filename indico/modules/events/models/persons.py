@@ -7,6 +7,7 @@
 
 from operator import attrgetter
 
+from sqlalchemy import or_
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -262,10 +263,11 @@ class EventPerson(PersonMixin, db.Model):
 
     @hybrid_property
     def has_speaker_profile(self):
-        return (
-            self.speaker_photo_file_id is not None
-            or self.speaker_description is not None
-        )
+        return self.speaker_photo_file_id is not None or self.speaker_description is not None
+
+    @has_speaker_profile.expression
+    def has_speaker_profile(cls):
+        return or_(cls.speaker_photo_file_id.is_not(None), cls.speaker_description.is_not(None))
 
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):

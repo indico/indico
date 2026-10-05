@@ -23,7 +23,7 @@ import {
 } from 'semantic-ui-react';
 import * as SUI from 'semantic-ui-react/dist/es/lib/SUI';
 
-import {FinalDropdown, FinalInput} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxiosWithMutation} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -90,21 +90,31 @@ export function SpeakerLinks({eventId}: {eventId: number}) {
   }, []);
 
   const addSpeakerLink = useCallback(
-    (link: NewSpeakerLink) => {
-      mutate(indicoAxios.put(speakerLinksURL({event_id: eventId}), link), data => [
-        ...data,
-        {...link, id: -1},
-      ]);
+    async (link: NewSpeakerLink) => {
+      try {
+        await mutate(
+          indicoAxios.put(speakerLinksURL({event_id: eventId}), link),
+          data => [...data, {...link, id: -1}],
+          {optimistic: false}
+        );
+      } catch (error) {
+        return handleSubmitError(error);
+      }
     },
     [mutate, eventId]
   );
 
   const editSpeakerLink = useCallback(
-    (link: SpeakerLink) => {
-      mutate(
-        indicoAxios.patch(speakerLinkURL({event_id: eventId, speaker_link_id: link.id}), link),
-        data => [...data.filter(l => l.id !== link.id), {...link}]
-      );
+    async (link: SpeakerLink) => {
+      try {
+        await mutate(
+          indicoAxios.patch(speakerLinkURL({event_id: eventId, speaker_link_id: link.id}), link),
+          data => [...data.filter(l => l.id !== link.id), {...link}],
+          {optimistic: false}
+        );
+      } catch (error) {
+        return handleSubmitError(error);
+      }
     },
     [mutate, eventId]
   );
@@ -120,16 +130,22 @@ export function SpeakerLinks({eventId}: {eventId: number}) {
   );
 
   const handleCreateSpeakerLink = useCallback(
-    (formData: NewSpeakerLink) => {
-      addSpeakerLink(formData);
+    async (formData: NewSpeakerLink) => {
+      const errors = await addSpeakerLink(formData);
+      if (errors !== undefined) {
+        return errors;
+      }
       setOpenModal('MANAGE_LINKS');
     },
     [addSpeakerLink]
   );
 
   const handleEditSpeakerLink = useCallback(
-    (formData: SpeakerLink) => {
-      editSpeakerLink(formData);
+    async (formData: SpeakerLink) => {
+      const errors = await editSpeakerLink(formData);
+      if (errors !== undefined) {
+        return errors;
+      }
       setOpenModal('MANAGE_LINKS');
     },
     [editSpeakerLink]

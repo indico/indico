@@ -407,17 +407,12 @@ class RHAPISpeaker(RHManageSpeakerProfileBase):
 
 class RHAPISpeakerLinks(RHManageEventBase):
     def _process_GET(self):
-        return SpeakerLinksSchema(many=True).jsonify(
-            EventSpeakerLink.query.with_parent(self.event).all()
-        )
+        return SpeakerLinksSchema(many=True).jsonify(self.event.speaker_links)
 
-    @use_kwargs({
-        'name': fields.String(required=True, validate=validate.Length(max=200)),
-        'icon': fields.String(required=True, validate=validate.Length(max=200)),
-    })
-    def _process_PUT(self, name, icon):
+    @use_args(SpeakerLinksSchema)
+    def _process_PUT(self, link):
         db.session.add(
-            EventSpeakerLink(name=name, icon=icon, event=self.event)
+            EventSpeakerLink(name=link['name'], icon=link['icon'], event=self.event)
         )
         return jsonify(success=True)
 
@@ -428,16 +423,12 @@ class RHAPISpeakerLinks(RHManageEventBase):
         db.session.delete(link)
         return jsonify(success=True)
 
-    @use_kwargs({
-        'name': fields.String(required=True, validate=validate.Length(max=200)),
-        'icon': fields.String(required=True, validate=validate.Length(max=200)),
-    })
+    @use_args(SpeakerLinksSchema, partial=True)
     @use_rh_kwargs({
         'link': ModelField(EventSpeakerLink, with_parent='event', required=True, data_key='speaker_link_id')
     }, location='view_args', rh_context=('event',))
-    def _process_PATCH(self, link, name, icon):
-        link.name = name
-        link.icon = icon
+    def _process_PATCH(self, link_data, *, link):
+        link.populate_from_dict(link_data)
         return jsonify(success=True)
 
 

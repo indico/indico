@@ -48,28 +48,27 @@ class EventSpeakerLink(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - link_data (EventSpeakerLinkData.speaker_link)
+
     def __repr__(self):
         return format_repr(self, 'id', _text=self.name)
 
 
 class EventSpeakerLinkData(db.Model):
     __tablename__ = 'speaker_link_data'
-    __table_args__ = (db.UniqueConstraint('speaker_link_id', 'event_person_id'), {'schema': 'events'})
+    __table_args__ = {'schema': 'events'}
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
     speaker_link_id = db.Column(
         db.Integer,
         db.ForeignKey('events.speaker_links.id'),
-        nullable=False,
+        primary_key=True,
         index=True
     )
     event_person_id = db.Column(
         db.Integer,
         db.ForeignKey('events.persons.id'),
-        nullable=False,
+        primary_key=True,
         index=True
     )
     data = db.Column(db.String, nullable=False)
@@ -84,5 +83,8 @@ class EventSpeakerLinkData(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - event_person (EventPerson.speaker_links)
+
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.data)
+        return format_repr(self, 'speaker_link_id', 'event_person_id', _text=self.data)

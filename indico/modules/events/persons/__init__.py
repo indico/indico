@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from flask import session
-from sqlalchemy import or_
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -32,7 +31,7 @@ def _extend_event_menu(sender, **kwargs):
             return False
         return EventPerson.query.filter(
             EventPerson.event_id == event.id,
-            or_(EventPerson.speaker_description.is_not(None), EventPerson.speaker_photo_file_id.is_not(None))
+            EventPerson.has_speaker_profile,
         ).has_rows()
     yield MenuEntryData(title=_('Speaker Profiles'), name='speakers_profiles',
                         endpoint='persons.display_speaker_profiles', position=1, visible=_visible_speakers,
