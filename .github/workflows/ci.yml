@@ -218,9 +218,10 @@ jobs:
       - name: Run DB script tests
         run: |
           export PGHOST=localhost
-          export PGPORT=${{ job.services.postgres.ports[5432] }}
           export PGUSER=postgres
           bin/utils/db_test.py --nb-scripts 10
+        env:
+          PGPORT: ${{ job.services.postgres.ports[5432] }}
 
   test-python-nodb:
     name: test-python-${{ matrix.name }}-nodb
