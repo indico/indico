@@ -153,8 +153,10 @@ class RHLoginForm(RH):
 class RHLogout(RH):
     """Log the user out."""
 
-    def _process(self):
-        next_url = request.args.get('next')
+    @use_kwargs({
+        'next_url': fields.String(load_default=None, data_key='next'),
+    }, location='query')
+    def _process(self, next_url):
         if not next_url or not multipass.validate_next_url(next_url):
             next_url = url_for_index()
         return multipass.logout(next_url, clear_session=True)
@@ -200,9 +202,12 @@ class RHLinkAccount(RH):
         self.email_verified = self.identity_info['email_verified']
         self.must_choose_email = len(self.emails) != 1 and not self.email_verified
 
-    def _process(self):
-        if self.verification_email_sent and 'token' in request.args:
-            email = _load_secure_token(request.args['token'], 'link-identity-email', consume=True)
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _process(self, token):
+        if self.verification_email_sent and token is not None:
+            email = _load_secure_token(token, 'link-identity-email', consume=True)
             if email not in self.emails:
                 raise BadData('Emails do not match')
             session['login_identity_info']['email_verified'] = True
@@ -274,11 +279,12 @@ class RHRegister(RH):
         elif not config.LOCAL_REGISTRATION:
             raise Forbidden('Local registration is disabled')
 
-    def _get_verified_email(self):
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _get_verified_email(self, token):
         """Check if there is an email verification token."""
-        try:
-            token = request.args['token']
-        except KeyError:
+        if token is None:
             return None, None
         try:
             return secure_serializer.loads(token, max_age=3600, salt='register-email'), False
@@ -726,8 +732,10 @@ class MultipassRegistrationHandler(RegistrationHandler):
 
 
 class LocalRegistrationHandler(RegistrationHandler):
-    def __init__(self, rh):
-        next_url = request.args.get('next')
+    @use_kwargs({
+        'next_url': fields.String(load_default=None, data_key='next'),
+    }, location='query')
+    def __init__(self, rh, next_url):
         if next_url and multipass.validate_next_url(next_url):
             session['register_next_url'] = next_url
 
