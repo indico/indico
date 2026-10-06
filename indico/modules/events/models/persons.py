@@ -7,10 +7,12 @@
 
 from operator import attrgetter
 
+from sqlalchemy import or_
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
@@ -167,7 +169,34 @@ class EventPerson(PersonMixin, db.Model):
         nullable=False,
         default=False
     )
+    speaker_photo_file_id = db.Column(
+        db.Integer,
+        db.ForeignKey('indico.files.id'),
+        nullable=True,
+    )
+    speaker_description = db.Column(
+        db.Text,
+        nullable=True,
+    )
 
+    speaker_photo = db.relationship(
+        'File',
+        lazy=False,
+        backref=db.backref(
+            'speaker_photos',
+            lazy=True
+        )
+    )
+    speaker_links = db.relationship(
+        'EventSpeakerLinkData',
+        lazy=False,
+        cascade='all, delete-orphan',
+        collection_class=attribute_mapped_collection('speaker_link_id'),
+        backref=db.backref(
+            'event_person',
+            lazy=True
+        )
+    )
     event = db.relationship(
         'Event',
         lazy=True,
@@ -231,6 +260,14 @@ class EventPerson(PersonMixin, db.Model):
         contain any signatures or similar data that could change.
         """
         return self.identifier
+
+    @hybrid_property
+    def has_speaker_profile(self):
+        return self.speaker_photo_file_id is not None or self.speaker_description is not None
+
+    @has_speaker_profile.expression
+    def has_speaker_profile(cls):
+        return or_(cls.speaker_photo_file_id.is_not(None), cls.speaker_description.is_not(None))
 
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
