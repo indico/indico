@@ -441,15 +441,16 @@ def strip_whitespace(s):
     return s
 
 
-def make_unique_token(is_unique):
-    """Create a unique UUID4-based token.
+def make_unique_token(is_unique, factory=lambda: str(uuid4())):
+    """Create a unique token.
 
     :param is_unique: a callable invoked with the token which should
                       return a boolean indicating if the token is actually
+    :param factory: a callable that returns a new token string
     """
-    token = str(uuid4())
+    token = factory()
     while not is_unique(token):
-        token = str(uuid4())
+        token = factory()
     return token
 
 

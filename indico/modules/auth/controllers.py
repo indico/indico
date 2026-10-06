@@ -9,6 +9,7 @@ import math
 from operator import itemgetter
 from uuid import uuid4
 
+from authlib.common.security import generate_token
 from flask import flash, jsonify, redirect, render_template, request, session
 from flask_multipass import AuthProvider
 from itsdangerous import BadData, BadSignature
@@ -19,6 +20,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.auth import login_rate_limiter, multipass, signup_rate_limiter
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.marshmallow import mm
@@ -41,13 +43,24 @@ from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
 from indico.util.signing import secure_serializer
-from indico.util.string import crc32, validate_email
+from indico.util.string import crc32, make_unique_token, validate_email
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.rh import RH
 from indico.web.util import url_for_index
+
+
+token_store = make_scoped_cache('email-tokens')
+
+
+def _load_secure_token(token, salt, *, consume=False):
+    if (payload := token_store.get(token)) is None or payload['salt'] != salt:
+        raise BadData('Invalid or expired token')
+    if consume:
+        token_store.delete(token)
+    return payload['data']
 
 
 def _get_provider(name, external):
@@ -140,17 +153,26 @@ class RHLoginForm(RH):
 class RHLogout(RH):
     """Log the user out."""
 
-    def _process(self):
-        next_url = request.args.get('next')
+    @use_kwargs({
+        'next_url': fields.String(load_default=None, data_key='next'),
+    }, location='query')
+    def _process(self, next_url):
         if not next_url or not multipass.validate_next_url(next_url):
             next_url = url_for_index()
         return multipass.logout(next_url, clear_session=True)
 
 
-def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
+def _send_confirmation(email, salt, endpoint, template, template_args=None, *, url_args=None, data=None,
+                       sensitive=True, ttl=None):
     template_args = template_args or {}
     url_args = url_args or {}
-    token = secure_serializer.dumps(data or email, salt=salt)
+    if sensitive:
+        assert ttl
+        token = make_unique_token(lambda t: not token_store.get(t), lambda: generate_token(42))
+        payload = {'data': data or email, 'salt': salt}
+        token_store.set(token, payload, ttl)
+    else:
+        token = secure_serializer.dumps(data or email, salt=salt)
     url = url_for(endpoint, token=token, _external=True, **url_args)
     with force_locale(None) if 'user' not in template_args else template_args['user'].force_user_locale():
         template_module = get_template_module(template, email=email, url=url, **template_args)
@@ -180,9 +202,12 @@ class RHLinkAccount(RH):
         self.email_verified = self.identity_info['email_verified']
         self.must_choose_email = len(self.emails) != 1 and not self.email_verified
 
-    def _process(self):
-        if self.verification_email_sent and 'token' in request.args:
-            email = secure_serializer.loads(request.args['token'], max_age=3600, salt='link-identity-email')
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _process(self, token):
+        if self.verification_email_sent and token is not None:
+            email = _load_secure_token(token, 'link-identity-email', consume=True)
             if email not in self.emails:
                 raise BadData('Emails do not match')
             session['login_identity_info']['email_verified'] = True
@@ -227,7 +252,7 @@ class RHLinkAccount(RH):
         session['login_identity_info']['data']['email'] = email  # throw away other emails
         return _send_confirmation(email, 'link-identity-email', '.link_account',
                                   'auth/emails/link_identity_verify_email.txt', {'user': self.user},
-                                  url_args={'provider': self.identity_info['provider']})
+                                  url_args={'provider': self.identity_info['provider']}, ttl=3600)
 
 
 class RHRegister(RH):
@@ -254,11 +279,12 @@ class RHRegister(RH):
         elif not config.LOCAL_REGISTRATION:
             raise Forbidden('Local registration is disabled')
 
-    def _get_verified_email(self):
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _get_verified_email(self, token):
         """Check if there is an email verification token."""
-        try:
-            token = request.args['token']
-        except KeyError:
+        if token is None:
             return None, None
         try:
             return secure_serializer.loads(token, max_age=3600, salt='register-email'), False
@@ -320,7 +346,7 @@ class RHRegister(RH):
     def _send_confirmation(self, email):
         session['register_verification_email_sent'] = True
         return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
-                                  url_args={'provider': self.provider_name})
+                                  url_args={'provider': self.provider_name}, sensitive=False)
 
     def _prepare_registration_data(self, data, handler):
         email = data['email']
@@ -706,8 +732,10 @@ class MultipassRegistrationHandler(RegistrationHandler):
 
 
 class LocalRegistrationHandler(RegistrationHandler):
-    def __init__(self, rh):
-        next_url = request.args.get('next')
+    @use_kwargs({
+        'next_url': fields.String(load_default=None, data_key='next'),
+    }, location='query')
+    def __init__(self, rh, next_url):
         if next_url and multipass.validate_next_url(next_url):
             session['register_next_url'] = next_url
 
@@ -786,13 +814,17 @@ class LocalRegistrationHandler(RegistrationHandler):
 class RHResetPassword(RH):
     """Reset the password for a local identity."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _process_args(self, token):
+        self.token = token
         if not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
 
     def _process(self):
-        if 'token' in request.args:
-            data = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
+        if self.token:
+            data = _load_secure_token(self.token, 'reset-password')
             identity = Identity.get(data['id'])
             if not identity:
                 raise BadData('Identity does not exist')
@@ -821,11 +853,11 @@ class RHResetPassword(RH):
             if identity := user.local_identity:
                 _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
                                    {'user': user, 'username': identity.identifier, 'alternatives': alternatives},
-                                   data={'id': identity.id, 'hash': crc32(identity.password_hash)})
+                                   data={'id': identity.id, 'hash': crc32(identity.password_hash)}, ttl=3600)
             else:
                 _send_confirmation(form.email.data, 'create-local-identity', '.create_local_identity',
                                    'auth/emails/create_local_identity.txt',
-                                   {'user': user, 'alternatives': alternatives}, data={'id': user.id})
+                                   {'user': user, 'alternatives': alternatives}, data={'id': user.id}, ttl=3600)
             user.log(UserLogRealm.user, LogKind.other, 'Accounts', 'Password reset requested',
                      data={'IP': request.remote_addr})
             session['resetpass_email_sent'] = True
@@ -838,6 +870,7 @@ class RHResetPassword(RH):
         form = ResetPasswordForm(user_emails=identity.user.all_emails)
         if form.validate_on_submit():
             identity.password = form.password.data
+            token_store.delete(self.token)
             flash(_('Your password has been changed successfully.'), 'success')
             login_user(identity.user, identity)
             identity.user.log(UserLogRealm.user, LogKind.change, 'Accounts', 'Password reset', session.user,
@@ -854,14 +887,18 @@ class RHResetPassword(RH):
 class RHCreateLocalIdentity(RH):
     """Create a new local identity from a password reset email."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'token': fields.String(load_default=None),
+    }, location='query')
+    def _process_args(self, token):
+        self.token = token
         if not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
 
     def _process(self):
-        if not (token := request.args.get('token')):
+        if not self.token:
             return redirect(url_for('.resetpass'))
-        data = secure_serializer.loads(token, max_age=3600, salt='create-local-identity')
+        data = _load_secure_token(self.token, 'create-local-identity')
         user = User.get(data['id'], is_deleted=False)
         if not user:
             raise BadData('User does not exist')
@@ -875,6 +912,7 @@ class RHCreateLocalIdentity(RH):
             identifier = form.username.data if config.LOCAL_USERNAMES else str(uuid4())  # uuid to have something unique
             identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
             user.identities.add(identity)
+            token_store.delete(self.token)
             flash(_('Local account added successfully'), 'success')
             login_user(identity.user, identity)
             user.log(UserLogRealm.user, LogKind.positive, 'Accounts', 'Local account created (password reset)',
