@@ -19,34 +19,39 @@
 
 :global(.indico-ui) {
   .indicator-root {
-    position: relative;
-    max-width: 100%;
     box-sizing: border-box;
+    position: absolute;
 
     &[data-position='top-right'] {
       @include indicator-position(0, 0, auto, auto, 50%, -50%);
+      --indicator-box-shadow: 0 0 0 3px var(--color-on-primary);
     }
 
     &[data-position='top-left'] {
       @include indicator-position(0, auto, auto, 0, -50%, -50%);
+      --indicator-box-shadow: 0 0 0 3px var(--color-on-primary);
     }
 
     &[data-position='bottom-right'] {
       @include indicator-position(auto, 0, 0, auto, 50%, 50%);
+      --indicator-box-shadow: 0 0 0 3px var(--color-on-primary);
     }
 
     &[data-position='bottom-left'] {
       @include indicator-position(auto, auto, 0, 0, -50%, 50%);
+      --indicator-box-shadow: 0 0 0 3px var(--color-on-primary);
     }
 
+    top: var(--top);
+    right: var(--right);
+    bottom: var(--bottom);
+    left: var(--left);
+
     .indicator-dot {
-      position: absolute;
+      // position: absolute;
       z-index: 1;
-      top: var(--top);
-      right: var(--right);
-      bottom: var(--bottom);
-      left: var(--left);
       transform: translate(var(--x-translate), var(--y-translate));
+      box-shadow: var(--indicator-box-shadow);
     }
   }
 }

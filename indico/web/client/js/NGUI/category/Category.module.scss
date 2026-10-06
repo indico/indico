@@ -8,13 +8,14 @@
 @use 'NGUI/styles/base' as *;
 
 :global(.indico-ui) {
-  .category-title {
+  .category-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--space-6);
     margin-top: var(--space-6);
-    margin-bottom: var(--space-6);
-
     @media (max-width: $viewport-mobile) {
       margin-top: var(--space-3);
-      margin-bottom: var(--space-6);
     }
   }
 
@@ -23,7 +24,6 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: var(--space-6);
-    margin-bottom: var(--space-6);
 
     .category-description {
       @include typography('text-md', 'regular');

@@ -60,19 +60,19 @@ export function Category({categoryId, isFlat}: CategoryProps) {
   }
 
   return (
-    <div>
+    <div styleName="category-wrapper">
       {category.title === 'Home' && category.isRoot ? (
         category.hasChildren ? (
-          <h1 styleName="category-title">
+          <h1>
             <Translate>Main categories</Translate>
           </h1>
         ) : (
-          <h1 styleName="category-title">
+          <h1>
             <Translate>All events</Translate>
           </h1>
         )
       ) : (
-        <h1 styleName="category-title">{category.title}</h1>
+        <h1>{category.title}</h1>
       )}
       <div styleName="category-info">
         {category.logoURL && (

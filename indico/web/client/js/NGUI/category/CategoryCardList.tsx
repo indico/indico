@@ -25,9 +25,14 @@ export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
   const gridClass = columns > 1 ? `grid-${columns}-responsive` : '';
 
   return (
-    <div className={gridClass} role="group" styleName="category-card-list">
+    <div className={gridClass} role="list">
       {categories.map(category => (
-        <Card styleName="category-card" key={category.id} href={category.displayURL}>
+        <Card
+          styleName="category-card"
+          key={category.id}
+          href={category.displayURL}
+          role="listitem"
+        >
           <Card.Icon
             icon="fas:folder"
             compact

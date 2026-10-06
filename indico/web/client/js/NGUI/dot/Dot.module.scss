@@ -7,9 +7,12 @@
 
 @use 'NGUI/styles/base' as *;
 
-@mixin dot-size($size) {
+@mixin dot-size($size, $font-size: '', $padding: '') {
   height: var(--space-#{$size});
   width: var(--space-#{$size});
+  font-size: var(--font-size-text-#{$font-size});
+  --dot-radius: var(--radius-#{$font-size});
+  --dot-padding: var(--space-#{$padding});
 }
 
 :global(.indico-ui) {
@@ -87,32 +90,38 @@
       --intensity-500: var(--color-tag-black);
     }
 
-    &[data-size='xxs'] {
-      @include dot-size('1');
-    }
-
     &[data-size='xs'] {
-      @include dot-size('2');
-    }
-
-    &[data-size='sm'] {
       @include dot-size('3');
     }
 
+    &[data-size='sm'] {
+      @include dot-size('3-5', 'xxs', '1');
+    }
+
     &[data-size='md'] {
-      @include dot-size('4');
+      @include dot-size('4-5', 'xs', '1-5');
     }
 
     &[data-size='lg'] {
-      @include dot-size('5');
+      @include dot-size('5', 'sm', '1-5');
     }
 
     &[data-size='xl'] {
-      @include dot-size('6');
+      @include dot-size('6', 'md', '2');
     }
 
     background-color: var(--intensity-500);
     border-radius: 50%;
     display: inline-block;
+
+    &[data-label='true'] {
+      color: var(--color-on-primary);
+      width: auto;
+      border-radius: var(--radius-pill);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--dot-padding);
+    }
   }
 }

@@ -9,10 +9,6 @@
 @use 'NGUI/styles/base' as *;
 
 :global(.indico-ui) {
-  .category-card-list {
-    margin-bottom: var(--space-6);
-  }
-
   .category-card-main {
     display: flex;
     flex-direction: column;

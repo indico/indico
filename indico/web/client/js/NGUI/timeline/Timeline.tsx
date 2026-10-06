@@ -10,49 +10,60 @@ import React, {forwardRef} from 'react';
 import './Timeline.module.scss';
 import {Dot} from 'indico/NGUI/dot/Dot';
 import {IndicoPaletteColor} from 'indico/NGUI/tokens';
-import {sharedClassName} from 'indico/NGUI/utils';
+import {NativeProps, sharedClassName} from 'indico/NGUI/utils';
 
-interface TimelineTitleProps {
+interface TimelineTitleCustomProps {
   dotColor?: IndicoPaletteColor;
-  children: React.ReactNode;
-  className?: string;
 }
 
-export const TimelineTitle = ({children, className, dotColor = 'primary'}: TimelineTitleProps) => (
-  <h5 className={className ?? ''}>
-    <Dot styleName="dot" color={dotColor} size="sm" />
-    {children}
-  </h5>
-);
+type TimelineTitleProps = TimelineTitleCustomProps & NativeProps<'h5'>;
 
-interface TimelineContentProps {
-  children: React.ReactNode;
-  className?: string;
-}
+export const TimelineTitle = (props: TimelineTitleProps) => {
+  const {dotColor = 'primary', ...nativeProps} = props;
+  return (
+    <h5 className={sharedClassName(nativeProps.className)} styleName="timeline-title">
+      <Dot styleName="dot" color={dotColor} size="sm" />
+      {nativeProps.children}
+    </h5>
+  );
+};
 
-export const TimelineContent = ({children, className}: TimelineContentProps) => (
-  <div styleName="timeline-content-wrapper" className={sharedClassName(className)}>
-    <div styleName="line" />
-    {children}
-  </div>
-);
+type TimelineContentProps = NativeProps<'div'>;
 
-interface TimelineItemProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-const TimelineItemRoot = forwardRef<HTMLDivElement, TimelineItemProps>(
-  ({className, children}, ref) => (
-    <div ref={ref} styleName="timeline-item" className={sharedClassName(className)} role="group">
-      {children}
+export const TimelineContent = (props: TimelineContentProps) => {
+  const {...nativeProps} = props;
+  return (
+    <div
+      {...nativeProps}
+      styleName="timeline-content-wrapper"
+      className={sharedClassName(nativeProps.className)}
+    >
+      <div styleName="line" />
+      {nativeProps.children}
     </div>
-  )
-);
+  );
+};
+
+TimelineContent.displayName = 'TimelineContent';
+
+type TimelineItemRootProps = NativeProps<'div'>;
+
+const TimelineItemRoot = forwardRef<HTMLDivElement, TimelineItemRootProps>((props, ref) => {
+  return (
+    <div
+      ref={ref}
+      styleName="timeline-item"
+      className={sharedClassName(props.className)}
+      role="group"
+    >
+      {props.children}
+    </div>
+  );
+});
 
 TimelineItemRoot.displayName = 'TimelineItem';
 
-type TimelineItemComponent = React.FunctionComponent<TimelineItemProps> & {
+type TimelineItemComponent = React.FunctionComponent<TimelineItemRootProps> & {
   Title: typeof TimelineTitle;
   Content: typeof TimelineContent;
 };

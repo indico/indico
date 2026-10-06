@@ -7,7 +7,7 @@
 
 import React, {forwardRef} from 'react';
 
-import {IndicoPaletteColor, LegacyColor} from 'indico/NGUI/tokens';
+import {IndicoPaletteColor, LegacyColor, Size} from 'indico/NGUI/tokens';
 import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
 import './Dot.module.scss';
 
@@ -15,13 +15,21 @@ export type DotColor = IndicoPaletteColor | LegacyColor;
 
 interface CustomDotProps {
   color?: DotColor;
-  size?: string;
 }
 
-export type DotProps = CustomDotProps & NativeProps<'span'>;
+export type DotSizeLabelMaxValueUnion =
+  | {label?: string; size?: Exclude<Size, 'xs'>; maxValue?: never}
+  | {label?: number; size?: Exclude<Size, 'xs'>; maxValue?: number}
+  | {label?: never; size: 'xs'; maxValue?: never};
+
+export type DotProps = CustomDotProps & DotSizeLabelMaxValueUnion & NativeProps<'span'>;
 
 export const Dot = forwardRef<HTMLSpanElement, DotProps>((props, ref) => {
-  const {color = 'primary', size = 'md', ...nativeProps} = props;
+  const {color = 'primary', size = 'md', label, maxValue, ...nativeProps} = props;
+  const formattedLabel =
+    maxValue !== undefined && typeof label === 'number' && label > maxValue
+      ? `${maxValue}+`
+      : label;
 
   return (
     <span
@@ -31,7 +39,10 @@ export const Dot = forwardRef<HTMLSpanElement, DotProps>((props, ref) => {
       className={sharedClassName(nativeProps.className)}
       data-color={color}
       data-size={size}
-    />
+      data-label={!!label}
+    >
+      {formattedLabel}
+    </span>
   );
 });
 

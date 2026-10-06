@@ -9,6 +9,7 @@ import React, {forwardRef, ReactElement} from 'react';
 
 import {Button, ButtonProps} from 'indico/NGUI/button/Button';
 import {Icon, IconProps} from 'indico/NGUI/icon/Icon';
+import {Indicator, IndicatorProps} from 'indico/NGUI/indicator/Indicator';
 import {Tag, TagProps} from 'indico/NGUI/tag/Tag';
 import './ListItem.module.scss';
 import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
@@ -18,13 +19,13 @@ export type ListItemHeaderProps = NativeProps<'h6'>;
 export const ListItemHeader = (props: ListItemHeaderProps) => {
   const {...nativeProps} = props;
   return (
-    <h6
+    <p
       {...nativeProps}
       styleName="list-item-header"
       className={sharedClassName(nativeProps.className)}
     >
       {nativeProps.children}
-    </h6>
+    </p>
   );
 };
 
@@ -43,53 +44,77 @@ export const ListItemDetails = (props: ListItemDetailsProps) => {
   );
 };
 
+export const ListItemIndicator = (props: IndicatorProps) => {
+  const {...nativeProps} = props;
+  return (
+    <Indicator
+      {...nativeProps}
+      className={sharedClassName(nativeProps.className)}
+      position="top-right"
+    />
+  );
+};
+
 type ListItemHeaderElement = ReactElement<ListItemHeaderProps, typeof ListItemHeader>;
 type ListItemDetailsElement = ReactElement<ListItemDetailsProps, typeof ListItemDetails>;
 type ListItemTagElement = ReactElement<TagProps, typeof Tag>;
 type ListItemIconElement = ReactElement<IconProps, typeof Icon>;
 type ListItemButtonElement = ReactElement<ButtonProps, typeof Button>;
+type ListItemIndicatorElement = ReactElement<IndicatorProps, typeof Indicator>;
 
 type ListItemChild =
   | ListItemIconElement
   | ListItemHeaderElement
   | ListItemDetailsElement
   | ListItemTagElement
-  | ListItemButtonElement;
+  | ListItemButtonElement
+  | ListItemIndicatorElement;
+
+type NativeLIElementProps = NativeProps<'li'>;
+type NativeAnchorProps = NativeProps<'a'>;
+type NativeDivProps = NativeProps<'div'>;
 
 interface CustomListItemProps {
   children: ListItemChild | ListItemChild[];
+  marker?: ReactElement;
+  contentProps?: NativeDivProps | NativeAnchorProps;
 }
 
-type NativeDivProps = NativeProps<'div'>;
-type NativeAnchorProps = NativeProps<'a'>;
-type NativeUnion = ({href?: undefined} & NativeDivProps) | ({href: string} & NativeAnchorProps);
-export type ListItemProps = CustomListItemProps & NativeUnion;
+export type ListItemProps = CustomListItemProps & NativeLIElementProps;
 
-const ListItemRoot = forwardRef<HTMLAnchorElement | HTMLDivElement, ListItemProps>((props, ref) => {
-  const {children, ...nativeProps} = props;
-  if (nativeProps.href !== undefined) {
-    const rest = nativeProps as NativeAnchorProps;
+const ListItemRoot = forwardRef<HTMLLIElement, ListItemProps>((props, ref) => {
+  const {children, marker, contentProps, ...nativeProps} = props;
+  const rest = nativeProps as NativeLIElementProps;
+
+  if (contentProps && 'href' in contentProps) {
+    const anchorProps = contentProps as NativeAnchorProps;
     return (
-      <a
+      <li
         {...rest}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        styleName="list-item-root"
+        styleName="list-item-wrapper"
         className={sharedClassName(rest.className)}
+        ref={ref as React.Ref<HTMLLIElement>}
       >
-        {children}
-      </a>
+        {marker}
+        <a {...anchorProps} styleName="list-item-content" className={sharedClassName()}>
+          {children}
+        </a>
+      </li>
     );
   }
-  const rest = nativeProps as NativeDivProps;
+  const divProps = contentProps as NativeDivProps;
   return (
-    <div
+    <li
       {...rest}
-      ref={ref as React.Ref<HTMLDivElement>}
-      styleName="list-item-root"
+      ref={ref as React.Ref<HTMLLIElement>}
+      styleName="list-item-wrapper"
       className={sharedClassName(rest.className)}
     >
-      {children}
-    </div>
+      {marker}
+      <div {...divProps} styleName="list-item-content" className={sharedClassName(rest.className)}>
+        {children}
+      </div>
+    </li>
   );
 });
 
@@ -101,6 +126,7 @@ type ListItemComponent = React.FunctionComponent<ListItemProps> & {
   Details: typeof ListItemDetails;
   Tag: typeof Tag;
   Button: typeof Button;
+  Indicator: typeof ListItemIndicator;
 };
 
 export const ListItem = Object.assign(ListItemRoot, {
@@ -109,4 +135,25 @@ export const ListItem = Object.assign(ListItemRoot, {
   Details: ListItemDetails,
   Tag,
   Button,
+  Indicator: ListItemIndicator,
 }) as ListItemComponent;
+
+const ListComponent = forwardRef<HTMLUListElement, NativeProps<'ul'>>((props, ref) => {
+  const {...nativeProps} = props;
+  return (
+    <ul
+      {...nativeProps}
+      ref={ref}
+      styleName="list"
+      className={sharedClassName(nativeProps.className)}
+    >
+      {nativeProps.children}
+    </ul>
+  );
+});
+
+ListComponent.displayName = 'List';
+
+export const List = Object.assign(ListComponent, {
+  Item: ListItem,
+});

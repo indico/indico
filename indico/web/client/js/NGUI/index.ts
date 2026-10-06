@@ -12,6 +12,6 @@ export {Tag} from './tag/Tag';
 export {Card, CardHeader, CardMeta, CardDescription} from './card/Card';
 export {Dot} from './dot/Dot';
 export {Indicator} from './indicator/Indicator';
-export {ListItem, ListItemHeader, ListItemDetails} from './list/ListItem';
+export {List, ListItem, ListItemHeader, ListItemDetails} from './list/ListItem';
 export {TimelineItem, TimelineContent, TimelineTitle} from './timeline/Timeline';
 export {YearPicker} from './year_picker/YearPicker';

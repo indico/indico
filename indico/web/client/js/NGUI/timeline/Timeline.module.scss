@@ -21,8 +21,9 @@
     background-color: var(--color-surface-soft-accent);
     width: 0.143rem; // 2px
     height: 100%;
-    margin-left: calc((var(--space-3) / 2) - (0.143rem));
+    margin-left: calc((var(--space-3-5) / 2) - (0.143rem));
     position: absolute;
+    border-radius: var(--radius-pill);
 
     @media (max-width: $viewport-mobile) {
       height: 0;
@@ -31,5 +32,10 @@
 
   .dot {
     margin-right: var(--space-2);
+  }
+
+  .timeline-title {
+    display: flex;
+    align-items: center;
   }
 }
