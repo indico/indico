@@ -40,6 +40,26 @@ def test_make_unique_token(monkeypatch):
     assert _get_token() == '5'
 
 
+def test_make_unique_token_custom_factory():
+    tokens = {'t1', 't3'}
+    state = 0
+
+    def _gen_token():
+        nonlocal state
+        state += 1
+        return f't{state}'
+
+    def _get_token():
+        token = make_unique_token(lambda t: t not in tokens, _gen_token)
+        tokens.add(token)
+        return token
+
+    assert _get_token() == 't2'
+    assert _get_token() == 't4'
+    assert _get_token() == 't5'
+    assert _get_token() == 't6'
+
+
 @pytest.mark.parametrize(('input', 'output'), (
     ('this is a    test',    'this-is-a-test'),
     ('this is \xe4    test', 'this-is-ae-test'),

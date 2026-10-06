@@ -43,7 +43,7 @@ from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
 from indico.util.signing import secure_serializer
-from indico.util.string import crc32, validate_email
+from indico.util.string import crc32, make_unique_token, validate_email
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -166,7 +166,7 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, *, u
     url_args = url_args or {}
     if sensitive:
         assert ttl
-        token = generate_token(42)
+        token = make_unique_token(lambda t: not token_store.get(t), lambda: generate_token(42))
         payload = {'data': data or email, 'salt': salt}
         token_store.set(token, payload, ttl)
     else:
