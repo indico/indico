@@ -71,14 +71,15 @@ export class TipBase extends CustomElementBase {
     this.addEventListener('x-connect', () => {
       this.contentMutationObserver = new MutationObserver(() => {
         this.updatePosition();
-      }).observe(this.$tip, {
+      });
+      this.contentMutationObserver.observe(this.$tip, {
         subtree: true,
         childList: true,
         characterData: true,
       });
     });
     this.addEventListener('x-disconnect', () => {
-      this.contentMutationObserver.disconnect();
+      this.contentMutationObserver?.disconnect();
     });
     this.$tip.addEventListener('click', evt => {
       evt.preventDefault();

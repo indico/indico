@@ -30,7 +30,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Improve keyboard navigation, screen-reader support and text contrast in the category navigator,
+  including category selection and move dialogs (:pr:`7779`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
