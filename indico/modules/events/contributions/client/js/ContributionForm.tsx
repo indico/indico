@@ -171,19 +171,21 @@ export function ContributionFormFields({
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
-      <FinalDropdown
-        name="type_id"
-        placeholder={Translate.string('No type selected')}
-        label={Translate.string('Type')}
-        options={contributionTypes.map(contributionType => ({
-          key: contributionType.id,
-          text: contributionType.name,
-          description: contributionType.description,
-          value: contributionType.id,
-        }))}
-        selection
-        nullIfEmpty
-      />
+      {contributionTypes.length > 0 && (
+        <FinalDropdown
+          name="type_id"
+          placeholder={Translate.string('No type selected')}
+          label={Translate.string('Type')}
+          options={contributionTypes.map(contributionType => ({
+            key: contributionType.id,
+            text: contributionType.name,
+            description: contributionType.description,
+            value: contributionType.id,
+          }))}
+          selection
+          nullIfEmpty
+        />
+      )}
       {initialValues.start_dt ? (
         <>
           <Field name="duration" subscription={{value: true}}>
