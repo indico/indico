@@ -194,4 +194,4 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
     _description = fields.String(attribute='description')
-    type = ModelField(ContributionType, data_key='type_id', with_parent='event')
+    type = ModelField(ContributionType, with_parent='event', data_key='type_id')
