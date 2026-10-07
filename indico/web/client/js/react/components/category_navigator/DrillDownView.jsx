@@ -209,6 +209,7 @@ export default function DrillDownView({
                 You can only{' '}
                 <Param
                   name="action"
+                  value={actionButtonText.toLowerCase()}
                   wrapper={
                     <button
                       type="button"
@@ -216,9 +217,7 @@ export default function DrillDownView({
                       onClick={() => onAction(currentCategory)}
                     />
                   }
-                >
-                  {actionButtonText.toLowerCase()}
-                </Param>{' '}
+                />{' '}
                 this one.
               </Translate>
             ) : (
@@ -226,6 +225,7 @@ export default function DrillDownView({
                 You can{' '}
                 <Param
                   name="action"
+                  value={actionButtonText.toLowerCase()}
                   wrapper={
                     <button
                       type="button"
@@ -233,9 +233,7 @@ export default function DrillDownView({
                       onClick={() => onAction(currentCategory)}
                     />
                   }
-                >
-                  {actionButtonText.toLowerCase()}
-                </Param>{' '}
+                />{' '}
                 this one,{' '}
                 <Param
                   name="navigateUp"
