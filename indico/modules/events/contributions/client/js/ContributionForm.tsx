@@ -8,6 +8,7 @@
 import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
 import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
 import contribPersonLinkFieldParamsURL from 'indico-url:contributions.api_contrib_person_link_params';
+import contribTypesURL from 'indico-url:contributions.api_contrib_types';
 import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
@@ -21,6 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
 
+import {ContributionType} from 'indico/modules/events/timetable/types';
 import {
   CollapsibleContainer,
   FinalContributionPersonLinkField,
@@ -58,6 +60,7 @@ interface ContributionFormProps {
   personLinkFieldParams?: Record<string, any>;
   locationParent?: Record<string, any>;
   customFields: CustomField[];
+  contributionTypes: ContributionType[];
   onSubmit: (formData: any, form?: any) => void;
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
@@ -72,6 +75,7 @@ interface ContributionFormFieldsProps {
   personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
   customFields?: CustomField[];
+  contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
   [key: string]: any; // Allow additional props
 }
@@ -82,6 +86,7 @@ export function ContributionFormFields({
   personLinkFieldParams = {},
   initialValues = {},
   customFields = [],
+  contributionTypes = [],
   extraOptions = {},
 }: ContributionFormFieldsProps) {
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
@@ -166,6 +171,19 @@ export function ContributionFormFields({
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
+      <FinalDropdown
+        name="type_id"
+        placeholder={Translate.string('No type selected')}
+        label={Translate.string('Type')}
+        options={contributionTypes.map(contributionType => ({
+          key: contributionType.id,
+          text: contributionType.name,
+          description: contributionType.description,
+          value: contributionType.id,
+        }))}
+        selection
+        nullIfEmpty
+      />
       {initialValues.start_dt ? (
         <>
           <Field name="duration" subscription={{value: true}}>
@@ -242,6 +260,7 @@ function ContributionForm({
   personLinkFieldParams = {},
   locationParent = {},
   customFields = [],
+  contributionTypes = [],
   onSubmit,
   initialValues = {},
   sessionBlock = null,
@@ -298,7 +317,14 @@ function ContributionForm({
     >
       <ContributionFormFields
         eventId={eventId}
-        {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}}
+        {...{
+          locationParent,
+          initialValues,
+          sessionBlock,
+          customFields,
+          contributionTypes,
+          personLinkFieldParams,
+        }}
       />
     </FinalModalForm>
   );
@@ -323,6 +349,10 @@ export function ContributionEditForm({
     contribFieldsURL({event_id: eventId}),
     {camelize: true}
   );
+  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
+    contribTypesURL({event_id: eventId}),
+    {camelize: true}
+  );
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentContribURL({event_id: eventId, contrib_id: contribId})
   );
@@ -343,7 +373,11 @@ export function ContributionEditForm({
   };
 
   const loading =
-    contribLoading || locationParentLoading || fieldsLoading || personLinkFieldParamsLoading;
+    contribLoading ||
+    locationParentLoading ||
+    fieldsLoading ||
+    personLinkFieldParamsLoading ||
+    contributionTypesLoading;
 
   return (
     <ContributionForm
@@ -351,6 +385,7 @@ export function ContributionEditForm({
       personLinkFieldParams={personLinkFieldParams}
       locationParent={locationParent}
       customFields={fields}
+      contributionTypes={contributionTypes}
       header={Translate.string("Edit contribution '{title}'", {title: contrib?.title})}
       onSubmit={onSubmit ?? handleSubmit}
       onClose={onClose}
@@ -386,6 +421,10 @@ export function ContributionCreateForm({
     contribFieldsURL({event_id: eventId}),
     {camelize: true}
   );
+  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
+    contribTypesURL({event_id: eventId}),
+    {camelize: true}
+  );
   const {data: defaultDuration, loading: defaultDurationLoading} = useIndicoAxios(
     defaultDurationURL({event_id: eventId})
   );
@@ -418,7 +457,8 @@ export function ContributionCreateForm({
     locationParentLoading ||
     defaultDurationLoading ||
     fieldsLoading ||
-    personLinkFieldParamsLoading;
+    personLinkFieldParamsLoading ||
+    contributionTypesLoading;
 
   const defaultValuesByType = {
     text: '',
@@ -445,6 +485,7 @@ export function ContributionCreateForm({
       personLinkFieldParams={personLinkFieldParams}
       locationParent={locationParent}
       customFields={fields ?? []}
+      contributionTypes={contributionTypes}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}
       onClose={onClose}
