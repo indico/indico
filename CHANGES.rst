@@ -22,6 +22,8 @@ Bugfixes
 - Fix "No value" filter for text-based abstract/contribution fields (:pr:`7725`)
 - Fix error when loading favorite contribution state when viewing a contribution in
   a restricted event the user cannot access (:pr:`7740`)
+- Fix contributions of parallel session blocks swapping columns in the detailed
+  timetable view (:pr:`7771`)
 - Fix "My contributions" page not working when "My timetable" menu entry is disabled
   (:pr:`7759`)
 - Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
