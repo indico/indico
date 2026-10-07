@@ -72,7 +72,11 @@ def js_vars_user():
 
     Useful for favorites, settings etc.
     """
-    return Response(generate_user_file(), mimetype='application/javascript')
+    response = Response(generate_user_file(), mimetype='application/javascript')
+    response.cache_control.no_store = True
+    response.cache_control.private = True
+    response.vary.add('Cookie')
+    return response
 
 
 @assets_blueprint.route('/i18n/<locale_name>.js')
