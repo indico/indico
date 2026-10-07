@@ -69,12 +69,11 @@ export function Category({categoryId, isFlat}: CategoryProps) {
   const isUntitledRoot = category.title === 'Home' && category.isRoot;
 
   // (Ajob) Honestly, I think the whole idea of checking the string for 'Home' is very hacky
-  let title = <h1>{category.title}</h1>;
+  let title;
   if (isUntitledRoot) {
-    title = (
-      // @ts-expect-error A string for 'as' is possible, just not typed properly
-      <Translate as="h1">{category.hasChildren ? 'Main categories' : 'All events'}</Translate>
-    );
+    title = <Translate>{category.hasChildren ? 'Main categories' : 'All events'}</Translate>;
+  } else {
+    title = category.title;
   }
 
   return (

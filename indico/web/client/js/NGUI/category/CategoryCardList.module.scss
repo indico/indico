@@ -17,7 +17,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--space-3);
-    margin-bottom: var(--space-6);
   }
 
   .category-card-main {

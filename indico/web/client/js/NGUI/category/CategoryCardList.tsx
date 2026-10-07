@@ -26,7 +26,7 @@ export function CategoryCardList({data, columns}: CategoryCardListProps) {
   const gridCSS = columns ? {gridTemplateColumns: `repeat(${columns}, 1fr)`} : {};
 
   return (
-    <Card style={gridCSS} role="list">
+    <div styleName="category-card-list" style={gridCSS} role="list">
       {categories.map(category => (
         <div role="listitem" key={category.id} styleName="wrapper">
           <Card styleName="category-card" href={category.displayURL}>
@@ -94,6 +94,6 @@ export function CategoryCardList({data, columns}: CategoryCardListProps) {
           </Card>
         </div>
       ))}
-    </Card>
+    </div>
   );
 }

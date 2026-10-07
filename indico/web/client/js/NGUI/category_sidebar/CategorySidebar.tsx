@@ -13,8 +13,17 @@ import {Card} from 'indico/NGUI/card/Card';
 export function CategorySidebar() {
   return (
     <div styleName="category-sidebar">
-      <Card>Hello</Card>
-      <Card>World</Card>
+      <Card>
+        <Card.Header>
+          <Card.Icon icon="fas:folder" />
+          Heyyy
+        </Card.Header>
+        Ajobbb
+      </Card>
+      <Card>
+        <Card.Header>Materials</Card.Header>
+        Hello
+      </Card>
     </div>
   );
 }
