@@ -38,6 +38,27 @@ it('does not offer a second selection action for a disabled empty category', () 
   expect(focusSearch).toHaveBeenCalled();
 });
 
+it('keeps the empty-category action available', () => {
+  const currentCategory = {id: 1, title: 'Current', parent_path: []};
+  const onAction = jest.fn();
+  const wrapper = mount(
+    <DrillDownView
+      navigatorState={{currentCategory, subcategories: [], navigateTo: jest.fn()}}
+      actionButtonText="Select"
+      isNavigation={false}
+      actionOn={{}}
+      emptyCategoryText="No subcategories"
+      onAction={onAction}
+      focusSearch={jest.fn()}
+    />
+  );
+
+  const action = wrapper.find('.placeholder-actions button');
+  expect(action.text()).toBe('select');
+  action.simulate('click');
+  expect(onAction).toHaveBeenCalledWith(currentCategory);
+});
+
 it('shows a spinner instead of the empty-category text while children load', () => {
   const wrapper = mount(
     <DrillDownView
