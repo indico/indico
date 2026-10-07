@@ -41,7 +41,7 @@ const getLayoutOverrides = (state: ReduxState) => state.entries.layoutOverrides;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
 
-const getEntries = createSelector(
+export const getEntries = createSelector(
   _getEntries,
   getSessions,
   (entries, sessions): Entries => {

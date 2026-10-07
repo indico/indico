@@ -211,6 +211,7 @@ interface SetCurrentDateAction {
   type: typeof SET_CURRENT_DATE;
   date: Moment;
   eventId: number;
+  pushState: boolean;
 }
 
 interface ToggleExpandAction {
@@ -224,6 +225,7 @@ interface ToggleDraftAction {
 interface SetExpandedSessionBlockIdAction {
   sessionBlockId: string | null;
   type: typeof SET_EXPANDED_SESSION_BLOCK_ID;
+  pushState: boolean;
 }
 
 export type Action =
@@ -379,9 +381,10 @@ export function toggleDraft(): ToggleDraftAction {
 }
 
 export function setExpandedSessionBlock(
-  sessionBlockId: string | null
+  sessionBlockId: string | null,
+  pushState = true
 ): SetExpandedSessionBlockIdAction {
-  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId};
+  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId, pushState};
 }
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
@@ -599,8 +602,12 @@ export function setEntryAttachments(
   return {type: SET_ENTRY_ATTACHMENTS, id, sessionId, attachments};
 }
 
-export function setCurrentDate(date: Moment, eventId: number): SetCurrentDateAction {
-  return {type: SET_CURRENT_DATE, date, eventId};
+export function setCurrentDate(
+  date: Moment,
+  eventId: number,
+  pushState = true
+): SetCurrentDateAction {
+  return {type: SET_CURRENT_DATE, date, eventId, pushState};
 }
 
 /**

@@ -14,7 +14,15 @@ import {useEffect, useRef} from 'react';
 import {SemanticICONS} from 'semantic-ui-react';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID} from './types';
+import {
+  BlockEntry,
+  Colors,
+  Entry,
+  EntryType,
+  EntryUniqueID,
+  Navigation,
+  SessionBlockId,
+} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -226,3 +234,36 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
 export const flattenEntries = (entries: Entry[]): Entry[] => {
   return entries.map(e => [e, ...((e as BlockEntry)?.children ?? [])]).flat();
 };
+
+function dateFromString(dayString: string) {
+  const date = moment(dayString, 'YYYYMMDD');
+  return date.isValid() ? date : undefined;
+}
+
+export function parseTimetableURLHash(hash: string): Partial<Navigation> | null {
+  const splitHash = hash.substring(1).split('.');
+  if (splitHash.length === 1) {
+    const currentDate = dateFromString(splitHash[0]);
+    if (currentDate !== null) {
+      return {currentDate, isExpanded: false};
+    }
+    return null;
+  } else if (splitHash.length === 2) {
+    const [dayString, expandedSessionBlockId] = splitHash;
+    const currentDate = dateFromString(dayString);
+    return {
+      currentDate,
+      isExpanded: true,
+      expandedSessionBlockId: expandedSessionBlockId as SessionBlockId,
+    };
+  }
+  return null;
+}
+
+export function createTimetableURLHash(date: Moment, expandedSessionBlockId?: string | null) {
+  const dateString = date.format('YYYYMMDD');
+  if (expandedSessionBlockId === null) {
+    return `#${dateString}`;
+  }
+  return `#${dateString}.${expandedSessionBlockId}`;
+}
