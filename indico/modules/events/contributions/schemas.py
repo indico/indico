@@ -25,7 +25,7 @@ from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, Basi
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested, SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList
 from indico.web.flask.util import url_for
 
 
@@ -183,7 +183,7 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
-                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links')
+                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'type')
         rh_context = ('event', {'object': 'contrib'})
 
     id = fields.Int(dump_only=True)
@@ -194,3 +194,4 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
     duration = fields.TimeDelta(required=True)
     _description = fields.String(attribute='description')
+    type = ModelField(ContributionType, data_key='type_id', with_parent='event')
