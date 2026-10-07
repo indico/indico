@@ -435,6 +435,8 @@ class RHAPIContributionFields(RHManageContributionsBase):
 
 class RHAPIContributionTypes(RHManageContributionsBase):
     def _process(self):
+        # TODO: Use a more appropriate permission here so that someone with access to this
+        # specific contribution (but not all of them) can use this endpoint
         return ContributionTypeSchema(many=True).jsonify(self.event.contribution_types)
 
 
