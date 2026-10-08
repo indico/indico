@@ -60,7 +60,6 @@ export function LegacyTimetableSwitchButton({eventId}: {eventId: number}) {
       }
     >
       <Popup.Header>
-        <Icon name="arrow left" />
         <Translate>Old Timetable</Translate>
       </Popup.Header>
       <Popup.Content>
