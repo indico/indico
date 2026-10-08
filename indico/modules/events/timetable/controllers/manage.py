@@ -39,7 +39,7 @@ from indico.modules.events.timetable.schemas import BreakSchema, ContributionSch
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
 from indico.modules.events.timetable.util import render_entry_info_balloon
-from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
+from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableLegacy
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
 from indico.util.i18n import _
 from indico.web.args import use_kwargs, use_rh_args
@@ -81,12 +81,13 @@ class RHManageTimetableLegacy(RHManageTimetableBase):
             return redirect(request.base_url)
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
-        return WPManageTimetableOld.render_template(
+        return WPManageTimetableLegacy.render_template(
             'management_legacy.html',
             self.event,
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
             timetable_data=timetable_data,
+            show_new_timetable_button=session.user.settings.get('prefer_legacy_timetable')
         )
 
 
