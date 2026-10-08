@@ -37,7 +37,8 @@ export function NavigationController() {
       if (newExpandedSessionBlockId !== undefined) {
         if (
           entries.entries[newExpandedSessionBlockId] === undefined ||
-          entries.entries[newExpandedSessionBlockId].type !== EntryType.SessionBlock
+          entries.entries[newExpandedSessionBlockId].type !== EntryType.SessionBlock ||
+          !entries.entries[newExpandedSessionBlockId].startDt.isSame(newDate, 'day')
         ) {
           newExpandedSessionBlockId = undefined;
         }
