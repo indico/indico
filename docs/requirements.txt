@@ -95,5 +95,5 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 urllib3==2.7.0
     # via requests
-werkzeug==3.1.8
+werkzeug==3.1.9
     # via flask
