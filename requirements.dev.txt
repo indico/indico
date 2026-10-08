@@ -236,7 +236,7 @@ typing-extensions==4.16.0
     #   starlette
 unbeheader==1.5.0
     # via -r requirements.dev.in
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   -c requirements.txt
     #   docker
@@ -252,7 +252,7 @@ watchfiles==1.2.0
     #   sphinx-autobuild
 websockets==17.0.1
     # via sphinx-autobuild
-werkzeug==3.1.8
+werkzeug==3.1.9
     # via
     #   -c requirements.txt
     #   flask
