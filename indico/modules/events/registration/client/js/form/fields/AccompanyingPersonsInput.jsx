@@ -227,18 +227,20 @@ function AccompanyingPersonsComponent({
             <span>
               {person.firstName} {person.lastName}
             </span>
-            <div styleName="actions">
-              <a
-                className="icon-edit"
-                title={Translate.string('Edit this person')}
-                onClick={() => handleAccompanyingPersonEdit(person.id)}
-              />
-              <a
-                className="icon-remove"
-                title={Translate.string('Remove this person')}
-                onClick={() => handleAccompanyingPersonRemove(person.id)}
-              />
-            </div>
+            {!disabled && (
+              <div styleName="actions">
+                <a
+                  className="icon-edit"
+                  title={Translate.string('Edit this person')}
+                  onClick={() => handleAccompanyingPersonEdit(person.id)}
+                />
+                <a
+                  className="icon-remove"
+                  title={Translate.string('Remove this person')}
+                  onClick={() => handleAccompanyingPersonRemove(person.id)}
+                />
+              </div>
+            )}
           </li>
         ))}
       </ul>
