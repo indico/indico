@@ -56,7 +56,9 @@ jobs:
         run: npm ci
 
       - name: Install ripgrep
-        run: sudo apt-get install ripgrep
+        run: |
+          sudo apt-get update
+          sudo apt-get install ripgrep
 
       - name: Install Indico
         run: uv pip install --system -e '.[dev]'
@@ -193,11 +195,12 @@ jobs:
       # END common steps
 
       - name: Install redis
-        run: sudo apt-get install redis-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install redis-server
 
       - name: Setup database
         run: |
-          sudo apt-get update
           sudo apt-get install postgresql-client
           export PGHOST=localhost
           export PGUSER=postgres
@@ -244,7 +247,9 @@ jobs:
       # END common steps
 
       - name: Install redis
-        run: sudo apt-get install redis-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install redis-server
 
       - name: Run pytest tests
         run: |
