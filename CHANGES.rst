@@ -27,6 +27,8 @@ Bugfixes
 - Fix paper submission button not showing up for authorized late submitters (:pr:`7766`)
 - Fix shift-click bulk selection in data tables misbehaving after sorting (:pr:`7777`)
 - Prevent caching of ``/assets/js-vars/user.js`` by CDNs and proxies (:issue:`6891`, :pr:`7782`)
+- Hide edit/remove buttons on disabled accompanying persons field (:pr:`7785`)
+- Correctly show locked/purged field indicators on registration form fields (:pr:`7785`)
 
 Accessibility
 ^^^^^^^^^^^^^
