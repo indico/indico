@@ -56,9 +56,9 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Fix an XSS vulnerability when resolving conflicts between concurrent edits to minutes
-  (`GHSA-cw24-x4mj-fw3q <https://github.com/indico/indico/security/advisories/GHSA-cw24-x4mj-fw3q>`__)
+  (:cve:`2026-107397`)
 - Fix an XSS vulnerability in various places that allow entering custom links
-  (`GHSA-c4wc-ggrj-jg9v <https://github.com/indico/indico/security/advisories/GHSA-c4wc-ggrj-jg9v>`__)
+  (:cve:`2026-107396`)
 
 .. note::
 
@@ -67,8 +67,7 @@ Security fixes
     to edit them), and the others require at least submitter or management access in an event
     and additionally an interaction (clicking the link) by the victim.
 
-- Fix a missing access check in the legacy session export API
-  (`GHSA-6p4f-j8j6-463q <https://github.com/indico/indico/security/advisories/GHSA-6p4f-j8j6-463q>`__)
+- Fix a missing access check in the legacy session export API (:cve:`2026-107395`)
 
 .. note::
 
@@ -76,8 +75,7 @@ Security fixes
     case the API could have been misused to retrieve metadata (such as title, description and conveners)
     of such a session.
 
-- Fix an incomplete SSRF check
-  (`GHSA-2v95-h47v-g4x9 <https://github.com/indico/indico/security/advisories/GHSA-2v95-h47v-g4x9>`__)
+- Fix an incomplete SSRF check (:cve:`2026-107394`)
 
 .. note::
 
