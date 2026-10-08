@@ -323,10 +323,6 @@
   }
 
   > .actions {
-    & > *:not(.conditional) {
-      visibility: hidden;
-    }
-
     a + a,
     a + i,
     i + i {
@@ -362,6 +358,10 @@
 
     &:not(.disabled):hover .sortable-handle:active {
       cursor: grabbing;
+    }
+
+    .actions > *:not(.conditional) {
+      visibility: hidden;
     }
 
     &:hover > .actions > * {
