@@ -126,6 +126,12 @@ export default env => {
         },
         indicoStaticLoader(config),
         {
+          test: /\.svg$/i,
+          resourceQuery: /react/,
+          issuer: /\.[jt]sx?$/,
+          use: ['@svgr/webpack'],
+        },
+        {
           test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
           use: {
             loader: 'file-loader',

@@ -1,0 +1,41 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'NGUI/styles/base' as *;
+
+:global(.indico-ui) {
+  .timeline-item {
+    display: block;
+  }
+
+  .timeline-content-wrapper {
+    position: relative;
+    border: 1px solid transparent;
+  }
+
+  .line {
+    background-color: var(--color-surface-soft-accent);
+    width: 0.143rem; // 2px
+    height: 100%;
+    margin-left: calc((var(--space-3-5) / 2) - (0.143rem));
+    position: absolute;
+    border-radius: var(--radius-pill);
+
+    @media (max-width: $viewport-mobile) {
+      height: 0;
+    }
+  }
+
+  .dot {
+    margin-right: var(--space-2);
+  }
+
+  .timeline-title {
+    display: flex;
+    align-items: center;
+  }
+}

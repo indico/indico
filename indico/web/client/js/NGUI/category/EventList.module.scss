@@ -1,0 +1,112 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/reset';
+@use 'NGUI/styles/base' as *;
+
+:global(.indico-ui) {
+  .event-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .event-list {
+    padding-right: var(--space-6);
+    padding-left: var(--space-6);
+
+    @media (max-width: $viewport-mobile) {
+      padding: 0;
+    }
+  }
+
+  .event-list-year-picker {
+    margin-bottom: var(--space-6);
+  }
+
+  .event-list-show-more {
+    align-self: center;
+  }
+
+  .event-list-item-spacing {
+    margin-left: var(--space-8);
+    max-width: 100%;
+    position: relative;
+
+    &:first-child {
+      margin-top: var(--space-5);
+    }
+
+    &:last-child {
+      margin-bottom: var(--space-5);
+    }
+
+    @media (max-width: $viewport-mobile) {
+      margin-left: 0;
+
+      .event-list-item-favorite-icon {
+        top: 0;
+        left: 0;
+        transform: translate(20%, -3%);
+        position: absolute;
+        z-index: 2;
+      }
+    }
+  }
+
+  .event-list-item {
+    @media (max-width: $viewport-mobile) {
+      margin-left: 0;
+      padding-left: var(--space-4);
+      gap: var(--space-2);
+    }
+
+    .event-list-item-date-tag {
+      min-width: 145px;
+      justify-content: start;
+      margin-left: var(--space-1-5);
+      padding: 0;
+    }
+
+    .event-list-item-series-label {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: $viewport-mobile) {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      min-width: 0;
+      flex: 1 1 auto;
+
+      .event-list-item-date-tag {
+        margin-left: var(--space-8);
+      }
+    }
+
+    .event-list-item-tag-section {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-1);
+
+      @media (max-width: $viewport-mobile) {
+        align-self: flex-end;
+      }
+    }
+
+    .event-list-item-label {
+      text-transform: uppercase;
+      font-weight: var(--font-weight-bold);
+      margin-right: var(--space-1-5);
+      @media (max-width: $viewport-mobile) {
+        margin-right: 0;
+      }
+    }
+  }
+}
