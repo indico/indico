@@ -902,7 +902,8 @@ class RegistrationData(StoredFileMixin, db.Model):
         db.Integer,
         db.ForeignKey('event_registration.form_field_data.id'),
         primary_key=True,
-        autoincrement=False
+        autoincrement=False,
+        index=True,
     )
     #: The submitted data for the field
     data = db.Column(

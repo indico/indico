@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from decimal import Decimal
+from functools import cached_property
 from uuid import uuid4
 
 from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
@@ -91,7 +92,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
     def is_anonymous(self):
         return (self.form_item.data or {}).get('is_anonymous', False)
 
-    @property
+    @cached_property
     def has_active_registration_data(self):
         from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
         from indico.modules.events.registration.models.registrations import Registration, RegistrationData
