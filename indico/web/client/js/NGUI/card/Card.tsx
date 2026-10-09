@@ -40,7 +40,12 @@ type CardHeaderElement = ReactElement<CardHeaderProps, typeof CardHeader>;
 type CardDescriptionElement = ReactElement<CardDescriptionProps, typeof CardDescription>;
 type CardIconElement = ReactElement<IconProps, typeof Icon>;
 
-type CardChild = CardIconElement | CardHeaderElement | CardMetaElement | CardDescriptionElement;
+type CardChild =
+  | CardIconElement
+  | CardHeaderElement
+  | CardMetaElement
+  | CardDescriptionElement
+  | React.ReactNode;
 
 interface CustomCardProps {
   children: CardChild | CardChild[];

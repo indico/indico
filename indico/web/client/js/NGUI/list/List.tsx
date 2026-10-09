@@ -11,7 +11,7 @@ import {Button, ButtonProps} from 'indico/NGUI/button/Button';
 import {Icon, IconProps} from 'indico/NGUI/icon/Icon';
 import {Indicator, IndicatorProps} from 'indico/NGUI/indicator/Indicator';
 import {Tag, TagProps} from 'indico/NGUI/tag/Tag';
-import './ListItem.module.scss';
+import './List.module.scss';
 import {sharedClassName, NativeProps} from 'indico/NGUI/utils';
 
 export type ListItemHeaderProps = NativeProps<'h6'>;
@@ -68,7 +68,8 @@ type ListItemChild =
   | ListItemDetailsElement
   | ListItemTagElement
   | ListItemButtonElement
-  | ListItemIndicatorElement;
+  | ListItemIndicatorElement
+  | React.ReactNode;
 
 type NativeLIElementProps = NativeProps<'li'>;
 type NativeAnchorProps = NativeProps<'a'>;
@@ -154,6 +155,10 @@ const ListComponent = forwardRef<HTMLUListElement, NativeProps<'ul'>>((props, re
 
 ListComponent.displayName = 'List';
 
+type ListComponent = React.FunctionComponent<NativeProps<'ul'>> & {
+  Item: typeof ListItem;
+};
+
 export const List = Object.assign(ListComponent, {
   Item: ListItem,
-});
+}) as ListComponent;

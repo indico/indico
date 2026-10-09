@@ -139,7 +139,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
             <TimelineItem.Content>
               <List>
                 {month.events.map((event: Event) => (
-                  <ListItem
+                  <List.Item
                     styleName="event-list-item event-list-item-spacing"
                     key={event.id + month.name}
                     contentProps={{href: event.url}}
@@ -153,7 +153,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                     }
                   >
                     {event.isRecent && <ListItem.Indicator size="xs" />}
-                    <ListItem.Tag
+                    <List.Item.Tag
                       color="primary"
                       variant="transparent"
                       size="sm"
@@ -161,27 +161,27 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                       styleName="event-list-item-date-tag"
                     >
                       {event.date}
-                    </ListItem.Tag>
-                    <ListItem.Header title={event.verbosedTitle}>
+                    </List.Item.Tag>
+                    <List.Item.Header title={event.verbosedTitle}>
                       {event.verbosedTitle}
-                    </ListItem.Header>
+                    </List.Item.Header>
                     {event.seriesLabel && (
-                      <ListItem.Details styleName="event-list-item-series-label">
+                      <List.Item.Details styleName="event-list-item-series-label">
                         {event.seriesLabel}
-                      </ListItem.Details>
+                      </List.Item.Details>
                     )}
                     <div styleName="event-list-item-tag-section">
                       {event.label && (
-                        <ListItem.Tag
+                        <List.Item.Tag
                           color={event.labelColor}
                           size="xs"
                           styleName="event-list-item-label"
                         >
                           {event.label}
-                        </ListItem.Tag>
+                        </List.Item.Tag>
                       )}
                       {event.visibility === 0 && (
-                        <ListItem.Icon
+                        <List.Item.Icon
                           icon="fas:eye-slash"
                           color="gray"
                           size="sm"
@@ -192,7 +192,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                       )}
 
                       {event.isProtected && (
-                        <ListItem.Icon
+                        <List.Item.Icon
                           icon="fas:shield-halved"
                           color="error"
                           size="sm"
@@ -202,7 +202,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                         />
                       )}
                     </div>
-                  </ListItem>
+                  </List.Item>
                 ))}
               </List>
             </TimelineItem.Content>
