@@ -15,6 +15,8 @@ import {Translate} from 'indico/react/i18n';
 
 const LEGACY_TIMETABLE_POPUP_LS_KEY = 'legacy-timetable-popup';
 
+type PopupState = 'hidden' | 'animating' | 'visible';
+
 interface PopupData {
   dontShowAgain: boolean;
   lastShown: number;
@@ -106,34 +108,25 @@ function NewTimetableDialog({eventId, onClose}: {eventId: number; onClose?: () =
 }
 
 function NewTimetableButton({eventId}: {eventId: number}) {
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [popupOpening, setPopupOpening] = useState(false);
-
-  const openPopup = useCallback(() => {
-    setPopupOpening(true);
-  }, []);
-
-  const closePopup = useCallback(() => {
-    setPopupOpening(false);
-    setPopupOpen(false);
-  }, []);
+  const [popupState, setPopupState] = useState<PopupState>('hidden');
 
   useEffect(() => {
-    if (popupOpening) {
-      setPopupOpen(true);
+    if (popupState === 'animating') {
+      const id = setTimeout(() => setPopupState('visible'), 500);
+      return () => clearTimeout(id);
     }
-  }, [popupOpening]);
+  }, [popupState]);
 
   return (
     <>
       <Popup
         style={{
-          opacity: popupOpen ? 1 : 0,
+          opacity: popupState === 'visible' ? 1 : 0,
           transition: 'opacity 0.5s ease-in-out',
         }}
         position="left center"
-        onClose={closePopup}
-        open={popupOpen || popupOpening}
+        onClose={() => setPopupState('hidden')}
+        open={popupState === 'animating' || popupState === 'visible'}
         trigger={
           <Button
             primary
@@ -151,7 +144,7 @@ function NewTimetableButton({eventId}: {eventId: number}) {
           <Translate>You can still try out the new timetable by pressing this button.</Translate>
         </Popup.Content>
       </Popup>
-      <NewTimetableDialog eventId={eventId} onClose={openPopup} />
+      <NewTimetableDialog eventId={eventId} onClose={() => setPopupState('animating')} />
     </>
   );
 }

@@ -7,47 +7,39 @@
 
 import legacyTimetableURL from 'indico-url:timetable.management-legacy';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Popup, Menu, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 const NEW_TIMETABLE_POPUP_LS_KEY = 'new-timetable-popup';
 
+type PopupState = 'hidden' | 'animating' | 'visible';
+
 export function LegacyTimetableSwitchButton({eventId}: {eventId: number}) {
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [popupOpening, setPopupOpening] = useState(false);
-
-  const openPopup = useCallback(() => {
-    setPopupOpening(true);
-  }, []);
-
-  const closePopup = useCallback(() => {
-    setPopupOpening(false);
-    setPopupOpen(false);
-  }, []);
+  const [popupState, setPopupState] = useState<PopupState>('hidden');
 
   useEffect(() => {
-    if (popupOpening) {
-      setPopupOpen(true);
+    if (popupState === 'animating') {
+      localStorage.setItem(NEW_TIMETABLE_POPUP_LS_KEY, 'true');
+      const id = setTimeout(() => setPopupState('visible'), 500);
+      return () => clearTimeout(id);
     }
-  }, [popupOpening]);
+  }, [popupState]);
 
   useEffect(() => {
-    // HACK: wait for the timetable to finish its layout
     const popupDataString = localStorage.getItem(NEW_TIMETABLE_POPUP_LS_KEY);
     if (popupDataString !== 'true') {
-      localStorage.setItem(NEW_TIMETABLE_POPUP_LS_KEY, 'true');
-      setTimeout(() => openPopup(), 500);
+      setPopupState('animating');
     }
-  }, [openPopup]);
+  }, []);
 
   return (
     <Popup
-      style={{opacity: popupOpen ? 1 : 0, transition: 'opacity 0.5s ease-in-out'}}
-      onClose={closePopup}
-      onOpen={() => setPopupOpen(true)}
-      open={popupOpen || popupOpening}
+      style={{opacity: popupState === 'visible' ? 1 : 0, transition: 'opacity 0.5s ease-in-out'}}
+      onClose={() => setPopupState('hidden')}
+      onOpen={() => setPopupState('visible')}
+      open={popupState === 'animating' || popupState === 'visible'}
       on="hover"
       trigger={
         <Menu.Item
