@@ -119,6 +119,14 @@ export:
       category_id: category_id = SKIP if VALUE not in CATEGORIES else MAKE_ID_REF(Category.id, VALUE)
       url_shortcut: ~
       label_id: label_id = EventLabel.get(VALUE).title
+      default_check_type_id: |
+        _check_type = RegistrationCheckType.get(VALUE)
+        if _check_type is None:
+          default_check_type_id = SKIP
+        elif _check_type.is_system_defined:
+          default_check_type_id = _check_type.title
+        else:
+          default_check_type_id = MAKE_ID_REF(RegistrationCheckType.id, VALUE)
     fks:
       - EventPerson.event_id
       - EventPersonLink.event_id
@@ -146,6 +154,7 @@ export:
       - EventPrincipal.event_id
       - EventNote.event_id
       - RegistrationTag.event_id
+      - RegistrationCheckType.event_id
       - RegistrationForm.event_id
       - Survey.event_id
       - DesignerTemplate.event_id
@@ -501,6 +510,7 @@ export:
       - Registration.tags.prop.secondary.c.registration_id
       - PaymentTransaction.registration_id
       - ReceiptFile.registration_id
+      - RegistrationCheck.registration_id
 
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
@@ -531,6 +541,19 @@ export:
   RegistrationInvitation:
     cols:
       uuid: uuid = VALUE if KEEP_UUIDS else SKIP
+  RegistrationCheckType:
+    skipif: ROW.is_system_defined
+    allow_duplicates: true
+
+  RegistrationCheck:
+    cols:
+      check_type_id: |
+        _check_type = RegistrationCheckType.get(VALUE)
+        if _check_type.is_system_defined:
+          check_type_id = _check_type.title
+        else:
+          check_type_id = MAKE_ID_REF(RegistrationCheckType.id, VALUE)
+
   RegistrationTag: {}
   event_registration.registration_tags: {}
 
@@ -627,6 +650,21 @@ import:
         label_id = None
         if _label := EventLabel.query.filter_by(title=VALUE).first():
           label_id = _label.id
+      default_check_type_id: |
+        if isinstance(VALUE, str):
+          _check_type = RegistrationCheckType.query.filter_by(title=VALUE, is_system_defined=True).first()
+          default_check_type_id = _check_type.id if _check_type else None
+        else:
+          default_check_type_id = RESOLVE_ID_REF(VALUE, None)
+
+    RegistrationCheck:
+      check_type_id: |
+        if isinstance(VALUE, str):
+          check_type_id = (RegistrationCheckType.query.filter_by(title=VALUE, is_system_defined=True).first() or
+                           RegistrationCheckType.query.filter_by(is_system_defined=True)
+                           .order_by(RegistrationCheckType.id).first()).id
+        else:
+          check_type_id = RESOLVE_ID_REF(VALUE)
 
     AbstractEmailTemplate:
       rules: |

@@ -10,7 +10,7 @@ import pytest
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration import REGISTRATION_PERMISSIONS
 from indico.modules.events.registration.controllers import management
-from indico.modules.events.registration.controllers.management import regforms, reglists
+from indico.modules.events.registration.controllers.management import checks, regforms, reglists
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -67,7 +67,7 @@ def test_edit_permission_granted(rh):
     regforms.RHRegistrationFormSchedule,
     reglists.RHRegistrationsApprove,
     reglists.RHRegistrationsReject,
-    reglists.RHRegistrationCheckIn,
+    checks.RHRegistrationChecksAdd,
     reglists.RHRegistrationHide,
 ))
 def test_edit_permission_excluded(rh):
