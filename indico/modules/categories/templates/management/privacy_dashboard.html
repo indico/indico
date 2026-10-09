@@ -1,0 +1,20 @@
+{% extends 'categories/management/base.html' %}
+{% from 'forms/_form.html' import form_header, form_footer, form_fieldset, form_rows %}
+{% from '_privacy_dashboard.html' import privacy_inheritance_message, privacy_settings_fieldsets,
+                                         privacy_save_button %}
+
+{% block title %}{% trans %}Privacy dashboard{% endtrans %}{% endblock %}
+
+{% block content %}
+    {{ privacy_inheritance_message(inherited_from, locked) }}
+    {{ form_header(form, id='privacy-dashboard-form') }}
+    {% call(disabled_fields) privacy_settings_fieldsets(form, locked) %}
+        {% call form_fieldset(_('Lock privacy data')) %}
+            {{ form_rows(form, fields=form._lock_privacy_data_fields, disable=disabled_fields) }}
+        {% endcall %}
+    {% endcall %}
+    {% if not locked %}
+        {{ privacy_save_button() }}
+    {% endif %}
+    {{ form_footer(form) }}
+{% endblock %}
