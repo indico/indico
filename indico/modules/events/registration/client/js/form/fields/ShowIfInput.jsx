@@ -9,20 +9,23 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Field, useForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
+import {Icon, Popup} from 'semantic-ui-react';
 
 import {FinalDropdown} from 'indico/react/forms';
 import {Fieldset, unsortedArraysEqual} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {getItems, getNestedSections} from '../selectors';
+import {showIfFieldDisabled} from '../../form_setup/selectors';
+import {getAllNestedSections, getItems} from '../selectors';
 
 import {getFieldRegistry} from './registry';
 
 export function ShowIfInput({fieldId: thisFieldId}) {
   const fields = useSelector(getItems);
-  const sections = useSelector(getNestedSections);
+  const sections = useSelector(getAllNestedSections);
   const fieldRegistry = getFieldRegistry();
   const form = useForm();
+  const isShowIfFieldDisabled = useSelector(state => showIfFieldDisabled(state, thisFieldId));
 
   const choices = sections.flatMap(section =>
     section.items
@@ -30,12 +33,21 @@ export function ShowIfInput({fieldId: thisFieldId}) {
       .map(({title, id: fieldId, isEnabled}) => ({
         value: fieldId,
         text: `${section.title} » ${title}`,
-        disabled: !isEnabled,
+        disabled: !isEnabled || !section.enabled,
       }))
   );
 
   return (
     <Fieldset legend={Translate.string('Show if')}>
+      {isShowIfFieldDisabled && (
+        <Popup trigger={<Icon name="warning sign" color="orange" />}>
+          <Translate>
+            The conditional field set to display this field is currently disabled and not in effect.
+            You may either re-enable the previous field or select another field to use for the
+            condition below.
+          </Translate>
+        </Popup>
+      )}
       <FinalDropdown
         name="showIfFieldId"
         /* i18n: Form field */
