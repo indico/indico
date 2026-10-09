@@ -19,3 +19,8 @@ declare namespace React {
     styleName?: string;
   }
 }
+
+declare module '*.svg?react' {
+  const ReactComponent: React.FC<React.SVGProps<SVGSVGElement>>;
+  export default ReactComponent;
+}

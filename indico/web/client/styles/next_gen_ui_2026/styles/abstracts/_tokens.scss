@@ -1,0 +1,81 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+// Viewports (for saas media queries)
+  $viewport-mobile: 375px;
+  $viewport-tablet: 768px;
+  $viewport-desktop: 1280px;
+
+:root {
+  // Spacing system
+  // Base: 14px
+
+  --space-1: 0.286rem; // 4px
+  --space-2: 0.571rem; // 8px
+  --space-3: 0.857rem; // 12px
+  --space-4: 1.143rem; // 16px
+  --space-5: 1.429rem; // 20px
+  --space-6: 1.714rem; // 24px
+  --space-8: 2.286rem; // 32px
+  --space-10: 2.857rem; // 40px
+  --space-12: 3.429rem; // 48px
+  --space-16: 4.571rem; // 64px
+  --space-20: 5.714rem; // 80px
+  --space-24: 6.857rem; // 96px
+  --space-32: 9.143rem; // 128px
+  --space-40: 11.429rem; // 160px
+  --space-48: 13.714rem; // 192px
+  --space-56: 16rem; // 224px
+  --space-64: 18.286rem; // 256px
+
+  // Container widths
+  // Based on 14px root font size
+
+  --container-sm: 45.714rem; // 640px
+  --container-md: 54.857rem; // 768px
+  --container-lg: 73.143rem; // 1024px
+  --container-xl: 91.429rem; // 1280px
+
+  // Radius
+  --radius-xs: 0.286rem; // 4px
+  --radius-sm: 0.429rem; // 6px
+  --radius-md: 0.571rem; // 8px
+  --radius-lg: 0.714rem; // 10px
+  --radius-xl: 0.857rem; // 12px
+  --radius-pill: 999px;
+
+  // Shadows
+  --shadow-xs: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(10, 13, 18, 0.1);
+  --shadow-md: 0 4px 8px -2px rgba(10, 13, 18, 0.1);
+  --shadow-lg: 0 12px 16px -4px rgba(10, 13, 18, 0.08);
+  --shadow-xl: 0 20px 24px -4px rgba(10, 13, 18, 0.08);
+  --shadow-2xl: 0 24px 48px -12px rgba(10, 13, 18, 0.18);
+  --shadow-3xl: 0 32px 64px -12px rgba(10, 13, 18, 0.14);
+
+  // Blurs
+    --blur-sm: blur(8px);
+    --blur-md: blur(16px);
+    --blur-lg: blur(24px);
+    --blur-xl: blur(40px);
+
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-base: 220ms ease;
+  --transition-slow: 400ms ease;
+
+  --animation-duration-fast: 150ms;
+  --animation-duration-base: 220ms;
+  --animation-duration-slow: 400ms;
+
+  // Icon sizes
+  --icon-size-xs: 1.714rem; // 24px
+  --icon-size-sm: 2.286rem; // 32px
+  --icon-size-md: 2.857rem; // 40px
+  --icon-size-lg: 3.429rem; // 48px
+  --icon-size-xl: 4rem; // 56px
+}
