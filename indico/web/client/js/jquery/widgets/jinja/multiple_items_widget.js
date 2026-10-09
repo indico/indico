@@ -33,26 +33,10 @@ import {$T} from 'indico/utils/i18n';
     const field = $(`#${options.fieldId}`);
     const data = JSON.parse(field.val());
     const addButton = $(`#${options.fieldId}-add-button`);
-    const deleteButton = $('<a>', {
-      class: 'action-icon icon-remove js-remove-row',
-      href: '#',
-      title: $T('Delete'),
-    });
-    const saveButton = $('<a>', {
-      class: 'action-icon icon-floppy js-save-row',
-      href: '#',
-      title: $T('Save'),
-    });
-    const editButton = $('<a>', {
-      class: 'action-icon icon-edit js-edit-row',
-      href: '#',
-      title: $T('Edit'),
-    });
-    const cancelButton = $('<a>', {
-      class: 'action-icon icon-close js-cancel-edit',
-      href: '#',
-      title: $T('Cancel'),
-    });
+    const deleteButton = makeActionButton('icon-remove js-remove-row', $T('Delete'));
+    const saveButton = makeActionButton('icon-floppy js-save-row', $T('Save'));
+    const editButton = makeActionButton('icon-edit js-edit-row', $T('Edit'));
+    const cancelButton = makeActionButton('icon-close js-cancel-edit', $T('Cancel'));
     let initialIndex;
 
     if (!data.length) {
@@ -103,8 +87,7 @@ import {$T} from 'indico/utils/i18n';
         e.preventDefault();
         const row = $(this).closest('tr');
         const item = {};
-        let requiredFieldIsEmpty = false;
-        let invalidNumber = false;
+        let firstInvalidField;
         if (options.uuidField && row.data('uuid')) {
           item[options.uuidField] = row.data('uuid');
         }
@@ -112,35 +95,29 @@ import {$T} from 'indico/utils/i18n';
           const inputField = row.find('.js-table-input').eq(i);
           let value = inputField.val().trim();
           if (!value && inputField.data('required')) {
-            requiredFieldIsEmpty = true;
-            inputField.addClass('hasError');
+            setFieldError(inputField, $T('This field is required'));
+            firstInvalidField ||= inputField;
           } else if (inputField.attr('type') === 'checkbox') {
             item[col.id] = inputField.prop('checked');
+            clearFieldError(inputField);
           } else {
             item[col.id] = value;
-            inputField.removeClass('hasError');
+            clearFieldError(inputField);
           }
-          if (inputField.attr('type') === 'number' && !requiredFieldIsEmpty) {
+          if (inputField.attr('type') === 'number' && value) {
             value = parseFloat(value);
             if (
               (inputField.attr('min') && value < parseFloat(inputField.attr('min'))) ||
               (inputField.attr('max') && value > parseFloat(inputField.attr('max')))
             ) {
-              invalidNumber = true;
-              inputField.addClass('hasError');
-              inputField.trigger('multipleItemsWidget:showNumberError');
-            } else {
-              inputField.removeClass('hasError');
-              inputField.trigger('multipleItemsWidget:hideNumberError');
+              setFieldError(inputField, getNumberErrorMessage(col.min, col.max));
+              firstInvalidField ||= inputField;
             }
           }
         });
-        if (requiredFieldIsEmpty) {
-          row.trigger('multipleItemsWidget:showRequiredError');
+        if (firstInvalidField) {
+          firstInvalidField.trigger('focus');
         } else {
-          row.trigger('multipleItemsWidget:hideRequiredError');
-        }
-        if (!requiredFieldIsEmpty && !invalidNumber) {
           if (row.data('hasItem')) {
             data[row.index()] = item;
           } else {
@@ -168,6 +145,9 @@ import {$T} from 'indico/utils/i18n';
         e.preventDefault();
         const row = $(this).closest('tr');
         updateRow(row, true, false);
+      })
+      .on('input change', '.js-table-input', function() {
+        clearFieldError($(this));
       })
       .on('keypress', 'input', function(e) {
         if (e.keyCode === 13) {
@@ -207,6 +187,20 @@ import {$T} from 'indico/utils/i18n';
       }
     }
 
+    function makeEditableField(input, col) {
+      return $('<label>', {class: 'table-input-label'})
+        .append($('<span>', {class: 'table-input-name', text: col.caption}))
+        .append(input);
+    }
+
+    function makeActionButton(classes, label) {
+      return $('<ind-with-tooltip>').append(
+        $('<a>', {class: `action-icon ${classes}`, href: '#'}).append(
+          $('<span>', {'data-tip-content': '', text: label})
+        )
+      );
+    }
+
     function makeColData(item, col, forceEditable) {
       if (item && !forceEditable) {
         if (col.type === 'select') {
@@ -226,6 +220,7 @@ import {$T} from 'indico/utils/i18n';
       } else if (col.type === 'select') {
         const sel = $('<select>', {
           class: 'js-table-input',
+          required: col.required,
           'data-required': col.required,
         });
         sel.append($('<option>')); // Default empty option
@@ -238,15 +233,18 @@ import {$T} from 'indico/utils/i18n';
             })
           );
         }
-        return {html: sel};
+        return {html: makeEditableField(sel, col)};
       } else if (col.type === 'checkbox') {
         return {
-          html: $('<input>', {
-            type: 'checkbox',
-            class: 'js-table-input',
-            value: '1',
-            checked: item ? item[col.id] : false,
-          }),
+          html: makeEditableField(
+            $('<input>', {
+              type: 'checkbox',
+              class: 'js-table-input',
+              value: '1',
+              checked: item ? item[col.id] : false,
+            }),
+            col
+          ),
         };
       } else if (col.type === 'number') {
         const numberInput = $('<input>', {
@@ -254,86 +252,70 @@ import {$T} from 'indico/utils/i18n';
           class: 'js-table-input',
           value: item ? item[col.id] : '',
           placeholder: col.caption,
+          required: col.required,
           'data-required': col.required,
           min: col.min,
           max: col.max,
           step: col.step ? col.step : 'any',
         });
-        initNumberErrorMessage(numberInput, col.min, col.max);
-        return {html: numberInput};
+        return {html: makeEditableField(numberInput, col)};
       } else if (col.type === 'textarea') {
         return {
-          html: $('<textarea>', {
-            class: 'js-table-input multiline',
-            value: item ? item[col.id] : '',
-            placeholder: col.caption,
-            'data-required': col.required,
-          }),
+          html: makeEditableField(
+            $('<textarea>', {
+              class: 'js-table-input multiline',
+              value: item ? item[col.id] : '',
+              placeholder: col.caption,
+              required: col.required,
+              'data-required': col.required,
+            }),
+            col
+          ),
         };
       } else {
         // Assuming the type is 'text'
         return {
-          html: $('<input>', {
-            type: 'text',
-            class: 'js-table-input',
-            value: item ? item[col.id] : '',
-            placeholder: col.caption,
-            'data-required': col.required,
-          }),
+          html: makeEditableField(
+            $('<input>', {
+              type: 'text',
+              class: 'js-table-input',
+              value: item ? item[col.id] : '',
+              placeholder: col.caption,
+              required: col.required,
+              'data-required': col.required,
+            }),
+            col
+          ),
         };
       }
     }
 
-    function initNumberErrorMessage($element, min, max) {
-      $element.qtip({
-        style: {
-          classes: 'qtip-danger',
-        },
-        content: {
-          text() {
-            if (min && max) {
-              return $T.gettext('Must be between {0} and {1}').format(min, max);
-            } else if (min) {
-              return $T.gettext('Must be above {0}').format(min);
-            } else {
-              return $T.gettext('Must be below {0}').format(max);
-            }
-          },
-        },
-        show: {
-          event: 'multipleItemsWidget:showNumberError',
-        },
-        hide: {
-          event: 'multipleItemsWidget:hideNumberError',
-        },
-      });
+    function getNumberErrorMessage(min, max) {
+      const hasMin = min !== undefined && min !== null;
+      const hasMax = max !== undefined && max !== null;
+      if (hasMin && hasMax) {
+        return $T.gettext('Must be between {0} and {1}').format(min, max);
+      } else if (hasMin) {
+        return $T.gettext('Must be at least {0}').format(min);
+      } else {
+        return $T.gettext('Must be at most {0}').format(max);
+      }
     }
 
-    function initRequiredErrorMessage($element) {
-      $element.qtip({
-        style: {
-          classes: 'qtip-danger',
-        },
-        content: {
-          text: $T('Please fill in the required fields.'),
-        },
-        position: {
-          my: 'left middle',
-          at: 'right middle',
-          adjust: {x: 15},
-        },
-        show: {
-          event: 'multipleItemsWidget:showRequiredError',
-        },
-        hide: {
-          event: 'multipleItemsWidget:hideRequiredError',
-        },
-      });
+    function setFieldError(input, message) {
+      const label = input.closest('label');
+      input.addClass('hasError');
+      label.find('.table-input-error').remove();
+      label.append($('<span>', {class: 'table-input-error', text: message}));
+    }
+
+    function clearFieldError(input) {
+      input.removeClass('hasError');
+      input.closest('label').find('.table-input-error').remove();
     }
 
     function createRow(item) {
-      const row = $('<tr>');
-      initRequiredErrorMessage(row);
+      const row = $('<tr>', {class: item ? '' : 'js-editing-row'});
       row.data('hasItem', !!item);
       if (options.uuidField && item) {
         row.data('uuid', item[options.uuidField]);
@@ -359,6 +341,7 @@ import {$T} from 'indico/utils/i18n';
     }
 
     function updateRow(row, editMode, moveTooltips) {
+      row.toggleClass('js-editing-row', editMode);
       row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
         const column = $('<td>', makeColData(data[row.index()], options.columns[i], editMode));
         if (options.columns[i].type === 'textarea') {
