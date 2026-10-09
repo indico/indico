@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import timetableURL from 'indico-url:timetable.management';
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
@@ -236,34 +237,56 @@ export const flattenEntries = (entries: Entry[]): Entry[] => {
 };
 
 function dateFromString(dayString: string) {
-  const date = moment(dayString, 'YYYYMMDD');
+  const date = moment(dayString, 'YYYY-MM-DD');
   return date.isValid() ? date : undefined;
 }
 
-export function parseTimetableURLHash(hash: string): Partial<Navigation> | null {
-  const splitHash = hash.substring(1).split('.');
-  if (splitHash.length === 1) {
-    const currentDate = dateFromString(splitHash[0]);
+function joinURLParts(base: string, ...parts: string[]) {
+  let result = base;
+  for (const part of parts) {
+    if (result.endsWith('/')) {
+      result += part.startsWith('/') ? part.substring(1) : part;
+    } else {
+      result += part.startsWith('/') ? part : `/${part}`;
+    }
+  }
+  return result;
+}
+
+export function parseTimetableURL(eventId: number, path: string): Partial<Navigation> | null {
+  const prefix = timetableURL({event_id: eventId});
+  const subpath = path.replace(prefix, '');
+  const parts = subpath.substring(0, subpath.length + (subpath.endsWith('/') ? -1 : 0)).split('/');
+  if (parts.length === 1) {
+    const currentDate = dateFromString(parts[0]);
     if (currentDate !== null) {
       return {currentDate, isExpanded: false};
     }
     return null;
-  } else if (splitHash.length === 2) {
-    const [dayString, expandedSessionBlockId] = splitHash;
-    const currentDate = dateFromString(dayString);
+  } else if (parts.length === 3) {
+    const [dateString, block, expandedSessionBlockId] = parts;
+    if (block !== 'block') {
+      return null;
+    }
+    const currentDate = dateFromString(dateString);
     return {
       currentDate,
       isExpanded: true,
-      expandedSessionBlockId: expandedSessionBlockId as SessionBlockId,
+      expandedSessionBlockId: `s${expandedSessionBlockId}` as SessionBlockId,
     };
   }
   return null;
 }
 
-export function createTimetableURLHash(date: Moment, expandedSessionBlockId?: string | null) {
-  const dateString = date.format('YYYYMMDD');
-  if (expandedSessionBlockId === null) {
-    return `#${dateString}`;
+export function createTimetableURL(
+  eventId: number,
+  date: Moment,
+  expandedSessionBlockId?: string | null
+) {
+  const prefix = timetableURL({event_id: eventId});
+  const dateString = date.format('YYYY-MM-DD');
+  if (!expandedSessionBlockId) {
+    return joinURLParts(prefix, dateString, '');
   }
-  return `#${dateString}.${expandedSessionBlockId}`;
+  return joinURLParts(prefix, dateString, 'block', expandedSessionBlockId.substring(1), '');
 }

@@ -11,7 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import {EntryType, Navigation} from './types';
-import {createTimetableURLHash, parseTimetableURLHash} from './utils';
+import {createTimetableURL, parseTimetableURL} from './utils';
 
 export function NavigationController() {
   const dispatch = useDispatch();
@@ -56,18 +56,18 @@ export function NavigationController() {
   useEffect(() => {
     function navigate(location: Navigation, replaceState: boolean) {
       dispatch(actions.setCurrentDate(location.currentDate, eventId, false));
-      dispatch(actions.setExpandedSessionBlock(location.expandedSessionBlockId, false));
+      dispatch(actions.setExpandedSessionBlock(location.expandedSessionBlockId, eventId, false));
       if (replaceState) {
         window.history.replaceState(
           null,
           '',
-          createTimetableURLHash(location.currentDate, location.expandedSessionBlockId)
+          createTimetableURL(eventId, location.currentDate, location.expandedSessionBlockId)
         );
       }
     }
 
     function popStateHandler() {
-      const location = parseTimetableURLHash(document.location.hash);
+      const location = parseTimetableURL(eventId, document.location.pathname);
       if (location === null) {
         return;
       }
@@ -76,10 +76,10 @@ export function NavigationController() {
     }
 
     function loadHandler() {
-      const location = parseTimetableURLHash(document.location.hash);
+      const location = parseTimetableURL(eventId, document.location.pathname);
       if (location === null) {
         // We should always include the current date in the URL
-        window.history.replaceState(null, '', `#${currentDate.format('YYYYMMDD')}`);
+        window.history.replaceState(null, '', createTimetableURL(eventId, currentDate));
       } else {
         const validatedLocation = getValidatedLocation(location);
         navigate(validatedLocation, true);

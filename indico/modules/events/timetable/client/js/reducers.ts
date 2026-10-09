@@ -16,7 +16,7 @@ import {
   preprocessUnscheduledContributions,
 } from './preprocess';
 import {Entries, EntryType, isChildEntry, SidePanelView, ChildEntry, Entry, Session} from './types';
-import {createTimetableURLHash, setCurrentDateLocalStorage} from './utils';
+import {createTimetableURL, setCurrentDateLocalStorage} from './utils';
 
 export default {
   entries: (
@@ -294,7 +294,7 @@ export default {
           window.history.pushState(
             null,
             '',
-            createTimetableURLHash(action.date, state.expandedSessionBlockId)
+            createTimetableURL(action.eventId, action.date, state.expandedSessionBlockId)
           );
         }
         setCurrentDateLocalStorage(action.date, action.eventId);
@@ -308,7 +308,7 @@ export default {
           window.history.pushState(
             null,
             '',
-            createTimetableURLHash(state.currentDate, action.sessionBlockId)
+            createTimetableURL(action.eventId, state.currentDate, action.sessionBlockId)
           );
         }
         return {...state, expandedSessionBlockId: action.sessionBlockId};

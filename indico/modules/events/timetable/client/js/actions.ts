@@ -225,6 +225,7 @@ interface ToggleDraftAction {
 interface SetExpandedSessionBlockIdAction {
   sessionBlockId: string | null;
   type: typeof SET_EXPANDED_SESSION_BLOCK_ID;
+  eventId: number;
   pushState: boolean;
 }
 
@@ -382,9 +383,10 @@ export function toggleDraft(): ToggleDraftAction {
 
 export function setExpandedSessionBlock(
   sessionBlockId: string | null,
+  eventId: number,
   pushState = true
 ): SetExpandedSessionBlockIdAction {
-  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId, pushState};
+  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId, pushState, eventId};
 }
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
