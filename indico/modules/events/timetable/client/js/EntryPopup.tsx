@@ -198,7 +198,7 @@ function EntryPopupContent({
   const onExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onClose();
-    dispatch(actions.setExpandedSessionBlock(entry.id));
+    dispatch(actions.setExpandedSessionBlock(entry.id, eventId));
   };
 
   const locationArray = _getOrderedLocationArray();

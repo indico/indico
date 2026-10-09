@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import timetableURL from 'indico-url:timetable.management';
 import breakURL from 'indico-url:timetable.tt_break_rest';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
@@ -14,7 +15,15 @@ import {useEffect, useRef} from 'react';
 import {SemanticICONS} from 'semantic-ui-react';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
-import {BlockEntry, Colors, Entry, EntryType, EntryUniqueID} from './types';
+import {
+  BlockEntry,
+  Colors,
+  Entry,
+  EntryType,
+  EntryUniqueID,
+  Navigation,
+  SessionBlockId,
+} from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
 export const LOCAL_STORAGE_KEY = 'manageTimetableData';
@@ -226,3 +235,58 @@ export function computeOverlappingEntryIds(entries: Entry[]): Set<string> {
 export const flattenEntries = (entries: Entry[]): Entry[] => {
   return entries.map(e => [e, ...((e as BlockEntry)?.children ?? [])]).flat();
 };
+
+function dateFromString(dayString: string) {
+  const date = moment(dayString, 'YYYY-MM-DD');
+  return date.isValid() ? date : undefined;
+}
+
+function joinURLParts(base: string, ...parts: string[]) {
+  let result = base;
+  for (const part of parts) {
+    if (result.endsWith('/')) {
+      result += part.startsWith('/') ? part.substring(1) : part;
+    } else {
+      result += part.startsWith('/') ? part : `/${part}`;
+    }
+  }
+  return result;
+}
+
+export function parseTimetableURL(eventId: number, path: string): Partial<Navigation> | null {
+  const prefix = timetableURL({event_id: eventId});
+  const subpath = path.replace(prefix, '');
+  const parts = subpath.substring(0, subpath.length + (subpath.endsWith('/') ? -1 : 0)).split('/');
+  if (parts.length === 1) {
+    const currentDate = dateFromString(parts[0]);
+    if (currentDate !== null) {
+      return {currentDate, isExpanded: false};
+    }
+    return null;
+  } else if (parts.length === 3) {
+    const [dateString, block, expandedSessionBlockId] = parts;
+    if (block !== 'block') {
+      return null;
+    }
+    const currentDate = dateFromString(dateString);
+    return {
+      currentDate,
+      isExpanded: true,
+      expandedSessionBlockId: `s${expandedSessionBlockId}` as SessionBlockId,
+    };
+  }
+  return null;
+}
+
+export function createTimetableURL(
+  eventId: number,
+  date: Moment,
+  expandedSessionBlockId?: string | null
+) {
+  const prefix = timetableURL({event_id: eventId});
+  const dateString = date.format('YYYY-MM-DD');
+  if (!expandedSessionBlockId) {
+    return joinURLParts(prefix, dateString, '');
+  }
+  return joinURLParts(prefix, dateString, 'block', expandedSessionBlockId.substring(1), '');
+}
