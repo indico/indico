@@ -38,6 +38,7 @@ $toolbar-bg-color: $raincloud-gray;
   }
 
   .publication-switch {
+    // TODO: "margin-top: auto;" should be uncommented out after the legacy timetable is removed
     // margin-top: auto;
     // SUI uses important so we need to override
     box-shadow: none !important;
