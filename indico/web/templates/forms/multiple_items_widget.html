@@ -9,14 +9,14 @@
             <thead data-tooltip-anchor>
                 <tr>
                     {% if field.sortable %}
-                        <th class="small-column"></th>
+                        <th scope="col" class="small-column"></th>
                     {% endif %}
                     {% for item in field.fields -%}
-                        <th class="{% if item.type == 'checkbox' %}thin-column{% endif %}">
+                        <th scope="col" class="{% if item.type == 'checkbox' %}thin-column{% endif %}">
                             {{ item.caption }}
                         </th>
                     {% endfor -%}
-                    <th class="action-column">{% trans %}Action{% endtrans %}</th>
+                    <th scope="col" class="action-column">{% trans %}Action{% endtrans %}</th>
                 </tr>
             </thead>
             <tbody></tbody>
