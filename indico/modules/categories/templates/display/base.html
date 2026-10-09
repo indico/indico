@@ -2,19 +2,6 @@
 
 <div class="category-container">
     <div class="category-header">
-        <h1 class="category-title">
-            {% block title %}
-                {% if category.title == 'Home' and category.is_root %}
-                    {% if category.children %}
-                        {% trans %}Main categories{% endtrans %}
-                    {% else %}
-                        {% trans %}All events{% endtrans %}
-                    {% endif %}
-                {% else %}
-                    {{ category.title }}
-                {% endif %}
-            {% endblock %}
-        </h1>
         {% block cat_toolbar %}
             <div id="category-toolbar" class="toolbar">
                 <div class="group">
