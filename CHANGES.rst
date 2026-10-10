@@ -33,7 +33,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Identify required fields and show field-specific validation errors in editable
+  lists such as upcoming events and event references (:issue:`7624`, :pr:`7790`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
