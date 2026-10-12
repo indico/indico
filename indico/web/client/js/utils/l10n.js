@@ -42,7 +42,8 @@ for (const p of paths) {
     // Convert to week info
     let weekInfo;
     try {
-      weekInfo = new Intl.Locale(localeName).weekInfo;
+      const locale = new Intl.Locale(localeName);
+      weekInfo = locale.getWeekInfo?.() || locale.weekInfo;
     } catch (e) {
       // Ignore unofficial (zh_CN.GB2312) and breaking locales during development
       continue;
