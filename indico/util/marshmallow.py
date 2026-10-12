@@ -20,7 +20,7 @@ from sqlalchemy import inspect
 
 from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
-from indico.util.date_time import now_utc
+from indico.util.date_time import now_utc, server_to_utc
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders
 from indico.util.string import get_format_placeholders, has_endpoint_links, has_relative_links, validate_email_verbose
@@ -459,7 +459,7 @@ class HumanizedDate(fields.Field):
             raise ValidationError("Can't parse humanized date!")
 
         if m.group('iso_date'):
-            return parser.isoparse(value)
+            return server_to_utc(parser.isoparse(value))
         else:
             unit = m.group('unit')
             today = now_utc(False)
