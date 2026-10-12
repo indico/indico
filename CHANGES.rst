@@ -45,6 +45,7 @@ Internal Changes
   (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 - Add new signals to allow restricting which registrations someone can manage
   (:pr:`7611`, thanks :user:`moliholy, unconventionaldotdev`)
+- Fix building JS assets on Node 26 (:pr:`7793`)
 
 
 Version 3.3.13

@@ -213,5 +213,9 @@
   },
   "scarfSettings": {
     "enabled": false
+  },
+  "allowScripts": {
+    "core-js": false,
+    "husky@4.3.8": true
   }
 }
