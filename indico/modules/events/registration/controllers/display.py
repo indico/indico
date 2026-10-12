@@ -395,7 +395,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         RHRegistrationFormRegistrationBase._process_args(self)
         InvitationMixin._process_args(self)
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
-            return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
+            return redirect(url_for('event_registration.display_regform',
+                                    self.invitation.registration.locator.registrant))
 
     @property
     def _captcha_required(self):
