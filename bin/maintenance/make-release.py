@@ -126,9 +126,9 @@ def _set_changelog_date(new_version: str, release_date: date, dry_run=False):
 
 def _canonicalize_version(new_version):
     version = Version(new_version)
-    if len(version._version.release) == 3 and version._version.release[-1] == 0:
+    if len(version.release) == 3 and version.release[-1] == 0:
         warn('Removing trailing `.0` from {}', new_version)
-        new_version = '.'.join(map(str, version._version.release[:-1]))
+        new_version = '.'.join(map(str, version.release[:-1]))
     return new_version
 
 
