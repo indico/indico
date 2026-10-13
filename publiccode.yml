@@ -2,8 +2,8 @@ publiccodeYmlVersion: '0.7'
 name: Indico
 url: https://github.com/indico/indico
 landingURL: https://getindico.io
-softwareVersion: 3.3.13
-releaseDate: '2026-08-25'
+softwareVersion: 3.3.14
+releaseDate: '2026-10-13'
 logo: indico/web/static/images/logo_indico.svg
 platforms:
   - web
