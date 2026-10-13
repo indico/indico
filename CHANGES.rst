@@ -7,6 +7,20 @@ Version 3.3.14
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an incorrect access check in the legacy contribution export API that could leak
+  extra contribution metadata through cache poisoning
+  (`GHSA-p9vj-86c7-h7q3 <https://github.com/indico/indico/security/advisories/GHSA-p9vj-86c7-h7q3>`__)
+- Fix a path traversal vulnerability in the offline-copy feature that could lead to the **disclosure
+  of local file contents** (:cve:`2026-107398`)
+
+.. note::
+
+    Updating as soon as possible is strongly recommended, and it is generally advisable to
+    limit event creation (and management) to trusted individuals.
+
 Improvements
 ^^^^^^^^^^^^
 
