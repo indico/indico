@@ -35,8 +35,3 @@ export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type Variant = 'solid' | 'light' | 'white' | 'transparent';
 export type TextWeight = 'regular' | 'bold';
 export type IconPosition = 'left' | 'right';
-
-export const DEFAULT_COLOR: IndicoPaletteColor = 'primary';
-export const DEFAULT_SIZE: Size = 'md';
-export const DEFAULT_VARIANT: Variant = 'solid';
-export const DEFAULT_TEXT_WEIGHT: TextWeight = 'regular';

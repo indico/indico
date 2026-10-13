@@ -53,10 +53,6 @@
       }
     }
 
-    &[data-rounded] {
-      border-radius: var(--radius-pill);
-    }
-
     // --------- Layout ---------
     &[data-size='xs'] {
       @include tag-size-spacing('xs', '1');
@@ -81,6 +77,10 @@
     &[data-size='xl'] {
       @include tag-size-spacing('xl', '5');
       @include button-typography('text-xl');
+    }
+
+    &[data-rounded] {
+      border-radius: var(--radius-pill);
     }
 
     &[data-text-weight='regular'] {

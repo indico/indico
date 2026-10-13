@@ -50,12 +50,7 @@ type TimelineItemRootProps = NativeProps<'div'>;
 
 const TimelineItemRoot = forwardRef<HTMLDivElement, TimelineItemRootProps>((props, ref) => {
   return (
-    <div
-      ref={ref}
-      styleName="timeline-item"
-      className={sharedClassName(props.className)}
-      role="group"
-    >
+    <div ref={ref} styleName="timeline-item" className={sharedClassName(props.className)}>
       {props.children}
     </div>
   );

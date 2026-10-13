@@ -111,7 +111,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       ...nativeProps
     } = props;
 
-    const handleClick = guardDisabledClick<HTMLButtonElement | HTMLAnchorElement>(
+    const handleClick = guardDisabledClick<HTMLButtonElement & HTMLAnchorElement>(
       disabled,
       nativeProps.onClick,
       loading
