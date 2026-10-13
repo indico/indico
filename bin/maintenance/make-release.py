@@ -325,7 +325,7 @@ def cli(version, dry_run, sign, no_assets, no_changelog, no_publiccode, next_cha
     _update_security_md(dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
     release_msg = f'Release {new_version}'
-    _git_commit(release_msg, ['SECURITY.md', 'CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
+    _git_commit(release_msg, ['SECURITY.md', 'CHANGES.rst', 'publiccode.yml', 'indico/__init__.py'], dry_run=dry_run)
     _git_tag(new_version, release_msg, sign=sign, dry_run=dry_run)
     prompt = 'Build release wheel before bumping version?' if next_version else 'Build release wheel now?'
     if click.confirm(click.style(prompt, fg='blue', bold=True), default=False):
