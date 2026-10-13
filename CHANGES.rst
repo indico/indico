@@ -45,11 +45,6 @@ Bugfixes
 - Correctly show locked/purged field indicators on registration form fields (:pr:`7785`)
 - Fix error on dashboard iCal download when providing a ``from`` date (:pr:`7794`)
 
-Accessibility
-^^^^^^^^^^^^^
-
-- Nothing so far
-
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
@@ -1493,12 +1488,6 @@ Bugfixes
 - Fix contribution list filters being obscured by the action dialog (:pr:`6055`)
 - Fix emailing Paper Peer Reviewing and Editing teams (:pr:`6145`)
 
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- None so far
-
-
 Version 3.2.8
 -------------
 
@@ -2478,17 +2467,6 @@ Internal Changes
 
 
 ----
-
-
-Version 2.3.6
--------------
-
-*Unreleased*
-
-Bugfixes
-^^^^^^^^
-
-- None so far :)
 
 
 Version 2.3.5
