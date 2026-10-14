@@ -7,7 +7,7 @@
 
 import apiCategoryChildrenURL from 'indico-url:categories.api_category_children';
 import apiCategoryInfoURL from 'indico-url:categories.api_category_info';
-import apiEventListWithMetaDataURL from 'indico-url:categories.api_event_list_with_meta_data';
+import apiEventListWithMetadataURL from 'indico-url:categories.api_event_list_with_metadata';
 
 import React from 'react';
 import remarkRehype from 'remark-rehype';
@@ -43,7 +43,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
   const {data: categoryEventListWithMetaData, loading: categoryEventListWithMetaDataLoading} =
     useIndicoAxios(
       {
-        url: apiEventListWithMetaDataURL({
+        url: apiEventListWithMetadataURL({
           category_id: categoryId,
           flat: isFlat ? 1 : 0,
         }),

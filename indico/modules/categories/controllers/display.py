@@ -275,7 +275,7 @@ class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):
     """Return data needed to display a category."""
 
     def _process(self):
-        return jsonify_data(
+        return jsonify(
             id=self.category.id,
             title=self.category.title,
             description=self.category.description,
@@ -298,16 +298,16 @@ class RHCategoryChildrenJSON(RHDisplayCategoryBase):
             data['description'] = child.description
             serialized_categories.append(data)
 
-        return jsonify_data(categories=serialized_categories, flash=False)
+        return jsonify(categories=serialized_categories, flash=False)
 
 
-class RHCategoryEventListWithMetaDataJSON(RHDisplayCategoryEventsBase):
+class RHCategoryEventListWithMetadataJSON(RHDisplayCategoryEventsBase):
     """Return meta data needed to display event list within category."""
 
     def _process(self):
         params = get_category_year_view_params(self.category, self.now, year=self.now.year, is_flat=self.is_flat)
 
-        return jsonify_data(
+        return jsonify(
             flash=False,
             available_years=params['available_years'],
             has_hidden_events=params['has_hidden_events'],
@@ -333,21 +333,18 @@ class RHCategoryEventListWithMetaDataJSON(RHDisplayCategoryEventsBase):
 class RHEventListJSON(RHDisplayCategoryEventsBase):
     """Return the JSON for the event list for specific year."""
 
-    def _parse_year(self, string):
-        try:
-            return int(string)
-        except (TypeError, ValueError):
-            return None
-
-    def _process_args(self):
+    @use_kwargs({
+        'year': fields.Int(load_default=False)
+    }, location='query')
+    def _process_args(self, year):
         RHDisplayCategoryEventsBase._process_args(self)
-        self.year = self._parse_year(request.args.get('year'))
+        self.year = year
         if self.year is None:
             raise BadRequest('Year parameter must be specified')
 
     def _process(self):
         params = get_event_list_view_params(self.category, self.now, year=self.year, is_flat=self.is_flat)
-        return jsonify_data(
+        return jsonify(
             is_flat=self.is_flat,
             event_count=params['event_count'],
             events_by_month=serialize_events_by_month(params['events_by_month'], self.category, self.now),

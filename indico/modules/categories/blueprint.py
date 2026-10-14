@@ -11,7 +11,7 @@ from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryCalendarViewEvents,
                                                            RHCategoryChildrenJSON, RHCategoryClosestEvent,
-                                                           RHCategoryEventListWithMetaDataJSON, RHCategoryIcon,
+                                                           RHCategoryEventListWithMetadataJSON, RHCategoryIcon,
                                                            RHCategoryInfo, RHCategoryLogo, RHCategoryManagedEventSearch,
                                                            RHCategoryOverview, RHCategoryPreviousEvent,
                                                            RHCategorySearch, RHCategoryStatistics,
@@ -114,7 +114,7 @@ _bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), s
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 _bp.add_url_rule('/api/children', 'api_category_children', RHCategoryChildrenJSON)
 _bp.add_url_rule('/api/event-list', 'api_event_list', RHEventListJSON)
-_bp.add_url_rule('/api/event-list-with-meta-data', 'api_event_list_with_meta_data', RHCategoryEventListWithMetaDataJSON)
+_bp.add_url_rule('/api/event-list-with-metadata', 'api_event_list_with_metadata', RHCategoryEventListWithMetadataJSON)
 _bp.add_url_rule('/api/info', 'api_category_info', RHDisplayCategoryJSON)
 _bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/events/search-for-series', 'event_search', RHCategoryManagedEventSearch)
