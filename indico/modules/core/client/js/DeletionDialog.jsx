@@ -7,7 +7,6 @@
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom';
 import {Button, Message, Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
@@ -26,7 +25,9 @@ const DeleteDialog = ({
   recordName,
   countdownSeconds,
 }) => {
-  const initialCountdown = Number.isFinite(Number(countdownSeconds)) ? Number(countdownSeconds) : 10;
+  const initialCountdown = Number.isFinite(Number(countdownSeconds))
+    ? Number(countdownSeconds)
+    : 10;
   const [countdown, setCountdown] = useState(initialCountdown);
   const [isButtonDisabled, setButtonDisabled] = useState(true);
 
@@ -200,7 +201,7 @@ const GenericDeleteButton = ({
       ) : (
         <Button
           {...buttonProps}
-          color='red'
+          color="red"
           onClick={() => setIsDialogOpen(true)}
           disabled={isDeleting || isDisabled}
         >
@@ -262,42 +263,6 @@ DeleteDialog.defaultProps = {
   isDeleting: false,
   countdownSeconds: 10,
 };
-
-const tagName = 'ind-delete-button';
-
-if (!customElements.get(tagName)) {
-  customElements.define(
-    tagName,
-    class extends HTMLElement {
-      connectedCallback() {
-        requestAnimationFrame(() => {
-          ReactDOM.render(
-            <GenericDeleteButton
-              title={this.getAttribute('dialog-title')}
-              buttonLabel={this.getAttribute('button-label')}
-              message={this.getAttribute('message')}
-              cancelText={this.getAttribute('cancel-text')}
-              confirmText={this.getAttribute('confirm-text')}
-              recordName={this.getAttribute('record-name')}
-              deleteURL={this.getAttribute('delete-url')}
-              redirectURL={this.getAttribute('redirect-url')}
-              isDisabled={JSON.parse(this.getAttribute('is-disabled') || 'false')}
-              disabledMessage={this.getAttribute('disabled-message')}
-              icon={this.getAttribute('icon')}
-              iconColor={this.getAttribute('icon-color')}
-              childrenHTML={this.innerHTML}
-              countdownSeconds={this.getAttribute('countdown-seconds') || 10}
-              method={this.getAttribute('method')}
-              dataParams={this.getAttribute('data-params')}
-              buttonClass={this.getAttribute('button-class') || undefined}
-            />,
-            this
-          );
-        });
-      }
-    }
-  );
-}
 
 export {DeleteDialog, GenericDeleteButton};
 export default GenericDeleteButton;
