@@ -26,12 +26,14 @@ const DeleteDialog = ({
   recordName,
   countdownSeconds,
 }) => {
-  const [countdown, setCountdown] = useState(countdownSeconds);
+  const initialCountdown = Number.isFinite(Number(countdownSeconds)) ? Number(countdownSeconds) : 10;
+  const [countdown, setCountdown] = useState(initialCountdown);
   const [isButtonDisabled, setButtonDisabled] = useState(true);
 
   useEffect(() => {
     if (open) {
-      setCountdown(countdownSeconds);
+      const start = Number.isFinite(Number(countdownSeconds)) ? Number(countdownSeconds) : 10;
+      setCountdown(start);
       setButtonDisabled(true);
       const timer = setInterval(() => {
         setCountdown(prevCountdown => {
@@ -110,18 +112,22 @@ const GenericDeleteButton = ({
   disabledMessage,
   icon,
   iconColor,
-  countdownSeconds = 10,
+  countdownSeconds,
   method,
-  dataParams = {},
+  dataParams,
   buttonClass,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const normalizedMethod = (method || 'DELETE').toUpperCase() === 'POST' ? 'POST' : 'DELETE';
+  const normalizedDataParams = JSON.parse(dataParams) || {};
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      if (method === 'POST') {
-        await indicoAxios.post(deleteURL, dataParams);
+      if (normalizedMethod === 'POST') {
+        await indicoAxios.post(deleteURL, normalizedDataParams);
       } else {
         await indicoAxios.delete(deleteURL);
       }
@@ -167,6 +173,14 @@ const GenericDeleteButton = ({
     );
   }
 
+  const buttonProps = {};
+  if (buttonClass === 'basic') {
+    buttonProps.basic = true;
+  }
+  if (buttonClass === 'small') {
+    buttonProps.size = 'small';
+  }
+
   return (
     <>
       {icon ? (
@@ -185,8 +199,7 @@ const GenericDeleteButton = ({
         />
       ) : (
         <Button
-          size={buttonClass === 'basic' ? undefined : 'small'}
-          basic={buttonClass === 'basic'}
+          {...buttonProps}
           color='red'
           onClick={() => setIsDialogOpen(true)}
           disabled={isDeleting || isDisabled}
@@ -247,6 +260,7 @@ DeleteDialog.propTypes = {
 
 DeleteDialog.defaultProps = {
   isDeleting: false,
+  countdownSeconds: 10,
 };
 
 const tagName = 'ind-delete-button';
@@ -257,15 +271,6 @@ if (!customElements.get(tagName)) {
     class extends HTMLElement {
       connectedCallback() {
         requestAnimationFrame(() => {
-          let dataParams = {};
-          const paramsAttr = this.getAttribute('data-params');
-          if (paramsAttr) {
-            try {
-              dataParams = JSON.parse(paramsAttr);
-            } catch (e) {
-              console.error('Failed to parse data-params:', e);
-            }
-          }
           ReactDOM.render(
             <GenericDeleteButton
               title={this.getAttribute('dialog-title')}
@@ -283,8 +288,8 @@ if (!customElements.get(tagName)) {
               childrenHTML={this.innerHTML}
               countdownSeconds={this.getAttribute('countdown-seconds') || 10}
               method={this.getAttribute('method')}
-              dataParams={dataParams}
-              buttonClass={this.getAttribute('button-class')}
+              dataParams={this.getAttribute('data-params')}
+              buttonClass={this.getAttribute('button-class') || undefined}
             />,
             this
           );
