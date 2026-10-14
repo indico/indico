@@ -75,6 +75,7 @@ interface DraftEntry {
   code?: string;
   board_number?: string;
   custom_fields?: any;
+  type_id?: number;
 }
 
 // Prop interface
@@ -154,6 +155,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       },
     }),
     custom_fields: entry.customFields,
+    type_id: entry.contributionTypeId,
   };
 
   const typeLongNames = {
@@ -163,6 +165,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const customFields = useSelector(selectors.getCustomContribFields);
+  const contributionTypes = useSelector(selectors.getContributionTypes);
   const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
   const sessionsObj = useSelector(selectors.getSessions);
   const sessions: Session[] = Object.values(sessionsObj);
@@ -178,6 +181,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={snakifyKeys(entry.locationParent)}
         sessionBlock={parent}
         customFields={customFields}
+        contributionTypes={contributionTypes}
       />
     ),
     ...(!isCreatingChild
