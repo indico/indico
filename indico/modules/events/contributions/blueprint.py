@@ -86,6 +86,7 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_con
 _bp.add_url_rule('/api/contributions/duration', 'api_contribs_duration',
                  management.RHAPIContributionDefaultDuration)
 _bp.add_url_rule('/api/contributions/fields', 'api_contrib_fields', management.RHAPIContributionFields)
+_bp.add_url_rule('/api/contributions/types', 'api_contrib_types', management.RHAPIContributionTypes)
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/person-link-params', 'api_contrib_person_link_params',
                  management.RHAPIContributionPersonLinkFieldParams)
 

@@ -136,6 +136,10 @@ export const getCustomContribFields = createSelector(
   getStaticData,
   staticData => staticData.customFields
 );
+export const getContributionTypes = createSelector(
+  getStaticData,
+  staticData => staticData.contributionTypes
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt

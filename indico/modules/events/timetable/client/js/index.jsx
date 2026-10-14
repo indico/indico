@@ -46,6 +46,7 @@ import {getCurrentDateLocalStorage} from './utils';
           defaultContribDurationMinutes: eventInfo.default_contribution_duration / 60,
           eventLocationParent: eventInfo.location_parent,
           customFields: camelizeKeys(eventInfo.customFields),
+          contributionTypes: eventInfo.contribution_types,
         },
         navigation: {
           isDraft: eventInfo.is_draft,
