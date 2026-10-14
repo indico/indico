@@ -65,6 +65,7 @@ function EntryPopupContent({
   const {objId, type, title, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);
+  const eventTimezone = useSelector(selectors.getEventTimezone);
   const entries = useSelector(selectors.getCurrentDayEntries);
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const isPosterBlock = useSelector((state: ReduxState) =>
@@ -113,7 +114,7 @@ function EntryPopupContent({
     const {data} = await indicoAxios.get(editURL);
     data['type'] = type;
 
-    const draftEntry = mapDataToEntry(data);
+    const draftEntry = mapDataToEntry(data, {eventTimezone});
 
     if (type === EntryType.SessionBlock) {
       (draftEntry as BlockEntry).children = entry.children;
@@ -250,7 +251,7 @@ function EntryPopupContent({
         )}
         <List.Item title={Translate.string('Date and time')}>
           <Icon name="clock outline" />
-          {formatTimeRange(moment.locale().replace('_', '-'), startTime, endTime)}
+          {formatTimeRange(moment.locale().replace('_', '-'), startTime, endTime, eventTimezone)}
         </List.Item>
         {parent?.title && (
           <List.Item title={Translate.string('Session block title')}>

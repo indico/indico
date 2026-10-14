@@ -37,7 +37,7 @@ export default {
         return {
           ...state,
           unscheduled: preprocessUnscheduledContributions(action.eventInfo.contributions),
-          entries: preprocessTimetableEntries(action.data),
+          entries: preprocessTimetableEntries(action.data, action.eventInfo.timezone),
         };
       }
       case actions.CHANGE_ENTRY_LAYOUT: {
