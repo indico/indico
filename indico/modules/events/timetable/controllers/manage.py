@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 import dateutil.parser
-from flask import jsonify, request, session
+from flask import jsonify, redirect, request, session
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -39,7 +39,7 @@ from indico.modules.events.timetable.schemas import BreakSchema, ContributionSch
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
 from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
 from indico.modules.events.timetable.util import render_entry_info_balloon
-from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
+from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableLegacy
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
 from indico.util.i18n import _
 from indico.web.args import use_kwargs, use_rh_args
@@ -52,12 +52,16 @@ class RHManageTimetable(RHManageTimetableBase):
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process(self):
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', False)
+            return redirect(request.base_url)
         event_info = serialize_event_info_new(self.event, user=session.user)
         # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
         timetable_data = TimetableSerializerNew(self.event).serialize_timetable()
         return WPManageTimetable.render_template(
-            'management_new.html',
+            'management.html',
             self.event,
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
@@ -65,20 +69,25 @@ class RHManageTimetable(RHManageTimetableBase):
         )
 
 
-class RHManageTimetableOld(RHManageTimetableBase):
+class RHManageTimetableLegacy(RHManageTimetableBase):
     """Display timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process(self):
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', True)
+            return redirect(request.base_url)
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
-        return WPManageTimetableOld.render_template(
-            'management.html',
+        return WPManageTimetableLegacy.render_template(
+            'management_legacy.html',
             self.event,
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
             timetable_data=timetable_data,
+            show_new_timetable_button=session.user.settings.get('prefer_legacy_timetable')
         )
 
 

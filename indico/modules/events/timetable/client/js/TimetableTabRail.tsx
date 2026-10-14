@@ -14,6 +14,7 @@ import PublicationStateSwitch from 'indico/modules/events/contributions/Publicat
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import {LegacyTimetableSwitchButton} from './LegacyTimetableSwitchButton';
 import * as selectors from './selectors';
 import {SidePanelView} from './types';
 
@@ -63,6 +64,7 @@ export default function TimetableTabRail() {
             <Icon name="file outline" size="large" />
           </Menu.Item>
         )}
+        <LegacyTimetableSwitchButton eventId={eventId} />
         <PublicationStateSwitch
           as={Menu.Item}
           styleName="publication-switch"

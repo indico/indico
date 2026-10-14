@@ -1,0 +1,24 @@
+{% extends 'events/management/full_width_base.html' %}
+{% from 'events/timetable/_timetable.html' import render_timetable %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+
+{% block title %}
+    <span style="line-height: 1em">{%- trans -%}Timetable{%- endtrans -%}</span>
+{% endblock %}
+
+{% block title_actions %}
+    {# TODO: remove this once new timetable is the default #}
+    {% if show_new_timetable_button %}
+        <style>.actions{width: 100%;}</style>
+        <div class="right" style="padding: 5px 0">
+            <ind-new-timetable-button event-id="{{ event.id }}"></ind-new-timetable-button>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if show_draft_warning %}
+        {{ render_draft_mode_warning(event) }}
+    {% endif %}
+    {{ render_timetable(timetable_data, event_info, management=true, custom_links=custom_links) }}
+{% endblock %}

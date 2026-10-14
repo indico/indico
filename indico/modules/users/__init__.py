@@ -41,6 +41,7 @@ user_settings = UserSettingsProxy('users', {
     'suggest_categories': False,  # whether the user should receive category suggestions
     'mastodon_server_url': None,
     'mastodon_server_name': None,
+    'prefer_legacy_timetable': True,
 }, converters={
     'name_format': EnumConverter(NameFormat),
 })
