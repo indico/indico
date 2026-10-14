@@ -122,6 +122,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   boardNumber?: string;
   keywords?: string[];
   customFields: any;
+  contributionTypeId?: number;
 }
 
 export interface BreakEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
@@ -210,6 +211,12 @@ interface CustomField {
   visibility: 'public' | 'managers_and_submitters' | 'managers_only';
 }
 
+export interface ContributionType {
+  id: number;
+  description: string;
+  name: string;
+}
+
 interface StaticData {
   eventId: number;
   startDt: Moment;
@@ -218,6 +225,7 @@ interface StaticData {
   eventLocationParent: LocationParent;
   eventType: EventType;
   customFields: CustomField[];
+  contributionTypes: ContributionType[];
 }
 
 export interface Navigation {

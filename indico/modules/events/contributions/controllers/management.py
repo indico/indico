@@ -42,7 +42,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionRESTSchema,
-                                                         FullContributionSchema)
+                                                         ContributionTypeSchema, FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, get_contribution_person_link_field_params,
                                                       import_contributions_from_csv, make_contribution_form)
@@ -431,6 +431,13 @@ class RHAPIContributionFields(RHManageContributionsBase):
         # TODO: Skip restricted fields when using this outside management (e.g. editing a contribution as a speaker)
         # TODO: Check if we really need all the fields on the client side.
         return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
+
+
+class RHAPIContributionTypes(RHManageContributionsBase):
+    def _process(self):
+        # TODO: Use a more appropriate permission here so that someone with access to this
+        # specific contribution (but not all of them) can use this endpoint
+        return ContributionTypeSchema(many=True).jsonify(self.event.contribution_types)
 
 
 class RHAPIContributionPersonLinkFieldParams(RHManageContributionBase):
