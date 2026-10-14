@@ -52,7 +52,7 @@ export interface Event {
   isProtected: boolean;
   label: string;
   labelColor: IndicoPaletteColor | LegacyColor;
-  isFavorite: boolean;
+  isFavorite: boolean | null;
 }
 
 export interface EventsMonth {

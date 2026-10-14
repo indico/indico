@@ -140,16 +140,18 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
               <List>
                 {month.events.map((event: Event) => (
                   <List.Item
-                    styleName="event-list-item event-list-item-spacing"
+                    styleName="event-list-item"
                     key={event.id + month.name}
                     contentProps={{href: event.url}}
                     marker={
-                      <FavoriteButton
-                        type="event"
-                        id={event.id}
-                        favorited={event.isFavorite}
-                        styleName="event-list-item-favorite-icon"
-                      />
+                      event.isFavorite !== null ? (
+                        <FavoriteButton
+                          type="event"
+                          id={event.id}
+                          favorited={event.isFavorite}
+                          styleName="event-list-item-favorite-icon"
+                        />
+                      ) : undefined
                     }
                   >
                     {event.isRecent && <ListItem.Indicator size="xs" />}
@@ -159,6 +161,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                       size="sm"
                       textWeight="regular"
                       styleName="event-list-item-date-tag"
+                      data-has-marker={event.isFavorite !== null}
                     >
                       {event.date}
                     </List.Item.Tag>
@@ -211,9 +214,6 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
       </div>
 
       {pastEventsCount > 0 && (
-        // expandButton(pastEventsExpanded, pastEventsCount, () =>
-        //   setUserPastExpanded(!pastEventsExpanded)
-        // )
         <ExpandButton
           wasExpanded={pastEventsExpanded}
           count={pastEventsCount}

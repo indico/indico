@@ -58,7 +58,7 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
         'type': event.type,
         'label': event.label.title if event.label else None,
         'labelColor': event.label.color if event.label else None,
-        'isFavorite': event in session.user.favorite_events,
+        'isFavorite': event in session.user.favorite_events if session.user else None,
     }
 
 
