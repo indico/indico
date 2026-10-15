@@ -39,6 +39,8 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
+_bp.add_url_rule('/manage/timetable/<date>/', 'management', RHManageTimetable)
+_bp.add_url_rule('/manage/timetable/<date>/block/<int:session_block_id>/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/old-timetable/', 'management-old', RHManageTimetableOld)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
