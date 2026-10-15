@@ -1,0 +1,68 @@
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_fieldset, form_rows, form_row_static %}
+
+{% macro _manage_source_link(category) %}
+    {% if category.can_manage(session.user) %}
+        <div>
+            <a href="{{ url_for('categories.manage_privacy_dashboard', category) }}">
+                {% trans %}Manage the privacy settings of that category{% endtrans %}
+            </a>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro privacy_inheritance_message(inherited_from, locked, is_event=false) %}
+    {% if inherited_from and locked %}
+        {%- call message_box('info') -%}
+            {% if is_event %}
+                {% trans category=inherited_from.title -%}
+                    The privacy settings of this event are inherited from the category
+                    <strong>{{ category }}</strong>, which does not allow overriding them.
+                {%- endtrans %}
+            {% else %}
+                {% trans category=inherited_from.title -%}
+                    The privacy settings of this category are inherited from the category
+                    <strong>{{ category }}</strong>, which does not allow overriding them.
+                {%- endtrans %}
+            {% endif %}
+            {{ _manage_source_link(inherited_from) }}
+        {%- endcall -%}
+    {% elif inherited_from %}
+        {%- call message_box('info') -%}
+            {% if is_event %}
+                {% trans category=inherited_from.title -%}
+                    The privacy settings shown below are inherited from the category
+                    <strong>{{ category }}</strong>. Saving them here makes this event use its own
+                    settings instead, and it will no longer follow changes made in that category.
+                {%- endtrans %}
+            {% else %}
+                {% trans category=inherited_from.title -%}
+                    The privacy settings shown below are inherited from the category
+                    <strong>{{ category }}</strong>. Saving them here makes this category use its own
+                    settings instead, and it will no longer follow changes made in that category.
+                {%- endtrans %}
+            {% endif %}
+            {{ _manage_source_link(inherited_from) }}
+        {%- endcall -%}
+    {% endif %}
+{% endmacro %}
+
+{% macro privacy_settings_fieldsets(form, locked=false) %}
+    {% set disabled_fields = form._fields.keys() if locked else () %}
+    {% call form_fieldset(_('Data controller')) %}
+        {{ form_rows(form, fields=form._data_controller_fields, disable=disabled_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_('Privacy notice')) %}
+        {{ form_rows(form, fields=form._privacy_policy_fields, disable=disabled_fields) }}
+    {% endcall %}
+    {% if caller is defined %}
+        {{ caller(disabled_fields) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro privacy_save_button() %}
+    {% call form_row_static() %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
+               data-disabled-until-change data-save-reminder>
+    {% endcall %}
+{% endmacro %}
