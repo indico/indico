@@ -20,7 +20,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Keyboard and screen reader users can now skip past the navigation to the main
+  content on management and user-area pages using the "Skip to main content"
+  bypass link (:issue:`7627`, :pr:`7741`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
