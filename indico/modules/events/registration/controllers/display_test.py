@@ -5,11 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import timedelta
+from datetime import datetime
 
 import pytest
 from flask import request, session
 from marshmallow import fields
+from pytz import utc
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.modules.events.features.util import set_feature_enabled
@@ -35,15 +36,16 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 @pytest.mark.parametrize('invitation_state', (None, InvitationState.pending, InvitationState.declined))
 @pytest.mark.parametrize(('availability', 'settings', 'message'), (
     ('open', {}, None),
-    ('unopened', {'start_dt': now_utc() + timedelta(days=1)}, b'The registration period has not started yet.'),
-    ('closed', {'end_dt': now_utc() - timedelta(hours=1)}, b'The registration period has passed.'),
-    ('full', {'registration_limit': 1}, b'There are no more places available.'),
-    ('purged', {'is_purged': True}, b'Registration is disabled due to an expired retention period'),
+    ('unopened', {'start_dt': datetime(2026, 1, 3, tzinfo=utc)}, 'The registration period has not started yet.'),
+    ('closed', {'end_dt': datetime(2026, 1, 1, 23, tzinfo=utc)}, 'The registration period has passed.'),
+    ('full', {'registration_limit': 1}, 'There are no more places available.'),
+    ('purged', {'is_purged': True}, 'Registration is disabled due to an expired retention period'),
 ))
-def test_registration_form_availability(db, dummy_regform, test_client, invitation_state, availability, settings,
-                                        message):
+def test_registration_form_availability(db, dummy_regform, test_client, freeze_time, invitation_state, availability,
+                                        settings, message):
+    freeze_time(datetime(2026, 1, 2, tzinfo=utc))
     set_feature_enabled(dummy_regform.event, 'registration', True)
-    dummy_regform.start_dt = now_utc() - timedelta(days=1)
+    dummy_regform.start_dt = datetime(2026, 1, 1, tzinfo=utc)
     for key, value in settings.items():
         setattr(dummy_regform, key, value)
     query = {}
@@ -59,13 +61,13 @@ def test_registration_form_availability(db, dummy_regform, test_client, invitati
 
     assert response.status_code == 200
     can_register = availability == 'open' or (invitation_state is not None and availability in {'unopened', 'closed'})
-    assert (b'id="registration-form-submission-container"' in response.data) == can_register
+    assert ('id="registration-form-submission-container"' in response.text) == can_register
     if not can_register:
-        assert message in response.data
+        assert message in response.text
     if invitation_state == InvitationState.declined and availability != 'purged':
-        invitation_message = b'You have declined the invitation, but you may still register for the event.'
-        assert (invitation_message in response.data) == can_register
-        assert (b'You have declined the invitation.' in response.data) == (not can_register)
+        invitation_message = 'You have declined the invitation, but you may still register for the event.'
+        assert (invitation_message in response.text) == can_register
+        assert ('You have declined the invitation.' in response.text) == (not can_register)
 
 
 @pytest.mark.usefixtures('request_context')
