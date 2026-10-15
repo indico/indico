@@ -19,7 +19,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.fields import (AbstractField, AbstractPersonLinkListField, EmailRuleListField,
                                                     TrackRoleField)
-from indico.modules.events.abstracts.models.abstracts import AbstractState, EditTrackMode
+from indico.modules.events.abstracts.models.abstracts import AbstractNotificationType, AbstractState, EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.placeholders import AbstractInvitationURLPlaceholder
 from indico.modules.events.abstracts.settings import (AllowEditingType, BOACorrespondingAuthorType, BOALinkFormat,
@@ -484,17 +484,12 @@ class EditEmailTemplateTextForm(IndicoForm):
 class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
     """Form for adding a new e-mail template."""
 
-    default_tpl = SelectField(_('Email template'), [DataRequired()], choices=[
-        ('submit', _('Submit')),
-        ('accept', _('Accept')),
-        ('reject', _('Reject')),
-        ('invite', _('Invited')),
-        ('merge', _('Merge')),
-        ('withdrawn', _('Withdrawn'))
-    ], description=_('The default template that will be used as a basis for this notification. '
-                     'You can customize it later. If you want the text to be in a specific language that is '
-                     'not the default language of this Indico server, set the default language of this event before '
-                     'creating this notification.'))
+    default_tpl = IndicoEnumSelectField(_('Email template'), [DataRequired()], enum=AbstractNotificationType,
+                                        description=_('The default template that will be used as a basis for this '
+                                                      'notification. You can customize it later. If you want the '
+                                                      'text to be in a specific language that is not the default '
+                                                      'language of this Indico server, set the default language of '
+                                                      'this event before creating this notification.'))
 
 
 class AbstractForm(IndicoForm):
