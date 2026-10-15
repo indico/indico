@@ -18,7 +18,7 @@ from indico.modules.events.registration.controllers.display import (RHRegistrati
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import ModificationMode
-from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_registration
@@ -32,9 +32,9 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.mark.usefixtures('dummy_reg')
-@pytest.mark.parametrize('invited', (False, True))
+@pytest.mark.parametrize('invitation_state', (None, InvitationState.pending, InvitationState.declined))
 @pytest.mark.parametrize('availability', ('open', 'unopened', 'closed', 'full', 'purged'))
-def test_registration_form_availability(db, dummy_regform, test_client, invited, availability):
+def test_registration_form_availability(db, dummy_regform, test_client, invitation_state, availability):
     set_feature_enabled(dummy_regform.event, 'registration', True)
     dummy_regform.start_dt = now_utc() - timedelta(days=1)
     messages = {
@@ -52,9 +52,10 @@ def test_registration_form_availability(db, dummy_regform, test_client, invited,
     elif availability == 'purged':
         dummy_regform.is_purged = True
     query = {}
-    if invited:
-        invitation = RegistrationInvitation(registration_form=dummy_regform, email='invitee@example.test',
-                                            first_name='Invited', last_name='User', affiliation='')
+    if invitation_state is not None:
+        invitation = RegistrationInvitation(registration_form=dummy_regform, state=invitation_state,
+                                            email='invitee@example.test', first_name='Invited', last_name='User',
+                                            affiliation='')
         db.session.add(invitation)
         db.session.flush()
         query['invitation'] = str(invitation.uuid)
@@ -63,10 +64,14 @@ def test_registration_form_availability(db, dummy_regform, test_client, invited,
                                query_string=query)
 
     assert response.status_code == 200
-    can_register = availability == 'open' or (invited and availability in {'unopened', 'closed'})
+    can_register = availability == 'open' or (invitation_state is not None and availability in {'unopened', 'closed'})
     assert (b'id="registration-form-submission-container"' in response.data) == can_register
     if not can_register:
         assert messages[availability] in response.data
+    if invitation_state == InvitationState.declined and availability != 'purged':
+        invitation_message = b'You have declined the invitation, but you may still register for the event.'
+        assert (invitation_message in response.data) == can_register
+        assert (b'You have declined the invitation.' in response.data) == (not can_register)
 
 
 @pytest.mark.usefixtures('request_context')

@@ -50,7 +50,7 @@
     {{ render_regform_info(regform) }}
 
     {% if invitation %}
-        {{ render_invitation_info(invitation) }}
+        {{ render_invitation_info(invitation, can_register) }}
     {% endif %}
 
     {% if registration %}
