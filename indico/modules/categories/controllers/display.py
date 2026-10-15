@@ -263,11 +263,11 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
     def _process(self):
         params = get_category_view_params(self.category, self.now, is_flat=self.is_flat)
         if not self.category.is_root:
-            return WPCategory.render_template('display/category.html', self.category, **params)
+            return WPCategory.render_template('display/category_ngui.html', self.category, **params)
 
         news = get_recent_news()
         upcoming_events = get_upcoming_events()
-        return WPCategory.render_template('display/root_category.html', self.category, news=news,
+        return WPCategory.render_template('display/root_category_ngui.html', self.category, news=news,
                                           upcoming_events=upcoming_events, **params)
 
 
