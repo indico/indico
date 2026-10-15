@@ -115,8 +115,9 @@ type('TimetableLayoutManager', [], {
       if (!lastAssigned[getLastAssignedId(block)]) {
         lastAssigned[getLastAssignedId(block)] = {blocks: {}};
       }
-      var lastAssignedCol = lastAssigned[getLastAssignedId(block)].col || -1;
-      if (!isNaN(parseInt(col, 10)) && col > lastAssignedCol) {
+      // Only remember the first column; blocks moved aside to make room for
+      // another slot must not overwrite the column preferred by their own slot
+      if (!isNaN(parseInt(col, 10)) && !exists(lastAssigned[getLastAssignedId(block)].col)) {
         lastAssigned[getLastAssignedId(block)].col = col;
       }
       lastAssigned[getLastAssignedId(block)].blocks[block.id] = true;
