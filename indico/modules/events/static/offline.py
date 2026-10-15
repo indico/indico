@@ -142,10 +142,14 @@ class StaticEventCreator:
         # assets
         css_files = {url for url in used_assets if re.match(r'static/dist/.*\.css$', url)}
         for file_path in css_files:
-            css_data = Path(self._web_dir, file_path).read_text()
+            srcpath = safe_join(self._web_dir, file_path)
+            dstpath = safe_join(self._content_dir, file_path)
+            if not srcpath or not dstpath:
+                raise ValueError(f'Invalid asset path: {file_path}')
+            css_data = Path(srcpath).read_text()
             rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
             used_assets |= used_urls
-            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            self._zip_file.writestr(dstpath, rewritten_css)
         for file_path in used_assets - css_files:
             if not re.match(r'^static/(images|fonts|dist)/(?!js/ckeditor/)', file_path):
                 continue
@@ -160,17 +164,25 @@ class StaticEventCreator:
         for file_path in css_files:
             plugin_name, path = re.match(r'static/plugins/([^/]+)/(.+.css)', file_path).groups()
             plugin = plugin_engine.get_plugin(plugin_name)
-            css_data = Path(plugin.root_path, 'static', path).read_text()
+            if plugin is None:
+                raise ValueError(f'Invalid asset path: {file_path}')
+            srcpath = safe_join(os.path.join(plugin.root_path, 'static'), path)
+            dstpath = safe_join(self._content_dir, file_path)
+            if not srcpath or not dstpath:
+                raise ValueError(f'Invalid asset path: {file_path}')
+            css_data = Path(srcpath).read_text()
             rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
             used_assets |= used_urls
-            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            self._zip_file.writestr(dstpath, rewritten_css)
         for file_path in used_assets - css_files:
             match = re.match(r'static/plugins/([^/]+)/(.+)', file_path)
             if not match:
                 continue
             plugin_name, path = match.groups()
             plugin = plugin_engine.get_plugin(plugin_name)
-            srcpath = safe_join(plugin.root_path, 'static', path)
+            if plugin is None:
+                raise ValueError(f'Invalid asset path: {file_path}')
+            srcpath = safe_join(os.path.join(plugin.root_path, 'static'), path)
             dstpath = safe_join(self._content_dir, file_path)
             if not srcpath or not dstpath:
                 raise ValueError(f'Invalid asset path: {file_path}')
@@ -183,10 +195,14 @@ class StaticEventCreator:
     def _copy_customization_files(self, used_assets):
         css_files = {url for url in used_assets if re.match(r'static/custom/.*\.css$', url)}
         for file_path in css_files:
-            css_data = Path(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))).read_text()
+            srcpath = safe_join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))
+            dstpath = safe_join(self._content_dir, file_path)
+            if not srcpath or not dstpath:
+                raise ValueError(f'Invalid asset path: {file_path}')
+            css_data = Path(srcpath).read_text()
             rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
             used_assets |= used_urls
-            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            self._zip_file.writestr(dstpath, rewritten_css)
         for file_path in used_assets - css_files:
             if not file_path.startswith('static/custom/'):
                 continue
