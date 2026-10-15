@@ -10,10 +10,12 @@
 import createFileTypeURL from 'indico-url:papers.api_add_file_type';
 import editFileTypeURL from 'indico-url:papers.api_edit_file_type';
 import fileTypeURL from 'indico-url:papers.api_file_types';
+import autoSubmissionFromPeerReviewURL from 'indico-url:papers.manage_submission_settings';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import AutoSubmissionCheckbox from './components/AutoSubmissionCheckbox';
 import setupReactPaperTimeline from './setup';
 
 // XXX this import must come after the `setup` import. Don't ask me why, but if it's before it then
@@ -157,9 +159,28 @@ customElements.define(
           editURLFn={editFileTypeURL}
           createURLFn={createFileTypeURL}
           allowDeleteLastType
+          autoSubmissionFromPeerReviewURLFn={() =>
+            autoSubmissionFromPeerReviewURL({
+              event_id: +this.getAttribute('event-id'),
+            })
+          }
+          source="peer-review"
         />,
         this
       );
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
+
+customElements.define(
+  'ind-auto-submission-checkbox',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(<AutoSubmissionCheckbox eventId={+this.getAttribute('event-id')} />, this);
     }
 
     disconnectedCallback() {
