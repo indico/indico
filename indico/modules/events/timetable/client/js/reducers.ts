@@ -16,7 +16,7 @@ import {
   preprocessUnscheduledContributions,
 } from './preprocess';
 import {Entries, EntryType, isChildEntry, SidePanelView, ChildEntry, Entry, Session} from './types';
-import {setCurrentDateLocalStorage} from './utils';
+import {createTimetableURL, setCurrentDateLocalStorage} from './utils';
 
 export default {
   entries: (
@@ -290,6 +290,13 @@ export default {
     state = {isExpanded: false, ...state};
     switch (action.type) {
       case actions.SET_CURRENT_DATE:
+        if (action.pushState) {
+          window.history.pushState(
+            null,
+            '',
+            createTimetableURL(action.eventId, action.date, state.expandedSessionBlockId)
+          );
+        }
         setCurrentDateLocalStorage(action.date, action.eventId);
         return {...state, currentDate: action.date};
       case actions.TOGGLE_EXPAND:
@@ -297,6 +304,13 @@ export default {
       case actions.TOGGLE_DRAFT:
         return {...state, isDraft: !state.isDraft};
       case actions.SET_EXPANDED_SESSION_BLOCK_ID:
+        if (action.pushState) {
+          window.history.pushState(
+            null,
+            '',
+            createTimetableURL(action.eventId, state.currentDate, action.sessionBlockId)
+          );
+        }
         return {...state, expandedSessionBlockId: action.sessionBlockId};
       default:
         return state;

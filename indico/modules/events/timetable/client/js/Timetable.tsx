@@ -12,6 +12,7 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
+import {NavigationController} from './NavigationController';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {EntryType, ReduxState} from './types';
@@ -63,24 +64,27 @@ export default function Timetable() {
   const initialScrollPosition = _getScrollOffset();
 
   return (
-    <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
-      <GlobalEvents />
-      <Toolbar
-        onNavigate={d => {
-          dispatch(actions.setCurrentDate(d, eventId));
-        }}
-      />
-      <div styleName="content">
-        <DayTimetable
-          dt={currentDate}
-          eventId={eventId}
-          minHour={minHour}
-          maxHour={maxHour}
-          entries={currentEntries}
-          scrollPosition={initialScrollPosition}
+    <>
+      <NavigationController />
+      <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
+        <GlobalEvents />
+        <Toolbar
+          onNavigate={d => {
+            dispatch(actions.setCurrentDate(d, eventId));
+          }}
         />
+        <div styleName="content">
+          <DayTimetable
+            dt={currentDate}
+            eventId={eventId}
+            minHour={minHour}
+            maxHour={maxHour}
+            entries={currentEntries}
+            scrollPosition={initialScrollPosition}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
