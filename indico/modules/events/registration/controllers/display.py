@@ -12,6 +12,7 @@ from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subq
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
+from indico.modules.affiliations.util import SearchAffiliationsMixin
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.core.captcha import get_captcha_settings, invalidate_captcha
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
@@ -38,7 +39,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.receipts.models.files import ReceiptFile
-from indico.modules.users.util import SearchAffiliationsMixin, send_avatar, send_default_avatar
+from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString
