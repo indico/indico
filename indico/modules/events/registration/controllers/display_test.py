@@ -5,11 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 import pytest
 from flask import request, session
 from marshmallow import fields
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationForm,
                                                                     RHRegistrationWithdraw)
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
@@ -26,6 +29,44 @@ from indico.util.string import snakify_keys
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
+
+
+@pytest.mark.usefixtures('dummy_reg')
+@pytest.mark.parametrize('invited', (False, True))
+@pytest.mark.parametrize('availability', ('open', 'unopened', 'closed', 'full', 'purged'))
+def test_registration_form_availability(db, dummy_regform, test_client, invited, availability):
+    set_feature_enabled(dummy_regform.event, 'registration', True)
+    dummy_regform.start_dt = now_utc() - timedelta(days=1)
+    messages = {
+        'unopened': b'The registration period has not started yet.',
+        'closed': b'The registration period has passed.',
+        'full': b'There are no more places available.',
+        'purged': b'Registration is disabled due to an expired retention period',
+    }
+    if availability == 'unopened':
+        dummy_regform.start_dt = now_utc() + timedelta(days=1)
+    elif availability == 'closed':
+        dummy_regform.end_dt = now_utc() - timedelta(hours=1)
+    elif availability == 'full':
+        dummy_regform.registration_limit = 1
+    elif availability == 'purged':
+        dummy_regform.is_purged = True
+    query = {}
+    if invited:
+        invitation = RegistrationInvitation(registration_form=dummy_regform, email='invitee@example.test',
+                                            first_name='Invited', last_name='User', affiliation='')
+        db.session.add(invitation)
+        db.session.flush()
+        query['invitation'] = str(invitation.uuid)
+
+    response = test_client.get(f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/',
+                               query_string=query)
+
+    assert response.status_code == 200
+    can_register = availability == 'open' or (invited and availability in {'unopened', 'closed'})
+    assert (b'id="registration-form-submission-container"' in response.data) == can_register
+    if not can_register:
+        assert messages[availability] in response.data
 
 
 @pytest.mark.usefixtures('request_context')
