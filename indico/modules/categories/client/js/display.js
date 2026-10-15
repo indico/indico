@@ -145,7 +145,7 @@ import {$T} from 'indico/utils/i18n';
             <IndicoUIProvider>
               <Category
                 categoryId={JSON.parse(this.getAttribute('category-id'))}
-                isFlat={this.getAttribute('is-flat')}
+                isFlat={this.hasAttribute('flat')}
               />
             </IndicoUIProvider>,
             this

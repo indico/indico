@@ -10,7 +10,7 @@
                 <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
                     {%- trans %}Categories in {{ category_title }}{% endtrans -%}
                 </h2>
-                <ind-ngui-category category-id="{{category.id}}"/>
+                <ind-ngui-category category-id="{{ category.id }}"></ind-ngui-category>
             {% endif %}
         {% else %}
             {% call message_box('info', icon=false) %}
@@ -20,7 +20,7 @@
                 </a>
             {% endcall %}
         {% endif %}
-        <ind-ngui-category category-id="{{category.id}}" is-flat="{{is_flat}}"/>
+        <ind-ngui-category category-id="{{ category.id }}" flat></ind-ngui-category>
     {% endblock %}
 {% endblock %}
 
