@@ -116,21 +116,41 @@ $toolbar-bg-color: $raincloud-gray;
 }
 
 .hover-guide {
-  font-weight: bold;
   position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  pointer-events: none;
+  transition: top 0.05s;
+}
+
+.hover-guide::before {
+  content: '';
+  z-index: 9;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0;
+  background: transparent;
+  border-top: 1px dashed #999;
+  mix-blend-mode: multiply;
+}
+
+.hover-guide-label {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: max-content;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  pointer-events: none;
-  z-index: 1;
-  background: $teal;
-  padding: 4px 6px;
   min-width: 60px;
+  padding: 4px 6px;
+  background: $dark-gray;
+  color: $white;
   font-size: 0.9rem;
+  font-weight: bold;
   line-height: 0.9rem;
   border-radius: 7px 0 0 7px;
-  transition: 0.05s;
-  transform: translate(-100%, -50%);
-  user-select: none;
 }
