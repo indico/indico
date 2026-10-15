@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global showFormErrors, initForms, handleAjaxError */
+/* global initForms, handleAjaxError */
 
 import _ from 'lodash';
 
@@ -99,7 +99,6 @@ import {$T} from '../../utils/i18n';
                           api.hide(true);
                         } else {
                           updateContent(data);
-                          showFormErrors($(`#qtip-${api.id}-content`));
                         }
                       },
                     });

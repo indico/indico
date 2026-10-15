@@ -170,6 +170,38 @@ form {
   }
 }
 
+.i-form .form-group .form-field > .form-field-error {
+  position: absolute;
+  left: 100%;
+  top: 1.25em;
+  z-index: 1;
+  margin-left: 0.6em;
+  width: max-content;
+  max-width: 30em;
+  padding: 0.4em 0.8em;
+  border-radius: 0.2em;
+  background-color: $red;
+  color: #fff;
+  white-space: nowrap;
+  transform: translateY(-50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    border: 0.4em solid transparent;
+    border-right-color: $red;
+    transform: translateY(-50%);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
 .i-form .form-group .form-label {
   display: inline-block;
   line-height: $i-form-line-height;
@@ -213,6 +245,7 @@ form {
 .i-form .form-group .form-field {
   padding-left: 1em;
   margin-bottom: 0.7em;
+  position: relative;
 
   @include apply-to-text-inputs('.i-form-field-fluid');
   @include apply-to-inputs('.form-field-input');

@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="recipients-box left" {% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
+    <div class="recipients-box left">
         <div class="text">
             {{- field.text_value|markdown -}}
         </div>
