@@ -165,8 +165,8 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                     >
                       {event.date}
                     </List.Item.Tag>
-                    <List.Item.Header title={event.verbosedTitle}>
-                      {event.verbosedTitle}
+                    <List.Item.Header title={event.verboseTitle}>
+                      {event.verboseTitle}
                     </List.Item.Header>
                     {event.seriesLabel && (
                       <List.Item.Details styleName="event-list-item-series-label">

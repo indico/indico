@@ -47,18 +47,18 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
     return {
         'id': event.id,
         'title': event.title,
-        'verbosedTitle': event.get_verbose_title(show_speakers=is_lecture, show_series_pos=False),
-        'seriesLabel': series_label,
+        'verbose_title': event.get_verbose_title(show_speakers=is_lecture, show_series_pos=False),
+        'series_label': series_label,
         'url': event.url,
         'date': format_event_date(event),
-        'isRecent': is_recent(event.created_dt),
-        'isHappeningNow': happening_now(event),
+        'is_recent': is_recent(event.created_dt),
+        'is_happening_now': happening_now(event),
         'visibility': event.visibility,
-        'isProtected': event.is_self_protected,
+        'is_protected': event.is_self_protected,
         'type': event.type,
         'label': event.label.title if event.label else None,
-        'labelColor': event.label.color if event.label else None,
-        'isFavorite': event in session.user.favorite_events if session.user else None,
+        'label_color': event.label.color if event.label else None,
+        'is_favorite': event in session.user.favorite_events if session.user else None,
     }
 
 

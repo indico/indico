@@ -42,7 +42,7 @@ export interface CategoryMetaData {
 export interface Event {
   id: number;
   title: string;
-  verbosedTitle: string;
+  verboseTitle: string;
   seriesLabel: string;
   url: string;
   date: string;

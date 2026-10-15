@@ -279,7 +279,7 @@ class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):
             id=self.category.id,
             title=self.category.title,
             description=self.category.description,
-            logo_url=(self.category.has_logo and self.category.logo_url) or None,
+            logo_url=(self.category.logo_url if self.category.has_logo else None),
             is_flat=self.is_flat,
             is_root=self.category.is_root,
             has_children=self.category.has_children,
@@ -334,13 +334,11 @@ class RHEventListJSON(RHDisplayCategoryEventsBase):
     """Return the JSON for the event list for specific year."""
 
     @use_kwargs({
-        'year': fields.Int(load_default=False)
+        'year': fields.Int(required=True)
     }, location='query')
     def _process_args(self, year):
         RHDisplayCategoryEventsBase._process_args(self)
         self.year = year
-        if self.year is None:
-            raise BadRequest('Year parameter must be specified')
 
     def _process(self):
         params = get_event_list_view_params(self.category, self.now, year=self.year, is_flat=self.is_flat)
