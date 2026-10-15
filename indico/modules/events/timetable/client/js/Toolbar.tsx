@@ -25,11 +25,12 @@ function SessionBlockToolbar() {
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const {title, sessionId} = expandedSessionBlock ?? {};
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
+  const eventId = useSelector(selectors.getEventId);
   const colors = getEntryColors(expandedSessionBlock, session);
 
   const closeExpandedBlock = useCallback(
-    () => dispatch(actions.setExpandedSessionBlock(null)),
-    [dispatch]
+    () => dispatch(actions.setExpandedSessionBlock(null, eventId)),
+    [dispatch, eventId]
   );
 
   useEffect(() => {
@@ -167,7 +168,7 @@ export default function Toolbar({onNavigate}: {onNavigate: (dt: Moment) => void}
         <div styleName="right">
           {expandedSessionBlock && (
             <Button
-              onClick={() => dispatch(actions.setExpandedSessionBlock(null))}
+              onClick={() => dispatch(actions.setExpandedSessionBlock(null, eventId))}
               title={Translate.string('Exit session block view')}
               icon="arrow left"
               circular

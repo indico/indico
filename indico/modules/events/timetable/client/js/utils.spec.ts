@@ -5,10 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {mockFlaskURL} from 'flask-urls';
 import moment from 'moment';
 
-import {BlockEntry, ChildEntry, Entry, EntryType} from './types';
-import {computeOverlappingEntryIds, flattenEntries, getDiffInDays} from './utils';
+import {BlockEntry, ChildEntry, Entry, EntryType, Navigation} from './types';
+import {
+  computeOverlappingEntryIds,
+  flattenEntries,
+  getDiffInDays,
+  parseTimetableURL,
+} from './utils';
+
+jest.mock('flask-urls');
 
 function dt(dtStr: string) {
   return moment(dtStr, 'YYYY-MM-DD HH:mm');
@@ -172,5 +180,76 @@ describe('flattenEntries', () => {
     }) as BlockEntry;
     const flat = flattenEntries([block]);
     expect(flat.length).toBe(1);
+  });
+});
+
+describe('parseTimetableURL', () => {
+  function verifyParsedTimetableURL(
+    parsed: Partial<Navigation> | null,
+    date: string,
+    sessionBlockId: string | undefined
+  ) {
+    expect(parsed).not.toBeNull();
+    expect(parsed.currentDate.format('YYYY-MM-DD')).toBe(date);
+    if (sessionBlockId) {
+      expect(parsed.expandedSessionBlockId).toBe(sessionBlockId);
+    } else {
+      expect(parsed.expandedSessionBlockId).toBeUndefined();
+    }
+    expect(parsed.isExpanded).toBe(sessionBlockId !== undefined);
+  }
+
+  it('handles a path with no session block', () => {
+    const eventId = 1533;
+    const date = '2026-10-15';
+    const base = `/event/${eventId}/manage/timetable`;
+    const pathname = `${base}/${date}`;
+
+    // Make sure timetableURL({event_id: 1533}) returns the expected pathname
+    mockFlaskURL.mockReturnValueOnce(base);
+
+    const parsed = parseTimetableURL(eventId, pathname);
+    verifyParsedTimetableURL(parsed, date, undefined);
+  });
+
+  it('handles a path with no session block ending with a slash', () => {
+    const eventId = 1533;
+    const date = '2026-10-15';
+    const base = `/event/${eventId}/manage/timetable`;
+    const pathname = `${base}/${date}/`;
+
+    // Make sure timetableURL({event_id: 1533}) returns the expected pathname
+    mockFlaskURL.mockReturnValueOnce(base);
+
+    const parsed = parseTimetableURL(eventId, pathname);
+    verifyParsedTimetableURL(parsed, date, undefined);
+  });
+
+  it('handles a path with a session block', () => {
+    const eventId = 1533;
+    const sessionBlockId = 's44';
+    const date = '2026-10-15';
+    const base = `/event/${eventId}/manage/timetable`;
+    const pathname = `${base}/${date}/block/${sessionBlockId.substring(1)}`;
+
+    // Make sure timetableURL({event_id: 1533}) returns the expected pathname
+    mockFlaskURL.mockReturnValueOnce(base);
+
+    const parsed = parseTimetableURL(eventId, pathname);
+    verifyParsedTimetableURL(parsed, date, sessionBlockId);
+  });
+
+  it('handles a path with a session block ending with a slash', () => {
+    const eventId = 1533;
+    const sessionBlockId = 's44';
+    const date = '2026-10-15';
+    const base = `/event/${eventId}/manage/timetable`;
+    const pathname = `${base}/${date}/block/${sessionBlockId.substring(1)}/`;
+
+    // Make sure timetableURL({event_id: 1533}) returns the expected pathname
+    mockFlaskURL.mockReturnValueOnce(base);
+
+    const parsed = parseTimetableURL(eventId, pathname);
+    verifyParsedTimetableURL(parsed, date, sessionBlockId);
   });
 });
