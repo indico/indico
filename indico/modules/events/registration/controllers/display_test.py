@@ -33,24 +33,19 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 @pytest.mark.usefixtures('dummy_reg')
 @pytest.mark.parametrize('invitation_state', (None, InvitationState.pending, InvitationState.declined))
-@pytest.mark.parametrize('availability', ('open', 'unopened', 'closed', 'full', 'purged'))
-def test_registration_form_availability(db, dummy_regform, test_client, invitation_state, availability):
+@pytest.mark.parametrize(('availability', 'settings', 'message'), (
+    ('open', {}, None),
+    ('unopened', {'start_dt': now_utc() + timedelta(days=1)}, b'The registration period has not started yet.'),
+    ('closed', {'end_dt': now_utc() - timedelta(hours=1)}, b'The registration period has passed.'),
+    ('full', {'registration_limit': 1}, b'There are no more places available.'),
+    ('purged', {'is_purged': True}, b'Registration is disabled due to an expired retention period'),
+))
+def test_registration_form_availability(db, dummy_regform, test_client, invitation_state, availability, settings,
+                                        message):
     set_feature_enabled(dummy_regform.event, 'registration', True)
     dummy_regform.start_dt = now_utc() - timedelta(days=1)
-    messages = {
-        'unopened': b'The registration period has not started yet.',
-        'closed': b'The registration period has passed.',
-        'full': b'There are no more places available.',
-        'purged': b'Registration is disabled due to an expired retention period',
-    }
-    if availability == 'unopened':
-        dummy_regform.start_dt = now_utc() + timedelta(days=1)
-    elif availability == 'closed':
-        dummy_regform.end_dt = now_utc() - timedelta(hours=1)
-    elif availability == 'full':
-        dummy_regform.registration_limit = 1
-    elif availability == 'purged':
-        dummy_regform.is_purged = True
+    for key, value in settings.items():
+        setattr(dummy_regform, key, value)
     query = {}
     if invitation_state is not None:
         invitation = RegistrationInvitation(registration_form=dummy_regform, state=invitation_state,
@@ -66,7 +61,7 @@ def test_registration_form_availability(db, dummy_regform, test_client, invitati
     can_register = availability == 'open' or (invitation_state is not None and availability in {'unopened', 'closed'})
     assert (b'id="registration-form-submission-container"' in response.data) == can_register
     if not can_register:
-        assert messages[availability] in response.data
+        assert message in response.data
     if invitation_state == InvitationState.declined and availability != 'purged':
         invitation_message = b'You have declined the invitation, but you may still register for the event.'
         assert (invitation_message in response.data) == can_register
