@@ -44,13 +44,13 @@ def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
         registration_form_id=dummy_regform.id,
         first_name='Guinea',
         last_name='Pig',
-        checked_in=True,
         state=RegistrationState.complete,
         currency='USD',
         email='1337@example.test',
         user=dummy_user
     )
     dummy_event.registrations.append(reg)
+    reg.checked_in = True
     db.session.flush()
     return reg
 
