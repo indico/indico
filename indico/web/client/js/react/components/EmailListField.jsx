@@ -24,7 +24,7 @@ export function EmailListField({value, disabled, onChange, onFocus, onBlur, rend
   const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
   const setValue = newValue => {
-    newValue = _.uniq(newValue.filter(isValid));
+    newValue = _.uniq(newValue.filter(isValid).map(email => email.toLowerCase()));
     onChange(newValue);
     onFocus();
     onBlur();
