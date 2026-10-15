@@ -18,6 +18,17 @@ $toolbar-bg-color: $raincloud-gray;
   width: 100%;
 }
 
+.scroll-wrapper {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.controls-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 .time-gutter {
   // (Ajob) Allows for clicking directly on timetable
   //        wrapper for click-drag creation.
