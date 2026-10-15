@@ -56,7 +56,6 @@ def test_registration_form_availability(db, dummy_regform, test_client, invitati
         invitation = RegistrationInvitation(registration_form=dummy_regform, state=invitation_state,
                                             email='invitee@example.test', first_name='Invited', last_name='User',
                                             affiliation='')
-        db.session.add(invitation)
         db.session.flush()
         query['invitation'] = str(invitation.uuid)
 
