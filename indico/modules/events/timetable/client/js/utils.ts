@@ -241,21 +241,9 @@ function dateFromString(dayString: string) {
   return date.isValid() ? date : undefined;
 }
 
-function joinURLParts(base: string, ...parts: string[]) {
-  let result = base;
-  for (const part of parts) {
-    if (result.endsWith('/')) {
-      result += part.startsWith('/') ? part.substring(1) : part;
-    } else {
-      result += part.startsWith('/') ? part : `/${part}`;
-    }
-  }
-  return result;
-}
-
 export function parseTimetableURL(eventId: number, path: string): Partial<Navigation> | null {
   const prefix = timetableURL({event_id: eventId});
-  const subpath = path.replace(prefix, '');
+  const subpath = path.replace(prefix.endsWith('/') ? prefix : `${prefix}/`, '');
   const parts = subpath.substring(0, subpath.length + (subpath.endsWith('/') ? -1 : 0)).split('/');
   if (parts.length === 1) {
     const currentDate = dateFromString(parts[0]);
@@ -283,10 +271,12 @@ export function createTimetableURL(
   date: Moment,
   expandedSessionBlockId?: string | null
 ) {
-  const prefix = timetableURL({event_id: eventId});
-  const dateString = date.format('YYYY-MM-DD');
-  if (!expandedSessionBlockId) {
-    return joinURLParts(prefix, dateString, '');
-  }
-  return joinURLParts(prefix, dateString, 'block', expandedSessionBlockId.substring(1), '');
+  const params = {
+    event_id: eventId,
+    date: date.format('YYYY-MM-DD'),
+    ...(expandedSessionBlockId
+      ? {session_block_id: expandedSessionBlockId.substring(1)}
+      : undefined),
+  };
+  return timetableURL(params);
 }
