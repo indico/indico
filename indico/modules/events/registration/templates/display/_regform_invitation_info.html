@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_invitation_info(invitation) %}
+{% macro render_invitation_info(invitation, can_register) %}
     {% call message_box('highlight') %}
         {% if invitation.state.name == 'pending' %}
             {% trans -%}
@@ -17,10 +17,12 @@
                     {% trans %}Decline{% endtrans %}
                 </button>
             </div>
-        {% else %}
+        {% elif can_register %}
             {% trans -%}
                 You have declined the invitation, but you may still register for the event.
             {%- endtrans %}
+        {% else %}
+            {% trans %}You have declined the invitation.{% endtrans %}
         {% endif %}
     {% endcall %}
 {% endmacro %}
