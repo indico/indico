@@ -2,6 +2,7 @@
 
 <div class="category-container">
     <div class="category-header">
+        {% block category_title %}
         <h1 class="category-title">
             {% block title %}
                 {% if category.title == 'Home' and category.is_root %}
@@ -15,6 +16,7 @@
                 {% endif %}
             {% endblock %}
         </h1>
+        {% endblock %}
         {% block cat_toolbar %}
             <div id="category-toolbar" class="toolbar">
                 <div class="group">

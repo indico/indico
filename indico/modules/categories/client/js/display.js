@@ -7,6 +7,12 @@
 
 /* global handleAjaxError:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {Category} from 'indico/NGUI/category/Category';
+import {IndicoUIProvider} from 'indico/NGUI/IndicoUIProvider';
+import {domReady} from 'indico/utils/domstate';
 import {$T} from 'indico/utils/i18n';
 
 (function(global) {
@@ -129,4 +135,27 @@ import {$T} from 'indico/utils/i18n';
       });
     }
   };
+
+  customElements.define(
+    'ind-ngui-category',
+    class extends HTMLElement {
+      connectedCallback() {
+        domReady.then(() => {
+          ReactDOM.render(
+            <IndicoUIProvider>
+              <Category
+                categoryId={JSON.parse(this.getAttribute('category-id'))}
+                isFlat={this.hasAttribute('flat')}
+              />
+            </IndicoUIProvider>,
+            this
+          );
+        });
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
 })(window);

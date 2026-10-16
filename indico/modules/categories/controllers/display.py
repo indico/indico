@@ -26,12 +26,14 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
-from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
+from indico.modules.categories.controllers.util import (get_category_view_params, get_category_year_view_params,
+                                                        get_event_list_view_params, get_event_query_filter,
                                                         group_by_month, make_format_event_date_func,
-                                                        make_happening_now_func, make_is_recent_func)
+                                                        make_happening_now_func, make_is_recent_func,
+                                                        serialize_events_by_month)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
-                                                 serialize_category_chain)
+                                                 serialize_category_chain, serialize_category_child)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryCalendar
 from indico.modules.events.management.settings import global_event_settings
@@ -261,12 +263,98 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
     def _process(self):
         params = get_category_view_params(self.category, self.now, is_flat=self.is_flat)
         if not self.category.is_root:
-            return WPCategory.render_template('display/category.html', self.category, **params)
+            return WPCategory.render_template('display/category_ngui.html', self.category, **params)
 
         news = get_recent_news()
         upcoming_events = get_upcoming_events()
-        return WPCategory.render_template('display/root_category.html', self.category, news=news,
+        return WPCategory.render_template('display/root_category_ngui.html', self.category, news=news,
                                           upcoming_events=upcoming_events, **params)
+
+
+class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):
+    """Return data needed to display a category."""
+
+    def _process(self):
+        return jsonify(
+            id=self.category.id,
+            title=self.category.title,
+            description=self.category.description,
+            logo_url=(self.category.logo_url if self.category.has_logo else None),
+            is_flat=self.is_flat,
+            is_root=self.category.is_root,
+            has_children=self.category.has_children,
+        )
+
+
+class RHCategoryChildrenJSON(RHDisplayCategoryBase):
+    """Return the children of a category in JSON format."""
+
+    @classproperty
+    @classmethod
+    def _category_query_options(cls):
+        children_strategy = selectinload('children')
+        children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode')
+        children_strategy.undefer('deep_children_count')
+        children_strategy.undefer('deep_events_count')
+        return (children_strategy,
+                load_only('id', 'title', 'protection_mode', 'description'),
+                subqueryload('acl_entries'),
+                undefer('has_children'))
+
+    def _process(self):
+        serialized_categories = [serialize_category_child(child) for child in self.category.children]
+        return jsonify(serialized_categories)
+
+
+class RHCategoryEventListWithMetadataJSON(RHDisplayCategoryEventsBase):
+    """Return meta data needed to display event list within category."""
+
+    def _process(self):
+        params = get_category_year_view_params(self.category, self.now, year=self.now.year, is_flat=self.is_flat)
+
+        return jsonify(
+            available_years=params['available_years'],
+            has_hidden_events=params['has_hidden_events'],
+            is_flat=params['is_flat'],
+            pending_event_moves=params['pending_event_moves'],
+            show_past_events=params['show_past_events'],
+            show_future_events=params['show_future_events'],
+            event_list_data={
+                'event_count': params['event_count'],
+                'events_by_month': serialize_events_by_month(params['events_by_month'], self.category, self.now),
+                'past_events_by_month': serialize_events_by_month(
+                    params['past_events_by_month'], self.category, self.now
+                ),
+                'past_event_count': params['past_event_count'],
+                'future_events_by_month': serialize_events_by_month(
+                    params['future_events_by_month'], self.category, self.now
+                ),
+                'future_event_count': params['future_event_count'],
+            },
+        )
+
+
+class RHEventListJSON(RHDisplayCategoryEventsBase):
+    """Return the JSON for the event list for specific year."""
+
+    @use_kwargs({
+        'year': fields.Int(required=True)
+    }, location='query')
+    def _process_args(self, year):
+        RHDisplayCategoryEventsBase._process_args(self)
+        self.year = year
+
+    def _process(self):
+        params = get_event_list_view_params(self.category, self.now, year=self.year, is_flat=self.is_flat)
+        return jsonify(
+            is_flat=self.is_flat,
+            event_count=params['event_count'],
+            events_by_month=serialize_events_by_month(params['events_by_month'], self.category, self.now),
+            past_events_by_month=serialize_events_by_month(params['past_events_by_month'], self.category, self.now),
+            past_event_count=params['past_event_count'],
+            future_events_by_month=serialize_events_by_month(params['future_events_by_month'], self.category, self.now),
+            future_event_count=params['future_event_count'],
+        )
 
 
 class RHEventList(RHDisplayCategoryEventsBase):

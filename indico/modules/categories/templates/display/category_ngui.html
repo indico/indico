@@ -1,0 +1,35 @@
+{% extends 'categories/display/base_ngui.html' %}
+{% from 'categories/display/sidebar.html' import render_attachments, render_managers %}
+{% from 'message_box.html' import message_box %}
+
+{% block content %}
+    {% block category_content %}
+        {% if not is_flat %}
+            {% if category.children %}
+                {% set category_title = category.title %}
+                <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
+                    {%- trans %}Categories in {{ category_title }}{% endtrans -%}
+                </h2>
+                <ind-ngui-category category-id="{{ category.id }}"></ind-ngui-category>
+            {% endif %}
+        {% else %}
+            {% call message_box('info', icon=false) %}
+                {% trans %}Displaying all the events from subcategories.{% endtrans %}
+                <a href="{{ url_for('.display', category) }}">
+                    {% trans %}Go back to single category view.{% endtrans %}
+                </a>
+            {% endcall %}
+            <ind-ngui-category category-id="{{ category.id }}" flat></ind-ngui-category>
+        {% endif %}
+    {% endblock %}
+{% endblock %}
+
+{% block sidebar -%}
+    {%- block sidebar_managers %}
+        {{- render_managers(managers) -}}
+    {% endblock -%}
+    {%- block sidebar_attachments %}
+        {{- render_attachments(category) -}}
+    {% endblock -%}
+    {{ template_hook('category-sidebar', category=category) }}
+{%- endblock %}
