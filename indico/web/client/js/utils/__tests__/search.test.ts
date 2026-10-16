@@ -15,6 +15,11 @@ describe('normalizeSearchText', () => {
     ['  Science\t Lab\n', 'sciencelab'],
     ['-./#', ''],
     ['', ''],
+    ['Zürich', 'zurich'],
+    ['Zu\u0308rich', 'zurich'],
+    ['Tromsø', 'tromso'],
+    ['Łódź', 'lodz'],
+    ['Straße', 'strasse'],
   ])('normalizes %j to %j', (value, expected) => {
     expect(normalizeSearchText(value)).toBe(expected);
   });
