@@ -63,37 +63,35 @@ describe('ListFilter', () => {
     expect(onChangeList).toHaveBeenLastCalledWith(new Set(ids));
   });
 
-  it.each(['  Science Lab  ', '  #12  '])(
-    'keeps the search active when filters change for %s',
-    search => {
-      const onChangeList = jest.fn();
-      const field = shallow(
-        <ListFilter
-          list={list}
-          filterOptions={[
-            {
-              key: 'session',
-              text: 'Session',
-              options: [{value: 'selected', text: 'Selected'}],
-              isMatch: entry => entry.id !== 3,
-            },
-          ]}
-          searchableId={entry => entry.id}
-          searchableFields={entry => [entry.text]}
-          onChangeList={onChangeList}
-        />
-      );
-      field.find(Input).simulate('change', {}, {value: search});
-      field.find(Dropdown).at(1).simulate('open');
-      field
-        .find(Dropdown.Item)
-        .filterWhere(item => item.prop('value') === 'selected')
-        .simulate('click', {}, {value: 'selected'});
-      expect(onChangeList).toHaveBeenLastCalledWith(
-        new Set(search.includes('#') ? [12] : [12, 123])
-      );
-    }
-  );
+  it.each([
+    ['  Science Lab  ', [12, 123]],
+    ['  #12  ', [12]],
+  ])('keeps the search active when filters change for %s', (search, ids) => {
+    const onChangeList = jest.fn();
+    const field = shallow(
+      <ListFilter
+        list={list}
+        filterOptions={[
+          {
+            key: 'session',
+            text: 'Session',
+            options: [{value: 'selected', text: 'Selected'}],
+            isMatch: entry => entry.id !== 3,
+          },
+        ]}
+        searchableId={entry => entry.id}
+        searchableFields={entry => [entry.text]}
+        onChangeList={onChangeList}
+      />
+    );
+    field.find(Input).simulate('change', {}, {value: search});
+    field.find(Dropdown).at(1).simulate('open');
+    field
+      .find(Dropdown.Item)
+      .filterWhere(item => item.prop('value') === 'selected')
+      .simulate('click', {}, {value: 'selected'});
+    expect(onChangeList).toHaveBeenLastCalledWith(new Set(ids));
+  });
 
   it('normalizes option searches', () => {
     const field = shallow(
