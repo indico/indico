@@ -97,7 +97,7 @@ export default function AffiliationListFilter({
         return {
           id: affiliation.id,
           countryCode: affiliation.country_code,
-          searchableFields,
+          searchableFields: searchableFields.map(normalizeSearchText),
           affiliation,
         };
       }),
@@ -161,9 +161,7 @@ export default function AffiliationListFilter({
           return true;
         }
 
-        return entry.searchableFields.some(field =>
-          normalizeSearchText(field).includes(normalizedSearch)
-        );
+        return entry.searchableFields.some(field => field.includes(normalizedSearch));
       })
       .map(entry => entry.affiliation);
   }, [filterableAffiliations, filterOptions, filters, searchText]);
