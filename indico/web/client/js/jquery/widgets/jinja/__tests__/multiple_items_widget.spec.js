@@ -23,7 +23,7 @@ const COLUMNS = [
 ];
 const CHOICES = {lang: {en: 'English', fr: 'French'}};
 
-function setupWidget(value = []) {
+function setupWidget(value = [], columns = COLUMNS) {
   document.body.innerHTML = `
     <form>
       <div class="form-group">
@@ -38,7 +38,7 @@ function setupWidget(value = []) {
   window.setupMultipleItemsWidget({
     fieldId: 'items',
     uuidField: null,
-    columns: COLUMNS,
+    columns,
     sortable: false,
     columnChoices: CHOICES,
   });
@@ -55,12 +55,11 @@ function firstInput(widget, index = 0) {
 }
 
 describe('multiple items widget', () => {
-  it('blocks the submission while an empty row is open', () => {
+  it('lets the form be submitted while the initial row is untouched', () => {
     const {form, widget} = setupWidget();
 
     expect(widget.find('tbody > tr')).toHaveLength(1);
-    expect(form[0].checkValidity()).toBe(false);
-    expect(firstInput(widget).validationMessage).not.toBe('');
+    expect(form[0].checkValidity()).toBe(true);
   });
 
   it('blocks the submission while a row is being filled', () => {
@@ -68,11 +67,20 @@ describe('multiple items widget', () => {
     fillRow(widget, 0, ['a@example.com', 'en']);
 
     expect(form[0].checkValidity()).toBe(false);
+    expect(firstInput(widget).validationMessage).not.toBe('');
   });
 
   it('blocks the submission while a saved row is reopened for editing', () => {
     const {form, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
     widget.find('.js-edit-row').trigger('click');
+
+    expect(form[0].checkValidity()).toBe(false);
+  });
+
+  it('keeps blocking the submission when a reopened row is emptied', () => {
+    const {form, widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+    widget.find('.js-edit-row').trigger('click');
+    fillRow(widget, 0, ['', '']);
 
     expect(form[0].checkValidity()).toBe(false);
   });
@@ -94,22 +102,43 @@ describe('multiple items widget', () => {
     expect(form[0].checkValidity()).toBe(true);
   });
 
-  it('lets the form be submitted once the empty row is discarded', () => {
+  it('lets the form be submitted once the unsaved row is discarded', () => {
     const {form, widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
     widget.find('.js-cancel-edit').trigger('click');
 
     expect(form[0].checkValidity()).toBe(true);
   });
 
+  it('blocks the submission while a row holding only a checked checkbox is unsaved', () => {
+    const columns = [
+      {id: 'name', caption: 'Name', type: 'text'},
+      {id: 'enabled', caption: 'Enabled', type: 'checkbox'},
+    ];
+    const {form, widget} = setupWidget([], columns);
+    widget.find('.js-table-input').eq(1).prop('checked', true).trigger('change');
+
+    expect(form[0].checkValidity()).toBe(false);
+  });
+
   it('ignores a row whose inputs are disabled by a HiddenUnless toggle', () => {
-    const {form} = setupWidget();
+    const {form, widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
     $('.form-group').find(':input').prop('disabled', true);
 
     expect(form[0].checkValidity()).toBe(true);
   });
 
-  it('flags pending changes while a row is open', () => {
+  it('flags pending changes while a row is being filled', () => {
     const {widget} = setupWidget();
+    fillRow(widget, 0, ['a@example.com', 'en']);
+
+    expect(widget.is('[data-pending-changes]')).toBe(true);
+  });
+
+  it('flags pending changes while a saved row is reopened', () => {
+    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+    widget.find('.js-edit-row').trigger('click');
 
     expect(widget.is('[data-pending-changes]')).toBe(true);
   });
@@ -122,8 +151,8 @@ describe('multiple items widget', () => {
     expect(widget.is('[data-pending-changes]')).toBe(false);
   });
 
-  it('does not flag pending changes when every row is saved', () => {
-    const {widget} = setupWidget([{email: 'a@example.com', lang: 'en'}]);
+  it('does not flag pending changes for the untouched initial row', () => {
+    const {widget} = setupWidget();
 
     expect(widget.is('[data-pending-changes]')).toBe(false);
   });
