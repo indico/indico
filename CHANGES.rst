@@ -33,6 +33,8 @@ Bugfixes
 - Disallow invalid number of extra slots in registration form choice fields (:pr:`7936`)
 - Require backside templates to belong to the same ancestry (:pr:`7896`, thanks :user:`p-w`)
 - Require cloned templates to belong to the same ancestry (:pr:`7896`)
+- Fix list rows still being edited getting lost when saving a form (:pr:`7702`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -78,8 +80,6 @@ Improvements
   :pr:`7187`)
 - Add new regform setting to allow withdrawing a registration outside the modification
   period (enabled by default for new forms) (:pr:`7769`)
-- Block the submission of a form that has a list widget row still being edited, instead of
-  silently dropping the row (:pr:`7702`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
