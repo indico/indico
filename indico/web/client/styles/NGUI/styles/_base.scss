@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@forward 'abstracts/mixins';
-@forward 'abstracts/tokens';
-@forward 'abstracts/grid';
-@forward 'abstracts/animations';
+@forward 'utils/mixins';
+@forward 'utils/tokens';
+@forward 'utils/grid';
+@forward 'utils/animations';
 
 @forward 'base/colors';
 @forward 'base/theme';
