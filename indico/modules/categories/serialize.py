@@ -144,3 +144,14 @@ def serialize_category_chain(category, include_children=False, include_parents=F
         data['supercategories'] = [serialize_category(c, with_path=True, child_path=data['category']['path'])
                                    for c in query]
     return data
+
+
+def serialize_category_child(category):
+    return {
+        'id': category.id,
+        'title': category.title,
+        'is_protected': category.is_protected,
+        'deep_category_count': category.deep_children_count,
+        'deep_event_count': category.deep_events_count,
+        'display_URL': category.url
+    }

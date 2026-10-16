@@ -33,7 +33,7 @@ from indico.modules.categories.controllers.util import (get_category_view_params
                                                         serialize_events_by_month)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
-                                                 serialize_category_chain)
+                                                 serialize_category_chain, serialize_category_child)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryCalendar
 from indico.modules.events.management.settings import global_event_settings
@@ -289,16 +289,21 @@ class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):
 class RHCategoryChildrenJSON(RHDisplayCategoryBase):
     """Return the children of a category in JSON format."""
 
+    @classproperty
+    @classmethod
+    def _category_query_options(cls):
+        children_strategy = selectinload('children')
+        children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode')
+        children_strategy.undefer('deep_children_count')
+        children_strategy.undefer('deep_events_count')
+        return (children_strategy,
+                load_only('id', 'title', 'protection_mode', 'description'),
+                subqueryload('acl_entries'),
+                undefer('has_children'))
+
     def _process(self):
-        serialized_categories = []
-
-        for child in self.category.children:
-            data = serialize_category(child, with_path=True, with_favorite=True)
-            data['display_url'] = url_for('.display', child)
-            data['description'] = child.description
-            serialized_categories.append(data)
-
-        return jsonify(categories=serialized_categories, flash=False)
+        serialized_categories = [serialize_category_child(child) for child in self.category.children]
+        return jsonify(serialized_categories)
 
 
 class RHCategoryEventListWithMetadataJSON(RHDisplayCategoryEventsBase):
@@ -308,7 +313,6 @@ class RHCategoryEventListWithMetadataJSON(RHDisplayCategoryEventsBase):
         params = get_category_year_view_params(self.category, self.now, year=self.now.year, is_flat=self.is_flat)
 
         return jsonify(
-            flash=False,
             available_years=params['available_years'],
             has_hidden_events=params['has_hidden_events'],
             is_flat=params['is_flat'],

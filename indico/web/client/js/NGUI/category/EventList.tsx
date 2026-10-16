@@ -141,7 +141,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
                 {month.events.map((event: Event) => (
                   <List.Item
                     styleName="event-list-item"
-                    key={event.id + month.name}
+                    key={event.id}
                     contentProps={{href: event.url}}
                     marker={
                       event.isFavorite !== null ? (

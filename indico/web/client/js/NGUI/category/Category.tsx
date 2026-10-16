@@ -14,7 +14,11 @@ import remarkRehype from 'remark-rehype';
 
 import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
 import {EventList} from 'indico/NGUI/category/EventList';
-import {CategoryEventListWithMetaData, CategoryMetaData, CategoryType} from 'indico/NGUI/types';
+import {
+  CategoryEventListWithMetaData,
+  CategoryChildMetadata,
+  Category as CategoryType,
+} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
@@ -38,7 +42,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
     {camelize: true}
   );
 
-  const categoryChildren = categoryChildrenData as {categories: CategoryMetaData[]};
+  const categoryChildren = categoryChildrenData as CategoryChildMetadata[];
 
   const {data: categoryEventListWithMetaData, loading: categoryEventListWithMetaDataLoading} =
     useIndicoAxios(
@@ -83,7 +87,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
           <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
         </div>
       </div>
-      {!isFlat && <CategoryCardList data={categoryChildren.categories} columns={2} />}
+      {!isFlat && <CategoryCardList data={categoryChildren} columns={2} />}
       {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
         <EventList viewData={categoryEventListWithMeta} categoryId={categoryId} isFlat={isFlat} />
       )}

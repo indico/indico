@@ -7,11 +7,7 @@
 
 import {IndicoPaletteColor, LegacyColor} from 'indico/NGUI/tokens';
 
-export interface CategorySimple {
-  id: number;
-  title: string;
-}
-export interface CategoryType {
+export interface Category {
   id: number;
   title: string;
   description: string;
@@ -21,22 +17,13 @@ export interface CategoryType {
   hasChildren: boolean;
 }
 
-export interface CategoryMetaData {
+export interface CategoryChildMetadata {
   id: number;
   title: string;
   isProtected: boolean;
-  hasEvents: boolean;
-  hasChildren: boolean;
   deepCategoryCount: number;
   deepEventCount: number;
-  canAccess: boolean;
-  canCreateEvents: boolean;
-  canProposeEvents: boolean;
-  canManage: boolean;
-  path: CategorySimple[];
-  parentPath: CategorySimple[];
   displayURL?: string;
-  description?: string;
 }
 
 export interface Event {

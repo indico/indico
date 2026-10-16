@@ -10,12 +10,12 @@ import React from 'react';
 import {Card} from 'indico/NGUI';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import {CategoryMetaData} from '../types';
+import {CategoryChildMetadata} from '../types';
 
 import './CategoryCardList.module.scss';
 
 interface CategoryCardListProps {
-  data: CategoryMetaData[];
+  data: CategoryChildMetadata[];
   columns?: 1 | 2 | 3;
 }
 
