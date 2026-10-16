@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix list rows still being edited getting lost when saving a form (:pr:`7702`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
