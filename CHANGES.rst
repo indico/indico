@@ -10,7 +10,7 @@ Version 3.3.15
 Improvements
 ^^^^^^^^^^^^
 
-- Ignore punctuation and whitespace in list filter searches, including the affiliation dashboard
+- Ignore punctuation and whitespace when searching in editing lists and the affiliation dashboard
   (:pr:`7803`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
