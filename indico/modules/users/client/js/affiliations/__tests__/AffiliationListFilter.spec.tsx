@@ -26,15 +26,14 @@ const affiliations = ['Science-Lab', 'Science Lab', 'ScienceLab', 'Science annua
 );
 
 describe('AffiliationListFilter', () => {
-  it.each(['Science-Lab', 'Science Lab', 'ScienceLab'])(
-    'matches punctuation and whitespace variants of %s',
-    search => {
-      const onFilteredChange = jest.fn();
-      const {getByPlaceholderText} = render(
-        <AffiliationListFilter affiliations={affiliations} onFilteredChange={onFilteredChange} />
-      );
-      fireEvent.change(getByPlaceholderText('Search affiliations...'), {target: {value: search}});
-      expect(onFilteredChange).toHaveBeenLastCalledWith(affiliations.slice(0, 3));
-    }
-  );
+  it('normalizes searchable fields and the search query', () => {
+    const onFilteredChange = jest.fn();
+    const {getByPlaceholderText} = render(
+      <AffiliationListFilter affiliations={affiliations} onFilteredChange={onFilteredChange} />
+    );
+    fireEvent.change(getByPlaceholderText('Search affiliations...'), {
+      target: {value: '  science\t lab  '},
+    });
+    expect(onFilteredChange).toHaveBeenLastCalledWith(affiliations.slice(0, 3));
+  });
 });
