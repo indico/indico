@@ -11,6 +11,7 @@ import React, {useEffect, useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {normalizeSearchText} from 'indico/utils/search';
 
 import './ListFilter.module.scss';
 
@@ -68,6 +69,7 @@ export default function ListFilter({
     );
 
   const matchSearch = (value, e) => {
+    value = value.trim();
     if (!value) {
       return true;
     }
@@ -77,9 +79,10 @@ export default function ListFilter({
         return searchableId(e) === +match[1];
       }
     }
+    const normalizedSearch = normalizeSearchText(value);
     return (
       !searchableFields ||
-      searchableFields(e).some(f => f.toLowerCase().includes(value.toLowerCase()))
+      searchableFields(e).some(f => normalizeSearchText(f).includes(normalizedSearch))
     );
   };
 
@@ -111,7 +114,6 @@ export default function ListFilter({
       return;
     }
     setInternalSearchText(value);
-    value = value.toLowerCase().trim();
     const filtered = list.filter(e => matchFilters(filters, e) && matchSearch(value, e));
     onChangeList(new Set(filtered.map(e => e.id)));
   };
@@ -189,7 +191,8 @@ export default function ListFilter({
             const filteredOptions = isOpen
               ? options.filter(
                   ({text}) =>
-                    !optionSearchText || text.toLowerCase().includes(optionSearchText.toLowerCase())
+                    !optionSearchText ||
+                    normalizeSearchText(text).includes(normalizeSearchText(optionSearchText))
                 )
               : [];
             return (
