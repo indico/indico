@@ -10,7 +10,8 @@ Version 3.3.15
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Ignore punctuation and whitespace in list filter searches, including the affiliation dashboard
+  (:pr:`7803`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
