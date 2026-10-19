@@ -321,8 +321,7 @@ class RHTimetableContribution(RHManageContributionBase):
             reference_type = ReferenceType.get(entry['reference_type_id'])
             if not reference_type:
                 raise BadRequest('Invalid reference type')
-            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
-                                                    value=entry['value']))
+            references.append(ContributionReference(reference_type=reference_type, value=entry['value']))
         return references
 
     def _change_parent(self, session_block_id):
