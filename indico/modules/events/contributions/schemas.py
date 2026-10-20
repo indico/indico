@@ -19,6 +19,7 @@ from indico.modules.events.contributions.models.fields import (ContributionField
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema
@@ -108,9 +109,10 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
 class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionReference
-        fields = ('id', 'type', 'value')
+        fields = ('id', 'reference_type', 'value')
 
-    type = fields.Integer(attribute='reference_type_id')
+    id = fields.Integer(dump_only=True)  # TODO maybe remove altogether?
+    reference_type = ModelField(ReferenceType, data_key='type')
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):

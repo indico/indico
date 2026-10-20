@@ -252,7 +252,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     }
 
     if (data.references) {
-      data.references = mapEntryToData({references: data.references}, true).references;
+      data.references = mapEntryToData({references: data.references}, true).references.map(x =>
+        _.omit(x, 'id')
+      );
     }
 
     try {

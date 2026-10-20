@@ -18,10 +18,8 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import (RHManageContributionBase,
                                                                         RHManageContributionsBase)
-from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
 from indico.modules.events.management.controllers.base import RHManageEventBase
-from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import delete_session_block, update_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
@@ -257,8 +255,6 @@ class RHTimetableBreak(RHManageEventBase):
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionSchema)
     def _process_POST(self, data):
-        if (references := data.get('references')) is not None:
-            data['references'] = self._get_references(references)
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         session_block = SessionBlock.get(data['session_block_id']) if data.get('session_block_id') else None
@@ -270,16 +266,6 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
         contrib = create_contribution(self.event, data, data.pop('custom_fields', None), session_block=session_block)
         return ContributionSchema(context={'event': self.event}).jsonify(contrib)
 
-    @no_autoflush
-    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
-        references = []
-        for entry in data:
-            reference_type = ReferenceType.get(entry['reference_type_id'])
-            if not reference_type:
-                raise BadRequest('Invalid reference type')
-            references.append(ContributionReference(reference_type=reference_type, value=entry['value']))
-        return references
-
     def _get_inherited_location(self, **kwargs):
         location_parent = kwargs.pop('location_parent', None)
         inherited_location = location_parent.location_data if location_parent else self.event.location_data
@@ -290,9 +276,6 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
 class RHTimetableContribution(RHManageContributionBase):
     @use_rh_args(ContributionSchema, partial=True)
     def _process_PATCH(self, data):
-        if (references := data.get('references')) is not None:
-            data['references'] = self._get_references(references)
-
         if (person_links := data.pop('person_links', None)) is not None:
             data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
 
@@ -313,16 +296,6 @@ class RHTimetableContribution(RHManageContributionBase):
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         return '', 204
-
-    @no_autoflush
-    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
-        references = []
-        for entry in data:
-            reference_type = ReferenceType.get(entry['reference_type_id'])
-            if not reference_type:
-                raise BadRequest('Invalid reference type')
-            references.append(ContributionReference(reference_type=reference_type, value=entry['value']))
-        return references
 
     def _change_parent(self, session_block_id):
         entry = self.contrib.timetable_entry

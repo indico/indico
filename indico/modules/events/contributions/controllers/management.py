@@ -18,7 +18,6 @@ from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
@@ -359,9 +358,6 @@ class RHAPIContribution(RHManageContributionBase):
 
     @use_rh_args(ContributionRESTSchema, partial=True)
     def _process_PATCH(self, data):
-        if (references := data.get('references')) is not None:
-            data['references'] = self._get_references(references)
-
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         with (track_time_changes(), track_location_changes()):
@@ -369,37 +365,14 @@ class RHAPIContribution(RHManageContributionBase):
 
         return ContributionRESTSchema(context={'event': self.event}).jsonify(self.contrib)
 
-    @no_autoflush
-    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
-        references = []
-        for entry in data:
-            reference_type = ReferenceType.get(entry['reference_type_id'])
-            if not reference_type:
-                raise BadRequest('Invalid reference type')
-            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
-                                                    value=entry['value']))
-        return references
-
 
 class RHAPIContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionRESTSchema)
     def _process_POST(self, data):
-        if (references := data.get('references')) is not None:
-            data['references'] = self._get_references(references)
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib = create_contribution(self.event, data, data.pop('custom_fields', None))
         return ContributionRESTSchema(context={'event': self.event}).jsonify(contrib)
-
-    @no_autoflush
-    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
-        references = []
-        for entry in data:
-            reference_type = ReferenceType.get(entry['reference_type_id'])
-            if not reference_type:
-                raise BadRequest('Invalid reference type')
-            references.append(ContributionReference(reference_type=reference_type, value=entry['value']))
-        return references
 
 
 class RHAPIContributionsInheritedLocation(RHManageContributionsBase):
