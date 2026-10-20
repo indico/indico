@@ -20,7 +20,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Form, Icon, Loader, Popup} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
 
 import {ContributionType} from 'indico/modules/events/timetable/types';
 import {
@@ -80,8 +80,6 @@ interface ContributionFormFieldsProps {
   [key: string]: any; // Allow additional props
 }
 
-const referenceIsIncomplete = ref => !ref.type || !ref.value;
-
 export function ContributionFormFields({
   eventId,
   locationParent = {inheriting: false},
@@ -92,7 +90,6 @@ export function ContributionFormFields({
   extraOptions = {},
 }: ContributionFormFieldsProps) {
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
-  const [hasIncompleteReferences, setHasIncompleteReferences] = useState(false);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       // TODO: add client-side validation for max length, choices, etc at some point
@@ -248,36 +245,7 @@ export function ContributionFormFields({
         {customFieldsSection}
         <FinalReferences
           name="references"
-          label={
-            <>
-              <Translate>External IDs</Translate>
-              {hasIncompleteReferences && (
-                <span style={{display: 'block', color: '#ba8e23', marginTop: '0.5em'}}>
-                  <Icon name="warning sign" />
-                  <Translate>
-                    Some external IDs are incomplete, and therefore will not be saved on submission.
-                  </Translate>
-                </span>
-              )}
-            </>
-          }
-          onChange={refs => {
-            refs.map(ref => {
-              if (typeof ref.id === 'string') {
-                delete ref.id;
-              }
-              return ref;
-            });
-            const incompleteRefs = refs.some(
-              ref => ref.type + ref.value !== '' && referenceIsIncomplete(ref)
-            );
-
-            if (incompleteRefs !== hasIncompleteReferences) {
-              setHasIncompleteReferences(incompleteRefs);
-            }
-
-            return refs;
-          }}
+          label={Translate.string('External IDs')}
           description={Translate.string('Manage external resources for this contribution')}
         />
         <Form.Group widths="equal">
@@ -326,9 +294,7 @@ function ContributionForm({
     formData = {
       ...formData,
       person_links: personLinks,
-      references: formData.references
-        .filter(ref => !referenceIsIncomplete(ref))
-        .map((ref: any) => _.omit(ref, 'id')),
+      references: formData.references.map((ref: any) => _.omit(ref, 'id')),
     };
     const submitPayload = editing ? getChangedValues(formData, form) : formData;
     return await onSubmit(submitPayload);
