@@ -216,6 +216,7 @@
   },
   "allowScripts": {
     "core-js": false,
-    "husky@4.3.8": true
+    "husky@4.3.8": true,
+    "canvas@2.11.2": true
   }
 }
