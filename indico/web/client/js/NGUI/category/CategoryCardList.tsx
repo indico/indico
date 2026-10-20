@@ -27,7 +27,7 @@ export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
   return (
     <div className={gridClass} role="list">
       {categories.map(category => (
-        <div role="listitem" key={category.id}>
+        <div role="listitem" key={category.id} styleName="wrapper">
           <Card styleName="category-card" href={category.displayURL}>
             <Card.Icon
               icon="fas:folder"

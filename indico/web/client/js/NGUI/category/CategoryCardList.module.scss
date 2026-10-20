@@ -9,6 +9,10 @@
 @use 'NGUI/styles/base' as *;
 
 :global(.indico-ui) {
+  .wrapper {
+    min-width: 0;
+  }
+
   .category-card-main {
     display: flex;
     flex-direction: column;

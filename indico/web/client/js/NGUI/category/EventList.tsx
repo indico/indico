@@ -61,7 +61,7 @@ interface EventListProps {
 }
 export function EventList({categoryId, isFlat, viewData}: EventListProps) {
   const [selectedYear, setSelectedYear] = React.useState<number>(
-    viewData?.displayedYear || new Date().getFullYear
+    viewData?.displayedYear || new Date().getFullYear()
   );
   const eventListURL = apiEventListURL({
     category_id: categoryId,
@@ -132,6 +132,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
           count={futureEventsCount}
           onClick={() => setUserFutureExpanded(!futureEventsExpanded)}
           disabled={fetchingList}
+          reversedChevron
         />
       )}
       <div role="list" styleName="event-list">
