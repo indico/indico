@@ -186,7 +186,10 @@ export default function ItemListField({
   };
   const handleAdd = () => {
     const newItem = Object.fromEntries(
-      itemShape.map(item => [item.name, item.defaultValue === undefined ? '' : item.defaultValue])
+      itemShape.map(item => [
+        item.name,
+        Object.prototype.hasOwnProperty.call(item, 'defaultValue') ? item.defaultValue : '',
+      ])
     );
     if (canDisableItem && !('isEnabled' in newItem)) {
       newItem.isEnabled = true;
@@ -302,11 +305,13 @@ export function FinalReferences({name, ...rest}) {
           name: 'type',
           title: Translate.string('Type'),
           as: Form.Select,
+          defaultValue: undefined,
           fieldProps: (item, onChange) => ({
             options: referenceTypes.map(r => ({key: r.id, value: r.id, text: r.name})),
             onChange: (__, {value}) => onChange('type', value),
             loading,
             required: true,
+            placeholder: Translate.string('Choose a type'),
           }),
         },
         {name: 'value', title: Translate.string('Value'), fieldProps: {required: true}},

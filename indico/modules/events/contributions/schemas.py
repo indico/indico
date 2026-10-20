@@ -26,7 +26,7 @@ from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, Basi
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty
 from indico.web.flask.util import url_for
 
 
@@ -112,7 +112,8 @@ class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'reference_type', 'value')
 
     id = fields.Integer(dump_only=True)  # TODO maybe remove altogether?
-    reference_type = ModelField(ReferenceType, data_key='type')
+    reference_type = ModelField(ReferenceType, data_key='type', required=True)
+    value = fields.String(required=True, validate=not_empty)
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
