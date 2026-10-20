@@ -67,7 +67,7 @@ export function NavigationController() {
     }
 
     function popStateHandler() {
-      const location = parseTimetableURL(eventId, document.location.pathname);
+      const location = parseTimetableURL(document.location.pathname);
       if (location === null) {
         return;
       }
@@ -76,7 +76,7 @@ export function NavigationController() {
     }
 
     function loadHandler() {
-      const location = parseTimetableURL(eventId, document.location.pathname);
+      const location = parseTimetableURL(document.location.pathname);
       if (location === null) {
         // We should always include the current date in the URL
         window.history.replaceState(null, '', createTimetableURL(eventId, currentDate));
