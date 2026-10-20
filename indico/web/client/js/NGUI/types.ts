@@ -59,6 +59,7 @@ export interface EventListData {
 }
 export interface CategoryEventListWithMetaData {
   availableYears: number[];
+  displayedYear: number;
   hasHiddenEvents: boolean;
   isFlat: boolean;
   pendingEventMoves: number;

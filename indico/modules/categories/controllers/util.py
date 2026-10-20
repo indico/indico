@@ -227,7 +227,7 @@ def get_category_view_params(category, now, is_flat=False):
     }
 
 
-def get_event_list_view_params(category, now, year, is_flat, for_category_view=False):
+def get_event_list_view_params(category, now, year, is_flat):
     from .display import RHDisplayCategoryEventsBase
 
     # Current events, which are always shown by default are events of this month
@@ -313,14 +313,6 @@ def get_event_list_view_params(category, now, year, is_flat, for_category_view=F
         or (session.user and session.user.settings.get('show_past_events', False))
     )
 
-    category_view_data = {}
-    if for_category_view:
-        category_view_data = {
-            'hidden_event_ids': hidden_event_ids,
-            'extra_event_ids': extra_event_ids,
-            'event_query_filter': event_query_filter,
-        }
-
     return {
         'event_count': len(events),
         'events_by_month': group_by_month(events, now, category.tzinfo),
@@ -330,45 +322,53 @@ def get_event_list_view_params(category, now, year, is_flat, for_category_view=F
         'future_events_by_month': group_by_month(future_events, now, category.tzinfo),
         'future_event_count': future_event_count,
         'show_future_events': show_future_events,
-        **category_view_data,
     }
 
 
-def get_category_year_view_params(category, now, year, is_flat=False):
+def get_category_year_view_params(category, now, is_flat=False):
     # Category paramters and current events, which are always shown by default are events of this month
     # and of the previous month within the year.
     # If there are no events in this range, it will include the last and next month containing events within the year.
 
-    event_list_params = get_event_list_view_params(category, now, year, is_flat=is_flat, for_category_view=True)
+    hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user)} if not is_flat else set()
+    event_query_filter = get_event_query_filter(category, is_flat=is_flat, hidden_event_ids=hidden_event_ids)
+    extra_event_ids = values_from_signal(signals.category.extra_events.send(category, is_flat=is_flat))
+
     years_query = (
         db.session
         .query(db.func.cast(db.func.extract('year', Event.start_dt), db.Integer))
-        .filter(event_list_params['event_query_filter'])
+        .filter(event_query_filter)
         .distinct()
     )
 
     available_years = {year[0] for year in years_query.all()}
 
-    if event_list_params['hidden_event_ids']:
+    if extra_event_ids:
         extra_years_query = (
             db.session
             .query(db.func.cast(db.func.extract('year', Event.start_dt), db.Integer))
-            .filter(Event.id.in_(event_list_params['extra_event_ids']))
+            .filter(Event.id.in_(extra_event_ids))
             .distinct()
         )
-        available_years.update(y[0] for y in extra_years_query.all())
+        available_years.update(year[0] for year in extra_years_query.all())
 
     sorted_years = sorted(available_years, reverse=True)
+
+    if now.year in sorted_years or not sorted_years:
+        year = now.year
+    else:
+        year = sorted_years[0]
+
+    event_list_params = get_event_list_view_params(category, now, year, is_flat=is_flat)
 
     pending_event_moves = 0
     if category.can_manage(session.user):
         pending_event_moves = category.event_move_requests.filter_by(state=MoveRequestState.pending).count()
 
-    has_hidden_events = bool(event_list_params['hidden_event_ids'])
-
     return event_list_params | {
         'available_years': sorted_years,
-        'has_hidden_events': has_hidden_events,
+        'displayed_year': year,
+        'has_hidden_events': bool(hidden_event_ids),
         'is_flat': is_flat,
         'pending_event_moves': pending_event_moves,
     }

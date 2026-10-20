@@ -310,10 +310,11 @@ class RHCategoryEventListWithMetadataJSON(RHDisplayCategoryEventsBase):
     """Return meta data needed to display event list within category."""
 
     def _process(self):
-        params = get_category_year_view_params(self.category, self.now, year=self.now.year, is_flat=self.is_flat)
+        params = get_category_year_view_params(self.category, self.now, is_flat=self.is_flat)
 
         return jsonify(
             available_years=params['available_years'],
+            displayed_year=params['displayed_year'],
             has_hidden_events=params['has_hidden_events'],
             is_flat=params['is_flat'],
             pending_event_moves=params['pending_event_moves'],

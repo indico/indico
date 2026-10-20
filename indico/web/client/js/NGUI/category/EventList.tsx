@@ -60,7 +60,9 @@ interface EventListProps {
   viewData: CategoryEventListWithMetaData;
 }
 export function EventList({categoryId, isFlat, viewData}: EventListProps) {
-  const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = React.useState<number>(
+    viewData?.displayedYear || new Date().getFullYear
+  );
   const eventListURL = apiEventListURL({
     category_id: categoryId,
     year: selectedYear,

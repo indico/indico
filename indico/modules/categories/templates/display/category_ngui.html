@@ -10,8 +10,8 @@
                 <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
                     {%- trans %}Categories in {{ category_title }}{% endtrans -%}
                 </h2>
-                <ind-ngui-category category-id="{{ category.id }}"></ind-ngui-category>
             {% endif %}
+            <ind-ngui-category category-id="{{ category.id }}"></ind-ngui-category>
         {% else %}
             {% call message_box('info', icon=false) %}
                 {% trans %}Displaying all the events from subcategories.{% endtrans %}
