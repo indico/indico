@@ -9,6 +9,7 @@
 
 :global(.indico-ui) {
   .category-sidebar {
+    position: sticky;
     min-width: 300px;
     display: flex;
     flex-direction: column;

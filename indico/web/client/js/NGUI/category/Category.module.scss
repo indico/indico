@@ -7,6 +7,11 @@
 
 @use 'NGUI/styles/base' as *;
 
+:global(.category-container),
+:global(.category-header) {
+  background: #e8e8e8;
+}
+
 :global(.indico-ui) {
   .category-wrapper {
     display: flex;
@@ -22,6 +27,9 @@
   }
 
   .category-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
     flex-grow: 1;
   }
 
@@ -34,9 +42,16 @@
 
   .category-info {
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    flex-direction: column;
     gap: var(--space-6);
+    padding: var(--space-6);
+
+    .category-info-sub {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: var(--space-6);
+    }
 
     .category-description {
       @include typography('text-md', 'regular');
