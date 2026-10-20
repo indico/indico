@@ -118,8 +118,7 @@ export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledM
   id: ContribId;
   type: EntryType.Contribution;
   references?: {
-    id: number;
-    type: string;
+    type: number;
     value: string;
   };
   attachments: Attachment[];

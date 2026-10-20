@@ -114,7 +114,7 @@ function Item({
 
 Item.propTypes = {
   index: PropTypes.number.isRequired,
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   onMove: PropTypes.func.isRequired,
   onFocus: PropTypes.func,
@@ -172,6 +172,7 @@ export default function ItemListField({
   scrollable,
   canDisableItem,
   canRemoveItem,
+  noId,
   ...rest
 }) {
   const makeOnDelete = index => () => onChange(value.filter((__, idx) => index !== idx));
@@ -194,7 +195,7 @@ export default function ItemListField({
     if (canDisableItem && !('isEnabled' in newItem)) {
       newItem.isEnabled = true;
     }
-    if (!('id' in newItem)) {
+    if (!('id' in newItem) && !noId) {
       newItem.id = `new:${nanoid()}`;
     }
     onChange([...value, newItem]);
@@ -222,7 +223,7 @@ export default function ItemListField({
       <tbody>
         {value.map((item, idx) => (
           <ItemComponent
-            key={item.id}
+            key={item.id ?? `item-${idx}`}
             index={idx}
             id={item.id}
             onChange={makeOnChange(idx)}
@@ -268,6 +269,7 @@ ItemListField.propTypes = {
   scrollable: PropTypes.bool,
   canDisableItem: PropTypes.bool,
   canRemoveItem: PropTypes.func,
+  noId: PropTypes.bool,
 };
 
 ItemListField.defaultProps = {
@@ -275,6 +277,7 @@ ItemListField.defaultProps = {
   sortable: false,
   scrollable: false,
   canDisableItem: false,
+  noId: false,
   canRemoveItem: () => true,
 };
 
@@ -287,10 +290,12 @@ export function FinalItemList(props) {
 FinalItemList.propTypes = {
   name: PropTypes.string.isRequired,
   sortable: PropTypes.bool,
+  noId: PropTypes.bool,
 };
 
 FinalItemList.defaultProps = {
   sortable: false,
+  noId: false,
 };
 
 export function FinalReferences({name, ...rest}) {
@@ -300,6 +305,7 @@ export function FinalReferences({name, ...rest}) {
   return (
     <FinalItemList
       name={name}
+      noId
       itemShape={[
         {
           name: 'type',

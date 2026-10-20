@@ -109,9 +109,8 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
 class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionReference
-        fields = ('id', 'reference_type', 'value')
+        fields = ('reference_type', 'value')
 
-    id = fields.Integer(dump_only=True)  # TODO maybe remove altogether?
     reference_type = ModelField(ReferenceType, data_key='type', required=True)
     value = fields.String(required=True, validate=not_empty)
 

@@ -251,8 +251,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       data.person_links = mapEntryToData({personLinks: data.person_links}, true).person_links;
     }
 
-    data.references = data.references.map((x: any) => _.omit(x, 'id'));
-
     try {
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
