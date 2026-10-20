@@ -13,7 +13,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManagePapers(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/papers/'
     sidemenu_option = 'papers'
-    bundles = ('markdown.js', 'module_events.papers.js')
+    bundles = ('markdown.js', 'module_events.papers.js', 'module_events.papers.css')
 
     def _get_head_content(self):
         return WPEventManagement._get_head_content(self) + MathjaxMixin._get_head_content(self)
