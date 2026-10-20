@@ -19,7 +19,7 @@ const ExternalLink = ({href, children}) => (
 /**
  * This component wraps ReactMarkdown and provides some convenience props.
  */
-const Markdown = ({targetBlank, remarkPlugins, ...props}) => {
+const Markdown = ({targetBlank = false, remarkPlugins = [], ...props}) => {
   if (targetBlank) {
     // XXX: not using linkTarget since that doesn't set noopener
     props.components = {a: ExternalLink, ...props.components};
@@ -36,9 +36,7 @@ Markdown.propTypes = {
 };
 
 Markdown.defaultProps = {
-  targetBlank: false,
   components: {},
-  remarkPlugins: [],
 };
 
 export default Markdown;
