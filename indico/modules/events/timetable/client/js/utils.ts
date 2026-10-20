@@ -237,33 +237,27 @@ export const flattenEntries = (entries: Entry[]): Entry[] => {
 };
 
 function dateFromString(dayString: string) {
-  const date = moment(dayString, 'YYYY-MM-DD');
+  if (dayString === undefined) {
+    return undefined;
+  }
+  const date = moment(dayString, 'YYYY-MM-DD', true);
   return date.isValid() ? date : undefined;
 }
 
-export function parseTimetableURL(eventId: number, path: string): Partial<Navigation> | null {
-  const prefix = timetableURL({event_id: eventId});
-  const subpath = path.replace(prefix.endsWith('/') ? prefix : `${prefix}/`, '');
-  const parts = subpath.substring(0, subpath.length + (subpath.endsWith('/') ? -1 : 0)).split('/');
-  if (parts.length === 1) {
-    const currentDate = dateFromString(parts[0]);
-    if (currentDate !== null) {
-      return {currentDate, isExpanded: false};
-    }
+export function parseTimetableURL(path: string): Partial<Navigation> | null {
+  const {date, session_block_id: sessionBlockId} = timetableURL.match(path);
+  const currentDate = dateFromString(date as string);
+  if (currentDate === undefined) {
     return null;
-  } else if (parts.length === 3) {
-    const [dateString, block, expandedSessionBlockId] = parts;
-    if (block !== 'block') {
-      return null;
-    }
-    const currentDate = dateFromString(dateString);
+  } else if (sessionBlockId === undefined) {
+    return {currentDate, isExpanded: false};
+  } else {
     return {
       currentDate,
       isExpanded: true,
-      expandedSessionBlockId: `s${expandedSessionBlockId}` as SessionBlockId,
+      expandedSessionBlockId: `s${sessionBlockId}` as SessionBlockId,
     };
   }
-  return null;
 }
 
 export function createTimetableURL(
