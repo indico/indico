@@ -18,9 +18,9 @@ import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 import {FormApi} from 'final-form';
 import _ from 'lodash';
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
+import {Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
 
 import {ContributionType} from 'indico/modules/events/timetable/types';
 import {
@@ -496,65 +496,20 @@ export function ContributionCreateForm({
   );
 }
 
-export function EditContributionButton({
-  eventId,
-  contribId,
-  eventTitle,
-  triggerSelector,
-  trigger,
-  ...rest
-}: {
-  eventId: number;
-  contribId: number;
-  eventTitle: string;
-  triggerSelector?: string;
-  trigger?: React.ReactElement;
-}) {
+export function EditContributionButton({eventId, contribId}: {eventId: number; contribId: number}) {
   const [open, setOpen] = useState(false);
-
-  const openEditModal = React.useCallback(() => {
-    setOpen(true);
-  }, []);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-
-    const element = document.querySelector(triggerSelector);
-
-    if (!element) {
-      console.error(`No element matched ${triggerSelector}`);
-      return;
-    }
-
-    const handleClick = (evt: any) => {
-      evt.preventDefault();
-      openEditModal();
-    };
-
-    element.addEventListener('click', handleClick);
-    return () => element.removeEventListener('click', handleClick);
-  }, [triggerSelector, openEditModal]);
 
   return (
     <>
-      {!triggerSelector &&
-        (trigger ? (
-          React.cloneElement(trigger, {
-            ...trigger.props,
-            onClick: e => {
-              e.stopPropagation();
-              trigger.props.onClick?.(e);
-              openEditModal();
-            },
-          })
-        ) : (
-          <Button onClick={openEditModal} {...rest}>
-            <Translate>Edit contribution</Translate>
-          </Button>
-        ))}
-
+      <a
+        className="icon-edit i-link highlight"
+        title={Translate.string('Edit contribution (new React-based dialog)')}
+        onClick={evt => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          setOpen(true);
+        }}
+      />
       {open && (
         <ContributionEditForm
           eventId={eventId}
@@ -566,38 +521,14 @@ export function EditContributionButton({
   );
 }
 
-export function CreateContributionButton({
-  eventId,
-  triggerSelector,
-  ...rest
-}: {
-  eventId: number;
-  triggerSelector?: string;
-}) {
+export function CreateContributionButton({eventId}: {eventId: number}) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    if (!element) {
-      console.error(`No element matched ${triggerSelector}`);
-      return;
-    }
-
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Create contribution</Translate>
-        </Button>
-      )}
+      <button type="button" className="i-button highlight icon-plus" onClick={() => setOpen(true)}>
+        <Translate>New contribution (React)</Translate>
+      </button>
       {open && <ContributionCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
     </>
   );
