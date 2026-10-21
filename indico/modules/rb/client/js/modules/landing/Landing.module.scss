@@ -26,6 +26,13 @@
   align-content: space-between;
   flex-direction: column;
 
+  &.with-upcoming-bookings {
+    height: auto;
+    min-height: calc(
+      100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px)
+    );
+  }
+
   &::before {
     @include rb-splash-background();
     @include remaining-screen-height();
@@ -132,5 +139,12 @@
         }
       }
     }
+  }
+
+  &.with-upcoming-bookings .landing-page-lower-row {
+    height: auto;
+    min-height: 300px;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;
   }
 }
