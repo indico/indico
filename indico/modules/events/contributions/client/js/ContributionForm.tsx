@@ -294,7 +294,6 @@ function ContributionForm({
     formData = {
       ...formData,
       person_links: personLinks,
-      references: formData.references.map(({id, ...refs}: any) => refs),
     };
     const submitPayload = editing ? getChangedValues(formData, form) : formData;
     return await onSubmit(submitPayload);

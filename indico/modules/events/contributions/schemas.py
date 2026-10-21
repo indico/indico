@@ -19,13 +19,14 @@ from indico.modules.events.contributions.models.fields import (ContributionField
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty
 from indico.web.flask.util import url_for
 
 
@@ -108,9 +109,10 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
 class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionReference
-        fields = ('id', 'type', 'value')
+        fields = ('reference_type', 'value')
 
-    type = fields.Integer(attribute='reference_type_id')
+    reference_type = ModelField(ReferenceType, data_key='type', required=True)
+    value = fields.String(required=True, validate=not_empty)
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
