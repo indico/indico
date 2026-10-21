@@ -52,6 +52,9 @@ class RHManageTimetable(RHManageTimetableBase):
 
     @use_kwargs({'set_preference': fields.Bool()}, location='query')
     def _process(self, set_preference=False):
+        # The set_preference field allows switching the default timetable from the legacy
+        # to the new.
+        # TODO: Remove once the legacy timetable is removed
         if set_preference:
             session.user.settings.set('prefer_legacy_timetable', False)
             return redirect(request.base_url)

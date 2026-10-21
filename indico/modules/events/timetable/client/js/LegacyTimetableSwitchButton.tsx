@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// TODO: This file should be removed once the legacy timetable is removed
+
 import legacyTimetableURL from 'indico-url:timetable.management-legacy';
 
 import React, {useEffect, useState} from 'react';
@@ -41,6 +43,7 @@ export function LegacyTimetableSwitchButton({eventId}: {eventId: number}) {
       onOpen={() => setPopupState('visible')}
       open={popupState === 'animating' || popupState === 'visible'}
       on="hover"
+      inverted
       trigger={
         <Menu.Item
           style={{marginTop: 'auto'}}
@@ -51,9 +54,6 @@ export function LegacyTimetableSwitchButton({eventId}: {eventId: number}) {
         </Menu.Item>
       }
     >
-      <Popup.Header>
-        <Translate>Old Timetable</Translate>
-      </Popup.Header>
       <Popup.Content>
         <Translate>You can use this button to switch to the old timetable.</Translate>
       </Popup.Content>

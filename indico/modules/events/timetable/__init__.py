@@ -41,10 +41,12 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if event.type == 'lecture':
         return
 
+    # This allows users to switch between the legacy and the new timetables
+    # TODO: remove once the legacy timetable is removed
     prefer_legacy_timetable = session.user.settings.get('prefer_legacy_timetable')
     if prefer_legacy_timetable or config.DEBUG:
         name = 'timetable-legacy'
-        title = 'Timetable (legacy)' if config.DEBUG else _('Timetable')
+        title = 'Timetable (old)' if config.DEBUG else _('Timetable')
         yield SideMenuItem(name, title, url_for('timetable.management-legacy', event), weight=80, icon='calendar')
 
     if not prefer_legacy_timetable or config.DEBUG:

@@ -64,6 +64,7 @@ function TimetableTabRail() {
             <Icon name="file outline" size="large" />
           </Menu.Item>
         )}
+        {/* TODO: Remove the LegacyTimetableSwitchButton once the legacy timetable is removed */}
         <LegacyTimetableSwitchButton eventId={eventId} />
         <PublicationStateSwitch
           as={Menu.Item}
