@@ -27,7 +27,7 @@ $toolbar-bg-color: $raincloud-gray;
   &.block {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     gap: 0.2rem;
     padding: 0 10px;

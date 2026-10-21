@@ -120,7 +120,7 @@ export function TimetableDayControls({
   }, [currentDayIdxRef]);
 
   return (
-    <div styleName="day-controls">
+    <div styleName={`day-controls ${isSessionBlockExpanded ? 'block' : ''}`}>
       {isSessionBlockExpanded && <SessionBlockToolbar />}
       {!isSessionBlockExpanded && numDays > 1 && (
         <>
