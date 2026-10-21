@@ -117,6 +117,10 @@ export interface UnscheduledContribEntry extends Omit<BaseEntry, 'id' | 'type'> 
 export interface ContribEntry extends Omit<BaseEntry, 'id' | 'type'>, ScheduledMixin {
   id: ContribId;
   type: EntryType.Contribution;
+  references?: {
+    type: number;
+    value: string;
+  };
   attachments: Attachment[];
   sessionId?: number | null;
   boardNumber?: string;
