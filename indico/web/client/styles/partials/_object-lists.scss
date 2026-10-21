@@ -64,7 +64,8 @@
   }
 
   .entry-action-buttons {
-    > a {
+    > a,
+    > ind-edit-contribution > a {
       font-size: 1.2em;
       margin-left: 3px;
     }
