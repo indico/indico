@@ -9,7 +9,8 @@ from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.contributions.schemas import ContributionFieldSchema, ContributionTypeSchema
+from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionReferenceSchema,
+                                                         ContributionTypeSchema)
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
 from indico.util.locations import LocationDataSchema, LocationParentSchema
@@ -141,8 +142,6 @@ class TimetableSerializer:
         return data
 
     def serialize_contribution_entry(self, entry):
-        from indico.modules.events.api import SerializerBase
-
         block = entry.parent.session_block if entry.parent else None
         contribution = entry.contribution
         data = {}
@@ -159,7 +158,7 @@ class TimetableSerializer:
                      'location_data': LocationDataSchema().dump(contribution),
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
-                     'references': list(map(SerializerBase.serialize_reference, contribution.references)),
+                     'references': ContributionReferenceSchema(many=True).dump(contribution.references),
                      'board_number': contribution.board_number})
         if self.api:
             data['authors'] = list(map(self._get_person_data,
@@ -236,7 +235,7 @@ def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
             'session_id': contribution.session.id if contribution.session else None,
             'title': contribution.title,
             'url': url_for('contributions.display_contribution', contribution),
-            'references': [],
+            'references': ContributionReferenceSchema(many=True).dump(contribution.references),
             'location_data': LocationDataSchema().dump(contribution),
             'board_number': contribution.board_number}
 

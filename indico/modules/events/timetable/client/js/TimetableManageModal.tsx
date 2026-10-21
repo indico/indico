@@ -254,6 +254,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     try {
       if (isEditing) {
         const updatedEntry = {...entry, ...mapDataToEntry(data, true)};
+        // TODO: (Ajob) This was missed in a PR. The toast logic below should not be part of
+        //              the handleSubmit and instead have a separate function
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
         const updatePayload = getChangedValues(data, form);

@@ -52,6 +52,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: p => p.map(mapDataToPersonLink),
     toTransform: p => p.map(mapPersonLinkToData),
   },
+  {from: 'references', to: 'references'},
   {
     from: 'location_data',
     to: 'locationData',
