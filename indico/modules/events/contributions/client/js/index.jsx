@@ -22,6 +22,7 @@ import 'indico/react/components/AffiliationPopup';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import PaperSubmissionButton from 'indico/modules/events/papers/components/PaperSubmissionButton';
 import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -30,6 +31,7 @@ import {$T} from 'indico/utils/i18n';
 import {CreateContributionButton, EditContributionButton} from './ContributionForm';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
+
 import './MyContributions';
 import './MyTimetable';
 import './ScheduleContributionIcon';
@@ -81,36 +83,46 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 });
 
+customElements.define(
+  'ind-edit-contribution',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+          <EditContributionButton
+            eventId={+this.getAttribute('event-id')}
+            contribId={+this.getAttribute('contrib-id')}
+          />
+        </UserSearchTokenContext.Provider>,
+        this
+      );
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
+
+customElements.define(
+  'ind-create-contribution',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+          <CreateContributionButton eventId={+this.getAttribute('event-id')} />
+        </UserSearchTokenContext.Provider>,
+        this
+      );
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
+
 (function(global) {
-  global.setupContributionForm = function setupContributionForm(field, trigger) {
-    const element = document.querySelector(field);
-    const {eventId, contribId, eventTitle} = element.dataset;
-
-    ReactDOM.render(
-      <EditContributionButton
-        eventId={+eventId}
-        contribId={contribId && +contribId}
-        eventTitle={eventTitle}
-        triggerSelector={trigger}
-      />,
-      element
-    );
-  };
-
-  global.setupContributionCreateForm = function setupContributionCreateForm(field, trigger) {
-    const element = document.querySelector(field);
-    const {eventId, eventType} = element.dataset;
-
-    ReactDOM.render(
-      <CreateContributionButton
-        eventId={+eventId}
-        eventType={eventType}
-        triggerSelector={trigger}
-      />,
-      element
-    );
-  };
-
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
     const editableSubmissionButton = document.querySelector('#editable-submission-button');
     if (!editableSubmissionButton) {

@@ -110,7 +110,8 @@
     }
 
     .actions-column {
-      width: 6em;
+      // TODO revert to 6em when removing the old edit contrib icon
+      width: 8em;
       box-sizing: initial;
     }
 
