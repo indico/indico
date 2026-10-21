@@ -158,6 +158,27 @@ $toolbar-bg-color: $raincloud-gray;
           }
         }
       }
+
+      .gradient {
+        pointer-events: none;
+        width: 30px;
+        margin-top: 10px;
+        top: 0;
+        bottom: 0;
+        flex-shrink: 0;
+        position: sticky;
+        z-index: 1;
+
+        &:first-child {
+          background: linear-gradient(90deg, $bg-color 30%, transparent);
+          left: 0;
+        }
+
+        &:last-child {
+          background: linear-gradient(-90deg, $bg-color 30%, transparent);
+          right: 0;
+        }
+      }
     }
   }
 }

@@ -77,6 +77,7 @@ export function TimetableDayControls({
   const currentDayIdxRef = useRef<number>(currentDayIdx);
 
   const reachedLastDay = currentDayIdx >= numDays - 1;
+  const gradientWidth = 30;
   const dayWidth = 75;
 
   const getDateFromIdx = (idx: number): Moment => eventStart.clone().add(idx, 'days');
@@ -85,7 +86,7 @@ export function TimetableDayControls({
     if (!daysBarRef.current) {
       return;
     }
-    const barWidth = daysBarRef.current.clientWidth;
+    const barWidth = daysBarRef.current.clientWidth - gradientWidth;
     const left = dayIndex * dayWidth - barWidth / 2 + dayWidth / 2;
     daysBarRef.current.scrollTo({left, behavior});
   };
@@ -109,7 +110,7 @@ export function TimetableDayControls({
       console.error('no daysBarRef');
       return;
     }
-    const daysPerPage = Math.floor(daysBarRef.current.clientWidth / dayWidth);
+    const daysPerPage = Math.floor((daysBarRef.current.clientWidth - gradientWidth) / dayWidth);
     const dayDelta = daysPerPage * pageDelta;
     scrollByDay(dayDelta, behavior);
   };
@@ -141,6 +142,7 @@ export function TimetableDayControls({
           />
           <div styleName="days-wrapper">
             <div ref={daysBarRef} styleName="days">
+              <div styleName="gradient" />
               {[...Array(numDays).keys()].map(n => {
                 const d = getDateFromIdx(n);
                 const isActive = n === currentDayIdx;
@@ -163,6 +165,7 @@ export function TimetableDayControls({
                   </Button>
                 );
               })}
+              <div styleName="gradient" />
             </div>
           </div>
           <Button
