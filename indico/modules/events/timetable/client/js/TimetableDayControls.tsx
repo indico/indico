@@ -29,14 +29,15 @@ interface TimetableDayControlsProps {
 
 function SessionBlockToolbar() {
   const dispatch = useDispatch();
+  const eventId = useSelector(selectors.getEventId);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const {title, sessionId} = expandedSessionBlock ?? {};
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors(expandedSessionBlock, session);
 
   const closeExpandedBlock = useCallback(
-    () => dispatch(actions.setExpandedSessionBlock(null)),
-    [dispatch]
+    () => dispatch(actions.setExpandedSessionBlock(null, eventId)),
+    [dispatch, eventId]
   );
 
   useEffect(() => {
