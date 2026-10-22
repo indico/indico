@@ -22,7 +22,6 @@ import './timetable.scss';
 import './Timetable.module.scss';
 
 export default function Timetable() {
-  const dispatch = useDispatch();
   const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const isExpanded = useSelector(selectors.getIsExpanded);
@@ -68,11 +67,7 @@ export default function Timetable() {
       <NavigationController />
       <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
         <GlobalEvents />
-        <Toolbar
-          onNavigate={d => {
-            dispatch(actions.setCurrentDate(d, eventId));
-          }}
-        />
+        <Toolbar />
         <div styleName="content">
           <DayTimetable
             dt={currentDate}
