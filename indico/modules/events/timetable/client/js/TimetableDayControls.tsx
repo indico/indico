@@ -8,6 +8,7 @@
 import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
 import {Button, Header, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -20,7 +21,6 @@ import {getEntryColors} from './utils';
 import './TimetableDayControls.module.scss';
 
 interface TimetableDayControlsProps {
-  onNavigate: (dt: Moment) => void;
   isSessionBlockExpanded: boolean;
   numDays: number;
   eventStart: Moment;
@@ -67,13 +67,15 @@ function SessionBlockToolbar() {
   );
 }
 
-export function TimetableDayControls({
+function TimetableDayControls({
   isSessionBlockExpanded,
-  onNavigate,
   numDays,
   currentDayIdx,
   eventStart,
 }: TimetableDayControlsProps) {
+  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const eventId = useSelector(selectors.getEventId);
+
   const daysBarRef = useRef<HTMLDivElement | null>(null);
   const currentDayIdxRef = useRef<number>(currentDayIdx);
 
@@ -94,7 +96,7 @@ export function TimetableDayControls({
 
   const navigateToDayNumber = (num: number, scrollBehavior: ScrollBehavior = 'smooth') => {
     scrollToDay(num, scrollBehavior);
-    onNavigate(getDateFromIdx(num));
+    dispatch(actions.setCurrentDate(getDateFromIdx(num), eventId));
   };
 
   const scrollByDay = (dayDelta: number, behavior: ScrollBehavior = 'smooth') => {
@@ -191,3 +193,5 @@ export function TimetableDayControls({
     </div>
   );
 }
+
+export default React.memo(TimetableDayControls);
