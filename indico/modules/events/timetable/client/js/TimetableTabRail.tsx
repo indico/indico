@@ -17,7 +17,7 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import {SidePanelView} from './types';
 
-export default function TimetableTabRail() {
+function TimetableTabRail() {
   const dispatch = useDispatch();
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const showSessions = useSelector(selectors.showSessions);
@@ -76,3 +76,5 @@ export default function TimetableTabRail() {
     </div>
   );
 }
+
+export default React.memo(TimetableTabRail);
