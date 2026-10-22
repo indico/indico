@@ -5,17 +5,21 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime
+
 import pytest
 from flask import request, session
 from marshmallow import fields
+from pytz import utc
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationForm,
                                                                     RHRegistrationWithdraw)
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import ModificationMode
-from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import create_registration
@@ -26,6 +30,44 @@ from indico.util.string import snakify_keys
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
+
+
+@pytest.mark.usefixtures('dummy_reg')
+@pytest.mark.parametrize('invitation_state', (None, InvitationState.pending, InvitationState.declined))
+@pytest.mark.parametrize(('availability', 'settings', 'message'), (
+    ('open', {}, None),
+    ('unopened', {'start_dt': datetime(2026, 1, 3, tzinfo=utc)}, 'The registration period has not started yet.'),
+    ('closed', {'end_dt': datetime(2026, 1, 1, 23, tzinfo=utc)}, 'The registration period has passed.'),
+    ('full', {'registration_limit': 1}, 'There are no more places available.'),
+    ('purged', {'is_purged': True}, 'Registration is disabled due to an expired retention period'),
+))
+def test_registration_form_availability(db, dummy_regform, test_client, freeze_time, invitation_state, availability,
+                                        settings, message):
+    freeze_time(datetime(2026, 1, 2, tzinfo=utc))
+    set_feature_enabled(dummy_regform.event, 'registration', True)
+    dummy_regform.start_dt = datetime(2026, 1, 1, tzinfo=utc)
+    for key, value in settings.items():
+        setattr(dummy_regform, key, value)
+    query = {}
+    if invitation_state is not None:
+        invitation = RegistrationInvitation(registration_form=dummy_regform, state=invitation_state,
+                                            email='invitee@example.test', first_name='Invited', last_name='User',
+                                            affiliation='')
+        db.session.flush()
+        query['invitation'] = str(invitation.uuid)
+
+    response = test_client.get(f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/',
+                               query_string=query)
+
+    assert response.status_code == 200
+    can_register = availability == 'open' or (invitation_state is not None and availability in {'unopened', 'closed'})
+    assert ('id="registration-form-submission-container"' in response.text) == can_register
+    if not can_register:
+        assert message in response.text
+    if invitation_state == InvitationState.declined and availability != 'purged':
+        invitation_message = 'You have declined the invitation, but you may still register for the event.'
+        assert (invitation_message in response.text) == can_register
+        assert ('You have declined the invitation.' in response.text) == (not can_register)
 
 
 @pytest.mark.usefixtures('request_context')

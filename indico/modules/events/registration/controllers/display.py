@@ -452,6 +452,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                invitation=self.invitation,
                                                registration=self.registration,
                                                management=False,
+                                               can_register=self._can_register(),
                                                login_required=self.regform.require_login and not session.user,
                                                is_restricted_access=self.is_restricted_access,
                                                captcha_required=self._captcha_required,
